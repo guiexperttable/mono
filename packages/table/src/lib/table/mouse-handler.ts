@@ -43,6 +43,7 @@ export class MouseHandler {
     this.tableScope.hostElement['_MouseHandler'] = 'true';
 
     this.tableScope.scrollViewport.addEventListener("scroll", this.tableScope.adjustAfterScrolling.bind(this.tableScope));
+    this.tableScope.scrollViewport.addEventListener("wheel", this.tableScope.onWheel.bind(this.tableScope), { passive: false });
 
     [window, this.tableScope.hostElement].forEach(
       ele => ele.addEventListener("resize", this.tableScope.adjustContainersAndRows.bind(this.tableScope))

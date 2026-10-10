@@ -539,6 +539,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   scrollToPixel(px: number, py: number) {
+    if (this.isScrollHeightCapped()) {
+      // py is a content position; the (capped) scroll bar is scaled
+      const contentRange = this.getContentScrollRangeY();
+      const scrollerRange = this.getScrollerRangeY();
+      if (contentRange > 0 && scrollerRange > 0) {
+        const contentTop = Math.min(contentRange, Math.max(0, py));
+        const scrollTop = contentTop / contentRange * scrollerRange;
+        this.scrollViewport.scrollTo(px, scrollTop);
+        this.pendingContentScroll = { scrollTop: this.scrollViewport.scrollTop, contentTop };
+        this.adjustAfterScrolling(); // render the exact position now (a scroll event may not fire)
+        return;
+      }
+    }
     this.scrollViewport.scrollTo(px, py);
   }
 

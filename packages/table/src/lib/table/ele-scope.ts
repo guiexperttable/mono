@@ -11,6 +11,14 @@ import { GeoData } from "./data/geo-data";
  */
 export class EleScope {
 
+  /**
+   * Maximum height (px) of the scrollable content wrapper. Taller tables are scrolled proportionally
+   * (rendering is based on the scroll factor anyway): browsers clamp element heights (Chrome ~33.5 million px)
+   * and GPU rasterization loses precision long before (1px borders disappear and text jitters beyond
+   * ~16.7 million px). 8 million px keep sub-pixel precision.
+   */
+  static maxScrollHeightInPx = 8_000_000;
+
   public scrollViewport: HTMLDivElement;
 
   protected contentWrapperDiv: HTMLDivElement; // the big one. height: sum of rows height == tableModel.getContentHeightInPixel()
@@ -301,7 +309,8 @@ export class EleScope {
    */
   protected resetSizeOfWrapperDiv() {
     const w = `${this.tableModel.getContentWidthInPixel()}px`;
-    const h = `${this.tableModel.getContentHeightInPixel() + 1}px`; // + 1, we want to see the last horizontal border
+    const contentHeight = this.tableModel.getContentHeightInPixel() + 1; // + 1, we want to see the last horizontal border
+    const h = `${Math.min(contentHeight, EleScope.maxScrollHeightInPx)}px`;
     this.dom.setStyle(this.contentWrapperDiv, "width", w);
     this.dom.setStyle(this.contentWrapperDiv, "height", h);
   }

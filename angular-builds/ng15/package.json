@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng15",
+  "version": "15.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 15 -> @guiexpert/angular-table@15.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng15",
+    "build": "node ../../scripts/sync-angular-src.mjs ng15 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag a15"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^15.2.10",
+    "@angular/core": "^15.2.10",
+    "@angular/compiler": "^15.2.10",
+    "@angular/platform-browser": "^15.2.10",
+    "@angular/compiler-cli": "^15.2.10",
+    "ng-packagr": "^15.2.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~4.9.5"
+  }
+}

@@ -1,0 +1,166 @@
+---
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="blackout-demo">
+  <br>
+  <div
+      style="height:450px;width: 900px;margin:36px; "
+      class={id}></div>
+</div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import {TableFactory, TableScope, EventAdapter, TableOptions, SimpleDomService, ColumnDef, Size} from '/scripts/table/index.js';
+
+  const svgSnow = '<svg class="svg-snow" xmlns="http://www.w3.org/2000/svg" height="17" viewBox="0 -960 960 960" width="17"><path d="M440-80v-166L310-118l-56-56 186-186v-80h-80L174-254l-56-56 128-130H80v-80h166L118-650l56-56 186 186h80v-80L254-786l56-56 130 128v-166h80v166l130-128 56 56-186 186v80h80l186-186 56 56-128 130h166v80H714l128 130-56 56-186-186h-80v80l186 186-56 56-130-128v166h-80Z"/></svg>';
+  const svgTree = '<svg class="svg-tree" xmlns="http://www.w3.org/2000/svg" height="17" viewBox="0 -960 960 960" width="17"><path d="M558-80H402v-160H120l160-240h-80l280-400 280 400h-80l160 240H558v160ZM270-320h160-76 252-76 160-420Zm0 0h420L530-560h76L480-740 354-560h76L270-320Z"/></svg>';
+
+
+  const headerData = [ ['','','','','','','','','',''] ];
+  const bodyData = [
+    [
+      { clazz: 'blue',  active: true, selected: false, values: {top: '101', bottom:'25', center:'ARRI S60'}},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '102', bottom:'25', center:'ARRI S60'}, freezed:true},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '103', bottom:'25', center:'ARRI S60'}},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '104', bottom:'25', center:'ARRI S60'}, e1: true, freezed:true },
+      { clazz: 'blue',  active: true, selected: false, values: {top: '105', bottom:'25', center:'ARRI S60'}, e1: true},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '106', bottom:'25', center:'ARRI S60'}, e1: true},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '107', bottom:'25', center:'ARRI S60'}, e1: true},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '108', bottom:'25', center:'ARRI S60'}, exclamation: true},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '109', bottom:'25', center:'ARRI S60'}},
+      { clazz: 'purple',  active: true, selected: false, values: {top: '201', bottom:'25', center:'Astera Titan'}}
+    ],
+    [
+      { clazz: 'purple',  active: true, selected: false, values: {top: '201.1', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: true, values: {top: '201.2', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: true, values: {top: '201.3', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: false, values: {top: '201.4', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: false, values: {top: '201.5', bottom:'55', center:'Astera Titan'}, freezed:true },
+      { clazz: 'purple',  active: true, selected: false, values: {top: '201.6', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: false, values: {top: '208', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'purple',  active: true, selected: false, values: {top: '207', bottom:'55', center:'Astera Titan'}},
+      { clazz: 'red',  active: true, selected: false, values: {top: '301', bottom:'25', center:'Aputure 600d'}},
+      { clazz: 'red',  active: true, selected: false, values: {top: '302', bottom:'100', center:'Aputure 600d'}},
+    ],
+    [
+      { clazz: 'red',  active: true, selected: false, values: {top: '303', bottom:'55', center:'Aputure 600d'}},
+      { clazz: 'red',  active: true, selected: false, values: {top: '304', bottom:'100', center:'Aputure 600d'}, freezed:true },
+      { clazz: 'green',  active: true, selected: false, values: {top: '401', bottom:'100', center:'Kino FreeStyle'}},
+      { clazz: 'green',  active: true, selected: false, values: {top: '402', bottom:'100', center:'Kino FreeStyle'}, freezed:true },
+      { clazz: 'green',  active: true, selected: false, values: {top: '405', bottom:'55', center:'Kino FreeStyle'}},
+      { clazz: 'green',  active: true, selected: false, values: {top: '403', bottom:'55', center:'Kino FreeStyle'}, freezed:true },
+      { clazz: 'green',  active: true, selected: false, values: {top: '404', bottom:'55', center:'Kino FreeStyle'}},
+      { clazz: 'blue',  active: true, selected: false, values: {top: '901', bottom:'25', center:'Kino FreeStyle'}},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '902', bottom:'25', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '903', bottom:'25', center:''}, f: true},
+    ],
+    [
+      { clazz: 'blue',  active: false, selected: false, values: {top: '904', bottom:'25', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '905', bottom:'75', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '909', bottom:'25', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '906', bottom:'25', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '907', bottom:'75', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '908', bottom:'25', center:''}, f: true},
+      { clazz: 'blue',  active: false, selected: false, values: {top: '910', bottom:'25', center:''}, f: true},
+      { clazz: 'green',  active: false, selected: false, values: {top: '131', bottom:'0', center:''}, tree:true },
+      { clazz: 'green',  active: false, selected: false, values: {top: '131', bottom:'0', center:''}, tree:true },
+      { clazz: 'green',  active: false, selected: false, values: {top: '131', bottom:'0', center:''}, tree:true },
+    ],
+  ];
+
+  class BR {
+    render(
+      cellDiv,
+      _rowIndex,
+      _columnIndex,
+      _areaIdent,
+      _areaModel,
+      cellValue,
+      _domService) {
+      if (cellValue) {
+        const item = cellValue;
+        // outer div:
+        const selectionDiv = document.createElement("div");
+        const classNames = ['selection-div', item.selected?'selected':'', item.active?'pointer': ''];
+        selectionDiv.className = classNames.join(' ');
+
+        if (item.active) {
+          selectionDiv.addEventListener('click', (evt) => {
+            if (selectionDiv.classList.contains('selected')) {
+              selectionDiv.classList.remove('selected');
+            } else {
+              selectionDiv.classList.add('selected');
+            }
+            evt.stopPropagation();
+          });
+        }
+
+        // box div:
+        const div = document.createElement("div");
+        const classes = ['box', item.clazz, (!item.active)?'inactive':'', item.freezed?'freezed':''];
+        div.className = classes.join(' ');
+
+        // inner div with 3 sub divs:
+        let {top, center, bottom} = item.values;
+        if (!center) center = '━━━━';
+        const buf = [`
+    <div class="inner-bg">
+      <div class="inner">
+        <div>${top}</div>
+        <div>${center}</div>
+        <div>${bottom}</div>
+      </div>
+    </div>
+    <div class="relative">
+    `];
+        if (item.freezed){
+          buf.push(svgSnow);
+        }
+        if (item.tree){
+          buf.push(svgTree);
+        }
+        if (item.e1){
+          buf.push('<div class="e1">E1</div>');
+        }
+        if (item.f){
+          buf.push('<div class="f">F</div>');
+        }
+        if (item.exclamation){
+          buf.push('<div class="exclamation">!</div>');
+        }
+        buf.push('</div>');
+        div.innerHTML = buf.join('');
+
+        selectionDiv.appendChild(div);
+        cellDiv.appendChild(selectionDiv);
+      }
+      return undefined;
+    }
+  }
+  const bodyRenderer = new BR();
+
+  const tableOptions = {
+    ...new TableOptions(),
+    defaultRowHeights: {
+      header: 0,
+      body: 98,
+      footer: 0
+    }
+  };
+  const tableModel = TableFactory.createTableModel({
+    headerData,
+    bodyData,
+    tableOptions,
+    overridingColumnWidth: 82,
+  });
+  const simpleDomService = new SimpleDomService();
+  const eventAdapter = new EventAdapter();
+  tableModel.bodyAreaModel.getCellRenderer = (_rowIndex, _columnIndex) => bodyRenderer;
+
+  const tableScope = new TableScope(document.querySelector('.'+id), tableModel, simpleDomService, tableOptions, eventAdapter);
+  tableScope.firstInit();
+</script>

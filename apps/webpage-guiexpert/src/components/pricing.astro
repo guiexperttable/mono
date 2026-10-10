@@ -1,0 +1,49 @@
+---
+import ContentSection from "~/components/content-section.astro";
+import PricingCard from "./pricing-card.astro";
+---
+
+<ContentSection
+    title="Pricing"
+    id="pricing"
+    noLead="true">
+
+  <div class="max-w-6xl space-y-2">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+
+      <PricingCard
+          title="MIT License"
+          subTitle="Open Source"
+          price="Free"
+          primary={true}>
+        <p>All features</p>
+        <p>Open source (MIT)</p>
+        <p>Commercial use allowed</p>
+        <p>Community support</p>
+        <a slot="action" href="/license/">License</a>
+      </PricingCard>
+
+    </div>
+  </div>
+
+  <div class="max-w-6xl space-y-2">
+    <br>
+    <br>
+    <h2 class="text-xl">Current releases: Open Source (MIT License)</h2>
+    <p>
+      All currently published versions of GuiExpert Table are released under the MIT License.
+      Everyone &ndash; individuals, organizations and businesses &ndash; may use, modify and distribute
+      them free of charge, including in commercial and proprietary applications.
+    </p>
+
+    <br>
+    <h2 class="text-xl">Future releases: possible dual licensing</h2>
+    <p>
+      Dr. Marc Kronberg (gui.expert) holds the copyright and reserves the right to publish future versions
+      under different license terms, for example a dual-licensing model. Such a change would only apply to
+      versions released after the change is announced. Versions already released under the MIT License
+      remain available under the MIT License. See <a class="underline" href="/license/">License</a>.
+    </p>
+  </div>
+
+</ContentSection>

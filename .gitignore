@@ -1,0 +1,29 @@
+# dependencies & build output
+node_modules
+dist
+build
+**/build
+out-tsc
+.angular/
+.astro/
+.nx/
+
+# credentials – never commit
+.npmrc
+**/.npmrc
+.env
+.env.*
+secret.txt
+
+# generated: Angular build harnesses get their sources from packages/angular-table (scripts/sync-angular-src.mjs)
+angular-builds/*/lib/src/
+angular-builds/*/lib/README.md
+angular-builds/*/lib/LICENSE
+
+# generated: website copies of built libraries (apps/webpage-guiexpert: pnpm pre:build)
+apps/webpage-guiexpert/public/scripts/
+
+# IDE / OS
+.idea/
+.DS_Store
+*.log

@@ -1,0 +1,35 @@
+# Build check for the whole mono repo (no publishing, no secrets).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build core
+        run: pnpm build:core
+
+      - name: Build libraries
+        run: pnpm build:libs
+
+      - name: Build Angular 14 … 22
+        run: pnpm build:angular
+
+      - name: Versions
+        run: pnpm version:check || true

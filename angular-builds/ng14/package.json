@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng14",
+  "version": "14.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 14 -> @guiexpert/angular-table@14.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng14",
+    "build": "node ../../scripts/sync-angular-src.mjs ng14 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag a14"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^14.3.0",
+    "@angular/core": "^14.3.0",
+    "@angular/compiler": "^14.3.0",
+    "@angular/platform-browser": "^14.3.0",
+    "@angular/compiler-cli": "^14.3.0",
+    "ng-packagr": "^14.3.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~4.8.4"
+  }
+}

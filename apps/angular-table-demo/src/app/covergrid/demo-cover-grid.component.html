@@ -1,0 +1,36 @@
+<div
+  #viewportdiv
+  class="viewport-div">
+
+  <guiexpert-table
+    (tableReady)="onTableReady($event)"
+    *ngIf="tableModel"
+    [tableModel]="tableModel"
+    [tableOptions]="tableOptions"
+    class="table-div"
+  ></guiexpert-table>
+
+  <div class="filter-div">
+    <mat-form-field appearance="fill">
+      <mat-label>Filter</mat-label>
+      <input (keyup)="onKeyup()" [(ngModel)]="filterText" matInput>
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="fill"
+      class="dimension-form-field">
+      <mat-label>Thumb size</mat-label>
+      <mat-select
+        (selectionChange)="onDimensionChanged()"
+        [(ngModel)]="thumbsDim">
+          @for (dim of thumbsDims; track dim; let i = $index) {
+            <mat-option
+              [value]="dim">
+              {{ dim.width }} x {{ dim.height }}
+            </mat-option>
+          }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+</div>

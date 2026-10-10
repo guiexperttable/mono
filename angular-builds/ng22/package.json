@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng22",
+  "version": "22.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 22 -> @guiexpert/angular-table@22.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng22",
+    "build": "node ../../scripts/sync-angular-src.mjs ng22 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag latest"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^22.0.1",
+    "@angular/core": "^22.0.1",
+    "@angular/compiler": "^22.0.1",
+    "@angular/platform-browser": "^22.0.1",
+    "@angular/compiler-cli": "^22.0.1",
+    "ng-packagr": "^22.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~6.0.3"
+  }
+}

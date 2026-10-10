@@ -1,0 +1,62 @@
+{
+  "name": "@guiexpert/vue3-table",
+  "version": "3.1.85",
+  "license": "MIT",
+  "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
+  "type": "commonjs",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "lib": {
+    "entryFile": "src/index.ts"
+  },
+  "scripts": {
+    "i": "pnpm i",
+    "patch-version": "node patch.js",
+    "build": "vite build",
+    "npm-pub": "pnpm publish --no-git-checks --access public"
+  },
+  "publishConfig": {
+    "directory": "dist",
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@guiexpert/table": "workspace:^",
+    "vue-i18n": "11.1.2",
+    "vue-router": "^4.1.6"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "vue": "^3.2.47",
+    "@cypress/vue": "^5.0.4",
+    "@intlify/eslint-plugin-vue-i18n": "^2.0.0",
+    "@vitejs/plugin-vue": "^4.4.1",
+    "@vue/eslint-config-typescript": "^12.0.0",
+    "@vue/test-utils": "^2.4.1",
+    "eslint-plugin-vue": "^9.18.1",
+    "unplugin-vue-components": "^0.24.0",
+    "vue-eslint-parser": "^9.1.0",
+    "@types/react": "^18.2.37 || ^19.0.0",
+    "@types/react-dom": "^18.2.15 || ^19.0.0",
+    "vite": "6.3.4",
+    "vite-plugin-dts": "^3.7.2",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-static-copy": "^0.17.0",
+    "vite-tsconfig-paths": "^4.2.1",
+    "vite-plugin-babel": "^1.2.0",
+    "@vitejs/plugin-react": "^4.1.1",
+    "ts-node": "10.9.1",
+    "tsconfig": "^7.0.0",
+    "typescript": "5.2.2",
+    "@babel/core": "~7.28.6"
+  }
+}

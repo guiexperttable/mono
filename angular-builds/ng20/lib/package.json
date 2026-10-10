@@ -1,0 +1,20 @@
+{
+  "name": "@guiexpert/angular-table",
+  "version": "20.1.84",
+  "license": "MIT",
+  "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
+  "peerDependencies": {
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guiexperttable/mono.git",
+    "directory": "angular-builds/ng20"
+  },
+  "homepage": "https://gui.expert"
+}

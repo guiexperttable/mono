@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng16",
+  "version": "16.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 16 -> @guiexpert/angular-table@16.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng16",
+    "build": "node ../../scripts/sync-angular-src.mjs ng16 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag a16"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^16.2.12",
+    "@angular/core": "^16.2.12",
+    "@angular/compiler": "^16.2.12",
+    "@angular/platform-browser": "^16.2.12",
+    "@angular/compiler-cli": "^16.2.12",
+    "ng-packagr": "^16.2.3",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~5.1.6"
+  }
+}

@@ -1,0 +1,8 @@
+# pnpm-workspace.yaml – GuiExpert Table mono repo
+packages:
+  # libraries published to npm (core + framework wrappers + demo models)
+  - 'packages/*'
+  # one build harness per Angular major version (14 … 22) for the shared code in packages/angular-table
+  - 'angular-builds/*'
+  # demo apps and the gui.expert website
+  - 'apps/*'

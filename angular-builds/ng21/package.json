@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng21",
+  "version": "21.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 21 -> @guiexpert/angular-table@21.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng21",
+    "build": "node ../../scripts/sync-angular-src.mjs ng21 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag a21"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "ng-packagr": "^21.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~5.9.3"
+  }
+}

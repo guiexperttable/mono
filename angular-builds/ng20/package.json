@@ -1,0 +1,26 @@
+{
+  "name": "angular-build-ng20",
+  "version": "20.1.84",
+  "private": true,
+  "description": "Build harness: compiles packages/angular-table/src for Angular 20 -> @guiexpert/angular-table@20.x",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../../scripts/sync-angular-src.mjs ng20",
+    "build": "node ../../scripts/sync-angular-src.mjs ng20 && ng-packagr -p lib/ng-package.json -c lib/tsconfig.lib.prod.json",
+    "npm-pub": "npm publish ./dist --access public --tag a20"
+  },
+  "dependencies": {
+    "@guiexpert/table": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@angular/compiler": "^20.0.0",
+    "@angular/platform-browser": "^20.0.0",
+    "@angular/compiler-cli": "^20.0.0",
+    "ng-packagr": "^20.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~5.8.3"
+  }
+}

@@ -95,6 +95,10 @@ export class RenderScope extends EleScope {
   protected colAndRowspanModels: AreaObjectMapType<ColAndRowspanModel> = new AreaObjectMap<ColAndRowspanModel>();
   protected draggingTargetColumnIndex = -1;
   protected mouseEvent?: GeMouseEvent;
+  /** Content pixels scrolled out at the top, i.e. the offset that is actually rendered (see adjustBody). */
+  protected contentScrollTop = 0;
+  /** Exact content position requested by scrollToPixel() for a capped scroll height (see TableScope). */
+  protected pendingContentScroll?: { scrollTop: number; contentTop: number };
   /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
   protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
 
@@ -270,6 +274,16 @@ export class RenderScope extends EleScope {
 
     if (isNaN(this.scrollFactorY)) {
       this.scrollFactorY = 0;
+    }
+    // scrollToPixel() on a capped scroll height: the scroll bar has a coarser resolution than the content,
+    // so we render exactly the requested content position as long as the scroll bar was not moved.
+    if (this.pendingContentScroll) {
+      const range = this.getContentScrollRangeY();
+      if (Math.abs(this.scrollTop - this.pendingContentScroll.scrollTop) <= 1 && range > 0) {
+        this.scrollFactorY = Math.min(1, Math.max(0, this.pendingContentScroll.contentTop / range));
+      } else {
+        this.pendingContentScroll = undefined;
+      }
     }
     if (isNaN(this.scrollFactorX)) {
       this.scrollFactorX = 0;
@@ -500,9 +514,54 @@ export class RenderScope extends EleScope {
     return Math.round(px * dpr) / dpr;
   }
 
+  /**
+   * True if the table content is taller than {@link EleScope.maxScrollHeightInPx}; then the scroll bar is
+   * scaled and scrollTop is no longer a content pixel position.
+   */
+  isScrollHeightCapped(): boolean {
+    return this.tableModel.getContentHeightInPixel() + 1 > EleScope.maxScrollHeightInPx;
+  }
+
+  /** Scrollable range of the content in content pixels (content height minus visible body height). */
+  protected getContentScrollRangeY(): number {
+    return this.tableModel.getContentHeightInPixel() - this.areaBodyCenterGeo.height;
+  }
+
+  /** Scrollable range of the scroll viewport in scroll bar pixels. */
+  protected getScrollerRangeY(): number {
+    return this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight;
+  }
+
+  /**
+   * Mouse wheel on a capped scroll height: scale the wheel delta, so one wheel step still moves the content
+   * by the usual amount of pixels (otherwise it would jump many rows). No-op for normal tables.
+   *
+   * @param {WheelEvent} evt - the wheel event of the scroll viewport
+   */
+  onWheel(evt: WheelEvent) {
+    if (evt.ctrlKey || !this.isScrollHeightCapped()) {
+      return;
+    }
+    const contentRange = this.getContentScrollRangeY();
+    const scrollerRange = this.getScrollerRangeY();
+    if (contentRange <= 0 || scrollerRange <= 0) {
+      return;
+    }
+    const ratio = scrollerRange / contentRange;
+    const unit = evt.deltaMode === 1 ? 16 : evt.deltaMode === 2 ? this.scrollViewport.clientHeight : 1;
+    evt.preventDefault();
+    if (evt.deltaY) {
+      this.scrollViewport.scrollTop += evt.deltaY * unit * ratio;
+    }
+    if (evt.deltaX) {
+      this.scrollViewport.scrollLeft += evt.deltaX * unit;
+    }
+  }
+
   protected adjustBody() {
     const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.tableModel.getContentHeightInPixel();
     const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);
+    this.contentScrollTop = -virtualRowDivTop;
 
     this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
     // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
@@ -1175,7 +1234,9 @@ export class RenderScope extends EleScope {
     if (this.tableOptions.hoverRowVisible && mouseMoveEvent.rowIndex > -1) {
       const width = this.hostElement.clientWidth;
       const rowHeight = this.tableModel.getAreaModel('body').getRowHeight(mouseMoveEvent.rowIndex);
-      const top = mouseMoveEvent.rowTop + this.areaHeaderCenter.parent.clientHeight - this.scrollTop;
+      // with a capped scroll height scrollTop is not a content position – use the rendered offset
+      const scrolledOut = this.isScrollHeightCapped() ? this.contentScrollTop : this.scrollTop;
+      const top = mouseMoveEvent.rowTop + this.areaHeaderCenter.parent.clientHeight - scrolledOut;
       this.dom.applyStyle(this.hoverRow, {
         'left': '0',
         'top': top + 'px',

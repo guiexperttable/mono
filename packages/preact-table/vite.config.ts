@@ -62,7 +62,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ["preact", "preact-dom", "preact/jsx-runtime"]
+      external: ["@guiexpert/table", /^preact($|\/)/]
     }
   },
   resolve: {

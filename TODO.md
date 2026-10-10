@@ -47,9 +47,9 @@
 
 ## Packaging & Doku
 
-- [ ] `packages/table/package.json` → `exports` um `"./css/*": "./css/*"` ergänzen, damit
+- [x] `packages/table/package.json` → `exports` um `"./css/*": "./css/*"` ergänzen, damit
       `import "@guiexpert/table/css/main.css"` in Bundlern funktioniert.
-- [ ] CDN-Links auf der Website (`getstarted/*.md`, Demo-`index.html`) zeigen auf
+- [x] CDN-Links auf der Website (`getstarted/*.md`, Demo-`index.html`) zeigen auf
       `cdn.jsdelivr.net/gh/guiexperttable/ge-table@main/libs/table/css/main.css` – den Ordner `libs/` gibt es nicht
       mehr. → `https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css`.
 - [ ] Repository-Links (README der Pakete, `llms.txt`, Website, `package.json` → `repository`) von `ge-table` bzw.

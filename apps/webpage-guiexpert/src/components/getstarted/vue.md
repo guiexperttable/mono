@@ -31,7 +31,7 @@ you can include the file in the header of the `index.html` file.
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://cdn.jsdelivr.net/gh/guiexperttable/ge-table@main/libs/table/css/main.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css" rel="stylesheet" />
 ```
 
 You will also find the `main.css` in the downloaded node module: `node_modules/@guiexpert/table/css/main.css`.

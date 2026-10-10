@@ -31,7 +31,9 @@
     ".": {
       "import": "./index.js",
       "require": "./index.cjs"
-    }
+    },
+    "./css/*": "./css/*",
+    "./package.json": "./package.json"
   },
   "dependencies": {
     "tslib": "^2.3.0"

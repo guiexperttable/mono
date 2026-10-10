@@ -49,9 +49,8 @@ The core package ships its styles (colors as CSS variables, helper classes such 
   ```html
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css" />
   ```
-- **Bundlers (Vite, webpack)** – copy the file into your assets or import it via a relative path to
-  `node_modules/@guiexpert/table/css/main.css`. (A bare `import "@guiexpert/table/css/main.css"` does not work yet,
-  because the package `exports` field only exposes `"."`.)
+- **Bundlers (Vite, webpack)** – `import "@guiexpert/table/css/main.css";` (from version 1.1.85; older versions only
+  export `"."` – there copy the file or import it via a relative path to `node_modules/@guiexpert/table/css/main.css`).
 
 ### 2.2 The container needs a height
 

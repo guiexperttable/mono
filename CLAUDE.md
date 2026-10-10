@@ -179,7 +179,7 @@ Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { heigh
 
 **Stylesheet:** `@guiexpert/table/css/main.css` (im npm-Paket unter `css/`). Angular (alle Majors aus dem
 Mono-Repo): `table.component.css` wird beim Build aus dem Core-CSS generiert – Anwender binden nichts extra ein. HTML: `https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css`.
-Bare Import `@guiexpert/table/css/main.css` scheitert in Bundlern, weil `exports` nur `"."` freigibt (s. `TODO.md`).
+Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um `./css/*` ergänzt).
 
 ### Angular: ein Quellcode, neun Builds
 - Änderungen am Angular-Wrapper **nur** in `packages/angular-table/src`. Danach `pnpm build:angular` – baut ng14 … ng22.

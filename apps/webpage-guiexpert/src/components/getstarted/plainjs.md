@@ -52,7 +52,7 @@ Here’s a basic example:
     />
     <!-- Alternate: use a CDN: 
     <link
-        href="https://cdn.jsdelivr.net/gh/guiexperttable/ge-table@main/libs/table/css/main.css"
+        href="https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css"
         rel="stylesheet"
     />
     -->
@@ -100,7 +100,7 @@ You can do it by adding this tag in your index.html...
 ```html
 <link 
     crossorigin="anonymous" media="all" rel="stylesheet" 
-    href="https://cdn.jsdelivr.net/gh/guiexperttable/ge-table@main/libs/table/css/main.css" />
+    href="https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css" />
 ```
 
 If you are working with plain JS, you don't need to do this.

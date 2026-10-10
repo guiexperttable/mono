@@ -583,6 +583,17 @@ export class AreaModel implements AreaModelIf {
   }
 
   /**
+   * Returns the row height if all rows have the same height, otherwise `undefined` (default).
+   * Override it together with `getRowHeight()` if your rows have a constant height – this makes rendering
+   * of very large tables independent of the scroll position.
+   *
+   * @returns {number | undefined} `undefined` in the base implementation.
+   */
+  getConstantRowHeight(): number | undefined {
+    return undefined;
+  }
+
+  /**
    * Initializes the area model.
    * This method is called internally by the TableModel during initialization.
    * It can be used to perform any necessary setup, such as calculating row positions.

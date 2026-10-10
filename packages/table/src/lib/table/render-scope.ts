@@ -557,7 +557,20 @@ export class RenderScope extends EleScope {
     }
 
 
-    for (let index = 0; index < rowCount; index++) {
+    // Skip the rows above the viewport. With a constant row height the first visible row can be computed
+    // directly – otherwise we iterate the row heights (O(n), noticeable with millions of rows).
+    let startIndex = 0;
+    const constantRowHeight = areaModel.getConstantRowHeight?.();
+    if (constantRowHeight !== undefined && constantRowHeight > 0 && y < 0) {
+      startIndex = Math.min(rowCount, Math.floor(-y / constantRowHeight));
+      // floating point guard: the row before startIndex must not be visible
+      while (startIndex > 0 && y + startIndex * constantRowHeight > 0) {
+        startIndex--;
+      }
+      y = y + startIndex * constantRowHeight;
+    }
+
+    for (let index = startIndex; index < rowCount; index++) {
       const top = y;
       const lastRowOfModel = index === rowCount - 1;
       const height = this.tableModel.getRowHeight(areaIdent, index);
@@ -658,6 +671,13 @@ export class RenderScope extends EleScope {
         break;
       }
     } // for
+
+    // The loop ended without leaving the viewport (end of table reached or all rows fit):
+    if (areaIdent === 'body' && this.firstVisibleRowIndex > -1 && this.lastVisibleRowIndex === -1) {
+      this.lastVisibleRowIndex = rowCount - 1;
+      this.lastFullVisibleRowIndex = rowCount - 1;
+      this.displayedRowCount = this.lastFullVisibleRowIndex - this.firstFullVisibleRowIndex + 1;
+    }
 
     if (this.loggingActive && areaIdent === 'body') {
       console.log('render scope: this.firstVisibleRowIndex <- ' + this.firstVisibleRowIndex

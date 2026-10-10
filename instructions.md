@@ -404,7 +404,8 @@ class MillionRowsModel extends AreaModel {
 
   override getRowCount(): number { return this.rowCount; }
   override getRowHeight(_rowIndex: number): number { return 34; }
-  override getYPosByRowIndex(rowIndex: number): number { return rowIndex * 34; }
+  override getConstantRowHeight(): number | undefined { return 34; }   // since 1.1.85: constant-time scrolling
+  override getYPosByRowIndex(rowIndex: number): number { return rowIndex * 34; }  // used by scrollToIndex()
   override getValueAt(rowIndex: number, columnIndex: number): string | number {
     return columnIndex === 0 ? "id" + rowIndex : rowIndex * 3;
   }
@@ -418,6 +419,12 @@ const tableModel = TableFactory.createTableModel({
 
 The showcase *Large dataset* (https://gui.expert/showcase/large) does exactly this with 2 million rows
 (`createLargeModelAndOptions` in `@guiexpert/demo-table-models`).
+
+Tips for very large models:
+- Return the row height from `getConstantRowHeight()` if all rows are equally high – the renderer then computes the
+  first visible row directly instead of summing up the heights of all rows above it (2 million rows: rendering at the
+  end of the table drops from ~29 ms to ~15 ms). The built-in models do this automatically.
+- Override `getYPosByRowIndex()` as well; `scrollToIndex()` relies on it (the `AreaModel` default returns 0).
 
 ---
 

@@ -447,6 +447,17 @@ export class AreaModelObjectArray<T>
   }
 
   /**
+   * All rows share `defaultRowHeight` – unless a subclass overrides `getRowHeight()`, then row heights may
+   * vary and `undefined` is returned.
+   *
+   * @returns {number | undefined} The constant row height or `undefined`.
+   */
+  getConstantRowHeight(): number | undefined {
+    const ownImpl = this.getRowHeight === AreaModelObjectArray.prototype.getRowHeight;
+    return ownImpl && this.defaultRowHeight > 0 ? this.defaultRowHeight : undefined;
+  }
+
+  /**
    * Returns the row object at the specified index from the filtered rows array.
    * This method overrides the parent class implementation.
    * 

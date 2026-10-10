@@ -21,8 +21,17 @@
 - [ ] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
       `setFooterVisible()`, `isFooterVisible()` sind leere TODO-Stubs → implementieren
       (Spalte: über `ColumnDef.isVisible` bzw. Breite 0 + `recalcColumnWidths`).
-- [ ] Performance: `RenderScope.adjustArea` iteriert ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
-      Scroll-Frame). Startindex bei konstanter Zeilenhöhe direkt berechnen, sonst Prefix-Summen + Binärsuche.
+- [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
+      Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
+      (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
+- [ ] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
+      Filter/Sortierung/Baum-Toggle beachten).
+- [ ] Performance, Teil 3: Grundlast pro Render hoch (Baum-Modell ~30 ms, Objekt-Array ~10 ms für ~25 sichtbare
+      Zeilen) – mit CPU-Profil analysieren (DOM-Neuaufbau je Scroll, Renderer, Layout-Reads).
+- [ ] `AreaModel.getYPosByRowIndex()` liefert in der Basisklasse 0 → `scrollToIndex()`/`ensureRowIsVisible()` sind für
+      eigene Modelle ohne Override falsch. Default aus `getRowHeight()` berechnen (bzw. `getConstantRowHeight()`).
+- [x] `getLastVisibleRowIndex()`/`getLastFullVisibleRowIndex()` lieferten am Tabellenende bzw. bei wenigen Zeilen −1
+      (Folgefehler in `ensureRowIsVisible`). Behoben im selben Branch.
 - [ ] Sehr große Inhalte (> ~33 Mio px Höhe): Verhalten in Chrome/Firefox/Safari testen, ggf. Höhe deckeln.
 - [ ] `AsyncBodyAreaModelObjectArray` – unfertige Source-Leiche (nicht exportiert, fehlerhafte Indizes).
       Entscheiden: fertigstellen (Server-Side-Row-Model) oder löschen. *(später)*

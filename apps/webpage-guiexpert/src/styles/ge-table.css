@@ -31,7 +31,7 @@ html[data-theme= "light"] {
   --ge-table-body-center-horizontal-border: #bbb;
   --ge-table-body-center-vertical-border: #ddd;
   --ge-table-body-east-horizontal-border: var(--ge-table-header-east-horizontal-border);
-  --ge-table-body-east-vertical-border: var(--ge-table-header-east-vertical-border);;
+  --ge-table-body-east-vertical-border: var(--ge-table-header-east-vertical-border);
 
 
   --ge-table-footer-west-bg: var(--ge-table-header-center-bg);
@@ -118,9 +118,9 @@ html[data-theme= "dark"] {
   --ge-table-footer-west-bg: #111827;
   --ge-table-footer-center-bg: #111827;
   --ge-table-footer-east-bg: #111827;
-  --ge-table-footer-west-text: var(--ge-table-header-center-text);;
-  --ge-table-footer-center-text: var(--ge-table-header-center-text);;
-  --ge-table-footer-east-text: var(--ge-table-header-center-text);;
+  --ge-table-footer-west-text: var(--ge-table-header-center-text);
+  --ge-table-footer-center-text: var(--ge-table-header-center-text);
+  --ge-table-footer-east-text: var(--ge-table-header-center-text);
   --ge-table-footer-west-horizontal-border: oklch(30% 0 0);
   --ge-table-footer-west-vertical-border: oklch(32% 0 0);
   --ge-table-footer-center-horizontal-border: oklch(30% 0 0);
@@ -134,10 +134,10 @@ html[data-theme= "dark"] {
   --ge-table-column-even-bg: transparent;
   --ge-table-hover-column-bg: rgba(0, 224, 255, 0.27);
   --ge-table-hover-row-bg: rgba(0, 224, 255, 0.27);
-  --ge-table-focus-border: rgb(0, 255, 255);;
+  --ge-table-focus-border: rgb(0, 255, 255);
   --ge-table-color-error-text: #ffa8b5;
   --ge-table-tree-arrow-collapsed-color: #ffa8b5;
-  --ge-table-column-resize-handle-border: rgb(0, 255, 255);;
+  --ge-table-column-resize-handle-border: rgb(0, 255, 255);
   --ge-table-dragged-col-div-bg: oklch(0% 0 0);
   --ge-table-drop-zone-bg: oklch(0% 0 0);
 

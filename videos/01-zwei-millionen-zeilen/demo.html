@@ -1,0 +1,80 @@
+<!doctype html>
+<!--
+  Recording page for episode 01 "2 Millionen Zeilen ohne Ruckeln".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/01-zwei-millionen-zeilen/demo.html
+  Keys: E = jump to end, A = auto-scroll on/off, T = jump to top
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – 2,000,000 rows</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #fff; }
+    .bar { display: flex; gap: 12px; align-items: center; padding: 10px 16px; font-size: 15px; }
+    .bar button { font: inherit; padding: 4px 12px; cursor: pointer; }
+    .stat { margin-left: auto; font-variant-numeric: tabular-nums; color: #333; }
+    .table-div { height: calc(100vh - 56px); width: 100%; }
+  </style>
+</head>
+<body>
+<div class="bar">
+  <strong>2,000,000 rows</strong>
+  <button id="top">Top (T)</button>
+  <button id="end">End (E)</button>
+  <button id="auto">Auto-scroll (A)</button>
+  <span class="stat" id="stat"></span>
+</div>
+<div class="table-div"></div>
+
+<script type="module">
+  // Same code as snippet.ts (plain JS for the browser)
+  import { AreaModel, ColumnDef, EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, px120, px200 } from "@guiexpert/table";
+
+  class TwoMillionRows extends AreaModel {
+    getRowCount() { return 2_000_000; }
+    getRowHeight() { return 34; }
+    getConstantRowHeight() { return 34; }     // since 1.1.85: constant-time rendering at any scroll position
+    getYPosByRowIndex(row) { return row * 34; }
+    getValueAt(row, col) { return col === 0 ? `#${row.toLocaleString("en-US")}` : (row * 7).toLocaleString("en-US"); }
+  }
+
+  const tableModel = TableFactory.createTableModel({
+    bodyAreaModel: new TwoMillionRows(),
+    columnDefs: [new ColumnDef("id", "ID", px120), new ColumnDef("value", "Value", px200)]
+  });
+  // measure render time (must wrap the prototype before the scope binds its scroll listener)
+  let renders = 0, renderMs = 0;
+  const origRender = TableScope.prototype.adjustAfterScrolling;
+  TableScope.prototype.adjustAfterScrolling = function () {
+    const t = performance.now(); origRender.call(this); renderMs += performance.now() - t; renders++;
+  };
+
+  const host = document.querySelector(".table-div");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+  scope.firstInit();
+  const api = scope.getApi();
+
+  // --- recording helpers: render time + FPS -------------------------------------------------
+  const vp = scope.scrollViewport, stat = document.getElementById("stat");
+  let frames = 0, last = performance.now(), auto = false;
+  function loop(now) {
+    frames++;
+    if (auto) vp.scrollTop += 2500;                       // ~75 rows per frame
+    if (auto && vp.scrollTop + vp.clientHeight >= vp.scrollHeight) vp.scrollTop = 0;
+    if (now - last >= 1000) {
+      stat.textContent = `${frames} fps · ${(renders ? renderMs / renders : 0).toFixed(1)} ms/render · first row ${api.getFirstVisibleRowIndex().toLocaleString("en-US")}`;
+      frames = 0; renders = 0; renderMs = 0; last = now;
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  const go = { top: () => (vp.scrollTop = 0), end: () => (vp.scrollTop = vp.scrollHeight), auto: () => (auto = !auto) };
+  for (const id of Object.keys(go)) document.getElementById(id).onclick = go[id];
+  addEventListener("keydown", e => ({ t: go.top, e: go.end, a: go.auto })[e.key.toLowerCase()]?.());
+  window.SCOPE = scope;
+</script>
+</body>
+</html>

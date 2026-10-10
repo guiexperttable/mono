@@ -487,9 +487,22 @@ export class RenderScope extends EleScope {
    * @protected
    * @return {void}
    */
+  /**
+   * Rounds a pixel offset to whole device pixels. The scroll offsets are derived from a scroll factor and are
+   * fractional; rows and cells placed at fractional positions render blurry text and 1px borders.
+   *
+   * @param {number} px - offset in CSS pixels
+   * @returns {number} offset snapped to the device pixel grid
+   * @protected
+   */
+  protected snapToDevicePixel(px: number): number {
+    const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    return Math.round(px * dpr) / dpr;
+  }
+
   protected adjustBody() {
     const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.tableModel.getContentHeightInPixel();
-    const virtualRowDivTop = this.scrollFactorY * virtualRowDivTopF1;
+    const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);
 
     this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
     // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
@@ -727,7 +740,7 @@ export class RenderScope extends EleScope {
           } else {
             // Center:
             const virtualRowDivLeftF1 = this.areaBodyCenterGeo.width - this.tableModel.getContentWidthInPixel();
-            xStart = (this.scrollFactorX * virtualRowDivLeftF1) - this.areaBodyWestGeo.width;
+            xStart = this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1) - this.areaBodyWestGeo.width;
             sideIdent = 'center';
           }
           this.drawBigCell(range, xStart, yStart, areaModel, child, sideIdent);
@@ -880,7 +893,7 @@ export class RenderScope extends EleScope {
     let virtualRowDivLeft = 0;
     if (!verticalFixed) {
       const virtualRowDivLeftF1 = (this.areaBodyCenterGeo.width) - this.tableModel.getContentWidthInPixel();
-      virtualRowDivLeft = this.scrollFactorX * virtualRowDivLeftF1;
+      virtualRowDivLeft = this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1);
     }
 
     const top = 0;

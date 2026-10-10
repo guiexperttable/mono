@@ -3,6 +3,12 @@
   "version": "1.1.85",
   "license": "MIT",
   "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guiexperttable/mono.git",
+    "directory": "packages/webcomponent-table"
+  },
+  "homepage": "https://gui.expert",
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",

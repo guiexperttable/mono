@@ -56,7 +56,7 @@ import {
 import { onMounted, reactive } from "vue";
 import { TableModelState } from '../../../common/table-model-state.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/treetable/TreeTable.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/treetable/TreeTable.vue';
 const state = reactive<TableModelState>({
   tableModel: undefined,
   tableOptions: new TableOptions(),

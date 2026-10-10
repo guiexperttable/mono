@@ -21,7 +21,7 @@ import { TableFactory, TableOptions, TableOptionsIf } from '@guiexpert/table';
 import { onMounted, reactive } from 'vue';
 import { TableModelState } from '../../../common/table-model-state.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/autotable/AutoTable1.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/autotable/AutoTable1.vue';
 
 const state = reactive<TableModelState>({
   tableModel: undefined,

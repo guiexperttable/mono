@@ -22,7 +22,7 @@ import {
 } from "@guiexpert/table";
 import { generateTreeCheckboxModel } from '@guiexpert/demo-table-models';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/treecheckbox/TreeTableCheckbox.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/treecheckbox/TreeTableCheckbox.vue';
 const tableOptions: TableOptionsIf = {
   ...new TableOptions(),
   hoverColumnVisible: false,

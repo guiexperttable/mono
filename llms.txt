@@ -4,7 +4,7 @@
 @guiexpert/table is a UI-agnostic table component for web applications. It's designed to handle large datasets with excellent performance through virtual scrolling. The project is part of the GuiExpert Table Project, which provides table components for various frameworks.
 
 ## Repository
-- Repository URL: https://github.com/guiexperttable/ge-table
+- Repository URL: https://github.com/guiexperttable/mono
 - License: MIT (current releases; future releases may be dual-licensed, see https://gui.expert/license/)
 
 ## Project Structure

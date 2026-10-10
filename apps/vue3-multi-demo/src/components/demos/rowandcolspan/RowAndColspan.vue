@@ -24,7 +24,7 @@ import {
 import { DemoRowAndColspanAreaModel } from './demo-row-and-colspan-area-model.ts';
 
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/rowandcolspan/RowAndColspan.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/rowandcolspan/RowAndColspan.vue';
 const rowCount = 100;
 const columnCount = 100;
 

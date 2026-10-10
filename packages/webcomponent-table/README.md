@@ -7,7 +7,7 @@ This is the Web Component of the GuiExpert Table Project.
 
 This is the UI-agnostic table component for your next web app. 😊
 
-<img src="https://raw.githubusercontent.com/guiexperttable/ge-table/main/apps/webpage-guiexpert/src/assets/screens/heatmap.png" width="50%">
+<img src="https://raw.githubusercontent.com/guiexperttable/mono/main/apps/webpage-guiexpert/src/assets/screens/heatmap.png" width="50%">
 
 ### Features
 - Handle large datasets easily
@@ -103,6 +103,6 @@ Please refer to the [Documentation](https://gui.expert/doc) for further informat
 
 ## License
 
-**Current releases: MIT License.** All currently published versions are free to use, modify and distribute – also in commercial and proprietary applications. See [LICENSE](https://github.com/guiexperttable/ge-table/blob/main/LICENSE).
+**Current releases: MIT License.** All currently published versions are free to use, modify and distribute – also in commercial and proprietary applications. See [LICENSE](https://github.com/guiexperttable/mono/blob/main/LICENSE).
 
 **Future releases: possible dual licensing.** Dr. Marc Kronberg (gui.expert) reserves the right to publish future versions under different terms (e.g. open source for individuals and non-commercial use, commercial license for businesses). Versions already released under MIT remain MIT. Details: [gui.expert/license](https://gui.expert/license/).

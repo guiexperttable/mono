@@ -35,7 +35,7 @@ const state = reactive<CrudTableModelState>({
   tableOptions: undefined,
   crudTableModelFactory: undefined,
 });
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/crud/Crud2.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/crud/Crud2.vue';
 
 function onCreateClicked(){
   state.crudTableModelFactory?.openDialogForCreate();

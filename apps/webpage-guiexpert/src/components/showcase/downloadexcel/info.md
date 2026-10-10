@@ -3,7 +3,7 @@ layout: ../../../layouts/DemoCodeLayout.astro
 ---
 
 
-Source of demo: [idfilter/run.astr](https://github.com/guiexperttable/ge-table/blob/main/apps/webpage-guiexpert/src/components/showcase/downloadexcel/run.astro).
+Source of demo: [idfilter/run.astr](https://github.com/guiexperttable/mono/blob/main/apps/webpage-guiexpert/src/components/showcase/downloadexcel/run.astro).
 
 In this example we demonstrate the excel export:
 

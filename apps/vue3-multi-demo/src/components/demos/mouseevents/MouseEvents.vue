@@ -27,7 +27,7 @@ import { GeMouseEvent, TableFactory } from '@guiexpert/table';
 import { DemoMouseeventAreaModel } from './demo-mouseevent-area-model.ts';
 import { ref } from 'vue';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/mouseevents/MouseEvents.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/mouseevents/MouseEvents.vue';
 
 function onContextmenu(evt: GeMouseEvent) {
   debugEvent(evt, 'onContextmenu');

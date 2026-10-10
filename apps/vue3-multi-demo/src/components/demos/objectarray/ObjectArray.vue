@@ -27,7 +27,7 @@ import { SimplePersonIf } from './simple-person.if.ts';
 import { onMounted, reactive, ref } from 'vue';
 import { TableModelState } from '../../../common/table-model-state.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/objectarray/ObjectArray.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/objectarray/ObjectArray.vue';
 
 const state = reactive<TableModelState>({
   tableModel: undefined,

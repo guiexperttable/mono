@@ -26,7 +26,7 @@ import { GuiexpertTable } from "@guiexpert/vue3-table";
 import { GeMouseEvent, TableApi } from "@guiexpert/table";
 import { generateSimpleModel } from "@guiexpert/demo-table-models";
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/simple/Simple.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/simple/Simple.vue';
 
 function onTableReady(api: TableApi) {
   console.info("demo onTableReady", api);

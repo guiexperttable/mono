@@ -52,7 +52,7 @@
 - [x] CDN-Links auf der Website (`getstarted/*.md`, Demo-`index.html`) zeigen auf
       `cdn.jsdelivr.net/gh/guiexperttable/ge-table@main/libs/table/css/main.css` – den Ordner `libs/` gibt es nicht
       mehr. → `https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css`.
-- [ ] Repository-Links (README der Pakete, `llms.txt`, Website, `package.json` → `repository`) von `ge-table` bzw.
+- [x] Repository-Links (README der Pakete, `llms.txt`, Website, `package.json` → `repository`) von `ge-table` bzw.
       `angular-XX-table` auf `guiexperttable/mono` umstellen. `public/llms.txt` verlinkt
       `guiexperttable/angular-table` (existiert nicht).
 - [ ] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen.

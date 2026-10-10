@@ -40,7 +40,7 @@ import { onMounted, reactive } from 'vue';
 import WidthResizeBox from '../../resizebox/WidthResizeBox.vue';
 import { TableModelArrayState } from '../../../common/table-model-array-state.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/columnsizes/ColumnSizes.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/columnsizes/ColumnSizes.vue';
 
 const state = reactive<TableModelArrayState>({
   tableModels: [undefined, undefined, undefined, undefined]

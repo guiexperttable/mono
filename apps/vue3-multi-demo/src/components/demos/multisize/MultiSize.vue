@@ -19,7 +19,7 @@ import { GuiexpertTable } from "@guiexpert/vue3-table";
 import { DefaultRowHeights, TableFactory } from '@guiexpert/table';
 import { DemoMultisizeAreaModel } from './demo-multisize-area-model.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/multisize/MultiSize.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/multisize/MultiSize.vue';
 const rowCount = 50;
 const colCount = 50;
 const columnSizes: number[] = [colCount];

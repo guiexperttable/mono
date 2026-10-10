@@ -19,7 +19,7 @@ import { DefaultRowHeights, TableFactory } from '@guiexpert/table';
 import { DemoStyleAreaModel } from './demo-style-area-model.ts';
 import { DemoStyleColorCellRenderer } from './demo-style-color-cell-renderer.ts';
 
-const gitUrl = 'https://github.com/guiexperttable/ge-table/blob/main/apps/vue3-multi-demo/src/components/demos/style/CssStyle.vue';
+const gitUrl = 'https://github.com/guiexperttable/mono/blob/main/apps/vue3-multi-demo/src/components/demos/style/CssStyle.vue';
 const size = 40
 
 const tableModel = TableFactory.createTableModel({

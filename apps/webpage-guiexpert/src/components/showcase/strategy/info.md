@@ -2,7 +2,7 @@
 layout: ../../../layouts/DemoCodeLayout.astro
 ---
 
-Source of demo: [strategy/run.astro](https://github.com/guiexperttable/ge-table/blob/main/apps/webpage-guiexpert/src/components/showcase/strategy/run.astro).
+Source of demo: [strategy/run.astro](https://github.com/guiexperttable/mono/blob/main/apps/webpage-guiexpert/src/components/showcase/strategy/run.astro).
 
 
 This example takes inspiration from: https://spread-grid.tomasz-rewak.com/examples/plotter

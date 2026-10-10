@@ -36,7 +36,7 @@
       für die neueste Major, sonst `aNN`. Bis dahin lokal: `pnpm build:angular` + `pnpm pub:angular`.
 - [ ] Versionen angleichen: `pnpm version:check` meldet 6 Abweichungen (einige Pakete schon auf x.1.85, nie
       veröffentlicht). Beim nächsten Release `pnpm version:patch` → alles x.1.85.
-- [ ] `@guiexpert/angular-table` sollte `@guiexpert/table` als `peerDependency` deklarieren (heute muss man es
+- [x] `@guiexpert/angular-table` sollte `@guiexpert/table` als `peerDependency` deklarieren (heute muss man es
       manuell mitinstallieren).
 - [ ] Dependency-Hygiene: Babel-7-Pin (`@babel/core ~7.28.6` in 16 package.json) entfernen, sobald
       `vite-plugin-babel` Babel 8 unterstützt; Override `@jridgewell/sourcemap-codec ^1.6.0` entfernen, sobald

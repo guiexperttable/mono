@@ -37,7 +37,7 @@
     "@guiexpert/table": "workspace:^"
   },
   "peerDependencies": {
-    "svelte": "^4.0.0 || ^5.0.0"
+    "svelte": "^4.0.0"
   },
   "devDependencies": {
     "svelte": "^4.2.19",

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import { EventListenerIf, FocusModelIf, LicenseManager, SelectionModelIf, SimpleDomService, TableOptions, TableScope } from '../../table/src'; // "@guiexpert/table";
+  import { EventListenerIf, FocusModelIf, LicenseManager, SelectionModelIf, SimpleDomService, TableOptions, TableScope } from '@guiexpert/table';
 
   export let tableModel: any;
   export let tableOptions = new TableOptions();

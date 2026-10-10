@@ -18,7 +18,7 @@ import {
   TableModelIf, TableOptionsIf,
   GeScrollEvent
 } from '@guiexpert/table';
-import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { defineComponent, onBeforeUnmount, onMounted, PropType, ref } from 'vue';
 
 
 export default defineComponent({
@@ -33,8 +33,13 @@ export default defineComponent({
       default: new TableOptions(),
       type: Object as PropType<TableOptionsIf>
     },
+    /**
+     * Debounce time for `mouseClicked` in ms (like the Angular wrapper): only the last click within this time is
+     * emitted, so a double click emits one event with `clickCount === 2`. `0` emits every click immediately.
+     */
     debounceMouseClickDelay: {
       required: false,
+      type: Number,
       default: 150
     },
     licenseKey: {
@@ -58,6 +63,24 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const root = ref(null);
+    let clickTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const emitMouseClicked = (evt: GeMouseEvent) => {
+      const delay = props.debounceMouseClickDelay;
+      if (!delay || delay <= 0) {
+        emit("mouseClicked", evt);
+        return;
+      }
+      if (clickTimer) clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => {
+        clickTimer = undefined;
+        emit("mouseClicked", evt);
+      }, delay);
+    };
+
+    onBeforeUnmount(() => {
+      if (clickTimer) clearTimeout(clickTimer);
+    });
 
     const initTable = (ele: HTMLDivElement) => {
 
@@ -84,7 +107,7 @@ export default defineComponent({
         },
 
         onMouseClicked: (evt: GeMouseEvent) => {
-          emit("mouseClicked", evt);
+          emitMouseClicked(evt);
         },
 
         onMouseDragging: (evt: GeMouseEvent) => {

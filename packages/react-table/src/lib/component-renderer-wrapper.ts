@@ -1,4 +1,5 @@
 import { AreaIdent, AreaModelIf, CellRendererIf, DomServiceIf, RendererCleanupFnType } from "@guiexpert/table";
+import { createElement } from "react";
 import { createRoot } from "react-dom/client";
 
 
@@ -7,7 +8,6 @@ export class ComponentRendererWrapper implements CellRendererIf {
   constructor(
     private readonly Component: any
   ) {
-    console.info(Component);
   }
 
   render(
@@ -28,7 +28,7 @@ export class ComponentRendererWrapper implements CellRendererIf {
       cellValue
     };
     const root = createRoot(cellDiv, {});
-    root.render(this.Component(props));
+    root.render(createElement(this.Component, props)); // render as element, so hooks work in cell components
 
     return () => {
       root.unmount();

@@ -25,12 +25,12 @@ export class ComponentRendererWrapper implements CellRendererIf {
       areaModel,
       cellValue
     });
-    render(
+    const dispose = render(
       () => this.code(props),
       cellDiv
     );
 
-    return undefined;
+    return dispose; // clean up the Solid root when the cell is re-rendered
   }
 
 

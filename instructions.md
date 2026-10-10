@@ -17,7 +17,7 @@ How to display large tabular data sets in web applications with `@guiexpert/tabl
 | `@guiexpert/react-table` | React 18 / 19 | `react`, `react-dom` |
 | `@guiexpert/preact-table` | Preact 10 | `preact` |
 | `@guiexpert/solid-table` | Solid 1 | `solid-js` |
-| `@guiexpert/svelte-table` | Svelte 4 | `svelte` |
+| `@guiexpert/svelte-table` | Svelte 4 (Svelte 5: not yet) | `svelte` |
 | `@guiexpert/vue3-table` | Vue 3 | `vue` |
 | `@guiexpert/webcomponent-table` | Custom Element for plain JS/TS or any other framework | – |
 | `@guiexpert/demo-table-models` | Ready-made demo models (large data set, heatmap, tree, …) – handy for prototypes | – |
@@ -218,9 +218,9 @@ function onMouseClicked(evt: GeMouseEvent) { console.info(evt.rowIndex, evt.colu
 
 Alternatively register it globally with the default export plugin:
 `app.use(GuiexpertTablePlugin)` (`import GuiexpertTablePlugin from "@guiexpert/vue3-table"`).
-Props: `tableModel`, `tableOptions`, `licenseKey`. Events: `tableReady`, `mouseClicked`, `mouseMoved`,
-`contextmenu`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`, `modelChanged`, `selectionChanged`,
-`focusChanged`, `scroll`. (`debounceMouseClickDelay` is declared but currently has no effect in the Vue wrapper.)
+Props: `tableModel`, `tableOptions`, `debounceMouseClickDelay` (default 150 ms, `0` = every click immediately; since
+1.1.85), `licenseKey`. Events: `tableReady`, `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`,
+`mouseDraggingEnd`, `checkboxChanged`, `modelChanged`, `selectionChanged`, `focusChanged`, `scroll`.
 
 ### 4.5 Svelte
 
@@ -268,8 +268,8 @@ export function SimpleTable() {
 
 ### 4.7 Solid
 
-The Solid wrapper dispatches all events as bubbling DOM `CustomEvent`s (payload in `detail`) instead of calling
-callback props – listen on a surrounding element:
+Same callback props as React (since 1.1.85; additionally every event is dispatched as bubbling DOM `CustomEvent`
+on the container, as in earlier versions):
 
 ```tsx
 import { GuiexpertTable } from "@guiexpert/solid-table";
@@ -277,10 +277,13 @@ import { TableOptions } from "@guiexpert/table";
 import { generateSimpleModel } from "@guiexpert/demo-table-models";
 
 export function SimpleTable() {
-  const onReady = (e: Event) => console.info("ready", (e as CustomEvent).detail);
   return (
-    <div class="table-div" ref={(el) => el.addEventListener("tableReady", onReady)}>
-      <GuiexpertTable tableModel={generateSimpleModel(1000, 100)} tableOptions={new TableOptions()} />
+    <div class="table-div">
+      <GuiexpertTable
+        tableModel={generateSimpleModel(1000, 100)}
+        tableOptions={new TableOptions()}
+        tableReady={(api) => console.info("ready", api)}
+        mouseClicked={(evt) => console.info(evt)} />
     </div>
   );
 }
@@ -541,7 +544,7 @@ const tableOptions: TableOptionsIf = {
 | Event | Payload | Notes |
 |---|---|---|
 | `tableReady` | `TableApi` | once, after the first render |
-| `mouseClicked` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`, `originalEvent`) | debounced in Angular (`debounceMouseClickDelay`, default 150 ms) |
+| `mouseClicked` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`, `originalEvent`) | debounced in Angular and Vue (`debounceMouseClickDelay`, default 150 ms) |
 | `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded` |
 | `checkboxChanged` | `any[]` (checked rows) | tree/row checkboxes |
 | `modelChanged` | `GeModelChangeEvent` | e.g. after inline editing |

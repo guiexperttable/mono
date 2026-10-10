@@ -2,7 +2,7 @@ import {GuiexpertTableProps} from "./GuiexpertTableProps";
 import {mergeProps, onMount} from "solid-js";
 import {
   EventListenerIf,
-  FocusModelIf, GeScrollEvent,
+  FocusModelIf, GeModelChangeEvent, GeMouseEvent, GeScrollEvent,
   LicenseManager,
   SelectionModelIf,
   SimpleDomService,
@@ -29,64 +29,33 @@ export default (props: GuiexpertTableProps) => {
 
 
   onMount(() => {
+    /**
+     * Calls the callback prop (e.g. `mouseClicked={...}`) and – for backward compatibility – also dispatches
+     * the event as bubbling DOM CustomEvent on the container div.
+     */
+    const emit = (name: string, detail: any, callback?: (detail: any) => unknown) => {
+      if (callback) callback(detail);
+      if (ref) ref.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
+    };
+
     const listener: EventListenerIf = {
-      onSelectionChanged(model: SelectionModelIf): void {
-        const e = new CustomEvent("selectionChanged", { detail: model, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onScroll(model: GeScrollEvent): void {
-        const e = new CustomEvent("scroll", { detail: model, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onFocusChanged(model: FocusModelIf): void{
-        const e = new CustomEvent("focusChanged", { detail: model, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onCheckboxChanged: (evt: any) => {
-        const e = new CustomEvent("checkboxChanged", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onContextmenu: (evt: any) => {
-        const e = new CustomEvent("contextmenu", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onModelChanged: (evt: any) => {
-        const e = new CustomEvent("modelChanged", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onMouseClicked: (evt: any) => {
-        const e = new CustomEvent("mouseClicked", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onMouseDragging: (evt: any) => {
-        const e = new CustomEvent("mouseDragging", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onMouseDraggingEnd: (evt: any) => {
-        const e = new CustomEvent("mouseDraggingEnd", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      },
-
-      onMouseMoved: (evt: any) => {
-        const e = new CustomEvent("mouseMoved", { detail: evt, bubbles: true });
-        if (ref) ref.dispatchEvent(e);
-      }
+      onSelectionChanged: (model: SelectionModelIf) => emit("selectionChanged", model, merged.selectionChanged),
+      onFocusChanged: (model: FocusModelIf) => emit("focusChanged", model, merged.focusChanged),
+      onScroll: (evt: GeScrollEvent) => emit("scroll", evt, merged.scroll),
+      onCheckboxChanged: (evt: any[]) => emit("checkboxChanged", evt, merged.checkboxChanged),
+      onContextmenu: (evt: GeMouseEvent) => emit("contextmenu", evt, merged.contextmenu),
+      onModelChanged: (evt: GeModelChangeEvent) => emit("modelChanged", evt, merged.modelChanged),
+      onMouseClicked: (evt: GeMouseEvent) => emit("mouseClicked", evt, merged.mouseClicked),
+      onMouseDragging: (evt: GeMouseEvent) => emit("mouseDragging", evt, merged.mouseDragging),
+      onMouseDraggingEnd: (evt: GeMouseEvent) => emit("mouseDraggingEnd", evt, merged.mouseDraggingEnd),
+      onMouseMoved: (evt: GeMouseEvent) => emit("mouseMoved", evt, merged.mouseMoved)
     };
 
     const tableScope = new TableScope(
       ref, merged.tableModel, new SimpleDomService(), merged.tableOptions, listener
     );
     tableScope.firstInit();
-    const e = new CustomEvent("tableReady", { detail: tableScope.getApi(), bubbles: true });
-    if (ref) ref.dispatchEvent(e);
+    emit("tableReady", tableScope.getApi(), merged.tableReady);
 
     if (merged.licenseKey) LicenseManager.getInstance().setLicenseKey(merged.licenseKey);
   });

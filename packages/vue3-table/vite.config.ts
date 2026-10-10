@@ -54,7 +54,7 @@ export default  defineConfig({
     },
     rollupOptions: {
       // externalize deps that shouldn't be bundled
-      external: ["vue"],
+      external: ["@guiexpert/table", /^vue($|\/)/],
       output: {
         // globals to use in the UMD build for externalized deps
         globals: {

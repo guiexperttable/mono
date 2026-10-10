@@ -260,6 +260,7 @@ export class RenderScope extends EleScope {
 
     this.scrollTop = this.scrollViewport.scrollTop;
     this.scrollLeft = this.scrollViewport.scrollLeft;
+    this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
     this.debounce(this.checkForScrollPosSaving.bind(this));
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
@@ -856,7 +857,8 @@ export class RenderScope extends EleScope {
     //   console.info('##################')
     // }
 
-    this.scrollViewportLeft = this.scrollViewport.scrollLeft;
+    // Note: do not read layout properties (scrollLeft, clientWidth, …) here – this method runs for every row
+    // after new cells were appended, so each read would force a synchronous layout (layout thrashing).
     let virtualRowDivLeft = 0;
     if (!verticalFixed) {
       const virtualRowDivLeftF1 = (this.areaBodyCenterGeo.width) - this.tableModel.getContentWidthInPixel();

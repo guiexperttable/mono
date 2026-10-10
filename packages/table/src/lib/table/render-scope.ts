@@ -95,6 +95,8 @@ export class RenderScope extends EleScope {
   protected colAndRowspanModels: AreaObjectMapType<ColAndRowspanModel> = new AreaObjectMap<ColAndRowspanModel>();
   protected draggingTargetColumnIndex = -1;
   protected mouseEvent?: GeMouseEvent;
+  /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
+  protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
 
   private debounceTimeout?: ReturnType<typeof setTimeout> | null;
   private editorRenderer?: CellRendererIf;
@@ -273,34 +275,48 @@ export class RenderScope extends EleScope {
       this.scrollFactorX = 0;
     }
 
-    this.adjustBody();
-    this.adjustArea('footer');
-    this.adjustArea('header');
-
+    // Read all geometry BEFORE the DOM is modified: every layout read after a modification forces a
+    // synchronous layout of the whole table (before: ~5 forced layouts per scroll frame, now 1).
+    const hostWidth = this.hostElement.clientWidth;
+    const hostHeight = this.hostElement.clientHeight;
+    const westWidth = this.areaBodyWest.child.clientWidth;
+    const headerHeight = this.areaHeaderCenter.child.clientHeight;
+    this.areaHeightsOfRenderPass = {
+      body: this.areaBodyCenter.child.clientHeight,
+      footer: this.areaFooterCenter.child.clientHeight,
+      header: headerHeight
+    };
+    try {
+      this.adjustBody();
+      this.adjustArea('footer');
+      this.adjustArea('header');
+    } finally {
+      this.areaHeightsOfRenderPass = undefined;
+    }
 
     if (this.tableOptions.tableTopBorderVisible) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, 0),
+        new GeoData(0, hostWidth, 1, 0),
         this.hostElement,
         'ge-table-border'));
     }
     if (this.tableOptions.tableBottomBorderVisible) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, this.hostElement.clientHeight - 1),
+        new GeoData(0, hostWidth, 1, hostHeight - 1),
         this.hostElement,
         'ge-table-border'));
     }
     // The border between east and center in  header/body/footer (full height):
     if (this.tableModel.getFixedLeftColumnCount() > 0) {
       this.removables.push(this.dom.addVerticalBorder(
-        new GeoData(this.areaBodyWest.child.clientWidth, 1, this.hostElement.clientHeight, 0),
+        new GeoData(westWidth, 1, hostHeight, 0),
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
     // The border between header and body (full width):
     if (this.tableModel.getAreaModel('header')?.getRowCount() > 0) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, this.areaHeaderCenter.child.clientHeight),
+        new GeoData(0, hostWidth, 1, headerHeight),
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
@@ -476,7 +492,9 @@ export class RenderScope extends EleScope {
     const virtualRowDivTop = this.scrollFactorY * virtualRowDivTopF1;
 
     this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
-    this.dom.setStyle(this.contentDiv, 'left', `${this.scrollViewport.scrollLeft}px`);
+    // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
+    const scrollLeft = this.areaHeightsOfRenderPass ? this.scrollLeft : this.scrollViewport.scrollLeft;
+    this.dom.setStyle(this.contentDiv, 'left', `${scrollLeft}px`);
 
     this.adjustArea('body', virtualRowDivTop);
   }
@@ -527,7 +545,7 @@ export class RenderScope extends EleScope {
     const westArea = this.getArea(areaIdent, 'west');
     const centerArea = this.getArea(areaIdent, 'center');
     const eastArea = this.getArea(areaIdent, 'east');
-    const divHeight = centerArea.child.clientHeight;
+    const divHeight = this.areaHeightsOfRenderPass?.[areaIdent] ?? centerArea.child.clientHeight;
 
     westArea.child.innerText = '';
     centerArea.child.innerText = '';

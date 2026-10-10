@@ -424,7 +424,8 @@ Tips for very large models:
 - Return the row height from `getConstantRowHeight()` if all rows are equally high – the renderer then computes the
   first visible row directly instead of summing up the heights of all rows above it (2 million rows: rendering at the
   end of the table drops from ~29 ms to ~15 ms). The built-in models do this automatically.
-- Override `getYPosByRowIndex()` as well; `scrollToIndex()` relies on it (the `AreaModel` default returns 0).
+- `scrollToIndex()` uses `getYPosByRowIndex()`. Since 1.1.85 the `AreaModel` default derives it from the row heights
+  (O(1) with `getConstantRowHeight()`, otherwise O(n)); override it for huge models with variable row heights.
 
 ---
 

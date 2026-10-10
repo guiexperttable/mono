@@ -28,7 +28,7 @@
       Filter/Sortierung/Baum-Toggle beachten).
 - [ ] Performance, Teil 3: Grundlast pro Render hoch (Baum-Modell ~30 ms, Objekt-Array ~10 ms für ~25 sichtbare
       Zeilen) – mit CPU-Profil analysieren (DOM-Neuaufbau je Scroll, Renderer, Layout-Reads).
-- [ ] `AreaModel.getYPosByRowIndex()` liefert in der Basisklasse 0 → `scrollToIndex()`/`ensureRowIsVisible()` sind für
+- [x] `AreaModel.getYPosByRowIndex()` lieferte in der Basisklasse 0 (Branch `perf/constant-row-height`, im Browser geprüft) → `scrollToIndex()`/`ensureRowIsVisible()` sind für
       eigene Modelle ohne Override falsch. Default aus `getRowHeight()` berechnen (bzw. `getConstantRowHeight()`).
 - [x] `getLastVisibleRowIndex()`/`getLastFullVisibleRowIndex()` lieferten am Tabellenende bzw. bei wenigen Zeilen −1
       (Folgefehler in `ensureRowIsVisible`). Behoben im selben Branch.

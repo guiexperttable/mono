@@ -552,10 +552,11 @@ export class AreaModel implements AreaModelIf {
   /**
    * Returns the Y-coordinate (in pixels) of the top of the row at the specified index.
    * This method is used for scrolling and positioning rows in the viewport.
-   * The base implementation returns 0 and should be overridden by
-   * subclasses that support scrolling.
+   * The base implementation computes it from `getConstantRowHeight()` (O(1)) or by summing up
+   * `getRowHeight()` of all rows above (O(n)) – override it for large models with variable row heights.
+   * (Before 1.1.85 the base implementation returned 0.)
    * 
-   * @param {number} _rowIndex - The index of the row
+   * @param {number} rowIndex - The index of the row
    * @returns {number} The Y-coordinate of the top of the row, in pixels
    * 
    * @example
@@ -578,8 +579,18 @@ export class AreaModel implements AreaModelIf {
    *   // return yPos;
    * }
    */
-  getYPosByRowIndex(_rowIndex: number): number {
-    return 0;
+  getYPosByRowIndex(rowIndex: number): number {
+    // Default: derived from the row heights (used e.g. by scrollToIndex / ensureRowIsVisible).
+    // Override it for large models with variable row heights (e.g. with precomputed offsets).
+    const constantRowHeight = this.getConstantRowHeight();
+    if (constantRowHeight !== undefined && constantRowHeight > 0) {
+      return rowIndex * constantRowHeight;
+    }
+    let y = 0;
+    for (let i = 0; i < rowIndex; i++) {
+      y += this.getRowHeight(i);
+    }
+    return y;
   }
 
   /**

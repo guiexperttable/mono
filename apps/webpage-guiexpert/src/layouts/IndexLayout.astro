@@ -29,6 +29,12 @@ const description =
     <meta property="og:url" content={site} />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- Bare module specifier for the demo scripts in /scripts (copied by "pnpm pre:build"):
+         @guiexpert/demo-table-models imports @guiexpert/table – both must use the same core instance. -->
+    <script type="importmap" is:inline>
+      { "imports": { "@guiexpert/table": "/scripts/table/index.js" } }
+    </script>
+
     <!-- initialize theme -->
     <script is:inline>
       const themeSaved = localStorage.getItem("theme");

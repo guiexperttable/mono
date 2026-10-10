@@ -34,9 +34,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@guiexpert/table": "workspace:^",
-    "vue-i18n": "11.1.2",
-    "vue-router": "^4.1.6"
+    "@guiexpert/table": "workspace:^"
   },
   "peerDependencies": {
     "vue": "^3.0.0"

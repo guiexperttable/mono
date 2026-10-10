@@ -1,5 +1,5 @@
 import { AreaIdent, AreaModelIf, CellRendererIf, DomServiceIf, RendererCleanupFnType } from "@guiexpert/table";
-import {createRoot} from "react-dom/client";
+import { h, render } from "preact";
 
 
 
@@ -8,7 +8,6 @@ export class ComponentRendererWrapper implements CellRendererIf {
   constructor(
     private readonly Component: any
   ) {
-    console.info(Component);
   }
 
   render(
@@ -28,11 +27,11 @@ export class ComponentRendererWrapper implements CellRendererIf {
       areaModel,
       cellValue
     };
-    const root = createRoot(cellDiv, {});
-    root.render(this.Component(props));
+    // Preact's own render() – no react-dom / preact/compat needed; h() keeps hooks working in cell components
+    render(h(this.Component, props), cellDiv);
 
     return () => {
-      root.unmount();
+      render(null, cellDiv);
     };
   }
 

@@ -21,8 +21,20 @@
 - [ ] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
       `setFooterVisible()`, `isFooterVisible()` sind leere TODO-Stubs → implementieren
       (Spalte: über `ColumnDef.isVisible` bzw. Breite 0 + `recalcColumnWidths`).
-- [ ] Performance: `RenderScope.adjustArea` iteriert ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
-      Scroll-Frame). Startindex bei konstanter Zeilenhöhe direkt berechnen, sonst Prefix-Summen + Binärsuche.
+- [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
+      Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
+      (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
+- [ ] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
+      Filter/Sortierung/Baum-Toggle beachten).
+- [x] Performance, Teil 3a: `adjustColumnsToRowParent` las pro Zeile `scrollViewport.scrollLeft` (Wert wurde nie
+      benutzt) → erzwungenes Layout je Zeile. Entfernt (Baum 30 → 19,5 ms, Objekt-Array 10,4 → 7 ms, gesamt mit
+      Teil 1: 2 Mio. Zeilen Ø 16,5 → 6,0 ms, max 28,7 → 9,6 ms).
+- [ ] Performance, Teil 3b: weitere Hotspots laut CPU-Profil (Baum): `setStyle` (~11 %), DOM-Neuaufbau je Scroll
+      (Zeilen-/Zell-Divs recyceln statt neu erzeugen wäre der große Hebel).
+- [x] `AreaModel.getYPosByRowIndex()` lieferte in der Basisklasse 0 (Branch `perf/constant-row-height`, im Browser geprüft) → `scrollToIndex()`/`ensureRowIsVisible()` sind für
+      eigene Modelle ohne Override falsch. Default aus `getRowHeight()` berechnen (bzw. `getConstantRowHeight()`).
+- [x] `getLastVisibleRowIndex()`/`getLastFullVisibleRowIndex()` lieferten am Tabellenende bzw. bei wenigen Zeilen −1
+      (Folgefehler in `ensureRowIsVisible`). Behoben im selben Branch.
 - [ ] Sehr große Inhalte (> ~33 Mio px Höhe): Verhalten in Chrome/Firefox/Safari testen, ggf. Höhe deckeln.
 - [ ] `AsyncBodyAreaModelObjectArray` – unfertige Source-Leiche (nicht exportiert, fehlerhafte Indizes).
       Entscheiden: fertigstellen (Server-Side-Row-Model) oder löschen. *(später)*

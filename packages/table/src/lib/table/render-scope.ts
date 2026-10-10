@@ -95,6 +95,8 @@ export class RenderScope extends EleScope {
   protected colAndRowspanModels: AreaObjectMapType<ColAndRowspanModel> = new AreaObjectMap<ColAndRowspanModel>();
   protected draggingTargetColumnIndex = -1;
   protected mouseEvent?: GeMouseEvent;
+  /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
+  protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
 
   private debounceTimeout?: ReturnType<typeof setTimeout> | null;
   private editorRenderer?: CellRendererIf;
@@ -260,6 +262,7 @@ export class RenderScope extends EleScope {
 
     this.scrollTop = this.scrollViewport.scrollTop;
     this.scrollLeft = this.scrollViewport.scrollLeft;
+    this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
     this.debounce(this.checkForScrollPosSaving.bind(this));
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
@@ -272,34 +275,48 @@ export class RenderScope extends EleScope {
       this.scrollFactorX = 0;
     }
 
-    this.adjustBody();
-    this.adjustArea('footer');
-    this.adjustArea('header');
-
+    // Read all geometry BEFORE the DOM is modified: every layout read after a modification forces a
+    // synchronous layout of the whole table (before: ~5 forced layouts per scroll frame, now 1).
+    const hostWidth = this.hostElement.clientWidth;
+    const hostHeight = this.hostElement.clientHeight;
+    const westWidth = this.areaBodyWest.child.clientWidth;
+    const headerHeight = this.areaHeaderCenter.child.clientHeight;
+    this.areaHeightsOfRenderPass = {
+      body: this.areaBodyCenter.child.clientHeight,
+      footer: this.areaFooterCenter.child.clientHeight,
+      header: headerHeight
+    };
+    try {
+      this.adjustBody();
+      this.adjustArea('footer');
+      this.adjustArea('header');
+    } finally {
+      this.areaHeightsOfRenderPass = undefined;
+    }
 
     if (this.tableOptions.tableTopBorderVisible) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, 0),
+        new GeoData(0, hostWidth, 1, 0),
         this.hostElement,
         'ge-table-border'));
     }
     if (this.tableOptions.tableBottomBorderVisible) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, this.hostElement.clientHeight - 1),
+        new GeoData(0, hostWidth, 1, hostHeight - 1),
         this.hostElement,
         'ge-table-border'));
     }
     // The border between east and center in  header/body/footer (full height):
     if (this.tableModel.getFixedLeftColumnCount() > 0) {
       this.removables.push(this.dom.addVerticalBorder(
-        new GeoData(this.areaBodyWest.child.clientWidth, 1, this.hostElement.clientHeight, 0),
+        new GeoData(westWidth, 1, hostHeight, 0),
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
     // The border between header and body (full width):
     if (this.tableModel.getAreaModel('header')?.getRowCount() > 0) {
       this.removables.push(this.dom.addHorizontalBorder(
-        new GeoData(0, this.hostElement.clientWidth, 1, this.areaHeaderCenter.child.clientHeight),
+        new GeoData(0, hostWidth, 1, headerHeight),
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
@@ -470,12 +487,27 @@ export class RenderScope extends EleScope {
    * @protected
    * @return {void}
    */
+  /**
+   * Rounds a pixel offset to whole device pixels. The scroll offsets are derived from a scroll factor and are
+   * fractional; rows and cells placed at fractional positions render blurry text and 1px borders.
+   *
+   * @param {number} px - offset in CSS pixels
+   * @returns {number} offset snapped to the device pixel grid
+   * @protected
+   */
+  protected snapToDevicePixel(px: number): number {
+    const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    return Math.round(px * dpr) / dpr;
+  }
+
   protected adjustBody() {
     const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.tableModel.getContentHeightInPixel();
-    const virtualRowDivTop = this.scrollFactorY * virtualRowDivTopF1;
+    const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);
 
     this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
-    this.dom.setStyle(this.contentDiv, 'left', `${this.scrollViewport.scrollLeft}px`);
+    // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
+    const scrollLeft = this.areaHeightsOfRenderPass ? this.scrollLeft : this.scrollViewport.scrollLeft;
+    this.dom.setStyle(this.contentDiv, 'left', `${scrollLeft}px`);
 
     this.adjustArea('body', virtualRowDivTop);
   }
@@ -526,7 +558,7 @@ export class RenderScope extends EleScope {
     const westArea = this.getArea(areaIdent, 'west');
     const centerArea = this.getArea(areaIdent, 'center');
     const eastArea = this.getArea(areaIdent, 'east');
-    const divHeight = centerArea.child.clientHeight;
+    const divHeight = this.areaHeightsOfRenderPass?.[areaIdent] ?? centerArea.child.clientHeight;
 
     westArea.child.innerText = '';
     centerArea.child.innerText = '';
@@ -557,7 +589,20 @@ export class RenderScope extends EleScope {
     }
 
 
-    for (let index = 0; index < rowCount; index++) {
+    // Skip the rows above the viewport. With a constant row height the first visible row can be computed
+    // directly – otherwise we iterate the row heights (O(n), noticeable with millions of rows).
+    let startIndex = 0;
+    const constantRowHeight = areaModel.getConstantRowHeight?.();
+    if (constantRowHeight !== undefined && constantRowHeight > 0 && y < 0) {
+      startIndex = Math.min(rowCount, Math.floor(-y / constantRowHeight));
+      // floating point guard: the row before startIndex must not be visible
+      while (startIndex > 0 && y + startIndex * constantRowHeight > 0) {
+        startIndex--;
+      }
+      y = y + startIndex * constantRowHeight;
+    }
+
+    for (let index = startIndex; index < rowCount; index++) {
       const top = y;
       const lastRowOfModel = index === rowCount - 1;
       const height = this.tableModel.getRowHeight(areaIdent, index);
@@ -659,6 +704,13 @@ export class RenderScope extends EleScope {
       }
     } // for
 
+    // The loop ended without leaving the viewport (end of table reached or all rows fit):
+    if (areaIdent === 'body' && this.firstVisibleRowIndex > -1 && this.lastVisibleRowIndex === -1) {
+      this.lastVisibleRowIndex = rowCount - 1;
+      this.lastFullVisibleRowIndex = rowCount - 1;
+      this.displayedRowCount = this.lastFullVisibleRowIndex - this.firstFullVisibleRowIndex + 1;
+    }
+
     if (this.loggingActive && areaIdent === 'body') {
       console.log('render scope: this.firstVisibleRowIndex <- ' + this.firstVisibleRowIndex
         + '\nrender scope: this.firstFullVisibleRowIndex <- ' + this.firstFullVisibleRowIndex
@@ -688,7 +740,7 @@ export class RenderScope extends EleScope {
           } else {
             // Center:
             const virtualRowDivLeftF1 = this.areaBodyCenterGeo.width - this.tableModel.getContentWidthInPixel();
-            xStart = (this.scrollFactorX * virtualRowDivLeftF1) - this.areaBodyWestGeo.width;
+            xStart = this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1) - this.areaBodyWestGeo.width;
             sideIdent = 'center';
           }
           this.drawBigCell(range, xStart, yStart, areaModel, child, sideIdent);
@@ -836,11 +888,12 @@ export class RenderScope extends EleScope {
     //   console.info('##################')
     // }
 
-    this.scrollViewportLeft = this.scrollViewport.scrollLeft;
+    // Note: do not read layout properties (scrollLeft, clientWidth, …) here – this method runs for every row
+    // after new cells were appended, so each read would force a synchronous layout (layout thrashing).
     let virtualRowDivLeft = 0;
     if (!verticalFixed) {
       const virtualRowDivLeftF1 = (this.areaBodyCenterGeo.width) - this.tableModel.getContentWidthInPixel();
-      virtualRowDivLeft = this.scrollFactorX * virtualRowDivLeftF1;
+      virtualRowDivLeft = this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1);
     }
 
     const top = 0;

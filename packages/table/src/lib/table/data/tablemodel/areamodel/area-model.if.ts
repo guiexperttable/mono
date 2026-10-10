@@ -583,6 +583,23 @@ export interface AreaModelIf {
   getRowHeight(rowIndex: number): number;
 
   /**
+   * Returns the row height if **all** rows of this area have the same height, otherwise `undefined`.
+   *
+   * The renderer uses this value to find the first visible row directly instead of summing up the heights
+   * of all rows above it – with millions of rows this keeps scrolling at the end of the table as fast as at
+   * the beginning. Only return a number if `getRowHeight(i)` returns exactly this value for every row.
+   * If the method is missing or returns `undefined`, the renderer falls back to iterating the row heights.
+   *
+   * @returns {number | undefined} The constant row height in pixels, or `undefined` if row heights may vary.
+   *
+   * @example
+   * // Custom area model with 34px rows:
+   * getRowHeight(_rowIndex: number): number { return 34; }
+   * getConstantRowHeight(): number | undefined { return 34; }
+   */
+  getConstantRowHeight?(): number | undefined;
+
+  /**
    * Returns the row object at the specified index.
    * This method provides access to the underlying data structure.
    * 

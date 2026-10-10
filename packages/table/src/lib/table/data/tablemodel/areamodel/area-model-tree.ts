@@ -81,6 +81,17 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     return this.defaultRowHeight;
   }
 
+  /**
+   * All rows share `defaultRowHeight` – unless a subclass overrides `getRowHeight()`, then row heights may
+   * vary and `undefined` is returned.
+   *
+   * @returns {number | undefined} The constant row height or `undefined`.
+   */
+  getConstantRowHeight(): number | undefined {
+    const ownImpl = this.getRowHeight === AreaModelTree.prototype.getRowHeight;
+    return ownImpl && this.defaultRowHeight > 0 ? this.defaultRowHeight : undefined;
+  }
+
   override getCustomClassesAt(rowIndex: number, _columnIndex: number): string[] {
     const row = this.filteredFlattenRows[rowIndex];
     return ["ge-table-tree-cell", "ge-table-tree-deep-" + row.deep];

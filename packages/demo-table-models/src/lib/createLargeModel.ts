@@ -76,6 +76,10 @@ export class LargeBodyModel extends AreaModel {
     return 34;
   }
 
+  override getConstantRowHeight(): number | undefined {
+    return 34; // all rows have the same height -> fast rendering at any scroll position
+  }
+
   override getValueAt(rowIndex: number, columnIndex: number): number | string {
     if (columnIndex === 0) return 'id' + rowIndex;
     if (columnIndex === 1) return this.nf.format(rowIndex);

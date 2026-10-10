@@ -53,6 +53,17 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
     return this.defaultRowHeight;
   }
 
+  /**
+   * All rows share `defaultRowHeight` – unless a subclass overrides `getRowHeight()`, then row heights may
+   * vary and `undefined` is returned.
+   *
+   * @returns {number | undefined} The constant row height or `undefined`.
+   */
+  getConstantRowHeight(): number | undefined {
+    const ownImpl = this.getRowHeight === AreaModelArrayOfArrays.prototype.getRowHeight;
+    return ownImpl && this.defaultRowHeight > 0 ? this.defaultRowHeight : undefined;
+  }
+
   override changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
     this.filteredArr.forEach(row => this.arrayMove(row, sourceColumnIndex, targetColumnIndex));
     super.changeColumnOrder(sourceColumnIndex, targetColumnIndex);

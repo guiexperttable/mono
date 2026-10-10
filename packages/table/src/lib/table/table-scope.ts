@@ -217,7 +217,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       if (ok) {
         this.resetEditorRenderer();
         this.repaint();
-        this.eventListener.onModelChanged(GeModelChangeEvent.createSingle(rowIndex, columnIndex));
+        this.eventListener.onModelChanged?.(GeModelChangeEvent.createSingle(rowIndex, columnIndex));
         this.hostElement.focus();
       }
     }
@@ -317,7 +317,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @param startMouseEvent
    */
   mouseDraggingOnFrame(mouseEvent: GeMouseEvent, startMouseEvent: GeMouseEvent | undefined) {
-    this.eventListener.onMouseDragging(mouseEvent);
+    this.eventListener.onMouseDragging?.(mouseEvent);
     this.mouseEvent = mouseEvent;
 
     if (this.mouseStartColumnIndex > -1 && this.mouseStartAction === 'resize-column' && this.tableOptions.columnsResizable) {
@@ -354,7 +354,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @returns {void}
    */
   mouseDraggingEndOnFrame(mouseEvent: GeMouseEvent) {
-    this.eventListener.onMouseDraggingEnd(mouseEvent);
+    this.eventListener.onMouseDraggingEnd?.(mouseEvent);
     this.draggingTargetColumnIndex = -1;
 
     if (this.mouseStartAction === 'resize-column') {
@@ -379,7 +379,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   mouseMove(mouseMoveEvent: GeMouseEvent) {
-    this.eventListener.onMouseMoved(mouseMoveEvent);
+    this.eventListener.onMouseMoved?.(mouseMoveEvent);
     this.adjustHoverRows(mouseMoveEvent);
     this.adjustHoverColumns(mouseMoveEvent);
   }
@@ -402,7 +402,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
 
     this.lastContextmenu = now;
-    this.eventListener.onContextmenu(mouseMoveEvent);
+    this.eventListener.onContextmenu?.(mouseMoveEvent);
   }
 
   /**
@@ -438,7 +438,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     areaModel.setRowChecked(rowIdx, unsel);
     this.repaint(); // TODO repaint cell only
     const selectedRows = areaModel.rowSelectionModel?.getCheckedRows();
-    this.eventListener.onCheckboxChanged(selectedRows ? selectedRows : []);
+    this.eventListener.onCheckboxChanged?.(selectedRows ? selectedRows : []);
   }
 
   /**
@@ -468,15 +468,15 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   publishGeMouseEvent(evt: GeMouseEvent) {
-    this.eventListener.onMouseClicked(evt);
+    this.eventListener.onMouseClicked?.(evt);
   }
 
   onFocusChanged(sm: FocusModelIf) {
-    this.eventListener.onFocusChanged(sm);
+    this.eventListener.onFocusChanged?.(sm);
   }
 
   onSelectionChanged(sm: SelectionModelIf) {
-    this.eventListener.onSelectionChanged(sm);
+    this.eventListener.onSelectionChanged?.(sm);
   }
 
 
@@ -558,7 +558,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   override adjustAfterScrolling() {
     super.adjustAfterScrolling();
     const viewport = this.scrollViewport;
-    this.eventListener.onScroll(new GeScrollEvent(
+    this.eventListener.onScroll?.(new GeScrollEvent(
       this.scrollTop,
       this.scrollLeft,
       viewport.scrollHeight,

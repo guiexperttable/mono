@@ -232,6 +232,8 @@ Angular-Demo an lokale Builds koppeln, CI-Workflow für Angular).
 - Kein `npm publish`, kein `deploy` (Website-FTP via `deploy.cjs`) ohne ausdrückliche Freigabe.
 - `.github/workflows/npm-publish-*.yml` laufen bei `release: created` und manuell – ein GitHub-Release im Mono-Repo
   veröffentlicht also alle Nicht-Angular-Pakete!
+- `npm-publish-angular.yml`: nur manuell, Standard **Dry-Run**; Matrix ng14 … ng22 nacheinander, Tag `latest` nur für ng22.
+- `ci.yml`: Build-Check (Core, Libs, Angular 14–22) bei Push/PR, ohne Secrets.
 
 ---
 

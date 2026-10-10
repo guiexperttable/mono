@@ -1,0 +1,68 @@
+# Publishes @guiexpert/angular-table for Angular 14 … 22 (built from packages/angular-table via angular-builds/ngNN).
+# Manual only. Default is a dry run – set "dry_run" to false to really publish.
+name: Publish angular-table (all Angular majors)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (npm publish --dry-run)'
+        type: boolean
+        default: true
+      only:
+        description: 'Only this build (e.g. ng22) – empty = all'
+        type: string
+        default: ''
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1          # publish one after another, newest last
+      matrix:
+        include:
+          - { ng: ng14, tag: a14 }
+          - { ng: ng15, tag: a15 }
+          - { ng: ng16, tag: a16 }
+          - { ng: ng17, tag: a17 }
+          - { ng: ng18, tag: a18 }
+          - { ng: ng19, tag: a19 }
+          - { ng: ng20, tag: a20 }
+          - { ng: ng21, tag: a21 }
+          - { ng: ng22, tag: latest }
+    steps:
+      - name: Skip?
+        id: skip
+        run: |
+          if [ -n "${{ inputs.only }}" ] && [ "${{ inputs.only }}" != "${{ matrix.ng }}" ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/checkout@v4
+        if: steps.skip.outputs.skip != 'true'
+
+      - uses: pnpm/action-setup@v4   # version from "packageManager" in package.json
+        if: steps.skip.outputs.skip != 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.skip.outputs.skip != 'true'
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+        if: steps.skip.outputs.skip != 'true'
+
+      - name: Build core
+        if: steps.skip.outputs.skip != 'true'
+        run: pnpm build:core
+
+      - name: Build ${{ matrix.ng }}
+        if: steps.skip.outputs.skip != 'true'
+        run: pnpm --filter angular-build-${{ matrix.ng }} build
+
+      - name: Publish ${{ matrix.ng }} (tag ${{ matrix.tag }})
+        if: steps.skip.outputs.skip != 'true'
+        run: npm publish ./angular-builds/${{ matrix.ng }}/dist --access public --tag ${{ matrix.tag }} ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPN_TOKEN }}

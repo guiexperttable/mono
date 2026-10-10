@@ -32,7 +32,7 @@
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
       (`@guiexpert/angular-table@^17.1.83`, `@guiexpert/table@^1.1.84`). Ziel: `workspace:`-Core +
       `link:../../angular-builds/ng17/dist` (oder Demo auf aktuelles Angular heben).
-- [ ] **Angular-Publish-Workflow** (GitHub Actions, nur `workflow_dispatch`): Matrix ng14 … ng22, Tag `latest` nur
+- [x] **Angular-Publish-Workflow** (GitHub Actions, nur `workflow_dispatch`, Standard = Dry-Run; `.github/workflows/npm-publish-angular.yml`): Matrix ng14 … ng22, Tag `latest` nur
       für die neueste Major, sonst `aNN`. Bis dahin lokal: `pnpm build:angular` + `pnpm pub:angular`.
 - [ ] Versionen angleichen: `pnpm version:check` meldet 6 Abweichungen (einige Pakete schon auf x.1.85, nie
       veröffentlicht). Beim nächsten Release `pnpm version:patch` → alles x.1.85.

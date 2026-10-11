@@ -100,6 +100,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private lastDragFrom = -1;
   private lastDragTo = -1;
   private firstDraggingRendering = true;
+  /** Last comparator passed to `sort()`; re-applied after filtering. Cleared by a header sort. */
+  private lastSortCompareFn?: (a: any, b: any) => number;
 
   constructor(
     hostElement: HTMLDivElement,
@@ -538,6 +540,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         this.clearSelectionModel();
       }
       this.tableModel.externalFilterChanged(predictFn);
+      this.reapplySorting(); // filtering starts from the unsorted rows
       this.scrollViewport.scrollTo(0, 0);
       this.tableModel.recalcHeightAndPadding();
       this.resetSizeOfWrapperDiv();
@@ -565,6 +568,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
       const sortItem = new SortItem(colIdx, newState);
       const done = this.tableModel.doSort([sortItem]);
+      this.lastSortCompareFn = undefined;
       if (done) {
         this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = '');
         colDef.sortState = newState;
@@ -955,7 +959,27 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   sort(compareFn: (a: any, b: any) => number) {
     this.tableModel.sort(compareFn);
+    this.lastSortCompareFn = compareFn;
+    this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = ''); // the header icons no longer apply
     this.repaint(); // without it the new order only appeared after the next scroll
+  }
+
+  /**
+   * Sorts the (freshly filtered) body rows again, so a filter keeps the current order:
+   * the last `sort(compareFn)` call, otherwise the columns with a `sortState` (header icons).
+   */
+  protected reapplySorting() {
+    if (this.lastSortCompareFn) {
+      this.tableModel.sort(this.lastSortCompareFn);
+      return;
+    }
+    const sortItems: SortItem[] = [];
+    this.tableModel.getColumnDefs()?.forEach((cd, index) => {
+      if (cd.sortState) sortItems.push(new SortItem(index, cd.sortState));
+    });
+    if (sortItems.length) {
+      this.tableModel.doSort(sortItems);
+    }
   }
 
 

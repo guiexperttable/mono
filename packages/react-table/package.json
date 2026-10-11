@@ -5,7 +5,7 @@
   "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/guiexperttable/mono.git",
+    "url": "git+https://github.com/guiexperttable/mono.git",
     "directory": "packages/react-table"
   },
   "homepage": "https://gui.expert",

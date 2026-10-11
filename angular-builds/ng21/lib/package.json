@@ -6,7 +6,7 @@
   "peerDependencies": {
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
-    "@guiexpert/table": "^1.1.84"
+    "@guiexpert/table": "^1.1.85"
   },
   "dependencies": {
     "tslib": "^2.3.0"
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/guiexperttable/mono.git",
+    "url": "git+https://github.com/guiexperttable/mono.git",
     "directory": "angular-builds/ng21"
   },
   "homepage": "https://gui.expert"

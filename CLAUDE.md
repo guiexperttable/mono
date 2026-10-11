@@ -56,7 +56,7 @@ mono/
 | Demos | `pnpm serve:table-demo`, `serve:react-table-demo`, …, `serve:angular-table-demo` |
 | Website lokal | `cd apps/webpage-guiexpert && pnpm pre:build` (kopiert dists nach `public/scripts/`, git-ignored), dann `pnpm serve:webpage-guiexpert` |
 | Versionen | `pnpm version:check`, `pnpm version:patch` (Core 1.1.84 → 1.1.85, Wrapper behalten Framework-Major) |
-| Publish | `pnpm pub:<paket>`, `pnpm pub:angular` – **nie ohne ausdrückliche Anweisung**. Angular-Dist-Tags: `latest` = neueste Major, sonst `a14` … `a21` (so auch bisher auf npm) |
+| Release / Publish | **nie ohne ausdrückliche Anweisung.** Ablauf in `RELEASING.md`: `pnpm version:patch` → Commit → GitHub-Release → Workflow `npm-publish.yml` (Trusted Publishing, kein Token). Lokal: `pnpm pub:all:dry` / `pnpm pub:all` (`scripts/publish.mjs`, überspringt bereits veröffentlichte Versionen). Angular-Dist-Tags: `latest` = neueste Major, sonst `a14` … `a21` |
 
 **Abhängigkeits-Fallen (beim Aufsetzen gelöst, nicht zurückdrehen):**
 - `pnpm-lock.yaml` basiert auf der Lockdatei von `ge-table`. Ohne sie zieht pnpm neuere Transitive (z. B. Babel 8),
@@ -231,11 +231,14 @@ Angular-Demo an lokale Builds koppeln, CI-Workflow für Angular).
 ## 9. Sicherheit
 
 - `.npmrc`, `.env*`, `secret.txt` sind git-ignored und werden **nie** ausgegeben, kopiert oder committet.
-  Publish-Tokens nur als GitHub-Secret (`NPN_TOKEN`, so in den Workflows) bzw. lokal in `~/.npmrc`.
+  CI braucht **kein npm-Token**: `npm-publish.yml` nutzt npm Trusted Publishing (OIDC, `id-token: write`) und erzeugt
+  Provenance. Lokales Publish nur mit eigenem `npm login` (`~/.npmrc`).
 - Kein `npm publish`, kein `deploy` (Website-FTP via `deploy.cjs`) ohne ausdrückliche Freigabe.
-- `.github/workflows/npm-publish-*.yml` laufen bei `release: created` und manuell – ein GitHub-Release im Mono-Repo
-  veröffentlicht also alle Nicht-Angular-Pakete!
-- `npm-publish-angular.yml`: nur manuell, Standard **Dry-Run**; Matrix ng14 … ng22 nacheinander, Tag `latest` nur für ng22.
+- `.github/workflows/npm-publish.yml`: bei **`release: published`** → veröffentlicht alle 9 Pakete (8 Libs + Angular
+  14–22), soweit die Version noch nicht auf npm ist. Manuell: Standard **Dry-Run**, Eingabe `only` für einzelne Pakete.
+  Ein GitHub-Release ist also ein echter npm-Release! Der Workflow läuft mit dem Stand des Release-Tags.
+- Trusted Publisher auf npmjs.com je Paket: `guiexperttable` / `mono` / `npm-publish.yml` (Dateiname nie ändern,
+  sonst schlägt das Publish fehl).
 - `ci.yml`: Build-Check (Core, Libs, Angular 14–22) bei Push/PR, ohne Secrets.
 
 ---

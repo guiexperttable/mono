@@ -69,17 +69,24 @@ for (const file of listPackageFiles()) {
   const major = majorFor(file, pkg);
   const expected = major === undefined ? coreVersion : `${major}.${cMinor}.${cPatch}`;
   const rel = relative(root, file);
-  if (pkg.version === expected) {
+  // published Angular manifests (angular-builds/ngNN/lib/package.json) pin the core as a plain semver range
+  const corePeer = pkg.peerDependencies?.["@guiexpert/table"];
+  const expectedPeer = `^${coreVersion}`;
+  const peerOk = corePeer === undefined || corePeer.startsWith("workspace:") || corePeer === expectedPeer;
+  if (pkg.version === expected && peerOk) {
     if (cmd === "check") console.log(`  ok   ${expected.padEnd(9)} ${rel}`);
     continue;
   }
   if (cmd === "check") {
     mismatches++;
-    console.log(`  DIFF ${String(pkg.version).padEnd(9)} ${rel}  (expected ${expected})`);
+    const peerInfo = peerOk ? "" : `, peer @guiexpert/table ${corePeer} (expected ${expectedPeer})`;
+    console.log(`  DIFF ${String(pkg.version).padEnd(9)} ${rel}  (expected ${expected}${peerInfo})`);
   } else {
     // replace only the first "version" field to keep the file formatting intact
-    writeFileSync(file, raw.replace(/("version"\s*:\s*")[^"]*(")/, `$1${expected}$2`));
-    console.log(`  set  ${expected.padEnd(9)} ${rel}`);
+    let out = raw.replace(/("version"\s*:\s*")[^"]*(")/, `$1${expected}$2`);
+    if (!peerOk) out = out.replace(/("@guiexpert\/table"\s*:\s*")[^"]*(")/, `$1${expectedPeer}$2`);
+    writeFileSync(file, out);
+    console.log(`  set  ${expected.padEnd(9)} ${rel}${peerOk ? "" : `  (peer @guiexpert/table ${expectedPeer})`}`);
   }
 }
 if (cmd === "check") {

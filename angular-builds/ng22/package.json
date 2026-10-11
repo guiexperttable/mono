@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng22",
-  "version": "22.1.84",
+  "version": "22.1.85",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 22 -> @guiexpert/angular-table@22.x",
   "license": "MIT",

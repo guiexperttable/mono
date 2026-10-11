@@ -27,3 +27,4 @@ apps/webpage-guiexpert/public/scripts/
 .idea/
 .DS_Store
 *.log
+/ .npmrc

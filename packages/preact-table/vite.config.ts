@@ -14,6 +14,8 @@ export default defineConfig({
   plugins: [
     dts({
       entryRoot: "src",
+      // keep "@guiexpert/table" in the .d.ts files (the alias below would turn it into ../../table/src)
+      aliasesExclude: [/^@guiexpert\/table$/],
       tsconfigPath: join(__dirname, "tsconfig.lib.json")
     }),
     // react(),

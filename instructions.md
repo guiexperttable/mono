@@ -703,8 +703,9 @@ const columnDefs = [
 ];
 ```
 
-Editing starts with a double click or the `START_EDITING` shortcut; changes are written into the row objects and
-reported via `modelChanged`.
+Editing starts with a double click or the `START_EDITING` shortcut (F2); changes are written into the row objects and
+reported via `modelChanged`. Since 1.1.89 this also works on cells with a renderer or a framework component, the
+editor keeps the focus, and table shortcuts are ignored while typing in it.
 
 ### 6.8 Rowspan and colspan
 
@@ -779,10 +780,15 @@ const tableOptions = {
     getStorageKeyFn: () => "my-person-table",        // key in localStorage
     autoRestoreScrollPosition: true,
     autoRestoreSortingState: true,
-    autoRestoreCollapsedExpandedState: true          // tree tables
+    autoRestoreCollapsedExpandedState: true,         // tree tables
+    getRowId: (row: any) => row.id                   // tree tables: a unique id per node
   }
 };
 ```
+
+Since 1.1.89: the header sort icon follows the restored order, nested tree rows are restored too, a table that
+starts collapsed stays collapsed until the user opens a node, and a blocked `localStorage` (private mode) no
+longer breaks the table.
 
 ### 6.12 Look & feel
 

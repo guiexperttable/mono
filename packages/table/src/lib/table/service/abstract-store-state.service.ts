@@ -15,7 +15,7 @@ export abstract class AbstractStoreStateService {
     const obj = {};
     if (item instanceof Map) {
       const map = item as Map<string, any>;
-      map.forEach((key,value) => {
+      map.forEach((value, key) => {   // Map.forEach passes (value, key)
         // @ts-ignore
         obj[key] = value;
       });
@@ -45,17 +45,25 @@ export abstract class AbstractStoreStateService {
   }
 
   protected persistItem(subKey: string, item: string | object) {
-    if (item) {
-      localStorage.setItem(subKey, JSON.stringify(item));
-    } else {
-      localStorage.removeItem(subKey);
+    try {
+      if (item) {
+        localStorage.setItem(subKey, JSON.stringify(item));
+      } else {
+        localStorage.removeItem(subKey);
+      }
+    } catch (_e) {
+      // storage blocked (private mode, quota, sandboxed iframe) – the table keeps working without persistence
     }
   }
 
   protected loadFromLocalStorage<U>(subKey: string): U | null {
-    const item = localStorage.getItem(subKey);
-    if (item) {
-      return JSON.parse(item) as U;
+    try {
+      const item = localStorage.getItem(subKey);
+      if (item) {
+        return JSON.parse(item) as U;
+      }
+    } catch (_e) {
+      // storage blocked or invalid JSON – start without a stored state
     }
     return null;
   }

@@ -26,6 +26,7 @@ export class MouseHandler {
   geMouseEventOld?: GeMouseEvent;
 
   private expandedAll = true;
+  private lastClickedCellKey = '';
   private mouseDown = false;
   private dragging = false;
 
@@ -76,13 +77,20 @@ export class MouseHandler {
    */
   private onHostElementClicked(event: MouseEvent) {
     const now = Date.now();
-    // console.log('onHostElementClicked', (now - this.lastClicked < this.doubleClickDelay));
-    if (now - this.lastClicked < this.doubleClickDelay) {
+    // a double click = two clicks on the SAME cell within doubleClickDelay
+    // (before, two quick clicks on different cells – e.g. two tree arrows – swallowed the second one)
+    const target = event.target as HTMLElement | null;
+    const cellKey = target?.closest?.('[data-col-index]')
+      ? ['data-area', 'data-row-index', 'data-col-index']
+        .map(key => target.closest('[' + key + ']')?.getAttribute(key) ?? '').join(':')
+      : '';
+    if (now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey) {
       this.lastClicked = now;
       this.publishGeMouseEvent(event, 2);
       return; // skipped
     }
     this.lastClicked = now;
+    this.lastClickedCellKey = cellKey;
 
     const mouseTargetData: MouseTargetData = new MouseTargetData(event.target, this.tableScope);
     if (mouseTargetData.action === 'toggleExpandCollapseAll') {
@@ -143,10 +151,11 @@ export class MouseHandler {
     this.lastClicked = Date.now();
 
     if (event.target instanceof HTMLElement) {
-      const target = event.target as HTMLElement;
-      const area = target.getAttribute("data-area");
+      // the target may be an element inside the cell (renderer, component) → look up the cell attributes
+      const target = (event.target.closest("[data-col-index]") ?? event.target) as HTMLElement;
+      const area = target.closest("[data-area]")?.getAttribute("data-area") ?? null;
       const areaIdent: AreaIdent = getAreaIdentByString(area);
-      const rowIdx = Number(target.getAttribute("data-row-index"));
+      const rowIdx = Number(target.closest("[data-row-index]")?.getAttribute("data-row-index"));
       const colIdx = Number(target.getAttribute("data-col-index"));
       const areaModel = this.tableScope.tableModel.getAreaModel(areaIdent);
 
@@ -225,6 +234,8 @@ export class MouseHandler {
     // store expanded/collapsed:
     const getRowId = this.tableScope.tableOptions?.autoRestoreOptions?.getRowId;
     if (getRowId) {
+      // first toggle: a row that is now expanded means "the table started collapsed" → store expanded ids
+      this.tableScope.storeStateCollapsedExpandService?.initModeIfEmpty(tr.expanded ? "expanded" : "collapsed");
       const mode = this.tableScope.storeStateCollapsedExpandService?.collapsedExpandedStateGet().mode;
       const push = (mode === "collapsed" && !tr.expanded) || (mode === "expanded" && tr.expanded);
       const remove = (mode === "collapsed" && tr.expanded) || (mode === "expanded" && !tr.expanded);

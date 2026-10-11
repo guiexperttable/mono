@@ -79,6 +79,7 @@ export class RenderScope extends EleScope {
   protected getSelectionModel?: GetT<SelectionModelIf>;
   protected getFocusModel?: GetT<FocusModelIf>;
   protected scrollLeft = 0;
+  private scrollPosSaveTimeout?: ReturnType<typeof setTimeout>;
   protected scrollViewportLeft = 0;
   protected scrollFactorY = 0;
   protected scrollFactorX = 0;
@@ -198,7 +199,7 @@ export class RenderScope extends EleScope {
         this.editing = true;
         this.repaint();
         // request focus:
-        const input = document.querySelector('input.ge-table-cell-editor-input') as HTMLInputElement;
+        const input = this.hostElement.querySelector('input.ge-table-cell-editor-input') as HTMLInputElement;
         if (input) {
           input.focus();
         }
@@ -267,7 +268,9 @@ export class RenderScope extends EleScope {
     this.scrollTop = this.scrollViewport.scrollTop;
     this.scrollLeft = this.scrollViewport.scrollLeft;
     this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
-    this.debounce(this.checkForScrollPosSaving.bind(this));
+    // own timer: the shared debounce() is also used by debounceRepaint() and would cancel the saving
+    if (this.scrollPosSaveTimeout) clearTimeout(this.scrollPosSaveTimeout);
+    this.scrollPosSaveTimeout = setTimeout(() => this.checkForScrollPosSaving(), 500);
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
     this.scrollFactorX = this.scrollLeft / (this.scrollViewport.scrollWidth - this.scrollViewport.clientWidth);
@@ -388,11 +391,11 @@ export class RenderScope extends EleScope {
   ) {
     const areaModel = this.tableModel.getAreaModel(area);
     const selector = 'div[data-col-index="' + columnIndex + '"][data-row-index="' + rowIndex + '"][data-area="' + area + '"]';
-    const cell = document.querySelector(selector) as HTMLDivElement;
+    const cell = this.hostElement.querySelector(selector) as HTMLDivElement; // this table only (several tables on a page)
 
     if (cell) {
       let fn: RendererCleanupFnType | undefined = undefined;
-      const editor = this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === columnIndex;
+      const editor = area === 'body' && this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === columnIndex;
       let cellRenderer;
       if (editor) {
         cellRenderer = this.editorRenderer;
@@ -1081,7 +1084,8 @@ export class RenderScope extends EleScope {
       lastRowOfModel
     }: ArgsRenderCellDiv): [HTMLDivElement, RendererCleanupFnType | undefined] {
 
-    const editor = this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === index;
+    // the editor belongs to the body only (header row 0 has the same row index as body row 0)
+    const editor = areaIdent === 'body' && this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === index;
     const cellRenderer = (editor) ? this.editorRenderer : areaModel.getCellRenderer(rowIndex, index);
     const geo = { left, width, height, top, index };
     const rowObject = areaModel.getRowByIndex(rowIndex);
@@ -1111,7 +1115,7 @@ export class RenderScope extends EleScope {
     }
 
     const val = areaModel.getValueAt(rowIndex, index);
-    const text = cellRenderer ? '' : `${val}`;
+    const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
     const checkedType = areaModel.isRowChecked(rowIndex);
     const cell = this.dom.addColumnDiv(
       {
@@ -1141,6 +1145,12 @@ export class RenderScope extends EleScope {
     let fn: RendererCleanupFnType | undefined = undefined;
     if (cellRenderer) {
       fn = cellRenderer.render(cell, rowIndex, index, areaIdent, areaModel, val, this.dom.domService);
+      if (editor) {
+        // the cell is rebuilt on every repaint (e.g. after the click events of the double click) –
+        // give the new input/select the focus, otherwise typing goes nowhere
+        const input = cell.querySelector('input, select') as HTMLInputElement | HTMLSelectElement | null;
+        if (input && !input.contains(document.activeElement)) input.focus();
+      }
     }
 
     const classes = areaModel.getCustomClassesAt(rowIndex, index);
@@ -1417,7 +1427,7 @@ export class RenderScope extends EleScope {
         const geo = { left: 0, width: columnGeo.width, height, top, index: rowIndex };
         const val = areaModel.getValueAt(rowIndex, columnIndex);
         const cellRenderer = areaModel.getCellRenderer(rowIndex, columnIndex);
-        const text = cellRenderer ? '' : `${val}`;
+        const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
         const para: AddColumnDivPara = {
           parent,
           geo,

@@ -58,10 +58,9 @@
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
       (`@guiexpert/angular-table@^17.1.83`, `@guiexpert/table@^1.1.84`). Ziel: `workspace:`-Core +
       `link:../../angular-builds/ng17/dist` (oder Demo auf aktuelles Angular heben).
-- [x] **Angular-Publish-Workflow** (GitHub Actions, nur `workflow_dispatch`, Standard = Dry-Run; `.github/workflows/npm-publish-angular.yml`): Matrix ng14 … ng22, Tag `latest` nur
-      für die neueste Major, sonst `aNN`. Bis dahin lokal: `pnpm build:angular` + `pnpm pub:angular`.
-- [ ] Versionen angleichen: `pnpm version:check` meldet 6 Abweichungen (einige Pakete schon auf x.1.85, nie
-      veröffentlicht). Beim nächsten Release `pnpm version:patch` → alles x.1.85.
+- [x] **Publish-Workflow**: ein Workflow `.github/workflows/npm-publish.yml` für alle 9 Pakete, npm Trusted Publishing
+      (OIDC, kein Token), Release = Publish, manuell Dry-Run. Ablauf: `RELEASING.md`.
+- [x] Versionen angeglichen (1.1.85); `version.mjs` setzt jetzt auch die Core-Peer-Dependency der Angular-Manifeste.
 - [x] `@guiexpert/angular-table` sollte `@guiexpert/table` als `peerDependency` deklarieren (heute muss man es
       manuell mitinstallieren).
 - [ ] Dependency-Hygiene: Babel-7-Pin (`@babel/core ~7.28.6` in 16 package.json) entfernen, sobald

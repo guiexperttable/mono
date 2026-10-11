@@ -1,0 +1,69 @@
+# Publishes all npm packages of the mono repo via npm trusted publishing (OIDC) – no npm token / secret needed.
+#
+#   @guiexpert/table, demo-table-models, react-, preact-, solid-, svelte-, vue3-, webcomponent-table   (dist-tag latest)
+#   @guiexpert/angular-table 14 … 22                                  (dist-tags a14 … a21, latest = newest major)
+#
+# Triggers:
+#   - GitHub release published  → publishes everything that is not on npm yet (no dry run)
+#   - manual (Actions → "Publish to npm" → Run workflow) → dry run by default, optionally only some packages
+#
+# One-time setup on npmjs.com, for EACH of the 9 packages: Settings → Trusted Publisher → GitHub Actions
+#   Organization or user: guiexperttable · Repository: mono · Workflow filename: npm-publish.yml · Environment: (empty)
+# Details: RELEASING.md
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (nothing is published)'
+        type: boolean
+        default: true
+      only:
+        description: 'Only these packages, comma separated (e.g. "table,react-table,ng22"). Empty = all'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  id-token: write          # required for npm trusted publishing (OIDC) and provenance
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest   # trusted publishing requires GitHub-hosted runners
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          # no dependency cache in release builds (npm recommendation, avoids cache poisoning)
+
+      - name: npm CLI with trusted publishing support (>= 11.5.1)
+        run: npm install -g "npm@^11.5.1" && npm --version
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Versions must be consistent
+        run: pnpm version:check
+
+      - name: Build core and libraries
+        run: pnpm build:libs
+
+      - name: Build Angular 14 … 22
+        run: pnpm build:angular
+
+      - name: Publish
+        run: node scripts/publish.mjs
+        env:
+          DRY_RUN: ${{ github.event_name == 'release' && 'false' || inputs.dry_run }}
+          ONLY: ${{ github.event_name == 'release' && '' || inputs.only }}

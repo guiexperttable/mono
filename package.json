@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
-  "description": "GuiExpert Table \u2013 mono repository: core, all framework wrappers (incl. Angular 14\u201322), demos and website",
+  "description": "GuiExpert Table – mono repository: core, all framework wrappers (incl. Angular 14–22), demos and website",
   "repository": "https://github.com/guiexperttable/mono",
   "packageManager": "pnpm@9.15.9",
   "engines": {
@@ -67,7 +67,9 @@
     "pub:svelte-table": "pnpm --filter svelte-table npm-pub",
     "pub:vue3-table": "pnpm --filter vue3-table npm-pub",
     "pub:webcomponent-table": "pnpm --filter webcomponent-table npm-pub",
-    "pub:angular": "pnpm --filter \"./angular-builds/*\" npm-pub"
+    "pub:angular": "pnpm --filter \"./angular-builds/*\" npm-pub",
+    "pub:all:dry": "node scripts/publish.mjs --dry-run",
+    "pub:all": "node scripts/publish.mjs"
   },
   "pnpm": {
     "overrides": {

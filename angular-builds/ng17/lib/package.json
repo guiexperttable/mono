@@ -6,7 +6,7 @@
   "peerDependencies": {
     "@angular/common": "^17.1.1",
     "@angular/core": "^17.1.1",
-    "@guiexpert/table": "^1.1.84"
+    "@guiexpert/table": "^1.1.85"
   },
   "dependencies": {
     "tslib": "^2.3.0"
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/guiexperttable/mono.git",
+    "url": "git+https://github.com/guiexperttable/mono.git",
     "directory": "angular-builds/ng17"
   },
   "homepage": "https://gui.expert"

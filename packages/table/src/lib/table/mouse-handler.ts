@@ -26,6 +26,7 @@ export class MouseHandler {
   geMouseEventOld?: GeMouseEvent;
 
   private expandedAll = true;
+  private lastClickedCellKey = '';
   private mouseDown = false;
   private dragging = false;
 
@@ -76,13 +77,20 @@ export class MouseHandler {
    */
   private onHostElementClicked(event: MouseEvent) {
     const now = Date.now();
-    // console.log('onHostElementClicked', (now - this.lastClicked < this.doubleClickDelay));
-    if (now - this.lastClicked < this.doubleClickDelay) {
+    // a double click = two clicks on the SAME cell within doubleClickDelay
+    // (before, two quick clicks on different cells – e.g. two tree arrows – swallowed the second one)
+    const target = event.target as HTMLElement | null;
+    const cellKey = target?.closest?.('[data-col-index]')
+      ? ['data-area', 'data-row-index', 'data-col-index']
+        .map(key => target.closest('[' + key + ']')?.getAttribute(key) ?? '').join(':')
+      : '';
+    if (now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey) {
       this.lastClicked = now;
       this.publishGeMouseEvent(event, 2);
       return; // skipped
     }
     this.lastClicked = now;
+    this.lastClickedCellKey = cellKey;
 
     const mouseTargetData: MouseTargetData = new MouseTargetData(event.target, this.tableScope);
     if (mouseTargetData.action === 'toggleExpandCollapseAll') {

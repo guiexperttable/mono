@@ -1014,7 +1014,7 @@ export class TableApi {
    * @param {string} fileName - The name of the Excel file to be downloaded (default: 'table.xlsx')
    * @param {string} author - Optional metadata for the Excel file to specify the author (default: '')
    *
-   * @returns {void} The result of the excelService.downloadExcel method call
+   * @returns {Promise<void>} resolves when the (compressed) file has been handed to the browser
    *
    * @example
    * // Download table data with default filename

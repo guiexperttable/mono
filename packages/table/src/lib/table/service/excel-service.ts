@@ -24,6 +24,29 @@ function crc32(bytes: Uint8Array): number {
   return (crc ^ 0xFFFFFFFF) >>> 0;
 }
 
+/**
+ * Raw DEFLATE (ZIP method 8) with the browser's built-in CompressionStream – no library.
+ * Returns undefined if the browser can't do it (very old browsers): the file is then stored uncompressed.
+ */
+async function deflateRaw(bytes: Uint8Array): Promise<Uint8Array | undefined> {
+  const CS = (globalThis as any).CompressionStream;
+  if (!CS || typeof Response === 'undefined' || typeof Blob === 'undefined') return undefined;
+  try {
+    const stream = new Blob([bytes as any]).stream().pipeThrough(new CS('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  } catch (_e) {
+    return undefined; // 'deflate-raw' not supported
+  }
+}
+
+interface ZipEntry {
+  path: Uint8Array;
+  data: Uint8Array;       // bytes written into the file (compressed or not)
+  size: number;           // uncompressed size
+  crc: number;
+  method: 0 | 8;          // 0 = stored, 8 = deflate
+}
+
 export class ExcelService implements ExcelServiceIf {
 
   /**
@@ -38,7 +61,7 @@ export class ExcelService implements ExcelServiceIf {
   downloadExcel(
     matrix: Array<Array<any>>,
     filename: string = 'file.xlsx',
-    author: string=''): void {
+    author: string=''): Promise<void> {
 
     if (!Array.isArray(matrix) || matrix.some(row => !Array.isArray(row))) {
       throw new Error('Invalid matrix format. Expected a 2D array.');
@@ -48,23 +71,35 @@ export class ExcelService implements ExcelServiceIf {
       throw new Error('Invalid filename. Filename must be a non-empty string.');
     }
 
-    try {
-      const workbook = this.generateBuffer(matrix, author)
-
-      const blob = new Blob([workbook as any], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    return this.createExcelBlob(matrix, author)
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000); // free the memory of the blob
+      })
+      .catch(error => {
+        console.error('Error generating Excel file:', error);
+        throw new Error('Failed to download Excel file.');
       });
+  }
 
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error generating Excel file:', error);
-      throw new Error('Failed to download Excel file.');
-    }
+  /**
+   * Creates the .xlsx file as a Blob (compressed), e.g. to upload it instead of downloading it.
+   *
+   * @example
+   * const blob = await new ExcelService().createExcelBlob([["Name", "City"], ["Ann", "Berlin"]]);
+   * await fetch("/api/upload", { method: "POST", body: blob });
+   */
+  async createExcelBlob(matrix: Array<Array<any>>, author: string = ''): Promise<Blob> {
+    const bytes = await this.createZipCompressed(this.generateMap(matrix, author));
+    return new Blob([bytes as any], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
   }
 
 
@@ -175,99 +210,102 @@ export class ExcelService implements ExcelServiceIf {
     return `${columnName}${row + 1}`;
   }
 
+  /**
+   * ZIP without compression (method 0, synchronous). Kept for compatibility –
+   * downloads use {@link createZipCompressed}.
+   */
   createZip(files: Map<string, string>): Uint8Array {
+    const entries: ZipEntry[] = [];
+    files.forEach((content, path) => {
+      const data = new TextEncoder().encode(content);
+      entries.push({ path: new TextEncoder().encode(path), data, size: data.length, crc: crc32(data), method: 0 });
+    });
+    return this.assembleZip(entries);
+  }
+
+  /**
+   * ZIP with DEFLATE (method 8) via the browser's CompressionStream; falls back to stored entries
+   * where that is not available. 100,000 rows × 7 columns: ~40 MB stored → a few MB compressed.
+   */
+  async createZipCompressed(files: Map<string, string>): Promise<Uint8Array> {
+    const entries: ZipEntry[] = [];
+    for (const [path, content] of Array.from(files.entries())) {
+      const raw = new TextEncoder().encode(content);
+      const deflated = await deflateRaw(raw);
+      const useDeflate = !!deflated && deflated.length < raw.length;
+      entries.push({
+        path: new TextEncoder().encode(path),
+        data: useDeflate ? deflated! : raw,
+        size: raw.length,
+        crc: crc32(raw),             // CRC of the UNcompressed data
+        method: useDeflate ? 8 : 0
+      });
+    }
+    return this.assembleZip(entries);
+  }
+
+  private assembleZip(entries: ZipEntry[]): Uint8Array {
     const chunks: Uint8Array[] = [];
+    const offsets: number[] = [];
     let offset = 0;
 
-    const fileEntries: { path: string; offset: number; contentSize: number; crc: number }[] = [];
-
-    files.forEach((content, path) => {
-      const pathBytes = new TextEncoder().encode(path);
-      const contentBytes = new TextEncoder().encode(content);
-      const crc = crc32(contentBytes);
-
-      const localHeader = new Uint8Array(30 + pathBytes.length);
+    for (const e of entries) {
+      const localHeader = new Uint8Array(30 + e.path.length);
       const view = new DataView(localHeader.buffer);
-
       localHeader.set([0x50, 0x4b, 0x03, 0x04], 0); // PK\x03\x04
-      view.setUint16(4, 20, true); // Version needed to extract
-      view.setUint16(6, 0, true);  // General purpose bit flag
-      view.setUint16(8, 0, true);  // Compression method
-      view.setUint16(10, 0, true); // File last modification time
-      view.setUint16(12, 0, true); // File last modification date
-      view.setUint32(14, crc, true); // CRC-32
-      view.setUint32(18, contentBytes.length, true); // Compressed size
-      view.setUint32(22, contentBytes.length, true); // Uncompressed size
-      view.setUint16(26, pathBytes.length, true);   // File name length
-      view.setUint16(28, 0, true);                  // Extra field length
+      view.setUint16(4, 20, true);        // Version needed to extract (2.0: deflate)
+      view.setUint16(6, 0, true);         // General purpose bit flag
+      view.setUint16(8, e.method, true);  // Compression method: 0 stored, 8 deflate
+      view.setUint16(10, 0, true);        // File last modification time
+      view.setUint16(12, 0x21, true);     // File last modification date (1980-01-01)
+      view.setUint32(14, e.crc, true);    // CRC-32 of the uncompressed data
+      view.setUint32(18, e.data.length, true); // Compressed size
+      view.setUint32(22, e.size, true);   // Uncompressed size
+      view.setUint16(26, e.path.length, true);
+      view.setUint16(28, 0, true);        // Extra field length
+      localHeader.set(e.path, 30);
 
-      localHeader.set(pathBytes, 30);
-
-      // @ts-ignore
-      chunks.push(localHeader, contentBytes);
-
-      fileEntries.push({
-        path,
-        offset,
-        contentSize: contentBytes.length,
-        crc,
-      });
-
-      offset += localHeader.length + contentBytes.length;
-    });
+      chunks.push(localHeader, e.data);
+      offsets.push(offset);
+      offset += localHeader.length + e.data.length;
+    }
 
     const centralDirStart = offset;
-
-    fileEntries.forEach((entry) => {
-      const pathBytes = new TextEncoder().encode(entry.path);
-
-      const centralHeader = new Uint8Array(46 + pathBytes.length);
+    entries.forEach((e, i) => {
+      const centralHeader = new Uint8Array(46 + e.path.length);
       const view = new DataView(centralHeader.buffer);
-
       centralHeader.set([0x50, 0x4b, 0x01, 0x02], 0); // PK\x01\x02
-      view.setUint16(4, 20, true); // Version made by
-      view.setUint16(6, 20, true); // Version needed to extract
-      view.setUint16(8, 0, true);  // General purpose bit flag
-      view.setUint16(10, 0, true); // Compression method
-      view.setUint16(12, 0, true); // File last modification time
-      view.setUint16(14, 0, true); // File last modification date
-      view.setUint32(16, entry.crc, true); // CRC-32
-      view.setUint32(20, entry.contentSize, true); // Compressed size
-      view.setUint32(24, entry.contentSize, true); // Uncompressed size
-      view.setUint16(28, pathBytes.length, true); // File name length
-      view.setUint16(30, 0, true); // Extra field length
-      view.setUint16(32, 0, true); // File comment length
-      view.setUint16(34, 0, true); // Disk number where file starts
-      view.setUint16(36, 0, true); // Internal file attributes
-      view.setUint32(38, 0, true); // External file attributes
-      view.setUint32(42, entry.offset, true); // Relative offset of local file header
-
-      centralHeader.set(pathBytes, 46);
-
-      // @ts-ignore
+      view.setUint16(4, 20, true);        // Version made by
+      view.setUint16(6, 20, true);        // Version needed to extract
+      view.setUint16(8, 0, true);         // General purpose bit flag
+      view.setUint16(10, e.method, true); // Compression method
+      view.setUint16(12, 0, true);        // File last modification time
+      view.setUint16(14, 0x21, true);     // File last modification date
+      view.setUint32(16, e.crc, true);    // CRC-32
+      view.setUint32(20, e.data.length, true); // Compressed size
+      view.setUint32(24, e.size, true);   // Uncompressed size
+      view.setUint16(28, e.path.length, true);
+      view.setUint16(30, 0, true);        // Extra field length
+      view.setUint16(32, 0, true);        // File comment length
+      view.setUint16(34, 0, true);        // Disk number where file starts
+      view.setUint16(36, 0, true);        // Internal file attributes
+      view.setUint32(38, 0, true);        // External file attributes
+      view.setUint32(42, offsets[i], true); // Relative offset of local file header
+      centralHeader.set(e.path, 46);
       chunks.push(centralHeader);
       offset += centralHeader.length;
     });
 
     const centralDirEnd = new Uint8Array(22);
     const view = new DataView(centralDirEnd.buffer);
-
     centralDirEnd.set([0x50, 0x4b, 0x05, 0x06], 0); // PK\x05\x06
-    view.setUint16(4, 0, true); // Number of this disk
-    view.setUint16(6, 0, true); // Disk where central directory starts
-    view.setUint16(8, fileEntries.length, true); // Number of central directory records on this disk
-    view.setUint16(10, fileEntries.length, true); // Total number of central directory records
-    view.setUint32(12, offset - centralDirStart, true); // Size of central directory
-    view.setUint32(16, centralDirStart, true); // Offset of start of central directory
-    view.setUint16(20, 0, true); // ZIP file comment length
-
-    // @ts-ignore
+    view.setUint16(8, entries.length, true);  // records on this disk
+    view.setUint16(10, entries.length, true); // total records
+    view.setUint32(12, offset - centralDirStart, true); // size of central directory
+    view.setUint32(16, centralDirStart, true);          // offset of central directory
     chunks.push(centralDirEnd);
 
-
-    // return new Uint8Array(chunks);
-    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-    const result = new Uint8Array(totalLength);
+    const result = new Uint8Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
     let off = 0;
     for (const chunk of chunks) {
       result.set(chunk, off);
@@ -277,10 +315,7 @@ export class ExcelService implements ExcelServiceIf {
   }
 
 
-  private generateBuffer(data: Array<Array<any>>, author: string=''): Uint8Array {
-    const map: Map<string, string> = this.generateMap(data, author);
-    return this.createZip(map);
-  }
+
 
 
 }

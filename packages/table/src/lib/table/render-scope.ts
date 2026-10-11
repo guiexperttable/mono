@@ -198,7 +198,7 @@ export class RenderScope extends EleScope {
         this.editing = true;
         this.repaint();
         // request focus:
-        const input = document.querySelector('input.ge-table-cell-editor-input') as HTMLInputElement;
+        const input = this.hostElement.querySelector('input.ge-table-cell-editor-input') as HTMLInputElement;
         if (input) {
           input.focus();
         }
@@ -388,7 +388,7 @@ export class RenderScope extends EleScope {
   ) {
     const areaModel = this.tableModel.getAreaModel(area);
     const selector = 'div[data-col-index="' + columnIndex + '"][data-row-index="' + rowIndex + '"][data-area="' + area + '"]';
-    const cell = document.querySelector(selector) as HTMLDivElement;
+    const cell = this.hostElement.querySelector(selector) as HTMLDivElement; // this table only (several tables on a page)
 
     if (cell) {
       let fn: RendererCleanupFnType | undefined = undefined;

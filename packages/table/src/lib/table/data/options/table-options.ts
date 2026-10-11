@@ -7,15 +7,11 @@ import { SortedOptions } from "./sorted-options";
 import { InputCellRenderer } from "../../renderer/edit/input-cell-renderer";
 import { GetEditRenderer } from "../../renderer/edit/edit-cell-renderer.type";
 import { SelectionModelIf } from "../../selection/selection-model.if";
-import { SelectionModel } from "../../selection/selection-model";
 import { GetT } from "../common/get-t";
 import { FocusModelIf } from "../../focus/focus-model.if";
-import { FocusModel } from "../../focus/focus-model";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptions } from './header-group-options';
 
-const selectionModel = new SelectionModel();
-const focusModel = new FocusModel("cell");
 
 /**
  * TableOptions class provides configuration options for the table.
@@ -68,7 +64,14 @@ export class TableOptions implements TableOptionsIf {
 
   getEditRenderer?: GetEditRenderer = (_rowIndex: number, _columnIndex: number) => new InputCellRenderer();
 
-  getSelectionModel?: GetT<SelectionModelIf> = () => selectionModel;
+  /**
+   * Selection model of the table. Not set (default): every table creates its own model
+   * (`new SelectionModel()`, type "none") – tables never share a selection.
+   */
+  getSelectionModel?: GetT<SelectionModelIf> = undefined;
 
-  getFocusModel?: GetT<FocusModelIf> = () => focusModel;
+  /**
+   * Focus model of the table. Not set (default): every table creates its own `new FocusModel("cell")`.
+   */
+  getFocusModel?: GetT<FocusModelIf> = undefined;
 }

@@ -130,8 +130,8 @@ export class MouseHandler {
       }
     }
 
-    if (mouseTargetData.areaIdent === "body" && this.tableScope.tableOptions.getFocusModel) {
-      const fm = this.tableScope.tableOptions.getFocusModel();
+    if (mouseTargetData.areaIdent === "body") {
+      const fm = this.tableScope.focusModel();
       fm?.clear();
       fm?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }

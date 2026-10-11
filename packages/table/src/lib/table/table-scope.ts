@@ -904,7 +904,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
           const length = text.length;
           if (length > maxLength[c]) {
             maxLength[c] = length;
-            for (const t of candidates[c]) if (t.length < length - 2) candidates[c].delete(t);
+            candidates[c].forEach(t => { if (t.length < length - 2) candidates[c].delete(t); });
           }
           if (length >= maxLength[c] - 2 && candidates[c].size < maxCandidates) candidates[c].add(text);
         }
@@ -929,7 +929,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     return candidates.map(texts => {
       let px = 0;
-      for (const t of texts) px = Math.max(px, measure(t));
+      texts.forEach(t => { px = Math.max(px, measure(t)); });
       return Math.max(Math.ceil(px + padding + 2), 50);
     });
   }

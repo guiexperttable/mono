@@ -17,8 +17,10 @@ import { GeMouseEvent } from './data/common/event/ge-mouse-event';
 import { GeoData } from './data/geo-data';
 import { CellRendererIf } from './renderer/cell-render.if';
 import { SelectionModelIf } from './selection/selection-model.if';
+import { SelectionModel } from './selection/selection-model';
 import { GetT } from './data/common/get-t';
 import { FocusModelIf } from './focus/focus-model.if';
+import { FocusModel } from './focus/focus-model';
 import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-model';
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
@@ -117,16 +119,22 @@ export class RenderScope extends EleScope {
   ) {
     super(hostElement, tableModel, dom, tableOptions);
 
-    if (this.tableModel.getSelectionModel) {
-      this.getSelectionModel = this.tableModel.getSelectionModel;
-
+    // Selection model: table model → table options → an own model of THIS table.
+    // (Before 1.1.90 the default was one module-wide SelectionModel/FocusModel shared by all tables.)
+    if (this.tableModel.getSelectionModel?.()) {
+      this.getSelectionModel = () => this.tableModel.getSelectionModel();
     } else if (this.tableOptions?.getSelectionModel) {
-      // The 'getSelectionModel' method from 'tableOptions' has a higher priority:
       this.getSelectionModel = this.tableOptions.getSelectionModel;
+    } else {
+      const ownSelectionModel = new SelectionModel();
+      this.getSelectionModel = () => ownSelectionModel;
     }
 
     if (this.tableOptions?.getFocusModel) {
       this.getFocusModel = this.tableOptions.getFocusModel;
+    } else {
+      const ownFocusModel = new FocusModel("cell");
+      this.getFocusModel = () => ownFocusModel;
     }
     if (isAreaModelTree(tableModel.getAreaModel('body'))) {
       this.tree = true;

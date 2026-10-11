@@ -38,6 +38,7 @@ export class CopyService implements CopyServiceIf {
           for (let rowIndex = range.r1; rowIndex <= range.r2; rowIndex++) {
             const rowData: string[] = [];
             for (let columnIndex = range.c1; columnIndex <= range.c2; columnIndex++) {
+              if (tableModel.getColumnDef(columnIndex)?.isVisible?.() === false) continue; // hidden column
               const cellValue = selectionModel.isSelected(rowIndex, columnIndex) ? tableModel.getBodyModel().getTextValueAt(rowIndex, columnIndex) : '';
               rowData.push(cellValue);
             }
@@ -97,6 +98,8 @@ export class CopyService implements CopyServiceIf {
               .catch(_ => {
                 reject();
               });
+          } else {
+            resolve(''); // nothing to copy – don't leave the promise pending
           }
         })
         .catch(_ => {

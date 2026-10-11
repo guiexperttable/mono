@@ -86,11 +86,16 @@
     Knoten wurden nie wiederhergestellt (nur sichtbare Zeilen durchlaufen), eine zugeklappt startende Tabelle merkte
     sich das Aufklappen nicht (Modus jetzt aus dem ersten Klick); `localStorage` ohne try/catch (Private Mode → Fehler
     beim Start); `autoConvertMapToObject` vertauschte Schlüssel und Wert.
-- [ ] `TreeFactory.buildTreeRows()` klappt alles auf (`expanded = true`) – Option für „zugeklappt starten“ fehlt.
-- [ ] `ExcelService` schreibt unkomprimiert (100.000 Zeilen × 7 Spalten ≈ 40 MB) → `CompressionStream('deflate-raw')`
-      (dann asynchron) oder eigener Deflate.
-- [ ] `TableOptions`: Standard-`SelectionModel`/`FocusModel` sind modulweite Singletons → mehrere Tabellen ohne
-      eigenes `getSelectionModel` teilen sich Auswahl und Fokus. Pro `new TableOptions()` neu erzeugen.
+- [x] **Release 1.1.90**:
+  - `TableOptions`: Standard-`SelectionModel`/`FocusModel` waren modulweite Singletons → mehrere Tabellen ohne
+    eigenes `getSelectionModel` teilten Auswahl und Fokus. Jetzt erzeugt jeder `TableScope` eigene Modelle
+    (Reihenfolge: Tabellenmodell → Options → eigenes Modell); Defaults in `TableOptions` sind `undefined`.
+  - `TreeFactory.buildTreeRows(data, { childrenProperty, expanded, deepMaxLimit })` – `expanded: false` oder
+    `(row, deep) => boolean`; `deepMaxLimit` wird jetzt an die Rekursion weitergegeben.
+  - Excel: ZIP-Einträge mit DEFLATE (`CompressionStream('deflate-raw')`, Fallback unkomprimiert) – 40 MB → 3,9 MB;
+    `downloadExcel()` liefert `Promise<void>`, neu `ExcelService.createExcelBlob()`; Object-URL wird freigegeben.
+  - `tableApi.sortByColumn(column, sortState?)` – Sortieren per eigenem Button wie per Doppelklick.
+  - tsc-Fehler TS2802 (Set-Iteration bei ES5-Target) in `calcAutoColumnWidths` behoben.
 - [x] `TableScope.destroy()` / `TableApi.destroy()`: entfernt alle DOM-Listener (u. a. `window` resize – vorher ein
       Leck bei jedem Neuaufbau), trennt den ResizeObserver, meldet sich bei Selection-/Focus-Model ab, ruft die
       Renderer-Cleanups. Grundlage für den Modellwechsel in allen Wrappern.

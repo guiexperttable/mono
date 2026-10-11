@@ -594,7 +594,11 @@ const ageColumn = ColumnDef.create({
 });
 ```
 
-Programmatically: `tableApi.sort((a, b) => a.age - b.age)` or `tableApi.reSort()` (re-apply the current sorting,
+The user sorts with a **double click** on the column header (asc → desc → asc …). From code – e.g. from your own
+button – use `tableApi.sortByColumn("age", "desc")` (since 1.1.90): same result as the double click, including the
+header icon; without the second argument it toggles like the header.
+
+Programmatically with a comparator: `tableApi.sort((a, b) => a.age - b.age)` or `tableApi.reSort()` (re-apply the current sorting,
 e.g. after data changes); both repaint the table (since 1.1.86 – before, the new order only appeared after scrolling). Header sort icons are configured with `tableOptions.sortedOptions`.
 
 ### 6.3 Filtering
@@ -637,6 +641,8 @@ const tableOptions: TableOptionsIf = {
 };
 ```
 
+- Without `getSelectionModel` / `getFocusModel` every table creates its **own** models (since 1.1.90; before, all
+  tables without them shared one selection and focus). The default selection type is `"none"`.
 - Mouse: click = focus, shift-click = range from the last click, Ctrl/⌘-click = add a cell (mode `"multi"`),
   drag over body cells = range (type `"range"`, since 1.1.88).
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
@@ -671,6 +677,8 @@ const data: PersonIf[] = [
 ];
 
 const tree = TreeFactory.buildTreeRows<PersonIf>(data, "friends");   // "friends" = children property
+// start collapsed (since 1.1.90) – expanded: boolean or (row, deep) => boolean, default true:
+// TreeFactory.buildTreeRows<PersonIf>(data, { childrenProperty: "friends", expanded: false });
 
 const tableModel = TableFactory.createTableModel({
   rows: tree,                                                          // TreeRow[] → tree area model
@@ -765,6 +773,9 @@ function exportAllRows(tableApi: TableApi) {          // all rows, ignoring filt
   sort order, plus header and footer rows (values from `getValueAt`, i.e. raw values, not the rendered HTML).
   Hidden columns (`isVisible: () => false`) are left out (since 1.1.88).
 - Any other data (all rows, other columns, a selection) → build a matrix and pass it to `ExcelService.downloadExcel()`.
+- Since 1.1.90 the file is compressed (DEFLATE via the browser's `CompressionStream`, no library; ~10× smaller) and
+  both `downloadExcel()` methods return a `Promise<void>`. `new ExcelService().createExcelBlob(matrix)` returns the
+  file as a `Blob`, e.g. for an upload.
 - Numbers stay numbers in Excel; dates are written as ISO text. Since 1.1.86 the files carry valid CRC-32 checksums,
   row numbers and sheet dimensions (older versions wrote CRC 0 and a fixed range `A1:B3`, which strict readers reject).
 

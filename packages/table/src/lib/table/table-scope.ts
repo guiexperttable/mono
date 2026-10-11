@@ -823,6 +823,15 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       if (sortItems?.length) {
         const areaModel = this.tableModel.getBodyModel();
         areaModel.doSort(sortItems);
+        // the header icons must show the restored order (not the sortState of the column definitions)
+        const columnDefs = this.tableModel.getColumnDefs();
+        if (columnDefs) {
+          columnDefs.forEach(cd => cd.sortState = '');
+          sortItems.forEach(item => {
+            const cd = columnDefs[item.columnIndex];
+            if (cd) cd.sortState = item.sortState;
+          });
+        }
       }
     }
   }
@@ -834,42 +843,33 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @private
    */
   private autoRestoreCollapsedExpandedState() {
-    if (this.tableOptions?.autoRestoreOptions?.getRowId && this.storeStateCollapsedExpandService) {
-      const autoRestoreOptions = this.tableOptions.autoRestoreOptions;
-      const getRowId = autoRestoreOptions.getRowId;
-      if (autoRestoreOptions.autoRestoreCollapsedExpandedState && getRowId) {
-        const state = this.storeStateCollapsedExpandService.collapsedExpandedStateGet();
-        const areaModel = this.tableModel.getAreaModel('body');
-        if (isAreaModelTree(areaModel)) {
-          const amtr: AreaModelTree<any> = areaModel as AreaModelTree<any>;
-          const rowCount = areaModel.getRowCount();
+    const service = this.storeStateCollapsedExpandService;
+    const autoRestoreOptions = this.tableOptions?.autoRestoreOptions;
+    const getRowId = autoRestoreOptions?.getRowId;
+    if (!service || !getRowId || !autoRestoreOptions?.autoRestoreCollapsedExpandedState) return;
+    if (!service.hasStoredState()) return; // nothing stored yet → keep the initial state of the rows
 
-
-          for (let i = 0; i < rowCount; i++) {
-            const row: TreeRowIf<any> | undefined = areaModel.getRowByIndex(i);
-            if (row) {
-              if (state.allExpanded) {
-                row.expanded = true;
-
-              } else if (state.allCollapsed) {
-                row.expanded = false;
-
-              } else {
-                const rowId = getRowId(row.data);
-                if (state.mode === 'expanded') {
-                  row.expanded = (this.storeStateCollapsedExpandService.collapsedExpandedStateIncludes(rowId));
-
-                } else if (state.mode === 'collapsed') {
-                  row.expanded = (!this.storeStateCollapsedExpandService.collapsedExpandedStateIncludes(rowId));
-                }
-              }
-            }
-          }
-          amtr.recalcVisibleTreeRows();
+    const areaModel = this.tableModel.getAreaModel('body');
+    if (isAreaModelTree(areaModel)) {
+      const amtr: AreaModelTree<any> = areaModel as AreaModelTree<any>;
+      const state = service.collapsedExpandedStateGet();
+      // walk ALL rows (not only the visible ones) – otherwise nested rows of collapsed parents are never restored
+      const restore = (rows: TreeRowIf<any>[] | undefined) => rows?.forEach(row => {
+        if (state.allExpanded) {
+          row.expanded = true;
+        } else if (state.allCollapsed) {
+          row.expanded = false;
+        } else {
+          const included = service.collapsedExpandedStateIncludes(getRowId(row.data));
+          row.expanded = state.mode === 'expanded' ? included : !included;
         }
-      }
+        restore(row.children);
+      });
+      restore(amtr.rows);
+      amtr.recalcVisibleTreeRows();
     }
   }
+
 
 
   /**

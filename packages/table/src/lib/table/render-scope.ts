@@ -79,6 +79,7 @@ export class RenderScope extends EleScope {
   protected getSelectionModel?: GetT<SelectionModelIf>;
   protected getFocusModel?: GetT<FocusModelIf>;
   protected scrollLeft = 0;
+  private scrollPosSaveTimeout?: ReturnType<typeof setTimeout>;
   protected scrollViewportLeft = 0;
   protected scrollFactorY = 0;
   protected scrollFactorX = 0;
@@ -267,7 +268,9 @@ export class RenderScope extends EleScope {
     this.scrollTop = this.scrollViewport.scrollTop;
     this.scrollLeft = this.scrollViewport.scrollLeft;
     this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
-    this.debounce(this.checkForScrollPosSaving.bind(this));
+    // own timer: the shared debounce() is also used by debounceRepaint() and would cancel the saving
+    if (this.scrollPosSaveTimeout) clearTimeout(this.scrollPosSaveTimeout);
+    this.scrollPosSaveTimeout = setTimeout(() => this.checkForScrollPosSaving(), 500);
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
     this.scrollFactorX = this.scrollLeft / (this.scrollViewport.scrollWidth - this.scrollViewport.clientWidth);

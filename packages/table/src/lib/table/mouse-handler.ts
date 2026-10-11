@@ -234,6 +234,8 @@ export class MouseHandler {
     // store expanded/collapsed:
     const getRowId = this.tableScope.tableOptions?.autoRestoreOptions?.getRowId;
     if (getRowId) {
+      // first toggle: a row that is now expanded means "the table started collapsed" → store expanded ids
+      this.tableScope.storeStateCollapsedExpandService?.initModeIfEmpty(tr.expanded ? "expanded" : "collapsed");
       const mode = this.tableScope.storeStateCollapsedExpandService?.collapsedExpandedStateGet().mode;
       const push = (mode === "collapsed" && !tr.expanded) || (mode === "expanded" && tr.expanded);
       const remove = (mode === "collapsed" && tr.expanded) || (mode === "expanded" && !tr.expanded);

@@ -54,7 +54,7 @@ mono/
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
 | Alles | `pnpm build:all` (= `pnpm -r build`, topologisch) |
 | Demos | `pnpm serve:table-demo`, `serve:react-table-demo`, …, `serve:angular-table-demo` |
-| Website lokal | `cd apps/webpage-guiexpert && pnpm pre:build` (kopiert dists nach `public/scripts/`, git-ignored), dann `pnpm serve:webpage-guiexpert` |
+| Website lokal | `pnpm build:core && pnpm --filter @guiexpert/demo-table-models build`, dann `pnpm serve:webpage-guiexpert` (`dev`/`build` kopieren die dists per `pre:build` nach `public/scripts/`, git-ignored – fehlen sie, bleiben alle Showcase-Tabellen leer) |
 | Versionen | `pnpm version:check`, `pnpm version:patch` (Core 1.1.84 → 1.1.85, Wrapper behalten Framework-Major) |
 | Publish | `pnpm pub:<paket>`, `pnpm pub:angular` – **nie ohne ausdrückliche Anweisung**. Angular-Dist-Tags: `latest` = neueste Major, sonst `a14` … `a21` (so auch bisher auf npm) |
 

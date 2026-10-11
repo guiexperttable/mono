@@ -100,6 +100,8 @@ export * from './lib/table/data/options/table-options';
 export * from './lib/table/data/options/table-options.if';
 export * from './lib/table/data/options/default-row-heights.if';
 export * from './lib/table/data/options/default-row-heights';
+export * from './lib/table/data/options/header-group-options';
+export * from './lib/table/data/options/header-group-options.if';
 export * from './lib/table/data/options/tree-options';
 export * from './lib/table/data/options/tree-options.if';
 export * from './lib/table/data/options/icon';

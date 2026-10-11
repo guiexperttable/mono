@@ -1111,7 +1111,7 @@ export class RenderScope extends EleScope {
     }
 
     const val = areaModel.getValueAt(rowIndex, index);
-    const text = cellRenderer ? '' : `${val}`;
+    const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
     const checkedType = areaModel.isRowChecked(rowIndex);
     const cell = this.dom.addColumnDiv(
       {
@@ -1417,7 +1417,7 @@ export class RenderScope extends EleScope {
         const geo = { left: 0, width: columnGeo.width, height, top, index: rowIndex };
         const val = areaModel.getValueAt(rowIndex, columnIndex);
         const cellRenderer = areaModel.getCellRenderer(rowIndex, columnIndex);
-        const text = cellRenderer ? '' : `${val}`;
+        const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
         const para: AddColumnDivPara = {
           parent,
           geo,

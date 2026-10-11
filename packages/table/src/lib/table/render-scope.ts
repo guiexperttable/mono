@@ -392,7 +392,7 @@ export class RenderScope extends EleScope {
 
     if (cell) {
       let fn: RendererCleanupFnType | undefined = undefined;
-      const editor = this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === columnIndex;
+      const editor = area === 'body' && this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === columnIndex;
       let cellRenderer;
       if (editor) {
         cellRenderer = this.editorRenderer;
@@ -1081,7 +1081,8 @@ export class RenderScope extends EleScope {
       lastRowOfModel
     }: ArgsRenderCellDiv): [HTMLDivElement, RendererCleanupFnType | undefined] {
 
-    const editor = this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === index;
+    // the editor belongs to the body only (header row 0 has the same row index as body row 0)
+    const editor = areaIdent === 'body' && this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === index;
     const cellRenderer = (editor) ? this.editorRenderer : areaModel.getCellRenderer(rowIndex, index);
     const geo = { left, width, height, top, index };
     const rowObject = areaModel.getRowByIndex(rowIndex);
@@ -1141,6 +1142,12 @@ export class RenderScope extends EleScope {
     let fn: RendererCleanupFnType | undefined = undefined;
     if (cellRenderer) {
       fn = cellRenderer.render(cell, rowIndex, index, areaIdent, areaModel, val, this.dom.domService);
+      if (editor) {
+        // the cell is rebuilt on every repaint (e.g. after the click events of the double click) –
+        // give the new input/select the focus, otherwise typing goes nowhere
+        const input = cell.querySelector('input, select') as HTMLInputElement | HTMLSelectElement | null;
+        if (input && !input.contains(document.activeElement)) input.focus();
+      }
     }
 
     const classes = areaModel.getCustomClassesAt(rowIndex, index);

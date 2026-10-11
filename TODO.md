@@ -70,6 +70,11 @@
   - Zellen ohne Wert (`undefined`/`null`) zeigten den Text „undefined“ (z. B. Elternzeilen im Baum).
   - Zwei schnelle Klicks auf **verschiedene** Zellen (< 500 ms, z. B. zwei Baum-Pfeile) galten als Doppelklick –
     der zweite Klick ging verloren. Doppelklick jetzt nur auf derselben Zelle.
+  - Inline-Editing war praktisch unbenutzbar: Doppelklick auf eine Zelle mit Renderer (Balken, Badge, Komponente)
+    öffnete keinen Editor (Attribute nur am Event-Target gesucht); der Editor erschien zusätzlich in Header-Zeile 0
+    und bekam keinen Fokus; Tastenkürzel (z. B. ⌘/Strg+A) liefen auch im Editor und bauten die Zelle neu → Eingabe weg.
+    Jetzt: `closest()` für die Zell-Attribute, Editor nur im Body, Fokus nach jedem Neuzeichnen, Kürzel ignorieren
+    Eingabefelder.
   - `ColumnDef.create()` ohne `sortable` setzte `sortIconVisible = FalseFn` → späteres `sortable = TrueFn` sortierte
     ohne Symbol. Sortier-Symbol überdeckte rechtsbündige Header-Texte (Label bekommt jetzt Platz).
 - [ ] `TreeFactory.buildTreeRows()` klappt alles auf (`expanded = true`) – Option für „zugeklappt starten“ fehlt.

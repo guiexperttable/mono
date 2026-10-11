@@ -151,10 +151,11 @@ export class MouseHandler {
     this.lastClicked = Date.now();
 
     if (event.target instanceof HTMLElement) {
-      const target = event.target as HTMLElement;
-      const area = target.getAttribute("data-area");
+      // the target may be an element inside the cell (renderer, component) → look up the cell attributes
+      const target = (event.target.closest("[data-col-index]") ?? event.target) as HTMLElement;
+      const area = target.closest("[data-area]")?.getAttribute("data-area") ?? null;
       const areaIdent: AreaIdent = getAreaIdentByString(area);
-      const rowIdx = Number(target.getAttribute("data-row-index"));
+      const rowIdx = Number(target.closest("[data-row-index]")?.getAttribute("data-row-index"));
       const colIdx = Number(target.getAttribute("data-col-index"));
       const areaModel = this.tableScope.tableModel.getAreaModel(areaIdent);
 

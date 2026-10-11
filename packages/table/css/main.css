@@ -118,6 +118,11 @@
 }
 
 
+/* room for the sort icon (20px, absolute, right) – otherwise it covers right-aligned header labels */
+.ge-table-col-div:has(> .ge-table-sorted-icon-div) .ge-table-label {
+  padding-right: 22px;
+}
+
 
 .ge-table { background-color: var(--ge-table-bg); }
 

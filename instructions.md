@@ -619,6 +619,9 @@ function onSearchInput(value: string) {
 }
 ```
 
+The current sort order survives a filter change (since 1.1.88): the last `tableApi.sort(fn)` or the header sort
+(columns with a `sortState`) is applied again to the filtered rows.
+
 Showcases: *Input filter*, *ID filter* and *Slider filter* on https://gui.expert/showcase.
 
 ### 6.4 Selection, focus and keyboard
@@ -634,6 +637,8 @@ const tableOptions: TableOptionsIf = {
 };
 ```
 
+- Mouse: click = focus, shift-click = range from the last click, Ctrl/⌘-click = add a cell (mode `"multi"`),
+  drag over body cells = range (type `"range"`, since 1.1.88).
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
 - API: `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
   `tableApi.getSelectionModel()`.
@@ -744,7 +749,7 @@ import { AreaModelObjectArray, ExcelService, TableApi } from "@guiexpert/table";
 interface PersonIf { name: string; city: string; }
 
 function exportTable(tableApi: TableApi) {
-  tableApi.copyToClipboard();                         // selected cells (or the focused cell) as text
+  tableApi.copyToClipboard();                         // selected cells (or the focused cell) as text, hidden columns skipped
   tableApi.downloadExcel("persons.xlsx", "Marc");     // what the table shows: header, body, footer – no extra library
 }
 

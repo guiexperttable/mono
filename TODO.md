@@ -56,6 +56,20 @@
       ein Typfehler. Geprüft mit gepackten
       Paketen + `tsc --strict` ohne `skipLibCheck`. **Release 1.1.87 nötig.**
 
+- [x] **Release 1.1.88** (1.1.87 wurde nur getaggt – `v1.1.87` zeigt auf einen Commit mit Version 1.1.86, der
+      Workflow hat deshalb nichts veröffentlicht). Enthält zusätzlich:
+  - `autoResizeColumns()` schätzte 10 px pro Zeichen nur aus dem Body → Datum und Footer-Summen abgeschnitten.
+    Jetzt Header + Body + Footer, gemessen mit `canvas.measureText` in Schrift und Padding eines echten Labels
+    (je Spalte max. 30 Kandidaten, ein Durchlauf → 100.000 Zeilen in < 0,5 s).
+  - Filter verlor die Sortierung: `externalFilterChanged()` baute `filteredRows` aus den unsortierten Zeilen, das
+    Sortier-Symbol blieb stehen. Jetzt wird die letzte Sortierung erneut angewendet; `sort(fn)` löscht die
+    Header-Symbole (sie stimmen dann nicht mehr).
+  - `copyToClipboard()` kopierte versteckte Spalten mit und hing ohne Inhalt für immer (Promise nie erfüllt).
+  - Bereichsauswahl per Maus-Ziehen (Typ `"range"`) – vorher nur Shift-Klick.
+  - `ColumnDef.create()` ohne `sortable` setzte `sortIconVisible = FalseFn` → späteres `sortable = TrueFn` sortierte
+    ohne Symbol. Sortier-Symbol überdeckte rechtsbündige Header-Texte (Label bekommt jetzt Platz).
+- [ ] `TableOptions`: Standard-`SelectionModel`/`FocusModel` sind modulweite Singletons → mehrere Tabellen ohne
+      eigenes `getSelectionModel` teilen sich Auswahl und Fokus. Pro `new TableOptions()` neu erzeugen.
 - [x] `TableScope.destroy()` / `TableApi.destroy()`: entfernt alle DOM-Listener (u. a. `window` resize – vorher ein
       Leck bei jedem Neuaufbau), trennt den ResizeObserver, meldet sich bei Selection-/Focus-Model ab, ruft die
       Renderer-Cleanups. Grundlage für den Modellwechsel in allen Wrappern.

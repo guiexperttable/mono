@@ -1,4 +1,6 @@
-.ge-table {
+/* Defaults for the host element. :where() = zero specificity, so the app's own rules always win –
+   e.g. ".table-div { height: 500px }" no longer depends on the order in which the stylesheets are bundled. */
+:where(.ge-table) {
   display: block;
   margin: 0;
   width: 100%;

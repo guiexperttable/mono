@@ -85,7 +85,8 @@ export class ColumnDef implements ColumnDefIf {
       param.footerClasses
     );
 
-    const sortIconVisible = param.sortIconVisible ?? param.sortable ?? FalseFn;
+    // undefined = icon follows sortState (like the constructor); a later `columnDef.sortable = TrueFn` then shows it too
+    const sortIconVisible = param.sortIconVisible ?? param.sortable;
     const editable = param.editable ?? param.editable ?? FalseFn;
     const isVisible = param.isVisible ?? param.isVisible ?? TrueFn;
 

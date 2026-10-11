@@ -100,6 +100,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private lastDragFrom = -1;
   private lastDragTo = -1;
   private firstDraggingRendering = true;
+  /** Last comparator passed to `sort()`; re-applied after filtering. Cleared by a header sort. */
+  private lastSortCompareFn?: (a: any, b: any) => number;
 
   constructor(
     hostElement: HTMLDivElement,
@@ -341,6 +343,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   onMouseDown(mouseEvent: GeMouseEvent) {
+    this.selectionService.onMouseDown();
     if (mouseEvent.columnIndex > -1 && mouseEvent.action && ['resize-column', 'drag-column'].includes(mouseEvent.action)) {
 
       this.mouseStartWidth = this.tableModel.getColumnWidth(mouseEvent.columnIndex);
@@ -366,6 +369,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     if (this.mouseStartColumnIndex > -1 && this.mouseStartAction === 'resize-column' && this.tableOptions.columnsResizable) {
       this.resizeColumn(mouseEvent);
+
+    } else if (!this.mouseStartAction && this.selectionService.onMouseDragging(mouseEvent, startMouseEvent)) {
+      this.repaint(); // drag selection (selection type "range")
 
     } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable) {
 
@@ -538,6 +544,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         this.clearSelectionModel();
       }
       this.tableModel.externalFilterChanged(predictFn);
+      this.reapplySorting(); // filtering starts from the unsorted rows
       this.scrollViewport.scrollTo(0, 0);
       this.tableModel.recalcHeightAndPadding();
       this.resetSizeOfWrapperDiv();
@@ -565,6 +572,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
       const sortItem = new SortItem(colIdx, newState);
       const done = this.tableModel.doSort([sortItem]);
+      this.lastSortCompareFn = undefined;
       if (done) {
         this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = '');
         colDef.sortState = newState;
@@ -650,7 +658,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     if ('columnDefs' in this.tableModel) {
       this.tableModel.columnDefs = headerAreaModel.toggleHeaderGroup(mouseTargetData);
-      console.info('####### !!!!!! *******, this.tableModel.columnDefs');
     }
     // this.repaint();
     this.firstInit();
@@ -865,29 +872,66 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
 
+  /**
+   * Calculates a width per column that fits the widest text of header, body and footer.
+   *
+   * The text is measured with the font and padding of a rendered cell label (canvas `measureText`),
+   * so dates, numbers and long names are no longer cut off. To stay fast with millions of rows, the body
+   * is scanned once by character length and only the longest candidates per column are measured.
+   * Without a canvas (e.g. in tests) it falls back to 8 px per character.
+   *
+   * @returns {number[]} one width in px per column (at least 50 px)
+   */
   calcAutoColumnWidths(): number[] {
     const bodyModel = this.tableModel.getBodyModel();
     const columnCount = this.tableModel.getColumnCount();
-    const rowCount = bodyModel?.getRowCount() ?? 0;
 
     if (!bodyModel) {
       console.warn('Body model is not available.');
       return [];
     }
 
-    const characterLengthArr = new Array(columnCount).fill(0);
-
-    // Calculate maximum string length for each column
-    for (let r = 0; r < rowCount; r++) {
-      for (let c = 0; c < columnCount; c++) {
-        const value = bodyModel.getValueAt(r, c);
-        const length = value?.toString().length || 0;
-        if (length > characterLengthArr[c]) {
-          characterLengthArr[c] = length;
+    // 1. candidates: per column the texts with (almost) the greatest character length
+    const maxCandidates = 30;
+    const candidates: Set<string>[] = Array.from({length: columnCount}, () => new Set<string>());
+    const maxLength = new Array(columnCount).fill(0);
+    const collect = (area: AreaIdent) => {
+      const model = this.tableModel.getAreaModel(area);
+      const rowCount = model?.getRowCount() ?? 0;
+      for (let r = 0; r < rowCount; r++) {
+        for (let c = 0; c < columnCount; c++) {
+          const text = model.getTextValueAt?.(r, c) || (model.getValueAt(r, c)?.toString() ?? '');
+          const length = text.length;
+          if (length > maxLength[c]) {
+            maxLength[c] = length;
+            for (const t of candidates[c]) if (t.length < length - 2) candidates[c].delete(t);
+          }
+          if (length >= maxLength[c] - 2 && candidates[c].size < maxCandidates) candidates[c].add(text);
         }
       }
+    };
+    collect('header');
+    collect('body');
+    collect('footer');
+
+    // 2. measure the candidates with the font and padding of a real cell label
+    const label = this.hostElement.querySelector('.ge-table-label') as HTMLElement | null;
+    const style = getComputedStyle(label ?? this.hostElement);
+    const padding = label ? (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0) : 20;
+    let ctx: CanvasRenderingContext2D | null = null;
+    try {
+      ctx = document.createElement('canvas').getContext('2d');
+    } catch (_e) {
+      ctx = null;
     }
-    return characterLengthArr.map((width) => Math.max(width * 10, 50));
+    if (ctx) ctx.font = style.font || `${style.fontSize} ${style.fontFamily}`;
+    const measure = (text: string) => ctx ? ctx.measureText(text).width : text.length * 8;
+
+    return candidates.map(texts => {
+      let px = 0;
+      for (const t of texts) px = Math.max(px, measure(t));
+      return Math.max(Math.ceil(px + padding + 2), 50);
+    });
   }
 
 
@@ -919,7 +963,27 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   sort(compareFn: (a: any, b: any) => number) {
     this.tableModel.sort(compareFn);
+    this.lastSortCompareFn = compareFn;
+    this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = ''); // the header icons no longer apply
     this.repaint(); // without it the new order only appeared after the next scroll
+  }
+
+  /**
+   * Sorts the (freshly filtered) body rows again, so a filter keeps the current order:
+   * the last `sort(compareFn)` call, otherwise the columns with a `sortState` (header icons).
+   */
+  protected reapplySorting() {
+    if (this.lastSortCompareFn) {
+      this.tableModel.sort(this.lastSortCompareFn);
+      return;
+    }
+    const sortItems: SortItem[] = [];
+    this.tableModel.getColumnDefs()?.forEach((cd, index) => {
+      if (cd.sortState) sortItems.push(new SortItem(index, cd.sortState));
+    });
+    if (sortItems.length) {
+      this.tableModel.doSort(sortItems);
+    }
   }
 
 

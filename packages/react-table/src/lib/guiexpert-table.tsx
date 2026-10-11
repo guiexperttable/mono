@@ -11,13 +11,13 @@ import {
 } from '@guiexpert/table';
 import { useEffect, useRef } from "react";
 
-export type GeMouseEventFn = (evt: GeMouseEvent) => {};
-export type GeCheckboxEventFn = (evt: any[]) => {};
-export type GeTableReadyEventFn = (evt: TableApi) => {};
-export type GeModelChangeEventFn = (evt: GeModelChangeEvent) => {};
-export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => {};
-export type GeFocusChangeEventFn = (evt: FocusModelIf) => {};
-export type GeScrollEventFn = (evt: GeScrollEvent) => {};
+export type GeMouseEventFn = (evt: GeMouseEvent) => void;
+export type GeCheckboxEventFn = (evt: any[]) => void;
+export type GeTableReadyEventFn = (evt: TableApi) => void;
+export type GeModelChangeEventFn = (evt: GeModelChangeEvent) => void;
+export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
+export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
+export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,

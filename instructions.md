@@ -619,6 +619,9 @@ function onSearchInput(value: string) {
 }
 ```
 
+The current sort order survives a filter change (since 1.1.88): the last `tableApi.sort(fn)` or the header sort
+(columns with a `sortState`) is applied again to the filtered rows.
+
 Showcases: *Input filter*, *ID filter* and *Slider filter* on https://gui.expert/showcase.
 
 ### 6.4 Selection, focus and keyboard
@@ -634,6 +637,8 @@ const tableOptions: TableOptionsIf = {
 };
 ```
 
+- Mouse: click = focus, shift-click = range from the last click, Ctrl/⌘-click = add a cell (mode `"multi"`),
+  drag over body cells = range (type `"range"`, since 1.1.88).
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
 - API: `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
   `tableApi.getSelectionModel()`.
@@ -744,7 +749,7 @@ import { AreaModelObjectArray, ExcelService, TableApi } from "@guiexpert/table";
 interface PersonIf { name: string; city: string; }
 
 function exportTable(tableApi: TableApi) {
-  tableApi.copyToClipboard();                         // selected cells (or the focused cell) as text
+  tableApi.copyToClipboard();                         // selected cells (or the focused cell) as text, hidden columns skipped
   tableApi.downloadExcel("persons.xlsx", "Marc");     // what the table shows: header, body, footer – no extra library
 }
 
@@ -757,6 +762,7 @@ function exportAllRows(tableApi: TableApi) {          // all rows, ignoring filt
 
 - `downloadExcel()` exports **the current view**: only the rows that pass `externalFilterFunction`, in the current
   sort order, plus header and footer rows (values from `getValueAt`, i.e. raw values, not the rendered HTML).
+  Hidden columns (`isVisible: () => false`) are left out (since 1.1.88).
 - Any other data (all rows, other columns, a selection) → build a matrix and pass it to `ExcelService.downloadExcel()`.
 - Numbers stay numbers in Excel; dates are written as ISO text. Since 1.1.86 the files carry valid CRC-32 checksums,
   row numbers and sheet dimensions (older versions wrote CRC 0 and a fixed range `A1:B3`, which strict readers reject).

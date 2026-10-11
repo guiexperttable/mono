@@ -343,6 +343,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   onMouseDown(mouseEvent: GeMouseEvent) {
+    this.selectionService.onMouseDown();
     if (mouseEvent.columnIndex > -1 && mouseEvent.action && ['resize-column', 'drag-column'].includes(mouseEvent.action)) {
 
       this.mouseStartWidth = this.tableModel.getColumnWidth(mouseEvent.columnIndex);
@@ -368,6 +369,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     if (this.mouseStartColumnIndex > -1 && this.mouseStartAction === 'resize-column' && this.tableOptions.columnsResizable) {
       this.resizeColumn(mouseEvent);
+
+    } else if (!this.mouseStartAction && this.selectionService.onMouseDragging(mouseEvent, startMouseEvent)) {
+      this.repaint(); // drag selection (selection type "range")
 
     } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable) {
 

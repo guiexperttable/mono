@@ -13,6 +13,8 @@ export class SelectionService implements OnActionTriggeredIf {
   getSelectionModel?: GetT<SelectionModelIf>;
   getFocusModel?: GetT<FocusModelIf>;
   protected previousEvt?: GeMouseEvent;
+  /** A drag selection ends with a click on another cell – that click must not clear the new range. */
+  protected ignoreNextClick = false;
 
 
   constructor(
@@ -27,7 +29,45 @@ export class SelectionService implements OnActionTriggeredIf {
   }
 
 
+  /**
+   * Called on mouse down: a new gesture starts.
+   */
+  onMouseDown(): void {
+    this.ignoreNextClick = false;
+  }
+
+  /**
+   * Selects a range by dragging the mouse over body cells (selection type "range").
+   * The cell where the drag started stays the anchor, so a following shift-click extends from there.
+   *
+   * @param {GeMouseEvent} evt - the current mouse position
+   * @param {GeMouseEvent} startEvt - the mouse down event that started the drag
+   * @returns {boolean} true if the selection changed (repaint needed)
+   */
+  onMouseDragging(evt: GeMouseEvent, startEvt: GeMouseEvent | undefined): boolean {
+    if (!startEvt || startEvt.action || startEvt.areaIdent !== 'body' || evt.areaIdent !== 'body') return false;
+    if (startEvt.rowIndex < 0 || startEvt.columnIndex < 0 || evt.rowIndex < 0 || evt.columnIndex < 0) return false;
+    const sm = this.getSelectionModel?.();
+    if (!sm || !('selectionType' in sm) || sm.selectionType !== 'range') return false;
+
+    sm.clear();
+    sm.addSelection(this.createRangeByEvents(evt, startEvt));
+    const fm = this.getFocusModel?.();
+    if (fm && !fm.hasFocus(startEvt.rowIndex, startEvt.columnIndex)) {
+      fm.setFocus(startEvt.rowIndex, startEvt.columnIndex);
+      this.tableScope.onFocusChanged(fm);
+    }
+    this.previousEvt = startEvt.clone();
+    this.ignoreNextClick = evt.rowIndex !== startEvt.rowIndex || evt.columnIndex !== startEvt.columnIndex;
+    this.tableScope.onSelectionChanged(sm);
+    return true;
+  }
+
   onMouseClicked(evt: GeMouseEvent, _previousEvt: GeMouseEvent | undefined): boolean {
+    if (this.ignoreNextClick) {
+      this.ignoreNextClick = false;
+      return false;
+    }
     let dirty = false;
     let deletePreviousEvent = false;
 

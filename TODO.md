@@ -67,6 +67,9 @@
   - `copyToClipboard()` kopierte versteckte Spalten mit und hing ohne Inhalt für immer (Promise nie erfüllt).
     `downloadExcel()` exportierte versteckte Spalten ebenfalls – jetzt nur sichtbare (= aktuelle Sicht).
   - Bereichsauswahl per Maus-Ziehen (Typ `"range"`) – vorher nur Shift-Klick.
+  - `ColumnDef.create()` ohne `sortable` setzte `sortIconVisible = FalseFn` → späteres `sortable = TrueFn` sortierte
+    ohne Symbol. Sortier-Symbol überdeckte rechtsbündige Header-Texte (Label bekommt jetzt Platz).
+- [x] **Release 1.1.89** (gefunden beim Drehen der Folgen 030/031):
   - Zellen ohne Wert (`undefined`/`null`) zeigten den Text „undefined“ (z. B. Elternzeilen im Baum).
   - Zwei schnelle Klicks auf **verschiedene** Zellen (< 500 ms, z. B. zwei Baum-Pfeile) galten als Doppelklick –
     der zweite Klick ging verloren. Doppelklick jetzt nur auf derselben Zelle.
@@ -75,8 +78,14 @@
     und bekam keinen Fokus; Tastenkürzel (z. B. ⌘/Strg+A) liefen auch im Editor und bauten die Zelle neu → Eingabe weg.
     Jetzt: `closest()` für die Zell-Attribute, Editor nur im Body, Fokus nach jedem Neuzeichnen, Kürzel ignorieren
     Eingabefelder.
-  - `ColumnDef.create()` ohne `sortable` setzte `sortIconVisible = FalseFn` → späteres `sortable = TrueFn` sortierte
-    ohne Symbol. Sortier-Symbol überdeckte rechtsbündige Header-Texte (Label bekommt jetzt Platz).
+  - `updateCells()` und der Editor-Fokus suchten Zellen per `document.querySelector` → bei mehreren Tabellen auf
+    einer Seite traf es die falsche. Jetzt nur im eigenen Host-Element.
+  - Zustand merken (`autoRestoreOptions`, Folge 033): Sortier-Symbol zeigte nach dem Laden die Spalten-Defaults statt
+    der wiederhergestellten Sortierung; die Scroll-Position wurde oft nie gespeichert (gemeinsamer Debounce-Timer mit
+    `debounceRepaint` brach das Speichern ab); Baum: ohne gespeicherten Zustand wurde alles aufgeklappt, verschachtelte
+    Knoten wurden nie wiederhergestellt (nur sichtbare Zeilen durchlaufen), eine zugeklappt startende Tabelle merkte
+    sich das Aufklappen nicht (Modus jetzt aus dem ersten Klick); `localStorage` ohne try/catch (Private Mode → Fehler
+    beim Start); `autoConvertMapToObject` vertauschte Schlüssel und Wert.
 - [ ] `TreeFactory.buildTreeRows()` klappt alles auf (`expanded = true`) – Option für „zugeklappt starten“ fehlt.
 - [ ] `ExcelService` schreibt unkomprimiert (100.000 Zeilen × 7 Spalten ≈ 40 MB) → `CompressionStream('deflate-raw')`
       (dann asynchron) oder eigener Deflate.

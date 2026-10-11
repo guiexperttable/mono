@@ -650,7 +650,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     if ('columnDefs' in this.tableModel) {
       this.tableModel.columnDefs = headerAreaModel.toggleHeaderGroup(mouseTargetData);
-      console.info('####### !!!!!! *******, this.tableModel.columnDefs');
     }
     // this.repaint();
     this.firstInit();

@@ -235,6 +235,17 @@ Gold A     Gold B    Gold C   Gold D    Gold Sum    HOH Loc    HOH A    HOH B   
       // console.info('toggled', cellGroup);
       // console.info('columnDefs 2', CellgroupFactory.buildColumnDefs(this.groups));
     }
-    return CellgroupFactory.buildColumnDefs(this.groupExts);
+    // Keep the existing ColumnDef objects (width, classes, renderers, sorting …) – only their visibility
+    // comes from the rebuilt groups. Fresh defs would reset every width to the default (100 px).
+    const fresh = CellgroupFactory.buildColumnDefs(this.groupExts);
+    const previous = new Map(this.columnDefs.map(def => [def.property, def]));
+    const merged = fresh.map(def => {
+      const old = previous.get(def.property);
+      if (!old) return def;
+      old.isVisible = def.isVisible;
+      return old;
+    });
+    this.columnDefs = merged;
+    return merged;
   }
 }

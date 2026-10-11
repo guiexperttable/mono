@@ -133,6 +133,10 @@ tableApi.scrollToIndex(0, 500);   // column 0, row 500
 
 To receive events, extend `EventAdapter` and override e.g. `onMouseClicked(evt: GeMouseEvent)`.
 
+To replace the table (new model) or remove it from the page, release it first with `tableApi.destroy()`
+(since 1.1.86): it removes all DOM listeners incl. the window resize listener, stops the resize observer and calls
+the cleanup functions of the cell renderers. The framework wrappers do this automatically.
+
 ### 4.2 Web Component
 
 ```ts
@@ -185,9 +189,38 @@ export function SimpleTable() {
 ```
 
 Callback props: `tableReady`, `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd`,
-`checkboxChanged`, `modelChanged`, `selectionChanged`, `focusChanged`, plus `licenseKey`.
-Note: the table is initialized once; replacing the `tableModel` prop later is not picked up – create a new
-component instance (e.g. with a React `key`) if you need a completely new model.
+`checkboxChanged`, `modelChanged`, `selectionChanged`, `focusChanged`, `scroll`, plus `licenseKey`.
+
+Since 1.1.86 a **new `tableModel` or `tableOptions` object re-creates the table** (the previous one is released with
+`TableApi.destroy()`, also on unmount and in `StrictMode`). Keep both stable – create them outside the component or
+with `useMemo` – otherwise the table is rebuilt on every render. Callback props may change freely:
+
+```tsx
+import { GuiexpertTable } from "@guiexpert/react-table";
+import { TableFactory, TableOptions } from "@guiexpert/table";
+import { useMemo, useState } from "react";
+
+interface PersonIf { name: string; city: string; }
+
+export function PersonTable({ persons }: { persons: PersonIf[] }) {
+  const [city, setCity] = useState("");
+  const tableOptions = useMemo(() => new TableOptions(), []);
+  const tableModel = useMemo(() => TableFactory.createTableModel({
+    rows: city ? persons.filter(p => p.city === city) : persons,
+    properties: ["name", "city"]
+  }), [persons, city]);                                  // new model → table is rebuilt
+
+  return (
+    <div className="table-div">
+      <button onClick={() => setCity(city ? "" : "Berlin")}>Berlin only</button>
+      <GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} />
+    </div>
+  );
+}
+```
+
+For filtering *within* the same model `externalFilterFunction` + `tableApi.externalFilterChanged()` (6.3) is
+cheaper – it keeps scroll position logic, selection model and column widths.
 
 ### 4.4 Vue 3
 
@@ -222,7 +255,12 @@ Props: `tableModel`, `tableOptions`, `debounceMouseClickDelay` (default 150 ms, 
 1.1.85), `licenseKey`. Events: `tableReady`, `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`,
 `mouseDraggingEnd`, `checkboxChanged`, `modelChanged`, `selectionChanged`, `focusChanged`, `scroll`.
 
-### 4.5 Svelte
+### 4.5 Svelte (4 and 5)
+
+Since 1.1.86 `@guiexpert/svelte-table` ships the component as **Svelte source**: it is compiled by your own Svelte
+compiler and works with **Svelte 4 and Svelte 5**. Events are available as `on:…` (payload in `e.detail`) and as
+callback props `onTableReady`, `onMouseClicked`, … (payload directly – use these in Svelte 5 runes mode).
+A new `tableModel` / `tableOptions` object re-creates the table.
 
 ```svelte
 <script lang="ts">
@@ -242,6 +280,31 @@ Props: `tableModel`, `tableOptions`, `debounceMouseClickDelay` (default 150 ms, 
     on:mouseClicked={(e) => console.info("click", e.detail)} />
 </div>
 ```
+
+Svelte 5 (runes mode):
+
+```svelte
+<script lang="ts">
+  import { GuiexpertTable } from "@guiexpert/svelte-table";
+  import { type GeMouseEvent, type TableApi, TableFactory } from "@guiexpert/table";
+
+  let rowCount = $state(1000);
+  const tableModel = $derived(TableFactory.createTableModel({
+    rows: Array.from({ length: rowCount }, (_, i) => ({ id: i, name: "Row " + i }))
+  }));
+</script>
+
+<button onclick={() => rowCount = 10}>10 rows</button>
+<div class="table-div">
+  <GuiexpertTable
+    {tableModel}
+    onTableReady={(api: TableApi) => console.info("ready", api)}
+    onMouseClicked={(evt: GeMouseEvent) => console.info(evt.rowIndex)} />
+</div>
+```
+
+Cell renderers with Svelte components: `new ComponentRendererWrapper(MyCell)` – uses `mount()`/`unmount()` under
+Svelte 5 and the component class under Svelte 4.
 
 ### 4.6 Preact
 
@@ -316,7 +379,8 @@ export class SimpleTableComponent {
 ```
 
 `TableComponent` is standalone (selector `guiexpert-table`). In NgModule-based apps add it to the `imports` of the
-module. The full Angular guide is [`packages/angular-table/instructions.md`](packages/angular-table/instructions.md).
+module. Since 1.1.86 a new `tableModel` / `tableOptions` object (e.g. from a signal) re-creates the table
+(`ngOnChanges`), and the table is released in `ngOnDestroy`. The full Angular guide is [`packages/angular-table/instructions.md`](packages/angular-table/instructions.md).
 
 ---
 
@@ -394,7 +458,46 @@ const tableModel = TableFactory.createTableModel({
 });
 ```
 
-### 5.4 Millions of rows: your own area model
+### 5.4 Footer with totals of the displayed rows
+
+`footerData` (5.3) is static text. A footer that follows filter and sorting is a small area model that computes its
+cells from the rows the body currently shows (`getFilteredRows()` = after `externalFilterFunction`, in display order).
+The footer is repainted with every `externalFilterChanged()`, `sort()` and `repaint()`:
+
+```ts
+import { AreaModel, AreaModelObjectArray, ColumnDef, TableFactory, TableOptions, TableOptionsIf, px120 } from "@guiexpert/table";
+
+interface OrderIf { id: number; city: string; total: number; }
+
+class OrderTotalsFooterModel extends AreaModel {
+  constructor(private readonly getBody: () => AreaModelObjectArray<OrderIf>) {
+    super();
+    this.areaIdent = "footer";
+  }
+  override getRowCount(): number { return 1; }
+  override getRowHeight(_rowIndex: number): number { return 34; }
+  override getValueAt(_rowIndex: number, columnIndex: number): any {
+    const rows = this.getBody().getFilteredRows();          // only the rows that pass the filter
+    if (columnIndex === 1) return rows.length + " orders";
+    if (columnIndex === 2) return rows.reduce((sum, o) => sum + o.total, 0);
+    return "Σ";
+  }
+}
+
+let city = "";
+const orders: OrderIf[] = [{ id: 1, city: "Berlin", total: 20 }, { id: 2, city: "Hamburg", total: 10 }];
+const tableOptions: TableOptionsIf = { ...new TableOptions(), externalFilterFunction: (o: OrderIf) => !city || o.city === city };
+const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  columnDefs: [new ColumnDef("id", "ID", px120), new ColumnDef("city", "City", px120), new ColumnDef("total", "Total", px120)],
+  tableOptions,
+  footerAreaModel: new OrderTotalsFooterModel(() => tableModel.getBodyModel() as AreaModelObjectArray<OrderIf>)
+});
+```
+
+`tableApi.downloadExcel()` exports this footer row as well (6.10).
+
+### 5.5 Millions of rows: your own area model
 
 You do not need to hold the data in an array. Extend `AreaModel` and compute the cells on demand – the table only
 asks for the visible ones:
@@ -492,7 +595,7 @@ const ageColumn = ColumnDef.create({
 ```
 
 Programmatically: `tableApi.sort((a, b) => a.age - b.age)` or `tableApi.reSort()` (re-apply the current sorting,
-e.g. after data changes). Header sort icons are configured with `tableOptions.sortedOptions`.
+e.g. after data changes); both repaint the table (since 1.1.86 – before, the new order only appeared after scrolling). Header sort icons are configured with `tableOptions.sortedOptions`.
 
 ### 6.3 Filtering
 
@@ -636,13 +739,27 @@ function onPriceTick(tableApi: TableApi, row: number, col: number, price: number
 ### 6.10 Export: clipboard and Excel
 
 ```ts
-import { TableApi } from "@guiexpert/table";
+import { AreaModelObjectArray, ExcelService, TableApi } from "@guiexpert/table";
+
+interface PersonIf { name: string; city: string; }
 
 function exportTable(tableApi: TableApi) {
   tableApi.copyToClipboard();                         // selected cells (or the focused cell) as text
-  tableApi.downloadExcel("persons.xlsx", "Marc");     // header, body and footer as .xlsx – no extra library
+  tableApi.downloadExcel("persons.xlsx", "Marc");     // what the table shows: header, body, footer – no extra library
+}
+
+function exportAllRows(tableApi: TableApi) {          // all rows, ignoring filter and sorting
+  const body = tableApi.getBodyModel() as AreaModelObjectArray<PersonIf>;
+  const matrix = [["Name", "City"], ...body.getAllRows().map(p => [p.name, p.city])];
+  new ExcelService().downloadExcel(matrix, "all-persons.xlsx", "Marc");
 }
 ```
+
+- `downloadExcel()` exports **the current view**: only the rows that pass `externalFilterFunction`, in the current
+  sort order, plus header and footer rows (values from `getValueAt`, i.e. raw values, not the rendered HTML).
+- Any other data (all rows, other columns, a selection) → build a matrix and pass it to `ExcelService.downloadExcel()`.
+- Numbers stay numbers in Excel; dates are written as ISO text. Since 1.1.86 the files carry valid CRC-32 checksums,
+  row numbers and sheet dimensions (older versions wrote CRC 0 and a fixed range `A1:B3`, which strict readers reject).
 
 ### 6.11 Persisting state
 
@@ -685,7 +802,8 @@ definition. Showcase: *Look and Feel* (https://gui.expert/showcase/laf).
 
 `scrollToIndex(col, row)`, `scrollToPixel(x, y)`, `ensureRowIsVisible(row)`, `getFirstVisibleRowIndex()`,
 `getLastVisibleRowIndex()`, `getDisplayedRowCount()`, `autoResizeColumns()`, `setColumnWidth(col, width)`,
-`recalcColumnWidths()`, `repaint()`, `repaintHard()`, `getTableModel()`, `getBodyModel()`, `setLoggingActive(true)`.
+`recalcColumnWidths()`, `repaint()`, `repaintHard()`, `getTableModel()`, `getBodyModel()`, `setLoggingActive(true)`,
+`destroy()` (since 1.1.86 – releases listeners, observers and cell renderers before you drop or replace the table).
 
 ---
 
@@ -697,7 +815,7 @@ To avoid surprises – these are **not** implemented in the current releases:
   To hide a column, give its column definition `isVisible: () => false` (width becomes 0).
 - No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
   (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
-- No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.4).
+- No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 
 ---
 

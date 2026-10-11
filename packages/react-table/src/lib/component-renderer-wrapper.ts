@@ -31,7 +31,9 @@ export class ComponentRendererWrapper implements CellRendererIf {
     root.render(createElement(this.Component, props)); // render as element, so hooks work in cell components
 
     return () => {
-      root.unmount();
+      // Deferred: the cleanup may run while React is rendering (e.g. GuiexpertTable's effect cleanup
+      // after a new tableModel) – a synchronous unmount there triggers a React warning.
+      setTimeout(() => root.unmount(), 0);
     };
   }
 

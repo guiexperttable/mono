@@ -1,6 +1,6 @@
 {
   "name": "@guiexpert/svelte-table",
-  "version": "4.1.85",
+  "version": "5.1.85",
   "license": "MIT",
   "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
   "repository": {
@@ -12,13 +12,14 @@
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
+  "svelte": "./index.js",
   "lib": {
     "entryFile": "src/index.ts"
   },
   "scripts": {
     "i": "pnpm i",
     "patch-version": "node patch.js",
-    "build": "vite build",
+    "build": "node build.mjs",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -28,8 +29,9 @@
   },
   "exports": {
     ".": {
-      "import": "./index.js",
-      "require": "./index.cjs"
+      "types": "./index.d.ts",
+      "svelte": "./index.js",
+      "default": "./index.js"
     }
   },
   "dependencies": {
@@ -37,10 +39,10 @@
     "@guiexpert/table": "workspace:^"
   },
   "peerDependencies": {
-    "svelte": "^4.0.0"
+    "svelte": "^4.0.0 || ^5.0.0"
   },
   "devDependencies": {
-    "svelte": "^4.2.19",
+    "svelte": "^5.38.0",
     "svelte-check": "^2.10.2",
     "svelte-jester": "^2.3.2",
     "svelte-preprocess": "^5.0.4",
@@ -62,5 +64,6 @@
     "tsconfig": "^7.0.0",
     "typescript": "5.2.2",
     "@babel/core": "~7.28.6"
-  }
+  },
+  "description": "Svelte 4 and 5 wrapper of the GuiExpert Table (@guiexpert/table)."
 }

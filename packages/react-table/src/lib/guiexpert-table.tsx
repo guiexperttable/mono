@@ -50,110 +50,60 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.mouseDragging] - The callback for mouse dragging events.
  * @param {Function} [props.mouseDraggingEnd] - The callback for mouse dragging end events.
  * @param {Function} [props.tableReady] - The callback for when the table is ready.
+ * @param {Function} [props.scroll] - The callback for scroll events.
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
+ *
+ * A new `tableModel` or `tableOptions` object (new reference) re-creates the table; the previous
+ * table is released with `TableApi.destroy()`. Keep both stable with `useMemo` / `useState`,
+ * otherwise the table is re-created on every render. Callback props may change freely.
  *
  * @returns {JSX.Element} - The rendered GuiexpertTable component.
  */
-export function GuiexpertTable(
-  {
+export function GuiexpertTable(props: GuiexpertTableProps) {
+  const {
     tableModel,
-    tableOptions = new TableOptions(),
-    mouseMoved,
-    checkboxChanged,
-    contextmenu,
-    modelChanged,
-    mouseClicked,
-    mouseDragging,
-    mouseDraggingEnd,
-    selectionChanged,
-    focusChanged,
-    tableReady,
+    tableOptions,
     licenseKey
-  }: GuiexpertTableProps) {
+  } = props;
 
-  const myContainer = useRef(null);
-  let initialized = false;
+  const myContainer = useRef<HTMLDivElement>(null);
+
+  // Always call the latest callback props without re-creating the table.
+  const propsRef = useRef<GuiexpertTableProps>(props);
+  propsRef.current = props;
 
   useEffect(() => {
-    if (myContainer.current && !initialized) {
-      initTable(myContainer.current);
-      initialized = true;
+    const ele = myContainer.current;
+    if (!ele) {
+      return;
     }
-  });
-
-  let root: HTMLDivElement | null;
-
-  const initTable = (ele: HTMLDivElement) => {
     const listener: EventListenerIf = {
-
-      onSelectionChanged(model: SelectionModelIf): void {
-        if (selectionChanged) {
-          selectionChanged(model);
-        }
-      },
-
-      onFocusChanged(model: FocusModelIf): void{
-        if (focusChanged) {
-          focusChanged(model);
-        }
-      },
-
-      onCheckboxChanged: (evt: any[]) => {
-        if (checkboxChanged) {
-          checkboxChanged(evt);
-        }
-      },
-
-      onContextmenu: (evt: GeMouseEvent) => {
-        if (contextmenu) {
-          contextmenu(evt);
-        }
-      },
-
-      onModelChanged: (evt: GeModelChangeEvent) => {
-        if (modelChanged) {
-          modelChanged(evt);
-        }
-      },
-
-      onMouseClicked: (evt: GeMouseEvent) => {
-        if (mouseClicked) {
-          mouseClicked(evt);
-        }
-      },
-
-      onMouseDragging: (evt: GeMouseEvent) => {
-        if (mouseDragging) {
-          mouseDragging(evt);
-        }
-      },
-
-      onMouseDraggingEnd: (evt: GeMouseEvent) => {
-        if (mouseDraggingEnd) {
-          mouseDraggingEnd(evt);
-        }
-      },
-
-      onMouseMoved: (evt: GeMouseEvent) => {
-        if (mouseMoved) {
-          mouseMoved(evt);
-        }
-      },
-
-      onScroll(evt: GeScrollEvent) {
-        // ignored
-      }
+      onSelectionChanged: (model: SelectionModelIf) => propsRef.current.selectionChanged?.(model),
+      onFocusChanged: (model: FocusModelIf) => propsRef.current.focusChanged?.(model),
+      onCheckboxChanged: (evt: any[]) => propsRef.current.checkboxChanged?.(evt),
+      onContextmenu: (evt: GeMouseEvent) => propsRef.current.contextmenu?.(evt),
+      onModelChanged: (evt: GeModelChangeEvent) => propsRef.current.modelChanged?.(evt),
+      onMouseClicked: (evt: GeMouseEvent) => propsRef.current.mouseClicked?.(evt),
+      onMouseDragging: (evt: GeMouseEvent) => propsRef.current.mouseDragging?.(evt),
+      onMouseDraggingEnd: (evt: GeMouseEvent) => propsRef.current.mouseDraggingEnd?.(evt),
+      onMouseMoved: (evt: GeMouseEvent) => propsRef.current.mouseMoved?.(evt),
+      onScroll: (evt: GeScrollEvent) => propsRef.current.scroll?.(evt)
     };
 
+    // A new tableModel or tableOptions object re-creates the table (dependency array below);
+    // the cleanup function releases the previous one (listeners, resize observer, cell renderers).
     const tableScope = new TableScope(
-      ele, tableModel, new SimpleDomService(), tableOptions, listener
+      ele, tableModel, new SimpleDomService(), tableOptions ?? new TableOptions(), listener
     );
     tableScope.firstInit();
-    if (tableReady) {
-      tableReady(tableScope.getApi());
-    }
+    propsRef.current.tableReady?.(tableScope.getApi());
+
+    return () => tableScope.destroy();
+  }, [tableModel, tableOptions]);
+
+  useEffect(() => {
     if (licenseKey) LicenseManager.getInstance().setLicenseKey(licenseKey);
-  };
+  }, [licenseKey]);
 
   return (
     <div

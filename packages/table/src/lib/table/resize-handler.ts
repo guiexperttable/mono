@@ -8,16 +8,29 @@ import { debounce } from '../common/debounce';
  */
 export class ResizeHandler {
 
+  private readonly resizeObserver: ResizeObserver;
+  private disconnected = false;
 
   constructor(
     protected tableScope: TableScope,
     protected debounceDelay: number = 500
   ) {
-    const resizeObserver = new ResizeObserver(debounce(this.handleResize.bind(this), debounceDelay));
-    resizeObserver.observe(this.tableScope.hostElement);
+    this.resizeObserver = new ResizeObserver(debounce(this.handleResize.bind(this), debounceDelay));
+    this.resizeObserver.observe(this.tableScope.hostElement);
+  }
+
+  /**
+   * Stops observing the host element. Called by {@link TableScope.destroy}.
+   */
+  disconnect(): void {
+    this.disconnected = true;
+    this.resizeObserver.disconnect();
   }
 
   private handleResize(entries: ResizeObserverEntry[]){
+    if (this.disconnected) {
+      return; // a debounced call may still arrive after destroy()
+    }
     const entry = entries[0];
     const { width } = entry.contentRect;
     this.tableScope.recalcColumnWidths(width);

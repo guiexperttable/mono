@@ -13,7 +13,8 @@ export class InputHandler {
   constructor(
     protected tableScope: TableScope
   ) {
-    this.tableScope.hostElement.addEventListener("change", this.onHostElementChanged.bind(this));
+    this.tableScope.hostElement.addEventListener("change", this.onHostElementChanged.bind(this),
+      { signal: this.tableScope.listenerAbortController.signal });
   }
 
 

@@ -768,6 +768,23 @@ export class TableApi {
     this.tableScope.repaint();
   }
 
+  /**
+   * Releases the table: removes all DOM listeners (incl. the window resize listener), stops the
+   * resize observer, calls the cleanup functions of all cell renderers and clears the host element.
+   * The framework wrappers call it automatically when they are unmounted or receive a new table model.
+   *
+   * @example
+   * // Plain TS: replace the table with a new model
+   * tableApi.destroy();
+   * const scope = new TableScope(hostDiv, newModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+   * scope.firstInit();
+   *
+   * @returns {void}
+   */
+  destroy(): void {
+    this.tableScope.destroy();
+  }
+
 
 
 

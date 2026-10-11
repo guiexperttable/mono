@@ -1,6 +1,29 @@
 
 import { ExcelServiceIf } from './excel-service.if';
 
+let crcTable: Uint32Array | undefined;
+
+/**
+ * CRC-32 (IEEE 802.3) of the given bytes – required in every ZIP entry header.
+ */
+function crc32(bytes: Uint8Array): number {
+  if (!crcTable) {
+    crcTable = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) {
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      }
+      crcTable[n] = c >>> 0;
+    }
+  }
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) {
+    crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
 export class ExcelService implements ExcelServiceIf {
 
   /**
@@ -89,12 +112,16 @@ export class ExcelService implements ExcelServiceIf {
   }
 
   private getX1WorksheetsSheet1Xml(data: Array<Array<any>>): string {
+    const columnCount = data.reduce((max, row) => Math.max(max, row.length), 1); // no spread: data may have millions of rows
+    const dimension = data.length
+      ? `A1:${this.getCellAddress(data.length - 1, columnCount - 1)}`
+      : 'A1';
     const sb: string[] = [
 
     ];
     sb.push(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac xr xr2 xr3" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr2="http://schemas.microsoft.com/office/spreadsheetml/2015/revision2" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" xr:uid="{E15F8FC4-4D40-434C-921A-3D9CFAAA2865}">
-  <dimension ref="A1:B3"/>
+  <dimension ref="${dimension}"/>
   <sheetViews>
   <sheetView tabSelected="1" workbookViewId="0"/></sheetViews>
   <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0.2"/>
@@ -102,7 +129,7 @@ export class ExcelService implements ExcelServiceIf {
 
     for (let r = 0; r < data.length; r++) {
       const row = data[r];
-      sb.push('<row r="${r + 1}" spans="1:2" x14ac:dyDescent="0.2">');
+      sb.push(`<row r="${r + 1}" spans="1:${columnCount}" x14ac:dyDescent="0.2">`);
       for (let c = 0; c < row.length; c++) {
         const cell = row[c];
         const cellAddress = this.getCellAddress(r, c);
@@ -152,11 +179,12 @@ export class ExcelService implements ExcelServiceIf {
     const chunks: Uint8Array[] = [];
     let offset = 0;
 
-    const fileEntries: { path: string; offset: number; contentSize: number }[] = [];
+    const fileEntries: { path: string; offset: number; contentSize: number; crc: number }[] = [];
 
     files.forEach((content, path) => {
       const pathBytes = new TextEncoder().encode(path);
       const contentBytes = new TextEncoder().encode(content);
+      const crc = crc32(contentBytes);
 
       const localHeader = new Uint8Array(30 + pathBytes.length);
       const view = new DataView(localHeader.buffer);
@@ -167,7 +195,7 @@ export class ExcelService implements ExcelServiceIf {
       view.setUint16(8, 0, true);  // Compression method
       view.setUint16(10, 0, true); // File last modification time
       view.setUint16(12, 0, true); // File last modification date
-      view.setUint32(14, 0, true); // CRC-32 placeholder
+      view.setUint32(14, crc, true); // CRC-32
       view.setUint32(18, contentBytes.length, true); // Compressed size
       view.setUint32(22, contentBytes.length, true); // Uncompressed size
       view.setUint16(26, pathBytes.length, true);   // File name length
@@ -182,6 +210,7 @@ export class ExcelService implements ExcelServiceIf {
         path,
         offset,
         contentSize: contentBytes.length,
+        crc,
       });
 
       offset += localHeader.length + contentBytes.length;
@@ -202,7 +231,7 @@ export class ExcelService implements ExcelServiceIf {
       view.setUint16(10, 0, true); // Compression method
       view.setUint16(12, 0, true); // File last modification time
       view.setUint16(14, 0, true); // File last modification date
-      view.setUint32(16, 0, true); // CRC-32 placeholder
+      view.setUint32(16, entry.crc, true); // CRC-32
       view.setUint32(20, entry.contentSize, true); // Compressed size
       view.setUint32(24, entry.contentSize, true); // Uncompressed size
       view.setUint16(28, pathBytes.length, true); // File name length

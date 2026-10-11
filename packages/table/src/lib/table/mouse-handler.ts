@@ -32,21 +32,23 @@ export class MouseHandler {
   constructor(
     protected tableScope: TableScope
   ) {
-    this.tableScope.hostElement.addEventListener("click", this.onHostElementClicked.bind(this));
-    this.tableScope.hostElement.addEventListener("dblclick", this.onHostElementDblClicked.bind(this));
-    this.tableScope.hostElement.addEventListener("mousedown", this.onMouseDown.bind(this));
-    this.tableScope.hostElement.addEventListener("mousemove", this.onMouseMove.bind(this));
-    this.tableScope.hostElement.addEventListener("mouseup", this.onMouseUp.bind(this));
-    this.tableScope.hostElement.addEventListener("contextmenu", this.onContextmenu.bind(this));
+    // All listeners are removed at once by TableScope.destroy() (abort signal).
+    const signal = this.tableScope.listenerAbortController.signal;
+    this.tableScope.hostElement.addEventListener("click", this.onHostElementClicked.bind(this), { signal });
+    this.tableScope.hostElement.addEventListener("dblclick", this.onHostElementDblClicked.bind(this), { signal });
+    this.tableScope.hostElement.addEventListener("mousedown", this.onMouseDown.bind(this), { signal });
+    this.tableScope.hostElement.addEventListener("mousemove", this.onMouseMove.bind(this), { signal });
+    this.tableScope.hostElement.addEventListener("mouseup", this.onMouseUp.bind(this), { signal });
+    this.tableScope.hostElement.addEventListener("contextmenu", this.onContextmenu.bind(this), { signal });
 
     // @ts-ignore
     this.tableScope.hostElement['_MouseHandler'] = 'true';
 
-    this.tableScope.scrollViewport.addEventListener("scroll", this.tableScope.adjustAfterScrolling.bind(this.tableScope));
-    this.tableScope.scrollViewport.addEventListener("wheel", this.tableScope.onWheel.bind(this.tableScope), { passive: false });
+    this.tableScope.scrollViewport.addEventListener("scroll", this.tableScope.adjustAfterScrolling.bind(this.tableScope), { signal });
+    this.tableScope.scrollViewport.addEventListener("wheel", this.tableScope.onWheel.bind(this.tableScope), { passive: false, signal });
 
     [window, this.tableScope.hostElement].forEach(
-      ele => ele.addEventListener("resize", this.tableScope.adjustContainersAndRows.bind(this.tableScope))
+      ele => ele.addEventListener("resize", this.tableScope.adjustContainersAndRows.bind(this.tableScope), { signal })
     );
   }
 

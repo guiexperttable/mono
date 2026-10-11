@@ -9,7 +9,7 @@
  *
  * Rules (core = packages/table):
  *   - framework wrappers keep their framework major and take minor.patch from the core
- *       @guiexpert/react-table 18.x.y, preact 10.x.y, solid 1.x.y, svelte 4.x.y, vue3 3.x.y, webcomponent 1.x.y
+ *       @guiexpert/react-table 18.x.y, preact 10.x.y, solid 1.x.y, svelte 5.x.y (runs on Svelte 4 and 5), vue3 3.x.y, webcomponent 1.x.y
  *       angular-builds/ngNN (+ lib/package.json = @guiexpert/angular-table)  NN.x.y
  *   - everything else (core, demo-table-models, apps, root) gets the full core version.
  */
@@ -24,7 +24,7 @@ const WRAPPER_MAJORS = {
   "@guiexpert/react-table": 18,
   "@guiexpert/preact-table": 10,
   "@guiexpert/solid-table": 1,
-  "@guiexpert/svelte-table": 4,
+  "@guiexpert/svelte-table": 5,
   "@guiexpert/vue3-table": 3,
   "@guiexpert/webcomponent-table": 1
 };

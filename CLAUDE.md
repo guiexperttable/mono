@@ -147,7 +147,13 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
 - Persistenz: `tableOptions.autoRestoreOptions` (Scroll-Pos, Sortierung, Collapsed/Expanded; `getStorageKeyFn`).
-- Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib).
+- Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
+  Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via
+  `getAllRows()`) über `new ExcelService().downloadExcel(matrix, …)`.
+- Footer mit Summen der gefilterten Zeilen: eigenes Footer-`AreaModel`, das `getFilteredRows()` des Body-Modells liest
+  (`instructions.md` 5.4); `footerData` ist statisch.
+- Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
+  den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `autoResizeColumns`, `setColumnWidth`,
   `recalcColumnWidths`, `updateCells([TableCellUpdateEvent…], repaintAll)`, `triggerAction(ActionId)`, `repaint`,
   `repaintHard`, `setLoggingActive`.
@@ -170,13 +176,13 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 
 | Paket | Komponente / Element | Inputs | Hinweise |
 |---|---|---|---|
-| react-table | `<GuiexpertTable tableModel tableOptions … />` | Callback-Props `mouseClicked`, `selectionChanged`, `tableReady`, `licenseKey` … | `useEffect`-Init, Container 100 % × 100 % |
+| react-table | `<GuiexpertTable tableModel tableOptions … />` | Callback-Props `mouseClicked`, `selectionChanged`, `tableReady`, `scroll`, `licenseKey` … | `useEffect([tableModel, tableOptions])` → neues Objekt = Neuaufbau (Modell/Options mit `useMemo` stabil halten), Container 100 % × 100 % |
 | vue3-table | `<GuiexpertTable :tableModel :tableOptions @tableReady @mouseClicked …>` | Events als Vue-Events | Default-Export = Plugin; `debounceMouseClickDelay` deklariert, aber wirkungslos |
 | preact-table | `GuiexpertTable` | Callback-Props analog React | |
-| svelte-table | `GuiexpertTable` | Svelte-Events (`on:tableReady`, `e.detail`) | importiert Core relativ (`../../table/src`) → wird mitgebündelt |
+| svelte-table | `GuiexpertTable` | Svelte-Events (`on:tableReady`, `e.detail`) **und** Callback-Props `onTableReady`, `onMouseClicked` … (Runes-Modus) | Paket = Svelte-**Quellcode** (plain JS + `.d.ts`, Build `build.mjs`), läuft unter Svelte 4 und 5; neues Modell = Neuaufbau |
 | solid-table | `GuiexpertTable` | Props deklariert, aber **nicht aufgerufen** – Events kommen als DOM-`CustomEvent` (bubbling) | s. `TODO.md` |
 | webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` (`mouseClicked`, `tableReady` …) |
-| angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; Output heißt `mouseDraggingEnded` |
+| angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 

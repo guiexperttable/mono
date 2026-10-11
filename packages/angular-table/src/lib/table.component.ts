@@ -4,10 +4,12 @@ import {
   ElementRef,
   Input,
   NgZone,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
   Renderer2,
+  SimpleChanges,
   ViewEncapsulation
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -37,7 +39,7 @@ import { DomService } from "./service/dom-service";
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TableComponent implements OnInit, OnDestroy, EventListenerIf {
+export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListenerIf {
 
   @Output()
   tableReady = new Subject<TableApi>();
@@ -85,6 +87,7 @@ export class TableComponent implements OnInit, OnDestroy, EventListenerIf {
 
   private tableScope?: TableScope;
   private alive = true;
+  private initialized = false;
 
 
   constructor(
@@ -128,7 +131,18 @@ export class TableComponent implements OnInit, OnDestroy, EventListenerIf {
     this.modelChanged.next(evt);
   }
 
+  /**
+   * A new `tableModel` or `tableOptions` object re-creates the table (the previous one is released
+   * with `TableScope.destroy()`). The first values are handled by `ngOnInit`.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.initialized && (changes["tableModel"] || changes["tableOptions"])) {
+      this.initModel();
+    }
+  }
+
   ngOnInit(): void {
+    this.initialized = true;
     this.initModel();
     this.debounceMouseClick
       .pipe(
@@ -144,6 +158,8 @@ export class TableComponent implements OnInit, OnDestroy, EventListenerIf {
 
   ngOnDestroy(): void {
     this.alive = false;
+    this.tableScope?.destroy();
+    this.tableScope = undefined;
   }
 
 
@@ -161,6 +177,8 @@ export class TableComponent implements OnInit, OnDestroy, EventListenerIf {
   }
 
   private init() {
+    this.tableScope?.destroy();
+    this.tableScope = undefined;
     if (this.tableModel) {
       this.tableScope = new TableScope(
         this.elementRef.nativeElement, this.tableModel, this.domService, this.tableOptions, this

@@ -51,7 +51,10 @@ Add the following two NPM packages to your existing Svelte project (run this in 
 npm install --save @guiexpert/table @guiexpert/svelte-table
 ```
 
-Add GuiexpertTable component to a template:
+Works with **Svelte 4 and Svelte 5**: the package ships the component as Svelte source, which is compiled by your
+own Svelte compiler (no preprocessor needed).
+
+Add GuiexpertTable component to a template – Svelte 4 / legacy syntax:
 
 ```
 <GuiexpertTable
@@ -59,8 +62,24 @@ Add GuiexpertTable component to a template:
   on:tableReady={handleTableReady}
   tableModel={tableModel}
   tableOptions={tableOptions}
-></SvelteTable>
+/>
 ```
+
+Svelte 5 (runes mode) – use the callback props (payload directly, no `e.detail`):
+
+```
+<GuiexpertTable
+  {tableModel}
+  {tableOptions}
+  onTableReady={(api) => tableApi = api}
+  onMouseClicked={(evt) => console.info(evt.rowIndex, evt.columnIndex)}
+/>
+```
+
+Callback props: `onTableReady`, `onMouseClicked`, `onMouseMoved`, `onMouseDragging`, `onMouseDraggingEnd`,
+`onContextmenu`, `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`
+(the same names without `on` are dispatched as Svelte events). A new `tableModel` / `tableOptions` object
+re-creates the table. Svelte components as cell renderers: `new ComponentRendererWrapper(MyCell)`.
 
 Import the following classes in your component:
 ```
@@ -69,7 +88,7 @@ Import the following classes in your component:
 import { GuiexpertTable } from "@guiexpert/svelte-table";
 import {
   GeMouseEvent,
-  TableApi
+  TableApi,
   TableFactory,
   TableModelIf,
   TableOptions,

@@ -50,9 +50,12 @@ The table fills its host element – give it a height:
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
 `RendererWrapper`, `DomService`.
 
-> The table is created once in `ngOnInit`. Changing the `tableModel` input afterwards is not picked up. Render the
-> component conditionally (`@if (tableModel) { … }`) and create it after the data has arrived, or modify the model
-> and call `tableApi.repaint()`.
+> Since 1.1.86 (`@guiexpert/angular-table@NN.1.86`) a **new `tableModel` or `tableOptions` object** re-creates the table
+> (`ngOnChanges`; the previous table is released with `TableApi.destroy()`, also in `ngOnDestroy`), and `tableReady`
+> fires again with the new API. Works with plain properties and signals (`[tableModel]="model()"`).
+> To change the data *within* a model, modify it and call `tableApi.repaint()`; to filter, use
+> `externalFilterFunction` + `tableApi.externalFilterChanged()` (section 8).
+> Up to 1.1.85 the input was read only once in `ngOnInit`.
 
 ---
 
@@ -419,7 +422,7 @@ export function updatePrice(api: TableApi, row: number, col: number, value: numb
 
 // Excel export (no extra library):
 export function exportExcel(api: TableApi) {
-  api.downloadExcel("export.xlsx", "Me");
+  api.downloadExcel("export.xlsx", "Me");   // current view: filtered + sorted rows, header and footer
 }
 
 // Restore scroll position and sorting from localStorage:

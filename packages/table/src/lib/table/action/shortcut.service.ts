@@ -55,7 +55,8 @@ export class ShortcutService {
         console.debug("ShortcutService", this.shortcutActionIdMapping);
       }
       // add key down listener:
-      this.tableScope.hostElement.addEventListener("keydown", this.onKeyDown.bind(this));
+      this.tableScope.hostElement.addEventListener("keydown", this.onKeyDown.bind(this),
+        { signal: this.tableScope.listenerAbortController.signal });
     }
   }
 

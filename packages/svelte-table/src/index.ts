@@ -1,2 +1,3 @@
 export { default as GuiexpertTable } from "./GuiexpertTable.svelte";
-export { ComponentRendererWrapper } from "./ComponentRendererWrapper";
+export type { GuiexpertTableProps, GuiexpertTableEvents } from "./GuiexpertTable.svelte";
+export { ComponentRendererWrapper } from "./ComponentRendererWrapper.js";

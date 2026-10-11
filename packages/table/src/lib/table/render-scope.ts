@@ -1312,6 +1312,25 @@ export class RenderScope extends EleScope {
    *
    * @return {undefined}
    */
+  /**
+   * Cancels a pending debounced rendering and calls all renderer cleanup functions
+   * (e.g. unmounts framework components rendered into cells). Used by {@link TableScope.destroy}.
+   */
+  protected disposeRendering(): void {
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+    }
+    for (const areaIdent of ["header", "body", "footer"] as const) {
+      while (this.cleanupFunctions[areaIdent].length) {
+        const fn = this.cleanupFunctions[areaIdent].shift();
+        if (fn) {
+          fn();
+        }
+      }
+    }
+  }
+
   protected debounce(fn: () => void, delay: number = 1000) {
     if (this.debounceTimeout) {
       clearTimeout(this.debounceTimeout);

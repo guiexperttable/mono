@@ -73,6 +73,12 @@ import { ExcelServiceIf } from './service/excel-service.if';
 export class TableScope extends RenderScope implements OnActionTriggeredIf, EventFocusChangedListenerIf, EventSelectionChangedListenerIf {
 
   public licenseManager = LicenseManager.getInstance();
+  /**
+   * Signal for all DOM listeners of this table (host element, scroll viewport, window).
+   * {@link destroy} aborts it, which removes every listener at once.
+   */
+  public readonly listenerAbortController = new AbortController();
+  private destroyed = false;
   public mouseHandler: MouseHandler;
   public inputHandler: InputHandler;
   public resizeHandler: ResizeHandler;
@@ -253,6 +259,44 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.autoRestoreScrollPosition();
 
     return this;
+  }
+
+  /**
+   * Releases the table: removes all DOM listeners (host element, scroll viewport, window resize),
+   * stops the resize observer, unregisters from the selection and focus model, calls the cleanup
+   * functions of all cell renderers and clears the host element.
+   *
+   * Call it before you create a new `TableScope` for the same host element (e.g. when a framework
+   * wrapper receives a new table model) or when the table is removed from the page.
+   * Calling it twice is harmless.
+   *
+   * @example
+   * const scope = new TableScope(hostDiv, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+   * scope.firstInit();
+   * // later, e.g. when a new model arrives:
+   * scope.destroy();
+   * new TableScope(hostDiv, newTableModel, new SimpleDomService(), new TableOptions(), new EventAdapter()).firstInit();
+   */
+  destroy(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.destroyed = true;
+    this.listenerAbortController.abort();
+    this.resizeHandler.disconnect();
+    const sm = this.getSelectionModel ? this.getSelectionModel() : undefined;
+    sm?.removeEventSelectionChangedListener(this);
+    const fm = this.getFocusModel ? this.getFocusModel() : undefined;
+    fm?.removeEventFocusChangedListener(this);
+    this.disposeRendering();
+    this.hostElement.innerText = "";
+  }
+
+  /**
+   * Returns `true` once {@link destroy} has been called.
+   */
+  isDestroyed(): boolean {
+    return this.destroyed;
   }
 
   /**
@@ -870,10 +914,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   reSort() {
     let sortItems = this.storeSortingService?.getSortItems()??[];
     this.tableModel.doSort(sortItems);
+    this.repaint();
   }
 
   sort(compareFn: (a: any, b: any) => number) {
     this.tableModel.sort(compareFn);
+    this.repaint(); // without it the new order only appeared after the next scroll
   }
 
 

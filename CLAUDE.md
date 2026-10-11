@@ -33,7 +33,7 @@ mono/
 ├── apps/
 │   ├── table-demo/ ts-todo-demo/ react-/preact-/solid-/svelte-/vue3-table-demo/ vue3-multi-demo/ webcomponent-table-demo/
 │   ├── angular-table-demo/    # Angular 17, NgModule-basiert, ~20 Feature-Demos (nutzt noch npm-Pakete, s. TODO.md)
-│   ├── webpage-guiexpert/     # Astro 5 + Tailwind: Quelle von https://gui.expert
+│   ├── webpage-guiexpert/     # Astro 7 + Tailwind 3 (via PostCSS): Quelle von https://gui.expert
 │   └── table-website/         # Ziel für typedoc-Ausgabe
 ├── scripts/
 │   ├── sync-angular-src.mjs   # packages/angular-table/src + Core-CSS → angular-builds/ngNN/lib/src
@@ -65,6 +65,9 @@ mono/
   Peer-Dependency mit Babel 8 aus `@angular/compiler-cli@22`.
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
+- Website (Astro 7): Tailwind 3 läuft über `postcss.config.cjs` + `src/styles/tailwind.css` – `@astrojs/tailwind` unterstützt
+  nur Astro ≤ 5. `compressHTML: false` ist Absicht (sonst fehlen Leerzeichen vor Links). Vite 8 minifiziert CSS mit
+  lightningcss: kein `//` in `<style>`, kein `;;`. Keine Datei in `public/` mit demselben Pfad wie eine Seite.
 
 ---
 

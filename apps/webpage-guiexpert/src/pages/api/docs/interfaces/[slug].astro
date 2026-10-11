@@ -5,8 +5,8 @@ import {marked} from "marked";
 
 
 export async function getStaticPaths() {
-  const posts = await Astro.glob('../../../../content/docsmd/interfaces/*.md');
-  console.debug('post', JSON.stringify(posts))
+  // Astro.glob() was removed in Astro 6 – import.meta.glob returns the same markdown modules
+  const posts: any[] = Object.values(import.meta.glob('../../../../content/docsmd/interfaces/*.md', { eager: true }));
   return posts.map((post) => {
     return {
       // params: {slug: post.frontmatter.slug},
@@ -21,7 +21,6 @@ export async function getStaticPaths() {
 const {Content, frontmatter} = Astro.props;
 const debug = JSON.stringify( Astro.props);
 const content = marked.parse(Astro.props.rawContent());
-console.debug('content', content)
 ---
 <IndexLayout title="Docs">
   <Header/>

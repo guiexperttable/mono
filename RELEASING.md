@@ -12,6 +12,10 @@ Paket bekommt auf npmjs.com einen Herkunftsnachweis (Provenance).
 
 Bereits veröffentlichte Versionen werden übersprungen – ein abgebrochener Lauf kann einfach neu gestartet werden.
 
+Vor dem ersten Upload prüft das Skript in GitHub Actions für **jedes** ausgewählte Paket, ob npm die OIDC-Anmeldung
+akzeptiert (`trusted publishing ok` / `FAILED` im Log). Schlägt eine fehl, wird gar nichts veröffentlicht. Das gilt
+auch für den Dry-Run – er testet also die npm-Einrichtung mit.
+
 ## Einmalig: Trusted Publisher auf npmjs.com eintragen
 
 Für **jedes** der 9 Pakete (als `guiexpert` eingeloggt):
@@ -72,7 +76,7 @@ pnpm pub:all                  # veröffentlicht (ohne Provenance); --only geht a
 
 | Meldung | Ursache |
 |---|---|
-| `ENEEDAUTH` / `E404 Not Found - PUT …` beim Publish | Trusted Publisher fehlt oder Angaben falsch (Workflow-Dateiname, Repo, User) |
+| `trusted publishing FAILED @guiexpert/…` (Vorabprüfung) bzw. `E404 Not Found - PUT …` | Trusted Publisher für dieses Paket fehlt oder Angaben falsch (User `guiexperttable`, Repo `mono`, Datei `npm-publish.yml`, Environment leer). npm selbst meldet das nur als irreführendes E404. |
 | `E422 … repository.url` | `repository.url` im Manifest passt nicht zu `github.com/guiexperttable/mono` |
 | `npm ERR! code EOTP` | lokal: 2FA-Code fehlt (`npm publish --otp …`) – in CI tritt das mit Trusted Publishing nicht auf |
 | `Versions must be consistent` schlägt fehl | `pnpm version:sync` bzw. `version:patch` vergessen |

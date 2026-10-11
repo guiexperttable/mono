@@ -53,6 +53,57 @@ function isPublished(name, version) {
   }
 }
 
+/**
+ * GitHub Actions only: verify npm trusted publishing for every selected package BEFORE anything is published.
+ * npm itself only logs a failed OIDC token exchange at "verbose" level and then fails with a misleading
+ * "E404 Not Found - PUT …". Here we do the same exchange npm does and report the registry's answer per package.
+ * The short-lived tokens returned by the registry are discarded and never printed.
+ */
+async function checkTrustedPublishing(names) {
+  if (!process.env.GITHUB_ACTIONS) return;
+  const reqUrl = process.env.ACTIONS_ID_TOKEN_REQUEST_URL, reqToken = process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+  if (!reqUrl || !reqToken) {
+    throw new Error('No OIDC token available – the workflow needs "permissions: id-token: write".');
+  }
+  const url = new URL(reqUrl);
+  url.searchParams.append("audience", "npm:registry.npmjs.org");
+  const idRes = await fetch(url, { headers: { Authorization: `Bearer ${reqToken}`, Accept: "application/json" } });
+  const idToken = idRes.ok ? (await idRes.json()).value : undefined;
+  if (!idToken) throw new Error(`Could not get an OIDC token from GitHub (HTTP ${idRes.status}).`);
+  try {
+    const claims = JSON.parse(Buffer.from(idToken.split(".")[1], "base64url").toString("utf8"));
+    console.log(`OIDC identity: repository=${claims.repository} workflow_ref=${claims.workflow_ref} ref=${claims.ref} environment=${claims.environment ?? "(none)"}`);
+  } catch { /* informational only */ }
+
+  const failures = [];
+  for (const name of [...new Set(names)]) {
+    const res = await fetch(`https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/${name.replace("/", "%2f")}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}`, Accept: "application/json" }
+    });
+    let message = `HTTP ${res.status}`;
+    try { const body = await res.json(); if (!res.ok) message += ` – ${body.message ?? body.error ?? JSON.stringify(body)}`; } catch { /* no JSON body */ }
+    console.log(`  trusted publishing ${res.ok ? "ok    " : "FAILED"} ${name}${res.ok ? "" : `  (${message})`}`);
+    if (!res.ok) failures.push(name);
+  }
+  if (failures.length) {
+    throw new Error(`npm trusted publishing is not set up (correctly) for: ${failures.join(", ")}.\n` +
+      `On npmjs.com → package → Settings → Trusted Publisher → GitHub Actions: user "guiexperttable", ` +
+      `repository "mono", workflow filename "npm-publish.yml", environment empty. See RELEASING.md.`);
+  }
+}
+
+const selectedNames = [
+  ...LIBS.filter(selected).map(id => readJson(join(root, "packages", id, "package.json")).name),
+  ...(NG.some(selected) ? ["@guiexpert/angular-table"] : [])
+];
+try {
+  await checkTrustedPublishing(selectedNames);
+} catch (e) {
+  console.error(`\n✖ ${e.message}`);
+  process.exit(1);
+}
+
 const tmp = mkdtempSync(join(tmpdir(), "ge-publish-"));
 const results = [];
 

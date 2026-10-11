@@ -1,3 +1,4 @@
+import { SortState } from "./data/common/sort-state.type";
 import {TableScope} from "./table-scope";
 import {ColumnDefIf} from "./data/tablemodel/column/column-def.if";
 import {TableCellUpdateEventIf} from "./data/common/event/input/table-cell-update-event.if";
@@ -1014,7 +1015,7 @@ export class TableApi {
    * @param {string} fileName - The name of the Excel file to be downloaded (default: 'table.xlsx')
    * @param {string} author - Optional metadata for the Excel file to specify the author (default: '')
    *
-   * @returns {void} The result of the excelService.downloadExcel method call
+   * @returns {Promise<void>} resolves when the (compressed) file has been handed to the browser
    *
    * @example
    * // Download table data with default filename
@@ -1484,6 +1485,21 @@ export class TableApi {
     } else {
       console.warn('updateRows<T>(rows: T[], predicate: (a: T, b: T) => boolean) only works with AreaModelObjectArray<T>, but this body area model is ', (typeof bodyModel), bodyModel)
     }
+  }
+
+  /**
+   * Sorts by one column from code – e.g. from your own button – exactly like a double click on the
+   * column header: rows, header icon, filter (sort order survives filtering) and auto-restore.
+   *
+   * @param {number | string} column - column index or property, e.g. `"total"`
+   * @param {SortState} [sortState] - `"asc"` or `"desc"`; omitted: toggles like the header (asc → desc → …)
+   * @returns {boolean} false if the column does not exist
+   *
+   * @example
+   * document.querySelector("#by-total")!.addEventListener("click", () => tableApi.sortByColumn("total", "desc"));
+   */
+  sortByColumn(column: number | string, sortState?: SortState): boolean {
+    return this.tableScope.sortByColumn(column, sortState);
   }
 
   /**

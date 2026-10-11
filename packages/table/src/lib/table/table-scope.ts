@@ -566,21 +566,43 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (colDef?.sortable && colDef.sortable()) {
       event.preventDefault();
       event.stopPropagation();
-      const states: SortState[] = colDef.sortStatesOrder ? colDef.sortStatesOrder : this.tableOptions.sortOrder;
-      const currentState: SortState = colDef.sortState ?? '';
-      const newState = states[(states.indexOf(currentState) + 1) % states.length];
-
-      const sortItem = new SortItem(colIdx, newState);
-      const done = this.tableModel.doSort([sortItem]);
-      this.lastSortCompareFn = undefined;
-      if (done) {
-        this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = '');
-        colDef.sortState = newState;
-      }
-      this.repaint();
-      this.storeSortingService?.setSortItems([sortItem]);
+      this.sortByColumn(colIdx);
     }
   }
+
+  /**
+   * Sorts the body by one column – the same as a double click on its header (header icon, filter and
+   * auto-restore included). Without `sortState` the next state of the column's sort order is used
+   * (asc → desc → asc …).
+   *
+   * @param {number | string} column - column index or property, e.g. 10 or "total"
+   * @param {SortState} [sortState] - "asc", "desc" or "" (unsorted icon, rows keep their current order)
+   * @returns {boolean} false if the column does not exist
+   */
+  sortByColumn(column: number | string, sortState?: SortState): boolean {
+    const colIdx = typeof column === "number"
+      ? column
+      : (this.tableModel.getColumnDefs() ?? []).findIndex(cd => cd.property === column);
+    const colDef = this.tableModel.getColumnDef(colIdx);
+    if (!colDef) {
+      return false;
+    }
+    const states: SortState[] = colDef.sortStatesOrder ? colDef.sortStatesOrder : this.tableOptions.sortOrder;
+    const currentState: SortState = colDef.sortState ?? '';
+    const newState: SortState = sortState ?? states[(states.indexOf(currentState) + 1) % states.length];
+
+    const sortItem = new SortItem(colIdx, newState);
+    const done = this.tableModel.doSort([sortItem]);
+    if (done) {
+      this.lastSortCompareFn = undefined;
+      this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = '');
+      colDef.sortState = newState;
+    }
+    this.repaint();
+    this.storeSortingService?.setSortItems([sortItem]);
+    return true;
+  }
+
 
   /**
    * Scrolls the viewport to the specified pixel coordinates.
@@ -904,7 +926,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
           const length = text.length;
           if (length > maxLength[c]) {
             maxLength[c] = length;
-            for (const t of candidates[c]) if (t.length < length - 2) candidates[c].delete(t);
+            candidates[c].forEach(t => { if (t.length < length - 2) candidates[c].delete(t); });
           }
           if (length >= maxLength[c] - 2 && candidates[c].size < maxCandidates) candidates[c].add(text);
         }
@@ -929,7 +951,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     return candidates.map(texts => {
       let px = 0;
-      for (const t of texts) px = Math.max(px, measure(t));
+      texts.forEach(t => { px = Math.max(px, measure(t)); });
       return Math.max(Math.ceil(px + padding + 2), 50);
     });
   }

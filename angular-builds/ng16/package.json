@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng16",
-  "version": "16.1.89",
+  "version": "16.1.90",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 16 -> @guiexpert/angular-table@16.x",
   "license": "MIT",

@@ -20,12 +20,9 @@ export class SelectionService implements OnActionTriggeredIf {
   constructor(
     protected readonly tableScope: TableScope
   ) {
-    if (this.tableScope.tableOptions?.getSelectionModel) {
-      this.getSelectionModel = this.tableScope.tableOptions.getSelectionModel;
-    }
-    if (this.tableScope.tableOptions?.getFocusModel) {
-      this.getFocusModel = this.tableScope.tableOptions.getFocusModel;
-    }
+    // the table scope knows the models of this table (own defaults if the options don't set them)
+    this.getSelectionModel = () => this.tableScope.selectionModel()!;
+    this.getFocusModel = () => this.tableScope.focusModel()!;
   }
 
 

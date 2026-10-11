@@ -1033,18 +1033,18 @@ export class TableApi {
     author: string = ''
   ) {
     const matrix: Array<Array<any>> = [];
-    const columnCount = this.tableScope.tableModel.getColumnCount()
+    const tableModel = this.tableScope.tableModel;
+    const columns: number[] = []; // visible columns only – what the table shows
+    for (let c = 0; c < tableModel.getColumnCount(); c++) {
+      if (tableModel.getColumnDef(c)?.isVisible?.() !== false) columns.push(c);
+    }
 
     const areas: AreaIdent[] = ["header" , "body" , "footer"];
     for (const area of areas) {
-      const areaModel = this.tableScope.tableModel.getAreaModel(area);
+      const areaModel = tableModel.getAreaModel(area);
       const rowCount = areaModel?.getRowCount() ?? 0;
       for (let r = 0; r < rowCount; r++) {
-        const row: any[] = [];
-        matrix.push(row);
-        for (let c = 0; c < columnCount; c++) {
-          row.push(areaModel.getValueAt(r,c));
-        }
+        matrix.push(columns.map(c => areaModel.getValueAt(r, c)));
       }
     }
     return this.tableScope.excelService.downloadExcel(matrix, fileName, author);

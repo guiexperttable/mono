@@ -762,6 +762,7 @@ function exportAllRows(tableApi: TableApi) {          // all rows, ignoring filt
 
 - `downloadExcel()` exports **the current view**: only the rows that pass `externalFilterFunction`, in the current
   sort order, plus header and footer rows (values from `getValueAt`, i.e. raw values, not the rendered HTML).
+  Hidden columns (`isVisible: () => false`) are left out (since 1.1.88).
 - Any other data (all rows, other columns, a selection) → build a matrix and pass it to `ExcelService.downloadExcel()`.
 - Numbers stay numbers in Excel; dates are written as ISO text. Since 1.1.86 the files carry valid CRC-32 checksums,
   row numbers and sheet dimensions (older versions wrote CRC 0 and a fixed range `A1:B3`, which strict readers reject).

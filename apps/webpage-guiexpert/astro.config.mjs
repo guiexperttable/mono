@@ -5,6 +5,7 @@ import icon from "astro-icon";
 /** @type {import('astro-expressive-code').AstroExpressiveCodeOptions} */
 import sitemap from "@astrojs/sitemap";
 import {join} from "path";
+import {fileURLToPath} from "node:url";
 const astroExpressiveCodeOptions = {
   // Example: Change the themes
   themes: ['github-dark']
@@ -25,6 +26,14 @@ export default defineConfig({
     icon()
   ],
   vite: {
+    resolve: {
+      // Training demos (src/training/demos) import "@guiexpert/table" like an app would.
+      // Resolved to the core built in this repo (pnpm build:core) – the same build the showcases use.
+      alias: [
+        { find: /^@guiexpert\/table$/, replacement: fileURLToPath(new URL("../../packages/table/dist/index.js", import.meta.url)) },
+        { find: /^@guiexpert\/table\/css\/(.*)$/, replacement: fileURLToPath(new URL("../../packages/table/css/$1", import.meta.url)) }
+      ]
+    },
     ssr: {
       external: ["svgo"],
       noExternal: ['@astrojs/prism']

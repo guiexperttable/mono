@@ -1,3 +1,4 @@
+/** @category Keyboard */
 export function harmonizeShortcut(shortcut: string): string {
   return shortcut
     .trim()
@@ -31,6 +32,7 @@ export function harmonizeShortcut(shortcut: string): string {
     .join(' ');
 }
 
+/** @category Keyboard */
 export function createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
   // Get the key from the event
   let key = keyboardEvent.key.toLowerCase();

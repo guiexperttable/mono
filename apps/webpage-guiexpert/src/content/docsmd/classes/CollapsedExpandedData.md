@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CollapsedExpandedData
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CollapsedExpandedData
 
 # Class: CollapsedExpandedData
 
@@ -25,7 +25,7 @@
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `mode` | ``"collapsed"`` \| ``"expanded"`` | `"collapsed"` |
+| `mode` | ``"expanded"`` \| ``"collapsed"`` | `"collapsed"` |
 | `rowIds` | (`string` \| `number`)[] | `[]` |
 | `allCollapsed` | `boolean` | `false` |
 | `allExpanded` | `boolean` | `false` |
@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[lib/table/service/data/collapsed-expanded.data.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/data/collapsed-expanded.data.ts#L3)
+[src/lib/table/service/data/collapsed-expanded.data.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/data/collapsed-expanded.data.ts#L4)
 
 ## Properties
 
@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[lib/table/service/data/collapsed-expanded.data.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/data/collapsed-expanded.data.ts#L6)
+[src/lib/table/service/data/collapsed-expanded.data.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/data/collapsed-expanded.data.ts#L7)
 
 ___
 
@@ -56,17 +56,17 @@ ___
 
 #### Defined in
 
-[lib/table/service/data/collapsed-expanded.data.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/data/collapsed-expanded.data.ts#L7)
+[src/lib/table/service/data/collapsed-expanded.data.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/data/collapsed-expanded.data.ts#L8)
 
 ___
 
 ### mode
 
-• **mode**: ``"collapsed"`` \| ``"expanded"`` = `"collapsed"`
+• **mode**: ``"expanded"`` \| ``"collapsed"`` = `"collapsed"`
 
 #### Defined in
 
-[lib/table/service/data/collapsed-expanded.data.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/data/collapsed-expanded.data.ts#L4)
+[src/lib/table/service/data/collapsed-expanded.data.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/data/collapsed-expanded.data.ts#L5)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/data/collapsed-expanded.data.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/data/collapsed-expanded.data.ts#L5)
+[src/lib/table/service/data/collapsed-expanded.data.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/data/collapsed-expanded.data.ts#L6)

@@ -57,7 +57,7 @@ import { AreaIdent } from "../area-ident.type";
  *   [2, "Jane", 25],
  *   [3, "Bob", 40]
  * ];
- * const footerData = [["", "Average", 31.67]];
+ * const footerData = [["", "Average", "31.67"]];
  * 
  * // Create the table model with all three areas
  * const tableModel: TableModelIf = TableFactory.createTableModel({
@@ -88,9 +88,9 @@ import { AreaIdent } from "../area-ident.type";
  * 
  * // Define column definitions
  * const columnDefs: ColumnDefIf[] = [
- *   { property: "id", headerLabel: "ID", width: 80 },
- *   { property: "name", headerLabel: "Name", width: 150 },
- *   { property: "age", headerLabel: "Age", width: 80 }
+ *   new ColumnDef('id', 'ID', new Size(80, 'px')),
+ *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+ *   new ColumnDef('age', 'Age', new Size(80, 'px'))
  * ];
  * 
  * // Create the table model
@@ -109,35 +109,36 @@ import { AreaIdent } from "../area-ident.type";
  * // Example of implementing a custom AreaModelIf
  * import { AreaModelIf, AreaIdent, CellRendererIf } from "@guiexpert/table";
  * 
- * class CustomAreaModel implements AreaModelIf {
+ * class CustomAreaModel extends AreaModel {
  *   constructor(
- *     public areaIdent: AreaIdent,
- *     private data: any[][],
- *     private defaultRowHeight: number = 30
- *   ) {}
- *   
- *   getRowCount(): number {
+ *     areaIdent: AreaIdent,
+ *     private readonly data: any[][],
+ *     private readonly rowHeight: number = 30
+ *   ) {
+ *     super();
+ *     this.areaIdent = areaIdent;
+ *   }
+ *
+ *   override getRowCount(): number {
  *     return this.data.length;
  *   }
- *   
- *   getValueAt(rowIndex: number, columnIndex: number): any {
- *     if (rowIndex < 0 || rowIndex >= this.data.length) return undefined;
- *     const row = this.data[rowIndex];
- *     if (columnIndex < 0 || columnIndex >= row.length) return undefined;
- *     return row[columnIndex];
+ *
+ *   override getValueAt(rowIndex: number, columnIndex: number): any {
+ *     return this.data[rowIndex]?.[columnIndex];
  *   }
- *   
- *   getRowHeight(rowIndex: number): number {
- *     return this.defaultRowHeight;
+ *
+ *   override getRowHeight(_rowIndex: number): number {
+ *     return this.rowHeight;
  *   }
- *   
- *   // Implement other required methods...
+ *   // AreaModel has defaults for all other methods
  * }
  * 
  * @see {@link TableModelIf} - The parent interface that contains area models
  * @see {@link AreaModel} - A base implementation of this interface
  * @see {@link AbstractAreaModel} - An abstract implementation with common functionality
  * @see {@link AreaModelObjectArray} - An implementation for object array data
+ *
+ * @category Area models
  */
 export interface AreaModelIf {
 
@@ -150,7 +151,8 @@ export interface AreaModelIf {
    * 
    * @example
    * // Creating an area model for the header
-   * const headerModel = new AreaModel("header");
+   * const headerModel = new AreaModel();
+   * headerModel.areaIdent = "header";
    * 
    * @example
    * // Checking which area a model represents
@@ -170,7 +172,8 @@ export interface AreaModelIf {
    * // Creating a checkbox model for row selection
    * import { CheckboxModel } from "@guiexpert/table";
    * 
-   * const bodyModel = new AreaModel("body");
+   * const bodyModel = new AreaModel();
+   * bodyModel.areaIdent = "body";
    * bodyModel.rowSelectionModel = new CheckboxModel();
    * 
    * // Later, check if a row is selected
@@ -756,9 +759,9 @@ export interface AreaModelIf {
    * @example
    * // Check if a row is checked
    * const checkedState = bodyAreaModel.isRowChecked(1);
-   * if (checkedState === true) {
+   * if (checkedState === "full") {
    *   console.log('This row is checked');
-   * } else if (checkedState === 'indeterminate') {
+   * } else if (checkedState === "semi") {
    *   console.log('This row is partially checked');
    * }
    * 
@@ -863,27 +866,29 @@ export interface AreaModelIf {
    * ]);
    * 
    * @example
-   * // Implementation example
-   * doSort(sortItems: SortItem[]): boolean {
-   *   if (!sortItems.length) return false;
-   *   
-   *   // Apply sorting to the rows
-   *   for (const sortItem of sortItems) {
-   *     const { columnIndex, sortState } = sortItem;
-   *     const property = this.columnDefs[columnIndex].property;
-   *     const direction = sortState === 'asc' ? 1 : -1;
+   * // Implementation example: a body model that sorts its own rows
+   * class MyBodyModel extends AreaModelObjectArray<any> {
+   *   override doSort(sortItems: SortItem[]): boolean {
+   *     if (!sortItems.length) return false;
    *     
-   *     this.rows.sort((a, b) => {
-   *       const valueA = a[property];
-   *       const valueB = b[property];
+   *     // Apply sorting to the rows
+   *     for (const sortItem of sortItems) {
+   *       const { columnIndex, sortState } = sortItem;
+   *       const property = this.columnDefs[columnIndex].property;
+   *       const direction = sortState === 'asc' ? 1 : -1;
    *       
-   *       if (valueA < valueB) return -1 * direction;
-   *       if (valueA > valueB) return 1 * direction;
-   *       return 0;
-   *     });
+   *       this.rows.sort((a, b) => {
+   *         const valueA = a[property];
+   *         const valueB = b[property];
+   *         
+   *         if (valueA < valueB) return -1 * direction;
+   *         if (valueA > valueB) return 1 * direction;
+   *         return 0;
+   *       });
+   *     }
+   *     
+   *     return true;
    *   }
-   *   
-   *   return true;
    * }
    */
   doSort(sortItems: SortItem[]): boolean;

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeFilterService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeFilterService
 
 # Class: GeFilterService
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[lib/table/service/ge-filter.service.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/ge-filter.service.ts#L4)
+[src/lib/table/service/ge-filter.service.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/ge-filter.service.ts#L5)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[lib/table/service/ge-filter.service.ts:56](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/ge-filter.service.ts#L56)
+[src/lib/table/service/ge-filter.service.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/ge-filter.service.ts#L57)
 
 ___
 
@@ -104,4 +104,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/ge-filter.service.ts:109](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/ge-filter.service.ts#L109)
+[src/lib/table/service/ge-filter.service.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/ge-filter.service.ts#L110)

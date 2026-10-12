@@ -1,32 +1,24 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableCellUpdateEvent
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableCellUpdateEvent
 
 # Class: TableCellUpdateEvent
 
-Represents an event that occurs when a table cell is updated.
+A new value for one cell – the input of [TableApi.updateCells](TableApi.md#updatecells).
+The value is written into the area model; if the cell is visible, only this cell is redrawn.
+`cssClasses` are applied to the current drawing of the cell (e.g. a short "flash"); permanent colours
+belong into the model ([AreaModelIf.getCustomClassesAt](../interfaces/AreaModelIf.md#getcustomclassesat)).
 
-**`Implements`**
+**`Example`**
 
-TableCellUpdateEventIf
+```ts
+tableApi.updateCells([
+  new TableCellUpdateEvent("body", row, 2, price, { "tick-up": up, "tick-down": !up }),
+  new TableCellUpdateEvent("body", row, 4, volume)
+]);
+```
 
-**`Param`**
+**`See`**
 
-The identification of the area where the cell belongs.
-
-**`Param`**
-
-The index of the row where the cell is located.
-
-**`Param`**
-
-The index of the column where the cell is located.
-
-**`Param`**
-
-The new value for the cell.
-
-**`Param`**
-
-An object containing CSS classes to be applied to the cell.
+Training: [Live data without rebuilding the table](https://gui.expert/training/live-data/)
 
 ## Implements
 
@@ -68,7 +60,7 @@ An object containing CSS classes to be applied to the cell.
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:18](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L18)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L22)
 
 ## Properties
 
@@ -84,7 +76,7 @@ Represents an area identifier ("header" | "body" | "footer"), which defines the 
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:19](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L19)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L23)
 
 ___
 
@@ -100,7 +92,7 @@ Represents the index of a column in a data table.
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:21](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L21)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L25)
 
 ___
 
@@ -128,7 +120,7 @@ Example:
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:23](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L23)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L27)
 
 ___
 
@@ -144,7 +136,7 @@ Represents the index of a row of the table.
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:20](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L20)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L24)
 
 ___
 
@@ -164,4 +156,4 @@ This valie will be set to the area model for the cell (rowIndex, columnIndex).
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L22)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L26)

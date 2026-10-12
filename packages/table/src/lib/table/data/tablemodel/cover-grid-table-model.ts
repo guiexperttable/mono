@@ -10,6 +10,7 @@ import { ColumnDefIf } from './column/column-def.if';
 import { Padding } from './padding';
 import { SelectionModelIf } from '../../selection/selection-model.if';
 
+/** @category Table model */
 export class CoverGridTableModel<T> implements TableModelIf {
 
   private headerAreaModel = new AreaModelHidden();

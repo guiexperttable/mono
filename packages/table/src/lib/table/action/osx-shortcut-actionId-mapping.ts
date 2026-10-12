@@ -6,6 +6,8 @@ import { ActionId } from "./action-id.type";
  * Use 'meta' for the MacOS 'cmd' key.
  *
  * @class OsxShortcutActionIdMapping
+ *
+ * @category Keyboard
  */
 export class OsxShortcutActionIdMapping {
 

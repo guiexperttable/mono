@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / NumberPropertyType
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / NumberPropertyType
 
 # Class: NumberPropertyType
 
@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:41](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L41)
+[src/lib/common/generator/domain/property-type.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L56)
 
 ## Properties
 
@@ -49,7 +49,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:41](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L41)
+[src/lib/common/generator/domain/property-type.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L56)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:40](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L40)
+[src/lib/common/generator/domain/property-type.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L55)

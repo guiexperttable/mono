@@ -3,6 +3,7 @@ import { SelectionModelIf } from '../selection/selection-model.if';
 import { FocusModelIf } from '../focus/focus-model.if';
 
 
+/** @category Export & clipboard */
 export interface CopyServiceIf {
 
   /**

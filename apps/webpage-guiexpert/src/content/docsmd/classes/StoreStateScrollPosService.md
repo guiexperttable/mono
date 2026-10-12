@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / StoreStateScrollPosService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / StoreStateScrollPosService
 
 # Class: StoreStateScrollPosService
 
@@ -16,9 +16,7 @@
 
 ### Properties
 
-- [SCROLL\_STATE](StoreStateScrollPosService.md#scroll_state)
 - [getStorageKeyFn](StoreStateScrollPosService.md#getstoragekeyfn)
-- [scrollOffset](StoreStateScrollPosService.md#scrolloffset)
 
 ### Methods
 
@@ -52,19 +50,9 @@ AbstractStoreStateService.constructor
 
 #### Defined in
 
-[lib/table/service/store-state-scroll-pos.service.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L11)
+[src/lib/table/service/store-state-scroll-pos.service.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-scroll-pos.service.ts#L12)
 
 ## Properties
-
-### SCROLL\_STATE
-
-• `Private` `Readonly` **SCROLL\_STATE**: ``"scrollState"``
-
-#### Defined in
-
-[lib/table/service/store-state-scroll-pos.service.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L7)
-
-___
 
 ### getStorageKeyFn
 
@@ -76,17 +64,7 @@ AbstractStoreStateService.getStorageKeyFn
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/abstract-store-state.service.ts#L7)
-
-___
-
-### scrollOffset
-
-• `Private` **scrollOffset**: [`number`, `number`]
-
-#### Defined in
-
-[lib/table/service/store-state-scroll-pos.service.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L8)
+[src/lib/table/service/abstract-store-state.service.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L7)
 
 ## Methods
 
@@ -110,7 +88,7 @@ AbstractStoreStateService.autoConvertMapToObject
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/abstract-store-state.service.ts#L14)
+[src/lib/table/service/abstract-store-state.service.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L14)
 
 ___
 
@@ -135,7 +113,7 @@ AbstractStoreStateService.checkAndPersistItem
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:35](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/abstract-store-state.service.ts#L35)
+[src/lib/table/service/abstract-store-state.service.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L30)
 
 ___
 
@@ -149,7 +127,7 @@ ___
 
 #### Defined in
 
-[lib/table/service/store-state-scroll-pos.service.ts:16](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L16)
+[src/lib/table/service/store-state-scroll-pos.service.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-scroll-pos.service.ts#L17)
 
 ___
 
@@ -167,7 +145,7 @@ AbstractStoreStateService.load
 
 #### Defined in
 
-[lib/table/service/store-state-scroll-pos.service.ts:26](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L26)
+[src/lib/table/service/store-state-scroll-pos.service.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-scroll-pos.service.ts#L27)
 
 ___
 
@@ -197,7 +175,7 @@ AbstractStoreStateService.loadFromLocalStorage
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:60](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/abstract-store-state.service.ts#L60)
+[src/lib/table/service/abstract-store-state.service.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L59)
 
 ___
 
@@ -222,7 +200,7 @@ AbstractStoreStateService.persistItem
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:52](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/abstract-store-state.service.ts#L52)
+[src/lib/table/service/abstract-store-state.service.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L47)
 
 ___
 
@@ -242,4 +220,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/store-state-scroll-pos.service.ts:20](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/store-state-scroll-pos.service.ts#L20)
+[src/lib/table/service/store-state-scroll-pos.service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-scroll-pos.service.ts#L21)

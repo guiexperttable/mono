@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AutoRestoreOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AutoRestoreOptionsIf
 
 # Interface: AutoRestoreOptionsIf\<T\>
 
@@ -44,7 +44,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:76](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L76)
+[src/lib/table/data/options/auto-restore-options.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L84)
 
 ___
 
@@ -57,7 +57,7 @@ the expanded/collapsed state of T elements will be preserved after changes in th
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:73](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L73)
+[src/lib/table/data/options/auto-restore-options.if.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L81)
 
 ___
 
@@ -70,7 +70,7 @@ in the list of T elements will be preserved after changes in the application sta
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:74](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L74)
+[src/lib/table/data/options/auto-restore-options.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L82)
 
 ___
 
@@ -83,7 +83,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:77](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L77)
+[src/lib/table/data/options/auto-restore-options.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L85)
 
 ___
 
@@ -96,7 +96,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:72](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L72)
+[src/lib/table/data/options/auto-restore-options.if.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L80)
 
 ___
 
@@ -109,7 +109,7 @@ for an instance of T. If not provided, each instance of T will create a new entr
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:79](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L79)
+[src/lib/table/data/options/auto-restore-options.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L87)
 
 ___
 
@@ -122,7 +122,7 @@ If not provided, a constant key 'autorestoreoptionsif' will be used.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:80](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L80)
+[src/lib/table/data/options/auto-restore-options.if.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L88)
 
 ___
 
@@ -135,4 +135,4 @@ if two instances of T are considered the same when restoring state. If not provi
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:81](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L81)
+[src/lib/table/data/options/auto-restore-options.if.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L89)

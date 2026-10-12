@@ -1,0 +1,44 @@
+---
+/** Diagram: three area models × three sides = nine areas (chapter 11, 18). */
+const areas = [
+  { id: "header", y: 40, h: 46, fill: ["#a5b4fc", "#c7d2fe", "#a5b4fc"], text: "#1e1b4b" },
+  { id: "body", y: 92, h: 150, fill: ["#f9a8d4", "#fce7f3", "#f9a8d4"], text: "#500724" },
+  { id: "footer", y: 248, h: 46, fill: ["#6ee7b7", "#d1fae5", "#6ee7b7"], text: "#064e3b" }
+];
+const sides = [
+  { id: "west", x: 150, w: 130 },
+  { id: "center", x: 286, w: 360 },
+  { id: "east", x: 652, w: 130 }
+];
+---
+<figure class="training-diagram">
+  <svg viewBox="0 0 860 340" role="img" aria-labelledby="na-title">
+    <title id="na-title">Header, body and footer, each split into west (fixed left), center (scrolls) and east (fixed right)</title>
+    <g font-family="Inter Variable, system-ui, sans-serif" font-size="13">
+      {sides.map(s => (
+        <text x={s.x + s.w / 2} y="26" text-anchor="middle" font-weight="700" fill="var(--color-text)">
+          {s.id}{s.id === "center" ? " (scrolls)" : s.id === "west" ? " (fixed)" : " (fixed)"}
+        </text>
+      ))}
+      {areas.map(a => (
+        <g>
+          <text x="136" y={a.y + a.h / 2 + 5} text-anchor="end" font-weight="700" fill="var(--color-text)">{a.id}</text>
+          {sides.map((s, i) => (
+            <g>
+              <rect x={s.x} y={a.y} width={s.w} height={a.h} rx="6" fill={a.fill[i]} />
+              <text x={s.x + s.w / 2} y={a.y + a.h / 2 + 4} text-anchor="middle" font-size="11" fill={a.text}>
+                {a.id}-{s.id}
+              </text>
+            </g>
+          ))}
+        </g>
+      ))}
+      <text x="150" y="322" font-size="12" fill="var(--color-text-offset)">fixedLeftColumnCount</text>
+      <text x="466" y="322" text-anchor="middle" font-size="12" fill="var(--color-text-offset)">all other columns – virtual, horizontally and vertically</text>
+      <text x="782" y="322" text-anchor="end" font-size="12" fill="var(--color-text-offset)">fixedRightColumnCount</text>
+      <path d="M800 92 L 800 242" stroke="var(--color-text-offset)" />
+      <text x="810" y="172" font-size="12" fill="var(--color-text-offset)" transform="rotate(90 810 172)" text-anchor="middle">scrolls</text>
+    </g>
+  </svg>
+  <figcaption>Every area asks its area model: <code>getRowCount()</code>, <code>getValueAt(row, col)</code>, <code>getRowHeight(row)</code> …</figcaption>
+</figure>

@@ -1,0 +1,46 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="array-of-arrays">
+
+  <h2 id="matrix">Every area as a two-dimensional array</h2>
+  <p>
+    Not every data source delivers objects. CSV files, spreadsheet exports, matrices from an API – they are rows of values.
+    <ApiLink name="TableFactory.createTableModel" /> takes them directly:
+  </p>
+  <Code lang="text" title="public/data/orders.csv" code={`id,date,customer,country,city,product,category,quantity,price,total,status
+1,2025-04-22,Dupont SA,Spain,Madrid,Docking Station,Accessories,18,230.15,4142.7,paid
+2,2026-07-19,Kowalski Sp.,Spain,Madrid,Support Plan,Services,10,915.73,9157.3,paid
+…`} />
+  <Snippet file="demos/array-of-arrays.ts" region="csv" title="csv/csv-table.ts" />
+  <Snippet file="demos/array-of-arrays.ts" region="model" />
+  <LiveDemo name="array-of-arrays" title="orders.csv" height={380} caption="1,000 rows from a CSV file, with a totals row in the footer." />
+
+  <h2 id="fields">The fields</h2>
+  <ul>
+    <li><code>headerData</code> and <code>footerData</code> are arrays of rows – <strong>several header rows</strong> are possible:
+      <code>headerData: [["Order", "", "Amount", ""], ["ID", "Date", "Qty", "Total"]]</code>.</li>
+    <li><code>bodyData</code> – the body rows; the factory wraps them into an <ApiLink name="AreaModelArrayOfArrays" />.</li>
+    <li><code>columnSizes</code> – widths in pixels, when you don't need full <ChapterLink slug="column-definitions" label="ColumnDefs" />.</li>
+  </ul>
+
+  <Callout type="pitfall" title="footerData is static">
+    <p>
+      The footer row here is computed once. If the table is filtered or edited, it does not change. A footer that follows the
+      visible rows is an own area model – <ChapterLink slug="footer-totals" />.
+    </p>
+  </Callout>
+  <Callout type="tip" title="Real CSV">
+    <p>The split by comma above is enough for the demo data. For quoted fields (<code>"Smith, Ltd"</code>) use a CSV parser of
+      your choice – the table only needs the resulting <code>string[][]</code>.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Grouped, multi-row headers that the user can collapse: <ChapterLink slug="header-groups" />.</p>
+</TrainingLayout>

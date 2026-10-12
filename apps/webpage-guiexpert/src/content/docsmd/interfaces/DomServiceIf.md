@@ -1,6 +1,21 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / DomServiceIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / DomServiceIf
 
 # Interface: DomServiceIf
+
+All DOM changes of the table go through this service – the third argument of `new TableScope(…)`.
+Plain TypeScript and most wrappers use [SimpleDomService](../classes/SimpleDomService.md); Angular uses its `Renderer2`.
+Cell renderers get it as last argument of [CellRendererIf.render](CellRendererIf.md#render).
+
+**`Example`**
+
+```ts
+// inside CellRendererIf.render(cellDiv, …, cellValue, dom)
+const badge = dom.createElement<HTMLSpanElement>("span");
+dom.addClass(badge, "status-badge");
+dom.setStyle(badge, "margin-left", "4px");
+badge.textContent = String(cellValue);
+dom.appendChild(cellDiv, badge);
+```
 
 ## Implemented by
 
@@ -15,6 +30,7 @@
 - [appendText](DomServiceIf.md#appendtext)
 - [createElement](DomServiceIf.md#createelement)
 - [createText](DomServiceIf.md#createtext)
+- [removeClass](DomServiceIf.md#removeclass)
 - [setAttribute](DomServiceIf.md#setattribute)
 - [setStyle](DomServiceIf.md#setstyle)
 
@@ -23,6 +39,8 @@
 ### addClass
 
 ▸ **addClass**(`div`, `clazz`): `HTMLDivElement`
+
+Adds a CSS class.
 
 #### Parameters
 
@@ -37,13 +55,15 @@
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L5)
+[src/lib/table/service/dom-service.if.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L22)
 
 ___
 
 ### appendChild
 
 ▸ **appendChild**(`parent`, `child`): `void`
+
+Appends a child element.
 
 #### Parameters
 
@@ -58,13 +78,15 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:13](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L13)
+[src/lib/table/service/dom-service.if.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L37)
 
 ___
 
 ### appendText
 
 ▸ **appendText**(`parent`, `text`): `HTMLDivElement`
+
+Appends text to an element (no HTML parsing).
 
 #### Parameters
 
@@ -79,13 +101,15 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L11)
+[src/lib/table/service/dom-service.if.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L34)
 
 ___
 
 ### createElement
 
 ▸ **createElement**\<`T`\>(`ele`): `T`
+
+Creates an element: `createElement<HTMLSpanElement>("span")`.
 
 #### Type parameters
 
@@ -105,13 +129,15 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L7)
+[src/lib/table/service/dom-service.if.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L28)
 
 ___
 
 ### createText
 
 ▸ **createText**(`text`): `HTMLElement`
+
+Creates a text node.
 
 #### Parameters
 
@@ -125,13 +151,38 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L9)
+[src/lib/table/service/dom-service.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L31)
+
+___
+
+### removeClass
+
+▸ **removeClass**(`div`, `clazz`): `HTMLDivElement`
+
+Removes a CSS class.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `div` | `HTMLElement` |
+| `clazz` | `string` |
+
+#### Returns
+
+`HTMLDivElement`
+
+#### Defined in
+
+[src/lib/table/service/dom-service.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L25)
 
 ___
 
 ### setAttribute
 
 ▸ **setAttribute**(`ele`, `key`, `value`): `void`
+
+Sets an attribute.
 
 #### Parameters
 
@@ -147,13 +198,15 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:15](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L15)
+[src/lib/table/service/dom-service.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L40)
 
 ___
 
 ### setStyle
 
 ▸ **setStyle**(`el`, `style`, `value`): `any`
+
+Sets one CSS property: `setStyle(el, "background-color", "#fdf2f8")`.
 
 #### Parameters
 
@@ -169,4 +222,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/dom-service.if.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/dom-service.if.ts#L3)
+[src/lib/table/service/dom-service.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L19)

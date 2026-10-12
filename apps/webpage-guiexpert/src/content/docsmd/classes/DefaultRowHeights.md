@@ -1,6 +1,15 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / DefaultRowHeights
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / DefaultRowHeights
 
 # Class: DefaultRowHeights
+
+Row heights of header, body and footer in px – default 34 each. Used in [TableOptionsIf.defaultRowHeights](../interfaces/TableOptionsIf.md#defaultrowheights)
+and [CreateTableModelPara.defaultRowHeights](../interfaces/CreateTableModelPara.md#defaultrowheights).
+
+**`Example`**
+
+```ts
+const tableOptions: TableOptionsIf = { ...new TableOptions(), defaultRowHeights: new DefaultRowHeights(40, 30, 36) };
+```
 
 ## Implements
 
@@ -26,11 +35,11 @@
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `header` | `number` | `34` |
-| `body` | `number` | `34` |
-| `footer` | `number` | `34` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `header` | `number` | `34` | Height of header rows in px. |
+| `body` | `number` | `34` | Height of body rows in px. |
+| `footer` | `number` | `34` | Height of footer rows in px. |
 
 #### Returns
 
@@ -38,7 +47,7 @@
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/default-row-heights.ts#L4)
+[src/lib/table/data/options/default-row-heights.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.ts#L13)
 
 ## Properties
 
@@ -46,13 +55,15 @@
 
 • **body**: `number` = `34`
 
+Height of body rows in px.
+
 #### Implementation of
 
 [DefaultRowHeightsIf](../interfaces/DefaultRowHeightsIf.md).[body](../interfaces/DefaultRowHeightsIf.md#body)
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/default-row-heights.ts#L6)
+[src/lib/table/data/options/default-row-heights.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.ts#L17)
 
 ___
 
@@ -60,13 +71,15 @@ ___
 
 • **footer**: `number` = `34`
 
+Height of footer rows in px.
+
 #### Implementation of
 
 [DefaultRowHeightsIf](../interfaces/DefaultRowHeightsIf.md).[footer](../interfaces/DefaultRowHeightsIf.md#footer)
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/default-row-heights.ts#L7)
+[src/lib/table/data/options/default-row-heights.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.ts#L19)
 
 ___
 
@@ -74,10 +87,12 @@ ___
 
 • **header**: `number` = `34`
 
+Height of header rows in px.
+
 #### Implementation of
 
 [DefaultRowHeightsIf](../interfaces/DefaultRowHeightsIf.md).[header](../interfaces/DefaultRowHeightsIf.md#header)
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/default-row-heights.ts#L5)
+[src/lib/table/data/options/default-row-heights.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.ts#L15)

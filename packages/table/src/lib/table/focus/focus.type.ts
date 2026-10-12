@@ -27,6 +27,8 @@
  * @see FocusModel#setFocus
  * @see FocusModelIf
  * @type
+ *
+ * @category Selection & focus
  */
 export type FocusType = "none" | "cell" | "row";
 

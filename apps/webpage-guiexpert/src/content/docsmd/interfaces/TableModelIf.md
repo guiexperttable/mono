@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableModelIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableModelIf
 
 # Interface: TableModelIf
 
@@ -20,6 +20,7 @@ will result in the presence of an east area.
 
 ## Implemented by
 
+- [`CoverGridTableModel`](../classes/CoverGridTableModel.md)
 - [`TableModel`](../classes/TableModel.md)
 
 ## Table of contents
@@ -44,6 +45,7 @@ will result in the presence of an east area.
 - [getPadding](TableModelIf.md#getpadding)
 - [getRowHeight](TableModelIf.md#getrowheight)
 - [getSelectionModel](TableModelIf.md#getselectionmodel)
+- [getTableScope](TableModelIf.md#gettablescope)
 - [getXPosByColumnIndex](TableModelIf.md#getxposbycolumnindex)
 - [init](TableModelIf.md#init)
 - [isFooterVisibe](TableModelIf.md#isfootervisibe)
@@ -54,6 +56,9 @@ will result in the presence of an east area.
 - [recalcPadding](TableModelIf.md#recalcpadding)
 - [recalcSize](TableModelIf.md#recalcsize)
 - [setColumnWidth](TableModelIf.md#setcolumnwidth)
+- [setParentWidth](TableModelIf.md#setparentwidth)
+- [setTableScope](TableModelIf.md#settablescope)
+- [sort](TableModelIf.md#sort)
 
 ## Methods
 
@@ -61,20 +66,24 @@ will result in the presence of an east area.
 
 ▸ **changeColumnOrder**(`sourceColumnIndex`, `targetColumnIndex`): `void`
 
+Moves a column from the source column index to the target column index.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `sourceColumnIndex` | `number` |
-| `targetColumnIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `sourceColumnIndex` | `number` | The index of the column to be moved. |
+| `targetColumnIndex` | `number` | The index where the column will be moved to. |
 
 #### Returns
 
 `void`
 
+- This method does not return anything.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:29](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L29)
+[src/lib/table/data/tablemodel/table-model.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L40)
 
 ___
 
@@ -82,19 +91,23 @@ ___
 
 ▸ **doSort**(`sortItems`): `boolean`
 
+Sorts an array of SortItem objects based on a predetermined sorting algorithm.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `sortItems` | [`SortItem`](../classes/SortItem.md)[] |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `sortItems` | [`SortItem`](../classes/SortItem.md)[] | An array of SortItem objects to be sorted. |
 
 #### Returns
 
 `boolean`
 
+- Returns true if the sorting was successful, false otherwise.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:87](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L87)
+[src/lib/table/data/tablemodel/table-model.if.ts:261](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L261)
 
 ___
 
@@ -102,17 +115,19 @@ ___
 
 ▸ **externalFilterChanged**\<`T`\>(`predictFn`): `void`
 
+This is triggered when an external filter has changed.
+
 #### Type parameters
 
-| Name |
-| :------ |
-| `T` |
+| Name | Description |
+| :------ | :------ |
+| `T` | The type of elements being filtered. |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `predictFn` | [`FilterFunction`](../modules.md#filterfunction)\<`T`\> |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `predictFn` | [`FilterFunction`](../modules.md#filterfunction)\<`T`\> | A function that takes an element of type T and returns a boolean indicating whether the element satisfies the filter conditions. |
 
 #### Returns
 
@@ -120,7 +135,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:85](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L85)
+[src/lib/table/data/tablemodel/table-model.if.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L253)
 
 ___
 
@@ -128,19 +143,23 @@ ___
 
 ▸ **getAreaModel**(`rowAreaIdent`): [`AreaModelIf`](AreaModelIf.md)
 
+Retrieves the area model based on the given row area identifier.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `rowAreaIdent` | [`AreaIdent`](../modules.md#areaident) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowAreaIdent` | [`AreaIdent`](../modules.md#areaident) | The identifier of the row area. |
 
 #### Returns
 
 [`AreaModelIf`](AreaModelIf.md)
 
+The area model corresponding to the provided row area identifier.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:41](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L41)
+[src/lib/table/data/tablemodel/table-model.if.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L95)
 
 ___
 
@@ -148,13 +167,17 @@ ___
 
 ▸ **getBodyModel**(): [`AreaModelIf`](AreaModelIf.md)
 
+Retrieves the body model.
+
 #### Returns
 
 [`AreaModelIf`](AreaModelIf.md)
 
+The body model representing an area.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:43](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L43)
+[src/lib/table/data/tablemodel/table-model.if.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L102)
 
 ___
 
@@ -162,19 +185,23 @@ ___
 
 ▸ **getBodyRowByIndex**(`rowIndex`): `any`
 
+Retrieves the body row at the specified index.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `rowIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the desired body row. |
 
 #### Returns
 
 `any`
 
+- The body row object at the specified index.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:63](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L63)
+[src/lib/table/data/tablemodel/table-model.if.ts:177](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L177)
 
 ___
 
@@ -182,13 +209,17 @@ ___
 
 ▸ **getColumnCount**(): `number`
 
+Returns the number of columns in a dataset.
+
 #### Returns
 
 `number`
 
+The number of columns in the dataset.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:35](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L35)
+[src/lib/table/data/tablemodel/table-model.if.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L71)
 
 ___
 
@@ -196,19 +227,23 @@ ___
 
 ▸ **getColumnDef**(`index`): `undefined` \| [`ColumnDefIf`](ColumnDefIf.md)
 
+Retrieves the column definition for the specified index.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `index` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `index` | `number` | The index of the column to retrieve the definition for. |
 
 #### Returns
 
 `undefined` \| [`ColumnDefIf`](ColumnDefIf.md)
 
+- The column definition for the specified index, or undefined if not found.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:57](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L57)
+[src/lib/table/data/tablemodel/table-model.if.ts:154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L154)
 
 ___
 
@@ -216,13 +251,17 @@ ___
 
 ▸ **getColumnDefs**(): `undefined` \| [`ColumnDefIf`](ColumnDefIf.md)[]
 
+Retrieves the column definitions for a table.
+
 #### Returns
 
 `undefined` \| [`ColumnDefIf`](ColumnDefIf.md)[]
 
+An array of column definitions or undefined if there are no column definitions.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:59](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L59)
+[src/lib/table/data/tablemodel/table-model.if.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L161)
 
 ___
 
@@ -230,19 +269,23 @@ ___
 
 ▸ **getColumnProperty**(`columnIndex`): `string`
 
+Retrieves the property of a specific column.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | The index of the column. |
 
 #### Returns
 
 `string`
 
+The property of the column.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:61](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L61)
+[src/lib/table/data/tablemodel/table-model.if.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L169)
 
 ___
 
@@ -250,35 +293,43 @@ ___
 
 ▸ **getColumnWidth**(`columnIndex`): `number`
 
+Retrieves the width (in pixels) of a specific column.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | The index of the column to get the width of. |
 
 #### Returns
 
 `number`
 
+The width of the specified column.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:37](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L37)
+[src/lib/table/data/tablemodel/table-model.if.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L79)
 
 ▸ **getColumnWidth**(`columnIndex`): `number`
 
+Retrieves the width of a given column in the table.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | The index of the column for which to get the width. |
 
 #### Returns
 
 `number`
 
+The width of the column in pixels.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:65](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L65)
+[src/lib/table/data/tablemodel/table-model.if.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L185)
 
 ___
 
@@ -286,13 +337,17 @@ ___
 
 ▸ **getContentHeightInPixel**(): `number`
 
+Retrieves the content height in pixels.
+
 #### Returns
 
 `number`
 
+The height of the content in pixels.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:79](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L79)
+[src/lib/table/data/tablemodel/table-model.if.ts:234](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L234)
 
 ___
 
@@ -300,13 +355,17 @@ ___
 
 ▸ **getContentWidthInPixel**(): `number`
 
+Returns the content width in pixels.
+
 #### Returns
 
 `number`
 
+The width of the content in pixels.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:81](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L81)
+[src/lib/table/data/tablemodel/table-model.if.ts:241](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L241)
 
 ___
 
@@ -314,13 +373,17 @@ ___
 
 ▸ **getFixedLeftColumnCount**(): `number`
 
+Retrieves the number of fixed left columns.
+
 #### Returns
 
 `number`
 
+The count of fixed left columns.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:45](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L45)
+[src/lib/table/data/tablemodel/table-model.if.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L109)
 
 ___
 
@@ -328,13 +391,17 @@ ___
 
 ▸ **getFixedRightColumnCount**(): `number`
 
+Retrieves the count of fixed right columns.
+
 #### Returns
 
 `number`
 
+The count of fixed right columns.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:47](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L47)
+[src/lib/table/data/tablemodel/table-model.if.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L116)
 
 ___
 
@@ -342,13 +409,17 @@ ___
 
 ▸ **getPadding**(): [`Padding`](../classes/Padding.md)
 
+Retrieves the padding value of the element.
+
 #### Returns
 
 [`Padding`](../classes/Padding.md)
 
+The padding value of the element.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:77](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L77)
+[src/lib/table/data/tablemodel/table-model.if.ts:227](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L227)
 
 ___
 
@@ -356,20 +427,24 @@ ___
 
 ▸ **getRowHeight**(`rowAreaIdent`, `rowIndex`): `number`
 
+Retrieves the height of a specific row in the provided row area.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `rowAreaIdent` | [`AreaIdent`](../modules.md#areaident) |
-| `rowIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowAreaIdent` | [`AreaIdent`](../modules.md#areaident) | The identifier of the row area. |
+| `rowIndex` | `number` | The index of the row for which to retrieve the height. |
 
 #### Returns
 
 `number`
 
+The height of the specified row in pixels.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:55](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L55)
+[src/lib/table/data/tablemodel/table-model.if.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L146)
 
 ___
 
@@ -377,13 +452,31 @@ ___
 
 ▸ **getSelectionModel**(): `undefined` \| [`SelectionModelIf`](SelectionModelIf.md)
 
+Retrieves the selection model associated with the component.
+
 #### Returns
 
 `undefined` \| [`SelectionModelIf`](SelectionModelIf.md)
 
+The selection model instance if available, or undefined if none is found.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:89](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L89)
+[src/lib/table/data/tablemodel/table-model.if.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L270)
+
+___
+
+### getTableScope
+
+▸ **getTableScope**(): `undefined` \| [`TableScope`](../classes/TableScope.md)
+
+#### Returns
+
+`undefined` \| [`TableScope`](../classes/TableScope.md)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/table-model.if.ts:273](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L273)
 
 ___
 
@@ -391,19 +484,23 @@ ___
 
 ▸ **getXPosByColumnIndex**(`columnIndex`): `number`
 
+Returns the x position corresponding to the given column index.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | The index of the column. |
 
 #### Returns
 
 `number`
 
+- The x position corresponding to the given column index.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:39](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L39)
+[src/lib/table/data/tablemodel/table-model.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L87)
 
 ___
 
@@ -411,13 +508,15 @@ ___
 
 ▸ **init**(): `void`
 
+Triggered by TableScope.firstInit() after the table tag is attached to the dom.
+
 #### Returns
 
 `void`
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:33](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L33)
+[src/lib/table/data/tablemodel/table-model.if.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L54)
 
 ___
 
@@ -425,13 +524,17 @@ ___
 
 ▸ **isFooterVisibe**(): `boolean`
 
+Checks if the footer is visible.
+
 #### Returns
 
 `boolean`
 
+Returns true if the footer is visible, otherwise returns false.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:51](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L51)
+[src/lib/table/data/tablemodel/table-model.if.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L130)
 
 ___
 
@@ -439,13 +542,17 @@ ___
 
 ▸ **isHeaderVisibe**(): `boolean`
 
+Checks if the header is visible.
+
 #### Returns
 
 `boolean`
 
+- Returns true if the header is visible, false otherwise.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:49](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L49)
+[src/lib/table/data/tablemodel/table-model.if.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L123)
 
 ___
 
@@ -453,13 +560,17 @@ ___
 
 ▸ **isRowCheckboxVisible**(): `boolean`
 
+Determines if the row checkbox is visible.
+
 #### Returns
 
 `boolean`
 
+True if the row checkbox is visible, false otherwise.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:53](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L53)
+[src/lib/table/data/tablemodel/table-model.if.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L137)
 
 ___
 
@@ -467,19 +578,23 @@ ___
 
 ▸ **isSortable**(`colIdx`): `boolean`
 
+Checks if a column at the specified index is sortable.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `colIdx` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `colIdx` | `number` | The index of the column to check. |
 
 #### Returns
 
 `boolean`
 
+- true if the column is sortable, false otherwise.
+
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:31](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L31)
+[src/lib/table/data/tablemodel/table-model.if.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L48)
 
 ___
 
@@ -487,13 +602,15 @@ ___
 
 ▸ **recalcHeightAndPadding**(): `void`
 
+Recalculates the height and padding of an element.
+
 #### Returns
 
 `void`
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:75](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L75)
+[src/lib/table/data/tablemodel/table-model.if.ts:220](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L220)
 
 ___
 
@@ -501,13 +618,17 @@ ___
 
 ▸ **recalcPadding**(): `void`
 
+Recalculates the padding of the element based on its content.
+This method updates the padding of the element to ensure that its content
+is properly aligned and displayed.
+
 #### Returns
 
 `void`
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:73](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L73)
+[src/lib/table/data/tablemodel/table-model.if.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L213)
 
 ___
 
@@ -515,11 +636,13 @@ ___
 
 ▸ **recalcSize**(`clientWidth`): `void`
 
+Recalculates the size of the element based on the provided client width.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `clientWidth` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `clientWidth` | `number` | The current client width of the element. |
 
 #### Returns
 
@@ -527,7 +650,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:71](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L71)
+[src/lib/table/data/tablemodel/table-model.if.ts:204](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L204)
 
 ___
 
@@ -535,12 +658,14 @@ ___
 
 ▸ **setColumnWidth**(`columnIndex`, `width`): `void`
 
+Sets the width of a column in the table.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
-| `width` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | The index of the column to set the width for. |
+| `width` | `number` | The width to set for the column, in pixels. |
 
 #### Returns
 
@@ -548,4 +673,66 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.if.ts:67](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/table-model.if.ts#L67)
+[src/lib/table/data/tablemodel/table-model.if.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L194)
+
+___
+
+### setParentWidth
+
+▸ **setParentWidth**(`widthInPixel`): `void`
+
+Recalculates the column widths of the table.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `widthInPixel` | `number` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/table-model.if.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L64)
+
+___
+
+### setTableScope
+
+▸ **setTableScope**(`tableScope`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tableScope` | [`TableScope`](../classes/TableScope.md) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/table-model.if.ts:272](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L272)
+
+___
+
+### sort
+
+▸ **sort**(`compareFn`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `compareFn` | (`a`: `any`, `b`: `any`) => `number` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/table-model.if.ts:263](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.if.ts#L263)

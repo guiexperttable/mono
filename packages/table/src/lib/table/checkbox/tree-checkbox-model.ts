@@ -3,6 +3,7 @@ import { CheckboxModelIf } from "./checkbox-model.if";
 import { TreeRowIf } from "../data/common/tree-row-if";
 
 
+/** @category Tree & checkboxes */
 export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxModelIf<T> {
 
 

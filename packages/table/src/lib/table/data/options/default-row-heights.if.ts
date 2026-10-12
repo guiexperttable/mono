@@ -7,6 +7,8 @@
  * @property `body`: It sets the height of the body rows present in the table. This value can be individually adjusted by developers.
  * @property `footer`: This property represents the height of the table footer row. It has a mutable value that can be modified as per requirements.
  *
+ * See {@link DefaultRowHeights} for the defaults (34 px each).
+ *
  * @example
  * // declaring a variable with default row heights
  * let rowHeights: DefaultRowHeightsIf = {
@@ -14,8 +16,9 @@
  *     body: 100,
  *     footer: 60
  * };
+
  *
- * For implementation details, refer to the `DefaultRowHeights` class.
+ * @category Options
  */
 export interface DefaultRowHeightsIf {
   header: number,

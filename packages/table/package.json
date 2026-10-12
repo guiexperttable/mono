@@ -22,10 +22,11 @@
     "build": "vite build && npm run concat-css:main && npm run concat-css:dist",
     "concat-css:main": "cat css/table*.css > css/main.css",
     "concat-css:dist": "cat css/table*.css > dist/css/main.css",
-    "typedoc:json": "npx typedoc --json ../../apps/table-website/src/assets/json/doctype.json src/index.ts",
-    "typedoc:docs-html": "npx typedoc --out ../../apps/table-website/src/assets/docs src/index.ts",
-    "typedoc:docs-html-custom-css": "npx typedoc --customCss ./doc.css --out ../../apps/table-website/src/assets/docs src/index.ts",
-    "typedoc:docs-md": "npx typedoc --plugin typedoc-plugin-markdown --out ../../apps/table-website/src/assets/docsmd src/index.ts",
+    "typedoc:website": "node scripts/typedoc-website.mjs",
+    "typedoc:json": "npx typedoc --json ../../apps/table-website/src/assets/json/doctype.json",
+    "typedoc:docs-html": "npx typedoc --out ../../apps/table-website/src/assets/docs",
+    "typedoc:docs-md": "npx typedoc --plugin typedoc-plugin-markdown --out ../../apps/table-website/src/assets/docsmd",
+    "docs:check": "node scripts/check-doc-examples.mjs",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {

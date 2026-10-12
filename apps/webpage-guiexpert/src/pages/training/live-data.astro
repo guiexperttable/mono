@@ -1,0 +1,48 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="live-data">
+
+  <h2 id="problem">Many small changes</h2>
+  <p>
+    A ticker, a monitoring view, a trading screen: values change many times per second, but the rows stay the same. Rebuilding
+    the table – or even repainting all visible cells – for every change would waste most of the frame.
+  </p>
+
+  <h2 id="update-cells">updateCells: value + redraw of exactly these cells</h2>
+  <Snippet file="demos/live-data.ts" region="model" title="src/model/ticker.ts" />
+  <Snippet file="demos/live-data.ts" region="tick" />
+  <Snippet file="demos/live-data.ts" region="timer" />
+  <ul>
+    <li>A <ApiLink name="TableCellUpdateEvent" /> = area, row, column, new value, and optionally CSS classes for this cell.</li>
+    <li><ApiLink name="TableApi.updateCells" /> writes the values into the model and redraws only the affected cells – if they are
+      visible. Cells off screen just get the value and are drawn when you scroll there.</li>
+    <li><code>updateCells(events, true)</code> repaints the whole table instead.</li>
+  </ul>
+  <LiveDemo name="live-data" title="1,000 quotes, 1,500 updates per second" height={420}
+            caption="Green = up, pink = down. Scroll while it runs – the frame rate stays at 60 fps." />
+
+  <Callout type="note" title="Flash, don't paint">
+    <p>The classes of the event apply to the <strong>current</strong> drawing of the cell – a flash. After the next full repaint
+      they are gone. Colours that must stay belong into the model (<ApiLink name="AreaModelIf.getCustomClassesAt" />,
+      <ChapterLink slug="heatmap" />).</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.89 <code>updateCells()</code> only searches the cells of its own table – before, several tables on one page could
+      update each other's cells.</p>
+  </Callout>
+
+  <h2 id="sources">Where the data comes from</h2>
+  <p>
+    WebSocket, Server-Sent Events, polling – collect the changes and call <code>updateCells</code> once per animation frame or
+    interval, not once per message. The showcase <a href="/showcase/crypto/run/">Crypto</a> does that with real price data.
+  </p>
+
+  <h2 id="next">Next</h2>
+  <p>A table that remembers sorting and scroll position: <ChapterLink slug="persist-state" />.</p>
+</TrainingLayout>

@@ -1,3 +1,9 @@
+/**
+ * A flag as function – e.g. {@link ColumnDefIf.sortable}, `editable`, `isVisible`. A function can depend on state:
+ * `isVisible: () => showDetails`. Constants: {@link TrueFn}, {@link FalseFn}.
+ *
+ * @category Columns
+ */
 export type BooleanFunction = () => boolean;
 
 /**
@@ -5,6 +11,8 @@ export type BooleanFunction = () => boolean;
  *
  * @function
  * @returns {boolean} - Always returns true
+ *
+ * @category Columns
  */
 export const TrueFn = () => true;
 /**
@@ -12,5 +20,7 @@ export const TrueFn = () => true;
  *
  * @function
  * @returns {boolean} Always returns `false`.
+ *
+ * @category Columns
  */
 export const FalseFn = () => false;

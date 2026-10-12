@@ -6,6 +6,8 @@ import {AreaModelObjectArray} from "../data/tablemodel/areamodel/area-model-obje
 
 /**
  * Works with AreaModelObjectArray only
+ *
+ * @category Renderers & editing
  */
 export class StarRatingCellRenderer<T> implements CellRendererIf {
 

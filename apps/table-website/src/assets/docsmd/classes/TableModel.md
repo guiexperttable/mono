@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableModel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableModel
 
 # Class: TableModel
 
@@ -49,13 +49,10 @@ will result in the presence of an east area.
 - [parentSize](TableModel.md#parentsize)
 - [rowCheckboxVisible](TableModel.md#rowcheckboxvisible)
 - [rowCount](TableModel.md#rowcount)
-- [tableScope](TableModel.md#tablescope)
 - [xPositions](TableModel.md#xpositions)
 
 ### Methods
 
-- [arrayMove](TableModel.md#arraymove)
-- [calcXPositions](TableModel.md#calcxpositions)
 - [changeColumnOrder](TableModel.md#changecolumnorder)
 - [doSort](TableModel.md#dosort)
 - [externalFilterChanged](TableModel.md#externalfilterchanged)
@@ -84,15 +81,12 @@ will result in the presence of an east area.
 - [isHeaderVisibe](TableModel.md#isheadervisibe)
 - [isRowCheckboxVisible](TableModel.md#isrowcheckboxvisible)
 - [isSortable](TableModel.md#issortable)
-- [recalcColumnWidths](TableModel.md#recalccolumnwidths)
-- [recalcContentWidthInPx](TableModel.md#recalccontentwidthinpx)
 - [recalcHeightAndPadding](TableModel.md#recalcheightandpadding)
 - [recalcPadding](TableModel.md#recalcpadding)
 - [recalcSize](TableModel.md#recalcsize)
 - [setColumnWidth](TableModel.md#setcolumnwidth)
 - [setParentWidth](TableModel.md#setparentwidth)
 - [setTableScope](TableModel.md#settablescope)
-- [sizeToPixel](TableModel.md#sizetopixel)
 - [sort](TableModel.md#sort)
 
 ## Constructors
@@ -125,7 +119,7 @@ will result in the presence of an east area.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:49](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L49)
+[src/lib/table/data/tablemodel/table-model.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L51)
 
 ## Properties
 
@@ -135,7 +129,7 @@ will result in the presence of an east area.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:51](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L51)
+[src/lib/table/data/tablemodel/table-model.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L53)
 
 ___
 
@@ -145,7 +139,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:60](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L60)
+[src/lib/table/data/tablemodel/table-model.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L62)
 
 ___
 
@@ -155,7 +149,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:57](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L57)
+[src/lib/table/data/tablemodel/table-model.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L59)
 
 ___
 
@@ -165,7 +159,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:58](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L58)
+[src/lib/table/data/tablemodel/table-model.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L60)
 
 ___
 
@@ -175,7 +169,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:42](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L42)
+[src/lib/table/data/tablemodel/table-model.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L44)
 
 ___
 
@@ -185,7 +179,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:43](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L43)
+[src/lib/table/data/tablemodel/table-model.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L45)
 
 ___
 
@@ -195,7 +189,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:56](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L56)
+[src/lib/table/data/tablemodel/table-model.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L58)
 
 ___
 
@@ -205,7 +199,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:53](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L53)
+[src/lib/table/data/tablemodel/table-model.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L55)
 
 ___
 
@@ -215,7 +209,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:54](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L54)
+[src/lib/table/data/tablemodel/table-model.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L56)
 
 ___
 
@@ -225,7 +219,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:52](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L52)
+[src/lib/table/data/tablemodel/table-model.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L54)
 
 ___
 
@@ -239,7 +233,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:62](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L62)
+[src/lib/table/data/tablemodel/table-model.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L64)
 
 ___
 
@@ -249,7 +243,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:50](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L50)
+[src/lib/table/data/tablemodel/table-model.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L52)
 
 ___
 
@@ -259,7 +253,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:59](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L59)
+[src/lib/table/data/tablemodel/table-model.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L61)
 
 ___
 
@@ -269,7 +263,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L46)
+[src/lib/table/data/tablemodel/table-model.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L48)
 
 ___
 
@@ -279,7 +273,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:61](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L61)
+[src/lib/table/data/tablemodel/table-model.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L63)
 
 ___
 
@@ -289,7 +283,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:55](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L55)
+[src/lib/table/data/tablemodel/table-model.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L57)
 
 ___
 
@@ -299,17 +293,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:41](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L41)
-
-___
-
-### tableScope
-
-• `Private` **tableScope**: `undefined` \| [`TableScope`](TableScope.md)
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:584](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L584)
+[src/lib/table/data/tablemodel/table-model.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L43)
 
 ___
 
@@ -319,45 +303,9 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:47](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L47)
+[src/lib/table/data/tablemodel/table-model.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L49)
 
 ## Methods
-
-### arrayMove
-
-▸ **arrayMove**(`arr`, `fromIndex`, `toIndex`): `any`[]
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `arr` | `any`[] |
-| `fromIndex` | `number` |
-| `toIndex` | `number` |
-
-#### Returns
-
-`any`[]
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:565](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L565)
-
-___
-
-### calcXPositions
-
-▸ **calcXPositions**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:575](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L575)
-
-___
 
 ### changeColumnOrder
 
@@ -382,7 +330,7 @@ Moves a column in the column order.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:498](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L498)
+[src/lib/table/data/tablemodel/table-model.ts:500](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L500)
 
 ___
 
@@ -410,7 +358,7 @@ Sorts the items using the given sortItems array.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:428](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L428)
+[src/lib/table/data/tablemodel/table-model.ts:430](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L430)
 
 ___
 
@@ -442,7 +390,7 @@ This method is called when an external filter is changed.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:418](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L418)
+[src/lib/table/data/tablemodel/table-model.ts:420](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L420)
 
 ___
 
@@ -466,7 +414,7 @@ Calculates the height of the area identified by the given area identifier.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:273](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L273)
+[src/lib/table/data/tablemodel/table-model.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L275)
 
 ___
 
@@ -498,7 +446,7 @@ If the area identification is invalid.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:364](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L364)
+[src/lib/table/data/tablemodel/table-model.ts:366](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L366)
 
 ___
 
@@ -520,7 +468,7 @@ The body area model.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:382](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L382)
+[src/lib/table/data/tablemodel/table-model.ts:384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L384)
 
 ___
 
@@ -548,7 +496,7 @@ The row object at the specified index.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:468](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L468)
+[src/lib/table/data/tablemodel/table-model.ts:470](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L470)
 
 ___
 
@@ -570,7 +518,7 @@ The count of columns.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:106](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L106)
+[src/lib/table/data/tablemodel/table-model.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L108)
 
 ___
 
@@ -598,7 +546,7 @@ Returns the column definition at the specified index.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:332](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L332)
+[src/lib/table/data/tablemodel/table-model.ts:334](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L334)
 
 ___
 
@@ -620,7 +568,7 @@ An array of ColumnDefIf objects or undefined.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:443](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L443)
+[src/lib/table/data/tablemodel/table-model.ts:445](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L445)
 
 ___
 
@@ -649,7 +597,7 @@ The property associated with the specified column index.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:454](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L454)
+[src/lib/table/data/tablemodel/table-model.ts:456](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L456)
 
 ___
 
@@ -677,7 +625,7 @@ Retrieves the width of a column specified by its index.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:134](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L134)
+[src/lib/table/data/tablemodel/table-model.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L136)
 
 ___
 
@@ -699,7 +647,7 @@ The height of the content in pixels.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:233](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L233)
+[src/lib/table/data/tablemodel/table-model.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L235)
 
 ___
 
@@ -721,7 +669,7 @@ The width of the content in pixels.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:242](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L242)
+[src/lib/table/data/tablemodel/table-model.ts:244](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L244)
 
 ___
 
@@ -743,7 +691,7 @@ The count of fixed left columns.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:344](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L344)
+[src/lib/table/data/tablemodel/table-model.ts:346](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L346)
 
 ___
 
@@ -765,7 +713,7 @@ The number of fixed right columns.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:353](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L353)
+[src/lib/table/data/tablemodel/table-model.ts:355](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L355)
 
 ___
 
@@ -789,7 +737,7 @@ Retrieves the model for the given row area identifier.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:263](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L263)
+[src/lib/table/data/tablemodel/table-model.ts:265](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L265)
 
 ___
 
@@ -811,7 +759,7 @@ The padding value.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:224](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L224)
+[src/lib/table/data/tablemodel/table-model.ts:226](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L226)
 
 ___
 
@@ -840,7 +788,7 @@ Returns the height of the specified row in the given row area identifier.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:253](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L253)
+[src/lib/table/data/tablemodel/table-model.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L255)
 
 ___
 
@@ -864,7 +812,7 @@ Returns the total width of the side area identified by sideIdent.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:293](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L293)
+[src/lib/table/data/tablemodel/table-model.ts:295](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L295)
 
 ___
 
@@ -888,7 +836,7 @@ Retrieves the start and end column indices based on the given side identifier.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:308](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L308)
+[src/lib/table/data/tablemodel/table-model.ts:310](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L310)
 
 ___
 
@@ -906,7 +854,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:588](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L588)
+[src/lib/table/data/tablemodel/table-model.ts:590](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L590)
 
 ___
 
@@ -934,7 +882,7 @@ Retrieves the x position for a given column index.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:154](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L154)
+[src/lib/table/data/tablemodel/table-model.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L156)
 
 ___
 
@@ -954,7 +902,7 @@ Triggered by TableScope.firstInit() after the table tag is attached to the dom.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:81](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L81)
+[src/lib/table/data/tablemodel/table-model.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L83)
 
 ___
 
@@ -976,7 +924,7 @@ True if the footer is visible, false otherwise.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:391](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L391)
+[src/lib/table/data/tablemodel/table-model.ts:393](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L393)
 
 ___
 
@@ -998,7 +946,7 @@ Returns true if the header area is visible, otherwise false.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:399](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L399)
+[src/lib/table/data/tablemodel/table-model.ts:401](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L401)
 
 ___
 
@@ -1020,7 +968,7 @@ True if the row checkbox is visible, otherwise false.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:408](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L408)
+[src/lib/table/data/tablemodel/table-model.ts:410](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L410)
 
 ___
 
@@ -1048,41 +996,7 @@ Checks if a column at the given index is sortable.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:479](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L479)
-
-___
-
-### recalcColumnWidths
-
-▸ **recalcColumnWidths**(`clientWidth`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `clientWidth` | `number` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:508](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L508)
-
-___
-
-### recalcContentWidthInPx
-
-▸ **recalcContentWidthInPx**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:571](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L571)
+[src/lib/table/data/tablemodel/table-model.ts:481](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L481)
 
 ___
 
@@ -1111,7 +1025,7 @@ Finally, the method calls the recalcPadding() method to recalculate the padding.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:190](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L190)
+[src/lib/table/data/tablemodel/table-model.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L192)
 
 ___
 
@@ -1135,7 +1049,7 @@ recalcPadding
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:206](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L206)
+[src/lib/table/data/tablemodel/table-model.ts:208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L208)
 
 ___
 
@@ -1163,7 +1077,7 @@ Recalculates the size (width, height, padding)  of the elements based on the cli
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:171](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L171)
+[src/lib/table/data/tablemodel/table-model.ts:173](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L173)
 
 ___
 
@@ -1190,7 +1104,7 @@ Sets the width in pixel of a column (by columnIndex) in a table.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:117](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L117)
+[src/lib/table/data/tablemodel/table-model.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L119)
 
 ___
 
@@ -1216,7 +1130,7 @@ Recalculates the column widths of the table.
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:97](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L97)
+[src/lib/table/data/tablemodel/table-model.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L99)
 
 ___
 
@@ -1240,33 +1154,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:585](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L585)
-
-___
-
-### sizeToPixel
-
-▸ **sizeToPixel**(`width`, `clientWidth`): `number`
-
-Converts the given `SizeIf` object to pixel units based on the provided `clientWidth`.
-The given `SizeIf` must have the uniit '%' or 'px'.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `width` | [`SizeIf`](../interfaces/SizeIf.md) | The size object to be converted. |
-| `clientWidth` | `number` | The width of the client area in pixels. |
-
-#### Returns
-
-`number`
-
-- The converted size value in pixels. returns -1 if unit is not '%' or 'px'.
-
-#### Defined in
-
-[lib/table/data/tablemodel/table-model.ts:558](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L558)
+[src/lib/table/data/tablemodel/table-model.ts:587](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L587)
 
 ___
 
@@ -1290,4 +1178,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/table-model.ts:433](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/table-model.ts#L433)
+[src/lib/table/data/tablemodel/table-model.ts:435](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/table-model.ts#L435)

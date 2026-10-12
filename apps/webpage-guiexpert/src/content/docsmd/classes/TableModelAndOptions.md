@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableModelAndOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableModelAndOptions
 
 # Class: TableModelAndOptions
+
+Container object for one table model and one table options object.
 
 ## Implements
 
@@ -36,7 +38,7 @@
 
 #### Defined in
 
-[lib/table/data/table-model-and-options.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/table-model-and-options.ts#L8)
+[src/lib/table/data/table-model-and-options.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/table-model-and-options.ts#L13)
 
 ## Properties
 
@@ -50,7 +52,7 @@
 
 #### Defined in
 
-[lib/table/data/table-model-and-options.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/table-model-and-options.ts#L9)
+[src/lib/table/data/table-model-and-options.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/table-model-and-options.ts#L14)
 
 ___
 
@@ -64,4 +66,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/table-model-and-options.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/table-model-and-options.ts#L10)
+[src/lib/table/data/table-model-and-options.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/table-model-and-options.ts#L15)

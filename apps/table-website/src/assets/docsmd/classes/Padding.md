@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / Padding
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / Padding
 
 # Class: Padding
 
@@ -38,7 +38,7 @@ Represents padding values for the top, right, bottom, and left sides of an eleme
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/padding.ts#L5)
+[src/lib/table/data/tablemodel/padding.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L7)
 
 ## Properties
 
@@ -48,7 +48,7 @@ Represents padding values for the top, right, bottom, and left sides of an eleme
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/padding.ts#L8)
+[src/lib/table/data/tablemodel/padding.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L10)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/padding.ts#L9)
+[src/lib/table/data/tablemodel/padding.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L11)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/padding.ts#L7)
+[src/lib/table/data/tablemodel/padding.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L9)
 
 ___
 
@@ -78,4 +78,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/padding.ts#L6)
+[src/lib/table/data/tablemodel/padding.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L8)

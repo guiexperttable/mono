@@ -1,4 +1,5 @@
 
+/** @category Styling */
 export class CssVars {
 
   public static readonly themes = ['light', 'combat', 'paper', 'blackboard'];

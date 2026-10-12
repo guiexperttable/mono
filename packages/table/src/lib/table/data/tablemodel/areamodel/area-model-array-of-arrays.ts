@@ -6,6 +6,8 @@ import { FilterFunction } from "../../common/filter-function";
 /**
  * Represents a model for an area containing a two-dimensional array of data.
  * @template T - The type of data in the array.
+ *
+ * @category Area models
  */
 export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
 

@@ -1,3 +1,4 @@
+/** @category Sorting & filtering */
 export class GeFilterService {
 
 

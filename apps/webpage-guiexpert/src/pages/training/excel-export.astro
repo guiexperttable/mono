@@ -1,0 +1,51 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="excel-export">
+
+  <h2 id="two-ways">Two ways to export</h2>
+  <p>
+    The core contains its own XLSX writer – no SheetJS, no extra dependency. The file is a real Office Open XML workbook,
+    compressed with the browser's built-in <code>CompressionStream</code>.
+  </p>
+  <Snippet file="demos/excel-export.ts" region="excel" title="src/order-excel.ts" />
+  <table>
+    <thead><tr><th></th><th><ApiLink name="TableApi.downloadExcel" /></th><th><ApiLink name="ExcelService.downloadExcel" /></th></tr></thead>
+    <tbody>
+      <tr><td>rows</td><td>the current view: filtered, in display order</td><td>whatever you pass</td></tr>
+      <tr><td>columns</td><td>visible columns</td><td>your choice</td></tr>
+      <tr><td>header / footer</td><td>included (e.g. the totals of <ChapterLink slug="footer-totals" label="chapter 16" />)</td><td>your first row</td></tr>
+    </tbody>
+  </table>
+  <LiveDemo name="excel-export" title="Export 100,000 orders" height={380}
+            caption="Filter for “berlin”, sort by a column, then “xlsx: view” – the file contains exactly that. “xlsx: all” ignores the view." />
+
+  <h2 id="types">What ends up in the cells</h2>
+  <ul>
+    <li>Numbers stay numbers (you can sum them in Excel), text stays text, ISO dates are text.</li>
+    <li>Renderers don't matter: the export uses the <strong>values</strong>, not the HTML (<ChapterLink slug="cell-renderers" />).</li>
+    <li>100,000 rows × 11 columns ≈ 3.9 MB (uncompressed it would be 40 MB).</li>
+  </ul>
+
+  <h2 id="blob">A Blob instead of a download</h2>
+  <p>To upload the file or attach it to an e-mail, create the Blob yourself with <ApiLink name="ExcelService.createExcelBlob" />:</p>
+  <Code lang="ts" code={`const blob = await new ExcelService().createExcelBlob(matrix, "GuiExpert");
+await fetch("/api/reports", { method: "POST", body: blob });`} />
+
+  <Callout type="version">
+    <p>
+      1.1.86: valid files (CRC, sheet size) – strict readers like Python's <code>zipfile</code> accepted nothing before.
+      1.1.88: hidden columns left out. 1.1.90: compression, <code>downloadExcel()</code> returns a Promise,
+      <code>createExcelBlob()</code>.
+    </p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Part 6 makes the table look good – starting with <ChapterLink slug="cell-renderers" />.</p>
+</TrainingLayout>

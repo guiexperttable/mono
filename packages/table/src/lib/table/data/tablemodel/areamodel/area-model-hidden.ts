@@ -8,6 +8,8 @@ import { AreaIdent } from "../area-ident.type";
 
 /**
  * An invisible model, which is used internally for hiding a header.
+ *
+ * @category Area models
  */
 export class AreaModelHidden implements AreaModelIf {
 

@@ -1,0 +1,52 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="heatmap">
+
+  <h2 id="styles-from-model">Styles and classes from the model</h2>
+  <p>
+    Two methods of the area model decide per cell how it looks – without a renderer:
+  </p>
+  <ul>
+    <li><ApiLink name="AreaModelIf.getCustomStyleAt" /> → inline styles, e.g. a background colour computed from the value;</li>
+    <li><ApiLink name="AreaModelIf.getCustomClassesAt" /> → CSS classes, e.g. <code>negative</code>, <code>overdue</code>, <code>vip</code>.</li>
+  </ul>
+  <p>Both are called only for visible cells – a colour per cell costs nothing for cells nobody sees.</p>
+
+  <h2 id="heatmap">A heatmap: revenue per city and month</h2>
+  <p>The 100,000 orders are aggregated into a matrix – one row per city, one column per month, values in thousand euro.
+    The body model extends <ApiLink name="AreaModelArrayOfArrays" /> and adds the colour:</p>
+  <Snippet file="demos/heatmap.ts" region="model" title="src/model/revenue-heatmap.ts" />
+  <Snippet file="demos/heatmap.ts" region="table" />
+  <LiveDemo name="heatmap" title="Revenue heatmap" height={460}
+            caption="12 cities × 21 months. White = low, pink = middle, indigo = high. The city column is fixed." />
+
+  <h2 id="colour-helpers">Colour helpers</h2>
+  <ul>
+    <li><ApiLink name="ColorRgb" /> – a colour as r, g, b.</li>
+    <li><ApiLink name="ThreeColorGradientArg" /> – min / middle / max value with a colour each; the two-colour variant is
+      <ApiLink name="TwoColorGradientArg" />.</li>
+    <li><ApiLink name="GeCssColorUtil" /> – <code>getThreeColorGradientRGB(value, arg)</code> resp.
+      <code>getTwoColorGradientRGB(value, arg)</code> returns a CSS colour.</li>
+  </ul>
+
+  <h2 id="classes">Conditional formatting with classes</h2>
+  <p>For rules instead of gradients, return classes and style them in CSS:</p>
+  <Snippet file="demos/heatmap.ts" region="classes" />
+  <Callout type="tip" title="Classes beat styles">
+    <p>Classes are easier to theme (<ChapterLink slug="theming-dark-mode" />) – use inline styles only for values that really
+      are continuous, like a gradient.</p>
+  </Callout>
+
+  <h2 id="showcases">Showcases</h2>
+  <p><a href="/showcase/heatmap1/run/">Heatmap</a> and <a href="/showcase/heatmap2/run/">Seattle heatmap</a> – real weather
+    data with a two-colour gradient.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Not one cell, the whole table in your colours: <ChapterLink slug="theming-dark-mode" />.</p>
+</TrainingLayout>

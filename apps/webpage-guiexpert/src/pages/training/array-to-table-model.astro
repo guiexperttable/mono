@@ -1,0 +1,63 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="array-to-table-model">
+
+  <h2 id="properties">Choose the columns with <code>properties</code></h2>
+  <p>
+    In <ChapterLink slug="first-table" /> every key of the first row became a column. Usually you want a selection, in a
+    certain order. <ApiLink name="TableFactory.createTableModel" /> takes the list as <code>properties</code>:
+  </p>
+  <Snippet file="demos/array-to-table-model.ts" region="model" title="src/model/order-table-model.ts" />
+  <ol>
+    <li>Only <code>rows</code> → every key of the first row is a column (<ChapterLink slug="first-table" />).</li>
+    <li><code>properties</code> → selection <strong>and</strong> order of the columns.</li>
+    <li><code>(keyof Order)[]</code> → a typo in a column name is a compile error, not an empty column.</li>
+    <li>The header label is the property in upper case. Own labels, widths and alignment: <ChapterLink slug="column-definitions" />.</li>
+  </ol>
+  <LiveDemo name="array-to-table-model" title="rows + properties" height={360}
+            caption="Toggle between “rows + properties” (8 columns) and “only rows” (11 columns, every key)." />
+
+  <h2 id="parameters">What else <code>createTableModel</code> accepts</h2>
+  <p>
+    <ApiLink name="TableFactory.createTableModel" /> is the universal entry point. It takes a partial
+    <ApiLink name="CreateTableModelPara" /> – the most important fields:
+  </p>
+  <table>
+    <thead><tr><th>Field</th><th>Meaning</th><th>Chapter</th></tr></thead>
+    <tbody>
+      <tr><td><code>rows</code>, <code>properties</code></td><td>array of objects, column selection</td><td>12</td></tr>
+      <tr><td><code>columnDefs</code></td><td>full column definitions</td><td><ChapterLink slug="column-definitions" label="13" /></td></tr>
+      <tr><td><code>headerData</code>, <code>bodyData</code>, <code>footerData</code>, <code>columnSizes</code></td><td>areas as 2-D arrays</td><td><ChapterLink slug="array-of-arrays" label="14" /></td></tr>
+      <tr><td><code>headerAreaModel</code>, <code>bodyAreaModel</code>, <code>footerAreaModel</code></td><td>your own area models</td><td><ChapterLink slug="header-groups" label="15" />–<ChapterLink slug="custom-area-model" label="17" /></td></tr>
+      <tr><td><code>fixedLeftColumnCount</code>, <code>fixedRightColumnCount</code></td><td>fixed columns</td><td><ChapterLink slug="fixed-columns" label="18" /></td></tr>
+      <tr><td><code>tableOptions</code>, <code>defaultRowHeights</code></td><td>row heights from the options</td><td><ChapterLink slug="table-options" label="19" /></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="other-factories">Other factory methods</h2>
+  <Code lang="ts" code={`// rows + column definitions (+ options, fixed columns)
+TableFactory.buildByTypedRows<Order>(orders, columnDefs, tableOptions, fixedLeft, fixedRight);
+// rows + header/footer rows as data
+TableFactory.createByObjectArray<Order>(orders, headerRows, footerRows, fixedLeft, fixedRight, …);
+// three area models of your own
+TableFactory.createByAreaModels(headerModel, bodyModel, footerModel, fixedLeft, fixedRight, …);`} />
+  <p>See <ApiLink name="TableFactory.buildByTypedRows" />, <ApiLink name="TableFactory.createByObjectArray" /> and
+    <ApiLink name="TableFactory.createByAreaModels" /> for all parameters.</p>
+
+  <Callout type="tip" title="Your data stays yours">
+    <p>The model keeps a <strong>reference</strong> to your array – it does not copy 100,000 objects. Change an object and call
+      <ApiLink name="TableApi.repaint" />. To replace the whole array call <ApiLink name="TableApi.setRows" /> and then
+      <ApiLink name="TableApi.repaintHard" /> – the row count changed (plus <ApiLink name="TableApi.externalFilterChanged" />
+      if a filter is active, <ChapterLink slug="filtering" />).</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Header labels, widths, alignment and hidden columns: <ChapterLink slug="column-definitions" />.</p>
+</TrainingLayout>

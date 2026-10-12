@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ColorRgbIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ColorRgbIf
 
 # Interface: ColorRgbIf
 
@@ -24,7 +24,7 @@ Represents a color in RGB format.
 
 #### Defined in
 
-[lib/table/color/color-rgb.if.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/color-rgb.if.ts#L10)
+[src/lib/table/color/color-rgb.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.if.ts#L12)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/color-rgb.if.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/color-rgb.if.ts#L9)
+[src/lib/table/color/color-rgb.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.if.ts#L11)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 #### Defined in
 
-[lib/table/color/color-rgb.if.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/color-rgb.if.ts#L8)
+[src/lib/table/color/color-rgb.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.if.ts#L10)

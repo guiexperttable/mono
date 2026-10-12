@@ -70,6 +70,8 @@ import {
  * const rootPropertyType: PropertyType = new PropertyTypeService().object2PropertyType(demoData, 'XyzRows');
  * console.log(new SchemeGenerator().renderTypeScriptInterfaces(rootPropertyType).join('\n'));
  *
+ *
+ * @category Utilities
  */
 export class SchemeGenerator {
 

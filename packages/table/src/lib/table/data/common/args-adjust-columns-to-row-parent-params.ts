@@ -6,6 +6,8 @@ import { GeoData } from "../geo-data";
 /**
  * Represents the parameters required for adjusting columns to the row parent.
  * @interface ArgsAdjustColumnsToRowParentParams
+ *
+ * @category Internals
  */
 export interface ArgsAdjustColumnsToRowParentParams {
   areaIdent: AreaIdent;

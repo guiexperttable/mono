@@ -3,5 +3,7 @@
  * It can take one of the following values: "asc", "desc", or "" (empty string).
  *
  * @typedef {("asc" | "desc" | "")} SortState
+ *
+ * @category Sorting & filtering
  */
 export type SortState = "asc" | "desc" | "";

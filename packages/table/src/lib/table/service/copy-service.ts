@@ -5,6 +5,7 @@ import { CopyServiceIf } from './copy-service.if';
 import { CellRange } from '../data/common/cell-range';
 
 
+/** @category Export & clipboard */
 export class CopyService implements CopyServiceIf {
 
   public static columnSeparatorChar = '\t';

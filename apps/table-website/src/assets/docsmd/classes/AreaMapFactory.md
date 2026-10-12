@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AreaMapFactory
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AreaMapFactory
 
 # Class: AreaMapFactory
 
@@ -44,4 +44,4 @@ The newly created AreaObjectMap.
 
 #### Defined in
 
-[lib/table/data/common/area-map-factory.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/area-map-factory.ts#L12)
+[src/lib/table/data/common/area-map-factory.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map-factory.ts#L13)

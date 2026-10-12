@@ -45,30 +45,31 @@ import { ExcelServiceIf } from './service/excel-service.if';
 
 
 /**
- * The TableScope class extends the RenderScope class and provides functionality for rendering and interacting with a table.
+ * Creates and runs one table in a host element – the core that every framework wrapper uses.
  *
- * @property {LicenseManager} licenseManager - An instance of LicenseManager.
- * @property {MouseHandler} mouseHandler - An instance of MouseHandler to handle mouse events.
- * @property {InputHandler} inputHandler - An instance of InputHandler to handle keyboard inputs.
- * @property {ShortcutService} shortcutService - An instance of ShortcutService to register and handle shortcuts.
- * @property {StoreStateCollapsedExpandService | undefined} storeStateCollapsedExpandService - A service to manage and restore the collapsed or expanded state of the table's rows.
- * @property {StoreStateSortingService | undefined} storeSortingService - A service to manage and restore the sort state of the table's columns.
- * @property {SelectionService} selectionService - An instance of SelectionService to manage cell selection in the table.
- * @property {GeKeyEvent | undefined} keyEvent - An object representing the last processed keyboard event.
- * @property {TableApi} api - An instance of TableApi, providing an API for table interactions.
+ * It connects the four building blocks: host element, {@link TableModelIf table model}, {@link TableOptionsIf options}
+ * and an {@link EventListenerIf event listener}, renders only the visible cells (virtual scrolling in both
+ * directions) and handles mouse, keyboard, selection, sorting and editing. Talk to the table through
+ * {@link getApi} – the {@link TableApi}.
  *
- * Additional properties related to the dragging state of the table:
- * - mouseStartAction: The action performed at the start of a mouse drag operation.
- * - mouseStartWidth: The initial width of an element at the start of a resizing drag operation.
- * - mouseStartColumnIndex: The index of the column at the start of a resizing drag operation.
- * - dragFrom: The initial cell index of a drag operation.
- * - dragTo: The current cell index of a drag operation.
- * - lastDragFrom: The previous initial cell index of a drag operation.
- * - lastDragTo: The previous current cell index of a drag operation.
- * - firstDraggingRendering: A boolean indicating if this is the first render during the current drag operation.
+ * The host element needs a height: the table fills it.
  *
- * Methods: Please refer to the documentation of the superclass RenderScope for the inherited methods.
- * The TableScope class introduces additional methods not listed here. Please refer to the source code for further details.
+ * @example
+ * import "@guiexpert/table/css/main.css";
+ * import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+ *
+ * const host = document.querySelector<HTMLDivElement>(".table-div")!;   // CSS: .table-div { height: 500px }
+ * const tableModel = TableFactory.createTableModel({ rows: orders });
+ * const tableScope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+ * tableScope.firstInit();
+ * const tableApi = tableScope.getApi();
+ *
+ * // later: remove the table (route change, new model)
+ * tableScope.destroy();
+ *
+ * @see Training: [Your first table in plain TypeScript](https://gui.expert/training/first-table/)
+ *
+ * @category Table & API
  */
 export class TableScope extends RenderScope implements OnActionTriggeredIf, EventFocusChangedListenerIf, EventSelectionChangedListenerIf {
 
@@ -1027,35 +1028,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @example
    * // Ensure row 5 is visible in the viewport
    * tableScope.ensureRowIsVisible(5);
-   *
-   * @example
-   * // Example usage in a component
-   * class MyTableComponent {
-   *   private tableScope: TableScope;
-   *
-   *   scrollToSpecificRow(rowIndex: number) {
-   *     // This will scroll the row into view if it's not visible
-   *     const didScroll = this.tableScope.ensureRowIsVisible(rowIndex);
-   *
-   *     if (didScroll) {
-   *       console.log(`Table scrolled to show row ${rowIndex}`);
-   *     } else {
-   *       console.log(`Row ${rowIndex} was already visible`);
-   *     }
-   *   }
-   * }
-   *
-   * @example
-   * // Example with row selection
-   * class TableHandler {
-   *   selectAndShowRow(rowIndex: number) {
-   *     // First ensure the row is visible
-   *     this.tableScope.ensureRowIsVisible(rowIndex);
-   *
-   *     // Then perform selection
-   *     this.selectionModel.selectRow(rowIndex);
-   *   }
-   * }
    *
    * @throws {Error} Implicitly may throw if rowIndex is not a number or if required properties are undefined
    *

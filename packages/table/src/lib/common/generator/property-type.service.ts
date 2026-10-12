@@ -21,6 +21,7 @@ import { JsonService } from './json-service';
 
 
 
+/** @category Utilities */
 export class PropertyTypeService {
 
   public debugging = false;

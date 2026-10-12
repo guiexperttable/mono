@@ -1,0 +1,65 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="checklist">
+
+  <h2 id="checklist">Checklist for your table</h2>
+  <ol>
+    <li><strong>Choose the model</strong> – <code>Array&lt;T&gt;</code> → <ApiLink name="TableFactory.createTableModel" /> with
+      <code>rows</code> (<ChapterLink slug="array-to-table-model" />), rows of values (<ChapterLink slug="array-of-arrays" />), an own
+      <ApiLink name="AreaModel" /> for millions of rows or server data (<ChapterLink slug="custom-area-model" />), a tree
+      (<ChapterLink slug="tree-table" />).</li>
+    <li><strong>Columns</strong> – <ApiLink name="ColumnDef" /> for label, width and alignment (<ChapterLink slug="column-definitions" />),
+      fixed columns in the model (<ChapterLink slug="fixed-columns" />).</li>
+    <li><strong>Header and footer</strong> – groups (<ChapterLink slug="header-groups" />), totals of the visible rows
+      (<ChapterLink slug="footer-totals" />).</li>
+    <li><strong>Options</strong> – <code>{"{ ...new TableOptions(), … }"}</code> (<ChapterLink slug="table-options" />), selection
+      (<ChapterLink slug="selection-and-copy" />), remembered state (<ChapterLink slug="persist-state" />).</li>
+    <li><strong>Tame the data</strong> – sorting (<ChapterLink slug="sorting" />), filtering (<ChapterLink slug="filtering" />), copy
+      (<ChapterLink slug="selection-and-copy" />), Excel (<ChapterLink slug="excel-export" />).</li>
+    <li><strong>Looks</strong> – renderers (<ChapterLink slug="cell-renderers" />), components (<ChapterLink slug="framework-components" />),
+      heatmap (<ChapterLink slug="heatmap" />), theme (<ChapterLink slug="theming-dark-mode" />), spans (<ChapterLink slug="rowspan-colspan" />).</li>
+    <li><strong>Interaction</strong> – events and context menu (<ChapterLink slug="events-and-context-menu" />), editing
+      (<ChapterLink slug="inline-editing" />), live data (<ChapterLink slug="live-data" />).</li>
+  </ol>
+
+  <h2 id="all-together">Everything together</h2>
+  <p>
+    One table with almost every chapter of this training: renderers, footer totals, a fixed ID column, own options, range
+    selection, live search, sorting, context menu, Excel, inline editing, brand theme and remembered state.
+  </p>
+  <LiveDemo name="finale" title="All chapters in one table" height={480}
+            caption="Search, sort (double-click a header), drag to select, right-click, double-click a quantity, export." />
+
+  <h2 id="good-fit">A good fit</h2>
+  <ul>
+    <li><strong>Large data sets in the browser</strong>: virtual scrolling vertically <em>and</em> horizontally, millions of rows.</li>
+    <li><strong>One core for every framework</strong>: Angular 14–22, React, Vue 3, Svelte 4/5, Solid, Preact, Web Component, plain JS.</li>
+    <li><strong>Full control over HTML and CSS</strong>, no runtime dependencies, MIT-licensed – free, also commercially.</li>
+  </ul>
+
+  <h2 id="not-a-fit">Honestly: choose something else if …</h2>
+  <ul>
+    <li>you need <strong>pivot tables</strong>, <strong>row grouping with aggregation by drag and drop</strong> or a ready-made
+      <strong>server-side row model</strong> – here you build these with own models (<ChapterLink slug="tree-table" />,
+      <ChapterLink slug="custom-area-model" />);</li>
+    <li>you want <strong>built-in filter rows, column menus or context menus</strong> – they are deliberately not included, the UI
+      is yours (<ChapterLink slug="filtering" />, <ChapterLink slug="events-and-context-menu" />).</li>
+  </ul>
+  <Callout type="note" title="Known gaps">
+    <p><ApiLink name="TableApi.setColumnVisible" />, <code>setHeaderVisible</code> and <code>setFooterVisible</code> are still empty
+      stubs – hide columns with <code>ColumnDef.isVisible</code> (<ChapterLink slug="column-definitions" hash="#hide" />).</p>
+  </Callout>
+
+  <h2 id="where-next">Where to go from here</h2>
+  <ul>
+    <li><a href="/api/">API reference</a> – every class, interface and option, with examples.</li>
+    <li><a href="/showcase/">Showcases</a> – 20+ complete demos with source.</li>
+    <li><a href="https://github.com/krocon/guiexpert-table-step-by-step-demo">Step-by-step demo repository</a> – one git tag per chapter.</li>
+    <li><a href="https://github.com/guiexperttable/mono">Source code</a> – issues and pull requests welcome.</li>
+  </ul>
+</TrainingLayout>

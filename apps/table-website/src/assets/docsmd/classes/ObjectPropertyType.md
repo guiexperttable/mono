@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ObjectPropertyType
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ObjectPropertyType
 
 # Class: ObjectPropertyType
 
@@ -39,7 +39,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:74](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L74)
+[src/lib/common/generator/domain/property-type.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L93)
 
 ## Properties
 
@@ -49,7 +49,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:76](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L76)
+[src/lib/common/generator/domain/property-type.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L95)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:77](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L77)
+[src/lib/common/generator/domain/property-type.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L96)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:75](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L75)
+[src/lib/common/generator/domain/property-type.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L94)
 
 ___
 
@@ -87,4 +87,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:72](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L72)
+[src/lib/common/generator/domain/property-type.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L91)

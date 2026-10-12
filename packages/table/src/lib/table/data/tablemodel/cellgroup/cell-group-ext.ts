@@ -1,6 +1,7 @@
 import { CellGroupIf } from "./cell-group.if";
 import { CellGroup } from "./cell-group";
 
+/** @category Header groups */
 export class CellGroupExt extends CellGroup {
 
   public override impl = 'CellGroupExt';

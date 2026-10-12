@@ -158,6 +158,27 @@
       `guiexperttable/angular-table` (existiert nicht).
 - [ ] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen.
 
+## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
+
+- [x] Schulung `/training/` (34 Kapitel, 26 Live-Demos) + API-Doc überarbeitet (Kategorien, typedoc.json, `docs:check`:
+      243 `@example`-Blöcke kompilieren; vorher u. a. erfundene Methoden wie `selectCell`, `getScrollLeft`,
+      `tableComponent.api`, `initializeTable()` in den Beispielen). Siehe CLAUDE.md §6 und §11.
+- [x] `TableApi.downloadExcel()` hat jetzt den Rückgabetyp `Promise<void>` (vorher `void | Promise<void>` durch `ExcelServiceIf`).
+- [x] `CreateTableModelPara` ist jetzt ein `interface` (vorher `type`) – jedes Feld dokumentiert und in typedoc verlinkbar.
+- [x] `ExcelServiceIf` wird exportiert (Typ des letzten `TableScope`-Arguments).
+- [x] Website: `/showcase/idfilter/` zeigte die Excel-Demo statt des Slider-Filters; Tab-Links der Platzhalter-Showcases
+      zeigten auf `/showcase/simple/…`; `.md`-Links der Seiten `/api/docs/interfaces/*` führten ins Leere.
+- [ ] Platzhalter-Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` mit echtem Inhalt
+      füllen oder entfernen (zeigen „Simple demo“ / „Dies ist ein Test“).
+- [ ] `TableApi.setRows/addRows/addRowsAt/removeRows` zeichnen nicht neu und setzen Filter + Sortierung zurück –
+      Anwender müssen `externalFilterChanged()` + `repaintHard()` selbst aufrufen (jetzt dokumentiert). Automatisch machen?
+- [ ] `ColumnDef.minWidth/maxWidth` wirken nur bei %-Breiten, nicht beim Ziehen mit der Maus. Begrenzen? (Die Folge 013 der
+      Videoreihe zeigt `minWidth: px80, maxWidth: px200` an einer px-Spalte – ohne Wirkung.)
+- [ ] Ohne `getSelectionModel` ist nichts auswählbar (eigenes `SelectionModel()` vom Typ `"none"`). Bewusst so?
+- [ ] `TableOptions.headerToggleExpandCollapseIcons` wird nirgends ausgewertet.
+- [ ] `ColumnDef`-Felder erben die Doku von `ColumnDefIf` nicht (typedoc) – ggf. `@inheritDoc`.
+- [ ] Demo-Repo `krocon/guiexpert-table-step-by-step-demo`: Tags `ep-001` … `ep-034` pushen (die Schulung verlinkt sie).
+
 ## Erledigt beim Aufsetzen (Okt. 2026)
 
 - [x] Ein gemeinsamer Angular-Quellcode für Angular 14–22 (`packages/angular-table` + `angular-builds/ngNN`);

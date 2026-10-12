@@ -5,6 +5,7 @@ import {RendererCleanupFnType} from "./renderer-cleanup-fn.type";
 import {AreaModelObjectArray} from "../data/tablemodel/areamodel/area-model-object-array";
 
 
+/** @category Renderers & editing */
 export class NumberCellProgressBarCellRenderer<T> implements CellRendererIf {
 
   constructor(

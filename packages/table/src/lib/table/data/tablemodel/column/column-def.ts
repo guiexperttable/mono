@@ -11,7 +11,30 @@ import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
 
 
 /**
- * Represents a column definition for one column of the table.
+ * The column definition – see {@link ColumnDefIf} for all fields.
+ *
+ * Two ways to create one:
+ *
+ * @example
+ * // short: property, header label, width, CSS classes
+ * new ColumnDef("customer", "Customer", px180, bodyLeft);
+ * new ColumnDef("total", "Total", px120, allRight);          // numbers: right-aligned in header, body and footer
+ *
+ * @example
+ * // named parameters for everything else
+ * ColumnDef.create({
+ *   property: "status",
+ *   headerLabel: "Status",
+ *   width: px110,
+ *   bodyRenderer: new StatusBadgeRenderer(),
+ *   sortable: TrueFn,
+ *   sortComparator: (a: string, b: string) => STATUS_ORDER.indexOf(a) - STATUS_ORDER.indexOf(b)
+ * });
+ *
+ * @see Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/),
+ *   [Sorting](https://gui.expert/training/sorting/), [Cell renderers](https://gui.expert/training/cell-renderers/)
+ *
+ * @category Columns
  */
 export class ColumnDef implements ColumnDefIf {
 
@@ -50,26 +73,60 @@ export class ColumnDef implements ColumnDefIf {
     );
   }
 
+  /**
+   * Creates a column definition from named parameters. Everything is optional; defaults: width 100 px,
+   * visible, not editable, sortable only if `sortable` is given.
+   *
+   * `headerRenderer` / `bodyRenderer` / `footerRenderer` and `headerClasses` / `bodyClasses` / `footerClasses`
+   * fill {@link ColumnDefIf.rendererMap} and {@link ColumnDefIf.classes}.
+   *
+   * @example
+   * ColumnDef.create({
+   *   property: "price", headerLabel: "Price", width: px100,
+   *   headerClasses: ["ge-table-text-align-right"], bodyClasses: ["ge-table-text-align-right"],
+   *   sortable: TrueFn
+   * });
+   */
   static create(param: {
+    /** Property of the row object, see {@link ColumnDefIf.property}. */
     property?: string,
+    /** Header label. */
     headerLabel?: string,
+    /** Width, default 100 px. */
     width?: SizeIf,
+    /** Lower limit for % widths. */
     minWidth?: SizeIf,
+    /** Upper limit for % widths. */
     maxWidth?: SizeIf,
+    /** Renderer of the header cell. */
     headerRenderer?: CellRendererIf,
+    /** Renderer of the body cells. */
     bodyRenderer?: CellRendererIf,
+    /** Renderer of the footer cells. */
     footerRenderer?: CellRendererIf,
+    /** CSS classes of the header cell, e.g. `["ge-table-text-align-right"]`. */
     headerClasses?: string[]
+    /** CSS classes of the body cells. */
     bodyClasses?: string[]
+    /** CSS classes of the footer cells. */
     footerClasses?: string[],
+    /** Sortable by double-click on the header, e.g. `TrueFn`. */
     sortable?: BooleanFunction,
+    /** Show the sort icon (default: follows `sortable`). */
     sortIconVisible?: BooleanFunction,
+    /** Own comparison of two cell values. */
     sortComparator?: ValueRowSortComparator,
+    /** Initial sort icon (`"asc"`, `"desc"`); sort the rows with `tableModel.doSort()` to match. */
     sortState?: SortState,
+    /** Order of the sort states on repeated double-clicks. */
     sortStatesOrder?: SortState[],
+    /** Cells can be edited, e.g. `TrueFn`. */
     editable?: BooleanFunction,
+    /** Column is shown (default `TrueFn`). */
     isVisible?: BooleanFunction,
+    /** The editor of this column. */
     getEditRenderer?: GetEditRenderer,
+    /** Converts the editor text before it is stored, e.g. `editInputPipeForNumber`. */
     editInputPipe?: editInputPipe,
   }): ColumnDefIf {
 

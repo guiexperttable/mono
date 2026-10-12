@@ -1,0 +1,60 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="table-options">
+
+  <h2 id="pattern">The pattern: defaults + your changes</h2>
+  <p>
+    Options are a plain object of type <ApiLink name="TableOptionsIf" />. <ApiLink name="TableOptions" /> contains all
+    defaults; spread it and override only what differs:
+  </p>
+  <Snippet file="demos/table-options.ts" region="options" title="src/model/order-table-options.ts" />
+  <Snippet file="demos/table-options.ts" region="model" />
+  <p>
+    <ApiLink name="TableOptionsIf.defaultRowHeights" /> is read by the factory when it creates the area models – that's why
+    the options go into <code>createTableModel</code> as well as into the <code>TableScope</code>.
+  </p>
+  <LiveDemo name="table-options" title="Own options vs. defaults" height={400}
+            caption="Untick “own options” to see new TableOptions() only. Drag a column border, drag a header to move a column, click “auto-size columns”." />
+
+  <h2 id="important">The options you will use most</h2>
+  <table>
+    <thead><tr><th>Option</th><th>Default</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>hoverRowVisible</code> / <ApiLink name="TableOptionsIf.hoverColumnVisible" label="hoverColumnVisible" /></td><td>true / true</td><td>highlight row / column under the mouse</td></tr>
+      <tr><td><ApiLink name="TableOptionsIf.columnsResizable" label="columnsResizable" /></td><td>true</td><td>drag the right border of a header cell</td></tr>
+      <tr><td><ApiLink name="TableOptionsIf.columnsDraggable" label="columnsDraggable" /></td><td>true</td><td>drag a header to move the column</td></tr>
+      <tr><td><code>verticalBorderVisible</code> / <code>horizontalBorderVisible</code></td><td>true / true</td><td>grid lines</td></tr>
+      <tr><td><code>defaultRowHeights</code></td><td>header 34, body 34, footer 34</td><td>row heights of the factory models</td></tr>
+      <tr><td><code>externalFilterFunction</code></td><td>–</td><td><ChapterLink slug="filtering" /></td></tr>
+      <tr><td><code>getSelectionModel</code>, <code>getFocusModel</code></td><td>one per table</td><td><ChapterLink slug="selection-and-copy" /></td></tr>
+      <tr><td><code>autoRestoreOptions</code></td><td>off</td><td><ChapterLink slug="persist-state" /></td></tr>
+      <tr><td><code>showCheckboxWihoutExtraColumn</code></td><td>false</td><td><ChapterLink slug="tree-table" /></td></tr>
+      <tr><td><code>shortcutActionIdMapping</code>, <code>shortcutActionsDisabled</code></td><td>OS defaults</td><td>keyboard shortcuts</td></tr>
+    </tbody>
+  </table>
+  <p>The complete list with descriptions: <ApiLink name="TableOptionsIf" />.</p>
+
+  <h2 id="autosize">Column widths from the content</h2>
+  <Snippet file="demos/table-options.ts" region="autosize" />
+  <p>
+    <ApiLink name="TableApi.autoResizeColumns" /> measures the real text of header, body and footer with the font of the table
+    (at most 30 sample rows per column – 100,000 rows take less than half a second).
+  </p>
+  <Callout type="version">
+    <p>Since <code>@guiexpert/table@1.1.88</code>. Before, the method estimated 10 px per character from the body only – dates
+      and footer totals were cut off.</p>
+  </Callout>
+  <Callout type="pitfall" title="New options object = new table">
+    <p>In the framework wrappers a new <code>tableOptions</code> object rebuilds the table (<ChapterLink slug="react" />). Create the
+      options once, not in every render.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p><ChapterLink slug="sorting" /> – by double-click, with own comparators and from code.</p>
+</TrainingLayout>

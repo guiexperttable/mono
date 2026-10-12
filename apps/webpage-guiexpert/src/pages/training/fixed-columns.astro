@@ -1,0 +1,42 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import NineAreas from "../../components/training/diagrams/NineAreas.astro";
+---
+<TrainingLayout slug="fixed-columns">
+
+  <h2 id="model">Fixed columns belong to the model</h2>
+  <p>
+    Two numbers in <ApiLink name="TableFactory.createTableModel" />: <code>fixedLeftColumnCount</code> and
+    <code>fixedRightColumnCount</code>. The first <em>n</em> columns go to the <strong>west</strong> side, the last <em>m</em>
+    to the <strong>east</strong> side – in header, body and footer.
+  </p>
+  <NineAreas />
+  <Snippet file="demos/fixed-columns.ts" region="model" title="src/model/order-wide-model.ts" />
+  <p>The 30 month columns are generated – 40 columns in total:</p>
+  <Snippet file="demos/fixed-columns.ts" region="wide" />
+  <LiveDemo name="fixed-columns" title="40 columns, ID and Total fixed" height={400}
+            caption="Scroll sideways: ID stays on the left, Total on the right – in the footer, too." />
+
+  <h2 id="horizontal">Horizontal virtual scrolling</h2>
+  <p>
+    Look at the DOM count in the toolbar: of 40 columns only the visible ones are rendered. The table virtualises in
+    both directions – that's why a table with 400 columns is as fast as one with 10.
+  </p>
+
+  <Callout type="pitfall" title="Not in the options">
+    <p>There is no <code>fixedLeftColumnCount</code> in <ApiLink name="TableOptions" />. It's part of the model:
+      <ApiLink name="TableModelIf.getFixedLeftColumnCount" /> and <ApiLink name="TableModelIf.getFixedRightColumnCount" />.</p>
+  </Callout>
+  <Callout type="tip" title="Footer by property">
+    <p>The totals footer of <ChapterLink slug="footer-totals" /> finds its columns by property – it works unchanged although
+      “Total” moved from position 10 to position 40.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Part 5 starts with the options: <ChapterLink slug="table-options" />.</p>
+</TrainingLayout>

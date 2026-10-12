@@ -25,5 +25,7 @@
  * @see TableModel
  * @see AreaModelIf
  * @type {("west"|"center"|"east")}
+ *
+ * @category Area models
  */
 export type SideIdent = "west" | "center" | "east";

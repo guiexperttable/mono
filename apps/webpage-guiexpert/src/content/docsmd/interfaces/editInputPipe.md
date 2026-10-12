@@ -1,6 +1,20 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / editInputPipe
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / editInputPipe
 
 # Interface: editInputPipe
+
+Represents an editInputPipe function.
+
+**`Param`**
+
+The input object.
+
+**`Param`**
+
+The index of the row.
+
+**`Param`**
+
+The index of the column.
 
 ## Callable
 
@@ -22,4 +36,4 @@
 
 #### Defined in
 
-[lib/table/renderer/edit/edit-input-pipe.if.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L4)
+[src/lib/table/renderer/edit/edit-input-pipe.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L14)

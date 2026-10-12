@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeKeyEvent
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeKeyEvent
 
 # Class: GeKeyEvent
 
@@ -34,7 +34,7 @@ Represents a keyboard event.
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L8)
+[src/lib/table/data/common/event/ge-key-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L10)
 
 ## Properties
 
@@ -44,7 +44,7 @@ Represents a keyboard event.
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L10)
+[src/lib/table/data/common/event/ge-key-event.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L12)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L9)
+[src/lib/table/data/common/event/ge-key-event.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L11)

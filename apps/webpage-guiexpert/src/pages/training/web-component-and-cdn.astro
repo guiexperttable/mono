@@ -1,0 +1,56 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="web-component-and-cdn">
+
+  <h2 id="custom-element">The table as a custom element</h2>
+  <p>
+    <code>@guiexpert/webcomponent-table</code> wraps the core into a standard Web Component. It works in every HTML page –
+    and inside any framework that can render custom elements.
+  </p>
+  <Code lang="bash" frame="terminal" code="npm i @guiexpert/table @guiexpert/webcomponent-table" />
+  <Snippet file="examples/web-component/index.html" title="web-component/index.html" />
+  <Snippet file="examples/web-component/main.ts" title="web-component/main.ts" />
+  <p>
+    The model is the one every framework demo of this training uses – a function that turns orders into a
+    <ApiLink name="TableModelIf" /> with <ApiLink name="TableFactory.createTableModel" />:
+  </p>
+  <Snippet file="examples/model/order-table.ts" title="src/model/order-table.ts" />
+
+  <Figure src="fw-web-component" caption="The same 100,000 orders, rendered by <code>&lt;guiexpert-table&gt;</code>." />
+
+  <h2 id="rules">Three rules</h2>
+  <ol>
+    <li><strong>Register the element yourself</strong>: <code>customElements.define("guiexpert-table", GuiexpertTable)</code>. The package
+      does not do it, so you can choose the tag name.</li>
+    <li><strong>Give it <code>display: block</code> and a height</strong> – a custom element is <code>inline</code> by default.</li>
+    <li><strong>Listen first, then set <code>data</code></strong>: <code>tableReady</code> fires right away when the data is set.</li>
+  </ol>
+  <p>
+    All events (<code>tableReady</code>, <code>mouseClicked</code>, <code>selectionChanged</code>, <code>contextmenu</code> …) arrive as
+    <strong>bubbling <code>CustomEvent</code>s</strong>; the payload is in <code>event.detail</code>. For <code>tableReady</code> it is the
+    <ApiLink name="TableApi" />.
+  </p>
+
+  <h2 id="cdn">Without npm and without a build step</h2>
+  <p>A single HTML file is enough – stylesheet and modules come from jsDelivr, an import map resolves the bare package names:</p>
+  <Snippet file="examples/cdn/index.html" title="cdn/index.html" />
+  <Callout type="tip" title="Pin the version">
+    <p>Use an exact version in CDN URLs (<code>@guiexpert/table@1.1.90</code>) – both packages must have the <strong>same</strong>
+      version, because the web component imports the core through the import map.</p>
+  </Callout>
+  <Callout type="pitfall" title="file:// does not work">
+    <p>ES modules and import maps need a web server. <code>npx serve</code>, <code>python3 -m http.server</code> or your IDE's
+      preview server are fine – double-clicking the HTML file is not.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Part 3 shows the wrappers for <ChapterLink slug="react" />, <ChapterLink slug="vue" />, <ChapterLink slug="angular" /> and
+    <ChapterLink slug="one-model-every-framework" label="Svelte, Solid and Preact" /> – always with the same model.</p>
+</TrainingLayout>

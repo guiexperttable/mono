@@ -1,8 +1,17 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / Size
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / Size
 
 # Class: Size
 
-Represents the size of an object or element.
+A width with unit – used for [ColumnDefIf.width](../interfaces/ColumnDefIf.md#width), `minWidth` and `maxWidth`.
+For pixel widths use the constants [px80](../modules.md#px80), [px100](../modules.md#px100), [px120](../modules.md#px120) … (`px0` – `px500`).
+
+**`Example`**
+
+```ts
+new Size(37, "px");        // fixed
+new Size(10, "%");         // 10 % of the table width (clamped by minWidth / maxWidth)
+new Size(2, "weight");     // twice as much of the remaining space as a column with weight 1
+```
 
 ## Implements
 
@@ -38,7 +47,7 @@ Represents the size of an object or element.
 
 #### Defined in
 
-[lib/table/data/common/size.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/size.ts#L5)
+[src/lib/table/data/common/size.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/size.ts#L16)
 
 ## Properties
 
@@ -52,7 +61,7 @@ Represents the size of an object or element.
 
 #### Defined in
 
-[lib/table/data/common/size.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/size.ts#L7)
+[src/lib/table/data/common/size.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/size.ts#L18)
 
 ___
 
@@ -66,4 +75,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/size.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/size.ts#L6)
+[src/lib/table/data/common/size.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/size.ts#L17)

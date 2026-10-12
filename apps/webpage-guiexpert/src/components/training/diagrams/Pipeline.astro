@@ -1,0 +1,41 @@
+---
+/** Diagram: all rows → filter → sort → displayed rows → body, footer, copy, Excel (chapters 16, 20, 21, 24). */
+const steps = [
+  { label: "all rows", sub: "getAllRows()", x: 20 },
+  { label: "filter", sub: "externalFilterFunction", x: 190 },
+  { label: "sort", sub: "comparator / sortByColumn", x: 360 },
+  { label: "displayed rows", sub: "getFilteredRows()", x: 530 }
+];
+const outs = ["body (visible part)", "footer totals", "copy · Excel view"];
+---
+<figure class="training-diagram">
+  <svg viewBox="0 0 860 200" role="img" aria-labelledby="pl-title">
+    <title id="pl-title">All rows pass the external filter and the sort order; the result feeds the body, the footer totals, copy and the Excel export of the view</title>
+    <defs>
+      <marker id="pl-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--color-text-offset)" />
+      </marker>
+    </defs>
+    <g font-family="Inter Variable, system-ui, sans-serif" font-size="13" fill="var(--color-text)">
+      {steps.map((s, i) => (
+        <g>
+          <rect x={s.x} y="60" width="150" height="62" rx="10"
+                fill={i === 3 ? "var(--color-background)" : "var(--color-background-offset)"}
+                stroke={i === 3 ? "var(--color-primary)" : "var(--color-border)"} stroke-width={i === 3 ? 2 : 1} />
+          <text x={s.x + 75} y="88" text-anchor="middle" font-weight="700">{s.label}</text>
+          <text x={s.x + 75} y="107" text-anchor="middle" font-size="11" fill="var(--color-text-offset)">{s.sub}</text>
+          {i < 3 && <path d={`M${s.x + 152} 91 L ${s.x + 186} 91`} stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#pl-arrow)" />}
+        </g>
+      ))}
+      {outs.map((o, i) => (
+        <g>
+          <path d={`M682 91 C 700 91, 700 ${40 + i * 55}, 716 ${40 + i * 55}`} fill="none" stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#pl-arrow)" />
+          <rect x="718" y={22 + i * 55} width="132" height="36" rx="8" fill="var(--color-background-offset)" stroke="var(--color-border)" />
+          <text x="784" y={45 + i * 55} text-anchor="middle" font-size="12">{o}</text>
+        </g>
+      ))}
+      <text x="20" y="160" font-size="12" fill="var(--color-text-offset)">externalFilterChanged() runs the filter again and keeps the last sort order.</text>
+      <text x="20" y="180" font-size="12" fill="var(--color-text-offset)">ExcelService with getAllRows() ignores filter and sorting.</text>
+    </g>
+  </svg>
+</figure>

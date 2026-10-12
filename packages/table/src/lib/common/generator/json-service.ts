@@ -1,3 +1,4 @@
+/** @category Utilities */
 export class JsonService {
 
   /**

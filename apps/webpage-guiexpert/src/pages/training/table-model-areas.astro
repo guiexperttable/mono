@@ -1,0 +1,59 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import NineAreas from "../../components/training/diagrams/NineAreas.astro";
+---
+<TrainingLayout slug="table-model-areas">
+
+  <h2 id="areas">Three area models, three sides</h2>
+  <p>
+    A <ApiLink name="TableModelIf" /> is not a big array. It consists of <strong>three area models</strong> – header, body and
+    footer (<ApiLink name="AreaIdent" />) – plus the column definitions. Fixed columns split every row again into
+    <strong>west</strong>, <strong>center</strong> and <strong>east</strong> (<ApiLink name="SideIdent" />). That makes nine areas:
+  </p>
+  <NineAreas />
+
+  <h2 id="questions">An area model only answers questions</h2>
+  <p>
+    The table never iterates over your data. It asks the area model – and only for the cells that are visible right now:
+  </p>
+  <ul>
+    <li><ApiLink name="AreaModelIf.getRowCount" /> – how many rows?</li>
+    <li><ApiLink name="AreaModelIf.getValueAt" /> – the value in row <em>r</em>, column <em>c</em></li>
+    <li><ApiLink name="AreaModelIf.getRowHeight" /> – how high is row <em>r</em>?</li>
+    <li>optional: <ApiLink name="AreaModelIf.getColspanAt" />, <ApiLink name="AreaModelIf.getCustomClassesAt" />,
+      <ApiLink name="AreaModelIf.getCellRenderer" />, <ApiLink name="AreaModelIf.isEditable" /> …</li>
+  </ul>
+  <p>That is why the table is fast with any amount of data – and why you can write your own model (<ChapterLink slug="custom-area-model" />).</p>
+  <Snippet file="demos/table-model-areas.ts" region="describe" title="describe-model.ts" />
+
+  <h2 id="try">See the nine areas</h2>
+  <p>The demo colours every area differently: ID is fixed on the left (west), status on the right (east), a footer row at the bottom.</p>
+  <Snippet file="demos/table-model-areas.ts" region="model" />
+  <LiveDemo name="table-model-areas" title="Nine areas" height={400}
+            caption="Scroll horizontally: west and east stay, center moves. Scroll vertically: header and footer stay, body moves." />
+
+  <Callout type="note" title="Column index = model index">
+    <p>Column indices always count over all three sides: west + center + east. With one fixed column on the left, the first
+      scrolling column has index 1, not 0.</p>
+  </Callout>
+
+  <h2 id="classes">Which classes do what?</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Use it for</th><th>Chapter</th></tr></thead>
+    <tbody>
+      <tr><td><ApiLink name="AreaModelObjectArray" /></td><td>an array of objects – what <code>TableFactory</code> creates for <code>rows</code></td><td><ChapterLink slug="array-to-table-model" label="12" /></td></tr>
+      <tr><td><ApiLink name="AreaModelArrayOfArrays" /></td><td>rows as arrays (CSV, matrices)</td><td><ChapterLink slug="array-of-arrays" label="14" /></td></tr>
+      <tr><td><ApiLink name="AreaModelCellGroups" /></td><td>grouped, collapsible headers</td><td><ChapterLink slug="header-groups" label="15" /></td></tr>
+      <tr><td><ApiLink name="AreaModel" /></td><td>base class for your own models (footers, millions of rows, server data)</td><td><ChapterLink slug="footer-totals" label="16" />, <ChapterLink slug="custom-area-model" label="17" /></td></tr>
+      <tr><td><ApiLink name="AreaModelTree" /></td><td>tree tables</td><td><ChapterLink slug="tree-table" label="30" /></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="next">Next</h2>
+  <p>The most common case first: an array of typed objects becomes a table – <ChapterLink slug="array-to-table-model" />.</p>
+</TrainingLayout>

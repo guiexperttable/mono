@@ -8,6 +8,8 @@ import { GeoData } from "./data/geo-data";
 /**
  * Represents a store for HTML elements.
  * @class
+ *
+ * @category Internals
  */
 export class EleScope {
 

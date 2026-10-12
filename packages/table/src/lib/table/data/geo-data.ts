@@ -1,5 +1,7 @@
 /**
  * Represents geometric data with left, width, height, top coordinates and an optional index.
+ *
+ * @category Utilities
  */
 export class GeoData {
 

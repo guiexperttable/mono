@@ -1,12 +1,16 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AreaObjectMap
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AreaObjectMap
 
 # Class: AreaObjectMap\<T\>
 
+An object map as container for all three areas.
+
+**`Implements`**
+
 ## Type parameters
 
-| Name |
-| :------ |
-| `T` |
+| Name | Description |
+| :------ | :------ |
+| `T` | The type of objects stored in the map. |
 
 ## Implements
 
@@ -50,7 +54,7 @@
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/area-map.ts#L5)
+[src/lib/table/data/common/area-map.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L14)
 
 ## Properties
 
@@ -64,7 +68,7 @@ AreaObjectMapType.body
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/area-map.ts#L7)
+[src/lib/table/data/common/area-map.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L16)
 
 ___
 
@@ -78,7 +82,7 @@ AreaObjectMapType.footer
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/area-map.ts#L8)
+[src/lib/table/data/common/area-map.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L17)
 
 ___
 
@@ -92,4 +96,4 @@ AreaObjectMapType.header
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/area-map.ts#L6)
+[src/lib/table/data/common/area-map.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L15)

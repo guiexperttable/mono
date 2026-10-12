@@ -5,6 +5,7 @@ import { ColumnWidthsIf } from './column-widths.if';
 import { ColumnWidths } from './column-widths';
 
 
+/** @category CRUD */
 export class CrudOptions implements CrudOptionsIf {
 
   urls: UrlsIf = {

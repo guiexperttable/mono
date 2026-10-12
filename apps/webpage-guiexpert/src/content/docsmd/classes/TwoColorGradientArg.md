@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TwoColorGradientArg
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TwoColorGradientArg
 
 # Class: TwoColorGradientArg
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[lib/table/color/two-color-gradient-arg.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/two-color-gradient-arg.ts#L5)
+[src/lib/table/color/two-color-gradient-arg.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/two-color-gradient-arg.ts#L6)
 
 ## Properties
 
@@ -54,7 +54,7 @@
 
 #### Defined in
 
-[lib/table/color/two-color-gradient-arg.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/two-color-gradient-arg.ts#L9)
+[src/lib/table/color/two-color-gradient-arg.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/two-color-gradient-arg.ts#L10)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/two-color-gradient-arg.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/two-color-gradient-arg.ts#L8)
+[src/lib/table/color/two-color-gradient-arg.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/two-color-gradient-arg.ts#L9)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/two-color-gradient-arg.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/two-color-gradient-arg.ts#L7)
+[src/lib/table/color/two-color-gradient-arg.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/two-color-gradient-arg.ts#L8)
 
 ___
 
@@ -96,4 +96,4 @@ ___
 
 #### Defined in
 
-[lib/table/color/two-color-gradient-arg.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/two-color-gradient-arg.ts#L6)
+[src/lib/table/color/two-color-gradient-arg.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/two-color-gradient-arg.ts#L7)

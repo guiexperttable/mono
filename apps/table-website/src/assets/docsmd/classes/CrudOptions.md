@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CrudOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CrudOptions
 
 # Class: CrudOptions
 
@@ -55,7 +55,7 @@
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:27](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L27)
+[src/lib/table/crud/crud-options.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L28)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:30](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L30)
+[src/lib/table/crud/crud-options.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L31)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L28)
+[src/lib/table/crud/crud-options.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L29)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:111](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L111)
+[src/lib/table/crud/crud-options.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L112)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:32](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L32)
+[src/lib/table/crud/crud-options.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L33)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:36](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L36)
+[src/lib/table/crud/crud-options.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L37)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:16](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L16)
+[src/lib/table/crud/crud-options.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L17)
 
 ___
 
@@ -187,7 +187,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:23](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L23)
+[src/lib/table/crud/crud-options.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L24)
 
 ___
 
@@ -201,7 +201,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L10)
+[src/lib/table/crud/crud-options.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L11)
 
 ## Methods
 
@@ -222,7 +222,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:84](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L84)
+[src/lib/table/crud/crud-options.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L85)
 
 ___
 
@@ -247,7 +247,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:98](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L98)
+[src/lib/table/crud/crud-options.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L99)
 
 ___
 
@@ -278,7 +278,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:57](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L57)
+[src/lib/table/crud/crud-options.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L58)
 
 ___
 
@@ -308,7 +308,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L46)
+[src/lib/table/crud/crud-options.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L47)
 
 ___
 
@@ -338,7 +338,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:38](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L38)
+[src/lib/table/crud/crud-options.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L39)
 
 ___
 
@@ -364,4 +364,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-options.ts:70](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-options.ts#L70)
+[src/lib/table/crud/crud-options.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L71)

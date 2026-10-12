@@ -1,6 +1,7 @@
 import {ChunkDataIf} from "./chunk.data-event.if";
 import {RequestChunk} from "./request-chunk";
 
+/** @category Utilities */
 export class ChunkData<T> extends RequestChunk implements ChunkDataIf<T> {
 
   constructor(

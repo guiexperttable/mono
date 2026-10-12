@@ -1,4 +1,5 @@
 
+/** @category Utilities */
 export function debounce<T extends (...args: any[]) => any>(func: T, wait: number = 500): (...args: Parameters<T>) => void {
   let timeout: number | null = null;
 

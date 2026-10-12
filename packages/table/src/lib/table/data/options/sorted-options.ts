@@ -2,6 +2,7 @@ import { IconIf } from "./icon.if";
 import { Icon } from "./icon";
 import { SortedOptionsIf } from "./sorted-options.if";
 
+/** @category Options */
 export class SortedOptions implements SortedOptionsIf {
 
   constructor(

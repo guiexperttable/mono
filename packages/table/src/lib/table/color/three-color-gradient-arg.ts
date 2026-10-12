@@ -1,6 +1,7 @@
 import { ColorRgbIf } from "./color-rgb.if";
 import { ThreeColorGradientArgIf } from "./three-color-gradient-arg.if";
 
+/** @category Styling */
 export class ThreeColorGradientArg implements ThreeColorGradientArgIf {
   constructor(
     public minValue: number,

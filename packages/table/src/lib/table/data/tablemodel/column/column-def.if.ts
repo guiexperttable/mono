@@ -21,134 +21,101 @@ import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
  * @param f Optional. The direction. It is not necessary to use this value in the comparator, as this number is used as a factor (1 or -1) in the outer sort method.
  *
  * @returns A number indicating the relative order of 'valueA' and 'valueB'.
+ *
+ * @category Columns
  */
 export type ValueRowSortComparator = (valueA: any, valueB: any, rowA?: any, rowB?: any, f?: number) => number;
 
 
 /**
- * Represents a column definition of one table column.
+ * Describes one column: which property it shows, header label, width, CSS classes, renderers,
+ * sorting, editing and visibility. Create it with {@link ColumnDef} – `new ColumnDef(property, label, width, classes)`
+ * or {@link ColumnDef.create} with named parameters.
+ *
+ * Column indices (e.g. in {@link AreaModelIf.getValueAt}) are positions in the `columnDefs` array –
+ * fixed columns and hidden columns included.
+ *
+ * @example
+ * const columnDefs: ColumnDefIf[] = [
+ *   new ColumnDef("id", "ID", px80, allRight),
+ *   ColumnDef.create({
+ *     property: "total", headerLabel: "Total", width: px120,
+ *     headerClasses: ["ge-table-text-align-right"], bodyClasses: ["ge-table-text-align-right"],
+ *     sortable: TrueFn, sortState: "desc"
+ *   })
+ * ];
+ *
+ * @see Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)
+ *
+ * @category Columns
  */
 export interface ColumnDefIf {
-  /**
-   * Represents a property name of the table row element.
-   * @typedef {String} VariableProperty
-   */
+  /** Property of the row object shown in this column (`"customer"`). With nested objects a path like `"address.city"`. */
   property: string;
-  /**
-   * Represents the label for a header.
-   *
-   * @typedef {string} headerLabel
-   */
+  /** Text of the header cell (used when the header is built from the column definitions). */
   headerLabel: string;
-  /**
-   * Represents the size of a column along the width dimension.
-   *
-   * @typedef {number} Width
-   */
+  /** Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. See {@link SizeUnitType}. */
   width: SizeIf;
-  /**
-   * Represents the minimum width of a column.
-   *
-   * @typedef {SizeIf} minWidth
-   * @property {number} width - The minimum width value.
-   * @property {string} unit - The unit of measurement for the minimum width value.
-   *                           Default value is 'px' if not specified.
-   */
+  /** Lower limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse. */
   minWidth: SizeIf;
-  /**
-   * Represents the maximum width of a column.
-   *
-   * @typedef {number} SizeIf
-   */
+  /** Upper limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse. */
   maxWidth: SizeIf;
   /**
-   * @typedef {Object} AreaObjectMapType
-   * @template T
-   * @property {Object.<string, T>} map - A mapping of strings to values of type T
+   * Cell renderers per area – `rendererMap.header`, `.body`, `.footer`.
+   * Without a renderer the value is shown as text.
+   *
+   * @example
+   * column.rendererMap.body = new NumberCellProgressBarCellRenderer(20, false);
+   * column.rendererMap.footer = new EuroRenderer();     // an own CellRendererIf
+   *
+   * @see Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
    */
   rendererMap: AreaObjectMapType<CellRendererIf>;
   /**
-   * Represents an object that maps an area to a collection of objects.
-   *
-   * @typedef {Object.<string, string[]>} AreaObjectMapType
+   * CSS classes per area – `classes.header`, `.body`, `.footer`. The constants {@link bodyLeft}, {@link allRight} …
+   * are ready-made maps for the alignment.
    */
   classes: AreaObjectMapType<string[]>;
-  /**
-   * Determines whether or not a column can be sorted.
-   *
-   * @param {boolean} sortable - Specifies if an item is sortable.
-   * @returns {boolean} - Indicating whether the item is sortable or not.
-   */
+  /** The column can be sorted by a double-click on its header (e.g. `TrueFn`). */
   sortable?: BooleanFunction,
-  /**
-   * Determines if the sort icon is visible.
-   *
-   * @typedef {BooleanFunction} sortIconVisible
-   * @returns {boolean} Indicates whether the sort icon is visible.
-   */
+  /** Show the sort icon in the header. Default: follows `sortable` resp. `sortState`. */
   sortIconVisible?: BooleanFunction,
   /**
-   * Represents a function that compares two values for sorting purposes.
-   * The function takes two values and optionally their corresponding row objects,
-   * compares them, and returns a number.
-   * If the result is negative, it means 'valueA' comes before 'valueB' in the sorted order.
-   * If the result is positive, it means 'valueB' comes before 'valueA' in the sorted order.
-   * If the result is zero, it means the two values are considered equal for sorting purposes.
+   * Own comparison of two cell values (and their rows), like for `Array.prototype.sort`.
    *
-   * @see ValueRowSortComparator
+   * @example
+   * sortComparator: (a: string, b: string) => a.localeCompare(b, "de")     // "Müller" before "Nordlicht"
+   *
+   * @see Training: [Sorting](https://gui.expert/training/sorting/)
    */
   sortComparator?: ValueRowSortComparator,
   /**
-   * Represents the state of sorting for a list.
-   *
-   * @typedef {Object} SortState
-   *
-   * @property {string} [sortKey] - The key to sort the list by. If not provided, no sorting will be applied.
-   * @property {boolean} [reverse] - Indicates whether the list should be sorted in reverse order. Defaults to false.
+   * The sort icon shown in the header: `"asc"`, `"desc"` or `""` (none). It only sets the icon –
+   * sort the rows once with {@link TableModelIf.doSort} to match it.
    */
   sortState?: SortState,
-  /**
-   * Represents the order of multiple sort states.
-   *
-   * @typedef {SortState[]} SortStatesOrder
-   */
+  /** Order of the sort states on repeated double-clicks. Default: `TableOptions.sortOrder` (`["asc", "desc"]`). */
   sortStatesOrder?: SortState[],
   /**
-   * Determines if a column is editable or not.
+   * The cells of this column can be edited (double-click or F2), e.g. `TrueFn`.
    *
-   * @param {any} variable - The variable to check.
-   * @returns {boolean} - Returns true if the variable is editable, false otherwise.
+   * @see Training: [Inline editing](https://gui.expert/training/inline-editing/)
    */
   editable?: BooleanFunction,
   /**
-   * Determines if the column is visible or not.
+   * Whether the column is shown. Hidden columns are not rendered, copied or exported.
    *
-   * @typedef {Function} isVisible
-   * @returns {boolean} - If the element is visible, returns true. Otherwise, returns false.
+   * @example
+   * ColumnDef.create({ property: "category", headerLabel: "Category", isVisible: FalseFn })
    */
   isVisible?: BooleanFunction,
   /**
-   * Retrieves the edit renderer for the column.
+   * The editor of this column. Default: `TableOptions.getEditRenderer` (a text input, {@link InputCellRenderer}).
    *
-   * @name getEditRenderer
-   * @function
-   * @param {HTMLElement} element - The element for which to retrieve the edit renderer.
-   * @returns {EditRenderer | null} - The edit renderer for the specified element, or null if not found.
+   * @example
+   * getEditRenderer: () => new SelectCellRenderer(["open", "paid"].map(s => new ValueLabel(s, s)))
    */
   getEditRenderer?: GetEditRenderer,
-  /**
-   * Represents an edit input pipe.
-   *
-   * @typedef {object} editInputPipe
-   * @property {string} name - The name of the edit input pipe.
-   * @property {number} id - The unique identifier of the edit input pipe.
-   * @property {boolean} isActive - Indicates whether the edit input pipe is active.
-   * @property {function} execute - Executes the edit input pipe operation.
-   * @property {function} addFilter - Adds a filter to the edit input pipe.
-   * @property {function} removeFilter - Removes a filter from the edit input pipe.
-   * @property {function} clearFilters - Clears all filters from the edit input pipe.
-   * @property {function} setPriority - Sets the priority of the edit input pipe.
-   * @property {function} getStatus - Retrieves the current status of the edit input pipe.
-   */
+  /** Converts the text of the editor before it is written into the model, e.g. {@link editInputPipeForNumber}. */
   editInputPipe?: editInputPipe
 }

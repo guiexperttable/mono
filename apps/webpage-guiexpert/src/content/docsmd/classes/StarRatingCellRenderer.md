@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / StarRatingCellRenderer
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / StarRatingCellRenderer
 
 # Class: StarRatingCellRenderer\<T\>
 
@@ -52,7 +52,7 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[lib/table/renderer/star-rating-cell-renderer.ts:12](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L12)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L14)
 
 ## Properties
 
@@ -62,7 +62,7 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[lib/table/renderer/star-rating-cell-renderer.ts:13](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L13)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L15)
 
 ## Methods
 
@@ -70,21 +70,25 @@ Works with AreaModelObjectArray only
 
 ▸ **render**(`cellDiv`, `rowIndex`, `columnIndex`, `areaIdent`, `areaModel`, `_cellValue`, `domService`): `undefined` \| `Function`
 
+Fills the (empty) cell element.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `cellDiv` | `HTMLDivElement` |
-| `rowIndex` | `number` |
-| `columnIndex` | `number` |
-| `areaIdent` | [`AreaIdent`](../modules.md#areaident) |
-| `areaModel` | [`AreaModelObjectyArray`](AreaModelObjectyArray.md)\<`T`\> |
-| `_cellValue` | `any` |
-| `domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellDiv` | `HTMLDivElement` | the cell element, already positioned and sized |
+| `rowIndex` | `number` | row in the area (as displayed) |
+| `columnIndex` | `number` | column index (west + center + east) |
+| `areaIdent` | [`AreaIdent`](../modules.md#areaident) | `"header"`, `"body"` or `"footer"` |
+| `areaModel` | [`AreaModelObjectArray`](AreaModelObjectArray.md)\<`T`\> | the model of this area (e.g. for `getRowByIndex(rowIndex)`) |
+| `_cellValue` | `any` | the value of the cell (`areaModel.getValueAt(rowIndex, columnIndex)`) |
+| `domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) | create and change elements through it (works with Angular's Renderer2, too) |
 
 #### Returns
 
 `undefined` \| `Function`
+
+optionally a cleanup function, called before the cell is drawn again
 
 #### Implementation of
 
@@ -92,4 +96,4 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[lib/table/renderer/star-rating-cell-renderer.ts:17](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L17)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L21)

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / EventFocusChangedListenerIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / EventFocusChangedListenerIf
 
 # Interface: EventFocusChangedListenerIf
 
@@ -30,8 +30,8 @@ focusModel.addEventFocusChangedListener(new MyFocusChangeListener());
 ```
 
 ## See Also
-- [FocusModelIf](./FocusModel.md) for focus management.
-- [EventAdapter](./EventAdapter.md) for a class that implements this and other listener interfaces.
+- [FocusModelIf](FocusModelIf.md) for focus management.
+- [EventAdapter](../classes/EventAdapter.md) for a class that implements this and other listener interfaces.
 
 **`Method`**
 
@@ -71,4 +71,4 @@ onFocusChanged - method to be called with an instance of the `FocusModelIf` inte
 
 #### Defined in
 
-[lib/table/focus/event-focus-changed-listener.if.ts:40](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/event-focus-changed-listener.if.ts#L40)
+[src/lib/table/focus/event-focus-changed-listener.if.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/event-focus-changed-listener.if.ts#L42)

@@ -1,8 +1,14 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AutoRestoreOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AutoRestoreOptionsIf
 
 # Interface: AutoRestoreOptionsIf\<T\>
 
-See TableOptionsIf#autoRestoreOptions()
+The AutoRestoreOptionsIf interface is utilized to encapsulate options
+for managing auto-restoring settings across different states of the application.
+This interface is generic and can be used with any type.
+
+**`Typeparam`**
+
+T - Any type that this interface is going to use.
 
 ## Type parameters
 
@@ -33,9 +39,12 @@ See TableOptionsIf#autoRestoreOptions()
 
 • `Optional` **autoRestoreCheckedState**: `boolean`
 
+Optional. If true, the checked state of
+T elements will be preserved after changes in the application state.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L14)
+[src/lib/table/data/options/auto-restore-options.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L84)
 
 ___
 
@@ -43,9 +52,12 @@ ___
 
 • `Optional` **autoRestoreCollapsedExpandedState**: `boolean`
 
+Optional. If true,
+the expanded/collapsed state of T elements will be preserved after changes in the application state.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L11)
+[src/lib/table/data/options/auto-restore-options.if.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L81)
 
 ___
 
@@ -53,9 +65,12 @@ ___
 
 • `Optional` **autoRestoreScrollPosition**: `boolean`
 
+Optional. If true, the scroll position
+in the list of T elements will be preserved after changes in the application state.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:12](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L12)
+[src/lib/table/data/options/auto-restore-options.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L82)
 
 ___
 
@@ -63,9 +78,12 @@ ___
 
 • `Optional` **autoRestoreSelectedState**: `boolean`
 
+Optional. If true, the selected state of
+T elements will be preserved after changes in the application state.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:15](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L15)
+[src/lib/table/data/options/auto-restore-options.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L85)
 
 ___
 
@@ -73,9 +91,12 @@ ___
 
 • **autoRestoreSortingState**: `boolean`
 
+If true, the sorting state of
+T elements will be preserved after changes in the application state.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L10)
+[src/lib/table/data/options/auto-restore-options.if.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L80)
 
 ___
 
@@ -83,9 +104,12 @@ ___
 
 • `Optional` **getRowId**: [`GetRowIdFn`](../modules.md#getrowidfn)\<`T`\>
 
+Function for generating a unique identifier
+for an instance of T. If not provided, each instance of T will create a new entry every time state is saved.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:17](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L17)
+[src/lib/table/data/options/auto-restore-options.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L87)
 
 ___
 
@@ -93,9 +117,12 @@ ___
 
 • `Optional` **getStorageKeyFn**: [`GetStorageKeyFn`](../modules.md#getstoragekeyfn)
 
+Function for generating a unique key used for storage.
+If not provided, a constant key 'autorestoreoptionsif' will be used.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:18](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L18)
+[src/lib/table/data/options/auto-restore-options.if.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L88)
 
 ___
 
@@ -103,6 +130,9 @@ ___
 
 • `Optional` **isSame**: [`IsSameFn`](../modules.md#issamefn)\<`T`\>
 
+Function for checking
+if two instances of T are considered the same when restoring state. If not provided, strict equality check (===) will be used.
+
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.if.ts:19](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/auto-restore-options.if.ts#L19)
+[src/lib/table/data/options/auto-restore-options.if.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L89)

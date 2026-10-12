@@ -15,6 +15,7 @@ import { SortedOptionsIf } from "../data/options/sorted-options.if";
 import { HtmlStyle } from "./data/html-style.type";
 
 
+/** @category DOM */
 export interface AddColumnDivPara {
   parent: HTMLDivElement;
   geo: GeoData;
@@ -29,6 +30,7 @@ export interface AddColumnDivPara {
   sortState?: SortState;
 }
 
+/** @category DOM */
 export class ConvenienceDomService {
 
   constructor(

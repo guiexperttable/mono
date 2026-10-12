@@ -4,6 +4,8 @@ import { TableModelIf } from "../table-model.if";
 
 /**
  * Represents a model for handling colspan and rowspan in a table.
+ *
+ * @category Area models
  */
 export class ColAndRowspanModel {
 

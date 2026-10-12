@@ -15,6 +15,8 @@
  * @param {AutoRestoreOptionsIf<T>} optionsIf - The options that dictate the behavior of auto-restoring.
  *
  * @returns {boolean} - Returns `true` if the two instances are considered the same, `false` otherwise.
+ *
+ * @category Options
  */
 export type IsSameFn<T> = (r1: T, r2: T, optionsIf: AutoRestoreOptionsIf<T>) => boolean;
 
@@ -25,6 +27,8 @@ export type IsSameFn<T> = (r1: T, r2: T, optionsIf: AutoRestoreOptionsIf<T>) => 
  * AutoRestoreOptionsIf interface.
  * @typedef
  * @typeparam T - The type of the object that the function is going to use.
+ *
+ * @category Options
  */
 export type GetRowIdFn<T> = ((row: T) => string | number);
 
@@ -32,6 +36,8 @@ export type GetRowIdFn<T> = ((row: T) => string | number);
  * GetStorageKeyFn is a type alias for a function that returns a unique key (as a string) for storage.
  * It is used for restoring state in conjunction with the AutoRestoreOptionsIf interface.
  * @typedef
+ *
+ * @category Options
  */
 export type GetStorageKeyFn = (() => string);
 
@@ -66,6 +72,8 @@ export type GetStorageKeyFn = (() => string);
  *
  * @property {(r1: T, r2: T, optionsIf: AutoRestoreOptionsIf<T>) => boolean} isSame - Function for checking
  * if two instances of T are considered the same when restoring state. If not provided, strict equality check (===) will be used.
+ *
+ * @category Options
  */
 export interface AutoRestoreOptionsIf<T> {
 

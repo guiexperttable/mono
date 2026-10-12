@@ -2,6 +2,7 @@ import { AreaIdent } from '../../data/tablemodel/area-ident.type';
 import { ActionEventIf } from './action-event.if';
 import { AreaModelIf } from '../../data/tablemodel/areamodel/area-model.if';
 
+/** @category Renderers & editing */
 export class ActionEvent implements ActionEventIf {
 
 

@@ -3,6 +3,7 @@ import { GetStorageKeyFn } from "../data/options/auto-restore-options.if";
 import { SortItem } from "../data/common/sort-item";
 
 
+/** @category Internals */
 export class StoreStateSortingService extends AbstractStoreStateService {
 
   private readonly SORTING_STATE = "sortingState";

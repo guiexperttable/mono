@@ -63,6 +63,7 @@ interface ArgsRenderHeaderCellResizeHandle {
 }
 
 
+/** @category Internals */
 export class RenderScope extends EleScope {
 
   public firstVisibleRowIndex = -1;

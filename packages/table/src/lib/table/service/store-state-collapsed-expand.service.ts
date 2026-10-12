@@ -3,6 +3,7 @@ import { CollapsedExpandedData } from "./data/collapsed-expanded.data";
 import { GetStorageKeyFn } from "../data/options/auto-restore-options.if";
 
 
+/** @category Internals */
 export class StoreStateCollapsedExpandService extends AbstractStoreStateService {
 
   private readonly COLLAPSED_EXPANDED_STATE = "collapsedExpandedState";

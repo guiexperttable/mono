@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / IndexAndPx
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / IndexAndPx
 
 # Class: IndexAndPx
+
+Represents an index and pixel value pair.
 
 ## Table of contents
 
@@ -32,7 +34,7 @@
 
 #### Defined in
 
-[lib/table/data/common/index-and-px.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/index-and-px.ts#L3)
+[src/lib/table/data/common/index-and-px.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/index-and-px.ts#L8)
 
 ## Properties
 
@@ -42,7 +44,7 @@
 
 #### Defined in
 
-[lib/table/data/common/index-and-px.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/index-and-px.ts#L4)
+[src/lib/table/data/common/index-and-px.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/index-and-px.ts#L9)
 
 ___
 
@@ -52,4 +54,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/index-and-px.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/index-and-px.ts#L5)
+[src/lib/table/data/common/index-and-px.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/index-and-px.ts#L10)

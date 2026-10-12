@@ -4,6 +4,8 @@ import { TreeRowIf } from "../data/common/tree-row-if";
 /**
  * Expanded state of a new tree row: a fixed value for all rows, or a function per row
  * (e.g. `(_data, deep) => deep < 1` → only the top level is open).
+ *
+ * @category Tree & checkboxes
  */
 export type TreeRowExpandedFn<T> = (data: T, deep: number) => boolean;
 
@@ -17,6 +19,8 @@ export type TreeRowExpandedFn<T> = (data: T, deep: number) => boolean;
  * @example
  * // open the first level only
  * TreeFactory.buildTreeRows(data, { expanded: (_row, deep) => deep === 0 });
+ *
+ * @category Tree & checkboxes
  */
 export interface TreeFactoryOptions<T> {
   /** Property that holds the child objects. Default: "children". */
@@ -27,6 +31,27 @@ export interface TreeFactoryOptions<T> {
   deepMaxLimit?: number;
 }
 
+/**
+ * Turns hierarchical data into {@link TreeRow tree rows} for a tree table. Pass the result as `rows`
+ * to {@link TableFactory.createTableModel} – the factory then creates an {@link AreaModelTree}; the first
+ * column shows the arrows.
+ *
+ * @example
+ * interface Node { label: string; total: number; children?: Node[] }
+ *
+ * const rows = TreeFactory.buildTreeRows<Node>(nodes, {
+ *   childrenProperty: "children",
+ *   expanded: (row, deep) => deep === 0          // open only the first level
+ * });
+ * const tableModel = TableFactory.createTableModel({
+ *   rows,
+ *   columnDefs: [new ColumnDef("label", "Name", px300, bodyLeft), new ColumnDef("total", "Total", px120, allRight)]
+ * });
+ *
+ * @see Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
+ *
+ * @category Tree & checkboxes
+ */
 export class TreeFactory {
 
   /**

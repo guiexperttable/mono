@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / RequestChunkIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / RequestChunkIf
 
 # Interface: RequestChunkIf
 
@@ -32,7 +32,7 @@
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L3)
+[src/lib/table/data/chunk/request-chunk.if.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L4)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:2](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L2)
+[src/lib/table/data/chunk/request-chunk.if.ts:3](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L3)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L8)
+[src/lib/table/data/chunk/request-chunk.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L9)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L5)
+[src/lib/table/data/chunk/request-chunk.if.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L6)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L4)
+[src/lib/table/data/chunk/request-chunk.if.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L5)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L6)
+[src/lib/table/data/chunk/request-chunk.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L7)
 
 ___
 
@@ -92,4 +92,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/chunk/request-chunk.if.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/chunk/request-chunk.if.ts#L7)
+[src/lib/table/data/chunk/request-chunk.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/chunk/request-chunk.if.ts#L8)

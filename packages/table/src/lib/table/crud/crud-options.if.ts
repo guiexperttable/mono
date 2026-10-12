@@ -2,6 +2,7 @@ import { UrlsIf } from './urls.if';
 import { CrudAction } from './crud-action';
 
 
+/** @category CRUD */
 export interface CrudOptionsIf {
 
   getHeadersInit?: () => HeadersInit;

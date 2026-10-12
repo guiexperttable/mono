@@ -1,0 +1,61 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="build-buy-or-guiexpert">
+
+  <h2 id="options">Three options</h2>
+  <p>
+    After <ChapterLink slug="virtual-scrolling" /> you know the core trick. Now there are three ways forward: build the
+    rest yourself, use the market leader ag-Grid (free Community or commercial Enterprise edition), or use the
+    GuiExpert Table. No new code in this chapter – a decision aid.
+  </p>
+
+  <h2 id="comparison">Comparison</h2>
+  <p>
+    As of October 2026. The ag-Grid column follows
+    <a href="https://www.ag-grid.com/javascript-data-grid/community-vs-enterprise/">ag-grid.com: Community vs. Enterprise</a> and
+    <a href="https://www.ag-grid.com/javascript-data-grid/licensing/">Licensing</a> – check there yourself before you decide,
+    features and terms change.
+  </p>
+  <table>
+    <thead>
+      <tr><th></th><th>Build it yourself</th><th>ag-Grid Community</th><th>ag-Grid Enterprise</th><th>GuiExpert Table</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>Licence</th><td>yours</td><td>MIT, free</td><td>commercial, per developer; watermark without key</td><td>MIT, free – also commercially</td></tr>
+      <tr><th>Virtual scrolling</th><td>yourself (<ChapterLink slug="virtual-scrolling" label="ch. 2" />)</td><td>✔</td><td>✔</td><td>✔ rows <strong>and</strong> columns</td></tr>
+      <tr><th>Excel export</th><td>yourself</td><td>–</td><td>✔</td><td>✔ without extra library (<ChapterLink slug="excel-export" label="ch. 24" />)</td></tr>
+      <tr><th>Range selection &amp; clipboard</th><td>yourself</td><td>–</td><td>✔</td><td>✔ (<ChapterLink slug="selection-and-copy" label="ch. 22" />)</td></tr>
+      <tr><th>Server-side row model</th><td>yourself</td><td>–</td><td>✔</td><td>– own area model (<ChapterLink slug="custom-area-model" label="ch. 17" />)</td></tr>
+      <tr><th>Row grouping / pivot</th><td>yourself</td><td>–</td><td>✔</td><td>– tree table (<ChapterLink slug="tree-table" label="ch. 30" />)</td></tr>
+      <tr><th>Filter UI</th><td>yourself</td><td>✔</td><td>✔</td><td>– filter function, the UI is yours (<ChapterLink slug="filtering" label="ch. 21" />)</td></tr>
+      <tr><th>Frameworks</th><td>–</td><td>React, Angular, Vue, JS</td><td>React, Angular, Vue, JS</td><td>Angular 14–22, React, Vue, Svelte 4/5, Solid, Preact, Web Component, JS</td></tr>
+      <tr><th>Runtime dependencies</th><td>–</td><td>–</td><td>–</td><td>none</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="rule">Rule of thumb</h2>
+  <Callout type="note" title="Which one?">
+    <p>
+      If you need <strong>pivot tables, row grouping or a server-side row model off the shelf</strong>, ag-Grid Enterprise is
+      further today.
+    </p>
+    <p>
+      If you need <strong>large data sets, export, selection and full control over HTML and CSS</strong> – without licence
+      costs and in any framework – the GuiExpert Table is a lean alternative.
+    </p>
+    <p>Building it yourself pays off only if your table is very special and small in scope.</p>
+  </Callout>
+
+  <h2 id="read-more">Read more</h2>
+  <ul>
+    <li>Blog: <a href="/post/top-framework-agnostic-data-table-libraries-in-2024/">Top framework-agnostic data table libraries</a></li>
+    <li><a href="/features/">All features of the GuiExpert Table</a> and the <a href="/license/">licence</a></li>
+    <li>The honest list of what is not built in: <ChapterLink slug="checklist" /></li>
+  </ul>
+
+  <h2 id="next">Next</h2>
+  <p>Decided to give it a try? <ChapterLink slug="installation" /> takes two minutes.</p>
+</TrainingLayout>

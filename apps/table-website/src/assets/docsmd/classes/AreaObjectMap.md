@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AreaObjectMap
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AreaObjectMap
 
 # Class: AreaObjectMap\<T\>
 
@@ -54,7 +54,7 @@ An object map as container for all three areas.
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/area-map.ts#L12)
+[src/lib/table/data/common/area-map.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L14)
 
 ## Properties
 
@@ -68,7 +68,7 @@ AreaObjectMapType.body
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/area-map.ts#L14)
+[src/lib/table/data/common/area-map.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L16)
 
 ___
 
@@ -82,7 +82,7 @@ AreaObjectMapType.footer
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:15](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/area-map.ts#L15)
+[src/lib/table/data/common/area-map.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L17)
 
 ___
 
@@ -96,4 +96,4 @@ AreaObjectMapType.header
 
 #### Defined in
 
-[lib/table/data/common/area-map.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/area-map.ts#L13)
+[src/lib/table/data/common/area-map.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map.ts#L15)

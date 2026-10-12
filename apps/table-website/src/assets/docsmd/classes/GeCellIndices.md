@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeCellIndices
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeCellIndices
 
 # Class: GeCellIndices
 
@@ -34,7 +34,7 @@ Represents the indices (position) of a cell in a table area.
 
 #### Defined in
 
-[lib/table/data/common/event/ge-cell-indices.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L6)
+[src/lib/table/data/common/event/ge-cell-indices.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L8)
 
 ## Properties
 
@@ -44,7 +44,7 @@ Represents the indices (position) of a cell in a table area.
 
 #### Defined in
 
-[lib/table/data/common/event/ge-cell-indices.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L8)
+[src/lib/table/data/common/event/ge-cell-indices.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L10)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/event/ge-cell-indices.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L7)
+[src/lib/table/data/common/event/ge-cell-indices.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-cell-indices.ts#L9)

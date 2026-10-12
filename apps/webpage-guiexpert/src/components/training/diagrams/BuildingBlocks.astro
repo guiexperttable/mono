@@ -1,0 +1,51 @@
+---
+/** Diagram: the four building blocks of every table (chapter 5). */
+---
+<figure class="training-diagram">
+  <svg viewBox="0 0 860 250" role="img" aria-labelledby="bb-title">
+    <title id="bb-title">Host element, table model and options go into a TableScope, which renders the table and returns the TableApi</title>
+    <defs>
+      <linearGradient id="bb-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6366f1" /><stop offset="0.5" stop-color="#d946ef" /><stop offset="1" stop-color="#ec4899" />
+      </linearGradient>
+      <marker id="bb-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--color-text-offset)" />
+      </marker>
+    </defs>
+    <g font-family="Inter Variable, system-ui, sans-serif" font-size="14" fill="var(--color-text)">
+      <g>
+        <rect x="10" y="14" width="210" height="58" rx="10" fill="var(--color-background-offset)" stroke="var(--color-border)" />
+        <text x="26" y="39" font-weight="700">1 · Host element</text>
+        <text x="26" y="59" font-size="12" fill="var(--color-text-offset)">&lt;div&gt; with a fixed height</text>
+      </g>
+      <g>
+        <rect x="10" y="96" width="210" height="58" rx="10" fill="var(--color-background-offset)" stroke="var(--color-border)" />
+        <text x="26" y="121" font-weight="700">2 · TableModel</text>
+        <text x="26" y="141" font-size="12" fill="var(--color-text-offset)">what to show (rows, columns)</text>
+      </g>
+      <g>
+        <rect x="10" y="178" width="210" height="58" rx="10" fill="var(--color-background-offset)" stroke="var(--color-border)" />
+        <text x="26" y="203" font-weight="700">3 · TableOptions</text>
+        <text x="26" y="223" font-size="12" fill="var(--color-text-offset)">how it behaves and looks</text>
+      </g>
+      <path d="M222 43 C 270 43, 270 110, 318 118" fill="none" stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#bb-arrow)" />
+      <path d="M222 125 L 318 125" fill="none" stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#bb-arrow)" />
+      <path d="M222 207 C 270 207, 270 140, 318 132" fill="none" stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#bb-arrow)" />
+      <g>
+        <rect x="320" y="74" width="220" height="102" rx="14" fill="url(#bb-grad)" />
+        <text x="430" y="112" text-anchor="middle" font-weight="800" font-size="18" fill="#fff">4 · TableScope</text>
+        <text x="430" y="135" text-anchor="middle" font-size="12" fill="#fff">renders · scrolls · listens</text>
+        <text x="430" y="156" text-anchor="middle" font-size="11" fill="#fff" opacity="0.85">+ DomService + EventListener</text>
+      </g>
+      <path d="M542 125 L 628 125" fill="none" stroke="var(--color-text-offset)" stroke-width="1.5" marker-end="url(#bb-arrow)" />
+      <text x="585" y="114" text-anchor="middle" font-size="11" fill="var(--color-text-offset)">getApi()</text>
+      <g>
+        <rect x="630" y="88" width="220" height="74" rx="10" fill="var(--color-background)" stroke="var(--color-secondary)" stroke-width="1.5" />
+        <text x="646" y="116" font-weight="700">TableApi</text>
+        <text x="646" y="137" font-size="12" fill="var(--color-text-offset)">scroll, sort, filter, copy,</text>
+        <text x="646" y="153" font-size="12" fill="var(--color-text-offset)">export, update cells …</text>
+      </g>
+    </g>
+  </svg>
+  <figcaption>The same four parts in every framework – the wrappers only hide step 4.</figcaption>
+</figure>

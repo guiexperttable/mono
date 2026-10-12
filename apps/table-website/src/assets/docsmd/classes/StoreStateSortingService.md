@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / StoreStateSortingService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / StoreStateSortingService
 
 # Class: StoreStateSortingService
 
@@ -16,9 +16,7 @@
 
 ### Properties
 
-- [SORTING\_STATE](StoreStateSortingService.md#sorting_state)
 - [getStorageKeyFn](StoreStateSortingService.md#getstoragekeyfn)
-- [sortItems](StoreStateSortingService.md#sortitems)
 
 ### Methods
 
@@ -52,19 +50,9 @@ AbstractStoreStateService.constructor
 
 #### Defined in
 
-[lib/table/service/store-state-sorting.service.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L12)
+[src/lib/table/service/store-state-sorting.service.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-sorting.service.ts#L13)
 
 ## Properties
-
-### SORTING\_STATE
-
-• `Private` `Readonly` **SORTING\_STATE**: ``"sortingState"``
-
-#### Defined in
-
-[lib/table/service/store-state-sorting.service.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L8)
-
-___
 
 ### getStorageKeyFn
 
@@ -76,17 +64,7 @@ AbstractStoreStateService.getStorageKeyFn
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/abstract-store-state.service.ts#L7)
-
-___
-
-### sortItems
-
-• `Private` **sortItems**: [`SortItem`](SortItem.md)[] = `[]`
-
-#### Defined in
-
-[lib/table/service/store-state-sorting.service.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L9)
+[src/lib/table/service/abstract-store-state.service.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L7)
 
 ## Methods
 
@@ -110,7 +88,7 @@ AbstractStoreStateService.autoConvertMapToObject
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/abstract-store-state.service.ts#L14)
+[src/lib/table/service/abstract-store-state.service.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L14)
 
 ___
 
@@ -135,7 +113,7 @@ AbstractStoreStateService.checkAndPersistItem
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:30](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/abstract-store-state.service.ts#L30)
+[src/lib/table/service/abstract-store-state.service.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L30)
 
 ___
 
@@ -149,7 +127,7 @@ ___
 
 #### Defined in
 
-[lib/table/service/store-state-sorting.service.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L17)
+[src/lib/table/service/store-state-sorting.service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-sorting.service.ts#L18)
 
 ___
 
@@ -167,7 +145,7 @@ AbstractStoreStateService.load
 
 #### Defined in
 
-[lib/table/service/store-state-sorting.service.ts:27](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L27)
+[src/lib/table/service/store-state-sorting.service.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-sorting.service.ts#L28)
 
 ___
 
@@ -197,7 +175,7 @@ AbstractStoreStateService.loadFromLocalStorage
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:55](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/abstract-store-state.service.ts#L55)
+[src/lib/table/service/abstract-store-state.service.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L59)
 
 ___
 
@@ -222,7 +200,7 @@ AbstractStoreStateService.persistItem
 
 #### Defined in
 
-[lib/table/service/abstract-store-state.service.ts:47](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/abstract-store-state.service.ts#L47)
+[src/lib/table/service/abstract-store-state.service.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/abstract-store-state.service.ts#L47)
 
 ___
 
@@ -242,4 +220,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/store-state-sorting.service.ts:21](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/store-state-sorting.service.ts#L21)
+[src/lib/table/service/store-state-sorting.service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/store-state-sorting.service.ts#L22)

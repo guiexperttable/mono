@@ -1,0 +1,133 @@
+---
+/**
+ * Layout of a training chapter: sidebar with all chapters, chapter header, content, API list, prev/next.
+ *   <TrainingLayout slug="sorting"> … </TrainingLayout>
+ */
+import IndexLayout from "./IndexLayout.astro";
+import Header from "../components/header.astro";
+import TrainingNav from "../components/training/TrainingNav.astro";
+import ApiLink from "../components/training/ApiLink.astro";
+import {
+  chapterBySlug, chapterUrl, demoTagUrl, neighbours, pad, partOf, showcaseUrl, CHAPTERS
+} from "../training/chapters";
+import "../styles/training.css";
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const chapter = chapterBySlug(slug);
+const part = partOf(chapter);
+const { prev, next } = neighbours(chapter);
+const episode = String(chapter.episode).padStart(3, "0");
+
+// showcases must exist (src/pages/showcase/<name>/run.astro)
+const showcasePages = import.meta.glob("/src/pages/showcase/*/run.astro");
+for (const s of chapter.showcases ?? []) {
+  if (!showcasePages[`/src/pages/showcase/${s.name}/run.astro`]) throw new Error(`Training: unknown showcase "${s.name}" in ${slug}`);
+}
+const progress = Math.round((chapter.no / CHAPTERS.length) * 100);
+---
+<IndexLayout title={`${chapter.title} · GuiExpert Table training`}>
+  <Header splashMode={false} smallGap={true} />
+
+  <div class="training-shell">
+    <TrainingNav current={slug} />
+
+    <main class="training-main">
+      <article class="training-article">
+        <nav class="training-breadcrumb" aria-label="Breadcrumb">
+          <a href="/training/">Training</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/training/#part-${part.id}`}>Part {part.no} · {part.title}</a>
+        </nav>
+
+        <header class="chapter-header">
+          <p class="chapter-no">Chapter {pad(chapter.no)} <span>of {CHAPTERS.length}</span></p>
+          <h1>{chapter.title}</h1>
+          <p class="chapter-lead">{chapter.lead}</p>
+          <ul class="chapter-meta">
+            <li title="Reading time">⏱ {chapter.minutes} min</li>
+            <li title="The 60-second video of this chapter">▶ Video episode {episode}</li>
+            <li><a href={demoTagUrl(chapter.episode)} title="Code of this episode in the demo repository">git tag <code>ep-{episode}</code></a></li>
+            {chapter.since && <li title="Minimum version of @guiexpert/table">needs <code>@guiexpert/table@{chapter.since}</code></li>}
+          </ul>
+          <div class="chapter-progress" aria-hidden="true"><span style={`width:${progress}%`}></span></div>
+        </header>
+
+        <section class="chapter-learn" aria-label="What you will learn">
+          <p>After this chapter you can</p>
+          <ul>{chapter.learn.map(item => <li>{item}</li>)}</ul>
+        </section>
+
+        <div class="training-prose">
+          <slot />
+        </div>
+
+        {(chapter.api.length > 0 || chapter.showcases?.length) && (
+          <section class="chapter-refs">
+            {chapter.api.length > 0 && (
+              <div>
+                <h2 id="api-reference">API used in this chapter</h2>
+                <ul class="api-chips">
+                  {chapter.api.map(name => <li><ApiLink name={name} /></li>)}
+                </ul>
+              </div>
+            )}
+            {chapter.showcases?.length && (
+              <div>
+                <h2 id="showcases">Showcases</h2>
+                <ul class="showcase-chips">
+                  {chapter.showcases.map(s => <li><a href={showcaseUrl(s.name)}>{s.title} →</a></li>)}
+                </ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        <nav class="chapter-pager" aria-label="Chapters">
+          {prev ? (
+            <a class="pager-prev" href={chapterUrl(prev.slug)}>
+              <span>← Chapter {pad(prev.no)}</span><b>{prev.title}</b>
+            </a>
+          ) : <a class="pager-prev" href="/training/"><span>← Overview</span><b>All chapters</b></a>}
+          {next ? (
+            <a class="pager-next" href={chapterUrl(next.slug)}>
+              <span>Chapter {pad(next.no)} →</span><b>{next.title}</b>
+            </a>
+          ) : <a class="pager-next" href="/api/"><span>Reference →</span><b>API documentation</b></a>}
+        </nav>
+      </article>
+
+      <aside class="training-toc" aria-label="On this page">
+        <p>On this page</p>
+        <ol id="training-toc-list"></ol>
+        <p class="toc-extra"><a href="/api/">API reference →</a></p>
+        <p class="toc-extra"><a href="/showcase/">Showcases →</a></p>
+      </aside>
+    </main>
+  </div>
+</IndexLayout>
+
+<script>
+  // "On this page": the h2 headings of the chapter
+  const list = document.getElementById("training-toc-list");
+  const headings = document.querySelectorAll<HTMLHeadingElement>(".training-article h2[id]");
+  if (list) {
+    for (const h of headings) {
+      const li = list.appendChild(document.createElement("li"));
+      const a = li.appendChild(document.createElement("a"));
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
+    }
+    const links = [...list.querySelectorAll("a")];
+    const observer = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${e.target.id}`));
+      }
+    }, { rootMargin: "-80px 0px -70% 0px" });
+    headings.forEach(h => observer.observe(h));
+  }
+</script>

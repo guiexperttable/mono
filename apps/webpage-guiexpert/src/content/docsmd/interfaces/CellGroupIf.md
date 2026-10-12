@@ -1,6 +1,26 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CellGroupIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CellGroupIf
 
 # Interface: CellGroupIf
+
+One node of a grouped header ([AreaModelCellGroups](../classes/AreaModelCellGroups.md)): a group with `children`, or a leaf with a `property`
+(a leaf becomes a column).
+
+**`Example`**
+
+```ts
+const groups: CellGroupIf[] = [
+  { data: "Order", children: [{ data: "ID", property: "id" }, { data: "Date", property: "date" }] },
+  { data: "Customer", toggle: true, children: [
+    { data: "Customer", property: "customer", visibility: "always" },   // stays visible when collapsed
+    { data: "City", property: "city" }] }
+];
+const columnDefs = CellgroupFactory.buildColumnDefs(CellgroupFactory.buildGroupExts(groups));
+const header = new AreaModelCellGroups("header", groups, columnDefs, 34);
+```
+
+**`See`**
+
+Training: [Header models: multi-row and grouped](https://gui.expert/training/header-groups/)
 
 ## Implemented by
 
@@ -24,9 +44,11 @@
 
 • `Optional` **children**: [`CellGroupIf`](CellGroupIf.md)[]
 
+Sub-groups or columns.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L8)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L35)
 
 ___
 
@@ -34,9 +56,11 @@ ___
 
 • `Optional` **closed**: `boolean`
 
+Current state: collapsed.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L6)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L28)
 
 ___
 
@@ -44,9 +68,11 @@ ___
 
 • **data**: `any`
 
+The label of the group or column.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L3)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L22)
 
 ___
 
@@ -54,9 +80,11 @@ ___
 
 • `Optional` **impl**: `string`
 
+Internal: the implementation type of the node.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L10)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L38)
 
 ___
 
@@ -64,9 +92,11 @@ ___
 
 • `Optional` **property**: `string`
 
+Set on leaves only: the property shown in this column.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L4)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L24)
 
 ___
 
@@ -74,16 +104,21 @@ ___
 
 • `Optional` **toggle**: `boolean`
 
+Show a ❯ toggle so that the user can collapse / expand the group.
+
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L5)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L26)
 
 ___
 
 ### visibility
 
-• `Optional` **visibility**: ``"always"`` \| ``"inverted"`` \| ``"normal"``
+• `Optional` **visibility**: ``"normal"`` \| ``"always"`` \| ``"inverted"``
+
+When is this child visible? `"always"` – also when the group is collapsed; `"inverted"` – only when collapsed
+(e.g. a summary column); `"normal"` / undefined – only when expanded.
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cell-group.if.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L7)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L33)

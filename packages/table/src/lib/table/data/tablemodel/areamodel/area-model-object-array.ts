@@ -37,10 +37,10 @@ import { ObjectArrayHolderIf } from './object-array-holder.if';
  *   { id: 3, name: 'Bob', age: 40 }
  * ];
  * 
- * const columnDefs = [
- *   { property: 'id', headerLabel: 'ID', width: 50 },
- *   { property: 'name', headerLabel: 'Name', width: 150 },
- *   { property: 'age', headerLabel: 'Age', width: 100 }
+ * const columnDefs: ColumnDefIf[] = [
+ *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+ *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+ *   new ColumnDef('age', 'Age', new Size(100, 'px'))
  * ];
  * 
  * const bodyAreaModel = new AreaModelObjectArray<any>(
@@ -60,10 +60,10 @@ import { ObjectArrayHolderIf } from './object-array-holder.if';
  *   { id: 3, name: 'Bob', age: 40 }
  * ];
  * 
- * const columnDefs = [
- *   { property: 'id', headerLabel: 'ID', width: 50 },
- *   { property: 'name', headerLabel: 'Name', width: 150 },
- *   { property: 'age', headerLabel: 'Age', width: 100 }
+ * const columnDefs: ColumnDefIf[] = [
+ *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+ *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+ *   new ColumnDef('age', 'Age', new Size(100, 'px'))
  * ];
  * 
  * const tableModel = TableFactory.createByObjectArray(
@@ -84,11 +84,11 @@ import { ObjectArrayHolderIf } from './object-array-holder.if';
  *   { id: 2, person: { name: 'Jane', contact: { email: 'jane@example.com', phone: '098-765-4321' } } }
  * ];
  * 
- * const columnDefs = [
- *   { property: 'id', headerLabel: 'ID', width: 50 },
- *   { property: 'person.name', headerLabel: 'Name', width: 150 },
- *   { property: 'person.contact.email', headerLabel: 'Email', width: 200 },
- *   { property: 'person.contact.phone', headerLabel: 'Phone', width: 150 }
+ * const columnDefs: ColumnDefIf[] = [
+ *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+ *   new ColumnDef('person.name', 'Name', new Size(150, 'px')),
+ *   new ColumnDef('person.contact.email', 'Email', new Size(200, 'px')),
+ *   new ColumnDef('person.contact.phone', 'Phone', new Size(150, 'px'))
  * ];
  * 
  * const bodyAreaModel = new AreaModelObjectArray<any>(
@@ -141,6 +141,8 @@ import { ObjectArrayHolderIf } from './object-array-holder.if';
  * @see {@link AbstractAreaModel} - The parent class that provides the base implementation
  * @see {@link ObjectArrayHolderIf} - The interface that defines methods for accessing rows
  * @see {@link AreaModelObjectArrayWithColumndefs} - A subclass that changes the constructor parameter order
+ *
+ * @category Area models
  */
 export class AreaModelObjectArray<T>
   extends AbstractAreaModel<T>
@@ -168,6 +170,7 @@ export class AreaModelObjectArray<T>
    * Service for handling sorting operations.
    * @protected
    * @type {SorterService}
+   * @internal
    */
   protected sorterService: SorterService = new SorterService();
 
@@ -187,10 +190,10 @@ export class AreaModelObjectArray<T>
    *   { id: 2, name: 'Jane', age: 25 }
    * ];
    * 
-   * const columnDefs = [
-   *   { property: 'id', headerLabel: 'ID', width: 50 },
-   *   { property: 'name', headerLabel: 'Name', width: 150 },
-   *   { property: 'age', headerLabel: 'Age', width: 100 }
+   * const columnDefs: ColumnDefIf[] = [
+   *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+   *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+   *   new ColumnDef('age', 'Age', new Size(100, 'px'))
    * ];
    * 
    * const bodyAreaModel = new AreaModelObjectArray(
@@ -525,7 +528,7 @@ export class AreaModelObjectArray<T>
    * 
    * @example
    * // Clear sorting
-   * bodyAreaModel.doSort([{ columnIndex: 0, sortState: 'none' }]);
+   * bodyAreaModel.doSort([new SortItem(0, '')]);
    */
   override doSort(sortItems: SortItem[]): boolean {
     for (const sortItem of sortItems) {
@@ -606,7 +609,7 @@ export class AreaModelObjectArray<T>
    * 
    * @example
    * // Move the last column to the first position
-   * const lastIndex = bodyAreaModel.columnDefs.length - 1;
+   * const lastIndex = tableModel.getColumnCount() - 1;
    * bodyAreaModel.changeColumnOrder(lastIndex, 0);
    */
   override changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
@@ -655,11 +658,11 @@ export class AreaModelObjectArray<T>
    * @returns {(a: T, b: T) => number} A comparator function that compares two rows
    * 
    * @example
-   * // Create a comparator for sorting by name in ascending order
-   * const comparator = bodyAreaModel.genericFlatTableSortComparator('name', 1);
+   * // inside a subclass: a comparator for sorting by name in ascending order
+   * const comparator = this.genericFlatTableSortComparator('name', 1);
    * 
    * // Sort the rows using the comparator
-   * const sortedRows = [...bodyAreaModel.getFilteredRows()].sort(comparator);
+   * const sortedRows = [...this.getFilteredRows()].sort(comparator);
    */
   protected genericFlatTableSortComparator(property: string, f: number): (a: T, b: T) => number {
     // Find the column definition for the property

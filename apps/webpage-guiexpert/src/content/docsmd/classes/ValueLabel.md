@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ValueLabel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ValueLabel
 
 # Class: ValueLabel
 
@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[lib/table/data/common/value-label.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/value-label.ts#L7)
+[src/lib/table/data/common/value-label.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/value-label.ts#L8)
 
 ## Properties
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[lib/table/data/common/value-label.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/value-label.ts#L9)
+[src/lib/table/data/common/value-label.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/value-label.ts#L10)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/value-label.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/value-label.ts#L8)
+[src/lib/table/data/common/value-label.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/value-label.ts#L9)

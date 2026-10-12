@@ -1,8 +1,26 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableOptions
 
 # Class: TableOptions
 
-TableOptions class provides configuration options for the table.
+All default options of a table – see [TableOptionsIf](../interfaces/TableOptionsIf.md) for the meaning of each field.
+
+Use it with the spread pattern: all defaults, plus your changes.
+
+**`Example`**
+
+```ts
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  hoverColumnVisible: false,
+  verticalBorderVisible: false,
+  defaultRowHeights: { header: 40, body: 30, footer: 36 },
+  externalFilterFunction: (order: Order) => order.total > 1000
+};
+```
+
+**`See`**
+
+Training: [TableOptions: behaviour and look](https://gui.expert/training/table-options/)
 
 ## Implements
 
@@ -72,7 +90,7 @@ The width of the column resize handle in pixels.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:44](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L44)
+[src/lib/table/data/options/table-options.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L55)
 
 ___
 
@@ -88,7 +106,7 @@ Flag indicating whether the columns are draggable.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:43](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L43)
+[src/lib/table/data/options/table-options.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L54)
 
 ___
 
@@ -104,7 +122,7 @@ Represents whether the columns are resizable.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:42](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L42)
+[src/lib/table/data/options/table-options.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L53)
 
 ___
 
@@ -112,11 +130,8 @@ ___
 
 • **defaultRowHeights**: [`DefaultRowHeightsIf`](../interfaces/DefaultRowHeightsIf.md)
 
-Represents the default row heights (for header, body and footer) for a given table.
-
-**`Description`**
-
-An array of numbers representing the default height for each row in a table.
+Row heights of header, body and footer in px (default 34 / 34 / 34). Read by [TableFactory.createTableModel](TableFactory.md#createtablemodel)
+when it creates the area models – pass the options there as `tableOptions`, too.
 
 #### Implementation of
 
@@ -124,7 +139,7 @@ An array of numbers representing the default height for each row in a table.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L46)
+[src/lib/table/data/options/table-options.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L57)
 
 ___
 
@@ -132,7 +147,26 @@ ___
 
 • **externalFilterFunction**: `undefined` \| [`FilterFunction`](../modules.md#filterfunction)\<`any`\> = `undefined`
 
-Represents the external filter function that will be used to filter the table rows.
+Your filter: called for every row, return `true` to show it. After changing the filter criteria call
+[TableApi.externalFilterChanged](TableApi.md#externalfilterchanged) – the table filters again and keeps the sort order.
+
+**`Example`**
+
+```ts
+const filter = { text: "" };
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  externalFilterFunction: (order: Order) => order.customer.toLowerCase().includes(filter.text)
+};
+searchInput.addEventListener("input", () => {
+  filter.text = searchInput.value.toLowerCase();
+  tableApi.externalFilterChanged();
+});
+```
+
+**`See`**
+
+Training: [Filtering with a live search](https://gui.expert/training/filtering/)
 
 #### Implementation of
 
@@ -140,7 +174,7 @@ Represents the external filter function that will be used to filter the table ro
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:61](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L61)
+[src/lib/table/data/options/table-options.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L72)
 
 ___
 
@@ -156,7 +190,7 @@ Determines whether the fixed east separator border is visible.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:32](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L32)
+[src/lib/table/data/options/table-options.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L43)
 
 ___
 
@@ -172,7 +206,7 @@ Indicates whether the fixed west separator border should be visible.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:33](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L33)
+[src/lib/table/data/options/table-options.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L44)
 
 ___
 
@@ -188,7 +222,7 @@ Indicates whether the footer separator border is visible or not.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:30](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L30)
+[src/lib/table/data/options/table-options.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L41)
 
 ___
 
@@ -204,7 +238,7 @@ Indicates whether a vertical separator should be displayed in the footer.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:52](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L52)
+[src/lib/table/data/options/table-options.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L63)
 
 ___
 
@@ -212,17 +246,12 @@ ___
 
 • `Optional` **getEditRenderer**: [`GetEditRenderer`](../modules.md#geteditrenderer)
 
-Retrieves the edit renderer for a specific action.
+The editor for a cell, if the column has no own [ColumnDefIf.getEditRenderer](../interfaces/ColumnDefIf.md#geteditrenderer).
+Default: a text input ([InputCellRenderer](InputCellRenderer.md)).
 
-**`Function`**
+**`See`**
 
-**`Name`**
-
-getEditRenderer
-
-**`Param`**
-
-The action for which to retrieve the edit renderer.
+Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 #### Implementation of
 
@@ -230,15 +259,15 @@ The action for which to retrieve the edit renderer.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:69](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L69)
+[src/lib/table/data/options/table-options.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L80)
 
 ___
 
 ### getFocusModel
 
-• `Optional` **getFocusModel**: [`GetT`](../modules.md#gett)\<[`FocusModelIf`](../interfaces/FocusModelIf.md)\>
+• `Optional` **getFocusModel**: [`GetT`](../modules.md#gett)\<[`FocusModelIf`](../interfaces/FocusModelIf.md)\> = `undefined`
 
-Retrieves the focus model of the component.
+Focus model of the table. Not set (default): every table creates its own `new FocusModel("cell")`.
 
 #### Implementation of
 
@@ -246,19 +275,16 @@ Retrieves the focus model of the component.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:73](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L73)
+[src/lib/table/data/options/table-options.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L91)
 
 ___
 
 ### getSelectionModel
 
-• `Optional` **getSelectionModel**: [`GetT`](../modules.md#gett)\<[`SelectionModelIf`](../interfaces/SelectionModelIf.md)\>
+• `Optional` **getSelectionModel**: [`GetT`](../modules.md#gett)\<[`SelectionModelIf`](../interfaces/SelectionModelIf.md)\> = `undefined`
 
-Retrieves the selection model for a specific object.
-
-**`Param`**
-
-The target object to retrieve the selection model from.
+Selection model of the table. Not set (default): every table creates its own model
+(`new SelectionModel()`, type "none") – tables never share a selection.
 
 #### Implementation of
 
@@ -266,13 +292,15 @@ The target object to retrieve the selection model from.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:71](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L71)
+[src/lib/table/data/options/table-options.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L86)
 
 ___
 
 ### headerGroupOptions
 
-• **headerGroupOptions**: `HeaderGroupOptions`
+• **headerGroupOptions**: [`HeaderGroupOptions`](HeaderGroupOptions.md)
+
+Icons of collapsible header groups ([AreaModelCellGroups](AreaModelCellGroups.md)).
 
 #### Implementation of
 
@@ -280,7 +308,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:58](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L58)
+[src/lib/table/data/options/table-options.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L69)
 
 ___
 
@@ -296,7 +324,7 @@ Indicates whether the header separator border is visible.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:31](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L31)
+[src/lib/table/data/options/table-options.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L42)
 
 ___
 
@@ -304,13 +332,15 @@ ___
 
 • **headerToggleExpandCollapseIcons**: `boolean` = `false`
 
+Reserved – currently not evaluated (tree tables always show the expand-all / collapse-all icon in the top left header cell).
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[headerToggleExpandCollapseIcons](../interfaces/TableOptionsIf.md#headertoggleexpandcollapseicons)
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:54](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L54)
+[src/lib/table/data/options/table-options.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L65)
 
 ___
 
@@ -330,7 +360,7 @@ Represents whether a vertical separator should be displayed in a header.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:55](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L55)
+[src/lib/table/data/options/table-options.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L66)
 
 ___
 
@@ -346,7 +376,7 @@ Represents the visibility of the horizontal border.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L28)
+[src/lib/table/data/options/table-options.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L39)
 
 ___
 
@@ -363,7 +393,7 @@ If true, the column get the hover background color while the mouse is over the c
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:41](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L41)
+[src/lib/table/data/options/table-options.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L52)
 
 ___
 
@@ -380,7 +410,7 @@ If true, the row get the hover background color while the mouse is over the row.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:40](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L40)
+[src/lib/table/data/options/table-options.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L51)
 
 ___
 
@@ -396,7 +426,7 @@ The value of the css `overflowX` determines the behavior of horizontal overflow 
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:25](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L25)
+[src/lib/table/data/options/table-options.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L36)
 
 ___
 
@@ -412,7 +442,7 @@ The value of the css `overflowX` determines the behavior of vertical overflow fo
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:26](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L26)
+[src/lib/table/data/options/table-options.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L37)
 
 ___
 
@@ -428,7 +458,7 @@ The delay in milliseconds used for debouncing the resize event.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:67](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L67)
+[src/lib/table/data/options/table-options.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L78)
 
 ___
 
@@ -436,7 +466,8 @@ ___
 
 • `Optional` **shortcutActionIdMapping**: [`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping)
 
-Represents a mapping of shortcut action IDs.
+Own keyboard shortcuts: maps a shortcut (e.g. `"ctrl+c"`, `"f2"`) to an [ActionId](../modules.md#actionid).
+Default: [WindowsShortcutActionIdMapping](WindowsShortcutActionIdMapping.md) resp. [OsxShortcutActionIdMapping](OsxShortcutActionIdMapping.md).
 
 #### Implementation of
 
@@ -444,7 +475,7 @@ Represents a mapping of shortcut action IDs.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:64](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L64)
+[src/lib/table/data/options/table-options.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L75)
 
 ___
 
@@ -452,13 +483,15 @@ ___
 
 • **shortcutActionsDisabled**: `boolean` = `false`
 
+Switch off all keyboard shortcuts of the table (copy, select all, navigation, F2 …).
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[shortcutActionsDisabled](../interfaces/TableOptionsIf.md#shortcutactionsdisabled)
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:65](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L65)
+[src/lib/table/data/options/table-options.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L76)
 
 ___
 
@@ -470,13 +503,17 @@ Indicates whether to show checkbox without an extra column.
 If true and the row is checkable, a checkbox is rendered in the first column.
 If false and the row is checkable, a checkbox is rendered in an extra column left to the first column.
 
+**`See`**
+
+Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[showCheckboxWihoutExtraColumn](../interfaces/TableOptionsIf.md#showcheckboxwihoutextracolumn)
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:59](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L59)
+[src/lib/table/data/options/table-options.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L70)
 
 ___
 
@@ -484,7 +521,8 @@ ___
 
 • **sortOrder**: [`SortState`](../modules.md#sortstate)[]
 
-Represents the sort order of the columns.
+The order of the sort states on repeated double-clicks on a header, default `["asc", "desc"]`.
+Add `""` to get "unsorted" as third state. Per column: [ColumnDefIf.sortStatesOrder](../interfaces/ColumnDefIf.md#sortstatesorder).
 
 #### Implementation of
 
@@ -492,7 +530,7 @@ Represents the sort order of the columns.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:63](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L63)
+[src/lib/table/data/options/table-options.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L74)
 
 ___
 
@@ -500,11 +538,7 @@ ___
 
 • **sortedOptions**: [`SortedOptions`](SortedOptions.md)
 
-Represents a sorted options object.
-
-**`Classdesc`**
-
-The SortedOptions represents a class that defines sorted icons, which will displayed in the header (if column is sortable).
+The sort icons shown in sortable header cells.
 
 #### Implementation of
 
@@ -512,7 +546,7 @@ The SortedOptions represents a class that defines sorted icons, which will displ
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:62](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L62)
+[src/lib/table/data/options/table-options.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L73)
 
 ___
 
@@ -528,7 +562,7 @@ Specifies whether the bottom border of a table is visible.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:36](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L36)
+[src/lib/table/data/options/table-options.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L47)
 
 ___
 
@@ -544,7 +578,7 @@ Indicates whether the top border of a table is visible or hidden.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:35](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L35)
+[src/lib/table/data/options/table-options.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L46)
 
 ___
 
@@ -552,13 +586,15 @@ ___
 
 • **treeOptions**: [`TreeOptions`](TreeOptions.md)
 
+Icons and behaviour of tree tables (arrows, indentation). See [TreeOptionsIf](../interfaces/TreeOptionsIf.md).
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[treeOptions](../interfaces/TableOptionsIf.md#treeoptions)
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:57](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L57)
+[src/lib/table/data/options/table-options.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L68)
 
 ___
 
@@ -574,4 +610,4 @@ Indicates whether the vertical border is visible.
 
 #### Defined in
 
-[lib/table/data/options/table-options.ts:29](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/table-options.ts#L29)
+[src/lib/table/data/options/table-options.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.ts#L40)

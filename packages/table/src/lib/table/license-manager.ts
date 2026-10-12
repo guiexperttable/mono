@@ -3,6 +3,8 @@
  * As it's a singleton class, it only allows one instance of itself to exist.
  *
  * Usage: LicenseManager.getInstance().setLicenseKey('Your API key');
+ *
+ * @category Table & API
  */
 export class LicenseManager {
 

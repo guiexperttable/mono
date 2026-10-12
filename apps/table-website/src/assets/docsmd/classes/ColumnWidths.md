@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ColumnWidths
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ColumnWidths
 
 # Class: ColumnWidths
 
@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L6)
+[src/lib/table/crud/column-widths.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L7)
 
 ## Properties
 
@@ -56,7 +56,7 @@
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L7)
+[src/lib/table/crud/column-widths.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L8)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L9)
+[src/lib/table/crud/column-widths.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L10)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L11)
+[src/lib/table/crud/column-widths.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L12)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L10)
+[src/lib/table/crud/column-widths.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L11)
 
 ___
 
@@ -127,4 +127,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.ts#L8)
+[src/lib/table/crud/column-widths.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.ts#L9)

@@ -40,6 +40,8 @@ import { IconIf } from "./icon.if";
  *     classes: ['placeholder-icon-class'],
  *   },
  * };
+ *
+ * @category Options
  */
 export interface TreeOptionsIf {
 

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ColumnWidthsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ColumnWidthsIf
 
 # Interface: ColumnWidthsIf
 
@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[lib/table/crud/column-widths.if.ts:3](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.if.ts#L3)
+[src/lib/table/crud/column-widths.if.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.if.ts#L4)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.if.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.if.ts#L5)
+[src/lib/table/crud/column-widths.if.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.if.ts#L6)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.if.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.if.ts#L7)
+[src/lib/table/crud/column-widths.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.if.ts#L8)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.if.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.if.ts#L6)
+[src/lib/table/crud/column-widths.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.if.ts#L7)
 
 ___
 
@@ -79,4 +79,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/column-widths.if.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/column-widths.if.ts#L4)
+[src/lib/table/crud/column-widths.if.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/column-widths.if.ts#L5)

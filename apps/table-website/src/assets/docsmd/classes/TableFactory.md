@@ -1,6 +1,39 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableFactory
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableFactory
 
 # Class: TableFactory
+
+Creates [table models](../interfaces/TableModelIf.md) from data – the usual way to start a table.
+
+- [createTableModel](TableFactory.md#createtablemodel) – the universal entry point with named parameters ([CreateTableModelPara](../interfaces/CreateTableModelPara.md)).
+- [buildByTypedRows](TableFactory.md#buildbytypedrows) – rows + column definitions (+ options, fixed columns).
+- [createByObjectArray](TableFactory.md#createbyobjectarray) – rows + header/footer rows as data.
+- [createByAreaModels](TableFactory.md#createbyareamodels) – three area models of your own.
+
+Trees: build the rows with [TreeFactory.buildTreeRows](TreeFactory.md#buildtreerows) first, then pass them as `rows`.
+
+**`Example`**
+
+```ts
+// all keys of the first row become columns
+const simple = TableFactory.createTableModel({ rows: orders });
+
+// choose and order the columns – typed
+const properties: (keyof Order)[] = ["id", "date", "customer", "total"];
+const selected = TableFactory.createTableModel({ rows: orders, properties });
+
+// rows of values with a header and a footer row
+const csv = TableFactory.createTableModel({
+  headerData: [["ID", "City"]],
+  bodyData: [[1, "Berlin"], [2, "Paris"]],
+  footerData: [["", "2 rows"]],
+  columnSizes: [80, 160]
+});
+```
+
+**`See`**
+
+Training: [Array&lt;T&gt; → TableModel](https://gui.expert/training/array-to-table-model/),
+  [Array of arrays](https://gui.expert/training/array-of-arrays/)
 
 ## Table of contents
 
@@ -80,7 +113,7 @@ as its property.
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:309](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L309)
+[src/lib/table/factory/table-factory.ts:362](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L362)
 
 ___
 
@@ -119,7 +152,7 @@ The newly constructed table model.
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:255](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L255)
+[src/lib/table/factory/table-factory.ts:308](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L308)
 
 ___
 
@@ -156,7 +189,7 @@ If a parameter isn't provided, the default value is used.
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:472](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L472)
+[src/lib/table/factory/table-factory.ts:517](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L517)
 
 ___
 
@@ -212,7 +245,7 @@ const tableModel = TableFactory.createByAreaModelsParam({
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:537](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L537)
+[src/lib/table/factory/table-factory.ts:582](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L582)
 
 ___
 
@@ -255,28 +288,23 @@ It returns an instance of `TableModel` with all the provided/processed parameter
 
 Note: You need to import the `AreaModelArrayOfArrays` and `AreaModelHidden` classes from the respective package/module before using this method.
 
+Simpler with named parameters: [createTableModel](TableFactory.md#createtablemodel).
+
 **`Generic`**
 
 `T` - The generic type parameter for data rows.
 
 **`Example`**
 
-```typescript
-// Given the following array of objects:
-const rows = [{field1: 'data11', field2: 'data12'}, {field1: 'data21', field2: 'data22'}];
-
-// And a set of column definitions:
-const columnDefs: ColumnDefIf[] = [{headerLabel: 'Field 1', property: 'field1'}, {headerLabel: 'Field 2', property: 'field2'}];
-
-// You can create a TableModel like following:
-let tableModel = TableFactory.createByObjectArray(rows, undefined, undefined, 0, 0, false, new DefaultRowHeights(), columnDefs);
+```ts
+const rows = [{ field1: "data11", field2: "data12" }, { field1: "data21", field2: "data22" }];
+const columnDefs: ColumnDefIf[] = [new ColumnDef("field1", "Field 1"), new ColumnDef("field2", "Field 2")];
+const tableModel = TableFactory.createByObjectArray(rows, undefined, undefined, 0, 0, false, new DefaultRowHeights(), columnDefs);
 ```
-
-Reference: For more details regarding the `DefaultRowHeightsIf`, `ColumnDefIf`, `AreaModelIf`, and `AreaModelArrayOfArrays` classes/interfaces, please refer to the respective API documents.
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:614](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L614)
+[src/lib/table/factory/table-factory.ts:652](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L652)
 
 ___
 
@@ -326,16 +354,8 @@ let param = {
   rowCheckboxVisible: true,
   defaultRowHeights: new DefaultRowHeights(40, 50, 40),
   columnDefs: [
-    {
-      property: 'name',
-      headerLabel: 'Name',
-      width: 100
-    },
-    {
-      property: 'age',
-      headerLabel: 'Age',
-      width: 50
-    }
+    new ColumnDef('name', 'Name', px100),
+    new ColumnDef('age', 'Age', px50)
   ],
   columnSizes: [100, 50]
 };
@@ -344,7 +364,7 @@ const tableModel = TableFactory.createByObjectArrayParam(param);
 
 #### Defined in
 
-[lib/table/factory/table-factory.ts:405](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L405)
+[src/lib/table/factory/table-factory.ts:450](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L450)
 
 ___
 
@@ -352,51 +372,32 @@ ___
 
 ▸ **createTableModel**(`p`): [`TableModelIf`](../interfaces/TableModelIf.md)
 
-TableFactory
-
-This class is responsible for creating table models based on various
-parameters and configurations. TableFactory provides different methods
-to create these models that must comply with TableModelIf interface.
-
-Methods:
-
-createTableModel(p: Partial<{...}>): TableModelIf
-Receives a set of parameters as a Partial object with a number of properties
-and returns an instance of an object that complies to TableModelIf interface.
-Refer to the method's documentation for details.
-
-buildByTypedRowsParam(param: {rows: T[]; columnDefs: ColumnDefIf[]; tableOptions?: TableOptionsIf; fixedLeftColumnCount?: number; fixedRightColumnCount?: number}): TableModelIf
-Receives a parameter object with essential properties needed to build the table model,
-including rows (type T array), column definitions (ColumnDefIf array),
-optional table options (TableOptionsIf object), and optional fixed column counts,
-and returns an instance of TableModelIf.
-
-buildByTypedRows(rows: T[], columnDefs: ColumnDefIf[], tableOptions?: TableOptionsIf, fixedLeftColumnCount?: number, fixedRightColumnCount?: number): TableModelIf
-Similar to `buildByTypedRowsParam` but accepts separate parameters instead of a single parameter object.
-
-createByObjectArrayParam(param: {rows: T[]; header?: string[][]; footer?: string[][]; fixedLeftColumnCount?: number; fixedRightColumnCount?: number; rowCheckboxVisible?: boolean; defaultRowHeights?: DefaultRowHeightsIf; columnDefs?: ColumnDefIf[]; columnSizes?: number[]}): TableModelIf
-Similar to `createTableModel` but accepts an object parameter with properties required to create a table, including row data, header and footer multi-line data, fixed column counts, visibility of row checkbox, default row heights, column definitions, and column sizes, and returns a TableModelIf instance.
-
-createByAreaModels(headerAreaModel: AreaModelIf, bodyAreaModel: AreaModelIf, footerAreaModel: AreaModelIf, fixedLeftColumnCount: number, fixedRightColumnCount: number, rowCheckboxVisible: boolean, defaultRowHeights: DefaultRowHeightsIf): TableModelIf
-Accepts area models for header, body, and footer, along with fixed column counts, visibility of row checkbox, and default row heights, to create a table model.
-
-createByAreaModelsParam(param: {headerAreaModel?: AreaModelIf; bodyAreaModel: AreaModelIf; footerAreaModel?: AreaModelIf; fixedLeftColumnCount?: number; fixedRightColumnCount?: number; rowCheckboxVisible?: boolean; defaultRowHeights?: DefaultRowHeightsIf; columnDefs?: ColumnDefIf[]; columnSizes?: number[]; overridingColumnWidth?: number; columnCount?: number}): TableModelIf
-Similar to `createByAreaModels` but accepts an object parameter with the required and optional properties to create the table model.
-
-createByObjectArray(rows: T[], header: string[][], footer: string[][], fixedLeftColumnCount: number, fixedRightColumnCount: number, rowCheckboxVisible: boolean, defaultRowHeights: DefaultRowHeightsIf): TableModelIf
-Allows to create a table model utilizing object array data for rows, header, and footer along with the specified configurations.
-Please consult each method's documentation for detailed explanation of their functionality.
+Creates a table model from any subset of [CreateTableModelPara](../interfaces/CreateTableModelPara.md).
+Missing parts are derived (see [CreateTableModelPara](../interfaces/CreateTableModelPara.md)).
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `p` | `Partial`\<[`CreateTableModelPara`](../modules.md#createtablemodelpara)\> |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `p` | `Partial`\<[`CreateTableModelPara`](../interfaces/CreateTableModelPara.md)\> | rows, column definitions, area models, fixed columns, options … |
 
 #### Returns
 
 [`TableModelIf`](../interfaces/TableModelIf.md)
 
+the table model for `new TableScope(host, tableModel, …)` or the `tableModel` input of a framework wrapper
+
+**`Example`**
+
+```ts
+const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  columnDefs,
+  fixedLeftColumnCount: 1,
+  footerAreaModel: new OrderTotalsFooterModel(() => tableModel.getBodyModel())
+});
+```
+
 #### Defined in
 
-[lib/table/factory/table-factory.ts:85](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/factory/table-factory.ts#L85)
+[src/lib/table/factory/table-factory.ts:138](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L138)

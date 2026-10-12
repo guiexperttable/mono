@@ -6,11 +6,18 @@ import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 
 /**
- * EventAdapter class implements the EventListenerIf interface.
- * It provides empty implementations for all the event listener methods.
+ * Empty implementation of {@link EventListenerIf} – extend it and override only the events you need.
  *
- * @class
- * @implements {EventListenerIf}
+ * @example
+ * class TreeEvents extends EventAdapter {
+ *   override onCheckboxChanged(rows: any[]): void {
+ *     console.log(`${rows.length} rows checked`);
+ *   }
+ * }
+ *
+ * @see Training: [Events and a context menu of your own](https://gui.expert/training/events-and-context-menu/)
+ *
+ * @category Events
  */
 export class EventAdapter implements EventListenerIf {
 

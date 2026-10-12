@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeRowService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeRowService
 
 # Class: TreeRowService
 
@@ -48,7 +48,7 @@
 
 #### Defined in
 
-[lib/table/service/tree-row.service.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/tree-row.service.ts#L6)
+[src/lib/table/service/tree-row.service.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L7)
 
 ___
 
@@ -68,4 +68,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/tree-row.service.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/tree-row.service.ts#L22)
+[src/lib/table/service/tree-row.service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L23)

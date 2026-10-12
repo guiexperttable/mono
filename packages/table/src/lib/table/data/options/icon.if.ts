@@ -10,6 +10,8 @@
  * )
  *
  * @interface
+ *
+ * @category Options
  */
 export interface IconIf {
 

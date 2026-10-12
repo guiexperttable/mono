@@ -1,6 +1,25 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeModelChangeEvent
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeModelChangeEvent
 
 # Class: GeModelChangeEvent
+
+Reported by [EventListenerIf.onModelChanged](../interfaces/EventListenerIf.md#onmodelchanged) after cells were edited: the row and column indices
+of the changed cells. The new values are already written into the area model.
+
+**`Example`**
+
+```ts
+override onModelChanged(evt: GeModelChangeEvent): void {
+  for (const { rowIndex } of evt.cells) {
+    const order = tableModel.getBodyModel().getRowByIndex(rowIndex) as Order;
+    order.total = order.quantity * order.price;          // recalculate derived values
+  }
+  tableApi.repaint();
+}
+```
+
+**`See`**
+
+Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 ## Table of contents
 
@@ -34,7 +53,7 @@
 
 #### Defined in
 
-[lib/table/data/common/event/ge-model-change-event.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-model-change-event.ts#L5)
+[src/lib/table/data/common/event/ge-model-change-event.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-model-change-event.ts#L22)
 
 ## Properties
 
@@ -44,7 +63,7 @@
 
 #### Defined in
 
-[lib/table/data/common/event/ge-model-change-event.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-model-change-event.ts#L6)
+[src/lib/table/data/common/event/ge-model-change-event.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-model-change-event.ts#L23)
 
 ## Methods
 
@@ -65,4 +84,4 @@
 
 #### Defined in
 
-[lib/table/data/common/event/ge-model-change-event.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-model-change-event.ts#L10)
+[src/lib/table/data/common/event/ge-model-change-event.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-model-change-event.ts#L27)

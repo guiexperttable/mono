@@ -1,5 +1,17 @@
+/**
+ * CSS classes for {@link ColumnDefIf.classes}: body cells left-aligned – `new ColumnDef("city", "City", px120, bodyLeft)`.
+ * @category Columns
+ */
 export const bodyLeft = { body: ["ge-table-text-align-left"] };
+/**
+ * CSS classes for {@link ColumnDefIf.classes}: body cells centered – `new ColumnDef("city", "City", px120, bodyCenter)`.
+ * @category Columns
+ */
 export const bodyCenter = { body: ["ge-table-text-align-center"] };
+/**
+ * CSS classes for {@link ColumnDefIf.classes}: body cells right-aligned – `new ColumnDef("city", "City", px120, bodyRight)`.
+ * @category Columns
+ */
 export const bodyRight = { body: ["ge-table-text-align-right"] };
 
 /**
@@ -8,6 +20,8 @@ export const bodyRight = { body: ["ge-table-text-align-right"] };
  * @property {Array.<string>} header - The CSS class(es) for aligning text to the left in the table header.
  * @property {Array.<string>} body - The CSS class(es) for aligning text to the left in the table body.
  * @property {Array.<string>} footer - The CSS class(es) for aligning text to the left in the table footer.
+ *
+ * @category Columns
  */
 export const allLeft = {
   header: ["ge-table-text-align-left"],
@@ -21,6 +35,8 @@ export const allLeft = {
  * @property {Array.<string>} header - The alignment classes for the table header.
  * @property {Array.<string>} body - The alignment classes for the table body.
  * @property {Array.<string>} footer - The alignment classes for the table footer.
+ *
+ * @category Columns
  */
 export const allCenter = {
   header: ["ge-table-text-align-center"],
@@ -34,6 +50,8 @@ export const allCenter = {
  * @property {Array} header - An array containing CSS classes for aligning text right in the table header.
  * @property {Array} body - An array containing CSS classes for aligning text right in the table body.
  * @property {Array} footer - An array containing CSS classes for aligning text right in the table footer.
+ *
+ * @category Columns
  */
 export const allRight = {
   header: ["ge-table-text-align-right"],

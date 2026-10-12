@@ -1,6 +1,37 @@
 import { AutoRestoreOptionsIf } from "./auto-restore-options.if";
 
 
+/**
+ * Defaults for {@link TableOptionsIf.autoRestoreOptions}: everything off. Spread it and switch on what the table
+ * should remember in `localStorage` (one key per table).
+ *
+ * @example
+ * const tableOptions: TableOptionsIf = {
+ *   ...new TableOptions(),
+ *   autoRestoreOptions: {
+ *     ...new AutoRestoreOptions<Order>(),
+ *     getStorageKeyFn: () => "orders-table",          // unique per table
+ *     autoRestoreSortingState: true,
+ *     autoRestoreScrollPosition: true
+ *   }
+ * };
+ *
+ * @example
+ * // trees: remember expanded nodes – needs a stable id per node
+ * const treeOptions: TableOptionsIf = {
+ *   ...new TableOptions(),
+ *   autoRestoreOptions: {
+ *     ...new AutoRestoreOptions<OrderNode>(),
+ *     getStorageKeyFn: () => "order-tree",
+ *     getRowId: (node: OrderNode) => node.id,
+ *     autoRestoreCollapsedExpandedState: true
+ *   }
+ * };
+ *
+ * @see Training: [Remember the state](https://gui.expert/training/persist-state/)
+ *
+ * @category Options
+ */
 export class AutoRestoreOptions<T> implements AutoRestoreOptionsIf<T> {
 
   public autoRestoreSortingState = false;

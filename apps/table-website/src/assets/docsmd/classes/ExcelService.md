@@ -1,10 +1,38 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ExcelService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ExcelService
 
 # Class: ExcelService
 
+Writes real `.xlsx` files (Office Open XML) without any library – compressed with the browser's
+built-in `CompressionStream`. Numbers stay numbers, everything else becomes text.
+
+[TableApi.downloadExcel](TableApi.md#downloadexcel) exports what the table shows; use the ExcelService directly for any other data.
+
+**`Example`**
+
+```ts
+// all rows, own columns – independent of filter and sorting
+const body = tableApi.getBodyModel() as AreaModelObjectArray<Order>;
+const matrix = [
+  ["ID", "Customer", "Total"],
+  ...body.getAllRows().map(o => [o.id, o.customer, o.total])
+];
+await new ExcelService().downloadExcel(matrix, "orders.xlsx", "GuiExpert");
+```
+
+**`Example`**
+
+```ts
+// a Blob instead of a download, e.g. for an upload
+const blob = await new ExcelService().createExcelBlob(matrix);
+```
+
+**`See`**
+
+Training: [Excel export without a library](https://gui.expert/training/excel-export/)
+
 ## Implements
 
-- `ExcelServiceIf`
+- [`ExcelServiceIf`](../interfaces/ExcelServiceIf.md)
 
 ## Table of contents
 
@@ -14,13 +42,10 @@
 
 ### Methods
 
+- [createExcelBlob](ExcelService.md#createexcelblob)
 - [createZip](ExcelService.md#createzip)
+- [createZipCompressed](ExcelService.md#createzipcompressed)
 - [downloadExcel](ExcelService.md#downloadexcel)
-- [escapeXml](ExcelService.md#escapexml)
-- [generateBuffer](ExcelService.md#generatebuffer)
-- [generateMap](ExcelService.md#generatemap)
-- [getCellAddress](ExcelService.md#getcelladdress)
-- [getX1WorksheetsSheet1Xml](ExcelService.md#getx1worksheetssheet1xml)
 
 ## Constructors
 
@@ -34,9 +59,42 @@
 
 ## Methods
 
+### createExcelBlob
+
+▸ **createExcelBlob**(`matrix`, `author?`): `Promise`\<`Blob`\>
+
+Creates the .xlsx file as a Blob (compressed), e.g. to upload it instead of downloading it.
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `matrix` | `any`[][] | `undefined` |
+| `author` | `string` | `''` |
+
+#### Returns
+
+`Promise`\<`Blob`\>
+
+**`Example`**
+
+```ts
+const blob = await new ExcelService().createExcelBlob([["Name", "City"], ["Ann", "Berlin"]]);
+await fetch("/api/upload", { method: "POST", body: blob });
+```
+
+#### Defined in
+
+[src/lib/table/service/excel-service.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L121)
+
+___
+
 ### createZip
 
 ▸ **createZip**(`files`): `Uint8Array`
+
+ZIP without compression (method 0, synchronous). Kept for compatibility –
+downloads use [createZipCompressed](ExcelService.md#createzipcompressed).
 
 #### Parameters
 
@@ -50,13 +108,36 @@
 
 #### Defined in
 
-[lib/table/service/excel-service.ts:151](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L151)
+[src/lib/table/service/excel-service.ts:240](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L240)
+
+___
+
+### createZipCompressed
+
+▸ **createZipCompressed**(`files`): `Promise`\<`Uint8Array`\>
+
+ZIP with DEFLATE (method 8) via the browser's CompressionStream; falls back to stored entries
+where that is not available. 100,000 rows × 7 columns: ~40 MB stored → a few MB compressed.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `files` | `Map`\<`string`, `string`\> |
+
+#### Returns
+
+`Promise`\<`Uint8Array`\>
+
+#### Defined in
+
+[src/lib/table/service/excel-service.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L253)
 
 ___
 
 ### downloadExcel
 
-▸ **downloadExcel**(`matrix`, `filename?`, `author?`): `void`
+▸ **downloadExcel**(`matrix`, `filename?`, `author?`): `Promise`\<`void`\>
 
 Downloads a matrix data as an Excel file.
 
@@ -70,7 +151,7 @@ Downloads a matrix data as an Excel file.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
 
 Does not return a value.
 
@@ -80,111 +161,8 @@ Throws an error if the input matrix is not a valid 2D array or if the filename i
 
 #### Implementation of
 
-ExcelServiceIf.downloadExcel
+[ExcelServiceIf](../interfaces/ExcelServiceIf.md).[downloadExcel](../interfaces/ExcelServiceIf.md#downloadexcel)
 
 #### Defined in
 
-[lib/table/service/excel-service.ts:15](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L15)
-
-___
-
-### escapeXml
-
-▸ **escapeXml**(`value`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | `any` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/table/service/excel-service.ts:129](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L129)
-
-___
-
-### generateBuffer
-
-▸ **generateBuffer**(`data`, `author?`): `Uint8Array`
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `data` | `any`[][] | `undefined` |
-| `author` | `string` | `''` |
-
-#### Returns
-
-`Uint8Array`
-
-#### Defined in
-
-[lib/table/service/excel-service.ts:251](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L251)
-
-___
-
-### generateMap
-
-▸ **generateMap**(`data`, `author?`): `Map`\<`string`, `string`\>
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `data` | `any`[][] | `undefined` |
-| `author` | `string` | `''` |
-
-#### Returns
-
-`Map`\<`string`, `string`\>
-
-#### Defined in
-
-[lib/table/service/excel-service.ts:48](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L48)
-
-___
-
-### getCellAddress
-
-▸ **getCellAddress**(`row`, `col`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `row` | `number` |
-| `col` | `number` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/table/service/excel-service.ts:139](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L139)
-
-___
-
-### getX1WorksheetsSheet1Xml
-
-▸ **getX1WorksheetsSheet1Xml**(`data`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `data` | `any`[][] |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/table/service/excel-service.ts:91](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/excel-service.ts#L91)
+[src/lib/table/service/excel-service.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L84)

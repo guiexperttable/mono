@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeCheckboxModel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeCheckboxModel
 
 # Class: TreeCheckboxModel\<T\>
 
@@ -25,10 +25,6 @@
 ### Methods
 
 - [addCheckedRows](TreeCheckboxModel.md#addcheckedrows)
-- [addSelectedRecursive](TreeCheckboxModel.md#addselectedrecursive)
-- [areAllChildrenChecked](TreeCheckboxModel.md#areallchildrenchecked)
-- [areAllChildrenUnchecked](TreeCheckboxModel.md#areallchildrenunchecked)
-- [autoCheckParent](TreeCheckboxModel.md#autocheckparent)
 - [checkAll](TreeCheckboxModel.md#checkall)
 - [checkRow](TreeCheckboxModel.md#checkrow)
 - [getCheckedRows](TreeCheckboxModel.md#getcheckedrows)
@@ -59,7 +55,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L9)
+[src/lib/table/checkbox/tree-checkbox-model.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L10)
 
 ## Properties
 
@@ -69,7 +65,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L10)
+[src/lib/table/checkbox/tree-checkbox-model.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L11)
 
 ## Methods
 
@@ -93,88 +89,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:56](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L56)
-
-___
-
-### addSelectedRecursive
-
-▸ **addSelectedRecursive**(`nodes`, `ret`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `nodes` | `T`[] |
-| `ret` | `T`[] |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/checkbox/tree-checkbox-model.ts:113](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L113)
-
-___
-
-### areAllChildrenChecked
-
-▸ **areAllChildrenChecked**(`row`): `boolean`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `row` | `T` |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/checkbox/tree-checkbox-model.ts:78](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L78)
-
-___
-
-### areAllChildrenUnchecked
-
-▸ **areAllChildrenUnchecked**(`row`): `boolean`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `row` | `T` |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/checkbox/tree-checkbox-model.ts:95](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L95)
-
-___
-
-### autoCheckParent
-
-▸ **autoCheckParent**(`parent`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `parent` | `undefined` \| `T` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/checkbox/tree-checkbox-model.ts:62](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L62)
+[src/lib/table/checkbox/tree-checkbox-model.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L57)
 
 ___
 
@@ -198,7 +113,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:24](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L24)
+[src/lib/table/checkbox/tree-checkbox-model.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L25)
 
 ___
 
@@ -223,7 +138,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L14)
+[src/lib/table/checkbox/tree-checkbox-model.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L15)
 
 ___
 
@@ -241,7 +156,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:33](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L33)
+[src/lib/table/checkbox/tree-checkbox-model.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L34)
 
 ___
 
@@ -265,7 +180,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:39](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L39)
+[src/lib/table/checkbox/tree-checkbox-model.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L40)
 
 ___
 
@@ -289,4 +204,4 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/tree-checkbox-model.ts:51](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/checkbox/tree-checkbox-model.ts#L51)
+[src/lib/table/checkbox/tree-checkbox-model.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/tree-checkbox-model.ts#L52)

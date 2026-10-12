@@ -1,0 +1,56 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import Wrappers from "../../components/training/diagrams/Wrappers.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="react">
+
+  <h2 id="wrappers">One core, thin wrappers</h2>
+  <p>
+    Every framework package is a thin layer over the core: it creates the <ApiLink name="TableScope" /> of
+    <ChapterLink slug="first-table" />, passes your model and options, and turns the table events into the idiom of the
+    framework – callback props in React.
+  </p>
+  <Wrappers />
+
+  <h2 id="install">Install</h2>
+  <Code lang="bash" frame="terminal" code="npm i @guiexpert/table @guiexpert/react-table" />
+  <Code lang="ts" title="src/main.tsx" code={`import "@guiexpert/table/css/main.css";`} />
+
+  <h2 id="component">The component</h2>
+  <p>
+    The demo shows the shared orders model (<ChapterLink slug="web-component-and-cdn" hash="#custom-element" label="the same as in chapter 6" />)
+    and toggles between 100,000 and 1,000 rows:
+  </p>
+  <Snippet file="examples/react/App.tsx" title="frameworks/react/src/App.tsx" mark={["useMemo", "tableModel={model}"]} />
+  <Figure src="fw-react" caption="React: the button builds a new model – and with it a new table." />
+
+  <h2 id="rules">Rules for React</h2>
+  <ul>
+    <li><strong>A new <code>tableModel</code> or <code>tableOptions</code> object rebuilds the table</strong> (the wrapper uses
+      <code>useEffect([tableModel, tableOptions])</code>). Create both with <code>useMemo</code> – otherwise every re-render of
+      your component throws the table away, including scroll position and selection.</li>
+    <li>Callback props: <code>tableReady</code>, <code>mouseClicked</code>, <code>selectionChanged</code>, <code>contextmenu</code>,
+      <code>modelChanged</code>, <code>checkboxChanged</code>, <code>scroll</code> … The callbacks may change on every render.</li>
+    <li><code>tableReady</code> hands you the <ApiLink name="TableApi" /> – keep it in a <code>useRef</code> if buttons need it.</li>
+    <li>The wrapper fills its parent (100 % × 100 %) – the parent needs a height.</li>
+  </ul>
+  <Callout type="version">
+    <p>Model changes rebuild the table from <code>@guiexpert/react-table@18.1.86</code>; the callback types
+      (<code>(evt) =&gt; void</code>) are correct from 18.1.88. StrictMode's double mount is handled.</p>
+  </Callout>
+
+  <h2 id="components-as-cells">React components inside cells</h2>
+  <p>
+    <code>ComponentRendererWrapper</code> turns a React component into a cell renderer – with working hooks. That is the
+    topic of <ChapterLink slug="framework-components" />.
+  </p>
+
+  <h2 id="next">Next</h2>
+  <p>The same model in <ChapterLink slug="vue" />.</p>
+</TrainingLayout>

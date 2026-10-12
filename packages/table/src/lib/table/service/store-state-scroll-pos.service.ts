@@ -2,6 +2,7 @@ import { AbstractStoreStateService } from "./abstract-store-state.service";
 import { GetStorageKeyFn } from "../data/options/auto-restore-options.if";
 
 
+/** @category Internals */
 export class StoreStateScrollPosService extends AbstractStoreStateService {
 
   private readonly SCROLL_STATE = "scrollState";

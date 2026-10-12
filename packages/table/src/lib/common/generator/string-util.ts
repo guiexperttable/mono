@@ -1,4 +1,5 @@
 
+/** @category Utilities */
 export const entitySuffix = 'Entity';
 
 
@@ -7,6 +8,8 @@ export const entitySuffix = 'Entity';
  *
  * @param {string} name - The base name to generate the entity name from.
  * @return {string} The formatted entity name with the appropriate suffix.
+ *
+ * @category Utilities
  */
 export function getEntityName(name: string): string {
   let entityName = trimArraySuffixes(firstLetterUppercase(name));
@@ -22,6 +25,8 @@ export function getEntityName(name: string): string {
  *
  * @param {string} text - The input string to process and trim suffixes from.
  * @return {string} The modified string with the suffix removed, or the original string if no suffix was found.
+ *
+ * @category Utilities
  */
 export function trimArraySuffixes(text: string): string {
   if (!text || text.length === 0) return text;
@@ -41,6 +46,8 @@ export function trimArraySuffixes(text: string): string {
  *
  * @param {string} text - The input string to be processed.
  * @return {string} The transformed string with the first letter in uppercase. Returns an empty string if the input is invalid or empty.
+ *
+ * @category Utilities
  */
 export function firstLetterUppercase(text: string): string {
   if (!text || text.length === 0) return '';

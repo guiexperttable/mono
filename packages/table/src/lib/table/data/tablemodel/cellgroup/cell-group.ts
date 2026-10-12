@@ -1,5 +1,6 @@
 import { CellGroupIf } from "./cell-group.if";
 
+/** @category Header groups */
 export class CellGroup implements CellGroupIf {
 
   public impl = 'CellGroup';

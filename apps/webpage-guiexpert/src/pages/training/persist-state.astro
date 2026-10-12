@@ -1,0 +1,50 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="persist-state">
+
+  <h2 id="options">Switch it on</h2>
+  <p>
+    <ApiLink name="TableOptionsIf.autoRestoreOptions" /> stores the state of a table in <code>localStorage</code> and restores it on
+    the next start. Start from <ApiLink name="AutoRestoreOptions" /> and switch on what you need:
+  </p>
+  <Snippet file="demos/persist-state.ts" region="options" title="src/model/order-table-options.ts" />
+  <LiveDemo name="persist-state" title="Sort, scroll, reload" height={380}
+            caption="Double-click “Total”, scroll down, then “reload page”. The table comes back sorted and at the same row." />
+
+  <h2 id="what">What can be remembered</h2>
+  <table>
+    <thead><tr><th>Option</th><th>Remembers</th></tr></thead>
+    <tbody>
+      <tr><td><code>autoRestoreSortingState</code></td><td>sorted column and direction (incl. the header icon)</td></tr>
+      <tr><td><code>autoRestoreScrollPosition</code></td><td>scroll position</td></tr>
+      <tr><td><code>autoRestoreCollapsedExpandedState</code></td><td>expanded / collapsed nodes of a tree – needs <code>getRowId</code></td></tr>
+    </tbody>
+  </table>
+  <p>For trees (<ChapterLink slug="tree-table" />) the table needs a stable id per node to recognise it after a reload:</p>
+  <Code lang="ts" title="tree/tree.ts" code={`autoRestoreOptions: {
+  ...new AutoRestoreOptions<OrderNode>(),
+  getStorageKeyFn: () => "ge-demo-order-tree",
+  getRowId: node => node.id,                 // "Czechia", "Czechia/Becker KG", "4711"
+  autoRestoreCollapsedExpandedState: true,
+  autoRestoreScrollPosition: true
+}`} />
+
+  <Callout type="pitfall" title="One key per table">
+    <p><code>getStorageKeyFn</code> must be unique per table – two tables with the same key overwrite each other's state. Include the
+      user id if several people share a browser.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Needs <code>@guiexpert/table@1.1.89</code>: the sort icon shows the restored sorting, the scroll position is saved reliably,
+      nested tree nodes are restored, and blocked storage (private mode) no longer breaks the start.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>The last chapter: a checklist for your own table – and when to choose something else. <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

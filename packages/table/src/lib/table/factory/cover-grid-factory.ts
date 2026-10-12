@@ -7,6 +7,7 @@ import { AutoRestoreOptions } from '../data/options/auto-restore-options';
 
 
 
+/** @category Table model */
 export class CoverGridFactory {
 
 

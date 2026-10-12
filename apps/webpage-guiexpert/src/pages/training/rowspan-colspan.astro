@@ -1,0 +1,42 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="rowspan-colspan">
+
+  <h2 id="spans">Spans come from the model</h2>
+  <p>
+    Like values and classes, spans are answers of the area model: <ApiLink name="AreaModelIf.getRowspanAt" /> and
+    <ApiLink name="AreaModelIf.getColspanAt" /> return how many rows resp. columns a cell covers – 1 is normal.
+  </p>
+  <Snippet file="demos/rowspan-colspan.ts" region="model" title="src/model/timetable-model.ts" />
+  <Snippet file="demos/rowspan-colspan.ts" region="table" />
+  <LiveDemo name="rowspan-colspan" title="A school timetable" height={460}
+            caption="Double periods (Math, German, English …) span two rows, breaks span all five days. Colours via getCustomClassesAt." />
+
+  <h2 id="rules">Rules</h2>
+  <ul>
+    <li><strong>Only the first cell of a block returns the span</strong>; the covered cells return 1. The rowspan code above checks
+      “is the cell above the same?” for that.</li>
+    <li>The table draws spanned cells at the end, separately – nothing is cut in half, even when the block starts above the
+      visible area.</li>
+    <li>Header and footer can span the same way, e.g. group labels over several columns (<ChapterLink slug="header-groups" />).</li>
+    <li>Colours per subject come from <ApiLink name="AreaModelIf.getCustomClassesAt" /> (<ChapterLink slug="heatmap" />):</li>
+  </ul>
+  <Snippet file="demos/shared/demo.css" region="timetable" title="timetable.css" />
+
+  <Callout type="tip" title="Spans and sorting">
+    <p>Spans are computed from neighbouring rows – after sorting or filtering they adapt automatically. If they should
+      <em>not</em> change, compute them from your data, not from the display position.</p>
+  </Callout>
+
+  <h2 id="showcases">Showcases</h2>
+  <p>The showcase <a href="/showcase/timetable/run/">Timetable</a> builds a weekly plan with spans.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Hierarchical data: <ChapterLink slug="tree-table" />.</p>
+</TrainingLayout>

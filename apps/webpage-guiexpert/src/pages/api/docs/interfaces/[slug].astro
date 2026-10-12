@@ -20,7 +20,13 @@ export async function getStaticPaths() {
 
 const {Content, frontmatter} = Astro.props;
 const debug = JSON.stringify( Astro.props);
-const content = marked.parse(Astro.props.rawContent());
+// The markdown (typedoc-plugin-markdown) links to other .md files – point them to the HTML reference in /api/ instead.
+const KINDS = "classes|interfaces|types|functions|variables|enums";
+const content = (marked.parse(Astro.props.rawContent()) as string)
+  .replace(new RegExp(`href="(?:\\.\\./)?(${KINDS})/([^"#]+)\\.md(#[^"]*)?"`, "g"), 'href="/api/$1/$2.html"')
+  .replace(/href="\.\.\/README\.md(#[^"]*)?"/g, 'href="/api/overview.html"')
+  .replace(/href="\.\.\/modules\.md(#[^"]*)?"/g, 'href="/api/modules.html"')
+  .replace(/href="([A-Za-z0-9_]+)\.md(#[^"]*)?"/g, 'href="/api/interfaces/$1.html"');
 ---
 <IndexLayout title="Docs">
   <Header/>

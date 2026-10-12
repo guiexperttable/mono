@@ -1,0 +1,56 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import { Code } from "astro-expressive-code/components";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="installation">
+
+  <h2 id="install">1. Install the package</h2>
+  <p>A new project with Vite (or use your existing one):</p>
+  <Code lang="bash" frame="terminal" code={`npm create vite@latest my-table -- --template vanilla-ts
+cd my-table
+npm i @guiexpert/table`} />
+  <p>The core has <strong>no runtime dependencies</strong> – only <code>tslib</code>:</p>
+  <Code lang="text" frame="terminal" title="npm ls --all --omit=dev" code={`my-table@0.0.0
+\`-- @guiexpert/table@1.1.90
+  \`-- tslib@2.8.1`} />
+  <p>
+    For a framework you add one wrapper package next to the core – <code>@guiexpert/react-table</code>,
+    <code>@guiexpert/vue3-table</code>, <code>@guiexpert/angular-table@22</code> … (<ChapterLink slug="react" label="part 3" />).
+  </p>
+
+  <h2 id="css">2. Load the stylesheet</h2>
+  <p>With a bundler (Vite, webpack, Angular CLI …) import it once, e.g. in <code>main.ts</code>:</p>
+  <Code lang="ts" title="src/main.ts" code={`import "@guiexpert/table/css/main.css";   // styles of the table (bare import since 1.1.85)`} />
+  <p>Without a build tool, from the CDN:</p>
+  <Code lang="html" title="index.html" code={`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css" />`} />
+  <p>
+    The file defines all colours as CSS variables (<code>--ge-table-*</code>) for light and dark mode – how to change them is
+    shown in <ChapterLink slug="theming-dark-mode" />. Angular users don't need this step: the Angular component ships its CSS.
+  </p>
+
+  <h2 id="height">3. Give the container a height</h2>
+  <Code lang="html" title="index.html" code={`<div class="table-div"></div>`} />
+  <Code lang="css" title="src/style.css" code={`/* the table fills its container – without a height you only see the header row */
+.table-div {
+  height: calc(100vh - 40px);
+}`} />
+
+  <Callout type="pitfall" title="The classic: an empty table">
+    <p>
+      A <code>&lt;div&gt;</code> without height is 0 px high – the table renders, but you see nothing (or only the header).
+      This is by far the most common question. Fixed height, <code>vh</code>, or a flex/grid cell with a defined size all work.
+    </p>
+  </Callout>
+
+  <h2 id="check">Checklist</h2>
+  <ul>
+    <li><code>@guiexpert/table</code> in <code>dependencies</code> (plus the wrapper for your framework)</li>
+    <li><code>main.css</code> loaded once</li>
+    <li>a host element with a height</li>
+  </ul>
+
+  <h2 id="next">Next</h2>
+  <p>Everything is in place – <ChapterLink slug="first-table" /> puts 100,000 rows on the screen.</p>
+</TrainingLayout>

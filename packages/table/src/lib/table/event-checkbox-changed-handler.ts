@@ -1,6 +1,7 @@
 import { EventAdapter } from './event-adapter';
 
 
+/** @category Events */
 export class EventCheckboxChangedHandler extends EventAdapter {
 
   constructor(

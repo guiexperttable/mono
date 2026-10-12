@@ -1,6 +1,17 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CellRange
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CellRange
 
 # Class: CellRange
+
+A rectangle of cells: rows `r1`…`r2`, columns `c1`…`c2` (inclusive, body indices as displayed).
+[SelectionModelIf.getRanges](../interfaces/SelectionModelIf.md#getranges) returns the selection as a list of them.
+
+**`Example`**
+
+```ts
+const firstTenRows = new CellRange(0, 0, 9, tableModel.getColumnCount() - 1);
+tableApi.getSelectionModel()?.addSelection(firstTenRows);
+tableApi.repaint();
+```
 
 ## Table of contents
 
@@ -32,13 +43,13 @@
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `r1` | `number` | `undefined` |
-| `c1` | `number` | `undefined` |
-| `r2` | `number` | `undefined` |
-| `c2` | `number` | `undefined` |
-| `gammaRange` | `boolean` | `false` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `r1` | `number` | `undefined` | first row |
+| `c1` | `number` | `undefined` | first column |
+| `r2` | `number` | `undefined` | last row (inclusive) |
+| `c2` | `number` | `undefined` | last column (inclusive) |
+| `gammaRange` | `boolean` | `false` | reserved for [AreaModelCellGroups](AreaModelCellGroups.md), not used yet (default false) |
 
 #### Returns
 
@@ -46,7 +57,7 @@
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L4)
+[src/lib/table/data/common/cell-range.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L22)
 
 ## Properties
 
@@ -54,9 +65,11 @@
 
 • **c1**: `number`
 
+first column
+
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L6)
+[src/lib/table/data/common/cell-range.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L24)
 
 ___
 
@@ -64,9 +77,11 @@ ___
 
 • **c2**: `number`
 
+last column (inclusive)
+
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L8)
+[src/lib/table/data/common/cell-range.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L26)
 
 ___
 
@@ -74,9 +89,11 @@ ___
 
 • **gammaRange**: `boolean` = `false`
 
+reserved for [AreaModelCellGroups](AreaModelCellGroups.md), not used yet (default false)
+
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L9)
+[src/lib/table/data/common/cell-range.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L27)
 
 ___
 
@@ -84,9 +101,11 @@ ___
 
 • **r1**: `number`
 
+first row
+
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L5)
+[src/lib/table/data/common/cell-range.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L23)
 
 ___
 
@@ -94,9 +113,11 @@ ___
 
 • **r2**: `number`
 
+last row (inclusive)
+
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L7)
+[src/lib/table/data/common/cell-range.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L25)
 
 ## Methods
 
@@ -117,7 +138,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:50](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L50)
+[src/lib/table/data/common/cell-range.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L68)
 
 ___
 
@@ -142,7 +163,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:12](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L12)
+[src/lib/table/data/common/cell-range.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L30)
 
 ___
 
@@ -163,7 +184,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:31](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L31)
+[src/lib/table/data/common/cell-range.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L49)
 
 ___
 
@@ -183,7 +204,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:44](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L44)
+[src/lib/table/data/common/cell-range.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L62)
 
 ___
 
@@ -203,4 +224,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:38](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/cell-range.ts#L38)
+[src/lib/table/data/common/cell-range.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L56)

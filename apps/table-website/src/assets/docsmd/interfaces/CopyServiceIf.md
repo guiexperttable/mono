@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CopyServiceIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CopyServiceIf
 
 # Interface: CopyServiceIf
 
@@ -36,7 +36,7 @@ Copies the content to a specified location.
 
 #### Defined in
 
-[lib/table/service/copy-service.if.ts:44](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.if.ts#L44)
+[src/lib/table/service/copy-service.if.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.if.ts#L45)
 
 ___
 
@@ -62,7 +62,7 @@ Copies the selected data from the table to the clipboard.
 
 #### Defined in
 
-[lib/table/service/copy-service.if.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.if.ts#L17)
+[src/lib/table/service/copy-service.if.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.if.ts#L18)
 
 ___
 
@@ -88,4 +88,4 @@ Creates content based on the provided table model, selection model, and focus mo
 
 #### Defined in
 
-[lib/table/service/copy-service.if.ts:32](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.if.ts#L32)
+[src/lib/table/service/copy-service.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.if.ts#L33)

@@ -7,6 +7,7 @@ import { ValueLabelIf } from "../../data/common/value-label.if";
 import { ValueLabel } from "../../data/common/value-label";
 
 
+/** @category Renderers & editing */
 export class SelectCellRenderer implements CellRendererIf {
 
   constructor(

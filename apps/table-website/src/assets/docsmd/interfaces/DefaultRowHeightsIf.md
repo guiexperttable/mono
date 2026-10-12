@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / DefaultRowHeightsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / DefaultRowHeightsIf
 
 # Interface: DefaultRowHeightsIf
 
@@ -15,8 +15,6 @@ let rowHeights: DefaultRowHeightsIf = {
     body: 100,
     footer: 60
 };
-
-For implementation details, refer to the `DefaultRowHeights` class.
 ```
 
 ## Implemented by
@@ -39,7 +37,7 @@ For implementation details, refer to the `DefaultRowHeights` class.
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.if.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L22)
+[src/lib/table/data/options/default-row-heights.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L25)
 
 ___
 
@@ -49,7 +47,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.if.ts:23](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L23)
+[src/lib/table/data/options/default-row-heights.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L26)
 
 ___
 
@@ -59,4 +57,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/default-row-heights.if.ts:21](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L21)
+[src/lib/table/data/options/default-row-heights.if.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/default-row-heights.if.ts#L24)

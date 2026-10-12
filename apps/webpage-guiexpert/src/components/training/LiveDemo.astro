@@ -1,0 +1,53 @@
+---
+/**
+ * A live demo box: toolbar + table. Starts on click (some demos are deliberately heavy).
+ *   <LiveDemo name="first-table" title="100,000 orders" />
+ * runs src/training/demos/first-table.ts. The poster is the screenshot
+ * src/assets/training/shots/demo-<name>-light.png / -dark.png (made by scripts/training-screenshots.mjs).
+ */
+import { Image } from "astro:assets";
+// CSS of the demos – imported here (not in the client script) so that it ends up in the page CSS of the build.
+import "@guiexpert/table/css/main.css";
+import "../../training/demos/shared/demo.css";
+import "../../training/demos/theming.css";
+
+interface Props {
+  name: string;
+  title?: string;
+  height?: number;
+  caption?: string;
+  /** start immediately when the box scrolls into view (only for light demos) */
+  autostart?: boolean;
+}
+
+const demos = import.meta.glob("/src/training/demos/*.ts");
+const shots = import.meta.glob<{ default: ImageMetadata }>("/src/assets/training/shots/*.png", { eager: true });
+
+const { name, title = "Live demo", height = 420, caption, autostart = false } = Astro.props;
+if (!demos[`/src/training/demos/${name}.ts`]) throw new Error(`LiveDemo: src/training/demos/${name}.ts not found`);
+const light = shots[`/src/assets/training/shots/demo-${name}-light.png`]?.default;
+const dark = shots[`/src/assets/training/shots/demo-${name}-dark.png`]?.default;
+---
+<figure class="training-demo" data-demo={name} data-autostart={autostart ? "1" : undefined}
+        style={`--demo-height: ${height}px`}>
+  <div class="td-toolbar">
+    <span class="td-badge">Live</span>
+    <span class="td-title">{title}</span>
+    <span class="td-controls"></span>
+    <span class="td-info" aria-live="polite"></span>
+  </div>
+  <div class="td-stage">
+    <div class="td-poster">
+      {light && <Image class:list={["shot", { "shot-light": !!dark }]} src={light} alt={`Screenshot: ${title}`} width={1100} />}
+      {dark && <Image class="shot shot-dark" src={dark} alt={`Screenshot: ${title}`} width={1100} />}
+      <button type="button" class="td-run"><span aria-hidden="true">▶</span> Run live demo</button>
+    </div>
+    <div class="td-host" hidden></div>
+  </div>
+  {caption && <figcaption set:html={caption} />}
+</figure>
+
+<script>
+  import { initLiveDemos } from "../../training/runtime";
+  initLiveDemos();
+</script>

@@ -2,6 +2,7 @@ import { IconIf } from "./icon.if";
 import { Icon } from "./icon";
 import { HeaderGroupOptionsIf } from './header-group-options.if';
 
+/** @category Header groups */
 export class HeaderGroupOptions implements HeaderGroupOptionsIf {
 
   constructor(

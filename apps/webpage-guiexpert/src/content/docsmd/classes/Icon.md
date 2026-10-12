@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / Icon
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / Icon
 
 # Class: Icon
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[lib/table/data/options/icon.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.ts#L4)
+[src/lib/table/data/options/icon.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.ts#L5)
 
 ## Properties
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[lib/table/data/options/icon.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.ts#L7)
+[src/lib/table/data/options/icon.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.ts#L8)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.ts#L5)
+[src/lib/table/data/options/icon.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.ts#L6)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.ts#L6)
+[src/lib/table/data/options/icon.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.ts#L7)

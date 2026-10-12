@@ -1,6 +1,12 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / InputHandler
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / InputHandler
 
 # Class: InputHandler
+
+Class representing an input handler for table input fields (HTMLSelectElement, HTMLTextAreaElement, HTMLInputElement).
+
+**`Member Of`**
+
+module:input
 
 ## Table of contents
 
@@ -11,10 +17,6 @@
 ### Properties
 
 - [tableScope](InputHandler.md#tablescope)
-
-### Methods
-
-- [onHostElementChanged](InputHandler.md#onhostelementchanged)
 
 ## Constructors
 
@@ -34,7 +36,7 @@
 
 #### Defined in
 
-[lib/table/input-handler.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/input-handler.ts#L7)
+[src/lib/table/input-handler.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/input-handler.ts#L15)
 
 ## Properties
 
@@ -44,24 +46,4 @@
 
 #### Defined in
 
-[lib/table/input-handler.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/input-handler.ts#L8)
-
-## Methods
-
-### onHostElementChanged
-
-▸ **onHostElementChanged**(`event`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `event` | `Event` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/input-handler.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/input-handler.ts#L14)
+[src/lib/table/input-handler.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/input-handler.ts#L16)

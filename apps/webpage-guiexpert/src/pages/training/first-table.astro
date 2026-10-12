@@ -1,0 +1,82 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import BuildingBlocks from "../../components/training/diagrams/BuildingBlocks.astro";
+---
+<TrainingLayout slug="first-table">
+
+  <h2 id="building-blocks">Four building blocks</h2>
+  <p>
+    Every GuiExpert Table – in plain TypeScript and inside every framework wrapper – is made of the same four parts.
+    The wrappers of <ChapterLink slug="react" label="part 3" /> do exactly this for you.
+  </p>
+  <BuildingBlocks />
+  <ol>
+    <li><strong>A host element</strong> – an empty <code>&lt;div&gt;</code> with a fixed height (see <ChapterLink slug="installation" />).</li>
+    <li><strong>A table model</strong> – what to show. <ApiLink name="TableFactory.createTableModel" /> builds one from an array of objects.</li>
+    <li><strong>Options</strong> – how it behaves: <ApiLink name="TableOptions" /> holds all defaults.</li>
+    <li><strong>A <ApiLink name="TableScope" /></strong> – it connects the three, renders the table and handles mouse and keyboard.
+      It also needs a DOM service (<ApiLink name="SimpleDomService" />) and an event listener (<ApiLink name="EventAdapter" />, details in <ChapterLink slug="events-and-context-menu" />).</li>
+  </ol>
+
+  <h2 id="code">The code</h2>
+  <p>Test data: <code>createOrders(n)</code> creates <em>n</em> orders – always the same ones, from a fixed seed. Every chapter of this training uses them.</p>
+  <Snippet file="demos/first-table.ts" region="full" title="src/main.ts" />
+  <Snippet file="demos/shared/orders.ts" region="order" title="src/data/orders.ts (excerpt)" />
+
+  <p>
+    Without <code>columnDefs</code>, the factory turns every key of the <em>first</em> row into a column and uses the key in
+    upper case as header label. Own labels, widths and alignment follow in <ChapterLink slug="array-to-table-model" /> and
+    <ChapterLink slug="column-definitions" />.
+  </p>
+
+  <h2 id="result">The result</h2>
+  <LiveDemo name="first-table" title="100,000 orders – plain TypeScript"
+            caption="Scroll, drag the scrollbar, use the buttons. The toolbar shows the time until the first paint and the number of DOM elements." />
+
+  <p>Compare that with the naive table of <ChapterLink slug="why-big-tables-freeze" />:</p>
+  <table>
+    <thead><tr><th></th><th class="num">Naive &lt;table&gt;</th><th class="num">GuiExpert Table</th></tr></thead>
+    <tbody>
+      <tr><td>100,000 rows – DOM elements</td><td class="num">1,200,014</td><td class="num">≈ 1,150</td></tr>
+      <tr><td>100,000 rows – until the first paint</td><td class="num">&gt; 2 min</td><td class="num">0.16 s</td></tr>
+      <tr><td>1,000,000 rows – until the first paint</td><td class="num">–</td><td class="num">1.6 s <small>(mostly creating the test data)</small></td></tr>
+    </tbody>
+  </table>
+  <p><small>Chromium headless on a Linux VM. Your numbers will differ – the ratio won't.</small></p>
+  <p>
+    Only visible rows <strong>and</strong> visible columns end up in the DOM: of the eleven columns, about seven are rendered
+    at 1,400 px width. Vertical and horizontal virtual scrolling are explained in <ChapterLink slug="virtual-scrolling" />.
+  </p>
+
+  <h2 id="api">Talking to the table: the TableApi</h2>
+  <p>
+    <ApiLink name="TableScope.getApi" /> returns the <ApiLink name="TableApi" /> – the one object you use from now on:
+    scrolling, sorting, filtering, copying, exporting.
+  </p>
+  <Snippet file="demos/first-table.ts" region="api" />
+  <p>
+    <ApiLink name="TableApi.scrollToIndex" /> takes the column first, then the row. To make sure a row is visible without
+    jumping if it already is, use <ApiLink name="TableApi.ensureRowIsVisible" />.
+  </p>
+
+  <Callout type="pitfall" title="Nothing visible?">
+    <p>The host element has no height. The table fills its container – a <code>&lt;div&gt;</code> without height is 0 px high.
+      Give it a fixed height (<code>height: 500px</code>, <code>calc(100vh - 40px)</code>, or a flex/grid cell that has one).</p>
+  </Callout>
+  <Callout type="tip" title="Clean up">
+    <p>When you remove the table (route change, new model), call <ApiLink name="TableScope.destroy" /> or
+      <ApiLink name="TableApi.destroy" />. It removes all DOM listeners, the resize observer and renderer cleanups.
+      The framework wrappers do this automatically.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>
+    The same table without a bundler – as Web Component, straight from a CDN: <ChapterLink slug="web-component-and-cdn" />.
+    Prefer a framework? Jump to <ChapterLink slug="react" />, <ChapterLink slug="vue" /> or <ChapterLink slug="angular" />.
+  </p>
+</TrainingLayout>

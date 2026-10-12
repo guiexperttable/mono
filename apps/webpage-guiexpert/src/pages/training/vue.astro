@@ -1,0 +1,43 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="vue">
+
+  <h2 id="install">Install</h2>
+  <Code lang="bash" frame="terminal" code="npm i @guiexpert/table @guiexpert/vue3-table" />
+  <Snippet file="examples/vue/main.ts" title="frameworks/vue/src/main.ts" />
+
+  <h2 id="component">The component</h2>
+  <Snippet file="examples/vue/App.vue" title="frameworks/vue/src/App.vue" />
+  <Figure src="fw-vue" caption="Vue 3: the same 100,000 orders. Click a cell – the header shows row and column." />
+
+  <h2 id="rules">Rules for Vue</h2>
+  <ul>
+    <li><strong>Model and options are plain objects</strong> – no <code>ref()</code> or <code>reactive()</code> needed. The table
+      keeps its own state; making 100,000 rows reactive would only cost memory.</li>
+    <li>Events are Vue events: <code>@tableReady</code>, <code>@mouseClicked</code>, <code>@selectionChanged</code>,
+      <code>@contextmenu</code> … The payload is the argument (<ApiLink name="TableApi" />, <ApiLink name="GeMouseEvent" /> …).</li>
+    <li><code>mouseClicked</code> is debounced by <code>debounceMouseClickDelay</code> (default 150 ms), so a double click does not
+      also report two single clicks.</li>
+  </ul>
+
+  <h3 id="plugin">Register globally</h3>
+  <p>Instead of importing the component in every file, install the plugin (default export):</p>
+  <Code lang="ts" title="main.ts" code={`import GuiexpertTablePlugin from "@guiexpert/vue3-table";
+
+createApp(App).use(GuiexpertTablePlugin).mount("#app");`} />
+
+  <Callout type="note" title="Options with defaults">
+    <p>Always start options with <code>{"{ ...new TableOptions() }"}</code> and change only what you need – details in
+      <ChapterLink slug="table-options" />.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p><ChapterLink slug="angular" /> – one source, nine Angular versions.</p>
+</TrainingLayout>

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeOptions
 
 # Class: TreeOptions
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[lib/table/data/options/tree-options.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.ts#L7)
+[src/lib/table/data/options/tree-options.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.ts#L8)
 
 ## Properties
 
@@ -54,7 +54,7 @@
 
 #### Defined in
 
-[lib/table/data/options/tree-options.ts:13](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.ts#L13)
+[src/lib/table/data/options/tree-options.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.ts#L14)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.ts:23](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.ts#L23)
+[src/lib/table/data/options/tree-options.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.ts#L24)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.ts#L8)
+[src/lib/table/data/options/tree-options.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.ts#L9)
 
 ___
 
@@ -96,4 +96,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.ts:18](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.ts#L18)
+[src/lib/table/data/options/tree-options.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.ts#L19)

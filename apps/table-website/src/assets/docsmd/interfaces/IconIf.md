@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / IconIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / IconIf
 
 # Interface: IconIf
 
@@ -32,7 +32,7 @@ new Icon(
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:18](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/icon.if.ts#L18)
+[src/lib/table/data/options/icon.if.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L20)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:16](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/icon.if.ts#L16)
+[src/lib/table/data/options/icon.if.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L18)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/icon.if.ts#L17)
+[src/lib/table/data/options/icon.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L19)

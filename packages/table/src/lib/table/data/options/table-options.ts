@@ -14,7 +14,22 @@ import { HeaderGroupOptions } from './header-group-options';
 
 
 /**
- * TableOptions class provides configuration options for the table.
+ * All default options of a table – see {@link TableOptionsIf} for the meaning of each field.
+ *
+ * Use it with the spread pattern: all defaults, plus your changes.
+ *
+ * @example
+ * const tableOptions: TableOptionsIf = {
+ *   ...new TableOptions(),
+ *   hoverColumnVisible: false,
+ *   verticalBorderVisible: false,
+ *   defaultRowHeights: { header: 40, body: 30, footer: 36 },
+ *   externalFilterFunction: (order: Order) => order.total > 1000
+ * };
+ *
+ * @see Training: [TableOptions: behaviour and look](https://gui.expert/training/table-options/)
+ *
+ * @category Options
  */
 export class TableOptions implements TableOptionsIf {
 

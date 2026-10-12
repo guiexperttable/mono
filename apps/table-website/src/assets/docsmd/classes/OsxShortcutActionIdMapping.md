@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / OsxShortcutActionIdMapping
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / OsxShortcutActionIdMapping
 
 # Class: OsxShortcutActionIdMapping
 
@@ -38,4 +38,4 @@ Use 'meta' for the MacOS 'cmd' key.
 
 #### Defined in
 
-[lib/table/action/osx-shortcut-actionId-mapping.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/action/osx-shortcut-actionId-mapping.ts#L12)
+[src/lib/table/action/osx-shortcut-actionId-mapping.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/osx-shortcut-actionId-mapping.ts#L14)

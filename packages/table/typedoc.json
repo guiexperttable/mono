@@ -1,0 +1,34 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "name": "GuiExpert Table API",
+  "readme": "typedoc-readme.md",
+  "customCss": "./doc.css",
+  "titleLink": "https://gui.expert/",
+  "navigationLinks": {
+    "Training": "https://gui.expert/training/",
+    "Showcase": "https://gui.expert/showcase/",
+    "GitHub": "https://github.com/guiexperttable/mono"
+  },
+  "sidebarLinks": {
+    "Start: your first table": "https://gui.expert/training/first-table/",
+    "All training chapters": "https://gui.expert/training/"
+  },
+  "categorizeByGroup": false,
+  "defaultCategory": "Utilities",
+  "categoryOrder": [
+    "Table & API", "Table model", "Area models", "Columns", "Options", "Header groups", "Tree & checkboxes",
+    "Renderers & editing", "Events", "Selection & focus", "Sorting & filtering", "Export & clipboard", "Styling",
+    "Keyboard", "DOM", "CRUD", "Utilities", "Internals", "*"
+  ],
+  "navigation": { "includeCategories": true, "includeGroups": false },
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "searchInComments": true,
+  "hideGenerator": true,
+  "disableGit": true,
+  "basePath": ".",
+  "sourceLinkTemplate": "https://github.com/guiexperttable/mono/blob/main/packages/table/{path}#L{line}",
+  "sourceLinkExternal": true,
+  "validation": { "notExported": true, "invalidLink": true, "notDocumented": false }
+}

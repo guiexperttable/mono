@@ -1,4 +1,5 @@
 
+/** @category CRUD */
 export interface ColumnWidthsIf  {
   autoCalc: boolean;
   takeHeaderLabelsIntoAccount: boolean;

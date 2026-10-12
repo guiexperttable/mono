@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableCellUpdateEventIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableCellUpdateEventIf
 
 # Interface: TableCellUpdateEventIf
 
@@ -29,7 +29,7 @@ Represents an area identifier ("header" | "body" | "footer"), which defines the 
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.if.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L14)
+[src/lib/table/data/common/event/input/table-cell-update-event.if.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L16)
 
 ___
 
@@ -41,7 +41,7 @@ Represents the index of a column in a data table.
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.if.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L28)
+[src/lib/table/data/common/event/input/table-cell-update-event.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L30)
 
 ___
 
@@ -65,7 +65,7 @@ Example:
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.if.ts:56](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L56)
+[src/lib/table/data/common/event/input/table-cell-update-event.if.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L58)
 
 ___
 
@@ -77,7 +77,7 @@ Represents the index of a row of the table.
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.if.ts:21](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L21)
+[src/lib/table/data/common/event/input/table-cell-update-event.if.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L23)
 
 ___
 
@@ -93,4 +93,4 @@ This valie will be set to the area model for the cell (rowIndex, columnIndex).
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.if.ts:40](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L40)
+[src/lib/table/data/common/event/input/table-cell-update-event.if.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.if.ts#L42)

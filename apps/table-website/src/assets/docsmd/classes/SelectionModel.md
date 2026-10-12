@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SelectionModel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SelectionModel
 
 # Class: SelectionModel
 
@@ -107,7 +107,6 @@ addRange(range: CellRange): void - Adds a range of cells to the selection.
 ### Properties
 
 - [allSelected](SelectionModel.md#allselected)
-- [listenerArr](SelectionModel.md#listenerarr)
 - [negativeRanges](SelectionModel.md#negativeranges)
 - [ranges](SelectionModel.md#ranges)
 - [selectionMode](SelectionModel.md#selectionmode)
@@ -155,7 +154,7 @@ addRange(range: CellRange): void - Adds a range of cells to the selection.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:54](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L54)
+[src/lib/table/selection/selection-model.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L56)
 
 ## Properties
 
@@ -167,19 +166,7 @@ This is a flag to indicate whether all cells in the grid are selected or not.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:48](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L48)
-
-___
-
-### listenerArr
-
-• `Private` **listenerArr**: [`EventSelectionChangedListenerIf`](../interfaces/EventSelectionChangedListenerIf.md)[] = `[]`
-
-This contains all the listeners for selection change events.
-
-#### Defined in
-
-[lib/table/selection/selection-model.ts:52](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L52)
+[src/lib/table/selection/selection-model.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L50)
 
 ___
 
@@ -191,7 +178,7 @@ This contains all the current negative cell ranges in the grid.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:47](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L47)
+[src/lib/table/selection/selection-model.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L49)
 
 ___
 
@@ -203,7 +190,7 @@ This contains all the current selected cell ranges in the grid.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L46)
+[src/lib/table/selection/selection-model.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L48)
 
 ___
 
@@ -215,7 +202,7 @@ The mode of selection being used. It's of type SelectionMode. Default: "single"
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:56](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L56)
+[src/lib/table/selection/selection-model.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L58)
 
 ___
 
@@ -227,7 +214,7 @@ The type of selection being used. It's of type ExtendedSelectionType. Default: "
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:55](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L55)
+[src/lib/table/selection/selection-model.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L57)
 
 ___
 
@@ -239,13 +226,15 @@ This is a flag to suppress the firing of selection change events.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:50](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L50)
+[src/lib/table/selection/selection-model.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L52)
 
 ## Methods
 
 ### addEventSelectionChangedListener
 
 ▸ **addEventSelectionChangedListener**(`listener`): `void`
+
+Get notified on every change of the selection.
 
 #### Parameters
 
@@ -263,7 +252,7 @@ This is a flag to suppress the firing of selection change events.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:64](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L64)
+[src/lib/table/selection/selection-model.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L66)
 
 ___
 
@@ -283,13 +272,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:194](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L194)
+[src/lib/table/selection/selection-model.ts:196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L196)
 
 ___
 
 ### addSelection
 
 ▸ **addSelection**(`range`): `void`
+
+Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9, columns 0–3).
 
 #### Parameters
 
@@ -307,13 +298,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:162](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L162)
+[src/lib/table/selection/selection-model.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L164)
 
 ___
 
 ### clear
 
 ▸ **clear**(): `void`
+
+Removes the whole selection.
 
 #### Returns
 
@@ -325,7 +318,7 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:121](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L121)
+[src/lib/table/selection/selection-model.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L123)
 
 ___
 
@@ -339,13 +332,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:78](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L78)
+[src/lib/table/selection/selection-model.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L80)
 
 ___
 
 ### firstClick
 
 ▸ **firstClick**(`rowIndex`, `columnIndex`): `void`
+
+Called by the table on a click: starts a selection at this cell, depending on selection type and mode.
 
 #### Parameters
 
@@ -364,13 +359,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:84](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L84)
+[src/lib/table/selection/selection-model.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L86)
 
 ___
 
 ### getEventSelectionChangedListeners
 
 ▸ **getEventSelectionChangedListeners**(): [`EventSelectionChangedListenerIf`](../interfaces/EventSelectionChangedListenerIf.md)[]
+
+The registered listeners (the table registers itself).
 
 #### Returns
 
@@ -382,7 +379,7 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:60](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L60)
+[src/lib/table/selection/selection-model.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L62)
 
 ___
 
@@ -404,7 +401,7 @@ Array of merged row indices
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:141](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L141)
+[src/lib/table/selection/selection-model.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L143)
 
 ___
 
@@ -426,13 +423,15 @@ Array of CellRange objects representing the ranges.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:117](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L117)
+[src/lib/table/selection/selection-model.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L119)
 
 ___
 
 ### getSelectionCount
 
 ▸ **getSelectionCount**(`rowIndex`, `columnIndex`): `number`
+
+In how many selected ranges is this cell (0 = not selected)?
 
 #### Parameters
 
@@ -451,13 +450,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:92](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L92)
+[src/lib/table/selection/selection-model.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L94)
 
 ___
 
 ### hasNoSelection
 
 ▸ **hasNoSelection**(): `boolean`
+
+Is nothing selected?
 
 #### Returns
 
@@ -469,13 +470,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:132](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L132)
+[src/lib/table/selection/selection-model.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L134)
 
 ___
 
 ### hasSelection
 
 ▸ **hasSelection**(): `boolean`
+
+Is anything selected?
 
 #### Returns
 
@@ -487,13 +490,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:128](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L128)
+[src/lib/table/selection/selection-model.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L130)
 
 ___
 
 ### isAllSelected
 
 ▸ **isAllSelected**(): `boolean`
+
+Was everything selected with [selectAll](../interfaces/SelectionModelIf.md#selectall)?
 
 #### Returns
 
@@ -505,7 +510,7 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:158](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L158)
+[src/lib/table/selection/selection-model.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L160)
 
 ___
 
@@ -526,7 +531,7 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:108](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L108)
+[src/lib/table/selection/selection-model.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L110)
 
 ___
 
@@ -555,13 +560,15 @@ Checks if a specific cell in a grid is selected.
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:189](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L189)
+[src/lib/table/selection/selection-model.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L191)
 
 ___
 
 ### removeEventSelectionChangedListener
 
 ▸ **removeEventSelectionChangedListener**(`listener`): `void`
+
+Stop notifications.
 
 #### Parameters
 
@@ -579,13 +586,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:70](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L70)
+[src/lib/table/selection/selection-model.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L72)
 
 ___
 
 ### removeSelection
 
 ▸ **removeSelection**(`range`): `void`
+
+Removes a rectangle from the selection.
 
 #### Parameters
 
@@ -603,13 +612,15 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:167](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L167)
+[src/lib/table/selection/selection-model.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L169)
 
 ___
 
 ### selectAll
 
 ▸ **selectAll**(): `void`
+
+Selects all cells (⌘/Ctrl+A).
 
 #### Returns
 
@@ -621,7 +632,7 @@ ___
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:153](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L153)
+[src/lib/table/selection/selection-model.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L155)
 
 ___
 
@@ -648,4 +659,4 @@ Toggles the selection state of a point at the specified row and column in a grid
 
 #### Defined in
 
-[lib/table/selection/selection-model.ts:181](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/selection-model.ts#L181)
+[src/lib/table/selection/selection-model.ts:183](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L183)

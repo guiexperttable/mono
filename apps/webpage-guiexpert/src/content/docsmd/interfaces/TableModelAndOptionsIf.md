@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableModelAndOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableModelAndOptionsIf
 
 # Interface: TableModelAndOptionsIf
+
+Interface for a container object for one table model and one table options object.
 
 ## Implemented by
 
@@ -21,7 +23,7 @@
 
 #### Defined in
 
-[lib/table/data/table-model-and-options.if.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/table-model-and-options.if.ts#L6)
+[src/lib/table/data/table-model-and-options.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/table-model-and-options.if.ts#L11)
 
 ___
 
@@ -31,4 +33,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/table-model-and-options.if.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/table-model-and-options.if.ts#L7)
+[src/lib/table/data/table-model-and-options.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/table-model-and-options.if.ts#L12)

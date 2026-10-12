@@ -1,0 +1,44 @@
+// A plain object shaped like a KeyboardEvent – for unit tests in Node, which has no KeyboardEvent.
+//
+//   createHarmonizedShortcutByKeyboardEvent(keyEvent({ key: 'c', code: 'KeyC', ctrlKey: true })) // → "ctrl c"
+//
+// Lives outside src/ on purpose: it must not end up in the npm package.
+
+export type KeyEventInit = Partial<Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey'>>;
+
+/**
+ * The key a user presses for each shortcut string used in the built-in shortcut mappings
+ * (WindowsShortcutActionIdMapping / OsxShortcutActionIdMapping), as the browser reports it.
+ */
+export const KEY_EVENTS_BY_MAPPING_KEY: Record<string, KeyEventInit> = {
+  'f2': { key: 'F2', code: 'F2' },
+  'space': { key: ' ', code: 'Space' },
+  'ctrl+num_add': { key: '+', code: 'NumpadAdd', ctrlKey: true },
+  'ctrl+num_subtract': { key: '-', code: 'NumpadSubtract', ctrlKey: true },
+  'ctrl+a': { key: 'a', code: 'KeyA', ctrlKey: true },
+  'meta+a': { key: 'a', code: 'KeyA', metaKey: true },
+  'ctrl+shift+a': { key: 'A', code: 'KeyA', ctrlKey: true, shiftKey: true },
+  'meta+shift+a': { key: 'A', code: 'KeyA', metaKey: true, shiftKey: true },
+  'ctrl+x': { key: 'x', code: 'KeyX', ctrlKey: true },
+  'meta+x': { key: 'x', code: 'KeyX', metaKey: true },
+  'ctrl -': { key: '-', code: 'Minus', ctrlKey: true },
+  'meta -': { key: '-', code: 'Minus', metaKey: true },
+  'ctrl+c': { key: 'c', code: 'KeyC', ctrlKey: true },
+  'meta+c': { key: 'c', code: 'KeyC', metaKey: true },
+  'arrowup': { key: 'ArrowUp', code: 'ArrowUp' },
+  'arrowdown': { key: 'ArrowDown', code: 'ArrowDown' },
+  'arrowleft': { key: 'ArrowLeft', code: 'ArrowLeft' },
+  'arrowright': { key: 'ArrowRight', code: 'ArrowRight' },
+};
+
+export function keyEvent(init: KeyEventInit): KeyboardEvent {
+  return {
+    key: '',
+    code: '',
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    ...init,
+  } as KeyboardEvent;
+}

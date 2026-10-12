@@ -1,340 +1,872 @@
 ---
-import ContentSection from "~/components/content-section.astro";
-import DiagramTableModel from "~/components/doc/diagram-table-model.astro";
-import CssVars from "./css-vars.md";
-import CssThemeInit from "./css-theme-init.md";
+/**
+ * /doc/ – the documentation: concepts, building blocks and reference of GuiExpert Table.
+ * Same look and components as the training (src/styles/training.css + src/styles/doc.css).
+ * Links are checked at build time: ApiLink → src/training/api-index.json, ChapterLink → src/training/chapters.ts.
+ * The CSS variable reference is read from packages/table/css/table-color-vars.css, so it never goes stale.
+ */
+import { Code } from "astro-expressive-code/components";
+import ApiLink from "../training/ApiLink.astro";
+import ChapterLink from "../training/ChapterLink.astro";
+import Callout from "../training/Callout.astro";
+import Wrappers from "../training/diagrams/Wrappers.astro";
+import VirtualScroll from "../training/diagrams/VirtualScroll.astro";
+import BuildingBlocks from "../training/diagrams/BuildingBlocks.astro";
+import NineAreas from "../training/diagrams/NineAreas.astro";
+import Pipeline from "../training/diagrams/Pipeline.astro";
+import { CHAPTERS, MONO_REPO, chapterBySlug, pad } from "../../training/chapters";
+import { apiEntry } from "../../training/api";
+import corePkg from "../../../../../packages/table/package.json";
+import colorVarsCss from "../../../../../packages/table/css/table-color-vars.css?raw";
+import "../../styles/training.css";
+import "../../styles/doc.css";
+
+const SECTIONS = [
+  { id: "overview", title: "What GuiExpert Table is" },
+  { id: "packages", title: "Packages and frameworks" },
+  { id: "installation", title: "Installation" },
+  { id: "building-blocks", title: "The four building blocks" },
+  { id: "table-model", title: "The table model" },
+  { id: "create-model", title: "Three ways to create a model" },
+  { id: "columns", title: "Column definitions" },
+  { id: "options", title: "Table options" },
+  { id: "api-events", title: "TableApi and events" },
+  { id: "features", title: "Features at a glance" },
+  { id: "styling", title: "Styling and theming" },
+  { id: "performance", title: "Performance checklist" },
+  { id: "limits", title: "What is not built in" },
+  { id: "help", title: "Help and feedback" }
+];
+const T = Object.fromEntries(SECTIONS.map(s => [s.id, s.title]));
+
+const npm = (name: string) => `https://www.npmjs.com/package/${name}`;
+/** "TableApi.sortByColumn" → "sortByColumn()", "ColumnDefIf.editable" → "editable", "TableApi" → "TableApi" */
+const short = (name: string) => {
+  const member = name.includes(".") ? name.slice(name.indexOf(".") + 1) : name;
+  return apiEntry(name).kind === "method" ? `${member}()` : member;
+};
+const chapterLabel = (slug: string) => {
+  const ch = chapterBySlug(slug);
+  return `${pad(ch.no)} · ${ch.nav}`;
+};
+
+// ── packages ──────────────────────────────────────────────────────────────
+const PACKAGES = [
+  { framework: "Plain TypeScript / JS", pkg: "@guiexpert/table", component: "new TableScope(…)", start: "/getstarted/plainjs/", slug: "first-table" },
+  { framework: "Web Component", pkg: "@guiexpert/webcomponent-table", component: "<guiexpert-table>", start: "/getstarted/webcomponent/", slug: "web-component-and-cdn" },
+  { framework: "React 18 / 19", pkg: "@guiexpert/react-table", component: "<GuiexpertTable>", start: "/getstarted/react/", slug: "react" },
+  { framework: "Vue 3", pkg: "@guiexpert/vue3-table", component: "<GuiexpertTable>", start: "/getstarted/vue/", slug: "vue" },
+  { framework: "Angular 14 – 22", pkg: "@guiexpert/angular-table", component: "<guiexpert-table>", start: "/getstarted/angular/", slug: "angular" },
+  { framework: "Svelte 4 / 5", pkg: "@guiexpert/svelte-table", component: "<GuiexpertTable>", start: "/getstarted/svelte/", slug: "one-model-every-framework" },
+  { framework: "Solid", pkg: "@guiexpert/solid-table", component: "<GuiexpertTable>", start: undefined, slug: "one-model-every-framework" },
+  { framework: "Preact 10", pkg: "@guiexpert/preact-table", component: "<GuiexpertTable>", start: "/getstarted/preact/", slug: "one-model-every-framework" }
+];
+
+// ── ready-made area models ────────────────────────────────────────────────
+const AREA_MODELS = [
+  { name: "AreaModelObjectArray", text: "an array of objects – what TableFactory creates from rows", slug: "array-to-table-model" },
+  { name: "AreaModelArrayOfArrays", text: "rows as arrays of values (CSV, matrices)", slug: "array-of-arrays" },
+  { name: "AreaModelCellGroups", text: "grouped, collapsible header rows", slug: "header-groups" },
+  { name: "AreaModelTree", text: "hierarchical rows for tree tables", slug: "tree-table" },
+  { name: "AreaModel", text: "base class for your own models: computed values, totals, server data", slug: "custom-area-model" }
+];
+
+// ── options ───────────────────────────────────────────────────────────────
+const OPTION_GROUPS = [
+  { title: "Layout", names: ["defaultRowHeights", "overflowX", "overflowY", "resizeEventDebounceDelay"] },
+  { title: "Mouse", names: ["hoverRowVisible", "hoverColumnVisible", "columnsResizable", "columnsDraggable", "columnResizeHandleWidthInPx"] },
+  { title: "Borders", names: ["verticalBorderVisible", "horizontalBorderVisible", "headerSeparatorBorderVisible", "footerSeparatorBorderVisible", "fixedWestSeparatorBorderVisible", "fixedEastSeparatorBorderVisible", "tableTopBorderVisible", "tableBottomBorderVisible"] },
+  { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction"] },
+  { title: "Selection and keyboard", names: ["getSelectionModel", "getFocusModel", "shortcutActionIdMapping", "shortcutActionsDisabled"] },
+  { title: "Trees, groups, editing", names: ["treeOptions", "headerGroupOptions", "showCheckboxWihoutExtraColumn", "getEditRenderer"] },
+  { title: "State", names: ["autoRestoreOptions"] }
+];
+
+// ── TableApi ──────────────────────────────────────────────────────────────
+const API_GROUPS = [
+  { title: "Scrolling", names: ["scrollToIndex", "scrollToPixel", "ensureRowIsVisible", "getFirstVisibleRowIndex", "getDisplayedRowCount"] },
+  { title: "Sorting and filtering", names: ["sortByColumn", "sort", "reSort", "externalFilterChanged"] },
+  { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
+  { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
+  { title: "Columns", names: ["autoResizeColumns", "setColumnWidth", "recalcColumnWidths"] },
+  { title: "Selection and keyboard", names: ["getSelectionModel", "setSelectionModel", "clearSelection", "copyToClipboard", "triggerAction"] },
+  { title: "Export and lifecycle", names: ["downloadExcel", "destroy"] }
+];
+
+const EVENTS = [
+  { event: "tableReady", listener: undefined, payload: "TableApi", note: "once, after the first render (wrappers only)" },
+  { event: "mouseClicked", listener: "onMouseClicked", payload: "GeMouseEvent", note: "area, row, column, click count; debounced in Angular and Vue" },
+  { event: "mouseMoved", listener: "onMouseMoved", payload: "GeMouseEvent", note: "" },
+  { event: "contextmenu", listener: "onContextmenu", payload: "GeMouseEvent", note: "for your own context menu" },
+  { event: "mouseDragging", listener: "onMouseDragging", payload: "GeMouseEvent", note: "" },
+  { event: "mouseDraggingEnd", listener: "onMouseDraggingEnd", payload: "GeMouseEvent", note: "Angular: mouseDraggingEnded" },
+  { event: "checkboxChanged", listener: "onCheckboxChanged", payload: "checked rows", note: "row and tree checkboxes" },
+  { event: "modelChanged", listener: "onModelChanged", payload: "GeModelChangeEvent", note: "after inline editing" },
+  { event: "selectionChanged", listener: "onSelectionChanged", payload: "SelectionModelIf", note: "" },
+  { event: "focusChanged", listener: "onFocusChanged", payload: "FocusModelIf", note: "" },
+  { event: "scroll", listener: "onScroll", payload: "GeScrollEvent", note: "not forwarded by the React wrapper" }
+];
+
+// ── features ──────────────────────────────────────────────────────────────
+const FEATURES = [
+  { feature: "Millions of rows", text: "an own area model that computes cells on demand", api: ["AreaModel", "AreaModelIf.getConstantRowHeight"], slug: "custom-area-model" },
+  { feature: "Fixed columns", text: "left and right, set in the model", api: ["CreateTableModelPara.fixedLeftColumnCount", "CreateTableModelPara.fixedRightColumnCount"], slug: "fixed-columns" },
+  { feature: "Header groups", text: "multi-row, collapsible headers", api: ["AreaModelCellGroups", "CellgroupFactory.buildColumnDefs"], slug: "header-groups" },
+  { feature: "Footer totals", text: "a footer model that sums the displayed rows", api: ["AreaModelObjectArray.getFilteredRows"], slug: "footer-totals" },
+  { feature: "Column resizing and reordering", text: "drag handles and drag & drop", api: ["TableOptionsIf.columnsResizable", "TableOptionsIf.columnsDraggable", "TableApi.autoResizeColumns"], slug: "table-options" },
+  { feature: "Sorting", text: "header double-click, own comparators, from code", api: ["ColumnDefIf.sortComparator", "TableApi.sortByColumn"], slug: "sorting" },
+  { feature: "Filtering", text: "your filter UI – the table asks per row", api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged"], slug: "filtering" },
+  { feature: "Selection and clipboard", text: "cells, rows, columns or ranges; keyboard shortcuts", api: ["SelectionModel", "TableApi.copyToClipboard"], slug: "selection-and-copy" },
+  { feature: "Events and context menu", text: "override only the events you need", api: ["EventAdapter", "EventListenerIf.onContextmenu"], slug: "events-and-context-menu" },
+  { feature: "Excel export", text: "real .xlsx files without a library", api: ["TableApi.downloadExcel", "ExcelService"], slug: "excel-export" },
+  { feature: "Cell renderers", text: "built-in renderers or one method of your own", api: ["CellRendererIf", "StarRatingCellRenderer"], slug: "cell-renderers" },
+  { feature: "Framework components in cells", text: "React, Vue, Angular, Svelte … per visible cell", api: ["CellRendererIf"], slug: "framework-components" },
+  { feature: "Heatmaps and conditional formatting", text: "style and classes per cell, colour gradients", api: ["AreaModelIf.getCustomStyleAt", "GeCssColorUtil"], slug: "heatmap" },
+  { feature: "Theming and dark mode", text: "CSS variables, light and dark built in", api: ["CssVars"], slug: "theming-dark-mode" },
+  { feature: "Rowspan and colspan", text: "merged cells, defined by the model", api: ["AreaModelIf.getRowspanAt", "AreaModelIf.getColspanAt"], slug: "rowspan-colspan" },
+  { feature: "Tree table with checkboxes", text: "hierarchical data, expanded or collapsed", api: ["TreeFactory.buildTreeRows", "EventListenerIf.onCheckboxChanged"], slug: "tree-table" },
+  { feature: "Inline editing", text: "text and select editors, input conversion", api: ["ColumnDefIf.editable", "ColumnDefIf.getEditRenderer"], slug: "inline-editing" },
+  { feature: "Live data", text: "update single cells – only visible ones are redrawn", api: ["TableApi.updateCells"], slug: "live-data" },
+  { feature: "Persisted state", text: "sorting, scroll position and open tree nodes", api: ["TableOptionsIf.autoRestoreOptions"], slug: "persist-state" }
+];
+
+// ── CSS variables, read from the core stylesheet ──────────────────────────
+function parseVars(block: RegExp): Map<string, string> {
+  const match = colorVarsCss.match(block);
+  if (!match) throw new Error("doc: theme block not found in packages/table/css/table-color-vars.css");
+  const vars = new Map<string, string>();
+  for (const [, name, value] of match[1].matchAll(/(--ge-table-[\w-]+)\s*:\s*([^;]+);/g)) vars.set(name, value.trim());
+  return vars;
+}
+const lightVars = parseVars(/html,\s*html\[data-theme="light"\]\s*\{([^}]*)\}/);
+const darkVars = parseVars(/html\[data-theme="dark"\]\s*\{([^}]*)\}/);
+const varNames = [...new Set([...lightVars.keys(), ...darkVars.keys()])];
+
+const VAR_GROUPS: { title: string; test: (name: string) => boolean }[] = [
+  { title: "Table", test: n => n === "--ge-table-bg" || n === "--ge-table-border" },
+  { title: "Selected cells", test: n => n.includes("-selected-range-") },
+  { title: "Header", test: n => n.startsWith("--ge-table-header-") },
+  { title: "Body", test: n => n.startsWith("--ge-table-body-") },
+  { title: "Footer", test: n => n.startsWith("--ge-table-footer-") },
+  { title: "Zebra rows and columns", test: n => /-(row|column)-(odd|even)-/.test(n) },
+  { title: "Hover and focus", test: n => (n.includes("hover-") && !n.includes("resize")) || n.includes("focus") },
+  { title: "Resizing and dragging columns", test: n => /resize|drag|drop/.test(n) },
+  { title: "Tree, errors and built-in renderers", test: () => true }
+];
+const varGroups = VAR_GROUPS.map(g => ({ title: g.title, names: [] as string[] }));
+for (const name of varNames) varGroups[VAR_GROUPS.findIndex(g => g.test(name))].names.push(name);
+const isLiteral = (value?: string) => !!value && !value.startsWith("var(");
+
+const chapterCount = CHAPTERS.length;
 ---
 
-<ContentSection
-    title="Documentation"
-    id="documentation"
-    noLead="true">
+<section class="training-hero doc-hero">
+  <p class="chapter-no">Documentation <span>· @guiexpert/table {corePkg.version}</span></p>
+  <h1><span class="gradient-text">GuiExpert Table</span><br />documentation</h1>
+  <p class="lead">
+    Concepts, building blocks and reference for a data grid that displays millions of rows in any web framework.
+    Read it once to understand how the table works – then use the training for guided examples and the API reference
+    for every detail.
+  </p>
+</section>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <h2 class="text-xl font-bold">Introduction</h2>
+<div class="training-facts">
+  <div><b>8</b><span>frameworks, one core</span></div>
+  <div><b>0</b><span>runtime dependencies</span></div>
+  <div><b>2 M</b><span>rows in the showcase</span></div>
+  <div><b>MIT</b><span>also for commercial use</span></div>
+</div>
+
+<section class="training-section" aria-label="Where to start">
+  <div class="chapter-cards doc-paths">
+    <a class="chapter-card" href="/getstarted/">
+      <span class="card-no">GET STARTED</span>
+      <b>Your first table</b>
+      <p>Install the package for your framework and render a table in a few minutes.</p>
+      <span class="card-meta">Angular · React · Vue · Svelte · Preact · Web Component · JS</span>
+    </a>
+    <a class="chapter-card" href="/training/">
+      <span class="card-no">TRAINING</span>
+      <b>Step by step</b>
+      <p>Short chapters with live demos – from the first table to editing and live data.</p>
+      <span class="card-meta">{chapterCount} chapters · free</span>
+    </a>
+    <a class="chapter-card" href="/showcase/">
+      <span class="card-no">SHOWCASE</span>
+      <b>Complete examples</b>
+      <p>2 million rows, heatmaps, tree tables, timetables and a live ticker – with source code.</p>
+      <span class="card-meta">runs in the browser</span>
+    </a>
+    <a class="chapter-card" href="/api/">
+      <span class="card-no">REFERENCE</span>
+      <b>API reference</b>
+      <p>Every class, interface, option and method, generated from the source code.</p>
+      <span class="card-meta">TypeScript · with examples</span>
+    </a>
   </div>
+</section>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-          The idea/philosophy: This project is made for solving the problem of displaying large datasets in a grid view.
-          Large datasets mean
-          thousands of rows and columns. We use virtual scrolling for both directions (horizontal and vertical) to
-          create
-          a high-performance ui component. The data can be displayed as a grid or as a tree table (hierarchical
-          structure). </p>
-        <p class="mb-4">
-          The core library is agnostic, it's written in plain typescript. This helps us to create a lot of table
-          components for all common frameworks:</p>
-        <ul class="list-disc ml-8 mb-8">
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/angular-table"
-                target="_blank">guiexpert/angular-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/vue3-table"
-                target="_blank">guiexpert/vue3-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/react-table"
-                target="_blank">guiexpert/react-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/preact-table"
-                target="_blank">guiexpert/preact-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/solid-table"
-                target="_blank">guiexpert/solid-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/svelte-table"
-                target="_blank">guiexpert/svelte-table
-            </a>
-          </li>
-          <li>
-            <a
-                href="https://www.npmjs.com/package/&#64;guiexpert/webcomponent-table"
-                target="_blank">guiexpert/webcomponent-table
-            </a>
-          </li>
-        </ul>
-        <p class="mb-4">
-          If you think that important framework support is missing, send us a short message. ;-)
-          Of course, you can use the table with plain JS. </p>
-      </div>
+<div class="doc-layout">
+  <article class="doc-article">
 
-      <div>
-        <p class="mb-4">
-          Our philosophy is to think in models. A simple table mostly has a simple data structure.
-          An array of arrays or an array of objects. This is not our meaning of a table model.
-          For our library: a table model gives the information on how many rows and
-          how many columns the table has, what the value of a cell is,
-          what the column span of a cell is, what the CSS classes are, and so on.
-          A model is a concrete class of this interface
-          <a
-              target="_blank"
-              href="/api/interfaces/TableModelIf.html">TableModelIf
-          </a>
-          .
-        </p>
-        <p class="mb-4">
-          A lot of requirements of a table body also exist for the header or footer.
-          Also for a header, it's important to know the CSS classes or to know the 'colspan' value of a header cell and
-          so
-          on.
-          Because of this, we decided to create three sub-models: our table has three areas (header, body, footer),
-          so our table model has three (sub) area models (see:
-          <a
-              target="_blank"
-              href="/api/interfaces/AreaModelIf.html">AreaModelIf
-          </a>
-          ).
-          This gives you the most flexibility for designing fancy tables.
-          You can write an implementation of the table model by hand or you can use one of the flexible factory methods.
-          We try to make this table component very flexible and easy to use.
-        </p>
-      </div>
+    <nav class="doc-contents" aria-label="Contents">
+      <p>Contents</p>
+      <ol>{SECTIONS.map(s => <li><a href={`#${s.id}`}>{s.title}</a></li>)}</ol>
+    </nav>
 
-      <div>
-        <DiagramTableModel></DiagramTableModel>
-      </div>
+    <div class="training-prose">
 
-      <div>
-        <p class="mb-4">
-          The table can respond to user inputs: it's possible to define an edit renderer so that the user can change
-          cell
-          values.
-          It's possible to filter table rows, re-order or resize the columns (by drag and drop), and so on.
-          This is all easy to use because it's handled by default.
-          All features of this table can be configured by an option property
-          (see
-          <a
-              target="_blank"
-              href="/api/classes/TableOptions.html">TableOptions
-          </a>
-          ).
-        </p>
-        <p class="mb-4">
-          We have tons of demo code for helping you by starting with this component. </p>
-        <p class="mb-4">
-          Have fun and don't worry: If you need help, write a question on Stackoverflow
-          (
-          <a
-              href="https://stackoverflow.com/questions/tagged/guiexpert-table"
-              target="_blank">#guiexpert-table
-          </a>
-          ).
-          Feedback is welcome! Do not hesitate to contact us
-          (
-          <a href="mailto:feedback&#64;gui.expert?subject=guiexpert-table">feedback&#64;gui.expert</a>
-          ).
-        </p>
-      </div>
-    </div>
-  </div>
+      <!-- ── Overview ───────────────────────────────────────────────── -->
+      <h2 id="overview">{T.overview}</h2>
+      <p>
+        GuiExpert Table is a data grid for web applications that work with large tabular data sets: tens of thousands
+        to millions of rows, dozens to hundreds of columns. It renders only the cells inside the visible area –
+        vertically <strong>and</strong> horizontally – so the size of the DOM depends on the size of the viewport, not
+        on the size of the data.
+      </p>
+      <VirtualScroll />
+      <p>
+        The core, <a href={npm("@guiexpert/table")}><code>@guiexpert/table</code></a>, is written in plain TypeScript
+        and has no runtime dependencies. Thin wrappers make it available in Angular, React, Vue, Svelte, Solid and
+        Preact and as a Web Component. Models, options, renderers and the API are identical in all of them.
+      </p>
+      <ul class="doc-principles">
+        <li>
+          <b>Model-driven</b>
+          <p>The table does not copy your data. While rendering it asks a model for each visible cell: value, row
+            height, span, CSS classes, renderer.</p>
+        </li>
+        <li>
+          <b>Virtual in both directions</b>
+          <p>Only visible rows and columns exist in the DOM. Fixed columns, header and footer stay in place while the
+            body scrolls.</p>
+        </li>
+        <li>
+          <b>One core for every framework</b>
+          <p>What you learn and build once – models, renderers, options – works unchanged in every supported
+            framework.</p>
+        </li>
+        <li>
+          <b>Open by design</b>
+          <p>Cells are plain DOM elements and colours are CSS variables. You decide what a cell contains and how
+            the table looks.</p>
+        </li>
+      </ul>
 
+      <!-- ── Packages ───────────────────────────────────────────────── -->
+      <h2 id="packages">{T.packages}</h2>
+      <p>
+        Every project needs the core. For a framework, add its wrapper – a small component that creates the table,
+        forwards its events in the style of the framework and hands you the <ApiLink name="TableApi" />.
+      </p>
+      <Wrappers />
+      <table class="doc-table">
+        <thead><tr><th>Framework</th><th>Package</th><th>Component</th><th>Guides</th></tr></thead>
+        <tbody>
+          {PACKAGES.map(p => (
+            <tr>
+              <td>{p.framework}</td>
+              <td><a href={npm(p.pkg)}><code>{p.pkg}</code></a></td>
+              <td><code>{p.component}</code></td>
+              <td class="nowrap">
+                {p.start && <><a href={p.start}>Get started</a> · </>}
+                <ChapterLink slug={p.slug} label={`chapter ${chapterBySlug(p.slug).no}`} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        The wrappers declare their framework as a peer dependency. For Angular, the major version of the package
+        follows the Angular major version (<code>@guiexpert/angular-table@22</code> for Angular 22). For prototypes,
+        <a href={npm("@guiexpert/demo-table-models")}><code>@guiexpert/demo-table-models</code></a> provides
+        ready-made models (large data set, heatmap, tree and more).
+      </p>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-          There are essentially three ways to create a table model: </p>
-        <ol class="list-decimal pl-6">
-          <li>Utilizing
-            <a
-                href="/api/classes/TableFactory.html#createTableModel"
-                target="_blank">TableFactory.createTableModel({})
-            </a>
-            to generate a
-            <a
-                href="/api/classes/TableModel.html"
-                target="_blank">TableModel
-            </a>
-            , enabling the passing of various parameters such as an array of business objects (T[]) combined with
-            <a
-                href="/api/classes/ColumnDef.html"
-                target="_blank">ColumnDef[]
-            </a>
-            , or an array of arrays, and so on.
-          </li>
-          <li>Developing individual
-            <a
-                href="/api/interfaces/AreaModelIf.html"
-                target="_blank">AreaModels
-            </a>
-            for the header, body, and footer, implementing the AreaModelIf interface. These can then be assembled into a
-            TableModel using <a
-                href="/api/classes/TableFactory.html#createTableModel"
-                target="_blank">TableFactory.createTableModel({})
-            </a>.
-          </li>
-          <li>Deriving from an existing model (e.g.,
-            <a
-                href="/api/classes/AreaModelObjectArrayWithColumndefs.html"
-                target="_blank"> AreaModelObjectArrayWithColumndefs&lt;T>
-            </a>
-            ) and overriding methods as necessary.
-          </li>
-        </ol>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter"></p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter"></p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter"></p>
-      </div>
-    </div>
-  </div>
+      <!-- ── Installation ───────────────────────────────────────────── -->
+      <h2 id="installation">{T.installation}</h2>
+      <p>Install the core and, if you use a framework, its wrapper:</p>
+      <Code wrap lang="bash" frame="terminal" code={`npm install @guiexpert/table @guiexpert/react-table
+# angular-table · vue3-table · svelte-table · solid-table · preact-table · webcomponent-table`} />
 
+      <h3>Stylesheet</h3>
+      <p>
+        The core ships one stylesheet, <code>css/main.css</code>. It contains the colours as CSS variables (light and
+        dark), the classes of the rendered cells and a few helper classes.
+      </p>
+      <ul>
+        <li><strong>Bundler</strong> (Vite, webpack, esbuild): <code>import "@guiexpert/table/css/main.css";</code></li>
+        <li><strong>Plain HTML page:</strong> load it from a CDN –
+          <code>https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css</code></li>
+        <li><strong>Angular:</strong> nothing to do – the component contains the styles.</li>
+      </ul>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <h2 class="text-xl font-bold">How to start</h2>
-  </div>
+      <Callout type="pitfall" title="The host element needs a height">
+        <p>The table fills its host element completely. Without a height – fixed, <code>calc()</code> or from a flex or
+          grid layout – the element is 0 pixels high and the table stays invisible.</p>
+      </Callout>
+      <Code wrap lang="css" title="styles.css" code={`.table-div {
+  height: 500px;   /* or: height: calc(100vh - 120px); or flex: 1 in a flex column */
+}`} />
+      <p>More on bundlers, CDN use and typical mistakes: <ChapterLink slug="installation" />.</p>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-          Starting Points: the guide
-          <a href="/getstarted">getstarted</a>
-          shows you how to start with your favorite framework.
-        </p>
-      </div>
+      <!-- ── Building blocks ────────────────────────────────────────── -->
+      <h2 id="building-blocks">{T["building-blocks"]}</h2>
+      <p>
+        Every table consists of the same four parts – in plain TypeScript and in every framework: a <strong>host
+        element</strong>, a <strong>table model</strong> (what to show), <strong>table options</strong> (how it behaves
+        and looks) and a <ApiLink name="TableScope" />, which renders the table and returns the <ApiLink name="TableApi" />.
+      </p>
+      <BuildingBlocks />
+      <p>Without a framework you connect the four parts yourself:</p>
+      <Code wrap lang="ts" title="main.ts" code={`import {
+  EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope
+} from "@guiexpert/table";
+import "@guiexpert/table/css/main.css";
 
-      <div>
-        <p class="mb-4">
-          The page
-          <a href="/showcase">showcase</a>
-          gives you a demonstration of some fancy tables and their models.
-        </p>
-      </div>
+interface Order { id: number; customer: string; city: string; total: number; }
 
-      <div>
-        <p class="mb-4">
-          Everything you need to know about the Table API:
-          <a href="/api">Table API</a>
-          .
-        </p>
-      </div>
+const orders: Order[] = [
+  { id: 1, customer: "Miller Ltd.", city: "Berlin", total: 1250 },
+  { id: 2, customer: "Acme Corp.", city: "Hamburg", total: 980 }
+];
 
-      <div>
-        <p class="mb-4">
-          Our stackblitz:
-          <a href="https://stackblitz.com/@guiexperttable/collections/gui-expert-simple-examples">
-            gui-expert-simple-examples
-          </a>
-          .
-        </p>
-      </div>
-    </div>
-  </div>
+const tableModel = TableFactory.createTableModel({          // 2 · what to show
+  rows: orders,
+  properties: ["id", "customer", "city", "total"]
+});
 
+const tableScope = new TableScope(
+  document.querySelector<HTMLDivElement>("#orders")!,       // 1 · host element with a height
+  tableModel,
+  new SimpleDomService(),
+  { ...new TableOptions() },                                // 3 · how it behaves and looks
+  new EventAdapter()                                        //     events – override what you need
+);
+tableScope.firstInit();                                     // 4 · render
+const tableApi = tableScope.getApi();                       // scroll, sort, filter, export …`} />
+      <p>
+        A framework wrapper takes over step 4: you pass <code>tableModel</code> and <code>tableOptions</code> as
+        inputs or props and receive the <code>TableApi</code> with the <code>tableReady</code> event. The guides for
+        each framework are listed under <a href="#packages">{T.packages}</a>.
+      </p>
+      <Callout type="tip" title="Keep model and options stable">
+        <p>A new <code>tableModel</code> or <code>tableOptions</code> object rebuilds the table. In React create them
+          with <code>useMemo</code> (or outside the component); in Angular, Vue and Svelte keep them in a field,
+          <code>ref</code> or <code>$state</code>. To change what is shown, use the <a href="#api-events">TableApi</a>
+          – filter, sort, update rows – instead of creating a new model.</p>
+      </Callout>
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <h2 class="text-xl font-bold">Styling (Look & Feel)</h2>
-  </div>
+      <!-- ── Table model ────────────────────────────────────────────── -->
+      <h2 id="table-model">{T["table-model"]}</h2>
+      <p>
+        A table model is not a data array. It is an object that answers the questions the table asks while it
+        renders: how many rows and columns are there, what is the value of a cell, how high is a row, does a cell span
+        several columns, which CSS classes does it get. Its interface is <ApiLink name="TableModelIf" />.
+      </p>
+      <p>
+        Header and footer need answers to most of these questions, too. That is why a table model consists of
+        <strong>three area models</strong> (<ApiLink name="AreaModelIf" />) – one each for header, body and footer – plus
+        the column definitions. Fixed columns split every area again into <strong>west</strong>, <strong>center</strong>
+        and <strong>east</strong>:
+      </p>
+      <NineAreas />
 
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-          Dark mode is trendy and gives a stylish look. It’s great for the eyes, especially in the dark. On the other
-          hand, light mode is easy to read and works well for people with vision problems. </p>
-        <p>
-          Light mode is familiar and accessible to more people. It shows colors accurately, which is essential for
-          things like design and medical stuff. But dark mode looks bold, is easy on the eyes, and can save power on
-          some screens. However, it can mess up colors and isn’t always good for long reading or bright places. </p>
+      <h3>What an area model answers</h3>
+      <table class="doc-table">
+        <thead><tr><th>Method</th><th>Question</th></tr></thead>
+        <tbody>
+          <tr><td><ApiLink name="AreaModelIf.getRowCount" label="getRowCount()" /></td><td class="wrap">How many rows does the area have?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getValueAt" label="getValueAt()" /></td><td class="wrap">Which value is in row <em>r</em>, column <em>c</em>?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getRowHeight" label="getRowHeight()" /></td><td class="wrap">How high is row <em>r</em>?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getConstantRowHeight" label="getConstantRowHeight()" /></td><td class="wrap">Are all rows equally high? Then scrolling to any position takes constant time.</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getRowspanAt" label="getRowspanAt()" /></td><td class="wrap">Does the cell span several rows – or several columns (<ApiLink name="AreaModelIf.getColspanAt" label="getColspanAt()" />)?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getCustomClassesAt" label="getCustomClassesAt()" /></td><td class="wrap">Which CSS classes – or inline styles (<ApiLink name="AreaModelIf.getCustomStyleAt" label="getCustomStyleAt()" />) – does the cell get?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getCellRenderer" label="getCellRenderer()" /></td><td class="wrap">Which renderer draws the cell?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.getTooltipAt" label="getTooltipAt()" /></td><td class="wrap">Which tooltip does the cell show?</td></tr>
+          <tr><td><ApiLink name="AreaModelIf.isEditable" label="isEditable()" /></td><td class="wrap">May the user edit the cell?</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The table asks these questions only for cells that are visible. A model can therefore compute its values on
+        demand – two million rows do not require two million objects in memory.
+      </p>
+      <Callout type="note" title="Column index = model index">
+        <p>Column indices count over all three sides: west + center + east. With one fixed column on the left, the
+          first scrolling column has the index 1.</p>
+      </Callout>
 
-        <p class="mb-4">
-          There is no golden way with one style to satisfy all users. Solution: Every app should have a dark, light and
-          system theme as an option. </p>
-        <p class="mb-4">
-          GUI Expert Table has a small set of
-          <a href="https://github.com/guiexperttable/mono/blob/main/packages/table/css/table-color-classes.css">CSS
-            classes
-          </a>
-          which defines the colors of the rendered table, which uses
-          <a href="https://github.com/guiexperttable/mono/blob/main/packages/table/css/table-color-vars.css">CSS
-            variables
-          </a>
-          .
-        </p>
-        <p class="mb-4">
-          This helps you to create a dark and a light mode matching the corporate style guide of your company. </p>
-      </div>
+      <h3>Ready-made area models</h3>
+      <table class="doc-table">
+        <thead><tr><th>Class</th><th>Use it for</th><th>Training</th></tr></thead>
+        <tbody>
+          {AREA_MODELS.map(m => (
+            <tr>
+              <td><ApiLink name={m.name} /></td>
+              <td class="wrap">{m.text}</td>
+              <td class="nowrap"><ChapterLink slug={m.slug} label={chapterLabel(m.slug)} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      <div>
-        <p class="mb-4">
-          Your global app CSS should have a set of CSS variables for each theme: </p>
-        <CssVars/>
-      </div>
+      <!-- ── Create a model ─────────────────────────────────────────── -->
+      <h2 id="create-model">{T["create-model"]}</h2>
+      <p>
+        Choose the approach that matches your data. All three end in the same <ApiLink name="TableModelIf" />, and
+        they can be combined – for example a body from an object array with a footer model of your own.
+      </p>
 
-      <div class="xl:col-span-2 2xl:col-span-2">
-        <p class="mb-4">
-          It's easy to implement a theme switcher with your favorite framework.
-          Here is a simple JS example: </p>
-        <CssThemeInit/>
-      </div>
-    </div>
-  </div>
+      <h3>1 · From your data with TableFactory</h3>
+      <p>
+        <ApiLink name="TableFactory.createTableModel" /> covers most cases. Pass an array of objects with the
+        properties to show – or with full column definitions (<a href="#columns">{T.columns}</a>):
+      </p>
+      <Code wrap lang="ts" code={`const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  properties: ["id", "customer", "city", "total"]      // the columns, in this order
+});`} />
+      <p>Data that already comes as rows of values – CSV, matrices, reports – goes in as an array of arrays:</p>
+      <Code wrap lang="ts" code={`const tableModel = TableFactory.createTableModel({
+  headerData: [["Name", "City", "Age"]],                // one or more header rows
+  bodyData: [
+    ["Anna", "Berlin", 34],
+    ["Ben", "Hamburg", 28]
+  ],
+  footerData: [["", "Average", "31"]],
+  columnSizes: [200, 150, 80]
+});`} />
+      <p>All parameters: <ApiLink name="CreateTableModelPara" />.</p>
 
-  <!--
-  <div class="max-w-8xl space-y-2 pl-4 pr-4">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-          Styling table cells:
-        </p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-        </p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-        </p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
-      <div>
-        <p class="mb-4 initial-letter">
-        </p>
-      </div>
-    </div>
-  </div>
--->
+      <h3>2 · Assemble your own area models</h3>
+      <p>
+        Implement an area model when the data is computed, very large or loaded on demand – and pass it to the
+        factory as <code>bodyAreaModel</code>, <code>headerAreaModel</code> or <code>footerAreaModel</code>. The base
+        class <ApiLink name="AreaModel" /> provides sensible defaults, so only a few methods are needed:
+      </p>
+      <Code wrap lang="ts" title="million-rows-model.ts" code={`import { AreaModel, ColumnDef, TableFactory, px120, px200 } from "@guiexpert/table";
 
+class MillionRowsModel extends AreaModel {
+  constructor(private readonly rowCount: number) { super(); }
 
-</ContentSection>
+  override getRowCount(): number { return this.rowCount; }
+  override getRowHeight(_rowIndex: number): number { return 34; }
+  override getConstantRowHeight(): number | undefined { return 34; }   // constant-time scrolling
+  override getValueAt(rowIndex: number, columnIndex: number): string | number {
+    return columnIndex === 0 ? "id" + rowIndex : rowIndex * 3;          // computed on demand
+  }
+}
 
-<style>
-    a {
-        text-decoration: underline
+const tableModel = TableFactory.createTableModel({
+  bodyAreaModel: new MillionRowsModel(2_000_000),
+  columnDefs: [new ColumnDef("id", "ID", px120), new ColumnDef("value", "Value", px200)]
+});`} />
+      <p>
+        The same pattern gives you a footer with totals of the filtered rows (<ChapterLink slug="footer-totals" />)
+        or a model that loads pages from a server (<ChapterLink slug="custom-area-model" />).
+      </p>
+
+      <h3>3 · Extend an existing model</h3>
+      <p>
+        To change a single aspect, derive from a ready-made model and override one method. Here negative balances
+        get the error colour:
+      </p>
+      <Code wrap lang="ts" title="balance-model.ts" code={`import { AreaModelArrayOfArrays, TableFactory } from "@guiexpert/table";
+
+class BalanceModel extends AreaModelArrayOfArrays<string | number> {
+  override getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
+    const value = this.getValueAt(rowIndex, columnIndex);
+    return typeof value === "number" && value < 0 ? ["ge-table-color-error"] : [];
+  }
+}
+
+const tableModel = TableFactory.createTableModel({
+  headerData: [["Account", "Balance"]],
+  bodyAreaModel: new BalanceModel("body", [["Cash", 1200], ["Loan", -350]], 34),
+  columnSizes: [200, 120]
+});`} />
+      <p>
+        Spans, tooltips, renderers and editability work the same way: override
+        <ApiLink name="AreaModelIf.getRowspanAt" label="getRowspanAt()" />,
+        <ApiLink name="AreaModelIf.getTooltipAt" label="getTooltipAt()" />,
+        <ApiLink name="AreaModelIf.getCellRenderer" label="getCellRenderer()" /> or
+        <ApiLink name="AreaModelIf.isEditable" label="isEditable()" />.
+      </p>
+
+      <!-- ── Columns ────────────────────────────────────────────────── -->
+      <h2 id="columns">{T.columns}</h2>
+      <p>
+        A <ApiLink name="ColumnDef" /> describes one column: which property it shows, its header label and width,
+        alignment, renderers, sorting and editing. Use the constructor for the short form and
+        <ApiLink name="ColumnDef.create" /> for named parameters:
+      </p>
+      <Code wrap lang="ts" code={`import { ColumnDef, ColumnDefIf, TableFactory, TrueFn, px80, px120, px200 } from "@guiexpert/table";
+
+const columnDefs: ColumnDefIf[] = [
+  new ColumnDef("id", "ID", px80),                     // property, header label, width
+  ColumnDef.create({                                   // named parameters
+    property: "customer",
+    headerLabel: "Customer",
+    width: px200,
+    sortable: TrueFn
+  }),
+  ColumnDef.create({
+    property: "total",
+    headerLabel: "Total",
+    width: px120,
+    headerClasses: ["ge-table-text-align-right"],
+    bodyClasses: ["ge-table-text-align-right"],
+    sortable: TrueFn,
+    sortComparator: (a: number, b: number) => a - b
+  })
+];
+
+const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  columnDefs,
+  fixedLeftColumnCount: 1                              // "ID" stays visible while scrolling
+});`} />
+      <table class="doc-table">
+        <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><ApiLink name="ColumnDefIf.property" label="property" />, <ApiLink name="ColumnDefIf.headerLabel" label="headerLabel" /></td><td class="wrap">the value shown in the body (dot notation for nested objects, e.g. <code>address.city</code>) and the header text</td></tr>
+          <tr><td><ApiLink name="ColumnDefIf.width" label="width" />, <ApiLink name="ColumnDefIf.minWidth" label="minWidth" />, <ApiLink name="ColumnDefIf.maxWidth" label="maxWidth" /></td><td class="wrap">sizes as <ApiLink name="Size" /> – constants <code>px0</code> … <code>px500</code></td></tr>
+          <tr><td><code>headerClasses</code>, <code>bodyClasses</code>, <code>footerClasses</code></td><td class="wrap">CSS classes per area, e.g. the alignment helpers <code>ge-table-text-align-left | center | right</code></td></tr>
+          <tr><td><code>headerRenderer</code>, <code>bodyRenderer</code>, <code>footerRenderer</code></td><td class="wrap">a <ApiLink name="CellRendererIf" /> per area (<ChapterLink slug="cell-renderers" />)</td></tr>
+          <tr><td><ApiLink name="ColumnDefIf.sortable" label="sortable" />, <ApiLink name="ColumnDefIf.sortComparator" label="sortComparator" />, <ApiLink name="ColumnDefIf.sortState" label="sortState" /></td><td class="wrap">sorting by header double-click, own comparators, initial sort state</td></tr>
+          <tr><td><ApiLink name="ColumnDefIf.editable" label="editable" />, <ApiLink name="ColumnDefIf.getEditRenderer" label="getEditRenderer" />, <ApiLink name="ColumnDefIf.editInputPipe" label="editInputPipe" /></td><td class="wrap">inline editing, the editor and the conversion of the input</td></tr>
+          <tr><td><ApiLink name="ColumnDefIf.isVisible" label="isVisible" /></td><td class="wrap">hide a column (width 0) – it is skipped by clipboard and Excel export</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Fixed columns are part of the model, not of the column: <code>fixedLeftColumnCount</code> and
+        <code>fixedRightColumnCount</code> in <ApiLink name="CreateTableModelPara" /> (<ChapterLink slug="fixed-columns" />).
+      </p>
+
+      <!-- ── Options ────────────────────────────────────────────────── -->
+      <h2 id="options">{T.options}</h2>
+      <p>
+        <ApiLink name="TableOptions" /> holds the behaviour and look of a table. Start from the defaults and change only
+        what you need:
+      </p>
+      <Code wrap lang="ts" code={`import { TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),                               // all defaults …
+  hoverColumnVisible: false,                           // … and only what you change
+  columnsResizable: true,
+  columnsDraggable: true,
+  defaultRowHeights: { header: 34, body: 34, footer: 0 }
+};`} />
+      <table class="doc-table">
+        <thead><tr><th>Topic</th><th>Options</th></tr></thead>
+        <tbody>
+          {OPTION_GROUPS.map(g => (
+            <tr>
+              <td>{g.title}</td>
+              <td class="wrap">{g.names.map((n, i) => <>{i > 0 && " "}<ApiLink name={`TableOptionsIf.${n}`} label={n} /></>)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>Every option with its default value: <ApiLink name="TableOptionsIf" />. Walkthrough: <ChapterLink slug="table-options" />.</p>
+
+      <!-- ── API and events ─────────────────────────────────────────── -->
+      <h2 id="api-events">{T["api-events"]}</h2>
+      <p>
+        After the first render you receive a <ApiLink name="TableApi" /> – from <code>tableScope.getApi()</code> or the
+        <code>tableReady</code> event of a wrapper. It is the interface for everything you do with an existing table:
+      </p>
+      <table class="doc-table">
+        <thead><tr><th>Task</th><th>Methods</th></tr></thead>
+        <tbody>
+          {API_GROUPS.map(g => (
+            <tr>
+              <td>{g.title}</td>
+              <td class="wrap">{g.names.map((n, i) => <>{i > 0 && " "}<ApiLink name={`TableApi.${n}`} label={`${n}()`} /></>)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h3>Data flow: filter, sort, display</h3>
+      <p>
+        Filtering and sorting do not change your data. The body model keeps all rows and derives the displayed rows
+        from them; footer totals, clipboard and Excel export work on exactly these displayed rows.
+      </p>
+      <Pipeline />
+
+      <h3>Events</h3>
+      <p>
+        In plain TypeScript, pass an <ApiLink name="EventListenerIf" /> to the <code>TableScope</code> – usually a
+        subclass of <ApiLink name="EventAdapter" /> that overrides only the methods you need. The wrappers forward the
+        same events as outputs, props or <code>CustomEvent</code>s:
+      </p>
+      <Code wrap lang="ts" code={`import { EventAdapter, GeMouseEvent, SelectionModelIf } from "@guiexpert/table";
+
+class OrderTableEvents extends EventAdapter {
+  override onMouseClicked(evt: GeMouseEvent): void {
+    if (evt.areaIdent === "body" && evt.clickCount === 2) {
+      console.info("open the order in row", evt.rowIndex);
     }
-</style>
+  }
+
+  override onSelectionChanged(model: SelectionModelIf): void {
+    console.info("selected ranges", model.getRanges());
+  }
+}`} />
+      <table class="doc-table">
+        <thead><tr><th>Wrapper event</th><th>EventListenerIf</th><th>Payload</th><th>Note</th></tr></thead>
+        <tbody>
+          {EVENTS.map(e => (
+            <tr>
+              <td><code>{e.event}</code></td>
+              <td>{e.listener ? <ApiLink name={`EventListenerIf.${e.listener}`} label={`${e.listener}()`} /> : <span class="muted">–</span>}</td>
+              <td><code>{e.payload}</code></td>
+              <td class="wrap muted">{e.note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <!-- ── Features ───────────────────────────────────────────────── -->
+      <h2 id="features">{T.features}</h2>
+      <p>
+        Each feature is built from the concepts above – model, column definitions, options, API and events. The
+        training covers each one in a chapter of its own, with a live demo.
+      </p>
+      <table class="doc-table">
+        <thead><tr><th>Feature</th><th>How</th><th>Training</th></tr></thead>
+        <tbody>
+          {FEATURES.map(f => (
+            <tr>
+              <td>{f.feature}</td>
+              <td class="wrap">{f.text} <span class="muted">–</span> {f.api.map((n, i) => <>{i > 0 && ", "}<ApiLink name={n} label={short(n)} /></>)}</td>
+              <td class="nowrap"><ChapterLink slug={f.slug} label={`chapter ${chapterBySlug(f.slug).no}`} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <!-- ── Styling ────────────────────────────────────────────────── -->
+      <h2 id="styling">{T.styling}</h2>
+      <p>
+        All colours of the table are CSS variables with the prefix <code>--ge-table-</code>. The classes of the
+        rendered elements only reference these variables, so a theme is a set of variable values – no selectors to
+        override, no build step. <code>main.css</code> contains a light and a dark set; the table follows the
+        <code>data-theme</code> attribute of the <code>&lt;html&gt;</code> element.
+      </p>
+
+      <h3>Your own theme</h3>
+      <p>
+        Override the variables in a stylesheet that is loaded after <code>main.css</code>. CSS variables are inherited:
+        put them on <code>html</code> to theme every table, or on a class around one table to theme only that one.
+      </p>
+      <Code wrap lang="css" title="theme.css" code={`/* light theme (default) */
+.brand-table {
+  --ge-table-header-center-bg: #1e293b;
+  --ge-table-header-center-text: #f8fafc;
+  --ge-table-body-center-text: #0f172a;    /* the body text follows the header text by default */
+  --ge-table-row-even-bg: #f8fafc;          /* zebra rows */
+  --ge-table-hover-row-bg: rgba(54, 187, 108, 0.12);
+  --ge-table-body-center-selected-range-bg: rgba(54, 187, 108, 0.25);
+}
+
+/* dark theme */
+html[data-theme="dark"] .brand-table {
+  --ge-table-header-center-bg: #0b1220;
+  --ge-table-body-center-text: #e2e8f0;
+  --ge-table-row-even-bg: rgba(148, 163, 184, 0.06);
+}`} />
+
+      <h3>Light, dark and the system setting</h3>
+      <p>
+        Most applications offer light, dark and “follow the system”. Set <code>data-theme</code> in an inline script
+        before the first paint, so that the page does not flash in the wrong theme:
+      </p>
+      <Code wrap lang="html" title="index.html" code={`<script>
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const systemTheme = () => (system.matches ? "dark" : "light");
+
+  // saved choice ("light" | "dark") or, without one, the system setting
+  root.dataset.theme = localStorage.getItem("theme") ?? systemTheme();
+  system.addEventListener("change", () => {
+    if (!localStorage.getItem("theme")) root.dataset.theme = systemTheme();
+  });
+
+  // e.g. from a toggle button
+  function setTheme(theme) {
+    root.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }
+</script>`} />
+      <p>
+        The table switches with the attribute – no API call needed. Live example: <ChapterLink slug="theming-dark-mode" />;
+        several complete themes: showcase <a href="/showcase/laf/run/">Look and feel</a>.
+      </p>
+
+      <h3 id="css-variables">CSS variables</h3>
+      <p>
+        {varNames.length} variables, grouped by what they colour. Header, body and footer each have their own set per side
+        (west, center, east); west and east default to the center values.
+      </p>
+      <details class="doc-details">
+        <summary>All {varNames.length} variables with their light and dark defaults</summary>
+        {varGroups.filter(g => g.names.length).map(g => (
+          <>
+            <h4>{g.title}</h4>
+            <table class="doc-table doc-var-table">
+              <thead><tr><th>Variable</th><th>Light</th><th>Dark</th></tr></thead>
+              <tbody>
+                {g.names.map(name => (
+                  <tr>
+                    <td><code>{name}</code></td>
+                    {[lightVars.get(name), darkVars.get(name)].map(value => (
+                      <td class="wrap">
+                        {value === undefined ? <span class="muted">–</span> : (
+                          <>{isLiteral(value) && <span class="swatch" aria-hidden="true"><span style={`background:${value}`}></span></span>}<code>{value}</code></>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ))}
+      </details>
+      <p class="doc-muted">
+        Source: <a href={`${MONO_REPO}/blob/main/packages/table/css/table-color-vars.css`}>table-color-vars.css</a>.
+        From TypeScript: <ApiLink name="CssVars" />.
+      </p>
+
+      <h3 id="css-classes">CSS classes</h3>
+      <p>
+        The rendered elements carry stable class names. Use them for layout details that are not covered by a variable
+        – and in tests. Every cell also has the attributes <code>data-area</code>, <code>data-row-index</code> and
+        <code>data-col-index</code>.
+      </p>
+      <table class="doc-table">
+        <thead><tr><th>Class</th><th>Element</th></tr></thead>
+        <tbody>
+          <tr><td><code>ge-table</code></td><td class="wrap">the host element</td></tr>
+          <tr><td><code>ge-table-&lt;area&gt;-&lt;side&gt;</code></td><td class="wrap">the nine areas, e.g. <code>ge-table-body-center</code> – background and text colour</td></tr>
+          <tr><td><code>ge-table-col-div</code></td><td class="wrap">every cell, plus <code>ge-table-col-div-&lt;column index&gt;</code></td></tr>
+          <tr><td><code>ge-table-label-div</code>, <code>ge-table-label</code></td><td class="wrap">the label inside a cell (padding, ellipsis)</td></tr>
+          <tr><td><code>ge-table-text-align-left | center | right</code></td><td class="wrap">helper classes for <code>headerClasses</code>, <code>bodyClasses</code>, <code>footerClasses</code></td></tr>
+          <tr><td><code>ge-table-row-even | odd</code></td><td class="wrap">rows of the scrolling body (zebra) – <code>ge-table-column-even | odd</code> for columns</td></tr>
+          <tr><td><code>ge-table-&lt;area&gt;-&lt;side&gt;-horizontal-border</code></td><td class="wrap">grid lines – likewise <code>…-vertical-border</code></td></tr>
+          <tr><td><code>ge-table-hover-row</code>, <code>ge-table-hover-column</code></td><td class="wrap">hover highlight</td></tr>
+          <tr><td><code>ge-table-body-&lt;side&gt;-selected-range</code></td><td class="wrap">selected cells</td></tr>
+          <tr><td><code>ge-table-focus-border</code></td><td class="wrap">the border of the focused cell</td></tr>
+          <tr><td><code>ge-table-sorted-icon-div</code></td><td class="wrap">the sort icon in the header</td></tr>
+          <tr><td><code>ge-table-column-resize-handle</code>, <code>ge-table-drop-zone</code></td><td class="wrap">resizing and reordering columns</td></tr>
+          <tr><td><code>ge-table-cell-editor-input</code></td><td class="wrap">the inline editor</td></tr>
+          <tr><td><code>ge-table-tree-cell</code>, <code>ge-table-tree-deep-0</code> … <code>5</code></td><td class="wrap">tree cells and their indentation per level</td></tr>
+          <tr><td><code>ge-table-row-checkbox-div</code></td><td class="wrap">the row checkbox</td></tr>
+          <tr><td><code>ge-table-color-error</code></td><td class="wrap">error colour for text, e.g. negative values</td></tr>
+          <tr><td><code>ge-table-progress-bar</code>, <code>ge-star-rating-div</code></td><td class="wrap">built-in renderers</td></tr>
+        </tbody>
+      </table>
+      <Callout type="tip" title="Styling single cells">
+        <p>Classes for a whole column go into the column definition (<code>bodyClasses</code>). Classes or styles that
+          depend on the value come from the area model: <ApiLink name="AreaModelIf.getCustomClassesAt" label="getCustomClassesAt()" /> and
+          <ApiLink name="AreaModelIf.getCustomStyleAt" label="getCustomStyleAt()" /> (<ChapterLink slug="heatmap" />).</p>
+      </Callout>
+
+      <!-- ── Performance ────────────────────────────────────────────── -->
+      <h2 id="performance">{T.performance}</h2>
+      <p>The table is fast by default. These points keep it fast with very large data and frequent updates:</p>
+      <ul class="doc-checklist">
+        <li><strong>Constant row height.</strong> If all rows have the same height, return it from
+          <ApiLink name="AreaModelIf.getConstantRowHeight" label="getConstantRowHeight()" /> in your own models. The table
+          then finds the first visible row directly instead of adding up the heights of all rows above it. The built-in
+          models do this automatically.</li>
+        <li><strong>Stable model and options.</strong> Create them once; a new object rebuilds the table (see
+          <a href="#building-blocks">{T["building-blocks"]}</a>).</li>
+        <li><strong>Filter, don't rebuild.</strong> Use <ApiLink name="TableOptionsIf.externalFilterFunction" label="externalFilterFunction" />
+          and <ApiLink name="TableApi.externalFilterChanged" label="externalFilterChanged()" /> instead of a new model with fewer rows.</li>
+        <li><strong>Update cells, not tables.</strong> For changing values use <ApiLink name="TableApi.updateCells" label="updateCells()" /> –
+          only the changed cells that are visible are redrawn.</li>
+        <li><strong>Lazy values.</strong> <code>getValueAt()</code> and renderers are called for visible cells only. Compute
+          expensive values there instead of preparing them for all rows.</li>
+        <li><strong>Clean up.</strong> Renderers that attach listeners or framework components return a cleanup function.
+          Call <ApiLink name="TableApi.destroy" label="destroy()" /> before you remove a table you created with <code>TableScope</code>; the
+          wrappers do it for you.</li>
+      </ul>
+      <p>Measure it yourself: showcases <a href="/showcase/large/run/">Large dataset</a> (2 million rows) and
+        <a href="/showcase/fps/run/">Render speed</a>.</p>
+
+      <!-- ── Limits ─────────────────────────────────────────────────── -->
+      <h2 id="limits">{T.limits}</h2>
+      <p>
+        GuiExpert Table concentrates on rendering, models and interaction. Some things are deliberately left to the
+        application, others are not available yet. The usual approach for each:
+      </p>
+      <table class="doc-table">
+        <thead><tr><th>Topic</th><th>Approach</th></tr></thead>
+        <tbody>
+          <tr><td>Filter UI</td><td class="wrap">your own inputs – the table provides <ApiLink name="TableOptionsIf.externalFilterFunction" label="externalFilterFunction" /> (<ChapterLink slug="filtering" />)</td></tr>
+          <tr><td>Context menu</td><td class="wrap">the <code>contextmenu</code> event plus a menu in the style of your app (<ChapterLink slug="events-and-context-menu" />)</td></tr>
+          <tr><td>Pagination</td><td class="wrap">not needed for display thanks to virtual scrolling; to load data page by page, use an own area model (<ChapterLink slug="custom-area-model" />)</td></tr>
+          <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend</td></tr>
+          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="ColumnDefIf.isVisible" label="isVisible" /> in the column definition, then <ApiLink name="TableApi.repaint" label="repaint()" />; <code>TableApi.setColumnVisible()</code> is not implemented yet</td></tr>
+          <tr><td>Row drag and drop</td><td class="wrap">not available</td></tr>
+        </tbody>
+      </table>
+      <p>A checklist for planning your own table – and for deciding when another product fits better:
+        <ChapterLink slug="checklist" />.</p>
+
+      <!-- ── Help ───────────────────────────────────────────────────── -->
+      <h2 id="help">{T.help}</h2>
+      <div class="chapter-cards doc-help">
+        <a class="chapter-card doc-card" href="https://stackoverflow.com/questions/tagged/guiexpert-table">
+          <span class="card-no">QUESTIONS</span>
+          <b>Stack Overflow</b>
+          <p>Ask with the tag <code>guiexpert-table</code> – answers stay findable for others.</p>
+        </a>
+        <a class="chapter-card doc-card" href={MONO_REPO}>
+          <span class="card-no">SOURCE CODE</span>
+          <b>GitHub</b>
+          <p>Core, all wrappers, demos and this website in one repository. Bug reports and ideas are welcome.</p>
+        </a>
+        <a class="chapter-card doc-card" href="https://stackblitz.com/@guiexperttable/collections/gui-expert-simple-examples">
+          <span class="card-no">PLAYGROUND</span>
+          <b>StackBlitz</b>
+          <p>Small examples to fork and try in the browser – no local setup.</p>
+        </a>
+        <a class="chapter-card doc-card" href="mailto:feedback@gui.expert?subject=guiexpert-table">
+          <span class="card-no">FEEDBACK</span>
+          <b>feedback@gui.expert</b>
+          <p>Missing a feature, a framework or an example? Let us know.</p>
+        </a>
+      </div>
+      <p>
+        GuiExpert Table is MIT-licensed and free to use, also in commercial applications – details on the
+        <a href="/license/">licence page</a>.
+      </p>
+    </div>
+  </article>
+
+  <aside class="training-toc" aria-label="On this page">
+    <p>On this page</p>
+    <ol id="doc-toc-list">{SECTIONS.map(s => <li><a href={`#${s.id}`}>{s.title}</a></li>)}</ol>
+    <p class="toc-extra"><a href="/training/">Training →</a></p>
+    <p class="toc-extra"><a href="/api/">API reference →</a></p>
+    <p class="toc-extra"><a href="/showcase/">Showcases →</a></p>
+  </aside>
+</div>
+
+<script>
+  // "On this page": highlight the section in view
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("#doc-toc-list a")];
+  const headings = document.querySelectorAll<HTMLHeadingElement>(".doc-article h2[id]");
+  const observer = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${e.target.id}`));
+    }
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  headings.forEach(h => observer.observe(h));
+</script>

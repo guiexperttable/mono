@@ -18,5 +18,5 @@
     "paths": { "@guiexpert/table": ["../../packages/table/dist/index.d.ts"], "@guiexpert/table/css/*": ["../../packages/table/css/*"] }
   },
   "include": ["src/training/**/*.ts", "src/env.d.ts"],
-  "exclude": ["src/training/examples/**"]
+  "exclude": ["training-examples/**"]
 }

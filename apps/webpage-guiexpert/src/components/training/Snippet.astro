@@ -22,11 +22,16 @@ interface Props {
   mark?: string | number | (string | number)[];
 }
 
-const files = import.meta.glob<string>("/src/training/{demos,examples}/**/*", { query: "?raw", import: "default", eager: true });
+// demos/… → src/training/demos (compiled and run); examples/… → training-examples (display only).
+// The framework examples live OUTSIDE src/ on purpose: Astro's dependency scan covers src/**, and
+// react, vue, svelte, … are not dependencies of this website.
+const demoFiles = import.meta.glob<string>("/src/training/demos/**/*", { query: "?raw", import: "default", eager: true });
+const exampleFiles = import.meta.glob<string>("/training-examples/**/*", { query: "?raw", import: "default", eager: true });
 
 const { file, region, title, mark } = Astro.props;
-const source = files[`/src/training/${file}`];
-if (source === undefined) throw new Error(`Snippet: file src/training/${file} not found`);
+const path = file.startsWith("examples/") ? `/training-examples/${file.slice("examples/".length)}` : `/src/training/${file}`;
+const source = file.startsWith("examples/") ? exampleFiles[path] : demoFiles[path];
+if (source === undefined) throw new Error(`Snippet: file ${path.slice(1)} not found`);
 
 const MARKER = /^\s*(\/\/|<!--|\/\*)\s*#(end)?region\b.*$/;
 

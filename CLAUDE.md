@@ -322,7 +322,6 @@ apps/webpage-guiexpert/src/
 ├── training/chapters.ts        # Register: Teile, Kapitel (slug, Titel, Lead, Lernziele, Folge, API-Symbole, Showcases, since)
 ├── training/demos/*.ts         # eine Live-Demo pro Datei: export default (ctx: DemoContext) => cleanup?
 │   └── shared/                 # orders.ts (Testdaten, fester Seed), order-columns.ts, order-totals-footer.ts, demo.ts, demo.css
-├── training/examples/          # Framework-Code aus dem Demo-Repo – nur Anzeige, wird NICHT kompiliert
 ├── training/api-index.json     # generiert (scripts/build-api-index.mjs) aus dem typedoc-JSON
 ├── training/runtime.ts         # startet Demos per Klick (?demos = alle sofort, für Screenshots)
 ├── components/training/        # Snippet, LiveDemo, ApiLink, ChapterLink, Callout, Figure, TrainingNav, diagrams/*.astro (SVG)
@@ -330,6 +329,11 @@ apps/webpage-guiexpert/src/
 ├── pages/training/index.astro + <slug>.astro (ein File pro Kapitel)
 └── assets/training/shots/      # demo-<name>-light|dark.png (Poster der Live-Demos), fw-*.png (Framework-Demos)
 ```
+
+`apps/webpage-guiexpert/training-examples/` enthält den Framework-Code aus dem Demo-Repo (React, Vue, Svelte, …) –
+nur Anzeige (`<Snippet file="examples/…" />`), wird nicht kompiliert. Er liegt **bewusst außerhalb von `src/`**:
+Astro scannt beim Dev-Start `src/**` nach Abhängigkeiten, und die Frameworks sind keine Dependencies der Website
+(sonst: „Failed to run dependency scan … react … could not be resolved“).
 
 - **Code auf der Seite = Code der Demo**: `<Snippet file="demos/x.ts" region="r" />` zeigt den Bereich zwischen
   `// #region r` und `// #endregion r` (mehrere gleichnamige Blöcke werden zusammengefügt). Anzeige-Umschreibungen:

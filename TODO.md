@@ -156,7 +156,76 @@
 - [x] Repository-Links (README der Pakete, `llms.txt`, Website, `package.json` → `repository`) von `ge-table` bzw.
       `angular-XX-table` auf `guiexperttable/mono` umstellen. `public/llms.txt` verlinkt
       `guiexperttable/angular-table` (existiert nicht).
-- [ ] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen.
+- [x] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen. → Vitest 5 in `packages/table`
+      (Phase 0 + 1 von `TESTPLAN`, Okt. 2026): 74 Unit-Specs (Node, ~2 s) + 1 Browser-Spec (Chromium); dafür Vite
+      6.3.4 → 6.4.4 in allen Paketen (Builds byte-identisch). Siehe CLAUDE.md §6.
+- [ ] Tests Phase 2: Browser-Tests für `RenderScope`/`TableScope`/`TableApi`, Renderer, Maus/Tastatur, CRUD-Dialoge
+      (heute ~38 % Zeilenabdeckung im Rendering-Teil, DOM-freie Teile 92–100 %).
+- [ ] Tests Phase 3: `ci.yml` um `test:types`, `test:unit`, `test:browser` (+ `playwright install --with-deps chromium`)
+      ergänzen; `npm-publish.yml` erst nach grünen Tests veröffentlichen lassen (Release = npm-Publish!).
+- [ ] Später: Vite 7/8 (ändert das ausgelieferte Bundle; Vite 8 = Rolldown, `vite-plugin-babel` warnt) – erst mit
+      ausreichend Browser-Tests. `ts-todo-demo` (Vite 6.2.6) und preact-/solid-Demo (Vite ^5) noch nicht angeglichen.
+
+## Gefunden durch die Unit-Tests (Okt. 2026)
+
+Jeder Punkt ist in einem Spec als `it.fails('<richtiges Verhalten>')` + `// BUG:` festgehalten: der Test ist grün,
+solange der Fehler besteht, und wird rot, sobald er behoben ist → dann `it.fails` in `it` umwandeln.
+Alle 42 vom unabhängigen Review bestätigt (2 davon „diskutabel“, markiert). Fragwürdiges, aber evtl. gewolltes
+Verhalten steht als `// NOTE:` in den Specs.
+
+**Hohe Wirkung (normale Bedienung im Browser):**
+- [ ] **Tastatur-Shortcuts komplett kaputt** (`action/shortcut.service.ts:126`): `findEntity` vergleicht das Event mit
+      sich selbst → **jede** Taste löst den ersten Eintrag aus (`START_EDITING`), auch Strg+C, Strg+A, Pfeile und
+      eigene `shortcutActionIdMapping`-Einträge. Im echten Chromium geprüft. Fix: `harmonizeShortcut(key)` statt
+      `createHarmonizedShortcutByKeyboardEvent(evt)`. **Gleichzeitig** die Pfeil-Schlüssel angleichen: Mappings nutzen
+      `"arrowup"`, das Event ergibt `"up"` (`windows-/osx-shortcut-actionId-mapping.ts`) – sonst ist danach die
+      Pfeil-Navigation kaputt. Specs: `shortcut.service.spec.ts`, `*-shortcut-actionId-mapping.spec.ts`.
+- [ ] **Strg/⌘-Klick ergänzt die Selektion nicht** (`selection/selection-service.ts:85`): jeder Klick ohne Shift
+      leert vorher die Selektion; Strg+Alt-Klick („Zelle abwählen“) arbeitet dadurch immer auf leerer Selektion.
+- [ ] **Strg+A, Strg+C kopiert nur eine Zelle** (`service/copy-service.ts:31`): `selectAll()` setzt nur ein Flag,
+      keine Range.
+- [ ] **Baum + Filter** (`data/tablemodel/areamodel/area-model-tree.ts`): Aufklappen/Zuklappen
+      (`recalcVisibleTreeRows`, `:50`) verwirft den Filter; ein Filter nach dem Aufklappen findet die neuen Zeilen nicht
+      (`flattenRows` veraltet); `doSort` (`:131`) verwirft den Filter – und weil `externalFilterChanged` danach neu
+      sortiert, wirkt ein Filter auf einem sortierten Baum gar nicht. `doSort([])` (`:124`) wirft einen TypeError
+      (erreichbar über `api.reSort()`).
+- [ ] **Abgewählte Zellen lassen sich nie wieder auswählen** (`selection/selection-model.ts:179/202`): negative Ranges
+      werden nur von `clear()` entfernt → `togglePoint` (Leertaste), `addSelection` nach `removeSelection`,
+      `MultiRowsSelectionModel.toggleRow`, `selectAll()` betroffen. `removeSelection` einer mehrzeiligen Range bei Typ
+      `row` entfernt nur die erste Zeile.
+- [ ] **`getMergedRowIndices()` hängt** bei Selektionstyp `column` (Schleife bis `MAX_SAFE_INTEGER`,
+      `selection-model.ts:146`) – nicht als Test möglich. Außerdem unsortiert (Doku: „sorted“) und prüft negative
+      Ranges nur in Spalte 0.
+
+**Mittel:**
+- [ ] Mehrspaltiges `doSort([a, b])` (`area-model-object-array.ts:533`): das **letzte** Item wird Primärschlüssel
+      (JSDoc: „name desc, then age asc“).
+- [ ] Variable Zeilenhöhen: `TableModel.getAreaHeight` (`table-model.ts:275`) ignoriert `getRowHeight()`, sobald
+      `defaultRowHeights.body` gesetzt ist (Factory setzt immer 34) → falsche Scrollhöhe; `AbstractAreaModel.getYPosByRowIndex`
+      (`abstract-area-model.ts:95`) ignoriert ein überschriebenes `getRowHeight()` → `scrollToIndex` daneben.
+- [ ] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): `setValue` schreibt bei aktivem Filter in die falsche Zeile
+      (`:46`); `changeColumnOrder` verschiebt ausgefilterte Zeilen nicht mit (`:70`) – Spalten-Drag ist Standard.
+- [ ] `ColumnDef`-Konstruktor überschreibt `minWidth`/`maxWidth` bei %-Breiten (`column-def.ts:62`).
+- [ ] `createTableModel({headerData, bodyData})` ohne `columnSizes` → Spaltenbreiten −1 (`table-model.ts:512`).
+- [ ] `CoverGridBodyModel`: Breite < 1 Cover → 0 Spalten → `getRowCount() = Infinity` (`:44`); leere Extrazeile bei
+      voller letzter Zeile (`:40`, `floor+1` statt `ceil`).
+- [ ] Header-Gruppen (`AreaModelCellGroups`, WIP): zugeklappte Gruppe überdeckt ihr „always“-Kind (`:130/168`).
+- [ ] Excel-Export: `NaN`/`Infinity` als `<v>NaN</v>` → Excel meldet defekte Datei (`excel-service.ts:194`).
+
+**Gering:**
+- [ ] `setValue` auf verschachteltem Pfad mit fehlendem Elternobjekt überschreibt das Elternfeld
+      (`abstract-area-model.ts:157`).
+- [ ] `setColumnWidth` aktualisiert die x-Positionen nicht (`table-model.ts:119`) → `GeMouseEvent.columnLeft` veraltet.
+- [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`); `buildByTypedRows(rows, [])` wirft
+      (`table-factory.ts:371`).
+- [ ] `TreeFactory`: `deepMaxLimit` off-by-one (`tree-factory.ts:98`); `TreeCheckboxModel.checkAll()` endlose Rekursion
+      (`tree-checkbox-model.ts:29`).
+- [ ] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei).
+- [ ] `CssVars` Blackboard-Theme: Tippfehler `otransparent` (`css-vars.ts:225`).
+- [ ] `SchemeGenerator.renderTypeScriptInterfaces` liefert beim zweiten Aufruf `[]` (`scheme-generator-service.ts:83`).
+- [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
+      `CellGroupExt.getColumnIndex` (unfertig).
+- [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

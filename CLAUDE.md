@@ -49,6 +49,7 @@ mono/
 |---|---|
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
+| Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
 | Alle Bibliotheken | `pnpm build:libs` |
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
@@ -63,6 +64,8 @@ mono/
   die `vite-plugin-babel` brechen.
 - `@babel/core: ~7.28.6` steht als devDependency in allen Paketen mit `vite-plugin-babel` – sonst erfüllt pnpm die
   Peer-Dependency mit Babel 8 aus `@angular/compiler-cli@22`.
+- Vite **6.4.4** (exakt gepinnt) in allen Paketen/Demos – Vitest 5 braucht ≥ 6.4. Nicht ohne Weiteres auf 7/8 heben:
+  das ändert das ausgelieferte Bundle (Vite 8 = Rolldown, `vite-plugin-babel` warnt), s. `TODO.md`.
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
 - Website (Astro 7): Tailwind 3 läuft über `postcss.config.cjs` + `src/styles/tailwind.css` – `@astrojs/tailwind` unterstützt
@@ -225,11 +228,34 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   HTML nach `apps/webpage-guiexpert/public/api` (`index.html` → `overview.html`, weil `/api/` die Astro-Seite `api.astro` ist),
   JSON nach `src/content/docs/doctype.json`, Link-Index `src/training/api-index.json` (s. §11). Konfiguration: `typedoc.json`,
   Startseite: `typedoc-readme.md`.
-- Es gibt praktisch **keine Unit-Tests**. Verifikation heute: Builds + Demo-Apps + Website-Showcases
+- **Tests (Core, Vitest 5)** – `packages/table`, Konfiguration `vitest.config.ts` (unabhängig von `vite.config.ts`):
+  | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
+  |---|---|
+  | `test` | Unit + Browser |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.350 Tests) |
+  | `test:browser` | echtes Chromium (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
+  | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
+  - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
+    `browser`, Helfer `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `destroyAllTables`).
+    Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`) – nie im npm-Paket.
+  - Importe wie Anwender: `from '@guiexpert/table'` (Alias → `src/index.ts`).
+  - Unit-Projekt läuft mit `isolate: false` (geteilter Modulzustand je Worker, sonst ~18 s statt ~2 s): keine
+    Zustandsreste zwischen Tests, Singletons im `beforeEach` zurücksetzen; `test-utils/unit-setup.ts` stellt Timer,
+    Globals und Mocks nach jedem Test zurück. Reihenfolge-Unabhängigkeit prüfen mit `test:unit --sequence.shuffle`.
+  - **Charakterisierungstests**: Specs halten das heutige Verhalten fest. Bekannte Fehler stehen als
+    `it.fails('<richtiges Verhalten>')` + `// BUG:` (grün, solange der Fehler besteht; nach dem Fix rot → `it.fails`
+    in `it` umwandeln). Liste: `TODO.md` „Gefunden durch die Unit-Tests“. Fragwürdiges, evtl. gewolltes Verhalten:
+    `// NOTE:`. **Jeder Bugfix bekommt zuerst einen roten Test.**
+  - `src/index.spec.ts` hält alle Exportnamen als Snapshot fest: neuer Export → `pnpm exec vitest run -u src/index.spec.ts`
+    und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
+  - Abdeckung (Okt. 2026): DOM-freie Teile (`data/`, `factory/`, `selection/`, `service/`, `action/` …) 92–100 %,
+    Rendering (`RenderScope`/`TableScope`/`TableApi`/Renderer) erst ~38 % → Browser-Tests sind der nächste Schritt (`TODO.md`).
+  - CI führt die Tests noch **nicht** aus (`ci.yml` baut nur) – s. `TODO.md`.
+- Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
   (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 26 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
-- Wer Tests ergänzt: Vitest passt zum Vite-Setup; Area-Modelle/Factories/SelectionModel sind DOM-frei testbar.
 
 ## 7. Offene Punkte
 

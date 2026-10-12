@@ -27,6 +27,12 @@
     "typedoc:docs-html": "npx typedoc --out ../../apps/table-website/src/assets/docs",
     "typedoc:docs-md": "npx typedoc --plugin typedoc-plugin-markdown --out ../../apps/table-website/src/assets/docsmd",
     "docs:check": "node scripts/check-doc-examples.mjs",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:browser": "vitest run --project browser",
+    "test:watch": "vitest --project unit",
+    "test:coverage": "vitest run --coverage",
+    "test:types": "tsc -p tsconfig.spec.json --noEmit",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -59,6 +65,10 @@
     "typedoc-plugin-rename-defaults": "^0.7.0",
     "typedoc-plugin-markdown": "3.17.1",
     "typescript": "5.2.2",
-    "@babel/core": "~7.28.6"
+    "@babel/core": "~7.28.6",
+    "vitest": "5.0.4",
+    "@vitest/browser-playwright": "5.0.4",
+    "@vitest/coverage-v8": "5.0.4",
+    "playwright": "1.64.0"
   }
 }

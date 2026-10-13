@@ -21,7 +21,7 @@ export class CheckboxCellRenderer implements CellRendererIf {
       domService.addClass(cellDiv, "ge-table-row-checkbox-div");
       const rowChecked = areaModel.isRowChecked(rowIndex);
       const checked = (rowChecked === "full") ? "checked" : "";
-      const semi = (rowChecked === "semi") ? "<span style=\"opacity: 0.4;\">✓<span>" : "";
+      const semi = (rowChecked === "semi") ? "<span style=\"opacity: 0.4;\">✓</span>" : "";
       cellDiv.innerHTML = `
         <input
             type="checkbox"

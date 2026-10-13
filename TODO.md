@@ -230,8 +230,8 @@ Verhalten steht als `// NOTE:` in den Specs.
       (`AbstractAreaModel.sort`) · Filter-Prädikat läuft bei jedem Auf-/Zuklappen über alle Knoten (1 Mio. Knoten ≈ 110 ms;
       `keep` hängt nicht vom Aufklapp-Zustand ab → nur bei Filteränderung neu berechnen) und bei aktiver Sortierung doppelt
       · `AreaModelTree.getRowCount()` prüft `isVisible` je Zeile (könnte die Array-Länge liefern) ·
-      `TreeCheckboxModel.checkAll()` O(n²) bei vielen Geschwistern · zwei Klicks < 500 ms auf das „alle auf/zu“-Icon bzw.
-      denselben Pfeil gelten als Doppelklick (`mouse-handler.ts:89`) · Eltern ohne sichtbare Kinder (gefiltert) zeigen
+      `TreeCheckboxModel.checkAll()` O(n²) bei vielen Geschwistern · (zwei Klicks < 500 ms auf „alle auf/zu“ bzw.
+      denselben Pfeil galten als Doppelklick – behoben, Branch `fix/mouse`) · Eltern ohne sichtbare Kinder (gefiltert) zeigen
       trotzdem einen Pfeil · Mehrspalten-Sortierung im Baum nutzt nur das letzte Item · keine `TableApi`-Methode zum
       Auf-/Zuklappen (heute `TableScope.toggleExpandCollapseAll` bzw. `recalcVisibleTreeRows()` + `repaintHard()`).
 - [x] **Abgewählte Zellen lassen sich wieder auswählen** (`selection-model.ts`): „letzte Operation je Zelle gewinnt“ –
@@ -300,15 +300,19 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
       gerenderte Zeile blieb mit ihren Zellen referenziert) – jeder Render-Durchlauf vergisst nicht gezeichnete Zeilen.
 
 **Maus**
-- [ ] Scroll-Viewport überdeckt den Footer (`ele-scope.ts:162`): Footer-Klicks/-Hover kommen als Body-Events mit −1 an
-      · Doppelklick-Sortierung: Event wird nach dem Repaint veröffentlicht – `areaIdent`/`sideIdent` undefined
-      (`mouse-handler.ts:167/201`, `table-scope.ts:317`) · Spalten-Drag: schneller Drag zeigt falsche Spalte im Ghost
-      (`table-scope.ts:384/393`), Ghost rendert **alle** Body-Zeilen der Spalte (`render-scope.ts:1433`), Style-Tippfehler
-      `'overfllow'` – Ghost nicht beschnitten (`render-scope.ts:1385`) · Hover über Header markiert Body-Zeile 0
-      (`render-scope.ts:1253`) · Hover-Spalte einer fixierten West-Spalte nach horizontalem Scrollen verschoben
-      (`render-scope.ts:1297`) · zweiter Klick auf dieselbe Zeilen-Checkbox < 500 ms wird als Doppelklick verschluckt
-      (`mouse-handler.ts:89`; DOM und Modell laufen auseinander) · Header-Checkbox von `CheckboxColumnDef` hakt nichts an
-      (`table-scope.ts:491`).
+- [x] Behoben (Branch `fix/mouse`): Footer-Klicks/-Hover kamen als Body-Events mit −1 an (der Scroll-Viewport liegt
+      über dem Footer, seine waagerechte Scrollleiste muss bedienbar bleiben) – `TableScope.getMouseEventTarget()` sucht
+      das Footer-Element unter dem Zeiger · Doppelklick-Sortierung: Event wurde nach dem Repaint erzeugt (`areaIdent`
+      undefined) · Spalten-Drag: schneller Drag zeigte die falsche Spalte im Ghost, Ghost renderte **alle** Body-Zeilen
+      (jetzt nur die sichtbaren, an ihrer Position), `'overfllow'` – Ghost nicht beschnitten · Hover über Header
+      markierte Body-Zeile 0 · Hover-Spalte fixierter West-/Ost-Spalten nach horizontalem Scrollen verschoben · zweiter
+      Klick auf dieselbe Checkbox (bzw. Baum-Pfeil, „alle auf/zu“, Header-Gruppe) < 500 ms wurde als Doppelklick
+      verschluckt – Aktions-Klicks zählen jetzt nie als Doppelklick · Header-Checkbox von `CheckboxColumnDef` hakte nichts
+      an – jetzt alle Body-Zeilen an/ab, zeigt „full“/„semi“/„none“ · `onCheckboxChanged` bekommt eine Kopie der Zeilen
+      (vorher das interne Array, das sich mit dem nächsten Klick änderte) · „semi“-Markup ohne schließendes `</span>`.
+- [ ] Footer: bei klassischen (nicht überlagerten) Scrollleisten, z. B. Windows, verdeckt die waagerechte Scrollleiste den
+      unteren Teil des Footers, die senkrechte liegt unter der Ost-Area (`z-index: 999`). Layout ändern (Viewport ohne
+      Footer/Ost-Area) – vorher in Windows/Linux-Browsern prüfen.
 
 **Renderer & Editor**
 - [x] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle; fehlendes Anführungszeichen
@@ -387,6 +391,10 @@ Objekt-Tabelle hat `ge-focused-row`.
   ab dem ersten Zeichnen und nach jedem Host-Resize (vorher 400 px bis ~500 ms nach dem Mounten bzw. eine Runde
   hinterher) und lassen Platz für die senkrechte Scrollleiste. `scrollToIndex()` trifft die Zeile exakt (auch mit Footer).
   Ost-Trennlinie bei nur rechts fixierten Spalten.
+- **Maus**: Footer-Zellen melden Klick/Hover/Kontextmenü als Footer-Events (vorher Body mit −1); zwei schnelle Klicks
+  auf eine Checkbox, einen Baum-Pfeil, „alle auf/zu“ oder eine Header-Gruppe schalten zweimal um (vorher wurde der
+  zweite als Doppelklick verschluckt); die Header-Checkbox einer `CheckboxColumnDef` hakt alle Body-Zeilen an/ab;
+  `onCheckboxChanged` bekommt eine Kopie des Arrays; ein Doppelklick, der sortiert, meldet `areaIdent` "header".
 - **Datums-Renderer**: ein ungültiges Datum wird unverändert angezeigt (vorher leerte es bei `DateToIsoCellRenderer`/
   `DateToTecCellRenderer` die ganze Tabelle, `DateToLocaleDateCellRenderer` zeigte „Invalid Date“). Baum: Einrückung
   bis Tiefe 9 (Tiefe 5 war wie Tiefe 6 eingerückt).

@@ -80,22 +80,26 @@ export class MouseHandler {
    */
   private onHostElementClicked(event: MouseEvent) {
     const now = Date.now();
+    const eventTarget = this.tableScope.getMouseEventTarget(event); // a footer cell below the scroll viewport
     // a double click = two clicks on the SAME cell within doubleClickDelay
     // (before, two quick clicks on different cells – e.g. two tree arrows – swallowed the second one)
-    const target = event.target as HTMLElement | null;
+    const target = eventTarget instanceof Element ? eventTarget : null;
     const cellKey = target?.closest?.('[data-col-index]')
       ? ['data-area', 'data-row-index', 'data-col-index']
         .map(key => target.closest('[' + key + ']')?.getAttribute(key) ?? '').join(':')
       : '';
-    if (now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey) {
-      this.lastClicked = now;
-      this.publishGeMouseEvent(event, 2);
-      return; // skipped
-    }
+    const secondClick = now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey;
     this.lastClicked = now;
     this.lastClickedCellKey = cellKey;
 
-    const mouseTargetData: MouseTargetData = new MouseTargetData(event.target, this.tableScope);
+    const mouseTargetData: MouseTargetData = new MouseTargetData(eventTarget, this.tableScope);
+    if (secondClick && !this.isClickAction(mouseTargetData)) {
+      // the second click of a double click: only reported – the "dblclick" event does the work (sort, edit, toggle).
+      // A click on a checkbox, an arrow or a toggle icon is no part of a double click: two quick clicks = two toggles.
+      this.publishGeMouseEvent(event, 2);
+      return;
+    }
+
     if (mouseTargetData.action === 'toggleExpandCollapseAll') {
       this.expandedAll = !this.expandedAll;
       this.tableScope.toggleExpandCollapseAll(this.expandedAll);
@@ -138,8 +142,16 @@ export class MouseHandler {
       this.tableScope.focusModel()?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }
 
-    this.publishGeMouseEvent(event, 1);
+    this.publishGeMouseEvent(event, secondClick ? 2 : 1);
   };
+
+  /** A click that triggers an action on its own: row checkbox, tree arrow, "expand/collapse all", header group toggle. */
+  private isClickAction(mouseTargetData: MouseTargetData): boolean {
+    return mouseTargetData.action === 'toggleExpandCollapseAll'
+      || mouseTargetData.action === 'toggleHeaderGroup'
+      || (mouseTargetData.inputType === 'checkbox' && !!mouseTargetData.areaIdent)
+      || mouseTargetData.className.includes('ge-table-tree-arrow-div');
+  }
 
 
   /**
@@ -149,12 +161,14 @@ export class MouseHandler {
    * @param {MouseEvent} event - The double click event.
    */
   private onHostElementDblClicked(event: MouseEvent) {
-    // console.log('ONHOSTELEMENTDBLCLICKED', event);
     this.lastClicked = Date.now();
+    const eventTarget = this.tableScope.getMouseEventTarget(event);
+    // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
+    const geMouseEvent = this.tableScope.createGeMouseEvent(event);
 
-    if (event.target instanceof HTMLElement) {
+    if (eventTarget instanceof HTMLElement && !this.isClickAction(new MouseTargetData(eventTarget, this.tableScope))) {
       // the target may be an element inside the cell (renderer, component) → look up the cell attributes
-      const target = (event.target.closest("[data-col-index]") ?? event.target) as HTMLElement;
+      const target = (eventTarget.closest("[data-col-index]") ?? eventTarget) as HTMLElement;
       const area = target.closest("[data-area]")?.getAttribute("data-area") ?? null;
       const areaIdent: AreaIdent = getAreaIdentByString(area);
       const rowIdx = Number(target.closest("[data-row-index]")?.getAttribute("data-row-index"));
@@ -198,7 +212,7 @@ export class MouseHandler {
       }
     }
 
-    this.publishGeMouseEvent(event, 2);
+    this.publishGeMouseEvent(event, 2, geMouseEvent);
   };
 
 
@@ -210,10 +224,10 @@ export class MouseHandler {
    *
    * @return {void}
    */
-  private publishGeMouseEvent(event: MouseEvent, clickCount: number) {
+  private publishGeMouseEvent(event: MouseEvent, clickCount: number, geMouseEvent?: GeMouseEvent) {
     this.mouseEvent = event;
     this.geMouseEventOld = this.geMouseEvent?.clone();
-    this.geMouseEvent = this.tableScope.createGeMouseEvent(event);
+    this.geMouseEvent = geMouseEvent ?? this.tableScope.createGeMouseEvent(event);
     if (this.geMouseEvent) {
       this.geMouseEvent.clickCount = clickCount;
     }

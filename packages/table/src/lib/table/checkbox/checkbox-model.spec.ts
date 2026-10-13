@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { CheckboxModel } from '@guiexpert/table';
+import { CheckboxColumnDef, CheckboxModel, ColumnDef, TableFactory, px100 } from '@guiexpert/table';
+import type { ColumnDefIf } from '@guiexpert/table';
 
 interface Item {
   id: number;
@@ -138,5 +139,41 @@ describe('CheckboxModel', () => {
       expect(cm.getCheckedRows()).toEqual([]);
       expect(cm.isRowChecked(b)).toBe('none');
     });
+  });
+});
+
+describe('header checkbox of a CheckboxColumnDef (all body rows)', () => {
+
+  function model(rowCount = 4) {
+    const rows = Array.from({ length: rowCount }, (_, id) => ({ id }));
+    const columnDefs = [new CheckboxColumnDef(), ColumnDef.create({ property: 'id', width: px100 })] as ColumnDefIf[];
+    const tm = TableFactory.createTableModel({ rows, columnDefs });
+    return { rows, header: tm.getAreaModel('header'), body: tm.getAreaModel('body') };
+  }
+
+  it('shows none / semi / full', () => {
+    const { header, body } = model();
+    expect(header.isRowChecked(0)).toBe('none');
+    body.setRowChecked(1, true);
+    expect(header.isRowChecked(0)).toBe('semi');
+    [0, 2, 3].forEach(r => body.setRowChecked(r, true));
+    expect(header.isRowChecked(0)).toBe('full');
+    body.setRowChecked(2, false);
+    expect(header.isRowChecked(0)).toBe('semi');
+  });
+
+  it('checking it checks all body rows (keeping the order of the checked ones), unchecking unchecks all', () => {
+    const { header, body, rows } = model();
+    body.setRowChecked(2, true);
+    header.setRowChecked(0, true);
+    expect(body.rowSelectionModel!.getCheckedRows()).toEqual([rows[2], rows[0], rows[1], rows[3]]);
+    expect(header.rowSelectionModel!.getCheckedRows()).toBe(body.rowSelectionModel!.getCheckedRows());
+    header.setRowChecked(0, false);
+    expect(body.rowSelectionModel!.getCheckedRows()).toEqual([]);
+    expect(header.isRowChecked(0)).toBe('none');
+  });
+
+  it('a table without rows shows none', () => {
+    expect(model(0).header.isRowChecked(0)).toBe('none');
   });
 });

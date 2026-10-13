@@ -214,7 +214,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const fm = this.getFocusModel ? this.getFocusModel() : undefined;
       this.copyService
         .createContent(this.tableModel, sm, fm)
-        .then(txt => this.copyService.copyContent(txt));
+        .then(txt => this.copyService.copyContent(txt))
+        .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
     }
     return false;
   }

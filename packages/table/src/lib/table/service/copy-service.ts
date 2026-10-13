@@ -8,6 +8,15 @@ import { CellRange } from '../data/common/cell-range';
 /** @category Export & clipboard */
 export class CopyService implements CopyServiceIf {
 
+  /**
+   * Upper limit for the number of cells {@link createContent} copies (e.g. after Ctrl+A on a table with millions
+   * of rows). Larger selections are rejected instead of building a huge string and blocking the browser.
+   *
+   * @example
+   * CopyService.maxCopyCells = 5_000_000; // allow bigger copies
+   */
+  public static maxCopyCells = 1_000_000;
+
   public static columnSeparatorChar = '\t';
   public static rowSeparatorChar = '\n';
 
@@ -41,6 +50,10 @@ export class CopyService implements CopyServiceIf {
         if (range) {
           range.c2 = Math.min(range.c2, tableModel.getColumnCount() - 1);
           range.r2 = Math.min(range.r2, tableModel.getBodyModel().getRowCount() - 1);
+          const cellCount = Math.max(0, range.r2 - range.r1 + 1) * Math.max(0, range.c2 - range.c1 + 1);
+          if (cellCount > CopyService.maxCopyCells) {
+            return reject(`Cannot copy ${cellCount} cells – more than CopyService.maxCopyCells (${CopyService.maxCopyCells}).`);
+          }
           const content: Array<string> = [];
 
           for (let rowIndex = range.r1; rowIndex <= range.r2; rowIndex++) {

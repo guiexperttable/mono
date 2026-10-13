@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { CellRange, ColumnDef, EventAdapter, FocusModel, InputCellRenderer, SelectionModel, TableFactory, TrueFn } from '@guiexpert/table';
-import type { ExtendedSelectionType, SelectionMode } from '@guiexpert/table';
+import type { CellRendererIf, ExtendedSelectionType, SelectionMode } from '@guiexpert/table';
 import { createRows, destroyAllTables, mountTable, nextFrame } from '../../../../test-utils/mount-table';
 
 type Modifier = 'Alt' | 'Control' | 'Meta' | 'Shift';
@@ -190,5 +190,63 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
     const input = host.querySelector('input.ge-table-cell-editor-input');
     expect(input).not.toBeNull();
     expect(document.activeElement).toBe(input);
+  });
+});
+
+// Regressions found in review: the repaint after a click re-created all visible cells – an <input> of a custom
+// renderer lost the focus and the typed text; Ctrl+A in a default table (selection type "none") selected everything.
+describe('click repaint and defaults', () => {
+
+  /** A renderer with a real <input> in every cell of column 1 (like an inline form in a cell). */
+  const inputRenderer: CellRendererIf = {
+    render(cellDiv: HTMLDivElement, rowIndex: number) {
+      const input = document.createElement('input');
+      input.className = 'test-cell-input';
+      input.value = 'v' + rowIndex;
+      cellDiv.appendChild(input);
+      return undefined;
+    },
+  };
+
+  it('a click into an <input> of a custom renderer keeps its focus and the typed text', async () => {
+    const fm = new FocusModel('cell');
+    const sm = new SelectionModel('range', 'multi');
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', headerLabel: 'Id' }),
+      ColumnDef.create({ property: 'name', headerLabel: 'Name', bodyRenderer: inputRenderer }),
+    ];
+    const { host } = mountTable(TableFactory.createTableModel({ rows: createRows(20), columnDefs }), {
+      tableOptions: { getFocusModel: () => fm, getSelectionModel: () => sm, resizeEventDebounceDelay: 1 },
+    });
+    await settle();
+    const input = host.querySelector<HTMLInputElement>(
+      '.ge-table-body-center .ge-table-col-div[data-row-index="0"][data-col-index="1"] input')!;
+    await userEvent.click(input);
+    await settle();
+    expect(input.isConnected).toBe(true);
+    expect(document.activeElement).toBe(input);
+    await userEvent.keyboard('X');
+    expect(input.value).toBe('v0X');
+    expect(fm.getFocus()).toEqual([0, 1]); // the table still knows the focused cell
+  });
+
+  it('a click on a plain cell is still painted', async () => {
+    const { host, fm } = await mountSelectionTable('range', 'multi');
+    await clickCell(host, 3, 1);
+    expect(fm.getFocus()).toEqual([3, 1]);
+    expect(host.querySelectorAll('.ge-table-focus-border').length).toBeGreaterThan(0);
+  });
+
+  it('Ctrl+A in a table without selection model (type "none") selects nothing and copies no body', async () => {
+    const { host, scope, api } = mountTable(TableFactory.createTableModel({ rows: createRows(50), properties: ['id', 'name'] }));
+    await settle();
+    const createContent = vi.spyOn(scope.copyService, 'createContent');
+    host.focus();
+    await userEvent.keyboard('{Control>}a{/Control}');
+    expect(api.getSelectionModel()?.isAllSelected() ?? false).toBe(false);
+    await userEvent.keyboard('{Control>}c{/Control}');
+    await vi.waitFor(() => expect(createContent).toHaveBeenCalled());
+    // no selection, no focused cell → nothing (before the fix: the whole body)
+    await expect(createContent.mock.results[0]!.value).resolves.toBe('');
   });
 });

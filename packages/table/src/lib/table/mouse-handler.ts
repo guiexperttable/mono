@@ -219,7 +219,7 @@ export class MouseHandler {
 
     const dirty = this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
     this.tableScope.publishGeMouseEvent(this.geMouseEvent);
-    if (dirty) {
+    if (dirty && !this.isInteractiveCellElement(event.target)) {
       // paint the new focus and selection (before, a click only became visible with the next scroll).
       // Deferred: a synchronous repaint replaces the clicked cell, and the browser then sends the following
       // "dblclick" to the detached element – double-click editing would no longer work.
@@ -227,6 +227,18 @@ export class MouseHandler {
     }
   }
 
+
+  /**
+   * True if the click went to a form control, button, link or editable element inside the table (e.g. rendered by
+   * a custom cell renderer or the cell editor). Such a click must not repaint: the repaint re-creates the cells,
+   * the element would lose the focus and the user's input.
+   */
+  private isInteractiveCellElement(target: EventTarget | null): boolean {
+    const element = target instanceof Element ? target : null;
+    const interactive = element?.closest(
+      'input, select, textarea, button, a[href], [contenteditable]:not([contenteditable="false"])');
+    return !!interactive && this.tableScope.hostElement.contains(interactive);
+  }
 
   /**
    * Update the collapsed/expanded state of a tree row.

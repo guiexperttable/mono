@@ -78,19 +78,21 @@ describe('SelectionModel', () => {
 
     it('ignores removeSelection() (no negative range is recorded)', () => {
       const sm = new SelectionModel('none');
-      sm.selectAll();
       sm.removeSelection(CellRange.singleCell(1, 1));
       expect(sm.isInNegativeRange(1, 1)).toBe(false);
-      expect(sm.isSelected(1, 1)).toBe(true);
     });
 
-    it('still allows selectAll()', () => {
-      // NOTE: selectAll() ignores the selection type – even a table with selectionType "none" becomes "all selected".
+    // Regression: selectAll() ignored the type – Ctrl+A in a default table (selection model of type "none") made
+    // everything "selected", and Ctrl+C then copied the whole body (millions of cells).
+    it('ignores selectAll()', () => {
       const sm = new SelectionModel('none');
+      const listener = { onSelectionChanged: vi.fn() };
+      sm.addEventSelectionChangedListener(listener);
       sm.selectAll();
-      expect(sm.isAllSelected()).toBe(true);
-      expect(sm.isSelected(5, 5)).toBe(true);
-      expect(sm.hasSelection()).toBe(true);
+      expect(sm.isAllSelected()).toBe(false);
+      expect(sm.isSelected(5, 5)).toBe(false);
+      expect(sm.hasSelection()).toBe(false);
+      expect(listener.onSelectionChanged).not.toHaveBeenCalled();
     });
   });
 

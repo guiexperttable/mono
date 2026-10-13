@@ -33,7 +33,7 @@ import { EventSelectionChangedListenerIf } from './event-selection-changed-liste
  * @method hasSelection(): boolean - Checks whether there is any selection. Returns true if yes, false if no.
  * @method hasNoSelection(): boolean - Checks whether there is no selection. Returns true if yes, false if no.
  * @method getMergedRowIndices(rowCount?: number): number[] - Gets the sorted indices of all rows with at least one selected cell.
- * @method selectAll(): void - Selects all selectable entities (also cells that were deselected before).
+ * @method selectAll(): void - Selects all selectable entities (also cells that were deselected before). No-op for type "none".
  * @method isAllSelected() - Checks if all selectable entities are selected.
  * @method addSelection(range: CellRange): void - Adds a certain range to the selection (selects removed cells again).
  * @method removeSelection(range: CellRange): void - Removes a certain range from the selection.
@@ -181,6 +181,9 @@ export class SelectionModel implements SelectionModelIf {
    * removing cells afterwards cuts holes into "all selected".
    */
   selectAll() {
+    if (this.selectionType === "none") {
+      return; // nothing is selectable – like addSelection()/removeSelection()
+    }
     this.allSelected = true;
     this.negativeRanges = [];
     this.fireChangeEvent();

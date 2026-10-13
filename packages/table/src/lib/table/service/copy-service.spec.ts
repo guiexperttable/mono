@@ -162,6 +162,33 @@ describe('CopyService', () => {
       await expect(new CopyService().createContent(tableModel, sm, focusAt(0, 0))).resolves.toBe('1\tBerlin\n3\tnull');
     });
 
+    describe('maxCopyCells', () => {
+      const original = CopyService.maxCopyCells;
+      afterEach(() => { CopyService.maxCopyCells = original; });
+
+      it('defaults to 1,000,000 cells', () => {
+        expect(CopyService.maxCopyCells).toBe(1_000_000);
+      });
+
+      it('rejects a selection with more cells (no huge string is built)', async () => {
+        CopyService.maxCopyCells = 8;
+        const sm = new SelectionModel('range', 'multi');
+        sm.selectAll(); // 3 rows × 3 columns = 9 cells
+        const tableModel = model();
+        const getTextValueAt = vi.spyOn(tableModel.getBodyModel(), 'getTextValueAt');
+        await expect(new CopyService().createContent(tableModel, sm, focusAt(0, 0)))
+          .rejects.toBe('Cannot copy 9 cells – more than CopyService.maxCopyCells (8).');
+        expect(getTextValueAt).not.toHaveBeenCalled();
+      });
+
+      it('copies a selection with exactly maxCopyCells cells', async () => {
+        CopyService.maxCopyCells = 9;
+        const sm = new SelectionModel('range', 'multi');
+        sm.selectAll();
+        await expect(new CopyService().createContent(model(), sm, focusAt(0, 0))).resolves.toContain('Ann');
+      });
+    });
+
     it('after selectAll() resolves with "" for an empty table', async () => {
       const tableModel = TableFactory.createTableModel({ rows: [], properties: ['a', 'b'] });
       const sm = new SelectionModel('range', 'multi');

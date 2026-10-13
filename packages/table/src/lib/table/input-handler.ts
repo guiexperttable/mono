@@ -17,6 +17,22 @@ export class InputHandler {
   ) {
     this.tableScope.hostElement.addEventListener("change", this.onHostElementChanged.bind(this),
       { signal: this.tableScope.listenerAbortController.signal });
+    this.tableScope.hostElement.addEventListener("keydown", this.onHostElementKeyDown.bind(this),
+      { signal: this.tableScope.listenerAbortController.signal });
+  }
+
+  /** Escape in the cell editor cancels the editing: the old value stays, nothing is committed. */
+  private onHostElementKeyDown(event: KeyboardEvent) {
+    if (event.key !== "Escape" || !this.tableScope.isEditing()) {
+      return;
+    }
+    const editor = event.target;
+    if ((editor instanceof HTMLInputElement || editor instanceof HTMLSelectElement || editor instanceof HTMLTextAreaElement)
+      && editor.getAttribute("data-area") === "body") {
+      event.preventDefault();  // e.g. a surrounding <dialog> must not close
+      event.stopPropagation();
+      this.tableScope.cancelEditing(editor);
+    }
   }
 
 

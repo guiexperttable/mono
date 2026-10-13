@@ -17,9 +17,14 @@ export class ColAndRowspanModel {
   ) {
   }
 
+  /** Row count of the area model at the last {@link init} (−1: not initialized yet). */
+  protected rowCountAtInit = -1;
+
   init() {
+    this.rowCountAtInit = this.areaModel.getRowCount();
     if (this.areaModel.getMaxColspan() < 2 && this.areaModel.getMaxRowspan() < 2) {
-      return; // sip
+      this.colAndRowspanRanges = undefined;
+      return; // skip
     }
     this.colAndRowspanRanges = [];
     const rowCount = this.areaModel.getRowCount();
@@ -43,6 +48,20 @@ export class ColAndRowspanModel {
         }
       }
     }
+  }
+
+  /**
+   * Builds the ranges again if the row count of the area model changed since the last {@link init} – e.g. after
+   * `setRows()` or a filter (the old ranges could point to rows that no longer exist). Cheap otherwise.
+   *
+   * @returns {boolean} true if the ranges were rebuilt
+   */
+  initIfRowCountChanged(): boolean {
+    if (this.areaModel.getRowCount() === this.rowCountAtInit) {
+      return false;
+    }
+    this.init();
+    return true;
   }
 
   getRanges(): CellRange[] {

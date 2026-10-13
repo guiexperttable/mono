@@ -143,10 +143,10 @@ describe('col-/rowspan in the body (getColspanAt / getRowspanAt)', () => {
     expect(columnIndices(renderedRows(host, 'east')[5])).toEqual([]);
   });
 
-  // BUG: the ColAndRowspanModels are built once in the RenderScope constructor (render-scope.ts:146) and never
-  // rebuilt. After setRows() with fewer rows drawBigCell() still draws the old range of row 4 →
-  // AreaModelObjectArray.getCustomClassesAt() reads `row.selected` of a missing row → TypeError, the repaint aborts.
-  it.fails('setRows() with fewer rows + repaintHard() renders without the old span cells', async () => {
+  // Regression: the ColAndRowspanModels were built once in the RenderScope constructor and never rebuilt. After
+  // setRows() with fewer rows drawBigCell() still drew the old range of row 4 → TypeError, the repaint aborted.
+  // repaintHard() now rebuilds them when the row count changed; stale ranges are skipped.
+  it('setRows() with fewer rows + repaintHard() renders without the old span cells', async () => {
     const { host, api } = mountSpanTable();
     await nextFrame();
     api.setRows([{ c0: 'a' }, { c0: 'b' }, { c0: 'c' }]);

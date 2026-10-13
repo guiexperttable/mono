@@ -1,0 +1,96 @@
+---
+/**
+ * Home page "Get started": the same table in every framework, one tab each.
+ * The code lives in training-examples/home/ (display only, type-checked against the published 1.1.90 packages).
+ */
+import ContentSection from "~/components/content-section.astro";
+import Snippet from "../training/Snippet.astro";
+import { Icon } from "astro-icon/components";
+import { CHAPTERS } from "../../training/chapters";
+import "../../styles/home.css";
+
+const TABS = [
+  { id: "react", label: "React", icon: "frameworks/react", file: "examples/home/react.tsx", title: "OrderTable.tsx",
+    install: "npm i @guiexpert/table @guiexpert/react-table", guide: "/getstarted/react/", chapter: "/training/react/" },
+  { id: "angular", label: "Angular", icon: "frameworks/angular", file: "examples/home/angular.ts", title: "order-table.component.ts",
+    install: "npm i @guiexpert/table @guiexpert/angular-table@22   # major = your Angular major (14 – 22)",
+    guide: "/getstarted/angular/", chapter: "/training/angular/" },
+  { id: "vue", label: "Vue", icon: "frameworks/vue", file: "examples/home/vue.vue", title: "OrderTable.vue",
+    install: "npm i @guiexpert/table @guiexpert/vue3-table", guide: "/getstarted/vue/", chapter: "/training/vue/" },
+  { id: "svelte", label: "Svelte", icon: "frameworks/svelte", file: "examples/home/svelte.svelte", title: "OrderTable.svelte",
+    install: "npm i @guiexpert/table @guiexpert/svelte-table", guide: "/getstarted/svelte/",
+    chapter: "/training/one-model-every-framework/" },
+  { id: "wc", label: "Web Component", icon: "frameworks/lit", file: "examples/home/web-component.ts", title: "main.ts",
+    install: "npm i @guiexpert/table @guiexpert/webcomponent-table", guide: "/getstarted/webcomponent/",
+    chapter: "/training/web-component-and-cdn/" },
+  { id: "ts", label: "TypeScript", icon: "frameworks/js", file: "examples/home/typescript.ts", title: "main.ts",
+    install: "npm i @guiexpert/table", guide: "/getstarted/plainjs/", chapter: "/training/first-table/" }
+];
+---
+
+<ContentSection title="Get started" id="getstarted">
+  <Fragment slot="lead">
+    One model, one component, a container with a height – <span class="text-primary">the same table</span> in every
+    framework.
+  </Fragment>
+
+  <div class="home-code" data-code-tabs>
+    <div class="home-code-tabs" role="tablist" aria-label="Framework">
+      {TABS.map((t, i) => (
+        <button type="button" role="tab" id={`tab-${t.id}`} aria-controls={`panel-${t.id}`}
+                aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1} data-tab={t.id}>
+          <Icon name={t.icon} aria-hidden="true" />{t.label}
+        </button>
+      ))}
+    </div>
+    {TABS.map((t, i) => (
+      <div class="home-code-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0}>
+        <p class="home-code-install"><span aria-hidden="true">$</span> <code>{t.install}</code></p>
+        <Snippet file={t.file} title={t.title} />
+        <p class="home-code-links">
+          <a href={t.guide}>{t.label} guide →</a>
+          <a href={t.chapter}>Training chapter →</a>
+        </p>
+      </div>
+    ))}
+    <p class="home-code-note">
+      <code>orders</code> is any array of objects. Solid and Preact work like React –
+      <a href="/training/one-model-every-framework/">see the training</a>.
+    </p>
+  </div>
+
+  <p class="home-links">
+    <a href="/training/">Training: {CHAPTERS.length} chapters with live demos →</a>
+    <a href="/doc/">Documentation →</a>
+    <a href="/json2ts">JSON to TypeScript generator →</a>
+  </p>
+</ContentSection>
+
+<script>
+  // tabs: click, arrow keys, remembered choice (per browser)
+  document.querySelectorAll<HTMLElement>("[data-code-tabs]").forEach(root => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach(t => {
+        const selected = t === tab;
+        t.setAttribute("aria-selected", String(selected));
+        t.tabIndex = selected ? 0 : -1;
+        const panel = root.querySelector<HTMLElement>("#" + t.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !selected;
+      });
+      if (focus) tab.focus();
+      try { localStorage.setItem("home-code-tab", tab.dataset.tab ?? ""); } catch { /* storage blocked */ }
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(tab));
+      tab.addEventListener("keydown", e => {
+        const next = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (next) select(tabs[(i + next + tabs.length) % tabs.length], true);
+      });
+    });
+    try {
+      const saved = tabs.find(t => t.dataset.tab === localStorage.getItem("home-code-tab"));
+      if (saved) select(saved);
+    } catch { /* storage blocked */ }
+  });
+</script>

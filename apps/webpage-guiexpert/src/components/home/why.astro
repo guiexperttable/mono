@@ -1,0 +1,95 @@
+---
+/**
+ * Home page "Why GuiExpert Table": three reasons and an honest comparison.
+ * The comparison is a short form of training chapter 3 (build-buy-or-guiexpert) – keep both in sync.
+ */
+import ContentSection from "~/components/content-section.astro";
+import { Icon } from "astro-icon/components";
+import "../../styles/home.css";
+
+const REASONS = [
+  {
+    icon: "mdi:scale-balance",
+    title: "Free – really",
+    text: "Every current release is MIT licensed, also for commercial use. No licence key, no watermark, no paid tier " +
+      "for Excel export, range selection or tree tables.",
+    link: { href: "/license/", label: "Licence" }
+  },
+  {
+    icon: "mdi:swap-horizontal-bold",
+    title: "Not tied to a framework",
+    text: "Eight integrations of one core. Models, renderers and options move with you from Angular to React or Svelte " +
+      "– you learn the grid once.",
+    link: { href: "#getstarted", label: "Same code in every framework" }
+  },
+  {
+    icon: "mdi:eye-outline",
+    title: "Nothing hidden",
+    text: "No runtime dependencies, plain DOM elements, CSS variables and readable TypeScript on GitHub. You can debug, " +
+      "style and extend every part.",
+    link: { href: "https://github.com/guiexperttable/mono", label: "Source on GitHub" }
+  }
+];
+
+// [feature, ag-Grid Community, ag-Grid Enterprise, GuiExpert Table] – short form of training chapter 3
+const ROWS: [string, string, string, string][] = [
+  ["Licence", "MIT, free", "commercial, per developer", "MIT, free – also commercially"],
+  ["Excel export", "–", "✔", "✔ no extra library"],
+  ["Range selection & clipboard", "–", "✔", "✔"],
+  ["Row grouping / pivot", "–", "✔", "– tree tables instead"],
+  ["Server-side row model", "–", "✔", "– own area model"],
+  ["Filter UI", "✔", "✔", "– your UI, a filter function"],
+  ["Frameworks", "React, Angular, Vue, JS", "React, Angular, Vue, JS", "Angular 14 – 22, React, Vue, Svelte, Solid, Preact, Web Component, JS"],
+  ["Runtime dependencies", "–", "–", "none"]
+];
+---
+
+<ContentSection title="Why GuiExpert Table" id="why">
+  <Fragment slot="lead">
+    A lean data grid with <span class="text-primary">everything included</span> – and an honest view of where others
+    go further.
+  </Fragment>
+
+  <div class="home-why">
+    <ul class="home-reasons">
+      {REASONS.map(r => (
+        <li>
+          <span class="home-feature-icon"><Icon name={r.icon} /></span>
+          <div>
+            <h3>{r.title}</h3>
+            <p>{r.text}</p>
+            <a href={r.link.href}>{r.link.label} →</a>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <figure class="home-compare">
+      <div class="home-compare-scroll">
+        <table>
+          <thead>
+            <tr><th></th><th class="ours">GuiExpert Table</th><th>ag-Grid Community</th><th>ag-Grid Enterprise</th></tr>
+          </thead>
+          <tbody>
+            {ROWS.map(([label, community, enterprise, ours]) => (
+              <tr><th>{label}</th><td class="ours">{ours}</td><td>{community}</td><td>{enterprise}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <figcaption>
+        <p>
+          <strong>Rule of thumb:</strong> need pivot tables, row grouping or a server-side row model off the shelf?
+          ag-Grid Enterprise is further today. Need large data, export, selection and full control over HTML and CSS –
+          in any framework, without licence costs? That is what GuiExpert Table is for.
+        </p>
+        <p class="home-compare-source">
+          As of October 2026, based on ag-grid.com
+          (<a href="https://www.ag-grid.com/javascript-data-grid/community-vs-enterprise/">Community vs. Enterprise</a>,
+          <a href="https://www.ag-grid.com/javascript-data-grid/licensing/">Licensing</a>) – check the current terms before
+          you decide. More in <a href="/training/build-buy-or-guiexpert/">chapter 3 of the training</a>.
+        </p>
+      </figcaption>
+    </figure>
+  </div>
+</ContentSection>

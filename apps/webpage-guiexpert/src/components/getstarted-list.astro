@@ -18,13 +18,13 @@ const { items, title, url } = Astro.props;
     >
       {title}
     </h3>
-    <ul class="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:grid-cols-8">
+    <ul class="grid grid-cols-2 gap-8 sm:grid-cols-4">
       {
         items.map((item) => (
           <li>
             <a class="flex flex-col items-center gap-2"
                href={item.url.startsWith("/") ? item.url : url + '/' + item.url}>
-              <Icon class="h-12" name={item.icon} />
+              <Icon class="h-[100px] w-full max-w-[200px]" name={item.icon} />
               <span>{item.title}</span>
             </a>
           </li>

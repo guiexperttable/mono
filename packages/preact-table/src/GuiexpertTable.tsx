@@ -36,97 +36,82 @@ export interface GuiexpertTableProps {
 
 
 /**
- * GuiexpertTable is a React component that wraps the ExpertTable library.
+ * GuiexpertTable is a Preact component that wraps the GuiExpert Table (`@guiexpert/table`).
  * It displays a table with various event listeners and callback functions.
+ *
+ * A new `tableModel` or `tableOptions` object (new reference) re-creates the table; the previous
+ * table is released with `TableScope.destroy()`, as on unmount. Keep both objects stable
+ * (create them once, not in `render`), otherwise the table is re-created on every render.
+ * Callback props may change freely – the current one is called.
  */
 export class GuiexpertTable extends Component<GuiexpertTableProps>  {
 
-  ref = createRef();
+  ref = createRef<HTMLDivElement>();
+
+  private tableScope?: TableScope;
 
   constructor(props: GuiexpertTableProps) {
     super(props);
   }
 
   componentDidMount() {
-    const myContainer: HTMLDivElement = this.ref.current;
-    this.initTable(myContainer, this.props as GuiexpertTableProps);
+    const myContainer = this.ref.current;
+    if (myContainer) {
+      this.initTable(myContainer, this.props);
+    }
+  }
+
+  componentDidUpdate(previousProps: Readonly<GuiexpertTableProps>) {
+    const myContainer = this.ref.current;
+    if (myContainer
+      && (previousProps.tableModel !== this.props.tableModel || previousProps.tableOptions !== this.props.tableOptions)) {
+      this.initTable(myContainer, this.props);
+    }
+    if (this.props.licenseKey && this.props.licenseKey !== previousProps.licenseKey) {
+      LicenseManager.getInstance().setLicenseKey(this.props.licenseKey);
+    }
   }
 
   componentWillUnmount() {
+    this.destroyTable();
   }
 
+  /**
+   * Creates the table in `ele` (a table created before is destroyed first) and calls `tableReady`.
+   * The event callbacks are always taken from the current props.
+   */
   initTable(ele: HTMLDivElement, props: GuiexpertTableProps) {
+    this.destroyTable();
+
+    // read the callbacks at call time: callback props may change without re-creating the table
+    const current = () => this.props;
     const listener: EventListenerIf = {
-
-      onSelectionChanged(model: SelectionModelIf): void {
-        if (props.selectionChanged) {
-          props.selectionChanged(model);
-        }
-      },
-
-      onScroll(model: GeScrollEvent): void {
-        if (props.scroll) {
-          props.scroll(model);
-        }
-      },
-
-      onFocusChanged(model: FocusModelIf): void{
-        if (props.focusChanged) {
-          props.focusChanged(model);
-        }
-      },
-
-
-      onCheckboxChanged: (evt: any[]) => {
-        if (props.checkboxChanged) {
-          props.checkboxChanged(evt);
-        }
-      },
-
-      onContextmenu: (evt: GeMouseEvent) => {
-        if (props.contextmenu) {
-          props.contextmenu(evt);
-        }
-      },
-
-      onModelChanged: (evt: GeModelChangeEvent) => {
-        if (props.modelChanged) {
-          props.modelChanged(evt);
-        }
-      },
-
-      onMouseClicked: (evt: GeMouseEvent) => {
-        if (props.mouseClicked) {
-          props.mouseClicked(evt);
-        }
-      },
-
-      onMouseDragging: (evt: GeMouseEvent) => {
-        if (props.mouseDragging) {
-          props.mouseDragging(evt);
-        }
-      },
-
-      onMouseDraggingEnd: (evt: GeMouseEvent) => {
-        if (props.mouseDraggingEnd) {
-          props.mouseDraggingEnd(evt);
-        }
-      },
-
-      onMouseMoved: (evt: GeMouseEvent) => {
-        // ignored
-      }
+      onSelectionChanged: (model: SelectionModelIf) => current().selectionChanged?.(model),
+      onFocusChanged: (model: FocusModelIf) => current().focusChanged?.(model),
+      onScroll: (evt: GeScrollEvent) => current().scroll?.(evt),
+      onCheckboxChanged: (evt: any[]) => current().checkboxChanged?.(evt),
+      onContextmenu: (evt: GeMouseEvent) => current().contextmenu?.(evt),
+      onModelChanged: (evt: GeModelChangeEvent) => current().modelChanged?.(evt),
+      onMouseClicked: (evt: GeMouseEvent) => current().mouseClicked?.(evt),
+      onMouseDragging: (evt: GeMouseEvent) => current().mouseDragging?.(evt),
+      onMouseDraggingEnd: (evt: GeMouseEvent) => current().mouseDraggingEnd?.(evt),
+      onMouseMoved: (evt: GeMouseEvent) => current().mouseMoved?.(evt)
     };
 
     const tableScope = new TableScope(
       ele, props.tableModel, new SimpleDomService(), props.tableOptions ?? new TableOptions(), listener
     );
+    this.tableScope = tableScope;
     tableScope.firstInit();
-    if (props.tableReady) {
-      props.tableReady(tableScope.getApi());
-    }
+    props.tableReady?.(tableScope.getApi());
     if (props.licenseKey) LicenseManager.getInstance().setLicenseKey(props.licenseKey);
   };
+
+  /** Releases the table (listeners, resize observer, cell renderers). */
+  private destroyTable() {
+    this.tableScope?.destroy();
+    this.tableScope = undefined;
+  }
 
   render() {
     return <div

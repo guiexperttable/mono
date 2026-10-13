@@ -105,9 +105,16 @@
 - [ ] Footer-Summen über gefilterte Zeilen: geht heute mit eigenem Footer-AreaModel + `getFilteredRows()`
       (instructions.md 5.4). Optional später eine fertige Klasse (z. B. `AreaModelAggregateFooter`).
 
-- [ ] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
-      `setFooterVisible()`, `isFooterVisible()` sind leere TODO-Stubs → implementieren
-      (Spalte: über `ColumnDef.isVisible` bzw. Breite 0 + `recalcColumnWidths`).
+- [x] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
+      `setFooterVisible()`, `isFooterVisible()` implementiert (Branch `fix/core-api`): Spalte über `ColumnDef.isVisible`
+      (Breite 0, Copy/Excel überspringen sie, Wieder-Einblenden stellt die alte Breite her; Index, Property oder
+      ColumnDef), Header/Footer über ein Flag im `TableModel` (Höhe 0, Daten bleiben). `TableModelIf` bekommt die
+      Methoden als optionale Member.
+- [ ] Sichtbarkeit – offen: bei Gewichts-Breiten („weight“) zählen ausgeblendete Spalten weiter in `usedWidth`
+      (`table-model.ts:619`, Lücke) · `AreaModelCellGroups.toggleHeaderGroup` überschreibt `isVisible` aller Spalten
+      (per API ausgeblendete Spalte kommt nach Gruppen-Toggle zurück und umgekehrt) · Pfeil-Navigation kann auf
+      ausgeblendete Spalten fallen und scrollt links/rechts nicht horizontal (`ensureColumnIsVisible` mit
+      `getScrollLeftForColumnIndex` wäre einfach).
 - [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
       Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
       (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
@@ -270,6 +277,12 @@ Verhalten steht als `// NOTE:` in den Specs.
   (Vorfahren sichtbar); das Filter-Prädikat bekommt weiterhin die `TreeRow`, `index`/`array` beziehen sich jetzt auf alle
   Zeilen; `api.reSort()` wirft nicht mehr; „alle auf/zu“ aktualisiert die Scrollleiste; `deepMaxLimit: n` erzeugt keine
   Zeilen tiefer als n (vorher n + 1).
+- **API**: `scrollToIndex(x, y)` scrollt horizontal zur Spalte (fixierte West-Spalte → x = 0, `-1` behält x);
+  `setColumnVisible/setHeaderVisible/setFooterVisible` funktionieren (`setColumnVisible` liefert jetzt `boolean`);
+  `isHeaderVisible()/isFooterVisible()` melden den echten Zustand; Selektion auf eigenem `AreaModel` wird gezeichnet
+  (`isSelectable()` Default `true`).
+- **Pakete**: `exports` mit Typen für `import`; relative `.d.ts`-Importe mit `.js` (node16/nodenext); `vue3-table` ist
+  ESM (`"type": "module"`).
 - **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
   `selectAll()` bei Typ `"none"` ohne Wirkung.
 
@@ -296,20 +309,21 @@ Verhalten steht als `// NOTE:` in den Specs.
 
 ## Gefunden beim Bau der Startseite (Okt. 2026)
 
-- [ ] `TableApi.scrollToIndex(indexX, indexY)` ignoriert `indexX`: `TableScope.scrollToIndex` ruft immer
-      `scrollToPixel(0, py)` auf (`// TODO calc indexX -> px`) und setzt die horizontale Position damit auf 0 zurück.
-      Die API-Doku verspricht eine Spalte (`@param indexX`, Beispiel `scrollToIndex(3, 10)`). Behelf auf der Startseite:
-      `scrollToPixel(x, getFirstVisibleRowIndex() * rowHeight)`. → x aus den Spaltenbreiten berechnen (fixierte Spalten
-      in west/east brauchen keinen horizontalen Scroll).
-- [ ] Zellen eines eigenen `AreaModel` sind nicht auswählbar: `AreaModel.isSelectable()` gibt `false` zurück
-      (`AbstractAreaModel` und damit alle Factory-Modelle: `true`). Mit `SelectionModel("range")` ist beim Ziehen nichts zu
-      sehen, obwohl `getSelectionModel().getRanges()` den Bereich enthält. Die Doku von `AreaModelIf.isSelectable` sagt
-      dagegen „All cells are selectable by default“. → Default `true` für den Body? Sonst in Kapitel 17 und 22 erwähnen.
-- [ ] Typen bei `skipLibCheck: false`: `vue-tsc` meldet in `@guiexpert/vue3-table@3.1.90` TS7016 („Could not find a
-      declaration file for module '@guiexpert/table' … index.cjs implicitly has an 'any' type“). Ursache: die `exports` von
-      `@guiexpert/table` haben keine `types`-Bedingung, und `vue3-table` ist `"type": "commonjs"` → seine `.d.ts` lösen
-      über `require` auf `index.cjs` auf, für die es keine Typen gibt. Mit `skipLibCheck: true` (Vite-Vorlagen) unsichtbar.
-      → in allen Paketen `"exports": { ".": { "types": "./index.d.ts", "import": …, "require": … } }`; Wrapper als ESM.
+- [x] `TableApi.scrollToIndex(indexX, indexY)` scrollt jetzt zur Spalte (erste Spalte des scrollbaren Mittelteils,
+      im Rahmen des Scrollbereichs); fixierte West-Spalte = zurück an den Anfang (x = 0, wie bisher), fixierte Ost-Spalte
+      und `-1` = horizontale Position behalten. `ensureRowIsVisible` (und damit die Pfeiltasten) behält x.
+- [ ] `scrollToIndex` vertikal leicht daneben: der ungedeckelte Pfad nimmt `py` direkt als `scrollTop`, der Scrollbereich
+      enthält aber den Footer (`ele-scope.ts:164`) und 1 px Extra-Höhe (`ele-scope.ts:314`) → mit Footer ist die Zielzeile
+      ~17 px angeschnitten (erste ganz sichtbare = Ziel + 1). Gedeckelter Pfad exakt.
+- [x] Zellen eines eigenen `AreaModel` sind auswählbar: `AreaModel.isSelectable()` Default `true` (wie
+      `AbstractAreaModel` und die Doku); Opt-out: überschreiben und `false` liefern.
+- [x] Typen bei `skipLibCheck: false` (TS7016 in `vue3-table`): `exports` aller Pakete mit
+      `"import": { "types": "./index.d.ts", "default": "./index.js" }, "require": "./index.cjs"`; `vue3-table` ist jetzt
+      `"type": "module"` (Node-`import()` ging vorher gar nicht); relative Importe in den `.d.ts` bekommen `.js`
+      (`scripts/fix-dts-imports.mjs` im `afterBuild` von vite-plugin-dts) – nötig für `moduleResolution` node16/nodenext.
+      Geprüft mit gepackten Tarballs: bundler 0 Fehler, node16-ESM 0 (bis auf svelte-table), node16-CJS wie vorher TS7016.
+- [ ] Typen – offen: CJS-Konsumenten mit `moduleResolution: node16` bekommen weiterhin TS7016 (keine `.d.cts`) ·
+      svelte-table: `.d.ts` importiert `./GuiexpertTable.svelte` (Svelte-Konvention; unter node16 TS2307).
 
 ## Erledigt beim Aufsetzen (Okt. 2026)
 

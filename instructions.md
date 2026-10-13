@@ -840,14 +840,17 @@ definition. Showcase: *Look and Feel* (https://gui.expert/showcase/laf).
 `recalcColumnWidths()`, `repaint()`, `repaintHard()`, `getTableModel()`, `getBodyModel()`, `setLoggingActive(true)`,
 `destroy()` (since 1.1.86 – releases listeners, observers and cell renderers before you drop or replace the table).
 
+Since 1.1.91: `scrollToIndex(col, row)` also scrolls horizontally to the column (a fixed west column scrolls back to the
+start, `-1` keeps the horizontal position); `setColumnVisible(column, visible)` (index, property or column definition;
+showing it again restores the previous width), `isColumnVisible(column)`, `setHeaderVisible(visible)`,
+`setFooterVisible(visible)`, `isHeaderVisible()`, `isFooterVisible()`.
+
 ---
 
 ## 7. Not available yet
 
 To avoid surprises – these are **not** implemented in the current releases:
 
-- `tableApi.setColumnVisible()`, `setHeaderVisible()`, `setFooterVisible()` exist but are empty stubs.
-  To hide a column, give its column definition `isVisible: () => false` (width becomes 0).
 - No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
   (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).

@@ -811,7 +811,7 @@ html[data-theme="dark"] .brand-table {
           <tr><td>Context menu</td><td class="wrap">the <code>contextmenu</code> event plus a menu in the style of your app (<ChapterLink slug="events-and-context-menu" />)</td></tr>
           <tr><td>Pagination</td><td class="wrap">not needed for display thanks to virtual scrolling; to load data page by page, use an own area model (<ChapterLink slug="custom-area-model" />)</td></tr>
           <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend</td></tr>
-          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="ColumnDefIf.isVisible" label="isVisible" /> in the column definition, then <ApiLink name="TableApi.repaint" label="repaint()" />; <code>TableApi.setColumnVisible()</code> is not implemented yet</td></tr>
+          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> (also <code>setHeaderVisible()</code> / <code>setFooterVisible()</code>, since 1.1.91)</td></tr>
           <tr><td>Row drag and drop</td><td class="wrap">not available</td></tr>
         </tbody>
       </table>

@@ -451,8 +451,6 @@ html {
 
 ## 14. Not available yet
 
-- `tableApi.setColumnVisible()`, `setHeaderVisible()`, `setFooterVisible()` are empty stubs; hide a column with
-  `isVisible: () => false` in its column definition.
 - No built-in filter UI, context menu, pagination or row drag & drop.
 
 ## License

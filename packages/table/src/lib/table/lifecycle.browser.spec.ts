@@ -147,26 +147,41 @@ describe('scrollToIndex() (vertical)', () => {
     expect(stylePx(renderedRows(host)[0], 'top')).toBe(0);
   });
 
-  // BUG: the scroll content is 1 px higher than the rows (ele-scope.ts:314, "we want to see the last horizontal
-  // border"), but render-scope.ts:284 maps scrollTop with the scroll bar range onto the content range – the further
-  // down, the larger the error: from the middle of a 1000-row table on, scrollToIndex(0, n) leaves 1 px of row n-1
-  // visible and getFirstVisibleRowIndex() returns n-1.
-  it.fails('scrollToIndex(0, n) makes row n the first visible row in the lower half of the table', async () => {
+  // Regression: the scroll content is 1 px higher than the rows ("we want to see the last horizontal border"), and
+  // scrollTop is mapped with the scroll bar range onto the content range – scrollToPixel() set scrollTop = py, so the
+  // further down, the larger the error: from the middle of a 1000-row table on, scrollToIndex(0, n) left 1 px of row
+  // n-1 visible and getFirstVisibleRowIndex() returned n-1.
+  it('scrollToIndex(0, n) makes row n the first visible row in the lower half of the table', async () => {
     const { host, api } = mountTable(objectModel());
     await nextFrame();
     api.scrollToIndex(0, 700);
     await nextFrame();
     expect(api.getFirstVisibleRowIndex()).toBe(700);
     expect(renderedRows(host)[0].getAttribute('data-row-index')).toBe('700');
+    expect(stylePx(renderedRows(host)[0], 'top')).toBe(0);
+  });
+
+  // Regression: the scroll viewport includes the footer – with a footer the target row was ~17 px off.
+  it('scrollToIndex(0, n) is exact with a footer', async () => {
+    const rows = createRows(1000);
+    const model = TableFactory.createTableModel({ rows, properties: ['id', 'name', 'value'], footerData: [['Σ', '', '']] });
+    const { host, api } = mountTable(model);
+    await nextFrame();
+    for (const n of [100, 500, 900]) {
+      api.scrollToIndex(0, n);
+      await nextFrame();
+      expect(api.getFirstVisibleRowIndex()).toBe(n);
+      expect(stylePx(renderedRows(host)[0], 'top')).toBe(0);
+    }
   });
 });
 
 describe('virtual scrolling – DOM kept alive', () => {
 
-  // BUG: convenience-dom.service.ts getDivOrCreateDiv() caches every row div by row index (DivScope.cache) and never
-  // evicts – each row ever scrolled into view stays referenced as detached div WITH its cells. Scrolling through a
-  // table with millions of rows grows memory without bound (here: 100 positions → ~1,400 cached row subtrees).
-  it.fails('the row div cache does not grow with every row that was ever rendered', async () => {
+  // Regression: convenience-dom.service.ts getDivOrCreateDiv() caches every row div by row index (DivScope.cache) and
+  // never evicted – each row ever scrolled into view stayed referenced as detached div WITH its cells (100 positions →
+  // ~1,400 cached row subtrees). Now every render pass forgets the rows it did not render.
+  it('the row div cache does not grow with every row that was ever rendered', async () => {
     const { api, scope } = mountTable(objectModel(createRows(100_000)));
     await nextFrame();
     for (let i = 0; i < 100; i++) {

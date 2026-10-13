@@ -222,17 +222,25 @@ describe('fixed columns (fixedLeftColumnCount / fixedRightColumnCount in the mod
     expect(host.querySelector<HTMLElement>('.ge-table-west-fixed-column-border')!.style.display).toBe('none');
   });
 
-  // BUG: ele-scope.ts:208 checks getFixedLeftColumnCount() for the EAST separator – with only fixed right
-  // columns the east border is hidden (and with only fixed left columns it is shown at the right table edge).
-  it.fails('shows the east separator border with fixed right columns only', async () => {
+  // Regression: ele-scope.ts checked getFixedLeftColumnCount() for the EAST separator – with only fixed right
+  // columns the east border was hidden (and with only fixed left columns it was shown at the right table edge).
+  it('shows the east separator border with fixed right columns only', async () => {
     const { host } = mountTable(wideModel({ fixedRight: 1 }));
     await nextFrame();
-    expect(host.querySelector<HTMLElement>('.ge-table-east-fixed-column-border')!.style.display).toBe('block');
+    const border = host.querySelector<HTMLElement>('.ge-table-east-fixed-column-border')!;
+    expect(border.style.display).toBe('block');
+    expect(stylePx(border, 'left')).toBe(800 - 100);
   });
 
-  // BUG: ele-scope.ts:92 creates the header/east area with data-area="body" (copy & paste) – a mouse event on
-  // that area outside of a cell would be reported as a body event.
-  it.fails('the header/east area is tagged as header area', async () => {
+  it('shows no east separator border with fixed left columns only', async () => {
+    const { host } = mountTable(wideModel({ fixedLeft: 1 }));
+    await nextFrame();
+    expect(host.querySelector<HTMLElement>('.ge-table-east-fixed-column-border')!.style.display).toBe('none');
+  });
+
+  // Regression: ele-scope.ts created the header/east area with data-area="body" (copy & paste) – a mouse event on
+  // that area outside of a cell would have been reported as a body event.
+  it('the header/east area is tagged as header area', async () => {
     const { host } = mountTable(wideModel({ fixedRight: 1 }));
     await nextFrame();
     expect(host.querySelector('.ge-table-header-east')!.getAttribute('data-area')).toBe('header');
@@ -298,9 +306,9 @@ describe('column widths', () => {
     expect(rowCellWidths(host)).toEqual([200, 600]);
   });
 
-  // BUG: firstInit() → tableModel.init() uses the default parentSize of 400 px (table-model.ts constructor),
-  // not the host width – % columns are wrong until the first ResizeObserver callback (≥ 500 ms later).
-  it.fails('% widths fit the host width right after mounting', async () => {
+  // Regression: firstInit() → tableModel.init() used the default parentSize of 400 px (table-model.ts constructor),
+  // not the host width – % columns were wrong until the first ResizeObserver callback (≥ 500 ms later).
+  it('% widths fit the host width right after mounting', async () => {
     const columnDefs = [
       ColumnDef.create({ property: 'id', width: new Size(50, '%') }),
       ColumnDef.create({ property: 'name', width: new Size(50, '%') }),
@@ -327,10 +335,10 @@ describe('column widths', () => {
     await vi.waitFor(() => expect(rowCellWidths(host)).toEqual([500, 500]));
   });
 
-  // BUG: render-scope.ts:254 recalcColumnWidths(clientWidth) ignores the new width passed by the ResizeObserver and
-  // reads the scroll viewport, which still has the OLD size (it is resized afterwards in repaintHard()). Without a
-  // window resize event (e.g. a splitter or flex layout changes the host) % columns are always one resize behind.
-  it.fails('host resize alone: the ResizeObserver recalculates % widths', async () => {
+  // Regression: recalcColumnWidths(clientWidth) ignored the new width passed by the ResizeObserver and read the scroll
+  // viewport, which still had the OLD size (it is resized afterwards in repaintHard()). Without a window resize event
+  // (e.g. a splitter or flex layout changes the host) % columns were always one resize behind.
+  it('host resize alone: the ResizeObserver recalculates % widths', async () => {
     const { host, scope } = mountHalfHalf();
     await vi.waitFor(() => expect(rowCellWidths(host)).toEqual([400, 400]));
     const recalc = vi.spyOn(scope, 'recalcColumnWidths');
@@ -339,17 +347,34 @@ describe('column widths', () => {
     expect(rowCellWidths(host)).toEqual([500, 500]);
   });
 
-  // BUG: every ResizeObserver callback calls recalcColumnWidths() → tableModel.init() → widths are rebuilt from
-  // the ColumnDefs (table-model.ts recalcColumnWidths). Widths set by setColumnWidth(), autoResizeColumns() or by
-  // dragging a header edge are lost on the next host resize – and the initial callback ~500 ms after mounting
-  // reverts widths set right after creation (e.g. autoResizeColumns() in "tableReady").
-  it.fails('a host resize keeps a width set by setColumnWidth()', async () => {
-    const { host, api, recalc } = await mountThreeColumns();
+  // Regression: every ResizeObserver callback calls recalcColumnWidths() → tableModel.init() → widths are rebuilt from
+  // the ColumnDefs. Widths set by setColumnWidth(), autoResizeColumns() or by dragging a header edge were lost on the
+  // next host resize – and the initial callback ~500 ms after mounting reverted widths set right after creation
+  // (e.g. autoResizeColumns() in "tableReady"). setColumnWidth() now stores the width in the ColumnDef.
+  it('a host resize keeps a width set by setColumnWidth()', async () => {
+    const { host, api, recalc, model } = await mountThreeColumns();
+    const sharedPx200 = model.getColumnDefs()![1]!.width;
     api.setColumnWidth(0, 300);
     api.repaint();
     host.style.height = '400px';
     await vi.waitFor(() => expect(recalc).toHaveBeenCalled());
-    expect(rowCellWidths(host)[0]).toBe(300);
+    expect(rowCellWidths(host)).toEqual([300, 200, 200]);
+    expect(model.getColumnDefs()![0]!.width).toMatchObject({ value: 300, unit: 'px' });
+    expect(sharedPx200.value).toBe(200); // a shared Size constant is replaced, not changed
+  });
+
+  it('a host resize keeps the widths of autoResizeColumns() and turns a resized % column into px', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: new Size(50, '%') }),
+      ColumnDef.create({ property: 'name', width: new Size(50, '%') }),
+    ];
+    const table = mountTable(TableFactory.createTableModel({ rows: createRows(5), columnDefs }),
+      { tableOptions: { resizeEventDebounceDelay: 10 } });
+    await vi.waitFor(() => expect(rowCellWidths(table.host)).toEqual([400, 400]));
+    table.api.setColumnWidth(1, 250);
+    table.api.repaint();
+    table.host.style.width = '1000px';
+    await vi.waitFor(() => expect(rowCellWidths(table.host)).toEqual([500, 250]));
   });
 
   it('a column with isVisible() = false has width 0 and is not rendered', async () => {

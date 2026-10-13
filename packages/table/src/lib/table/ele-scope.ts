@@ -89,7 +89,7 @@ export class EleScope {
         dom.createAreaDivWithClass("ge-table-header ge-table-header-center", hostEle, "header", "center")));
     this.areaHeaderEast = dom.appendRelativeChildDiv(
       dom.applyStylePosistionAbsolute(
-        dom.createAreaDivWithClass("ge-table-header ge-table-header-east", hostEle, "body", "east")));
+        dom.createAreaDivWithClass("ge-table-header ge-table-header-east", hostEle, "header", "east")));
 
     this.areaBodyWest = dom.appendRelativeChildDiv(
       dom.applyStylePosistionAbsolute(
@@ -205,7 +205,7 @@ export class EleScope {
     this.dom.applyStyleInPx(this.areaBodyEast.parent, this.areaBodyEastGeo);
 
     if (this.tableOptions.fixedEastSeparatorBorderVisible &&
-      this.tableModel.getFixedLeftColumnCount()) {
+      this.tableModel.getFixedRightColumnCount()) {
       this.dom.applyDisplayBlockStyle(
         this.dom.applyStyle(this.borderFixedEast, {
           width: `1px`,

@@ -17,7 +17,9 @@ export class DateToIsoCellRenderer implements CellRendererIf {
     cellValue: any,
     _domService: DomServiceIf): RendererCleanupFnType | undefined {
     if (cellValue) {
-      cellDiv.innerText = new Date(cellValue).toISOString();
+      const date = new Date(cellValue);
+      // an invalid date is shown as it is (toISOString() would throw a RangeError and stop the whole render pass)
+      cellDiv.innerText = isNaN(date.getTime()) ? String(cellValue) : date.toISOString();
     }
     return undefined;
   }

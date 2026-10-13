@@ -17,10 +17,11 @@ export class DateToTecCellRenderer implements CellRendererIf {
     cellValue: any,
     _domService: DomServiceIf): RendererCleanupFnType | undefined {
     if (cellValue) {
-      cellDiv.innerText = new Date(cellValue)
-        .toISOString()
-        .replace(/T/g, " ")
-        .replace(/\..*/g, "");
+      const date = new Date(cellValue);
+      // an invalid date is shown as it is (toISOString() would throw a RangeError and stop the whole render pass)
+      cellDiv.innerText = isNaN(date.getTime())
+        ? String(cellValue)
+        : date.toISOString().replace(/T/g, " ").replace(/\..*/g, "");
     }
     return undefined;
   }

@@ -17,7 +17,9 @@ export class DateToLocaleDateCellRenderer implements CellRendererIf {
     cellValue: any,
     _domService: DomServiceIf): RendererCleanupFnType | undefined {
     if (cellValue) {
-      cellDiv.innerText = new Date(cellValue).toLocaleDateString();
+      const date = new Date(cellValue);
+      // an invalid date is shown as it is (instead of "Invalid Date")
+      cellDiv.innerText = isNaN(date.getTime()) ? String(cellValue) : date.toLocaleDateString();
     }
     return undefined;
   }

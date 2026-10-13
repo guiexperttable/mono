@@ -50,7 +50,6 @@ export default function (ctx: DemoContext) {
   requestAnimationFrame(() => ctx.info(
     `${tableModel.getColumnCount()} columns · ${fmt(domCount(ctx.host))} DOM elements – scroll sideways`));
   ctx.button("→ scroll right", () => scope.getApi().scrollToIndex(35, scope.getApi().getFirstVisibleRowIndex()));
-  // column 0 is fixed (always visible, keeps the scroll position) – 1 is the first scrollable column
-  ctx.button("← back", () => scope.getApi().scrollToIndex(1, scope.getApi().getFirstVisibleRowIndex()));
+  ctx.button("← back", () => scope.getApi().scrollToIndex(0, scope.getApi().getFirstVisibleRowIndex()));
   return () => scope.destroy();
 }

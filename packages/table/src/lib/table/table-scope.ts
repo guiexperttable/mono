@@ -650,8 +650,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * Scrolls to a column and a row: the row becomes the first row of the viewport, the column the first column of the
    * scrollable center area (as far as the scroll range allows).
    *
-   * A column outside the scrollable center – a fixed west/east column (always visible), `-1` or any other index
-   * outside the column range – keeps the current horizontal position.
+   * A fixed west column scrolls back to the start (x = 0, like before columns were supported). A fixed east column,
+   * `-1` or any other index outside the column range keeps the current horizontal position.
    *
    * @param {number} indexX - The column index (model index over west + center + east), `-1` = keep the horizontal position.
    * @param {number} indexY - The row index of the body.
@@ -666,7 +666,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   /**
    * The horizontal scroll position (`scrollLeft` of the scroll viewport) that shows a column as the first column of
    * the scrollable center area, clamped to the scroll range.
-   * Fixed west/east columns and indices outside the center columns return the current position.
+   * A fixed west column returns 0 (start); fixed east columns and indices outside the columns return the current position.
    *
    * @param {number} columnIndex - model column index (west + center + east)
    * @returns {number} scrollLeft in scroll bar pixels
@@ -675,8 +675,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const viewport = this.scrollViewport;
     const firstCenterColumn = this.tableModel.getFixedLeftColumnCount();
     const lastCenterColumn = this.tableModel.getColumnCount() - this.tableModel.getFixedRightColumnCount() - 1;
+    if (columnIndex >= 0 && columnIndex < firstCenterColumn) {
+      return 0; // fixed west column: back to the start – as scrollToIndex(0, y) always did
+    }
     if (!(columnIndex >= firstCenterColumn && columnIndex <= lastCenterColumn)) {
-      return viewport.scrollLeft; // fixed column (always visible), -1, NaN or out of range
+      return viewport.scrollLeft; // fixed east column (always visible), -1, NaN or out of range
     }
     let contentLeft = 0; // hidden columns have width 0
     for (let c = firstCenterColumn; c < columnIndex; c++) {

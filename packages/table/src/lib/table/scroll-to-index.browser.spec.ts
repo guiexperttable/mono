@@ -106,7 +106,7 @@ describe('TableApi.scrollToIndex – column index (real browser)', () => {
     expect(bodyColumnLeft(host, 25)).toBeCloseTo(0, 0);
   });
 
-  it('-1 and fixed west/east columns keep the horizontal position', async () => {
+  it('-1 and fixed east columns keep the horizontal position, a fixed west column scrolls back to the start', async () => {
     const { host, api } = await mountWide({ fixedLeft: 1, fixedRight: 1 });
     api.scrollToIndex(30, 0);
     await nextFrame();
@@ -114,11 +114,6 @@ describe('TableApi.scrollToIndex – column index (real browser)', () => {
     expect(bodyColumnLeft(host, 30)).toBeCloseTo(100, 0);
     const x = scrollLeft(host);
     expect(x).toBeGreaterThan(0);
-
-    api.scrollToIndex(0, 10);   // west
-    await nextFrame();
-    expect(scrollLeft(host)).toBe(x);
-    expect(api.getFirstVisibleRowIndex()).toBe(10);
 
     api.scrollToIndex(59, 20);  // east
     await nextFrame();
@@ -160,5 +155,18 @@ describe('TableApi.scrollToIndex – column index (real browser)', () => {
     await nextFrame();
     expect(api.getFirstVisibleRowIndex()).toBe(1_000_000);
     expect(bodyColumnLeft(host, 30)).toBeCloseTo(0, 0);
+  });
+
+  // compatible with the old behaviour (indexX was ignored, x was always reset to 0): scrollToIndex(0, y) on a table
+  // with a fixed column 0 still scrolls back to the start
+  it('a fixed west column scrolls back to the start (x = 0)', async () => {
+    const { host, api } = await mountWide({ fixedLeft: 1, fixedRight: 1 });
+    api.scrollToIndex(30, 0);
+    await nextFrame();
+    expect(scrollLeft(host)).toBeGreaterThan(0);
+    api.scrollToIndex(0, 10);
+    await nextFrame();
+    expect(scrollLeft(host)).toBe(0);
+    expect(api.getFirstVisibleRowIndex()).toBe(10);
   });
 });

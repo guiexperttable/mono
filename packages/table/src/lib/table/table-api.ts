@@ -276,8 +276,9 @@ export class TableApi {
    * The row becomes the first row of the body, the column the first column of the scrollable (center) part –
    * as far as the scroll range allows: the last columns and rows cannot move further than to the right/bottom edge.
    *
-   * Fixed columns (`fixedLeftColumnCount` / `fixedRightColumnCount`) are always visible: a column index of a fixed
-   * column – and `-1` or any other index outside the columns – keeps the current horizontal position.
+   * Fixed columns (`fixedLeftColumnCount` / `fixedRightColumnCount`) are always visible: a fixed west column scrolls
+   * back to the start (x = 0), a fixed east column – and `-1` or any other index outside the columns – keeps the
+   * current horizontal position.
    *
    * @param {number} indexX - The column index (model index, fixed columns included) to scroll to.
    *   Defaults to 0 (first column). `-1` keeps the horizontal position.

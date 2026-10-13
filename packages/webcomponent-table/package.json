@@ -28,8 +28,10 @@
   },
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
       "require": "./index.cjs"
     }
   },

@@ -3,7 +3,7 @@
 // The REST calls of CrudOptions (fetch) are replaced by spies.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { ActionEvent, CrudObjectEdit, CrudObjectView, CrudOptions, CrudTableModelFactory } from '@guiexpert/table';
+import { ActionEvent, CrudObjectEdit, CrudObjectView, CrudOptions, CrudTableModelFactory, UrlInfo } from '@guiexpert/table';
 import type { TableModelAndOptionsIf } from '@guiexpert/table';
 import { destroyAllTables, getCellDiv, mountTable, nextFrame } from '../../../../test-utils/mount-table';
 
@@ -249,5 +249,66 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     await userEvent.click(actionLink(host, 0, 'VIEW'));
     expect(listen).toHaveBeenCalledWith(expect.any(ActionEvent));
     expect(listen.mock.calls[0][0]).toMatchObject({ action: 'VIEW', rowIndex: 0, id: '1' });
+  });
+});
+
+describe('CrudOptions – REST calls (fetch)', () => {
+
+  function stubFetch(json: unknown = { ok: true }) {
+    return vi.spyOn(window, 'fetch').mockImplementation(() => Promise.resolve(new Response(JSON.stringify(json))));
+  }
+
+  function options() {
+    const o = new CrudOptions();
+    o.urls = {
+      list: new UrlInfo('GET', '/api/items'),
+      read: new UrlInfo('GET', '/api/items/{id}'),
+      update: new UrlInfo('PUT', '/api/items/{id}'),
+      create: new UrlInfo('POST', '/api/items'),
+      delete: new UrlInfo('DELETE', '/api/items/{id}'),
+    };
+    o.getHeadersInit = () => ({ Authorization: 'Bearer x' });
+    return o;
+  }
+
+  it('fetchList / fetchItem: GET with the headers, {id} replaced, JSON parsed', async () => {
+    const fetch = stubFetch([{ id: 1 }]);
+    const o = options();
+    await expect(o.fetchList(o)).resolves.toEqual([{ id: 1 }]);
+    expect(fetch).toHaveBeenCalledWith('/api/items', { headers: { Authorization: 'Bearer x' }, method: 'GET' });
+    await o.fetchItem(o, 42);
+    expect(fetch).toHaveBeenLastCalledWith('/api/items/42', { headers: { Authorization: 'Bearer x' }, method: 'GET' });
+  });
+
+  it('updateItem / createItem / deleteItem use their URL, method and a JSON body', async () => {
+    const fetch = stubFetch();
+    const o = options();
+    await o.updateItem(o, 7, { id: 7, name: 'x' });
+    expect(fetch).toHaveBeenLastCalledWith('/api/items/7', { headers: { Authorization: 'Bearer x' }, method: 'PUT', body: '{"id":7,"name":"x"}' });
+    await o.createItem(o, { name: 'y' });
+    expect(fetch).toHaveBeenLastCalledWith('/api/items', { headers: { Authorization: 'Bearer x' }, method: 'POST', body: '{"name":"y"}' });
+    await o.deleteItem(o, 7);
+    expect(fetch).toHaveBeenLastCalledWith('/api/items/7', { headers: { Authorization: 'Bearer x' }, method: 'DELETE' });
+  });
+
+  it('without URLs: empty URL and the default methods', async () => {
+    const fetch = stubFetch();
+    const o = new CrudOptions();
+    await o.updateItem(o, 1, {});
+    expect(fetch.mock.calls[0][0]).toBe('');
+    expect(fetch.mock.calls[0][1]).toMatchObject({ method: 'PATCH' });
+    await o.createItem(o, {});
+    expect(fetch.mock.calls[1][1]).toMatchObject({ method: 'POST' });
+    await o.deleteItem(o, 1);
+    // NOTE: crud-options.ts – the default method of deleteItem is GET (not DELETE), and a missing URL fetches ''
+    // (= the current page) instead of failing.
+    expect(fetch.mock.calls[2]).toEqual(['', { headers: {}, method: 'GET' }]);
+  });
+
+  // BUG: crud-options.ts getIdByObject checks `getIdKey()` but always returns o['id'].
+  it.fails('getIdByObject() uses the key of getIdKey()', () => {
+    const o = new CrudOptions();
+    o.getIdKey = () => 'uuid';
+    expect(o.getIdByObject({ uuid: 'u-1', name: 'x' })).toBe('u-1');
   });
 });

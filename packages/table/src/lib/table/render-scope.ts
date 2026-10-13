@@ -339,8 +339,8 @@ export class RenderScope extends EleScope {
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
-    // The border between header and body (full width):
-    if (this.tableModel.getAreaModel('header')?.getRowCount() > 0) {
+    // The border between header and body (full width), not for a hidden header (setHeaderVisible):
+    if (this.tableModel.isHeaderVisibe()) {
       this.removables.push(this.dom.addHorizontalBorder(
         new GeoData(0, hostWidth, 1, headerHeight),
         this.hostElement,
@@ -645,6 +645,12 @@ export class RenderScope extends EleScope {
       if (fn) {
         fn();
       }
+    }
+    // A hidden header/footer (TableApi.setHeaderVisible / setFooterVisible) has the height 0 – render no rows,
+    // otherwise the first row would overflow its 0 px area.
+    if ((areaIdent === 'header' && !this.tableModel.isHeaderVisibe())
+      || (areaIdent === 'footer' && !this.tableModel.isFooterVisibe())) {
+      return;
     }
     let y = yStart;
 

@@ -12,6 +12,7 @@ import { SelectionModelIf } from "../../selection/selection-model.if";
 import { GetT } from "../common/get-t";
 import { CheckboxModel } from "../../checkbox/checkbox-model";
 import {isCheckboxColumnDef} from "../../instanceof-workaround";
+import { FalseFn, TrueFn } from "../common/boolean-function";
 import { SizeIf } from '../common/size.if';
 import { TableScope } from '../../table-scope';
 
@@ -47,6 +48,10 @@ export class TableModel implements TableModelIf {
   // in case of a fixed header, left or right column, footer:
   protected padding = new Padding(0, 0, 0, 0); // the dimension of the 'body/center'
   protected xPositions: number[] = [];
+  /** false: the header is hidden (height 0), see {@link setHeaderVisible}. */
+  protected headerVisible = true;
+  /** false: the footer is hidden (height 0), see {@link setFooterVisible}. */
+  protected footerVisible = true;
 
   constructor(
     public readonly headerAreaModel: AreaModelIf,
@@ -208,8 +213,9 @@ export class TableModel implements TableModelIf {
   recalcPadding() {
     const westWidth = this.getSideAreaWidth("west");
     const eastWidth = this.getSideAreaWidth("east");
-    const headerHeight = this.getAreaHeight("header");
-    const footerHeight = this.getAreaHeight("footer");
+    // a hidden header/footer (setHeaderVisible / setFooterVisible) takes no space – its rows stay in the model
+    const headerHeight = this.headerVisible ? this.getAreaHeight("header") : 0;
+    const footerHeight = this.footerVisible ? this.getAreaHeight("footer") : 0;
 
     this.padding = new Padding(
       headerHeight,
@@ -386,20 +392,98 @@ export class TableModel implements TableModelIf {
   }
 
   /**
-   * Checks if the footer is visible.
+   * Checks if the footer is visible: it has rows and is not hidden with {@link setFooterVisible}.
    *
    * @returns {boolean} True if the footer is visible, false otherwise.
    */
   isFooterVisibe(): boolean {
-    return (this.footerAreaModel?.getRowCount() ?? 0) > 0;
+    return this.footerVisible && (this.footerAreaModel?.getRowCount() ?? 0) > 0;
   }
 
   /**
-   * Checks if the header area is visible.
+   * Checks if the header area is visible: it has rows and is not hidden with {@link setHeaderVisible}.
    * @return {boolean} Returns true if the header area is visible, otherwise false.
    */
   isHeaderVisibe(): boolean {
-    return (this.headerAreaModel?.getRowCount() ?? 0) > 0;
+    return this.headerVisible && (this.headerAreaModel?.getRowCount() ?? 0) > 0;
+  }
+
+  /**
+   * Shows or hides the header. A hidden header takes no space (the body moves up); its area model and rows stay
+   * unchanged, so showing it again restores it. Only changes the model – {@link TableApi.setHeaderVisible} also
+   * repaints the table.
+   *
+   * @param {boolean} visible - false hides the header
+   *
+   * @example
+   * tableModel.setHeaderVisible?.(false);
+   */
+  setHeaderVisible(visible: boolean): void {
+    this.headerVisible = visible;
+    this.recalcPadding();
+  }
+
+  /**
+   * Shows or hides the footer. A hidden footer takes no space; its area model and rows stay unchanged.
+   * Only changes the model – {@link TableApi.setFooterVisible} also repaints the table.
+   *
+   * @param {boolean} visible - false hides the footer
+   *
+   * @example
+   * tableModel.setFooterVisible?.(false);
+   */
+  setFooterVisible(visible: boolean): void {
+    this.footerVisible = visible;
+    this.recalcPadding();
+  }
+
+  /**
+   * Shows or hides a column. The column keeps its definition, position and width – a hidden column has the width 0
+   * ({@link getColumnWidth}), is not rendered, copied or exported; showing it again restores its width.
+   *
+   * Works through {@link ColumnDefIf.isVisible}: it is replaced by {@link TrueFn} / {@link FalseFn} (an own
+   * `isVisible` function of the column is replaced, too). Columns without a column definition can't be hidden.
+   * Recalculates the content width, the padding (fixed columns) and the x positions. Only changes the model –
+   * {@link TableApi.setColumnVisible} also repaints the table.
+   *
+   * @param {number | string | ColumnDefIf} column - column index (fixed columns included), property or column definition
+   * @param {boolean} visible - false hides the column
+   * @returns {boolean} false if there is no such column definition
+   *
+   * @example
+   * tableModel.setColumnVisible?.("category", false);
+   */
+  setColumnVisible(column: number | string | ColumnDefIf, visible: boolean): boolean {
+    const columnDef = this.findColumnDef(column);
+    if (!columnDef) {
+      return false;
+    }
+    columnDef.isVisible = visible ? TrueFn : FalseFn;
+    const withFlag = columnDef as ColumnDefIf & { visible?: unknown };
+    if (typeof withFlag.visible === "boolean") {
+      withFlag.visible = visible; // ColumnDef: keep its flag in sync
+    }
+    this.recalcContentWidthInPx();
+    this.recalcPadding();
+    this.calcXPositions();
+    return true;
+  }
+
+  /**
+   * Whether a column is shown ({@link ColumnDefIf.isVisible}). Columns without a column definition are always shown.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @returns {boolean} false for hidden and for unknown columns
+   *
+   * @example
+   * const hidden = tableModel.isColumnVisible?.("category") === false;
+   */
+  isColumnVisible(column: number | string | ColumnDefIf): boolean {
+    const columnDef = this.findColumnDef(column);
+    if (columnDef) {
+      return columnDef.isVisible?.() !== false;
+    }
+    return typeof column === "number" && column >= 0 && column < this.getColumnCount();
   }
 
   /**
@@ -562,6 +646,21 @@ export class TableModel implements TableModelIf {
     if (width.unit === "%") return Math.floor(width.value * clientWidth / 100);
 
     return -1;
+  }
+
+  /** The column definition for a column index, a property or a column definition of this model. */
+  private findColumnDef(column: number | string | ColumnDefIf): ColumnDefIf | undefined {
+    const columnDefs = this.columnDefs ?? [];
+    if (typeof column === "number") {
+      return column >= 0 ? columnDefs[column] : undefined;
+    }
+    if (typeof column === "string") {
+      for (const cd of columnDefs) {
+        if (cd.property === column) return cd;
+      }
+      return undefined;
+    }
+    return columnDefs.indexOf(column) > -1 ? column : undefined;
   }
 
   private arrayMove(arr: any[], fromIndex: number, toIndex: number) {

@@ -42,6 +42,7 @@ import { EventSelectionChangedListenerIf } from './selection/event-selection-cha
 import { ResizeHandler } from './resize-handler';
 import { ExcelService } from './service/excel-service';
 import { ExcelServiceIf } from './service/excel-service.if';
+import { ColumnDefIf } from './data/tablemodel/column/column-def.if';
 
 
 /**
@@ -1021,6 +1022,50 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   setColumnWidth(columnIndex: number, width: number): void{
     this.tableModel.setColumnWidth(columnIndex, width);
+  }
+
+  /**
+   * Shows or hides a column and repaints (see {@link TableApi.setColumnVisible}).
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @param {boolean} visible - false hides the column
+   * @returns {boolean} false if the column has no column definition (or the table model can't hide columns)
+   */
+  setColumnVisible(column: number | string | ColumnDefIf, visible: boolean): boolean {
+    if (!this.tableModel.setColumnVisible?.(column, visible)) {
+      return false;
+    }
+    this.recalcWrappers(); // content width, wrapper div, fixed areas, repaint
+    return true;
+  }
+
+  /**
+   * Shows or hides the header and repaints (see {@link TableApi.setHeaderVisible}).
+   *
+   * @param {boolean} visible - false hides the header
+   */
+  setHeaderVisible(visible: boolean): void {
+    this.setAreaVisible('header', visible);
+  }
+
+  /**
+   * Shows or hides the footer and repaints (see {@link TableApi.setFooterVisible}).
+   *
+   * @param {boolean} visible - false hides the footer
+   */
+  setFooterVisible(visible: boolean): void {
+    this.setAreaVisible('footer', visible);
+  }
+
+  private setAreaVisible(area: 'header' | 'footer', visible: boolean): void {
+    const tableModel = this.tableModel;
+    const setter = area === 'header' ? tableModel.setHeaderVisible : tableModel.setFooterVisible;
+    if (!setter) {
+      console.warn(`set${area === 'header' ? 'Header' : 'Footer'}Visible() needs a table model with this method (e.g. TableModel), this one has none:`, tableModel);
+      return;
+    }
+    setter.call(tableModel, visible);
+    this.recalcWrappers(); // area heights → scroll viewport and body height, repaint
   }
 
   autoResizeColumns(recalcWrappers: boolean= true) {

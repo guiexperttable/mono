@@ -42,6 +42,11 @@ import Callout from "../../components/training/Callout.astro";
     <p><code>expanded</code> in <code>buildTreeRows</code> since 1.1.90. Since 1.1.89 empty parent cells show nothing instead of
       “undefined”, and two quick clicks on different arrows are no longer swallowed as a double-click.</p>
   </Callout>
+  <Callout type="note" title="Filter a tree">
+    <p>The filter function gets the <ApiLink name="TreeRowIf" /> (use <code>row.data</code>) and checks every node – also below
+      collapsed nodes. Ancestors of a match stay visible, and the filter stays active while you expand, collapse or sort
+      (since 1.1.91).</p>
+  </Callout>
   <Callout type="note" title="Remember what was open">
     <p>With <code>autoRestoreOptions</code> and <code>getRowId</code> the table remembers expanded nodes across reloads –
       <ChapterLink slug="persist-state" />.</p>

@@ -155,6 +155,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Editor öffnen: F2. Erst seit Okt. 2026 wirksam – vorher löste jede Taste `START_EDITING` aus (s. `TODO.md`).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
+  Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
+  `TreeRow`, prüft alle Knoten (auch zugeklappte), Vorfahren von Treffern bleiben sichtbar.
 - Persistenz: `tableOptions.autoRestoreOptions` (Scroll-Pos, Sortierung, Collapsed/Expanded; `getStorageKeyFn`).
 - Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
   Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via

@@ -693,6 +693,13 @@ const tableModel = TableFactory.createTableModel({
 
 Row checkboxes in a tree: set `showCheckboxWihoutExtraColumn: true` in the options (checkbox inside the first
 column) and listen to `checkboxChanged`. Arrow icons are configured with `tableOptions.treeOptions`.
+
+Filtering a tree (`externalFilterFunction` + `tableApi.externalFilterChanged()`): the function receives the `TreeRow`
+(use `row.data`) and is checked for **every** node, also below collapsed nodes. A node is shown if it or one of its
+descendants matches and all its parents are expanded – the ancestors of a match stay visible (a collapsed ancestor
+stays collapsed). The filter stays active when nodes are expanded, collapsed or sorted (since 1.1.91).
+Expanding from code: set `treeRow.expanded = true`, then `treeAreaModel.recalcVisibleTreeRows()` and
+`tableApi.repaintHard()`.
 Showcases: *Tree table*, *Tree table with row checkbox*.
 
 ### 6.7 Inline editing

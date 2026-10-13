@@ -198,11 +198,20 @@ Verhalten steht als `// NOTE:` in den Specs.
       beim nächsten Scrollen. Jetzt verzögertes Repaint (~1 ms), aber nicht bei
       Klicks in `input`/`select`/`textarea`/`button`/Links/`contenteditable` einer Zelle (sonst verlieren Eingabefelder
       eigener Renderer Fokus und Text).
-- [ ] **Baum + Filter** (`data/tablemodel/areamodel/area-model-tree.ts`): Aufklappen/Zuklappen
-      (`recalcVisibleTreeRows`, `:50`) verwirft den Filter; ein Filter nach dem Aufklappen findet die neuen Zeilen nicht
-      (`flattenRows` veraltet); `doSort` (`:131`) verwirft den Filter – und weil `externalFilterChanged` danach neu
-      sortiert, wirkt ein Filter auf einem sortierten Baum gar nicht. `doSort([])` (`:124`) wirft einen TypeError
-      (erreichbar über `api.reSort()`).
+- [x] **Baum + Filter** (`area-model-tree.ts`, Branch `fix/tree-filter`): eine Pipeline – alle Zeilen (in Sortier-
+      Reihenfolge) → sichtbar (alle Eltern aufgeklappt) → Filter – für Aufklappen, Zuklappen, Filter, Sortieren und
+      „alle auf/zu“. Der Filter bleibt erhalten, findet auch Treffer unter zugeklappten Knoten (deren Vorfahren bleiben
+      sichtbar, zugeklappt) und wirkt auf sortierten Bäumen. `doSort([])` ist ein No-op. „Alle auf/zu“ berechnet die
+      Scrollhöhe neu (`repaintHard`).
+- [ ] Baum – gefunden, nicht behoben: `api.reSort()` nutzt nur gespeicherte Sortier-Items (`autoRestoreOptions`), sonst
+      wirkungslos – für alle Tabellen (`table-scope.ts` `reSort`); `api.sort(fn)` ist auf Bäumen ein No-op
+      (`AbstractAreaModel.sort`) · Filter-Prädikat läuft bei jedem Auf-/Zuklappen über alle Knoten (1 Mio. Knoten ≈ 110 ms;
+      `keep` hängt nicht vom Aufklapp-Zustand ab → nur bei Filteränderung neu berechnen) und bei aktiver Sortierung doppelt
+      · `AreaModelTree.getRowCount()` prüft `isVisible` je Zeile (könnte die Array-Länge liefern) ·
+      `TreeCheckboxModel.checkAll()` O(n²) bei vielen Geschwistern · zwei Klicks < 500 ms auf das „alle auf/zu“-Icon bzw.
+      denselben Pfeil gelten als Doppelklick (`mouse-handler.ts:89`) · Eltern ohne sichtbare Kinder (gefiltert) zeigen
+      trotzdem einen Pfeil · Mehrspalten-Sortierung im Baum nutzt nur das letzte Item · keine `TableApi`-Methode zum
+      Auf-/Zuklappen (heute `TableScope.toggleExpandCollapseAll` bzw. `recalcVisibleTreeRows()` + `repaintHard()`).
 - [x] **Abgewählte Zellen lassen sich wieder auswählen** (`selection-model.ts`): „letzte Operation je Zelle gewinnt“ –
       `addSelection`/`togglePoint`/`firstClick`/`toggleRow` heben negative Ranges für ihre Zellen auf (Rechteck-Differenz,
       auch unbegrenzte Zeilen/Spalten), `selectAll()` verwirft sie. `removeSelection` bei Typ `row`/`column` entfernt
@@ -241,8 +250,8 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] `setColumnWidth` aktualisiert die x-Positionen nicht (`table-model.ts:119`) → `GeMouseEvent.columnLeft` veraltet.
 - [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`); `buildByTypedRows(rows, [])` wirft
       (`table-factory.ts:371`).
-- [ ] `TreeFactory`: `deepMaxLimit` off-by-one (`tree-factory.ts:98`); `TreeCheckboxModel.checkAll()` endlose Rekursion
-      (`tree-checkbox-model.ts:29`).
+- [x] `TreeFactory`: `deepMaxLimit` off-by-one behoben (Zeilen bis Tiefe n, vorher n + 1); `TreeCheckboxModel.checkAll()`
+      endlose Rekursion behoben (Argument optional, Default: ganzer Baum; entfernt weiterhin die Häkchen).
 - [ ] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei).
 - [ ] `CssVars` Blackboard-Theme: Tippfehler `otransparent` (`css-vars.ts:225`).
 - [ ] `SchemeGenerator.renderTypeScriptInterfaces` liefert beim zweiten Aufruf `[]` (`scheme-generator-service.ts:83`).
@@ -257,6 +266,10 @@ Verhalten steht als `// NOTE:` in den Specs.
 - **Maus/Selektion**: Strg/⌘-Klick schaltet Zellen/Zeilen um (Einzelmodus: Strg-Klick auf die selektierte Zeile wählt
   sie ab – Master/Detail-Ansichten prüfen), Strg/⌘+Alt-Klick wählt ab; Klicks werden sofort gezeichnet;
   `onFocusChanged` einmal je Änderung (vorher zweimal, auch ohne Änderung); `getMergedRowIndices(rowCount?)` sortiert.
+- **Baum**: ein Filter bleibt beim Auf-/Zuklappen und Sortieren erhalten und findet Treffer unter zugeklappten Knoten
+  (Vorfahren sichtbar); das Filter-Prädikat bekommt weiterhin die `TreeRow`, `index`/`array` beziehen sich jetzt auf alle
+  Zeilen; `api.reSort()` wirft nicht mehr; „alle auf/zu“ aktualisiert die Scrollleiste; `deepMaxLimit: n` erzeugt keine
+  Zeilen tiefer als n (vorher n + 1).
 - **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
   `selectAll()` bei Typ `"none"` ohne Wirkung.
 

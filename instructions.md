@@ -558,7 +558,7 @@ Built-in renderers (all in `@guiexpert/table`): `NumberCellRenderer`, `PositiveA
 Own renderer – implement `CellRendererIf`; you get the cell `<div>` and full control over its content:
 
 ```ts
-import { AreaIdent, AreaModelIf, CellRendererIf, DomServiceIf, RendererCleanupFnType } from "@guiexpert/table";
+import { AreaIdent, AreaModelIf, CellRendererIf, DomServiceIf, RendererCleanupFnType, escapeHtml } from "@guiexpert/table";
 
 export class TrafficLightRenderer implements CellRendererIf {
   render(
@@ -570,11 +570,15 @@ export class TrafficLightRenderer implements CellRendererIf {
     cellValue: any,
     _domService: DomServiceIf): RendererCleanupFnType | undefined {
     const color = cellValue > 80 ? "#36BB6C" : cellValue > 40 ? "#f5b400" : "#e00034";
-    cellDiv.innerHTML = `<span style="color:${color}">●</span> ${cellValue}`;
+    cellDiv.innerHTML = `<span style="color:${color}">●</span> ${escapeHtml(cellValue)}`;
     return undefined;   // optionally return a cleanup function (called before the cell is re-rendered)
   }
 }
 ```
+
+Data written into `innerHTML` must go through `escapeHtml()` (or be set as text, e.g. `textContent`) – otherwise a
+value like `<img src=x onerror=…>` from your server becomes markup and runs (HTML injection). The built-in renderers
+and the CRUD dialogs escape their values.
 
 Use it with `ColumnDef.create({ property: "score", headerLabel: "Score", bodyRenderer: new TrafficLightRenderer() })`
 or per cell by overriding `getCellRenderer(rowIndex, columnIndex)` in your area model.

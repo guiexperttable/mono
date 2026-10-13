@@ -6,6 +6,7 @@ import { RendererCleanupFnType } from '../renderer-cleanup-fn.type';
 import { ActionEventListenerIf } from './action-event-listener.if';
 import { ActionEvent } from './action-event';
 import { CrudAction } from '../../crud/crud-action';
+import { escapeHtml } from '../../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -59,7 +60,7 @@ export class ActionsCellRenderer implements CellRendererIf {
       type="button"
       data-area="${areaIdent}"
       data-action="${action.action}"
-      data-id="${id}"
+      data-id="${escapeHtml(id)}"
       data-row-index="${rowIndex}"
       data-col-index="${columnIndex}"
       style="height: 100%;line-height: 1;"
@@ -82,7 +83,7 @@ export class ActionsCellRenderer implements CellRendererIf {
       href="javascript:void(0)"
       data-area="${areaIdent}"
       data-action="${action.action}"
-      data-id="${id}"
+      data-id="${escapeHtml(id)}"
       data-row-index="${rowIndex}"
       data-col-index="${columnIndex}"
       ${isEnabled}

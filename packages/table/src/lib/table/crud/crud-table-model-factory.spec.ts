@@ -72,6 +72,25 @@ describe('CrudTableModelFactory', () => {
       expect(actions.rendererMap.body).toBeInstanceOf(ActionsCellRenderer);
     });
 
+    it('the action column shows the id of getIdKey()', async () => {
+      const { tm } = await createModel([{ uuid: 'u-1', name: 'a' }], {}, o => { o.getIdKey = () => 'uuid'; });
+      expect(tm.getColumnDefs()!.map(d => d.property)).toEqual(['uuid', 'name', 'uuid']);
+      expect(tm.getBodyModel().getValueAt(0, 2)).toBe('u-1');
+    });
+
+    it('a failed list request is logged – no table model, no callback', async () => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const failure = new Error('offline');
+      const factory = new CrudTableModelFactory();
+      const options = new CrudOptions();
+      options.fetchList = () => Promise.reject(failure);
+      const callback = vi.fn();
+      factory.createTableModel(options, {}, callback);
+      await vi.waitFor(() => expect(error).toHaveBeenCalledWith('CrudTableModelFactory: loading the list failed', failure));
+      expect(callback).not.toHaveBeenCalled();
+      expect(factory.tableModel).toBeUndefined();
+    });
+
     it('adds no action column with autoAddActionColumn = false', async () => {
       const { tm } = await createModel(people(), {}, o => { o.autoAddActionColumn = false; });
       expect(tm.getColumnCount()).toBe(3);
@@ -168,6 +187,29 @@ describe('CrudTableModelFactory', () => {
       expect(deleteItem).toHaveBeenCalledWith(options, 1);
       expect(factory.bodyModel!.getAllRows().map((r: Person) => r.id)).toEqual([22]);
       expect(factory.bodyModel!.getRowCount()).toBe(1);
+    });
+
+    it('DELETE: compares the id of getIdKey() as text (data-id of the action link is a string)', async () => {
+      const rows = [{ uuid: 1, name: 'a' }, { uuid: 22, name: 'b' }, { id: 22, name: 'no uuid' }];
+      const { factory, options } = await createModel(rows, {}, o => {
+        o.getIdKey = () => 'uuid';
+        o.deleteItem = vi.fn(() => Promise.resolve(undefined));
+      });
+      factory.onActionEvent(new ActionEvent('DELETE', 'body', factory.bodyModel!, 1, 3, '22'));
+      await vi.waitFor(() => expect(factory.bodyModel!.getRowCount()).toBe(2));
+      expect(options.deleteItem).toHaveBeenCalledWith(options, '22');
+      expect(factory.bodyModel!.getAllRows().map(r => r.name)).toEqual(['a', 'no uuid']);
+    });
+
+    it('DELETE: a failed request keeps the row and logs the error', async () => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const failure = new Error('500');
+      const { factory } = await createModel(people(), {}, o => {
+        o.deleteItem = () => Promise.reject(failure);
+      });
+      factory.onActionEvent(new ActionEvent('DELETE', 'body', factory.bodyModel!, 0, 3, 1));
+      await vi.waitFor(() => expect(error).toHaveBeenCalledWith('CrudTableModelFactory: DELETE failed', failure));
+      expect(factory.bodyModel!.getRowCount()).toBe(2);
     });
 
     it('calls the listener also for unknown actions', () => {

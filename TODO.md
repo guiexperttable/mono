@@ -309,29 +309,45 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
       (`table-scope.ts:491`).
 
 **Renderer & Editor**
-- [ ] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle
-      (`number-cell-renderer.ts:25`, `positive-and-negative-number-renderer.ts:21`); fehlendes Anführungszeichen
-      `data-row-index=${rowIndex}"` (`positive-and-negative-number-renderer.ts:25`) · ungültiges Datum: `RangeError`
-      bricht den Render-Durchlauf ab, Tabelle bleibt leer (`date-to-iso-cell-renderer.ts:20`, `date-to-tec-cell-renderer.ts:21`).
-- [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Wert nicht escaped – `"` schneidet den Text ab, leere
-      Zelle zeigt „undefined“ (`input-cell-renderer.ts:28`) · Span-Modell wird nie neu aufgebaut: `setRows()` mit weniger
-      Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
+- [x] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle; fehlendes Anführungszeichen
+      `data-row-index=${rowIndex}"` (`positive-and-negative-number-renderer.ts`) – behoben (Branch `fix/crud`).
+- [ ] Ungültiges Datum: `RangeError` bricht den Render-Durchlauf ab, Tabelle bleibt leer (`date-to-iso-cell-renderer.ts:20`,
+      `date-to-tec-cell-renderer.ts:21`).
+- [x] **HTML-Injection in Renderern** (Branch `fix/crud`): neue Hilfsfunktion `escapeHtml()` (exportiert); Werte werden
+      escaped in `InputCellRenderer` (Editor: `"` schnitt den Text ab, leere Zelle zeigte „undefined“),
+      `SelectCellRenderer` (Optionen), `NumberCellRenderer`, `PositiveAndNegativeNumberRenderer`,
+      `DateToIntlDDMMYYYYCellRenderer`, `CellGroupExtCellRenderer` (Header-Gruppen-Label), `ActionsCellRenderer` (`data-id`).
+      Die übrigen `innerHTML`-Renderer schreiben nur Zahlen/Konstanten.
+- [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Span-Modell wird nie neu aufgebaut: `setRows()` mit
+      weniger Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
 - [ ] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 (`css/table-tree.css:42/46`).
 
 **CRUD** (`crud/*`)
-- [ ] **HTML-Injection**: Werte unescaped in `innerHTML` (`crud-object-view.ts:61`) · Edit liest per `FormData`: Zahlen
-      als Strings, Checkbox „on“, nicht angehakte Checkbox fehlt (Boolean nie wieder `false`) (`crud-object-edit.ts:34`) ·
-      verschachtelte `<form>`: Felder nach einem Unterobjekt gehen verloren (`:63/85`) · Wert nicht escaped (`:68`) ·
-      CREATE sendet das leere Objekt, Eingaben gehen verloren (`crud-table-model-factory.ts:177`) ·
-      `getIdByObject` liefert immer `o['id']` (`crud-options.ts:42`).
+- [x] Behoben (Branch `fix/crud`): **HTML-Injection** – View/Edit escapen Titel, Namen und Werte · Edit liest typgerecht
+      (Zahl bleibt Zahl, leeres Zahlfeld = `null`, Checkbox = `true`/`false`, leeres Feld zu `null`/`undefined` bleibt so),
+      ein `<form>` mit `<fieldset>` je Unterobjekt (Felder nach einem Unterobjekt gingen verloren), tiefe Kopie (das
+      Original blieb nicht unverändert), Schlüssel mit Punkt bleiben flach, `__proto__`/`constructor`/`prototype` werden
+      ignoriert · View und Edit verschwinden auch nach Escape aus dem DOM · CREATE sendet die Eingaben (vorher das leere
+      Objekt), CLONE und CREATE senden **ohne** id · die Tabelle zeigt das Ergebnis: EDIT aktualisiert die Zeile (Antwort
+      des Servers, falls sie ein Objekt mit id ist, sonst die Eingaben), CREATE/CLONE hängen das neue Objekt an (bzw. laden
+      die Liste neu, wenn die Antwort keins enthält) · Actions-Spalte und DELETE nutzen `getIdKey()` (vorher fest `id`) ·
+      Fehler werden per `console.error` gemeldet statt unbehandelt, `console.info`-Ausgaben entfernt · `CrudOptions`:
+      `getIdByObject` nutzt `getIdKey()`, `deleteItem` Default `DELETE` (vorher GET), fehlende URL → Promise rejected
+      (vorher `fetch('')`), HTTP-Fehlerstatus → rejected (vorher wurde z. B. bei 500 die Zeile trotzdem gelöscht), leere
+      Antwort (204) → `undefined` (vorher Parse-Fehler: DELETE mit 204 entfernte die Zeile nie), `{id}` URL-kodiert und
+      jedes Vorkommen ersetzt, JSON-Body mit `Content-Type: application/json`.
+- [ ] Leere Liste: es entsteht keine Tabelle und der Aufrufer erfährt nichts (Spalten kommen aus der ersten Zeile) –
+      Spalten könnten aus `columnDefs` bzw. `getEmptyItem()` kommen, dann ginge auch „Create“ bei leerer Liste.
+- [ ] Tabellen-Aktion `DELETE_SELECTED` (in `CrudOptions.tableActions`) wird von der Factory nicht behandelt.
+- [ ] `{ ...new CrudOptions(), getIdKey: () => 'uuid' }`: das kopierte `getIdByObject` ruft noch das `getIdKey` der
+      Original-Instanz (Arrow-Function) – die Factory selbst nutzt `getIdKey()` und ist nicht betroffen.
 
 Weitere fragwürdige Stellen (als `// NOTE:` in den Specs): `setColumnWidth()` zeichnet nicht neu · Doppelklick feuert
 `onMouseClicked` dreimal · Strg+Alt ruft `debugOnce()`/`console.clear()` · voreingestellter `sortState` zeigt das Icon,
 sortiert aber nicht · Spaltenziehen ignoriert min/max · Kontextmenü-Drossel 50 ms · `setRows/addRows/…` zeichnen nicht neu,
 `setRows` verwirft Filter + Sortierung (Icon bleibt) · alle Span-Bereiche werden bei jedem Render gezeichnet ·
 Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderVisible: false` uneinheitlich · Zeile 0 jeder
-Objekt-Tabelle hat `ge-focused-row` · CRUD: Dialog bleibt nach Escape im DOM, flache Kopie beim Editieren, CLONE behält die
-id, `deleteItem` per GET.
+Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
 
@@ -357,6 +373,17 @@ id, `deleteItem` per GET.
   nicht eingehängten Elements erst beim Einhängen, `el.data = undefined` gibt die Tabelle frei.
 - **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
   `selectAll()` bei Typ `"none"` ohne Wirkung.
+- **HTML-Escaping**: CRUD-Dialoge und die Renderer `InputCellRenderer`, `SelectCellRenderer`, `NumberCellRenderer`,
+  `PositiveAndNegativeNumberRenderer`, `DateToIntlDDMMYYYYCellRenderer`, `CellGroupExtCellRenderer` und
+  `ActionsCellRenderer` (`data-id`) zeigen Daten als **Text** – wer bisher bewusst HTML in Header-Gruppen-Labels oder
+  Select-Optionen geschrieben hat, braucht einen eigenen Renderer. Neue Hilfsfunktion `escapeHtml()` für eigene Renderer.
+  `NumberCellRenderer`/`PositiveAndNegativeNumberRenderer` zeigen 0 an (vorher leer).
+- **CRUD**: `deleteItem` sendet per Default `DELETE` (vorher GET); CLONE/CREATE senden das Objekt **ohne** id-Property;
+  `updateItem`/`createItem` senden `Content-Type: application/json` (bei Cross-Origin-Servern ggf. CORS-Header erlauben);
+  `{id}` in URLs wird URL-kodiert; die REST-Promises werden bei HTTP-Fehlerstatus und fehlender URL rejected, eine leere
+  Antwort liefert `undefined`; `getIdByObject` liefert `o[getIdKey()]` (ohne die Property `undefined`, vorher das Objekt
+  selbst); die Tabelle zeigt gespeicherte/neue Zeilen sofort; Actions-Spalte und DELETE nutzen `getIdKey()`; keine
+  `console.info`-Ausgaben mehr. Edit-Dialog: Zahlen bleiben Zahlen, Booleans werden als `true`/`false` gespeichert.
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

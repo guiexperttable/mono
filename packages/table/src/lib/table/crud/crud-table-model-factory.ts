@@ -23,7 +23,36 @@ import { CrudObjectEdit } from './crud-object-edit';
 import { ActionEvent } from '../renderer/action/action-event';
 
 
-/** @category CRUD */
+/**
+ * Builds a table for a REST resource: loads the list (`crudOptions.fetchList`), derives the columns from the first item
+ * (nested objects flattened, e.g. `address.city`) and adds an "Actions" column (View / Edit / Clone / Delete) whose
+ * links open the CRUD dialogs ({@link CrudTableModelFactory.onActionEvent}). The table shows the result of a save or
+ * delete without reloading the list.
+ *
+ * @example
+ * const factory = new CrudTableModelFactory();
+ * factory.createTableModel(
+ *   {
+ *     ...new CrudOptions(),
+ *     urls: {
+ *       list: new UrlInfo('GET', '/api/customers'),
+ *       read: new UrlInfo('GET', '/api/customers/{id}'),
+ *       update: new UrlInfo('PUT', '/api/customers/{id}'),
+ *       create: new UrlInfo('POST', '/api/customers'),
+ *       delete: new UrlInfo('DELETE', '/api/customers/{id}'),
+ *     },
+ *     getEmptyItem: () => ({ name: '', vip: false }),
+ *   },
+ *   {},
+ *   ({ tableModel, tableOptions }) => {
+ *     const tableScope = new TableScope(hostDiv, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+ *     tableScope.firstInit();
+ *   }
+ * );
+ * document.querySelector('#create')!.addEventListener('click', () => factory.openDialogForCreate());
+ *
+ * @category CRUD
+ */
 export class CrudTableModelFactory implements ActionEventListenerIf {
 
   public tableModel: TableModelIf | undefined;
@@ -78,8 +107,9 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
         }
 
         if (crudOptions.autoAddActionColumn) {
+          // the cell value of the action column is the id of the row
           let columnDef = new ColumnDef(
-            'id',
+            this.getIdKey(),
             'Actions',
             px300,
             new AreaObjectMap(['ge-table-text-align-left'], ['ge-table-text-align-left ge-table-actions-cell'], undefined)
@@ -109,7 +139,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
 
         callback(mo);
       }
-    });
+    }, error => this.logError('loading the list', error));
   }
 
   public openDialogForCreate() {
@@ -119,77 +149,125 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
     }
   }
 
+  /**
+   * Handles the actions of the action column (and `CREATE`): the listener of {@link createTableModel} is called first,
+   * then
+   * - `VIEW`: `fetchItem` → {@link CrudObjectView};
+   * - `EDIT`: `fetchItem` → {@link CrudObjectEdit} → Save: `updateItem(id, item)`, the row shows the saved values
+   *   (the response, if it is an item with id – otherwise the edited item);
+   * - `CLONE` / `CREATE`: `fetchItem` resp. `getEmptyItem()` → {@link CrudObjectEdit} → Save: `createItem(item)` – without
+   *   the id property, the server assigns it. If the response is an item with id, it is added as last row, otherwise the
+   *   list is loaded again (`fetchList`);
+   * - `DELETE`: `deleteItem(id)` → the row is removed.
+   *
+   * A failed request is logged with `console.error`; the table stays unchanged.
+   */
   onActionEvent(actionEvent: ActionEventIf): void {
     if (this.listenActionEvent) {
       this.listenActionEvent(actionEvent);
     }
-    if (actionEvent.action === 'VIEW') {
-      let id = actionEvent.id;
-      this.crudOptions?.fetchItem(this.crudOptions, id)
-        .then(json => {
-          console.info(json);
-          new CrudObjectView(json as Record<string, any>).openDialog();
-          return json;
-        });
+    const options = this.crudOptions;
+    const idKey = this.getIdKey();
+    const action = actionEvent.action;
+    const id = actionEvent.id;
 
-    } else if (actionEvent.action === 'EDIT') {
-      let id = actionEvent.id;
-      const idKey = this.crudOptions.getIdKey()??'id';
-      this.crudOptions?.fetchItem<any>(this.crudOptions, id)
-        .then(json => {
-          console.info(json);
-          new CrudObjectEdit(
-            idKey,
-            json as Record<string, any>
-          ).openDialog((updatedObject: any) => {
-            console.info(updatedObject); // TODO
-            this.crudOptions.updateItem(this.crudOptions, id, updatedObject);
-          });
-          return json;
-        });
+    if (action === 'VIEW') {
+      options.fetchItem<Record<string, any>>(options, id)
+        .then(item => new CrudObjectView(item).openDialog())
+        .catch(error => this.logError(action, error));
 
-    } else if (actionEvent.action === 'CLONE') {
-      let id = actionEvent.id;
-      const idKey = this.crudOptions.getIdKey()??'id';
-      this.crudOptions?.fetchItem<any>(this.crudOptions, id)
-        .then(item => {
-          const clone = JSON.parse(JSON.stringify(item));
-          new CrudObjectEdit(
-            idKey,
-            clone as Record<string, any>,
-            'Clone Item'
-          ).openDialog((updatedObject: any) => {
-            console.info(updatedObject); // TODO
-            this.crudOptions.createItem(this.crudOptions, updatedObject);
-          });
-          return clone;
-        });
+    } else if (action === 'EDIT') {
+      options.fetchItem<Record<string, any>>(options, id)
+        .then(item => new CrudObjectEdit(idKey, item).openDialog(updatedObject =>
+          options.updateItem(options, id, updatedObject)
+            .then(response => this.updateRow(id, this.isItemWithId(response) ? response : updatedObject))
+            .catch(error => this.logError(action, error))))
+        .catch(error => this.logError(action, error));
 
-    } else if (actionEvent.action === 'CREATE') {
-      const idKey = this.crudOptions.getIdKey()??'id';
-      const clone = JSON.parse(JSON.stringify(this.crudOptions.getEmptyItem()));
-      new CrudObjectEdit(
-        idKey,
-        clone as Record<string, any>,
-        'Create Item'
-      ).openDialog((updatedObject: any) => {
-        console.info(updatedObject); // TODO
-        this.crudOptions.createItem(this.crudOptions, clone);
-      });
-      return clone;
+    } else if (action === 'CLONE') {
+      options.fetchItem<Record<string, any>>(options, id)
+        .then(item => new CrudObjectEdit(idKey, item, 'Clone Item')
+          .openDialog(updatedObject => this.createItem(action, updatedObject)))
+        .catch(error => this.logError(action, error));
 
+    } else if (action === 'CREATE') {
+      new CrudObjectEdit(idKey, options.getEmptyItem() ?? {}, 'Create Item')
+        .openDialog(updatedObject => this.createItem(action, updatedObject));
 
-    } else if (actionEvent.action === 'DELETE') {
-      let id = actionEvent.id;
-
-      this.crudOptions?.deleteItem(this.crudOptions, id)
-        .then(json => {
-          this.bodyModel?.filterRowsByPredict(row => row.id != id);
+    } else if (action === 'DELETE') {
+      options.deleteItem(options, id)
+        .then(() => {
+          this.bodyModel?.filterRowsByPredict(row => !this.hasId(row, id));
           this.tableModel?.getTableScope()?.clearSelection(true);
           this.tableModel?.getTableScope()?.repaintHard();
-          return json;
-        });
+        })
+        .catch(error => this.logError(action, error));
     }
+  }
+
+  /** `createItem` without the id property (the server assigns it), then shows the new row. */
+  private createItem(action: string, item: Record<string, any>): void {
+    const options = this.crudOptions;
+    const { [this.getIdKey()]: _ignoredId, ...itemWithoutId } = item;
+    options.createItem(options, itemWithoutId)
+      .then(response => this.isItemWithId(response) ? this.addRow(response) : this.reloadRows())
+      .catch(error => this.logError(action, error));
+  }
+
+  /** Copies the saved values into the row with the given id (rows, filter and sort order stay as they are). */
+  private updateRow(id: unknown, item: Record<string, any>): void {
+    const row = this.bodyModel?.getAllRows().find(r => this.hasId(r, id));
+    if (row) {
+      Object.assign(row, item);
+      this.tableModel?.getTableScope()?.repaint();
+    }
+  }
+
+  /** Appends a new row (shown as last row, also with an active filter or sort order). */
+  private addRow(item: Record<string, any>): void {
+    const bodyModel = this.bodyModel;
+    if (bodyModel) {
+      const allRows = bodyModel.getAllRows();
+      const filteredRows = bodyModel.getFilteredRows();
+      allRows.push(item);
+      if (filteredRows !== allRows) {
+        filteredRows.push(item);
+      }
+      this.tableModel?.getTableScope()?.repaintHard();
+    }
+  }
+
+  /** Loads the list again (`fetchList`) – after a create whose response does not contain the new item. */
+  private reloadRows(): Promise<void> {
+    const options = this.crudOptions;
+    return options.fetchList<any>(options).then(rows => {
+      this.bodyModel?.setRows(rows ?? []);
+      const tableScope = this.tableModel?.getTableScope();
+      tableScope?.externalFilterChanged(false); // re-applies an external filter (if there is one)
+      tableScope?.repaintHard();
+    });
+  }
+
+  private getIdKey(): string {
+    return this.crudOptions.getIdKey?.() ?? 'id';
+  }
+
+  /** The action column carries the id as text (data-id) – compare as strings. */
+  private hasId(row: unknown, id: unknown): boolean {
+    const rowId = this.getValueByT(row, this.getIdKey());
+    return rowId !== undefined && rowId !== null && String(rowId) === String(id);
+  }
+
+  private isItemWithId(response: unknown): response is Record<string, any> {
+    if (response === null || typeof response !== 'object' || Array.isArray(response)) {
+      return false;
+    }
+    const id = this.getValueByT(response, this.getIdKey());
+    return id !== undefined && id !== null;
+  }
+
+  private logError(what: string, error: unknown): void {
+    console.error(`CrudTableModelFactory: ${what} failed`, error);
   }
 
   private calcAutoColumnWidths<T>(

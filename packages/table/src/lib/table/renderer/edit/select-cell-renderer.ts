@@ -5,6 +5,7 @@ import { DomServiceIf } from "../../service/dom-service.if";
 import { RendererCleanupFnType } from "../renderer-cleanup-fn.type";
 import { ValueLabelIf } from "../../data/common/value-label.if";
 import { ValueLabel } from "../../data/common/value-label";
+import { escapeHtml } from '../../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -37,7 +38,7 @@ export class SelectCellRenderer implements CellRendererIf {
       let opts = [];
       for (let option of this.options) {
         const selected = (option.value === val) ? " selected " : "";
-        opts.push(`<option value="${option.value}" ${selected}>${option.label}</option>`);
+        opts.push(`<option value="${escapeHtml(option.value)}" ${selected}>${escapeHtml(option.label)}</option>`);
       }
       const o = opts.join("");
 

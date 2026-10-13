@@ -1,4 +1,11 @@
-/** @category CRUD */
+import { escapeHtml } from '../../common/escape-html';
+
+/**
+ * Read-only dialog (`<dialog>`) that lists all properties of an object (nested objects flattened). Labels and values
+ * are escaped – data is shown as text, never as markup.
+ *
+ * @category CRUD
+ */
 export class CrudObjectView<T extends Record<string, any>> {
 
   private object: T;
@@ -20,11 +27,10 @@ export class CrudObjectView<T extends Record<string, any>> {
       </div>
     `;
     document.body.appendChild(dialog);
+    // Close button and Escape both close the dialog – remove it from the document then
+    dialog.addEventListener('close', () => dialog.remove());
     const closeButton = dialog.querySelector('.ge-table-dialog-footer-close-button') as HTMLButtonElement;
-    closeButton.addEventListener('click', () => {
-      dialog.close('close');
-      dialog.remove();
-    });
+    closeButton.addEventListener('click', () => dialog.close('close'));
 
     dialog.showModal();
   }
@@ -58,8 +64,8 @@ export class CrudObjectView<T extends Record<string, any>> {
 
     const generateRow = (label: string, value: string | null = null, isChildObject: boolean = false): string => `
     <tr>
-      <td${isChildObject ? ' class="ge-table-crud-object-view-object-child"' : ''}>${label}</td>
-      <td>${value ?? ''}</td>
+      <td${isChildObject ? ' class="ge-table-crud-object-view-object-child"' : ''}>${escapeHtml(label)}</td>
+      <td>${escapeHtml(value)}</td>
     </tr>`;
 
     for (const property in obj) {

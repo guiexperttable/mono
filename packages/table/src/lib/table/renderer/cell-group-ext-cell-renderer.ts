@@ -7,6 +7,7 @@ import { CellGroupExt } from '../data/tablemodel/cellgroup/cell-group-ext';
 import { HeaderGroupOptions } from '../data/options/header-group-options';
 import { HeaderGroupOptionsIf } from '../data/options/header-group-options.if';
 import { IconIf } from '../data/options/icon.if';
+import { escapeHtml } from '../../common/escape-html';
 
 
 /** @category Header groups */
@@ -60,7 +61,7 @@ export class CellGroupExtCellRenderer implements CellRendererIf {
                 data-area="${areaIdent}"
                 data-row-index="${rowIndex}"
                 data-col-index="${columnIndex}"
-                >${label}</span>`;
+                >${escapeHtml(label)}</span>`;
   }
 
   private addArrowDiv(

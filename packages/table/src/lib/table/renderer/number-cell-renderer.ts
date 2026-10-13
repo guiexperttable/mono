@@ -3,6 +3,7 @@ import { AreaModelIf } from "../data/tablemodel/areamodel/area-model.if";
 import { DomServiceIf } from "../service/dom-service.if";
 import { AreaIdent } from "../data/tablemodel/area-ident.type";
 import { RendererCleanupFnType } from "./renderer-cleanup-fn.type";
+import { escapeHtml } from '../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -22,10 +23,10 @@ export class NumberCellRenderer implements CellRendererIf {
     cellValue: any,
     domService: DomServiceIf): RendererCleanupFnType | undefined {
 
-    if (cellValue) {
+    if (cellValue || cellValue === 0) { // 0 is a value, not an empty cell
       cellDiv.innerHTML = `
 <div class="ge-table-label-div">
-  <div class="ge-table-label">${cellValue}</div>
+  <div class="ge-table-label">${escapeHtml(cellValue)}</div>
 </div>`;
       if (typeof cellValue === "string"
         || isNaN(cellValue)

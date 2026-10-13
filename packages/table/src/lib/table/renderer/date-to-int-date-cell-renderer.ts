@@ -3,6 +3,7 @@ import { AreaModelIf } from "../data/tablemodel/areamodel/area-model.if";
 import { DomServiceIf } from "../service/dom-service.if";
 import { AreaIdent } from "../data/tablemodel/area-ident.type";
 import { RendererCleanupFnType } from "./renderer-cleanup-fn.type";
+import { escapeHtml } from '../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -31,7 +32,7 @@ export class DateToIntlDDMMYYYYCellRenderer implements CellRendererIf {
       }
       cellDiv.innerHTML = `
           <div class="ge-table-label-div" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}" style="position: relative; background: transparent; width: 100%; height: 100%;">
-            <div class="ge-table-label" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}">${dateStr}</div>
+            <div class="ge-table-label" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}">${escapeHtml(dateStr)}</div>
           </div>`;
     }
     return undefined;

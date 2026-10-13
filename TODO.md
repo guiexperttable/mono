@@ -269,7 +269,8 @@ Verhalten steht als `// NOTE:` in den Specs.
 **Gering:**
 - [ ] `setValue` auf verschachteltem Pfad mit fehlendem Elternobjekt überschreibt das Elternfeld
       (`abstract-area-model.ts:157`).
-- [ ] `setColumnWidth` aktualisiert die x-Positionen nicht (`table-model.ts:119`) → `GeMouseEvent.columnLeft` veraltet.
+- [x] `setColumnWidth` aktualisierte die x-Positionen nicht → `GeMouseEvent.columnLeft` veraltet (Branch
+      `fix/columns-scrolling`).
 - [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`); `buildByTypedRows(rows, [])` wirft
       (`table-factory.ts:371`).
 - [x] `TreeFactory`: `deepMaxLimit` off-by-one behoben (Zeilen bis Tiefe n, vorher n + 1); `TreeCheckboxModel.checkAll()`
@@ -286,16 +287,17 @@ Verhalten steht als `// NOTE:` in den Specs.
 Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`packages/table/src/**/*.browser.spec.ts`).
 
 **Spaltenbreiten, Scrollen, fixierte Spalten**
-- [ ] %-Spaltenbreiten werden bis zum ersten ResizeObserver-Callback (~500 ms) für 400 px berechnet
-      (`table-model.ts:63` Default `parentSize`) · `recalcColumnWidths(clientWidth)` ignoriert die neue Breite
-      (`render-scope.ts:254`, nach Host-Resize eine Runde hinterher) · jeder ResizeObserver-Callback baut die Breiten neu
-      aus den ColumnDefs (`table-model.ts:510`) – per `setColumnWidth`/`autoResizeColumns`/Ziehen gesetzte Breiten gehen
-      verloren, auch durch den ersten Callback ~500 ms nach dem Mounten.
-- [ ] Ost-Trennlinie prüft `getFixedLeftColumnCount()` (`ele-scope.ts:208`) · Header/East-Area trägt `data-area="body"`
-      (`ele-scope.ts:92`) · Scroll-Inhalt 1 px höher als die Zeilen (`ele-scope.ts:314` vs `render-scope.ts:284`) –
-      `scrollToIndex(0, n)` lässt in der unteren Hälfte 1 px von Zeile n-1 sehen.
-- [ ] Row-Div-Cache wird nie geleert (`convenience-dom.service.ts:570/577`): jede je gerenderte Zeile bleibt mit ihren
-      Zellen referenziert (Speicher wächst beim Scrollen).
+- [x] Behoben (Branch `fix/columns-scrolling`): %-Spaltenbreiten wurden bis zum ersten ResizeObserver-Callback (~500 ms)
+      für 400 px berechnet – `firstInit()` nimmt jetzt die Host-Breite · `recalcColumnWidths(clientWidth)` las den noch
+      alten Scroll-Viewport (nach Host-Resize eine Runde hinterher) – jetzt Host-Breite minus West-Spalten und
+      senkrechte Scrollleiste · per `setColumnWidth`/`autoResizeColumns`/Ziehen gesetzte Breiten gingen beim nächsten
+      Host-Resize (auch beim ersten Callback nach dem Mounten) verloren – `setColumnWidth` speichert die Breite jetzt im
+      ColumnDef (`width` = neue px-`Size`; eine %-Spalte wird damit zur px-Spalte) und berechnet die x-Positionen neu.
+- [x] Behoben (Branch `fix/columns-scrolling`): Ost-Trennlinie prüfte `getFixedLeftColumnCount()` · Header/East-Area trug
+      `data-area="body"` · `scrollToIndex(0, n)` war vertikal daneben (1 px in der unteren Tabellenhälfte, mit Footer
+      ~17 px – Scrollleisten- und Inhaltsbereich sind verschieden groß): `scrollToPixel()` rechnet jetzt immer um und
+      zeichnet die exakte Position (wie bisher nur bei gedeckelter Höhe) · Row-Div-Cache wurde nie geleert (jede je
+      gerenderte Zeile blieb mit ihren Zellen referenziert) – jeder Render-Durchlauf vergisst nicht gezeichnete Zeilen.
 
 **Maus**
 - [ ] Scroll-Viewport überdeckt den Footer (`ele-scope.ts:162`): Footer-Klicks/-Hover kommen als Body-Events mit −1 an
@@ -380,6 +382,11 @@ Objekt-Tabelle hat `ge-focused-row`.
   `ActionsCellRenderer` (`data-id`) zeigen Daten als **Text** – wer bisher bewusst HTML in Header-Gruppen-Labels oder
   Select-Optionen geschrieben hat, braucht einen eigenen Renderer. Neue Hilfsfunktion `escapeHtml()` für eigene Renderer.
   `NumberCellRenderer`/`PositiveAndNegativeNumberRenderer` zeigen 0 an (vorher leer).
+- **Spaltenbreiten**: `setColumnWidth()` (auch `autoResizeColumns()` und Ziehen) schreibt die Breite in den ColumnDef
+  (`columnDef.width` = neue px-`Size`) – sie bleibt bei Host-Resize erhalten (vorher zurückgesetzt); %-Spalten passen
+  ab dem ersten Zeichnen und nach jedem Host-Resize (vorher 400 px bis ~500 ms nach dem Mounten bzw. eine Runde
+  hinterher) und lassen Platz für die senkrechte Scrollleiste. `scrollToIndex()` trifft die Zeile exakt (auch mit Footer).
+  Ost-Trennlinie bei nur rechts fixierten Spalten.
 - **Datums-Renderer**: ein ungültiges Datum wird unverändert angezeigt (vorher leerte es bei `DateToIsoCellRenderer`/
   `DateToTecCellRenderer` die ganze Tabelle, `DateToLocaleDateCellRenderer` zeigte „Invalid Date“). Baum: Einrückung
   bis Tiefe 9 (Tiefe 5 war wie Tiefe 6 eingerückt).
@@ -416,9 +423,7 @@ Objekt-Tabelle hat `ge-focused-row`.
 - [x] `TableApi.scrollToIndex(indexX, indexY)` scrollt jetzt zur Spalte (erste Spalte des scrollbaren Mittelteils,
       im Rahmen des Scrollbereichs); fixierte West-Spalte = zurück an den Anfang (x = 0, wie bisher), fixierte Ost-Spalte
       und `-1` = horizontale Position behalten. `ensureRowIsVisible` (und damit die Pfeiltasten) behält x.
-- [ ] `scrollToIndex` vertikal leicht daneben: der ungedeckelte Pfad nimmt `py` direkt als `scrollTop`, der Scrollbereich
-      enthält aber den Footer (`ele-scope.ts:164`) und 1 px Extra-Höhe (`ele-scope.ts:314`) → mit Footer ist die Zielzeile
-      ~17 px angeschnitten (erste ganz sichtbare = Ziel + 1). Gedeckelter Pfad exakt.
+- [x] `scrollToIndex` vertikal leicht daneben (mit Footer ~17 px) – behoben (Branch `fix/columns-scrolling`).
 - [x] Zellen eines eigenen `AreaModel` sind auswählbar: `AreaModel.isSelectable()` Default `true` (wie
       `AbstractAreaModel` und die Doku); Opt-out: überschreiben und `false` liefern.
 - [x] Typen bei `skipLibCheck: false` (TS7016 in `vue3-table`): `exports` aller Pakete mit

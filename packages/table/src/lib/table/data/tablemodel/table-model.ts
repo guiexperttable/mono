@@ -14,6 +14,7 @@ import { CheckboxModel } from "../../checkbox/checkbox-model";
 import {isCheckboxColumnDef} from "../../instanceof-workaround";
 import { FalseFn, TrueFn } from "../common/boolean-function";
 import { SizeIf } from '../common/size.if';
+import { Size } from '../common/size';
 import { TableScope } from '../../table-scope';
 
 
@@ -116,6 +117,8 @@ export class TableModel implements TableModelIf {
 
   /**
    * Sets the width in pixel of a column (by columnIndex) in a table.
+   * The width is also stored in the column's ColumnDef (`width` = the new px size), so it survives a host resize
+   * (the widths are recalculated from the ColumnDefs then).
    *
    * @param {number} columnIndex - The index of the column.
    * @param {number} width - The desired width of the column.
@@ -128,6 +131,16 @@ export class TableModel implements TableModelIf {
     }
     if (columnIndex > -1 && columnIndex < this.columnSizes?.length) {
       this.columnSizes[columnIndex] = width;
+      // The widths are rebuilt from the ColumnDefs whenever the host is resized (recalcColumnWidths) – without this
+      // the width set here (also by autoResizeColumns() and by dragging a header edge) would be lost.
+      // A new Size: the old one may be a shared constant like px100.
+      const columnDef = this.columnDefs?.[columnIndex];
+      if (columnDef) {
+        columnDef.width = new Size(width, 'px');
+      }
+    }
+    if (this.overridingColumnWidth === -1) {
+      this.calcXPositions(); // the following columns move
     }
     this.recalcContentWidthInPx();
   }

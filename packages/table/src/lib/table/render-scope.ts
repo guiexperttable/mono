@@ -245,21 +245,33 @@ export class RenderScope extends EleScope {
   }
 
   /**
-   * Recalculates the column widths of the table.
+   * Recalculates the column widths of the table (% and weight columns depend on the available width) and repaints.
    *
-   * @param {number} [clientWidth] - The client width of the table. If not provided, the client width of the scroll viewport will be used.
+   * @param {number} [clientWidth] - The (new) width of the host element, e.g. from a ResizeObserver.
+   *                                 Default: its current width.
    *
    * @return {undefined}
    */
   recalcColumnWidths(clientWidth?: number) {
-    let widthInPixel =
-      (
-        (!clientWidth || clientWidth > this.scrollViewport.offsetWidth)
-        && this.scrollViewport.offsetWidth > 100
-      ) ? this.scrollViewport.offsetWidth : this.scrollViewport.clientWidth;
-    this.tableModel.setParentWidth(widthInPixel);
+    // The scroll viewport may still have the size from before a host resize (it is resized in repaintHard()),
+    // so the width is taken from the host, not from the viewport.
+    const widthInPixel = this.getAvailableColumnWidth(clientWidth);
+    if (widthInPixel > 0) {
+      this.tableModel.setParentWidth(widthInPixel);
+    }
     this.tableModel.init();
     this.repaintHard();
+  }
+
+  /**
+   * The width that % and weight columns share: host width minus the fixed west columns and a vertical scroll bar.
+   *
+   * @param {number} [hostWidth] - the width of the host element (default: its current client width)
+   * @returns {number} the width in px (0 if the host has no width yet, e.g. while it is hidden)
+   */
+  protected getAvailableColumnWidth(hostWidth: number = this.hostElement.clientWidth): number {
+    const verticalScrollBarWidth = Math.max(0, this.scrollViewport.offsetWidth - this.scrollViewport.clientWidth);
+    return Math.max(0, hostWidth - this.tableModel.getPadding().left - verticalScrollBarWidth);
   }
 
 
@@ -795,6 +807,12 @@ export class RenderScope extends EleScope {
         + '\nrender scope: this.lastFullVisibleRowIndex <- ' + this.lastFullVisibleRowIndex); // TODO del
     }
 
+    // The row div cache reuses the divs of rows that stay visible – forget the rows that were not rendered in this
+    // pass (otherwise every row ever scrolled into view stays referenced with all its cells).
+    this.pruneRowDivCache(westArea);
+    this.pruneRowDivCache(centerArea);
+    this.pruneRowDivCache(eastArea);
+
     // We draw the big colspan and rowspan cells at the end.
     // This fixes the 'half cutted big cell' problem:
     if (this.colAndRowspanModels && this.colAndRowspanModels[areaIdent]) {
@@ -822,6 +840,16 @@ export class RenderScope extends EleScope {
           }
           this.drawBigCell(range, xStart, yStart, areaModel, child, sideIdent);
         }
+      }
+    }
+  }
+
+  /** Removes the cached row divs that are no longer in the area (see `ConvenienceDomService.addRowDiv`). */
+  private pruneRowDivCache(divScope: DivScope) {
+    const cache = divScope.cache;
+    for (const key in cache) {
+      if (cache[key].parentNode !== divScope.child) {
+        delete cache[key];
       }
     }
   }

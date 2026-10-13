@@ -253,6 +253,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @returns {TableScope} This instance of the table scope.
    */
   firstInit(): TableScope {
+    // % and weight columns: start with the real width of the host (the model's default is 400 px – the
+    // ResizeObserver corrects it only ≥ 500 ms later)
+    const availableWidth = this.getAvailableColumnWidth();
+    if (availableWidth > 0) {
+      this.tableModel.setParentWidth(availableWidth);
+    }
     this.tableModel.init();
     if (this.tableOptions?.externalFilterFunction) {
       this.externalFilterChanged(false);
@@ -630,18 +636,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   scrollToPixel(px: number, py: number) {
-    if (this.isScrollHeightCapped()) {
-      // py is a content position; the (capped) scroll bar is scaled
-      const contentRange = this.getContentScrollRangeY();
-      const scrollerRange = this.getScrollerRangeY();
-      if (contentRange > 0 && scrollerRange > 0) {
-        const contentTop = Math.min(contentRange, Math.max(0, py));
-        const scrollTop = contentTop / contentRange * scrollerRange;
-        this.scrollViewport.scrollTo(px, scrollTop);
-        this.pendingContentScroll = { scrollTop: this.scrollViewport.scrollTop, contentTop };
-        this.adjustAfterScrolling(); // render the exact position now (a scroll event may not fire)
-        return;
-      }
+    // py is a content position. The scroll bar range differs from the content range – always with a capped scroll
+    // height, but also slightly without: the scroll content is 1 px higher than the rows, the scroll viewport
+    // includes the footer and the horizontal scroll bar. scrollTop = py would leave the target row a few pixels off.
+    const contentRange = this.getContentScrollRangeY();
+    const scrollerRange = this.getScrollerRangeY();
+    if (contentRange > 0 && scrollerRange > 0) {
+      const contentTop = Math.min(contentRange, Math.max(0, py));
+      const scrollTop = contentTop / contentRange * scrollerRange;
+      this.scrollViewport.scrollTo(px, scrollTop);
+      this.pendingContentScroll = { scrollTop: this.scrollViewport.scrollTop, contentTop };
+      this.adjustAfterScrolling(); // render the exact position now (a scroll event may not fire)
+      return;
     }
     this.scrollViewport.scrollTo(px, py);
   }

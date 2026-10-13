@@ -323,17 +323,20 @@ describe('TableModel', () => {
       expect(widths(tm)).toEqual([50, 100, 200, 100, 50]);
     });
 
-    it('is reset by the next recalcSize()', () => {
-      // NOTE: recalcSize() rebuilds all widths from the column definitions – a width set with setColumnWidth() is lost.
+    // Regression: recalcSize() rebuilds all widths from the column definitions – a width set with setColumnWidth()
+    // was lost (every host resize). Now setColumnWidth() also stores it in the ColumnDef.
+    it('survives the next recalcSize() (stored in the ColumnDef)', () => {
       const tm = create();
       tm.init();
       tm.setColumnWidth(1, 150);
       tm.recalcSize(400);
-      expect(tm.getColumnWidth(1)).toBe(100);
+      expect(tm.getColumnWidth(1)).toBe(150);
+      expect(tm.getColumnDefs()![1]!.width).toMatchObject({ value: 150, unit: 'px' });
     });
 
-    // BUG: setColumnWidth does not recalculate the cached x positions – getXPosByColumnIndex is stale until init()/changeColumnOrder().
-    it.fails('updates getXPosByColumnIndex of the following columns', () => {
+    // Regression: setColumnWidth did not recalculate the cached x positions – getXPosByColumnIndex was stale until
+    // init()/changeColumnOrder() (GeMouseEvent.columnLeft too).
+    it('updates getXPosByColumnIndex of the following columns', () => {
       const tm = create();
       tm.init();
       tm.setColumnWidth(0, 10);

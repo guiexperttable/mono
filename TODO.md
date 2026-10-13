@@ -185,24 +185,40 @@ Verhalten steht als `// NOTE:` in den Specs.
       Verhaltensänderung: Buchstaben öffnen den Editor nicht mehr – nur noch F2 (laut Mapping).
 - [ ] Optional: Excel-artig „Enter“ bzw. Tippen startet das Editieren (heute nur F2). Pfeile springen nicht in fixierte
       Spalten-Bereiche horizontal ins Bild (`ensureRowIsVisible` scrollt nur vertikal).
-- [ ] `onFocusChanged` feuert bei Mausklick **zweimal** (`selection-service.ts:79`: `fm.setFocus` feuert schon über den
-      Focus-Listener von `TableScope`, danach noch `tableScope.onFocusChanged(fm)`).
-- [ ] **Strg/⌘-Klick ergänzt die Selektion nicht** (`selection/selection-service.ts:85`): jeder Klick ohne Shift
-      leert vorher die Selektion; Strg+Alt-Klick („Zelle abwählen“) arbeitet dadurch immer auf leerer Selektion.
-- [ ] **Strg+A, Strg+C kopiert nur eine Zelle** (`service/copy-service.ts:31`): `selectAll()` setzt nur ein Flag,
-      keine Range.
+- [x] `onFocusChanged` feuerte bei Mausklick **zweimal** (`mouse-handler.ts`: `fm.clear()` vor `setFocus()`;
+      `selection-service.ts`: zusätzlich `tableScope.onFocusChanged(fm)`). Jetzt einmal je echter Änderung
+      (Branch `fix/selection`).
+- [x] **Strg/⌘-Klick ergänzt die Selektion** (`selection-service.ts`): Klick = neue Selektion, Shift-Klick = Bereich ab
+      letztem Klick, Strg/⌘-Klick = Zelle (bzw. Zeile/Spalte) **umschalten**, Strg/⌘+Alt-Klick = Zelle abwählen; jeder
+      Klick ohne Shift ist Startpunkt für den nächsten Shift-Klick.
+- [x] **Strg+A, Strg+C kopiert den ganzen (sichtbaren) Body** (`copy-service.ts`), gedeckelt durch
+      `CopyService.maxCopyCells` (1.000.000; darüber Ablehnung + `console.warn`). `selectAll()` ist bei Typ `"none"`
+      (Default-Modell) wirkungslos.
+- [x] **Klicks wurden nicht gezeichnet** (`mouse-handler.ts`: Repaint auskommentiert) – Fokusrahmen/Selektion erst
+      beim nächsten Scrollen. Jetzt verzögertes Repaint (~1 ms), aber nicht bei
+      Klicks in `input`/`select`/`textarea`/`button`/Links/`contenteditable` einer Zelle (sonst verlieren Eingabefelder
+      eigener Renderer Fokus und Text).
 - [ ] **Baum + Filter** (`data/tablemodel/areamodel/area-model-tree.ts`): Aufklappen/Zuklappen
       (`recalcVisibleTreeRows`, `:50`) verwirft den Filter; ein Filter nach dem Aufklappen findet die neuen Zeilen nicht
       (`flattenRows` veraltet); `doSort` (`:131`) verwirft den Filter – und weil `externalFilterChanged` danach neu
       sortiert, wirkt ein Filter auf einem sortierten Baum gar nicht. `doSort([])` (`:124`) wirft einen TypeError
       (erreichbar über `api.reSort()`).
-- [ ] **Abgewählte Zellen lassen sich nie wieder auswählen** (`selection/selection-model.ts:179/202`): negative Ranges
-      werden nur von `clear()` entfernt → `togglePoint` (Leertaste), `addSelection` nach `removeSelection`,
-      `MultiRowsSelectionModel.toggleRow`, `selectAll()` betroffen. `removeSelection` einer mehrzeiligen Range bei Typ
-      `row` entfernt nur die erste Zeile.
-- [ ] **`getMergedRowIndices()` hängt** bei Selektionstyp `column` (Schleife bis `MAX_SAFE_INTEGER`,
-      `selection-model.ts:146`) – nicht als Test möglich. Außerdem unsortiert (Doku: „sorted“) und prüft negative
-      Ranges nur in Spalte 0.
+- [x] **Abgewählte Zellen lassen sich wieder auswählen** (`selection-model.ts`): „letzte Operation je Zelle gewinnt“ –
+      `addSelection`/`togglePoint`/`firstClick`/`toggleRow` heben negative Ranges für ihre Zellen auf (Rechteck-Differenz,
+      auch unbegrenzte Zeilen/Spalten), `selectAll()` verwirft sie. `removeSelection` bei Typ `row`/`column` entfernt
+      die ganze Spanne.
+- [x] **`getMergedRowIndices(rowCount?)`** terminiert (ohne `rowCount` werden unbegrenzte Spalten-Selektionen
+      übersprungen), sortiert, prüft alle Spalten der negativen Ranges.
+- [ ] Selektion – gefunden, nicht behoben (Branch `fix/selection`):
+      Typ `"cell"`: ein einfacher Klick selektiert nichts (`firstClick` kennt nur row/column), die Schulung
+      (`training/selection-and-copy.astro`) sagt „one cell“ · Header-/Footer-Klicks prüfen `areaIdent` nicht (leeren die
+      Selektion, setzen Fokus auf Body-Zelle) · `onSelectionChanged` feuert mehrfach je Klick · `setSelectionModel()`
+      meldet `TableScope` nicht am neuen Modell an · Ziehen leert immer (kein Strg+Ziehen für zweiten Bereich) · ein
+      Doppelklick erreicht `onMouseClicked` dreimal (mit Strg: an/aus/an) · `hasSelection()` bleibt nach Abwählen aller
+      Zellen `true` (Copy liefert leere Zellen) · Strg+Alt (auch bei Mausbewegung) ruft `debugOnce()` →
+      `console.clear()` (`table-scope.ts:331`) · Beispiel-Zellenzählung `(r2-r1+1)*(c2-c1+1)` in `SelectionModelIf` und
+      `training/demos/selection-and-copy.ts` für row/column sinnlos (~9e15) · Klick-Repaint baut alle sichtbaren Zellen
+      neu (Komponenten-Renderer werden neu gemountet) – besser nur Fokus-/Selektions-Overlay neu zeichnen.
 
 **Mittel:**
 - [ ] Mehrspaltiges `doSort([a, b])` (`area-model-object-array.ts:533`): das **letzte** Item wird Primärschlüssel
@@ -233,6 +249,16 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
+
+## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **Tastatur**: Shortcuts funktionieren (vorher löste jede Taste `START_EDITING` aus); Buchstaben öffnen den Editor
+  nicht mehr (nur F2); Tab verlässt die Tabelle; Pfeile navigieren.
+- **Maus/Selektion**: Strg/⌘-Klick schaltet Zellen/Zeilen um (Einzelmodus: Strg-Klick auf die selektierte Zeile wählt
+  sie ab – Master/Detail-Ansichten prüfen), Strg/⌘+Alt-Klick wählt ab; Klicks werden sofort gezeichnet;
+  `onFocusChanged` einmal je Änderung (vorher zweimal, auch ohne Änderung); `getMergedRowIndices(rowCount?)` sortiert.
+- **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
+  `selectAll()` bei Typ `"none"` ohne Wirkung.
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

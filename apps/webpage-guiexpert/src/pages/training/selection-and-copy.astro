@@ -23,12 +23,14 @@ import Callout from "../../components/training/Callout.astro";
       <tr><td><code>"none"</code></td><td>nothing</td></tr>
     </tbody>
   </table>
-  <p>Mode <code>"multi"</code> adds more selections with ⌘/Ctrl+click; <code>"single"</code> replaces the selection.</p>
+  <p>Mode <code>"multi"</code> adds more selections with ⌘/Ctrl+click; <code>"single"</code> replaces the selection.
+    ⌘/Ctrl+click on a selected cell deselects it, ⌘/Ctrl+Alt+click removes a cell from the selection.</p>
 
   <h2 id="keyboard">Mouse and keyboard</h2>
   <ul>
     <li>Drag = range (since 1.1.88), <kbd>Shift</kbd>+click = range up to here, <kbd>⌘/Ctrl</kbd>+click = another cell.</li>
-    <li><kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies, <kbd>⌘/Ctrl</kbd>+<kbd>A</kbd> selects all, arrow keys move the focus.</li>
+    <li><kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies, <kbd>⌘/Ctrl</kbd>+<kbd>A</kbd> selects all (<kbd>⌘/Ctrl</kbd>+<kbd>A</kbd>,
+      <kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies the whole displayed body, up to <code>CopyService.maxCopyCells</code> cells), arrow keys move the focus.</li>
     <li>Shortcuts can be remapped or switched off (<code>shortcutActionIdMapping</code>, <code>shortcutActionsDisabled</code> in
       <ApiLink name="TableOptionsIf" />).</li>
   </ul>

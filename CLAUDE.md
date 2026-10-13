@@ -144,7 +144,11 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`. Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent`, `GeScrollEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
-  `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`.
+  `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
+  Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
+  Bereich. „Letzte Operation je Zelle gewinnt“ (negative Ranges). Ein Klick zeichnet verzögert neu (`debounceRepaint`),
+  nicht bei Klicks in Formularelemente (input, select, button …) einer Zelle. Strg+A, Strg+C kopiert
+  den sichtbaren Body, gedeckelt durch `CopyService.maxCopyCells`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
   Mapping-Schlüssel werden mit `harmonizeShortcut` normalisiert („ctrl+c“, „meta+c“ = „cmd c“, „arrowup“ = „up“).

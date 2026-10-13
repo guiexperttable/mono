@@ -643,8 +643,13 @@ const tableOptions: TableOptionsIf = {
 
 - Without `getSelectionModel` / `getFocusModel` every table creates its **own** models (since 1.1.90; before, all
   tables without them shared one selection and focus). The default selection type is `"none"`.
-- Mouse: click = focus, shift-click = range from the last click, Ctrl/⌘-click = add a cell (mode `"multi"`),
-  drag over body cells = range (type `"range"`, since 1.1.88).
+- Mouse: click = focus (and a new selection), shift-click = range from the last click, Ctrl/⌘-click = toggle the
+  cell (row/column for those types; mode `"multi"` keeps the rest of the selection), Ctrl/⌘+Alt-click = remove the
+  cell, drag over body cells = range (type `"range"`, since 1.1.88).
+- Ctrl/⌘+A selects all (not for type `"none"`), Ctrl/⌘+C then copies the displayed body – at most
+  `CopyService.maxCopyCells` cells (default 1,000,000; larger selections are not copied).
+- `selectionModel.getMergedRowIndices(rowCount)` returns the sorted indices of all rows with a selected cell (pass
+  the row count when whole columns can be selected).
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
 - API: `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
   `tableApi.getSelectionModel()`.

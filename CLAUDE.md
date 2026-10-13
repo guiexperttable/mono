@@ -170,7 +170,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (`instructions.md` 5.4); `footerData` ist statisch.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
-- Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `autoResizeColumns`, `setColumnWidth`,
+- Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
   `recalcColumnWidths`, `updateCells([TableCellUpdateEvent…], repaintAll)`, `triggerAction(ActionId)`, `repaint`,
   `repaintHard`, `setLoggingActive`.
 - Sichtbarkeit: `api.setColumnVisible(index | property | ColumnDef, visible)` / `isColumnVisible` (über
@@ -238,7 +238,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 275 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 283 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -250,7 +250,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   |---|---|
   | `test` | Unit + Browser |
   | `test:unit` / `test:watch` | nur Node, ~2 s (~1.450 Tests) |
-  | `test:browser` | echtes Chromium, ~315 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:browser` | echtes Chromium, ~345 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt

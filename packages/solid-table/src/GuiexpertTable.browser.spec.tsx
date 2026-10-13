@@ -95,15 +95,27 @@ describe('GuiexpertTable (Solid)', () => {
     expect(cellOf(contextmenu.mock.calls[0][0])).toEqual({ areaIdent: 'body', rowIndex: 1, columnIndex: 1 });
   });
 
-  // BUG: the "contextmenu" CustomEvent never leaves the wrapper. It is dispatched on the div that is also the
-  // TableScope host; the core's own "contextmenu" listener there (MouseHandler.onContextmenu → TableScope.contextmenu)
-  // sees it as a second right click within 50 ms and calls stopImmediatePropagation() on it. The callback prop works.
-  // Fix: MouseHandler.onContextmenu ignores events that are no MouseEvent – or dispatch on an outer element.
-  it.fails('a right click also dispatches a "contextmenu" CustomEvent', async () => {
+  // Regression: the "contextmenu" CustomEvent never left the wrapper. It is dispatched on the div that is also the
+  // TableScope host; the core's own "contextmenu" listener there took it for a second right click within 50 ms and
+  // called stopImmediatePropagation() on it. MouseHandler.onContextmenu now ignores events that are no MouseEvent.
+  it('a right click also dispatches a "contextmenu" CustomEvent', async () => {
     const customEvents = await rightClick();
 
     expect(customEvents).toHaveLength(1);
     expect(customEvents[0].detail).toBeInstanceOf(GeMouseEvent);
+  });
+
+  // Regression: the "scroll" CustomEvent bubbled – every table scroll reached window/document "scroll" listeners.
+  it('the "scroll" CustomEvent does not bubble; the scroll callback is called', async () => {
+    const host = createHost();
+    const scroll = vi.fn();
+    const bubbled = vi.fn();
+    host.addEventListener('scroll', e => { if (e instanceof CustomEvent) bubbled(e); });
+    disposers.push(render(() => <GuiexpertTable tableModel={createModel(200)} scroll={scroll} />, host));
+    await nextFrame();
+    host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollTop = 500;
+    await vi.waitFor(() => expect(scroll).toHaveBeenCalled());
+    expect(bubbled).not.toHaveBeenCalled();
   });
 
   it('a new tableModel re-creates the table and destroys the old one', async () => {

@@ -589,4 +589,20 @@ describe('context menu (onContextmenu)', () => {
     expect(contextmenu).toHaveLength(1);
     expect(second.defaultPrevented).toBe(true);
   });
+
+  // Regression: a wrapper's "contextmenu" CustomEvent on the host (Solid) was taken for a second right click and
+  // stopped with stopImmediatePropagation() – it never reached the app.
+  it('a "contextmenu" CustomEvent is ignored (not reported, not stopped)', async () => {
+    const { host, contextmenu } = await mountMouseTable();
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1_000);
+    fireMouse(getCellDiv(host, 'body', 'center', 2, 1), 'contextmenu');
+    const parentListener = vi.fn();
+    host.parentElement!.addEventListener('contextmenu', parentListener);
+    const custom = new CustomEvent('contextmenu', { detail: 'from a wrapper', bubbles: true, cancelable: true });
+    host.dispatchEvent(custom);
+    host.parentElement!.removeEventListener('contextmenu', parentListener);
+    expect(contextmenu).toHaveLength(1);
+    expect(custom.defaultPrevented).toBe(false);
+    expect(parentListener).toHaveBeenCalledWith(custom);
+  });
 });

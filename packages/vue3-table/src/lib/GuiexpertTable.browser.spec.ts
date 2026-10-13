@@ -81,6 +81,23 @@ describe('GuiexpertTable (Vue 3)', () => {
     expect(mouseClicked.mock.calls[0][0].clickCount).toBe(2);
   });
 
+  // Regression: inheritAttrs: false dropped class, style and other attributes of <GuiexpertTable>.
+  it('class, style and attributes reach the root element', async () => {
+    const host = createHost();
+    const app = createApp({
+      render: () => h(GuiexpertTable, { tableModel: createModel(5), class: 'my-table', style: { opacity: '0.5' }, 'data-test': 'x' }),
+    });
+    app.mount(host);
+    apps.push(app);
+    await nextFrame();
+    const root = host.firstElementChild as HTMLElement;
+    expect(root.classList).toContain('container-div');
+    expect(root.classList).toContain('my-table');
+    expect(root.style.opacity).toBe('0.5');
+    expect(root.style.height).toBe('100%');
+    expect(root.getAttribute('data-test')).toBe('x');
+  });
+
   it('a new tableModel re-creates the table and destroys the old one', async () => {
     const destroy = vi.spyOn(TableScope.prototype, 'destroy');
     const tableOptions = new TableOptions();

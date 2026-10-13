@@ -56,7 +56,7 @@ const toggleAt = (rowIdx: number, colIdx: number) => ({ rowIdx, colIdx } as Mous
 let tableSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
-  // the model prints its array with console.table on every init()
+  // the model printed its array with console.table on every init() (removed, see 'does not print to the console')
   tableSpy = vi.spyOn(console, 'table').mockImplementation(() => undefined);
 });
 
@@ -76,10 +76,13 @@ describe('AreaModelCellGroups', () => {
       ]);
     });
 
-    it('prints the grid with console.table', () => {
-      // NOTE: debug output in production code – every init() / toggle logs a table to the console.
-      new AreaModelCellGroups('header', orderGroups(), [], 34);
-      expect(tableSpy).toHaveBeenCalledOnce();
+    // Regression: every init() / toggle printed the grid with console.table (debug output in production code).
+    it('does not print to the console', () => {
+      const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+      const m = new AreaModelCellGroups('header', orderGroups(), [], 34);
+      m.toggleHeaderGroup(toggleAt(0, 2));
+      expect(tableSpy).not.toHaveBeenCalled();
+      expect(log).not.toHaveBeenCalled();
     });
 
     it('derives the column definitions from the leaves if none are given', () => {
@@ -205,7 +208,6 @@ describe('AreaModelCellGroups', () => {
       const defs = m.toggleHeaderGroup(toggleAt(0, 2));
       expect(defs.map(d => `${d.property}:${d.isVisible?.()}`)).toEqual(['id:true', 'date:true', 'customer:true', 'city:false']);
       expect(m.getColspanAt(1, 3)).toBe(0);
-      expect(tableSpy).toHaveBeenCalledTimes(2);
     });
 
     it('expands the group again on a second toggle', () => {
@@ -239,6 +241,33 @@ describe('AreaModelCellGroups', () => {
       expect(tm.getColumnWidth(3)).toBe(100);
       header.toggleHeaderGroup(toggleAt(0, 2));
       expect(tm.getColumnWidth(3)).toBe(0);
+    });
+
+    // Regression: the group overwrote ColumnDef.isVisible – a column hidden with setColumnVisible() came back on the
+    // next toggle, and a column of a collapsed group could be shown by the API.
+    it('a column hidden by setColumnVisible() stays hidden when its group is expanded again', () => {
+      const header = new AreaModelCellGroups('header', orderGroups(), [], 34);
+      const tm = new TableModel(header, new AreaModelHidden(), new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(), header.columnDefs);
+      tm.init();
+      tm.setColumnVisible('city', false);
+      header.toggleHeaderGroup(toggleAt(0, 2)); // collapse
+      header.toggleHeaderGroup(toggleAt(0, 2)); // expand
+      expect(tm.isColumnVisible('city')).toBe(false);
+      expect(tm.getColumnWidth(3)).toBe(0);
+      tm.setColumnVisible('city', true);
+      expect(tm.getColumnWidth(3)).toBe(100);
+    });
+
+    it('setColumnVisible(…, true) does not show a column of a collapsed group – expanding it does', () => {
+      const header = new AreaModelCellGroups('header', orderGroups(), [], 34);
+      const tm = new TableModel(header, new AreaModelHidden(), new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(), header.columnDefs);
+      tm.init();
+      header.toggleHeaderGroup(toggleAt(0, 2)); // collapse: city hidden by the group
+      tm.setColumnVisible('city', true);
+      expect(tm.getColumnWidth(3)).toBe(0);
+      header.toggleHeaderGroup(toggleAt(0, 2)); // expand
+      expect(tm.getColumnWidth(3)).toBe(100);
+      expect(tm.isColumnVisible('city')).toBe(true);
     });
 
     // BUG: the collapsed group gets rowspan 2 (it claims an own column) and covers the still visible "always" child in row 1.

@@ -53,6 +53,20 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(rowTexts(el)[0]).toContain('Row 0');
   });
 
+  // Regression: the "scroll" CustomEvent bubbled – every table scroll reached window/document "scroll" listeners.
+  it('"scroll" is dispatched on the element and does not bubble', async () => {
+    const { host, el } = createTableElement();
+    const onElement = vi.fn();
+    const bubbled = vi.fn();
+    el.addEventListener('scroll', e => { if (e instanceof CustomEvent) onElement(e.detail); });
+    host.addEventListener('scroll', e => { if (e instanceof CustomEvent) bubbled(e); });
+    el.data = data(createModel(200));
+    await nextFrame();
+    el.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollTop = 500;
+    await vi.waitFor(() => expect(onElement).toHaveBeenCalled());
+    expect(bubbled).not.toHaveBeenCalled();
+  });
+
   it('a click on a body cell dispatches mouseClicked with row and column index', async () => {
     const { el, events } = createTableElement();
     el.data = data(createModel(5));

@@ -1,6 +1,7 @@
 // TableApi.setColumnVisible / setHeaderVisible / setFooterVisible in a real browser (before: empty stubs, TODO.md).
 import { afterEach, describe, expect, it } from 'vitest';
-import { CellRange, ColumnDef, SelectionModel, TableFactory, px100 } from '@guiexpert/table';
+import { userEvent } from 'vitest/browser';
+import { CellRange, ColumnDef, FocusModel, SelectionModel, TableFactory, px100 } from '@guiexpert/table';
 import { createRows, destroyAllTables, mountTable, nextFrame, renderedRows } from '../../../test-utils/mount-table';
 
 /** id | name | value (3 × 100 px), 1000 rows, one footer row; optionally the first column fixed. */
@@ -141,5 +142,118 @@ describe('TableApi.setHeaderVisible / setFooterVisible (real browser)', () => {
     await nextFrame();
     expect(api.isFooterVisible()).toBe(false);
     expect(api.isHeaderVisible()).toBe(true);
+  });
+});
+
+/** `columnCount` columns of 100 px (c0 … cN), 1000 rows, a focus model; the host has the keyboard focus. */
+async function mountWideTable(columnCount: number, fixed: { left?: number, right?: number } = {}) {
+  const columnDefs = Array.from({ length: columnCount }, (_, i) => new ColumnDef(`c${i}`, `C${i}`, px100));
+  const rows = Array.from({ length: 1000 }, (_, r) =>
+    Object.fromEntries(columnDefs.map((def, c) => [def.property, `${r}/${c}`])));
+  const tableModel = TableFactory.createTableModel({
+    rows, columnDefs, fixedLeftColumnCount: fixed.left ?? 0, fixedRightColumnCount: fixed.right ?? 0,
+  });
+  const fm = new FocusModel('cell');
+  const table = mountTable(tableModel, { width: 800, height: 500, tableOptions: { getFocusModel: () => fm } });
+  await nextFrame();
+  table.host.focus();
+  return { ...table, fm };
+}
+
+/** Left and right edge of the first rendered body cell of a column relative to the visible center area. */
+function centerEdges(host: HTMLElement, col: number) {
+  const area = host.querySelector<HTMLElement>('.ge-table-body-center')!.getBoundingClientRect();
+  const cell = cells(host, 'body', col)[0]!.getBoundingClientRect();
+  return { left: cell.left - area.left, right: cell.right - area.left, areaWidth: area.width };
+}
+
+function expectFullyVisible(host: HTMLElement, col: number) {
+  const { left, right, areaWidth } = centerEdges(host, col);
+  expect(left).toBeGreaterThanOrEqual(-1);
+  expect(right).toBeLessThanOrEqual(areaWidth + 1);
+}
+
+// Regression (TODO.md, column visibility): the arrow keys could land on a hidden column (width 0 – the focus was
+// invisible) and never scrolled horizontally – the focused cell could leave the viewport to the left or right.
+describe('keyboard navigation and hidden columns (real browser)', () => {
+
+  it('ArrowRight / ArrowLeft skip hidden columns', async () => {
+    const { api, fm } = await mountWideTable(4);
+    api.setColumnVisible(1, false);
+    api.setColumnVisible(2, false);
+    fm.setFocus(0, 0);
+    await userEvent.keyboard('{ArrowRight}');
+    expect(fm.getFocus()).toEqual([0, 3]);
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(fm.getFocus()).toEqual([0, 0]);
+  });
+
+  it('stays on the last shown column if only hidden columns follow', async () => {
+    const { api, fm } = await mountWideTable(4);
+    api.setColumnVisible(3, false);
+    fm.setFocus(0, 2);
+    await userEvent.keyboard('{ArrowRight}');
+    expect(fm.getFocus()).toEqual([0, 2]);
+  });
+
+  it('the first arrow key without a focus focuses the first shown column', async () => {
+    const { api, fm } = await mountWideTable(4);
+    api.setColumnVisible(0, false);
+    await userEvent.keyboard('{ArrowDown}');
+    expect(fm.getFocus()).toEqual([0, 1]);
+  });
+
+  it('ArrowRight scrolls the focused column into view, ArrowLeft back', async () => {
+    const { host, fm } = await mountWideTable(20);
+    fm.setFocus(0, 6);
+    for (let i = 0; i < 6; i++) {
+      await userEvent.keyboard('{ArrowRight}');
+      await nextFrame();
+      expectFullyVisible(host, fm.getFocus()[1]);
+    }
+    expect(fm.getFocus()).toEqual([0, 12]);
+    expect(host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollLeft).toBeGreaterThan(0);
+    fm.setFocus(0, 3);
+    await userEvent.keyboard('{ArrowLeft}');
+    await nextFrame();
+    expect(fm.getFocus()).toEqual([0, 2]);
+    expectFullyVisible(host, 2);
+  });
+});
+
+describe('TableApi.ensureColumnIsVisible (real browser)', () => {
+
+  it('scrolls only if needed: a column on the right becomes the last, a column on the left the first visible one', async () => {
+    const { host, api } = await mountWideTable(20);
+    expect(api.ensureColumnIsVisible(3)).toBe(false);          // visible already
+    expect(api.ensureColumnIsVisible(15)).toBe(true);
+    await nextFrame();
+    expectFullyVisible(host, 15);
+    expect(centerEdges(host, 15).right).toBeGreaterThan(centerEdges(host, 15).areaWidth - 2); // the last one
+    expect(api.ensureColumnIsVisible(15)).toBe(false);
+    expect(api.ensureColumnIsVisible(4)).toBe(true);
+    await nextFrame();
+    expect(Math.abs(centerEdges(host, 4).left)).toBeLessThanOrEqual(1);                          // the first one
+  });
+
+  it('keeps the vertical position', async () => {
+    const { api } = await mountWideTable(20);
+    api.scrollToIndex(-1, 300);
+    await nextFrame();
+    const firstRow = api.getFirstVisibleRowIndex();
+    api.ensureColumnIsVisible(18);
+    await nextFrame();
+    expect(api.getFirstVisibleRowIndex()).toBe(firstRow);
+  });
+
+  it('returns false for fixed, hidden and unknown columns', async () => {
+    const { api } = await mountWideTable(20, { left: 1, right: 1 });
+    expect(api.ensureColumnIsVisible(0)).toBe(false);
+    expect(api.ensureColumnIsVisible(19)).toBe(false);
+    expect(api.ensureColumnIsVisible(-1)).toBe(false);
+    expect(api.ensureColumnIsVisible(99)).toBe(false);
+    api.setColumnVisible(17, false);
+    expect(api.ensureColumnIsVisible(17)).toBe(false);
+    expect(api.ensureColumnIsVisible(16)).toBe(true);
   });
 });

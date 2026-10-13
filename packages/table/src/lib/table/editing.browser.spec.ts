@@ -142,9 +142,9 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(rows[3].name).toBe('Name 3');
   });
 
-  // BUG: input-cell-renderer.ts:28 writes the value unescaped into value="…" – a double quote ends the attribute
-  // (the rest of the text is lost, and committing the edit truncates the value).
-  it.fails('the editor shows a value with double quotes completely', async () => {
+  // Regression: input-cell-renderer.ts wrote the value unescaped into value="…" – a double quote ended the attribute
+  // (the rest of the text was lost, and committing the edit truncated the value).
+  it('the editor shows a value with double quotes completely', async () => {
     const rows: Row[] = [{ id: 0, name: 'He said "hi"', value: 1, status: 'open' }];
     const { host, fm } = await mountEditTable(rows);
     fm.setFocus(0, 1);
@@ -152,9 +152,18 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(editorInput(host)!.value).toBe('He said "hi"');
   });
 
-  // BUG: input-cell-renderer.ts:28 – an empty cell (undefined) opens the editor with the text "undefined"
-  // (the table itself shows an empty cell).
-  it.fails('an empty cell opens an empty editor', async () => {
+  it('a value with markup is edited as text (no HTML injection)', async () => {
+    const xss = '"><img src="x" onerror="geXss = 1">';
+    const rows: Row[] = [{ id: 0, name: xss, value: 1, status: 'open' }];
+    const { host, fm } = await mountEditTable(rows);
+    fm.setFocus(0, 1);
+    await userEvent.keyboard('{F2}');
+    expect(editorInput(host)!.value).toBe(xss);
+    expect(host.querySelector('img')).toBeNull();
+  });
+
+  // Regression: input-cell-renderer.ts – an empty cell (undefined) opened the editor with the text "undefined".
+  it('an empty cell opens an empty editor', async () => {
     const rows: Row[] = [{ id: 0, value: 1, status: 'open' }];
     const { host, fm } = await mountEditTable(rows);
     expect(cellText(host, 0, 1)).toBe('');

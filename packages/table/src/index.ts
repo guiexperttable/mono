@@ -1,6 +1,7 @@
 
 export * from './lib/common/throttle';
 export * from './lib/common/debounce';
+export * from './lib/common/escape-html';
 export * from './lib/common/decorator/avoid-double-execution.decorator';
 
 export * from './lib/common/generator/column-def-generator-service';

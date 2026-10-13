@@ -147,6 +147,7 @@ exports[`public API (src/index.ts) > exports exactly the known set of runtime sy
   "debounce",
   "editInputPipeForNumber",
   "entitySuffix",
+  "escapeHtml",
   "firstLetterUppercase",
   "getAreaIdentByString",
   "getEntityName",

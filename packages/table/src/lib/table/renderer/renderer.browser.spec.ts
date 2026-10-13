@@ -7,6 +7,7 @@ import {
   ActionEvent,
   ActionsCellRenderer,
   AreaModelObjectArrayWithColumndefs,
+  CellGroupExtCellRenderer,
   CheckboxBooleanPropertyCellRenderer,
   CheckboxColumnDef,
   ColumnDef,
@@ -22,15 +23,17 @@ import {
   PositiveAndNegativeNumberRenderer,
   ProgressBarCellRenderer,
   Renderer,
+  SelectCellRenderer,
   SimpleArrayCellRenderer,
   SimpleDomService,
   StarRatingCellRenderer,
   TableFactory,
   TrueFalseCellRenderer,
+  ValueLabel,
   px100,
   px200,
 } from '@guiexpert/table';
-import type { AreaIdent, AreaModelIf, CellRendererIf, ColumnDefIf, DomServiceIf } from '@guiexpert/table';
+import type { AreaIdent, AreaModelIf, CellGroupExt, CellRendererIf, ColumnDefIf, DomServiceIf } from '@guiexpert/table';
 import {
   createRows,
   destroyAllTables,
@@ -77,8 +80,8 @@ describe('built-in cell renderers', () => {
       expect((await renderCell(new NumberCellRenderer(), '12')).cell.classList).toContain('ge-cell-error');
     });
 
-    // BUG: number-cell-renderer.ts:25 `if (cellValue)` – the number 0 renders an empty cell.
-    it.fails('renders the number 0', async () => {
+    // Regression: number-cell-renderer.ts `if (cellValue)` rendered the number 0 as an empty cell.
+    it('renders the number 0', async () => {
       const { cell } = await renderCell(new NumberCellRenderer(), 0);
       expect(cell.textContent?.trim()).toBe('0');
     });
@@ -94,15 +97,15 @@ describe('built-in cell renderers', () => {
       expect(neg.classList).toContain('ge-negative-text-color');
     });
 
-    // BUG: positive-and-negative-number-renderer.ts:25 `data-row-index=${rowIndex}"` – the opening quote is missing,
-    // the attribute value is `0"` → a click on the label div is reported with rowIndex NaN.
-    it.fails('the label div carries the row index', async () => {
+    // Regression: positive-and-negative-number-renderer.ts had `data-row-index=${rowIndex}"` (opening quote missing,
+    // the attribute value was `0"` → a click on the label div was reported with rowIndex NaN).
+    it('the label div carries the row index', async () => {
       const { cell } = await renderCell(new PositiveAndNegativeNumberRenderer(), 5);
       expect(cell.querySelector('.ge-table-label-div')!.getAttribute('data-row-index')).toBe('0');
     });
 
-    // BUG: positive-and-negative-number-renderer.ts:21 `if (cellValue)` – the number 0 renders an empty cell.
-    it.fails('renders the number 0', async () => {
+    // Regression: positive-and-negative-number-renderer.ts `if (cellValue)` rendered the number 0 as an empty cell.
+    it('renders the number 0', async () => {
       const { cell } = await renderCell(new PositiveAndNegativeNumberRenderer(), 0);
       expect(cell.textContent?.trim()).toBe('0');
     });
@@ -362,6 +365,62 @@ describe('ActionsCellRenderer', () => {
     const own = [new CrudAction('OPEN', 'Open', '', 'my-open', 'button')];
     const { cell } = await renderCell(new ActionsCellRenderer({ onActionEvent: () => undefined }, [new CrudAction('VIEW', 'View')]), own);
     expect(Array.from(cell.querySelectorAll('.ge-table-cell-action'), e => e.textContent!.trim())).toEqual(['Open']);
+  });
+});
+
+describe('HTML injection – renderers show data as text', () => {
+
+  // would run JavaScript if it became markup (the <img> is never loaded: the tests check that it is not created)
+  const XSS = '<img src="x" onerror="geXss = 1">';
+  const noMarkup = (cell: HTMLElement) => expect(cell.querySelector('img')).toBeNull();
+
+  it('NumberCellRenderer', async () => {
+    const { cell } = await renderCell(new NumberCellRenderer(), XSS);
+    noMarkup(cell);
+    expect(label(cell)).toBe(XSS);
+  });
+
+  it('PositiveAndNegativeNumberRenderer', async () => {
+    const { cell } = await renderCell(new PositiveAndNegativeNumberRenderer(), XSS);
+    noMarkup(cell);
+    expect(label(cell)).toBe(XSS);
+  });
+
+  it('DateToIntlDDMMYYYYCellRenderer (an invalid date is shown as it is)', async () => {
+    const noDate = '<img src="x" onerror="geXss">'; // no digits – Chromium's Date parser reads "1" as the year 2001
+    const { cell } = await renderCell(new DateToIntlDDMMYYYYCellRenderer(), noDate);
+    noMarkup(cell);
+    expect(label(cell)).toBe(noDate);
+  });
+
+  it('ActionsCellRenderer: an id with quotes stays one data-id attribute', async () => {
+    const onActionEvent = vi.fn();
+    const id = '7" data-evil="1';
+    const { cell } = await renderCell(new ActionsCellRenderer({ onActionEvent }, [new CrudAction('VIEW', 'View', '', '', 'link')]), id);
+    const link = cell.querySelector<HTMLElement>('[data-action="VIEW"]')!;
+    expect(link.getAttribute('data-id')).toBe(id);
+    expect(cell.querySelector('[data-evil]')).toBeNull();
+    await userEvent.click(link);
+    expect(onActionEvent.mock.calls[0][0].id).toBe(id);
+  });
+
+  it('SelectCellRenderer: option values and labels', () => {
+    const cellDiv = document.createElement('div');
+    const areaModel = { isEditable: () => true, getValueAt: () => 'a"b' } as unknown as AreaModelIf;
+    new SelectCellRenderer([new ValueLabel('a"b', XSS), new ValueLabel('c', 'C')])
+      .render(cellDiv, 0, 0, 'body', areaModel, undefined, new SimpleDomService());
+    noMarkup(cellDiv);
+    const options = Array.from(cellDiv.querySelectorAll('option'));
+    expect(options.map(o => [o.value, o.textContent])).toEqual([['a"b', XSS], ['c', 'C']]);
+    expect(options[0].selected).toBe(true);
+  });
+
+  it('CellGroupExtCellRenderer: the label of a header group', () => {
+    const cellDiv = document.createElement('div');
+    new CellGroupExtCellRenderer().render(cellDiv, 0, 0, 'header', {} as AreaModelIf,
+      { data: XSS } as unknown as CellGroupExt, new SimpleDomService());
+    noMarkup(cellDiv);
+    expect(cellDiv.textContent).toBe(XSS);
   });
 });
 

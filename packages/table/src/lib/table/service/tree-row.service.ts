@@ -12,12 +12,23 @@ export class TreeRowService {
     for (const row of rows) {
       if (this.isVisible(row)) {
         ret.push(row);
-      }
-      if (row.children?.length) {
-        this.flattenTree(row.children, ret);
+        if (row.expanded && row.children?.length) {
+          this.flattenVisibleChildren(row.children, ret);
+        }
       }
     }
     return ret;
+  }
+
+  /** The children of a visible, expanded row are visible – collapsed subtrees are not walked at all
+   *  (before, every node of the tree was visited and checked up to the root on every expand/collapse). */
+  private flattenVisibleChildren<T>(rows: TreeRowIf<T>[], ret: TreeRowIf<T>[]): void {
+    for (const row of rows) {
+      ret.push(row);
+      if (row.expanded && row.children?.length) {
+        this.flattenVisibleChildren(row.children, ret);
+      }
+    }
   }
 
   isVisible(row: TreeRowIf<any>): boolean {

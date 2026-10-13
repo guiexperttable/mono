@@ -510,7 +510,8 @@ export class AreaModelObjectArray<T>
 
   /**
    * Sorts the filtered rows based on the provided sort items.
-   * This method supports sorting by multiple columns with different sort directions.
+   * This method supports sorting by multiple columns with different sort directions: the first item is the primary
+   * key, the following ones break ties.
    * 
    * @param {SortItem[]} sortItems - An array of sort items, each containing a column index and sort state
    * @returns {boolean} Always returns true to indicate sorting was performed
@@ -531,12 +532,20 @@ export class AreaModelObjectArray<T>
    * bodyAreaModel.doSort([new SortItem(0, '')]);
    */
   override doSort(sortItems: SortItem[]): boolean {
-    for (const sortItem of sortItems) {
-      const { columnIndex, sortState } = sortItem;
-      const f = sortState === 'asc' ? 1 :
-        sortState === 'desc' ? -1 : 0;
-      const property = this.properties[columnIndex];
-      this.filteredRows = this.filteredRows.sort(this.genericFlatTableSortComparator(property, f));
+    const comparators = sortItems.map(({ columnIndex, sortState }) => {
+      const f = sortState === 'asc' ? 1 : sortState === 'desc' ? -1 : 0;
+      return this.genericFlatTableSortComparator(this.properties[columnIndex], f);
+    });
+    if (comparators.length) {
+      // the first item is the primary key, the following ones break ties (before: one stable sort per item, so the
+      // LAST item became the primary key)
+      this.filteredRows = this.filteredRows.sort((a, b) => {
+        for (const comparator of comparators) {
+          const c = comparator(a, b);
+          if (c) return c;
+        }
+        return 0;
+      });
     }
     return true;
   }

@@ -170,14 +170,15 @@ describe('AreaModelTree', () => {
       expect(shown(model)).toEqual(['B', 'B2', 'B1', 'A', 'C']);
     });
 
-    it('getRowCount() already drops collapsed rows before recalcVisibleTreeRows(), getRowByIndex() does not', () => {
+    // Regression: getRowCount() checked the visibility of every row itself (O(n) per call), while getRowByIndex()/
+    // getValueAt() used the list – until recalcVisibleTreeRows() count and content disagreed.
+    it('getRowCount() and getRowByIndex() both use the displayed list (updated by recalcVisibleTreeRows())', () => {
       const { model, rows } = createModel();
       find(rows, 'A').expanded = false;
-      // NOTE: getRowCount() checks visibility itself, while getRowByIndex()/getValueAt() use the stale list
-      // until recalcVisibleTreeRows() is called – count and content disagree in between.
-      expect(model.getRowCount()).toBe(5);
+      expect(model.getRowCount()).toBe(7);
       expect(model.getValueAt(4, 0)).toBe('A1');
       model.recalcVisibleTreeRows();
+      expect(model.getRowCount()).toBe(5);
       expect(model.getValueAt(4, 0)).toBe('C');
     });
   });
@@ -365,10 +366,20 @@ describe('AreaModelTree', () => {
       expect(shown(model)).toEqual(['C', 'A', 'A1', 'A1x', 'B', 'B1', 'B2']);
     });
 
-    it('uses only the last sort item', () => {
+    // Regression: only the last sort item was used.
+    it('sorts by the first item, the following ones break ties', () => {
       const { model } = createModel();
-      model.doSort([new SortItem(0, 'asc'), new SortItem(1, 'desc')]);
-      // NOTE: multi-column sorting is not supported by the tree; earlier items are ignored.
+      model.doSort([new SortItem(1, 'desc'), new SortItem(0, 'asc')]);
+      expect(shown(model)).toEqual(['C', 'A', 'A1', 'A1x', 'B', 'B1', 'B2']);
+      const ties = createModel().model; // equal sizes → the name decides
+      ties.rows.forEach(r => (r.data.size = 1));
+      ties.doSort([new SortItem(1, 'asc'), new SortItem(0, 'desc')]);
+      expect(ties.rows.map(r => r.data.name)).toEqual(['C', 'B', 'A']);
+    });
+
+    it('sort(fn) sorts the siblings of every level with the tree rows', () => {
+      const { model } = createModel();
+      model.sort((a, b) => b.data.size - a.data.size);
       expect(shown(model)).toEqual(['C', 'A', 'A1', 'A1x', 'B', 'B1', 'B2']);
     });
 
@@ -574,6 +585,45 @@ describe('AreaModelTree', () => {
 
     it('isRowChecked() is undefined without rowSelectionModel', () => {
       expect(createModel().model.isRowChecked(0)).toBeUndefined();
+    });
+  });
+
+  describe('filter, expand/collapse and the arrows (Okt. 2026)', () => {
+
+    // Regression: the filter function ran over all nodes on every expand/collapse (1 million nodes ≈ 110 ms per
+    // click) and twice with an active sort – whether a row matches does not depend on the expanded state.
+    it('the filter function runs on externalFilterChanged() and recalcVisibleTreeRows(), not on expand/collapse', () => {
+      const { model, rows } = createModel();
+      const predicate = vi.fn((row: TreeRowIf<Node>) => row.data.name.startsWith('A'));
+      model.externalFilterChanged(predicate);
+      expect(predicate).toHaveBeenCalledTimes(7);
+      predicate.mockClear();
+      find(rows, 'A').expanded = false;
+      model.recalcVisibleTreeRows(false);
+      model.toggleExpandCollapseAll(true);
+      model.doSort([new SortItem(0, 'desc')]);
+      model.sort((a, b) => a.data.size - b.data.size);
+      expect(predicate).not.toHaveBeenCalled();
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
+      model.recalcVisibleTreeRows(); // default: the rows may have changed → filter again
+      expect(predicate).toHaveBeenCalledTimes(7);
+    });
+
+    it('hasDisplayedChildren(): false for leaves and for parents whose children are all filtered out', () => {
+      const { model, rows } = createModel();
+      expect(model.hasDisplayedChildren(find(rows, 'B'))).toBe(true);
+      expect(model.hasDisplayedChildren(find(rows, 'C'))).toBe(false);
+      model.externalFilterChanged((row: TreeRowIf<Node>) => row.data.name === 'B'); // B matches, its children do not
+      expect(model.hasDisplayedChildren(find(rows, 'B'))).toBe(false);
+      model.externalFilterChanged((row: TreeRowIf<Node>) => row.data.name === 'B1');
+      expect(model.hasDisplayedChildren(find(rows, 'B'))).toBe(true);
+    });
+
+    it('getDisplayedRootRows(): all top rows, with a filter only the matching ones', () => {
+      const { model } = createModel();
+      expect(model.getDisplayedRootRows().map(r => r.data.name)).toEqual(['B', 'A', 'C']);
+      model.externalFilterChanged((row: TreeRowIf<Node>) => row.data.name === 'A1x');
+      expect(model.getDisplayedRootRows().map(r => r.data.name)).toEqual(['A']);
     });
   });
 });

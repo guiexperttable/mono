@@ -10,6 +10,8 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
+import { isTreeRow } from './instanceof-workaround';
+import { TreeRowIf } from './data/common/tree-row-if';
 
 
 /**
@@ -38,6 +40,7 @@ import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-obj
  * | change data | {@link updateCells}, {@link setRows}, {@link addRows}, {@link updateRows}, {@link removeRows} |
  * | redraw | {@link repaint} (same row count), {@link repaintHard} (row count or heights changed) |
  * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths} |
+ * | tree | {@link expandAll}, {@link collapseAll}, {@link setRowExpanded} |
  * | lifecycle | {@link destroy} |
  *
  * @example
@@ -1196,17 +1199,59 @@ export class TableApi {
   }
 
   /**
-   * Re-applies the current sorting configuration to the table data.
+   * Re-applies the current sorting configuration to the table data and repaints.
    *
    * @description
-   * This method triggers a re-sort of the table data using the current sorting configuration.
-   * It's useful when the underlying data has changed and needs to be re-sorted without changing
-   * the sort columns or direction.
-   * 
+   * The current sorting is the last {@link sort} function, otherwise the columns with a sort state (the header icons,
+   * also restored by `autoRestoreOptions`). Useful when the underlying data has changed and needs to be re-sorted
+   * without changing the sort columns or direction. (Before 1.1.91 only the sort items stored by `autoRestoreOptions`
+   * were used – without them `reSort()` did nothing.)
+   *
+   * @example
+   * orders[0].total = 999_999;
+   * tableApi.reSort();
+   *
    * @return {void} - This method doesn't return anything.
    */
   reSort(){
     this.tableScope.reSort();
+  }
+
+  /**
+   * Tree tables: expands every row on every level (like the "expand all" icon in the header) and repaints.
+   * No effect for other tables.
+   *
+   * @example
+   * document.querySelector("#expand")!.addEventListener("click", () => tableApi.expandAll());
+   */
+  expandAll(): void {
+    this.tableScope.toggleExpandCollapseAll(true);
+  }
+
+  /**
+   * Tree tables: collapses every row on every level and repaints. No effect for other tables.
+   *
+   * @example
+   * tableApi.collapseAll();
+   */
+  collapseAll(): void {
+    this.tableScope.toggleExpandCollapseAll(false);
+  }
+
+  /**
+   * Tree tables: expands or collapses the displayed body row `rowIndex` (like a click on its arrow), repaints and
+   * remembers the state with `autoRestoreOptions`.
+   *
+   * @param {number} rowIndex - index of the displayed body row
+   * @param {boolean} expanded - the new state
+   * @returns {boolean} false if the table is no tree, the row does not exist or already has this state
+   *
+   * @example
+   * tableApi.setRowExpanded(0, true);   // expand the first row
+   */
+  setRowExpanded(rowIndex: number, expanded: boolean): boolean {
+    const row = this.tableScope.tableModel.getBodyModel().getRowByIndex(rowIndex);
+    return isTreeRow(row) ? this.tableScope.setTreeRowExpanded(row as TreeRowIf<any>, expanded) : false;
   }
 
   /**
@@ -1252,6 +1297,11 @@ export class TableApi {
    * tableApi.sort((a: Person, b: Person) =>
    *   a.name.toLowerCase().localeCompare(b.name.toLowerCase())
    * );
+   *
+   * @example
+   * // Tree tables: the function compares the tree rows of siblings (your objects: a.data / b.data),
+   * // children stay below their parent
+   * tableApi.sort((a: TreeRowIf<OrderNode>, b: TreeRowIf<OrderNode>) => b.data.total - a.data.total);
    */
   sort(compareFn: (a: any, b: any) => number): void {
     this.tableScope.sort(compareFn);

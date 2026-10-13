@@ -191,6 +191,54 @@ describe('autoRestoreCollapsedExpandedState', () => {
   });
 });
 
+describe('tree – TableApi, filter and sort (Okt. 2026)', () => {
+
+  it('expandAll() / collapseAll() / setRowExpanded()', async () => {
+    const { host, api } = await mountTree();
+    api.collapseAll();
+    expect(visibleNames(host)).toEqual(['A', 'B', 'C']);
+    expect(api.setRowExpanded(1, true)).toBe(true);   // B
+    expect(visibleNames(host)).toEqual(['A', 'B', 'B1', 'C']);
+    expect(api.setRowExpanded(1, true)).toBe(false);  // already expanded
+    expect(api.setRowExpanded(99, true)).toBe(false); // no such row
+    api.expandAll();
+    expect(visibleNames(host)).toEqual(['A', 'A1', 'A1a', 'A2', 'B', 'B1', 'C']);
+  });
+
+  it('the header icon toggles relative to expandAll()/collapseAll()', async () => {
+    const { host, api } = await mountTree();
+    api.collapseAll();
+    const icon = host.querySelector<HTMLElement>('[data-ge-action="toggleExpandCollapseAll"]')!;
+    await userEvent.click(icon); // collapsed → expands (before: the icon kept its own state)
+    expect(visibleNames(host)).toEqual(['A', 'A1', 'A1a', 'A2', 'B', 'B1', 'C']);
+  });
+
+  it('setRowExpanded() is not a TableApi feature of flat tables', async () => {
+    const { api } = mountTable(TableFactory.createTableModel({ rows: [{ id: 1, name: 'x' }], properties: ['id', 'name'] }));
+    await nextFrame();
+    expect(api.setRowExpanded(0, false)).toBe(false);
+  });
+
+  // Regression: a parent whose children were all filtered out still showed an arrow.
+  it('a parent without displayed children shows no arrow', async () => {
+    const { host, api } = await mountTree({
+      tableOptions: { externalFilterFunction: (row: { data: Node }) => ['A', 'A1', 'B1'].includes(row.data.name) },
+    });
+    api.externalFilterChanged();
+    await nextFrame();
+    expect(visibleNames(host)).toEqual(['A', 'A1', 'B', 'B1']);
+    expect(arrow(host, 0).classList).toContain('gt-table-tree-arrow-expanded'); // A: A1 is shown
+    expect(arrow(host, 1).classList).toContain('gt-table-tree-arrow-hidden');   // A1: its child A1a is filtered out
+  });
+
+  // Regression: api.sort(fn) did nothing on a tree (AbstractAreaModel.sort was a no-op).
+  it('api.sort(fn) sorts the siblings of every level', async () => {
+    const { host, api } = await mountTree();
+    api.sort((a: { data: Node }, b: { data: Node }) => b.data.id - a.data.id);
+    expect(visibleNames(host)).toEqual(['C', 'B', 'B1', 'A', 'A2', 'A1', 'A1a']);
+  });
+});
+
 describe('tree checkboxes (CheckboxColumnDef → TreeCheckboxModel)', () => {
 
   const box = (host: HTMLElement, row: number) =>
@@ -212,6 +260,40 @@ describe('tree checkboxes (CheckboxColumnDef → TreeCheckboxModel)', () => {
     // CheckboxColumnDef – the arrow is drawn into column 0 and overwritten by the CheckboxCellRenderer.
     expect(host.querySelector('.ge-table-body-center .ge-table-tree-arrow-div')).toBeNull();
     expect(box(host, 0)).not.toBeNull();
+  });
+
+  it('the header checkbox checks and unchecks the whole tree', async () => {
+    const { host, checked } = await mountTree({ checkbox: true, rowCheckboxVisible: true });
+    const headerBox = () => getCellDiv(host, 'header', 'center', 0, 0).querySelector<HTMLInputElement>('input')!;
+    // a click repaints (deferred) – wait for it, otherwise the next click hits a detached element
+    const click = async (el: HTMLElement) => {
+      await userEvent.click(el);
+      await nextFrame();
+      await new Promise(resolve => setTimeout(resolve, 5));
+    };
+    await click(headerBox());
+    expect(checked[checked.length - 1]).toHaveLength(7);
+    expect([0, 3, 6].map(r => box(host, r).checked)).toEqual([true, true, true]);
+    expect(headerBox().checked).toBe(true);
+    await click(box(host, 3)); // A2 off → header "semi"
+    expect(headerBox().checked).toBe(false);
+    expect(getCellDiv(host, 'header', 'center', 0, 0).textContent).toContain('✓');
+    await click(headerBox()); // semi → all checked
+    expect(checked[checked.length - 1]).toHaveLength(7);
+    await click(headerBox()); // all → none
+    expect(checked[checked.length - 1]).toEqual([]);
+    expect([0, 3, 6].map(r => box(host, r).checked)).toEqual([false, false, false]);
+  });
+
+  // Regression: the "expand/collapse all" icon was always drawn at x = 16 of the header row – over the header checkbox.
+  it('the "expand/collapse all" icon sits in the header of the arrow column, not on the header checkbox', async () => {
+    const { host } = await mountTree({ checkbox: true, rowCheckboxVisible: true });
+    const icon = host.querySelector<HTMLElement>('[data-ge-action="toggleExpandCollapseAll"]')!;
+    const arrowHeader = getCellDiv(host, 'header', 'center', 0, 1).getBoundingClientRect();
+    expect(icon.getBoundingClientRect().left).toBe(arrowHeader.left + 16);
+    const input = getCellDiv(host, 'header', 'center', 0, 0).querySelector('input')!;
+    const r = input.getBoundingClientRect();
+    expect(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)).toBe(input);
   });
 
   it('a partly checked parent shows the "semi" mark', async () => {

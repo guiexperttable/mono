@@ -13,12 +13,8 @@ export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxMode
   }
 
   checkRow(row: T, sel: boolean): void {
-    row.checked = sel;
-    if (row.children) {
-      for (const child of row.children) {
-        this.checkRow(child as T, sel);
-      }
-    }
+    this.setCheckedRecursive(row, sel);
+    // once for the row – before, every descendant re-checked all its ancestors (O(n²) for a big subtree)
     this.autoCheckParent(row.parent as T);
   }
 
@@ -36,9 +32,14 @@ export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxMode
     for (const node of arr) {
       this.uncheckRecursive(node);
     }
+    // each parent once – before, once per child (O(n²) for many siblings)
+    const parents = new Set<T>();
     for (const node of arr) {
-      this.autoCheckParent(node.parent as T);
+      if (node.parent) {
+        parents.add(node.parent as T);
+      }
     }
+    parents.forEach(parent => this.autoCheckParent(parent));
   }
 
   getCheckedRows(): T[] {
@@ -51,12 +52,33 @@ export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxMode
     if (row.checked) {
       return "full";
     }
-    const b1 = this.areAllChildrenChecked(row as T);
-    const b2 = this.areAllChildrenUnchecked(row as T);
-    if (!b1 && !b2) {
-      return "semi";
+    // one walk instead of two: "semi" as soon as a checked AND an unchecked descendant were seen
+    return this.hasMixedDescendants(row) ? "semi" : "none";
+  }
+
+  /** True if the descendants of `row` are partly checked (stops at the first checked + unchecked pair). */
+  private hasMixedDescendants(row: T): boolean {
+    let checked = false;
+    let unchecked = false;
+    const walk = (children: TreeRowIf<any>[] | undefined): boolean => {
+      for (const child of children ?? []) {
+        if (child.checked) checked = true; else unchecked = true;
+        if ((checked && unchecked) || walk(child.children)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    return walk(row.children);
+  }
+
+  private setCheckedRecursive(row: T, sel: boolean): void {
+    row.checked = sel;
+    if (row.children) {
+      for (const child of row.children) {
+        this.setCheckedRecursive(child as T, sel);
+      }
     }
-    return "none";
   }
 
   setCheckedRows(rows: T[]): void {

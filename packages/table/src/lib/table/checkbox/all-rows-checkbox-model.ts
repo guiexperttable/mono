@@ -1,6 +1,8 @@
 import { CheckedType } from "../data/common/checked-type";
 import { AreaModelIf } from "../data/tablemodel/areamodel/area-model.if";
 import { CheckboxModelIf } from "./checkbox-model.if";
+import { TreeCheckboxModel } from "./tree-checkbox-model";
+import { TreeRowIf } from "../data/common/tree-row-if";
 
 /**
  * Checkbox model of the HEADER checkbox of a `CheckboxColumnDef`: it stands for all (filtered) rows of the body.
@@ -31,10 +33,23 @@ export class AllRowsCheckboxModel<T> implements CheckboxModelIf<T> {
   }
 
   checkRow(_row: T, check: boolean): void {
+    const model = this.bodyAreaModel.rowSelectionModel;
+    if (model instanceof TreeCheckboxModel) {
+      // a tree: (un)check the top rows – TreeCheckboxModel passes it on to the children and parents
+      this.getTopTreeRows().forEach(row => model.checkRow(row, check));
+      return;
+    }
     this.checkAll(check ? this.getBodyRows() : []);
   }
 
   isRowChecked(_row: T): CheckedType {
+    const model = this.bodyAreaModel.rowSelectionModel;
+    if (model instanceof TreeCheckboxModel) {
+      // a tree: from the states of the top rows (each knows "full" / "semi" for its subtree)
+      const states = this.getTopTreeRows().map(row => model.isRowChecked(row));
+      if (!states.length || states.every(st => st === "none")) return "none";
+      return states.every(st => st === "full") ? "full" : "semi";
+    }
     const checkedRows = this.getCheckedRows();
     const rowCount = this.bodyAreaModel.getRowCount();
     if (!checkedRows.length || !rowCount) {
@@ -77,6 +92,15 @@ export class AllRowsCheckboxModel<T> implements CheckboxModelIf<T> {
     const checked = new Set(model.getCheckedRows());
     rows.forEach(row => checked.add(row));
     model.setCheckedRows(Array.from(checked));
+  }
+
+  /** The displayed top-level tree rows (with a filter: the matching ones) – cheap, no walk over all rows. */
+  private getTopTreeRows(): TreeRowIf<any>[] {
+    const body = this.bodyAreaModel as Partial<{ getDisplayedRootRows(): TreeRowIf<any>[] }>;
+    if (typeof body.getDisplayedRootRows === 'function') {
+      return body.getDisplayedRootRows();
+    }
+    return (this.getBodyRows() as unknown as TreeRowIf<any>[]).filter(row => !row.parent);
   }
 
   private getBodyRows(): T[] {

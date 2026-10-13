@@ -280,9 +280,9 @@ describe('AreaModelObjectArray', () => {
       expect(model.getFilteredRows().map((r: any) => r.d)).toEqual([d3, d1, d2]);
     });
 
-    // BUG: the JSDoc example reads "sort by name desc, then by age asc", but doSort() runs one stable sort per item,
-    // so the LAST item becomes the primary key and earlier items only break ties.
-    it.fails('sorts by the first sort item, the second one only breaks ties (JSDoc: "name desc, then age asc")', () => {
+    // Regression: the JSDoc example reads "sort by name desc, then by age asc", but doSort() ran one stable sort per
+    // item, so the LAST item became the primary key and earlier items only broke ties.
+    it('sorts by the first sort item, the second one only breaks ties (JSDoc: "name desc, then age asc")', () => {
       const rows: Person[] = [
         { id: 1, name: 'A', age: 1 },
         { id: 2, name: 'B', age: 2 },

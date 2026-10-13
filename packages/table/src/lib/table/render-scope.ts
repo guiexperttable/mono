@@ -1284,7 +1284,8 @@ export class RenderScope extends EleScope {
    * @return {void}
    */
   protected adjustHoverRows(mouseMoveEvent: GeMouseEvent) {
-    if (this.tableOptions.hoverRowVisible && mouseMoveEvent.rowIndex > -1) {
+    // only body rows: the hover row is positioned in the body (a header row 0 was drawn on body row 0)
+    if (this.tableOptions.hoverRowVisible && mouseMoveEvent.rowIndex > -1 && mouseMoveEvent.areaIdent === 'body') {
       const width = this.hostElement.clientWidth;
       const rowHeight = this.tableModel.getAreaModel('body').getRowHeight(mouseMoveEvent.rowIndex);
       // with a capped scroll height scrollTop is not a content position – use the rendered offset
@@ -1327,8 +1328,7 @@ export class RenderScope extends EleScope {
     if (this.tableOptions.hoverColumnVisible && mouseMoveEvent.rowIndex > -1) {
       const height = this.hostElement.clientHeight;
       const width = this.tableModel.getColumnWidth(mouseMoveEvent.columnIndex);
-      const fixedWest = this.areaBodyWestGeo.width;
-      const left = mouseMoveEvent.columnLeft + this.tableModel.getPadding().left - this.scrollLeft - fixedWest;
+      const left = this.getColumnLeftInHost(mouseMoveEvent.columnIndex, mouseMoveEvent.columnLeft);
       this.dom.applyStyle(this.hoverColumn, {
         'left': (left) + 'px',
         'top': '0px',
@@ -1341,6 +1341,27 @@ export class RenderScope extends EleScope {
     }
   }
 
+
+  /**
+   * The x position of a column relative to the host element: fixed west and east columns do not scroll.
+   *
+   * @param {number} columnIndex - model index of the column
+   * @param {number} columnLeft - x position of the column over all columns (`getXPosByColumnIndex`)
+   * @returns {number} the left position in px
+   */
+  protected getColumnLeftInHost(columnIndex: number, columnLeft: number): number {
+    const columnCount = this.tableModel.getColumnCount();
+    const fixedLeft = this.tableModel.getFixedLeftColumnCount();
+    const fixedRight = this.tableModel.getFixedRightColumnCount();
+    if (columnIndex < fixedLeft) {
+      return columnLeft;
+    }
+    if (fixedRight > 0 && columnIndex >= columnCount - fixedRight) {
+      const firstEastColumnLeft = this.tableModel.getXPosByColumnIndex(columnCount - fixedRight);
+      return this.areaBodyEastGeo.left + columnLeft - firstEastColumnLeft;
+    }
+    return columnLeft - this.scrollLeft; // center: west columns + scrolled center = columnLeft - scrollLeft
+  }
 
   /**
    * Hide hover column.
@@ -1409,8 +1430,8 @@ export class RenderScope extends EleScope {
   ) {
     if (this.dragging) {
       const height = this.hostElement.clientHeight;
-      // const width = this.tableModel.getColumnWidth(sourceColumnIndex);
-      const width = this.storedColumnWidths[sourceColumnIndex];
+      // sourceColumnIndex is the current index of the dragged column (it moves while dragging)
+      const width = this.tableModel.getColumnWidth(sourceColumnIndex);
 
       if (mouseMoveEvent.originalEvent?.clientX) {
         const left = mouseMoveEvent.originalEvent?.clientX - width / 2;
@@ -1419,7 +1440,7 @@ export class RenderScope extends EleScope {
         this.dom.applyStyle(this.draggingColumn, {
           'background': 'rgba(128,128,128,0.2)',
           'display': 'block',
-          'overfllow': 'clip'
+          'overflow': 'hidden' // the rows of the ghost must not spill out below the table
         });
         this.dom.applyStyleInPx(this.draggingColumn, geo);
         if (firstDraggingRendering) {
@@ -1441,7 +1462,12 @@ export class RenderScope extends EleScope {
    */
   protected renderContentOfDraggingColumn(columnGeo: GeoData) {
     const y = this.renderContentOfDraggingColumnForArea(columnGeo, 'header', 0);
-    this.renderContentOfDraggingColumnForArea(columnGeo, 'body', y);
+    // only the rows visible in the body, at their current position (before: ALL body rows from the top –
+    // millions of divs for a large table)
+    const firstRow = Math.max(0, this.firstVisibleRowIndex);
+    const bodyModel = this.tableModel.getAreaModel('body');
+    const firstRowTop = y + bodyModel.getYPosByRowIndex(firstRow) - this.contentScrollTop;
+    this.renderContentOfDraggingColumnForArea(columnGeo, 'body', firstRowTop, firstRow, this.hostElement.clientHeight);
     // we refrain from rendering the footer:
     // y = this. renderContentOfDraggingColumnForArea(columnGeo, 'footer', y);
   }
@@ -1457,7 +1483,9 @@ export class RenderScope extends EleScope {
   protected renderContentOfDraggingColumnForArea(
     columnGeo: GeoData,
     areaIdent: AreaIdent,
-    y: number = 0
+    y: number = 0,
+    firstRowIndex: number = 0,
+    maxY: number = Number.POSITIVE_INFINITY
   ): number {
 
     const sideIdent = 'center';
@@ -1467,7 +1495,7 @@ export class RenderScope extends EleScope {
       const columnIndex = columnGeo.index ?? 0;
       const parent = this.draggingColumn;
 
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      for (let rowIndex = firstRowIndex; rowIndex < rowCount && y < maxY; rowIndex++) {
         const top = y;
         const height = areaModel.getRowHeight(rowIndex);
         const geo = { left: 0, width: columnGeo.width, height, top, index: rowIndex };

@@ -246,10 +246,10 @@ describe('checkbox renderers', () => {
     expect(changed[1]).toEqual([rows[2], rows[4]]);
   });
 
-  // BUG: mouse-handler.ts:89 – a second click on the same cell within doubleClickDelay (500 ms) is treated as part of
-  // a double click and returns before the checkbox handling: the browser unchecks the input, the row stays checked
-  // in the model and onCheckboxChanged is not fired (DOM and model disagree until the next repaint).
-  it.fails('CheckboxColumnDef: a quick second click on the same checkbox unchecks the row', async () => {
+  // Regression: a second click on the same cell within doubleClickDelay (500 ms) was treated as part of a double click
+  // and returned before the checkbox handling: the browser unchecked the input, the row stayed checked in the model
+  // and onCheckboxChanged was not fired (DOM and model disagreed until the next repaint).
+  it('CheckboxColumnDef: a quick second click on the same checkbox unchecks the row', async () => {
     const listener = new EventAdapter();
     const changed: unknown[][] = [];
     listener.onCheckboxChanged = rows => changed.push(rows);
@@ -263,20 +263,34 @@ describe('checkbox renderers', () => {
     expect(changed).toEqual([[rows[2]], []]);
   });
 
-  // BUG: table-scope.ts:491 reads the checked rows from the model of the CLICKED area – a click on the header
-  // checkbox of CheckboxColumnDef (rendered by CheckboxCellRenderer) checks nothing and reports [] although body
-  // rows are checked.
-  it.fails('CheckboxColumnDef: a click on the header checkbox reports the checked body rows', async () => {
+  // Regression: the header checkbox of CheckboxColumnDef (rendered by CheckboxCellRenderer) checked nothing and reported
+  // [] – the header model had no checkbox model. Now it stands for all body rows (AllRowsCheckboxModel).
+  it('CheckboxColumnDef: the header checkbox checks / unchecks all body rows and shows their state', async () => {
     const listener = new EventAdapter();
     const changed: unknown[][] = [];
     listener.onCheckboxChanged = rows => changed.push(rows);
     const rows = createRows(10);
     const columnDefs = [new CheckboxColumnDef(), ColumnDef.create({ property: 'name', width: px100 })] as ColumnDefIf[];
-    const { host } = mountTable(TableFactory.createTableModel({ rows, columnDefs }), { eventListener: listener });
+    const { host, scope } = mountTable(TableFactory.createTableModel({ rows, columnDefs }), { eventListener: listener });
+    scope.mouseHandler.doubleClickDelay = 0;
     await nextFrame();
-    await userEvent.click(getCellDiv(host, 'body', 'center', 2, 0).querySelector('input')!);
-    await userEvent.click(getCellDiv(host, 'header', 'center', 0, 0).querySelector('input')!);
+    const headerBox = () => getCellDiv(host, 'header', 'center', 0, 0);
+    const bodyBox = (r: number) => getCellDiv(host, 'body', 'center', r, 0).querySelector<HTMLInputElement>('input')!;
+    expect(headerBox().querySelector<HTMLInputElement>('input')!.checked).toBe(false);
+
+    await userEvent.click(bodyBox(2));
+    await vi.waitFor(() => expect(headerBox().textContent).toContain('✓')); // "semi": some rows checked
+    expect(headerBox().querySelector<HTMLInputElement>('input')!.checked).toBe(false);
+
+    await userEvent.click(headerBox().querySelector('input')!);
+    expect(changed[changed.length - 1]).toHaveLength(10); // all rows
     expect(changed[changed.length - 1]).toContain(rows[2]);
+    await vi.waitFor(() => expect(headerBox().querySelector<HTMLInputElement>('input')!.checked).toBe(true));
+    expect(bodyBox(7).checked).toBe(true);
+
+    await userEvent.click(headerBox().querySelector('input')!);
+    expect(changed[changed.length - 1]).toEqual([]);
+    await vi.waitFor(() => expect(bodyBox(2).checked).toBe(false));
   });
 
   it('CheckboxBooleanPropertyCellRenderer shows and toggles a boolean row property', async () => {

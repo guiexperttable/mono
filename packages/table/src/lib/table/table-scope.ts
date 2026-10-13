@@ -321,7 +321,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     ret.originalEvent = mouseEvent;
 
     if (mouseEvent) {
-      const target = mouseEvent.target as HTMLElement;
+      const target = this.getMouseEventTarget(mouseEvent) as HTMLElement;
       [ret.areaIdent, ret.sideIdent] = this.getAreaAndSideIdentByAttr(target);
       ret.rowIndex = this.getNumberByAttr(target, 'data-row-index');
       ret.columnIndex = this.getNumberByAttr(target, 'data-col-index');
@@ -343,6 +343,33 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       }
     }
     return ret;
+  }
+
+  /**
+   * The element a mouse event belongs to – usually `evt.target`. The scroll viewport lies above the footer areas (its
+   * horizontal scroll bar must stay usable), so a mouse event on a footer cell arrives at the viewport: then the footer
+   * element below the mouse pointer is returned (not on the scroll bar itself).
+   *
+   * @param {MouseEvent} evt - a mouse event on the host element
+   * @returns {EventTarget | null} the target element
+   */
+  getMouseEventTarget(evt: MouseEvent): EventTarget | null {
+    const target = evt.target;
+    if ((target === this.scrollViewport || target === this.contentWrapperDiv || target === this.contentDiv)
+      && this.tableModel.getPadding().bottom > 0) {
+      const viewportRect = this.scrollViewport.getBoundingClientRect();
+      const onScrollBar = evt.clientY - viewportRect.top >= this.scrollViewport.clientHeight
+        || evt.clientX - viewportRect.left >= this.scrollViewport.clientWidth;
+      const root = this.hostElement.getRootNode() as Document | ShadowRoot;
+      if (!onScrollBar && root.elementsFromPoint) {
+        const footerElement = root.elementsFromPoint(evt.clientX, evt.clientY)
+          .find(e => this.hostElement.contains(e) && e.closest('.ge-table-footer'));
+        if (footerElement) {
+          return footerElement;
+        }
+      }
+    }
+    return target;
   }
 
   /**
@@ -398,7 +425,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         }
       }
       if (startMouseEvent) {
-        this.adjustDraggingColumn(mouseEvent, startMouseEvent.columnIndex, this.firstDraggingRendering);
+        // dragFrom = the CURRENT index of the dragged column – it may already have been moved by this first move
+        // (a fast drag); the start index would then show the column that took its place
+        this.adjustDraggingColumn(mouseEvent, this.dragFrom, this.firstDraggingRendering);
         this.firstDraggingRendering = false;
       }
       this.repaint();
@@ -497,7 +526,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     areaModel.setRowChecked(rowIdx, unsel);
     this.repaint(); // TODO repaint cell only
     const selectedRows = areaModel.rowSelectionModel?.getCheckedRows();
-    this.eventListener.onCheckboxChanged?.(selectedRows ? selectedRows : []);
+    // a copy: the model changes its array with the next click (a listener that keeps it would see the change)
+    this.eventListener.onCheckboxChanged?.(selectedRows ? selectedRows.slice() : []);
   }
 
   /**

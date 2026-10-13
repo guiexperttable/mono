@@ -25,6 +25,7 @@ afterEach(() => {
 interface MountOpts {
   rows?: number;
   fixedLeft?: number;
+  fixedRight?: number;
   columnDefs?: ColumnDefIf[];
   tableOptions?: Partial<TableOptionsIf>;
   footer?: boolean;
@@ -49,6 +50,7 @@ async function mountMouseTable(opts: MountOpts = {}) {
     rows: createRows(opts.rows ?? 100),
     columnDefs,
     fixedLeftColumnCount: opts.fixedLeft ?? 0,
+    fixedRightColumnCount: opts.fixedRight ?? 0,
     footerData: opts.footer ? [columnDefs.map(cd => 'F-' + cd.property)] : undefined,
   });
   const table = mountTable(model, { eventListener: listener, tableOptions: opts.tableOptions });
@@ -103,15 +105,18 @@ describe('onMouseClicked – GeMouseEvent', () => {
     expect(clicked[0]).toMatchObject({ rowIndex: 0, columnIndex: 1, areaIdent: 'header', sideIdent: 'center', action: 'drag-column' });
   });
 
-  // BUG: ele-scope.ts:162 – the scroll viewport (created after the footer areas) is as high as the table minus the
-  // header (h - padding.top) and covers the footer: a real click on a footer cell hits the viewport and is reported as a
-  // BODY click with rowIndex/columnIndex -1 (hover and onMouseMoved likewise). Only the body east area is lifted
-  // above it (z-index in table-classes.css).
-  it.fails('a click on a footer cell is reported as footer click', async () => {
-    const { host, clicked } = await mountMouseTable({ footer: true });
+  // Regression: the scroll viewport (created after the footer areas) is as high as the table minus the header and
+  // covers the footer (its horizontal scroll bar lies on the footer) – a real click on a footer cell hit the viewport
+  // and was reported as a BODY click with rowIndex/columnIndex -1 (hover and onMouseMoved likewise).
+  // TableScope.getMouseEventTarget() now finds the footer element below the pointer.
+  it('a click on a footer cell is reported as footer click', async () => {
+    const { host, clicked, moved } = await mountMouseTable({ footer: true });
     // force: Playwright would refuse the click because the cell is covered by another element
     await userEvent.click(getCellDiv(host, 'footer', 'center', 0, 2), { force: true });
-    expect(clicked[0]).toMatchObject({ rowIndex: 0, columnIndex: 2, areaIdent: 'footer' });
+    expect(clicked[0]).toMatchObject({ rowIndex: 0, columnIndex: 2, areaIdent: 'footer', sideIdent: 'center' });
+    await vi.waitFor(() => expect(moved.length).toBeGreaterThan(0));
+    expect(moved[moved.length - 1]).toMatchObject({ rowIndex: 0, columnIndex: 2, areaIdent: 'footer' });
+    expect(host.querySelector<HTMLElement>('.ge-table-hover-row')!.style.display).toBe('none');
   });
 
   it('click on a scrolled row reports the model row index', async () => {
@@ -142,14 +147,13 @@ describe('onMouseClicked – GeMouseEvent', () => {
     expect(clicked.every(e => e.rowIndex === 4 && e.areaIdent === 'body')).toBe(true);
   });
 
-  // BUG: mouse-handler.ts:167/201 – the dblclick handler sorts (repaint → the header cells are rebuilt) BEFORE it
-  // publishes the event; the event target is then detached and table-scope.ts:317 finds no data-side ancestor →
-  // areaIdent/sideIdent undefined, rowTop -1.
-  it.fails('the double click that sorts a column is reported with area "header"', async () => {
+  // Regression: the dblclick handler sorted (repaint → the header cells are rebuilt) BEFORE it created the event; the
+  // event target was then detached → areaIdent/sideIdent undefined, rowTop -1.
+  it('the double click that sorts a column is reported with area "header"', async () => {
     const { host, clicked } = await mountMouseTable();
     await userEvent.dblClick(getCellDiv(host, 'header', 'center', 0, 1));
     const dblclick = clicked.find(e => e.originalEvent?.type === 'dblclick')!;
-    expect(dblclick.areaIdent).toBe('header');
+    expect(dblclick).toMatchObject({ areaIdent: 'header', sideIdent: 'center', rowIndex: 0, columnIndex: 1, rowTop: 0 });
   });
 
   it('Ctrl+Alt + mouse move clears the browser console (debug code)', async () => {
@@ -379,9 +383,9 @@ describe('column drag & drop (columnsDraggable)', () => {
     expect(host.querySelector('.ge-table-drop-zone')).toBeNull();
   });
 
-  // BUG: render-scope.ts:1433 renders EVERY body row of the column into the ghost (not only the visible ones) – a
-  // header drag in a table with millions of rows creates millions of divs and freezes the page.
-  it.fails('the ghost column renders only the visible rows', async () => {
+  // Regression: the ghost rendered EVERY body row of the column (not only the visible ones) – a header drag in a table
+  // with millions of rows created millions of divs and froze the page.
+  it('the ghost column renders only the visible rows', async () => {
     const { host } = await mountMouseTable({ rows: 2_000 });
     const header0 = getCellDiv(host, 'header', 'center', 0, 0);
     fireMouse(header0, 'mousedown');
@@ -392,9 +396,9 @@ describe('column drag & drop (columnsDraggable)', () => {
     expect(ghostCells).toBeLessThanOrEqual(renderedRows(host).length);
   });
 
-  // BUG: render-scope.ts:1385 sets the style 'overfllow' (typo) instead of overflow – the ghost (host height) is not
-  // clipped, its rows spill out below the table while dragging.
-  it.fails('the ghost column is clipped to the table height', async () => {
+  // Regression: the ghost had the style 'overfllow' (typo) instead of overflow – it was not clipped, its rows spilled out
+  // below the table while dragging.
+  it('the ghost column is clipped to the table height', async () => {
     const { host } = await mountMouseTable();
     const header0 = getCellDiv(host, 'header', 'center', 0, 0);
     fireMouse(header0, 'mousedown');
@@ -404,6 +408,20 @@ describe('column drag & drop (columnsDraggable)', () => {
     const overflow = getComputedStyle(ghost).overflowY;
     fireMouse(header0, 'mouseup');
     expect(overflow).not.toBe('visible');
+  });
+
+  it('the ghost column shows the visible rows at their position when the table is scrolled', async () => {
+    const { host, api } = await mountMouseTable({ rows: 2_000 });
+    api.scrollToIndex(0, 1_000);
+    await nextFrame();
+    const header0 = getCellDiv(host, 'header', 'center', 0, 0);
+    fireMouse(header0, 'mousedown');
+    fireMouse(header0, 'mousemove', { clientX: header0.getBoundingClientRect().left + 60 });
+    await nextFrame();
+    const first = host.querySelector<HTMLElement>('.ge-table-dragging-column [data-area="body"].ge-table-col-div')!;
+    fireMouse(header0, 'mouseup');
+    expect(first.getAttribute('data-row-index')).toBe('1000');
+    expect(stylePx(first, 'top')).toBe(34); // directly below the header
   });
 
   it('the ghost column uses the renderers, classes and styles of the column', async () => {
@@ -426,10 +444,9 @@ describe('column drag & drop (columnsDraggable)', () => {
     await nextFrame();
   });
 
-  // BUG: table-scope.ts:384/393 – the column is moved BEFORE the ghost is rendered with the START index; when the
-  // first mouse move is already over another column (fast drag), the ghost shows the column that now sits at the
-  // start index instead of the dragged one.
-  it.fails('a fast drag shows the dragged column in the ghost', async () => {
+  // Regression: the column was moved BEFORE the ghost was rendered with the START index; when the first mouse move was
+  // already over another column (fast drag), the ghost showed the column that took its place.
+  it('a fast drag shows the dragged column in the ghost', async () => {
     const { host } = await mountMouseTable();
     fireMouse(getCellDiv(host, 'header', 'center', 0, 0), 'mousedown');
     fireMouse(getCellDiv(host, 'header', 'center', 0, 1), 'mousemove');
@@ -494,23 +511,34 @@ describe('hover row and column (hoverRowVisible / hoverColumnVisible)', () => {
     expect(hoverColumn(host).style.display).toBe('none');
   });
 
-  // BUG: render-scope.ts:1253 adjustHoverRows() does not check the area – the header row 0 is drawn as hover row at
-  // the position of BODY row 0 (top = header height).
-  it.fails('hovering a header cell shows no hover row on the body', async () => {
+  // Regression: adjustHoverRows() did not check the area – the header row 0 was drawn as hover row at the position of
+  // BODY row 0 (top = header height).
+  it('hovering a header cell shows no hover row on the body', async () => {
     const { host, moved } = await mountMouseTable();
     await userEvent.hover(getCellDiv(host, 'header', 'center', 0, 1));
     await vi.waitFor(() => expect(moved.length).toBeGreaterThan(0));
     expect(hoverRow(host).style.display).toBe('none');
   });
 
-  // BUG: render-scope.ts:1297 subtracts scrollLeft for every column – the hover column of a fixed (west) column
-  // moves away from the column when the table is scrolled horizontally.
-  it.fails('the hover column stays on a fixed west column after horizontal scrolling', async () => {
+  // Regression: adjustHoverColumns() subtracted scrollLeft for every column – the hover column of a fixed (west) column
+  // moved away from the column when the table was scrolled horizontally.
+  it('the hover column stays on a fixed west column after horizontal scrolling', async () => {
     const columnDefs = Array.from({ length: 20 }, (_, i) => ColumnDef.create({ property: i === 0 ? 'id' : 'p' + i, width: px100 }));
     const { host, api } = await mountMouseTable({ fixedLeft: 1, columnDefs });
     api.scrollToPixel(300, 0);
     await nextFrame();
     const cell = getCellDiv(host, 'body', 'west', 2, 0);
+    await userEvent.hover(cell);
+    await vi.waitFor(() => expect(hoverColumn(host).style.display).toBe('block'));
+    expect(stylePx(hoverColumn(host), 'left')).toBe(leftInHost(host, cell));
+  });
+
+  it('the hover column stays on a fixed east column after horizontal scrolling', async () => {
+    const columnDefs = Array.from({ length: 20 }, (_, i) => ColumnDef.create({ property: i === 0 ? 'id' : 'p' + i, width: px100 }));
+    const { host, api } = await mountMouseTable({ fixedRight: 2, columnDefs });
+    api.scrollToPixel(300, 0);
+    await nextFrame();
+    const cell = getCellDiv(host, 'body', 'east', 2, 19);
     await userEvent.hover(cell);
     await vi.waitFor(() => expect(hoverColumn(host).style.display).toBe('block'));
     expect(stylePx(hoverColumn(host), 'left')).toBe(leftInHost(host, cell));

@@ -11,6 +11,7 @@ import { SortItem } from "../common/sort-item";
 import { SelectionModelIf } from "../../selection/selection-model.if";
 import { GetT } from "../common/get-t";
 import { CheckboxModel } from "../../checkbox/checkbox-model";
+import { AllRowsCheckboxModel } from "../../checkbox/all-rows-checkbox-model";
 import {isCheckboxColumnDef} from "../../instanceof-workaround";
 import { FalseFn, TrueFn } from "../common/boolean-function";
 import { SizeIf } from '../common/size.if';
@@ -83,6 +84,12 @@ export class TableModel implements TableModelIf {
       && isCheckboxColumnDef(this.columnDefs[0])
       && !bodyAreaModel.rowSelectionModel) {
       bodyAreaModel.rowSelectionModel = new CheckboxModel();
+    }
+    // the header checkbox of a CheckboxColumnDef checks / unchecks all body rows and shows their state
+    if (this.columnDefs?.length
+      && isCheckboxColumnDef(this.columnDefs[0])
+      && !headerAreaModel.rowSelectionModel) {
+      headerAreaModel.rowSelectionModel = new AllRowsCheckboxModel(bodyAreaModel);
     }
   }
 

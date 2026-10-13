@@ -10,7 +10,5 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     GuiexpertTable: typeof import('./src/lib/GuiexpertTable.vue')['default']
-    RouterLink: typeof import('vue-router')['RouterLink']
-    RouterView: typeof import('vue-router')['RouterView']
   }
 }

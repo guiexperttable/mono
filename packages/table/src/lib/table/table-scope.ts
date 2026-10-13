@@ -345,20 +345,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       ret.columnIndex = this.getNumberByAttr(target, 'data-col-index');
       ret.action = this.getStringByAttr(target, 'data-ge-action');
 
-      // const bodyY = mouseEvent.clientY - this.hostElement.offsetTop - this.areaHeaderCenter.parent.clientHeight;
-      // const bodyX = mouseEvent.clientX - this.hostElement.offsetLeft - this.areaBodyWestGeo.width;
-
       if (ret.areaIdent) {
         const am = this.tableModel.getAreaModel(ret.areaIdent);
         ret.rowTop = am.getYPosByRowIndex(ret.rowIndex);
       }
       ret.columnLeft = this.tableModel.getXPosByColumnIndex(ret.columnIndex);
-
-      if (mouseEvent.ctrlKey && mouseEvent.altKey) {
-        const bodyY = mouseEvent.clientY - this.hostElement.offsetTop - this.areaHeaderCenter.parent.clientHeight;
-        const bodyX = mouseEvent.clientX - this.hostElement.offsetLeft - this.areaBodyWestGeo.width;
-        this.debugOnce(bodyX, bodyY);
-      }
     }
     return ret;
   }
@@ -556,6 +547,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @returns {void}
    */
   onMouseClicked(evt: GeMouseEvent, previousEvt: GeMouseEvent | undefined): boolean {
+    if (evt.clickCount > 1) {
+      // a double click: the first click did focus and selection, the dblclick handler sorts/edits/toggles
+      // (resetting the editor here would close the editor the double click just opened)
+      return false;
+    }
     let dirty = this.selectionService.onMouseClicked(evt, previousEvt);
     if (!dirty) {
       if (this.getFocusModel) {
@@ -597,7 +593,34 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   onSelectionChanged(sm: SelectionModelIf) {
+    if (this.selectionEventsHeld > 0) {
+      this.heldSelectionModel = sm; // reported once at the end of holdSelectionEvents()
+      return;
+    }
     this.eventListener.onSelectionChanged?.(sm);
+  }
+
+  private selectionEventsHeld = 0;
+  private heldSelectionModel?: SelectionModelIf;
+
+  /**
+   * Runs `fn` and reports all selection changes made in it as ONE `onSelectionChanged` event (a click used to fire
+   * up to three: `clear()`, adding the new range and the selection service itself).
+   *
+   * @param {() => void} fn - code that changes the selection model
+   */
+  holdSelectionEvents(fn: () => void): void {
+    this.selectionEventsHeld++;
+    try {
+      fn();
+    } finally {
+      this.selectionEventsHeld--;
+      if (this.selectionEventsHeld === 0 && this.heldSelectionModel) {
+        const sm = this.heldSelectionModel;
+        this.heldSelectionModel = undefined;
+        this.eventListener.onSelectionChanged?.(sm);
+      }
+    }
   }
 
 
@@ -774,6 +797,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void} - This method does not return any value.
    */
   setSelectionModel(sm: SelectionModel, rerender: boolean = false) {
+    // the table listens to its selection model (onSelectionChanged) – move the listener to the new model
+    this.selectionModel()?.removeEventSelectionChangedListener(this);
+    sm.addEventSelectionChangedListener(this);
     const getSm = () => sm;
     this.tableOptions.getSelectionModel = getSm;
     this.getSelectionModel = getSm;
@@ -908,23 +934,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (this.getSelectionModel) {
       this.getSelectionModel()?.clear();
     }
-  }
-
-  private debugOnce(bodyX: number, bodyY: number) {
-    console.clear();
-    console.info('this.hostElement.offsetTop', this.hostElement.offsetTop); // pageY of table tag
-    console.info('this.hostElement.scrollHeight', this.hostElement.scrollHeight); // height of visible scroll area
-    console.info('this.scrollViewportTop', this.scrollTop); // amount of px scrolled to top (initial : 0)
-    console.info('this.areaHeaderCenter.parent.clientHeight', this.areaHeaderCenter.parent.clientHeight);
-    console.info('bodyY', bodyY);
-    console.info('bodyX', bodyX);
-    console.info('rows', this.firstVisibleRowIndex);
-    console.info('');
-    console.info('this.tableModel', this.tableModel);
-    console.info('');
-    console.info('this.mouseMoveEvent.clientX', this.mouseHandler.mouseEvent?.clientX);
-    console.info('this.hostElement.offsetLeft', this.hostElement.offsetLeft);
-    console.info('this.areaBodyWestGeo.width', this.areaBodyWestGeo.width);
   }
 
   /**

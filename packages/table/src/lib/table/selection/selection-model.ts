@@ -6,6 +6,17 @@ import { EventSelectionChangedListenerIf } from './event-selection-changed-liste
 
 
 /**
+ * Saved state of a {@link SelectionModel} – see {@link SelectionModel.createSnapshot}.
+ *
+ * @category Selection & focus
+ */
+export interface SelectionSnapshot {
+  ranges: CellRange[];
+  negativeRanges: CellRange[];
+  allSelected: boolean;
+}
+
+/**
  * `SelectionModel` is a class that manages the various modes and types of selections within a grid.
  * It supports basic modes like single cell, row, column, and range selections, as well as advanced mode like negative ranges.
  * Events related to selections, such as changes to a selection, are propagated to listeners through the EventSelectionChangedListener interface.
@@ -83,12 +94,42 @@ export class SelectionModel implements SelectionModelIf {
     }
   }
 
+  /**
+   * A plain click: selects the clicked row (`"row"`), column (`"column"`) or cell (`"cell"`, `"range"`).
+   *
+   * @param {number} rowIndex - row index of the clicked cell
+   * @param {number} columnIndex - column index of the clicked cell
+   */
   firstClick(rowIndex: number, columnIndex: number): void {
      if (this.selectionType === 'row') {
        this.addRange(CellRange.singleRow(rowIndex));
      } else if (this.selectionType === 'column') {
        this.addRange(CellRange.singleColumn(columnIndex));
+     } else if (this.selectionType === 'cell' || this.selectionType === 'range') {
+       this.addRange(CellRange.singleCell(rowIndex, columnIndex));
      }
+  }
+
+  /**
+   * A copy of the current selection state, e.g. to restore it while a drag rectangle changes
+   * (see {@link restoreSnapshot}). The ranges themselves are shared – they are never changed after being added.
+   *
+   * @returns {SelectionSnapshot} the state
+   */
+  createSnapshot(): SelectionSnapshot {
+    return { ranges: [...this.ranges], negativeRanges: [...this.negativeRanges], allSelected: this.allSelected };
+  }
+
+  /**
+   * Restores a state created by {@link createSnapshot} (fires a change event).
+   *
+   * @param {SelectionSnapshot} snapshot - the state to restore
+   */
+  restoreSnapshot(snapshot: SelectionSnapshot): void {
+    this.ranges = [...snapshot.ranges];
+    this.negativeRanges = [...snapshot.negativeRanges];
+    this.allSelected = snapshot.allSelected;
+    this.fireChangeEvent();
   }
 
   getSelectionCount(rowIndex: number, columnIndex: number): number {
@@ -201,8 +242,7 @@ export class SelectionModel implements SelectionModelIf {
    * @param {CellRange} range - the cells to select (adjusted in place to the selection type)
    */
   addSelection(range: CellRange): void {
-    this.addRange(range);
-    this.fireChangeEvent();
+    this.addRange(range); // fires the change event (once – before, addSelection() fired a second time)
   }
 
   /**
@@ -223,6 +263,9 @@ export class SelectionModel implements SelectionModelIf {
       r = new CellRange(0, range.c1, Number.MAX_SAFE_INTEGER, range.c2);
     }
     this.negativeRanges.push(r);
+    // ranges whose cells are all deselected now are dropped – otherwise hasSelection() stayed true after all
+    // selected cells were removed (and copy produced empty cells)
+    this.ranges = this.ranges.filter(range => !this.isCoveredByNegativeRanges(range));
     this.fireChangeEvent();
   }
 
@@ -335,6 +378,35 @@ export class SelectionModel implements SelectionModelIf {
       if (ic2 < n.c2) ret.push(new CellRange(ir1, ic2 + 1, ir2, n.c2, n.gammaRange)); // right
     }
     this.negativeRanges = ret;
+  }
+
+  /** True if every cell of `range` is inside one of the negative ranges (rectangle difference, works unbounded). */
+  private isCoveredByNegativeRanges(range: CellRange): boolean {
+    let remaining: CellRange[] = [range];
+    for (const n of this.negativeRanges) {
+      remaining = remaining.flatMap(rect => SelectionModel.difference(rect, n));
+      if (!remaining.length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** `a` minus `b`: up to four rectangles (above, below, left and right of the overlap). */
+  private static difference(a: CellRange, b: CellRange): CellRange[] {
+    const ir1 = Math.max(a.r1, b.r1);
+    const ir2 = Math.min(a.r2, b.r2);
+    const ic1 = Math.max(a.c1, b.c1);
+    const ic2 = Math.min(a.c2, b.c2);
+    if (ir1 > ir2 || ic1 > ic2) {
+      return [a]; // no overlap
+    }
+    const ret: CellRange[] = [];
+    if (a.r1 < ir1) ret.push(new CellRange(a.r1, a.c1, ir1 - 1, a.c2));
+    if (ir2 < a.r2) ret.push(new CellRange(ir2 + 1, a.c1, a.r2, a.c2));
+    if (a.c1 < ic1) ret.push(new CellRange(ir1, a.c1, ir2, ic1 - 1));
+    if (ic2 < a.c2) ret.push(new CellRange(ir1, ic2 + 1, ir2, a.c2));
+    return ret;
   }
 
   private static intersects(a: CellRange, b: CellRange): boolean {

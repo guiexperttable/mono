@@ -127,24 +127,40 @@ describe('onMouseClicked – GeMouseEvent', () => {
     expect(clicked[0]).toMatchObject({ rowIndex: 5_002, columnIndex: 0, rowTop: 5_002 * 34 });
   });
 
-  it('two quick clicks on the same cell: clickCount 1, then 2 – on different cells: 1 and 1', async () => {
+  // The browser decides what a double click is (event.detail – the double-click speed of the OS): two separate clicks
+  // are two single clicks, however quick (before: < 500 ms on the same cell was a double click – the second
+  // ctrl-click or checkbox click was swallowed).
+  it('separate clicks are single clicks – also two quick ones on the same cell', async () => {
     const { host, scope, clicked } = await mountMouseTable();
-    scope.mouseHandler.doubleClickDelay = 60_000; // deterministic, independent of the machine speed
-    const cellA = getCellDiv(host, 'body', 'center', 1, 1);
-    await userEvent.click(cellA);
+    scope.mouseHandler.doubleClickDelay = 60_000; // only for programmatic clicks (detail 0)
+    await userEvent.click(getCellDiv(host, 'body', 'center', 1, 1));
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 1));
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 1));
-    expect(clicked.map(e => [e.rowIndex, e.clickCount])).toEqual([[1, 1], [2, 1], [2, 2]]);
+    expect(clicked.map(e => [e.rowIndex, e.clickCount])).toEqual([[1, 1], [2, 1], [2, 1]]);
   });
 
-  it('a double click on a body cell fires onMouseClicked three times', async () => {
+  it('programmatic clicks (element.click()) on the same cell within doubleClickDelay are a double click', async () => {
     const { host, scope, clicked } = await mountMouseTable();
     scope.mouseHandler.doubleClickDelay = 60_000;
+    getCellDiv(host, 'body', 'center', 2, 1).click();
+    getCellDiv(host, 'body', 'center', 2, 1).click();
+    expect(clicked.map(e => [e.rowIndex, e.clickCount])).toEqual([[2, 1], [2, 2]]);
+  });
+
+  // Regression: click (1) + click (2) + dblclick (2) – a double click was reported three times (a handler for
+  // clickCount === 2 ran twice).
+  it('a double click on a body cell fires onMouseClicked twice: clickCount 1 and 2', async () => {
+    const { host, clicked } = await mountMouseTable();
     await userEvent.dblClick(getCellDiv(host, 'body', 'center', 4, 0));
-    // NOTE: click (1) + click (2, same cell within doubleClickDelay) + dblclick (2) – the double click is reported twice.
-    expect(clicked.map(e => e.clickCount)).toEqual([1, 2, 2]);
-    expect(clicked.map(e => e.originalEvent?.type)).toEqual(['click', 'click', 'dblclick']);
+    expect(clicked.map(e => e.clickCount)).toEqual([1, 2]);
+    expect(clicked.map(e => e.originalEvent?.type)).toEqual(['click', 'click']); // the dblclick is not reported again
     expect(clicked.every(e => e.rowIndex === 4 && e.areaIdent === 'body')).toBe(true);
+  });
+
+  it('a "dblclick" without a reported second click (e.g. dispatched) is reported', async () => {
+    const { host, clicked } = await mountMouseTable();
+    getCellDiv(host, 'body', 'center', 3, 1).dispatchEvent(new MouseEvent('dblclick', { bubbles: true, detail: 2 }));
+    expect(clicked.map(e => [e.rowIndex, e.clickCount, e.originalEvent?.type])).toEqual([[3, 2, 'dblclick']]);
   });
 
   // Regression: the dblclick handler sorted (repaint → the header cells are rebuilt) BEFORE it created the event; the
@@ -152,19 +168,20 @@ describe('onMouseClicked – GeMouseEvent', () => {
   it('the double click that sorts a column is reported with area "header"', async () => {
     const { host, clicked } = await mountMouseTable();
     await userEvent.dblClick(getCellDiv(host, 'header', 'center', 0, 1));
-    const dblclick = clicked.find(e => e.originalEvent?.type === 'dblclick')!;
+    const dblclick = clicked.find(e => e.clickCount === 2)!;
     expect(dblclick).toMatchObject({ areaIdent: 'header', sideIdent: 'center', rowIndex: 0, columnIndex: 1, rowTop: 0 });
   });
 
-  it('Ctrl+Alt + mouse move clears the browser console (debug code)', async () => {
+  // Regression: debugOnce() – Ctrl+Alt on any mouse event (even a move) cleared the user's console and logged internals
+  // (Ctrl+Alt+click is the "deselect cell" gesture).
+  it('Ctrl+Alt + mouse move leaves the browser console alone', async () => {
     const clear = vi.spyOn(console, 'clear').mockImplementation(() => undefined);
-    vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
     const { host } = await mountMouseTable();
     fireMouse(getCellDiv(host, 'body', 'center', 1, 1), 'mousemove', { ctrlKey: true, altKey: true });
     await nextFrame();
-    // NOTE: table-scope.ts:331 debugOnce() – Ctrl+Alt on any mouse event (even a move) clears the user's console
-    // and logs internals; Ctrl+Alt+click is also the "deselect cell" gesture.
-    expect(clear).toHaveBeenCalled();
+    expect(clear).not.toHaveBeenCalled();
+    expect(info).not.toHaveBeenCalled();
   });
 });
 

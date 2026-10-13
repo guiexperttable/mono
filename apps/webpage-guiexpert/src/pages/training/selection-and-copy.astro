@@ -19,7 +19,7 @@ import Callout from "../../components/training/Callout.astro";
     <tbody>
       <tr><td><code>"cell"</code></td><td>one cell</td></tr>
       <tr><td><code>"row"</code> / <code>"column"</code></td><td>the whole row / column</td></tr>
-      <tr><td><code>"range"</code></td><td>a rectangle – drag with the mouse or Shift+click</td></tr>
+      <tr><td><code>"range"</code></td><td>one cell – or a rectangle: drag with the mouse or Shift+click</td></tr>
       <tr><td><code>"none"</code></td><td>nothing</td></tr>
     </tbody>
   </table>
@@ -28,7 +28,8 @@ import Callout from "../../components/training/Callout.astro";
 
   <h2 id="keyboard">Mouse and keyboard</h2>
   <ul>
-    <li>Drag = range (since 1.1.88), <kbd>Shift</kbd>+click = range up to here, <kbd>⌘/Ctrl</kbd>+click = another cell.</li>
+    <li>Drag = range (since 1.1.88), <kbd>⌘/Ctrl</kbd>+drag = another range, <kbd>Shift</kbd>+click = range from the last
+      click up to here (click again with <kbd>Shift</kbd> to change it), <kbd>⌘/Ctrl</kbd>+click = another cell.</li>
     <li><kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies, <kbd>⌘/Ctrl</kbd>+<kbd>A</kbd> selects all (<kbd>⌘/Ctrl</kbd>+<kbd>A</kbd>,
       <kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies the whole displayed body, up to <code>CopyService.maxCopyCells</code> cells), arrow keys move the focus.</li>
     <li>Shortcuts can be remapped or switched off (<code>shortcutActionIdMapping</code>, <code>shortcutActionsDisabled</code> in
@@ -38,8 +39,9 @@ import Callout from "../../components/training/Callout.astro";
   <h2 id="events">React to the selection</h2>
   <Snippet file="demos/selection-and-copy.ts" region="events" />
   <p>
-    <ApiLink name="EventListenerIf.onSelectionChanged" /> gets the model; <ApiLink name="SelectionModelIf.getRanges" /> returns
-    the selected rectangles (<code>r1, c1, r2, c2</code>). Event listeners in general: <ChapterLink slug="events-and-context-menu" />.
+    <ApiLink name="EventListenerIf.onSelectionChanged" /> gets the model (once per click); <ApiLink name="SelectionModelIf.getRanges" />
+    returns the selected rectangles (<code>r1, c1, r2, c2</code> – for rows and columns unbounded, so count rows with
+    <ApiLink name="SelectionModelIf.getMergedRowIndices" />). Event listeners in general: <ChapterLink slug="events-and-context-menu" />.
   </p>
 
   <h2 id="copy">Copy</h2>

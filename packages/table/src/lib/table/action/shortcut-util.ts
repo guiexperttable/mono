@@ -1,4 +1,25 @@
-/** @category Keyboard */
+/**
+ * Key names that mean the same key. Keyboard events are harmonized to the short form ("up"),
+ * mappings may use either form ("arrowup" as in `KeyboardEvent.key`, or "up").
+ */
+const KEY_ALIASES: { [key: string]: string } = {
+  'arrowup': 'up',
+  'arrowdown': 'down',
+  'arrowleft': 'left',
+  'arrowright': 'right',
+};
+
+/**
+ * Normalizes a shortcut string (e.g. a key of a {@link ShortcutActionIdMapping}) so that it can be compared with
+ * {@link createHarmonizedShortcutByKeyboardEvent}: "+" becomes a space, symbols and synonyms are unified
+ * ("⌘"/"meta"/"command" → "cmd", "arrowup" → "up" …), modifiers come first.
+ *
+ * @example
+ * harmonizeShortcut('meta+c');    // "cmd c"
+ * harmonizeShortcut('arrowup');   // "up"
+ *
+ * @category Keyboard
+ */
 export function harmonizeShortcut(shortcut: string): string {
   return shortcut
     .trim()
@@ -19,6 +40,7 @@ export function harmonizeShortcut(shortcut: string): string {
     .replace(/\*/g, 'multiply')
     .split(' ')
     .filter(s => s)
+    .map(s => KEY_ALIASES[s] ?? s)
     .filter((s, i, arr) => arr.indexOf(s) === i) // remove double entries
     .sort((a: string, b: string) => {
       const modifierOrder: { [key: string]: number } = { 'cmd': 1, 'ctrl': 2, 'alt': 3, 'shift': 4 };

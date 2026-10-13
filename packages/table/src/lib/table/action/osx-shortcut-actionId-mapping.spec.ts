@@ -80,8 +80,9 @@ describe('OsxShortcutActionIdMapping', () => {
     }
   });
 
-  // BUG: "arrowup" etc. never equal the harmonized arrow key events ("up", "down", …).
-  it.fails('the arrow shortcuts match the harmonized shortcut of the arrow key events', () => {
+  // Regression: the mapping uses "arrowup" …, the keyboard event is harmonized to "up" … – harmonizeShortcut()
+  // maps both spellings to the same key (before, the arrow shortcuts could never match).
+  it('the arrow shortcuts match the harmonized shortcut of the arrow key events', () => {
     for (const key of ARROW_KEYS) {
       expect(createHarmonizedShortcutByKeyboardEvent(keyEvent(KEY_EVENTS_BY_MAPPING_KEY[key]!)), key)
         .toBe(harmonizeShortcut(key));

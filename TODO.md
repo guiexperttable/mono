@@ -177,12 +177,16 @@ Alle 42 vom unabhängigen Review bestätigt (2 davon „diskutabel“, markiert)
 Verhalten steht als `// NOTE:` in den Specs.
 
 **Hohe Wirkung (normale Bedienung im Browser):**
-- [ ] **Tastatur-Shortcuts komplett kaputt** (`action/shortcut.service.ts:126`): `findEntity` vergleicht das Event mit
-      sich selbst → **jede** Taste löst den ersten Eintrag aus (`START_EDITING`), auch Strg+C, Strg+A, Pfeile und
-      eigene `shortcutActionIdMapping`-Einträge. Im echten Chromium geprüft. Fix: `harmonizeShortcut(key)` statt
-      `createHarmonizedShortcutByKeyboardEvent(evt)`. **Gleichzeitig** die Pfeil-Schlüssel angleichen: Mappings nutzen
-      `"arrowup"`, das Event ergibt `"up"` (`windows-/osx-shortcut-actionId-mapping.ts`) – sonst ist danach die
-      Pfeil-Navigation kaputt. Specs: `shortcut.service.spec.ts`, `*-shortcut-actionId-mapping.spec.ts`.
+- [x] **Tastatur-Shortcuts komplett kaputt** (`action/shortcut.service.ts`): `findEntity` verglich das Event mit sich
+      selbst → **jede** Taste löste `START_EDITING` aus (und wurde mit `preventDefault` geschluckt – auch Tab).
+      Behoben: Vergleich mit `harmonizeShortcut(key)`; `harmonizeShortcut` versteht jetzt „arrowup“ **und** „up“
+      (öffentliche Mappings bleiben gleich). Pfeil-Navigation (erstmals wirksam) bleibt am ersten/letzten Zeilen-/
+      Spaltenrand stehen und scrollt die fokussierte Zeile ins Bild. Browser-Test `keyboard.browser.spec.ts`.
+      Verhaltensänderung: Buchstaben öffnen den Editor nicht mehr – nur noch F2 (laut Mapping).
+- [ ] Optional: Excel-artig „Enter“ bzw. Tippen startet das Editieren (heute nur F2). Pfeile springen nicht in fixierte
+      Spalten-Bereiche horizontal ins Bild (`ensureRowIsVisible` scrollt nur vertikal).
+- [ ] `onFocusChanged` feuert bei Mausklick **zweimal** (`selection-service.ts:79`: `fm.setFocus` feuert schon über den
+      Focus-Listener von `TableScope`, danach noch `tableScope.onFocusChanged(fm)`).
 - [ ] **Strg/⌘-Klick ergänzt die Selektion nicht** (`selection/selection-service.ts:85`): jeder Klick ohne Shift
       leert vorher die Selektion; Strg+Alt-Klick („Zelle abwählen“) arbeitet dadurch immer auf leerer Selektion.
 - [ ] **Strg+A, Strg+C kopiert nur eine Zelle** (`service/copy-service.ts:31`): `selectAll()` setzt nur ein Flag,

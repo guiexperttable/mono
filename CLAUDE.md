@@ -66,6 +66,10 @@ mono/
   Peer-Dependency mit Babel 8 aus `@angular/compiler-cli@22`.
 - Vite **6.4.4** (exakt gepinnt) in allen Paketen/Demos – Vitest 5 braucht ≥ 6.4. Nicht ohne Weiteres auf 7/8 heben:
   das ändert das ausgelieferte Bundle (Vite 8 = Rolldown, `vite-plugin-babel` warnt), s. `TODO.md`.
+- Paket-Typen: `exports` mit `"import": { "types", "default" }` + `"require"` (Typen absichtlich nur für `import`, sonst
+  TS1479 bei CJS-Konsumenten mit node16). `scripts/fix-dts-imports.mjs` (im `afterBuild` von vite-plugin-dts aller
+  Pakete) ergänzt `.js` in relativen `.d.ts`-Importen (node16/nodenext). `vue3-table` ist `"type": "module"`
+  (`postcss.config.cjs`, `.eslintrc.cjs`).
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
 - Website (Astro 7): Tailwind 3 läuft über `postcss.config.cjs` + `src/styles/tailwind.css` – `@astrojs/tailwind` unterstützt
@@ -144,13 +148,19 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`. Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent`, `GeScrollEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
-  `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`.
+  `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
+  Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
+  Bereich. „Letzte Operation je Zelle gewinnt“ (negative Ranges). Ein Klick zeichnet verzögert neu (`debounceRepaint`),
+  nicht bei Klicks in Formularelemente (input, select, button …) einer Zelle. Strg+A, Strg+C kopiert
+  den sichtbaren Body, gedeckelt durch `CopyService.maxCopyCells`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
   Mapping-Schlüssel werden mit `harmonizeShortcut` normalisiert („ctrl+c“, „meta+c“ = „cmd c“, „arrowup“ = „up“).
   Editor öffnen: F2. Erst seit Okt. 2026 wirksam – vorher löste jede Taste `START_EDITING` aus (s. `TODO.md`).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
+  Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
+  `TreeRow`, prüft alle Knoten (auch zugeklappte), Vorfahren von Treffern bleiben sichtbar.
 - Persistenz: `tableOptions.autoRestoreOptions` (Scroll-Pos, Sortierung, Collapsed/Expanded; `getStorageKeyFn`).
 - Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
   Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via
@@ -162,8 +172,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `autoResizeColumns`, `setColumnWidth`,
   `recalcColumnWidths`, `updateCells([TableCellUpdateEvent…], repaintAll)`, `triggerAction(ActionId)`, `repaint`,
   `repaintHard`, `setLoggingActive`.
-- **Stubs (leer, TODO):** `setColumnVisible`, `isColumnVisible`, `setHeaderVisible`, `isHeaderVisible`,
-  `setFooterVisible`, `isFooterVisible`. Spalte ausblenden geht nur über `ColumnDef.isVisible: () => false`.
+- Sichtbarkeit: `api.setColumnVisible(index | property | ColumnDef, visible)` / `isColumnVisible` (über
+  `ColumnDef.isVisible`, Breite 0, alte Breite bleibt), `setHeaderVisible` / `setFooterVisible` (Flag im `TableModel`,
+  Höhe 0). `scrollToIndex(x, y)`: x = Spalte (fixierte West-Spalte → Anfang, `-1` behält x).
 
 ### 3.7 Wichtige `TableOptionsIf`-Felder (echte Namen!)
 `defaultRowHeights {header, body, footer}`, `hoverRowVisible`, `hoverColumnVisible`, `columnsResizable`,
@@ -223,7 +234,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 243 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 270 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -234,8 +245,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.350 Tests) |
-  | `test:browser` | echtes Chromium (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.440 Tests) |
+  | `test:browser` | echtes Chromium, ~290 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -251,8 +262,14 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `// NOTE:`. **Jeder Bugfix bekommt zuerst einen roten Test.**
   - `src/index.spec.ts` hält alle Exportnamen als Snapshot fest: neuer Export → `pnpm exec vitest run -u src/index.spec.ts`
     und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
-  - Abdeckung (Okt. 2026): DOM-freie Teile (`data/`, `factory/`, `selection/`, `service/`, `action/` …) 92–100 %,
-    Rendering (`RenderScope`/`TableScope`/`TableApi`/Renderer) erst ~38 % → Browser-Tests sind der nächste Schritt (`TODO.md`).
+  - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~89 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
+    `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
+    `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
+    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility` …).
+  - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
+    `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
+    `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
+    `columnIndices`, `stylePx`, `createRows`, `destroyAllTables`.
   - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
     Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests

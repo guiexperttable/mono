@@ -593,6 +593,161 @@ describe('TableModel', () => {
     });
   });
 
+  // TableApi.setColumnVisible / setHeaderVisible / setFooterVisible were empty stubs (TODO.md, CLAUDE.md §3.6).
+  describe('setColumnVisible / isColumnVisible', () => {
+    it('hides a column by index: width 0, content width, padding and x positions follow', () => {
+      const tm = create({ fixedLeftColumnCount: 1 });
+      tm.init();
+      expect(tm.getContentWidthInPixel()).toBe(450);
+      expect(tm.setColumnVisible(1, false)).toBe(true);
+      expect(widths(tm)).toEqual([50, 0, 200, 100, 50]);
+      expect(tm.isColumnVisible(1)).toBe(false);
+      expect(tm.getContentWidthInPixel()).toBe(350);
+      expect(tm.getXPosByColumnIndex(2)).toBe(50);
+      expect(tm.getXPosByColumnIndex(3)).toBe(250);
+    });
+
+    it('showing again restores the previous width (also a width set with setColumnWidth)', () => {
+      const tm = create();
+      tm.init();
+      tm.setColumnWidth(2, 333);
+      tm.setColumnVisible(2, false);
+      expect(tm.getColumnWidth(2)).toBe(0);
+      tm.setColumnVisible(2, true);
+      expect(tm.getColumnWidth(2)).toBe(333);
+      expect(tm.isColumnVisible(2)).toBe(true);
+      expect(tm.getContentWidthInPixel()).toBe(50 + 100 + 333 + 100 + 50);
+    });
+
+    it('accepts a property or a column definition', () => {
+      const columnDefs = defs();
+      const tm = create({ columnDefs });
+      tm.init();
+      expect(tm.setColumnVisible('city', false)).toBe(true);
+      expect(tm.isColumnVisible('city')).toBe(false);
+      expect(tm.isColumnVisible(3)).toBe(false);
+      expect(tm.setColumnVisible(columnDefs[0]!, false)).toBe(true);
+      expect(tm.isColumnVisible(columnDefs[0]!)).toBe(false);
+      expect(widths(tm)).toEqual([0, 100, 200, 0, 50]);
+    });
+
+    it('returns false for unknown columns', () => {
+      const tm = create();
+      tm.init();
+      expect(tm.setColumnVisible(5, false)).toBe(false);
+      expect(tm.setColumnVisible(-1, false)).toBe(false);
+      expect(tm.setColumnVisible('nope', false)).toBe(false);
+      expect(tm.setColumnVisible(new ColumnDef('id', 'ID', px50), false)).toBe(false); // not part of the model
+      expect(widths(tm)).toEqual([50, 100, 200, 100, 50]);
+      expect(tm.isColumnVisible(5)).toBe(false);
+      expect(tm.isColumnVisible('nope')).toBe(false);
+    });
+
+    it('sets ColumnDefIf.isVisible – also for ColumnDef.create() definitions – and keeps ColumnDef.visible in sync', () => {
+      const created = ColumnDef.create({ property: 'id', headerLabel: 'ID', width: px50 });
+      const constructed = new ColumnDef('name', 'Name', px100);
+      const tm = create({ columnDefs: [created, constructed] });
+      tm.init();
+      tm.setColumnVisible(0, false);
+      tm.setColumnVisible(1, false);
+      expect(created.isVisible?.()).toBe(false);
+      expect(constructed.isVisible()).toBe(false);
+      expect(constructed.visible).toBe(false);
+      tm.setColumnVisible(1, true);
+      expect(constructed.visible).toBe(true);
+      expect(constructed.isVisible()).toBe(true);
+    });
+
+    it('shows a column that was defined as hidden (isVisible: FalseFn)', () => {
+      const columnDefs = defs();
+      columnDefs[4]!.isVisible = FalseFn;
+      const tm = create({ columnDefs });
+      tm.init();
+      expect(tm.isColumnVisible('zip')).toBe(false);
+      tm.setColumnVisible('zip', true);
+      expect(tm.getColumnWidth(4)).toBe(50);
+    });
+
+    it('a hidden column keeps its definition, data and position when other columns are moved', () => {
+      const tm = create();
+      tm.init();
+      tm.setColumnVisible('age', false);
+      tm.changeColumnOrder(0, 4); // id → end: name, age, city, zip, id
+      expect(tm.getColumnProperty(1)).toBe('age');
+      expect(tm.isColumnVisible(1)).toBe(false);
+      expect(tm.getBodyModel().getValueAt(0, 1)).toBe(30);
+      tm.setColumnVisible('age', true);
+      expect(widths(tm)).toEqual([100, 200, 100, 50, 50]);
+    });
+
+    it('a hidden fixed column shrinks the west area', () => {
+      const tm = create({ fixedLeftColumnCount: 2 });
+      tm.init();
+      expect(tm.getPadding().left).toBe(150);
+      tm.setColumnVisible(0, false);
+      expect(tm.getPadding().left).toBe(100);
+    });
+
+    it('columns without a column definition are always visible and cannot be hidden', () => {
+      const tm = TableFactory.createTableModel({ bodyData: [[1, 2]], columnSizes: [80, 90] }) as TableModel;
+      tm.init();
+      expect(tm.isColumnVisible(1)).toBe(true);
+      expect(tm.setColumnVisible(1, false)).toBe(false);
+      expect(tm.isColumnVisible(2)).toBe(false);
+    });
+  });
+
+  describe('setHeaderVisible / setFooterVisible', () => {
+    it('a hidden header has the height 0 – its rows stay in the model', () => {
+      const tm = create({ footerData: [['f']] });
+      tm.init();
+      expect(tm.getPadding()).toEqual(new Padding(40, 0, 20, 0));
+      tm.setHeaderVisible(false);
+      expect(tm.isHeaderVisibe()).toBe(false);
+      expect(tm.getPadding()).toEqual(new Padding(0, 0, 20, 0));
+      expect(tm.getAreaModel('header').getRowCount()).toBe(1);
+      expect(tm.getAreaModel('header').getValueAt(0, 1)).toBe('Name');
+      tm.setHeaderVisible(true);
+      expect(tm.isHeaderVisibe()).toBe(true);
+      expect(tm.getPadding()).toEqual(new Padding(40, 0, 20, 0));
+    });
+
+    it('a hidden footer has the height 0', () => {
+      const tm = create({ footerData: [['f'], ['g']] });
+      tm.init();
+      tm.setFooterVisible(false);
+      expect(tm.isFooterVisibe()).toBe(false);
+      expect(tm.getPadding().bottom).toBe(0);
+      expect(tm.getAreaModel('footer').getRowCount()).toBe(2);
+      tm.setFooterVisible(true);
+      expect(tm.getPadding().bottom).toBe(40);
+    });
+
+    it('stays hidden after init() / recalcHeightAndPadding() (repaintHard, filter, recalcColumnWidths)', () => {
+      const tm = create({ footerData: [['f']] });
+      tm.setHeaderVisible(false);
+      tm.setFooterVisible(false);
+      tm.init();
+      tm.recalcHeightAndPadding();
+      expect(tm.getPadding()).toEqual(new Padding(0, 0, 0, 0));
+    });
+
+    it('an area without rows stays invisible after setFooterVisible(true)', () => {
+      const tm = create();
+      tm.setFooterVisible(true);
+      expect(tm.isFooterVisibe()).toBe(false);
+    });
+
+    it('the body height does not change', () => {
+      const tm = create({ footerData: [['f']] });
+      tm.init();
+      const contentHeight = tm.getContentHeightInPixel();
+      tm.setHeaderVisible(false);
+      tm.setFooterVisible(false);
+      expect(tm.getContentHeightInPixel()).toBe(contentHeight);
+    });
+  });
+
   describe('table scope', () => {
     it('stores the table scope', () => {
       const tm = create();

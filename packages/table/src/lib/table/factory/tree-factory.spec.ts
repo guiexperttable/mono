@@ -185,19 +185,40 @@ describe('TreeFactory', () => {
       expect(warn).not.toHaveBeenCalled();
     });
 
-    it('stops below the limit and warns', () => {
+    it('stops at the limit and warns', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
       const rows = all(TreeFactory.buildTreeRows([deepChain(5)], { deepMaxLimit: 1 }));
-      // NOTE: rows of depth limit + 1 are still created (see the it.fails test below)
-      expect(rows.map(r => r.deep)).toEqual([0, 1, 2]);
-      expect(warn).toHaveBeenCalledWith('Max deep limit reached: ', 2);
+      // Changed (fix/tree-filter): rows of depth limit + 1 were created and the warning named depth 2.
+      expect(rows.map(r => r.deep)).toEqual([0, 1]);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith('Max deep limit reached: ', 1);
     });
 
-    // BUG: off-by-one – deepMaxLimit is documented as "Maximum depth", but rows with deep = limit + 1 are created.
-    it.fails('creates no row deeper than deepMaxLimit', () => {
+    // Regression: off-by-one – deepMaxLimit is documented as "Maximum depth", but rows with deep = limit + 1 were created.
+    it('creates no row deeper than deepMaxLimit', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => undefined);
       const rows = all(TreeFactory.buildTreeRows([deepChain(5)], { deepMaxLimit: 1 }));
       expect(Math.max(...rows.map(r => r.deep))).toBeLessThanOrEqual(1);
+    });
+
+    it('deepMaxLimit 0 keeps the top level only', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const rows = all(TreeFactory.buildTreeRows(nodes(), { deepMaxLimit: 0 }));
+      expect(names(rows)).toEqual(['a', 'b']);
+      expect(warn).toHaveBeenCalledTimes(1); // "b" has no children → no warning for it
+    });
+
+    it('a tree exactly as deep as the limit is built completely without warning', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const rows = all(TreeFactory.buildTreeRows([deepChain(3)], { deepMaxLimit: 3 }));
+      expect(rows.map(r => r.deep)).toEqual([0, 1, 2, 3]);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('honours the positional deepMaxLimit as well', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const rows = all(TreeFactory.buildTreeRows([deepChain(5)], 'children', 2));
+      expect(rows.map(r => r.deep)).toEqual([0, 1, 2]);
     });
   });
 

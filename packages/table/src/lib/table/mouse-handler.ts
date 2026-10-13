@@ -30,6 +30,7 @@ export class MouseHandler {
   private expandedAll = true;
   private lastClickedCellKey = '';
   private mouseDown = false;
+  private repaintAfterMouseUp = false;
   private dragging = false;
 
   constructor(
@@ -133,9 +134,8 @@ export class MouseHandler {
     }
 
     if (mouseTargetData.areaIdent === "body") {
-      const fm = this.tableScope.focusModel();
-      fm?.clear();
-      fm?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
+      // fires onFocusChanged once, and only if the focus moves (a clear() before it fired twice per click)
+      this.tableScope.focusModel()?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }
 
     this.publishGeMouseEvent(event, 1);
@@ -218,13 +218,28 @@ export class MouseHandler {
       this.geMouseEvent.clickCount = clickCount;
     }
 
-    this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
+    const dirty = this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
     this.tableScope.publishGeMouseEvent(this.geMouseEvent);
-    if (clickCount===1) {
-      // this.tableScope.debounceRepaint();
+    if (dirty && !this.isInteractiveCellElement(event.target)) {
+      // paint the new focus and selection (before, a click only became visible with the next scroll).
+      // Deferred: a synchronous repaint replaces the clicked cell, and the browser then sends the following
+      // "dblclick" to the detached element – double-click editing would no longer work.
+      this.tableScope.debounceRepaint();
     }
   }
 
+
+  /**
+   * True if the click went to a form control, button, link or editable element inside the table (e.g. rendered by
+   * a custom cell renderer or the cell editor). Such a click must not repaint: the repaint re-creates the cells,
+   * the element would lose the focus and the user's input.
+   */
+  private isInteractiveCellElement(target: EventTarget | null): boolean {
+    const element = target instanceof Element ? target : null;
+    const interactive = element?.closest(
+      'input, select, textarea, button, a[href], [contenteditable]:not([contenteditable="false"])');
+    return !!interactive && this.tableScope.hostElement.contains(interactive);
+  }
 
   /**
    * Update the collapsed/expanded state of a tree row.
@@ -258,6 +273,11 @@ export class MouseHandler {
 
 
   private onMouseDown(evt: MouseEvent) {
+    // A click repaint must not happen between mousedown and mouseup/click/dblclick: it would replace the pressed cell
+    // element, and the browser would not see a click (or double click) on it. Hold it back until mouseup.
+    if (this.tableScope.cancelPendingRepaint()) {
+      this.repaintAfterMouseUp = true;
+    }
 
     if (!this.dragging) {
       this.mouseEvent = evt;
@@ -284,6 +304,11 @@ export class MouseHandler {
 
   private onMouseUp(evt: MouseEvent) {
     this.mouseEvent = evt;
+    if (this.repaintAfterMouseUp) {
+      // deferred: "click" and "dblclick" of this mouseup are dispatched first
+      this.repaintAfterMouseUp = false;
+      this.tableScope.debounceRepaint();
+    }
     if (this.dragging) {
       requestAnimationFrame(this.mouseDraggingEndOnFrame.bind(this));
     }

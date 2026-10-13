@@ -42,7 +42,10 @@
   },
   "exports": {
     ".": {
-      "import": "./index.js",
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
       "require": "./index.cjs"
     },
     "./css/*": "./css/*",

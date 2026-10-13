@@ -242,7 +242,7 @@ const install = "npm i @guiexpert/table";
     play,
     end: () => { stop(); api.scrollToIndex(0, rowCount - 1); },
     top: () => { stop(); api.scrollToIndex(0, 0); },
-    // scrollToIndex() only scrolls vertically – scrollToPixel() takes x (clamped) and the content y
+    // the far right: scrollToPixel() takes x (clamped) and the content y
     right: () => { stop(); api.scrollToPixel(1e7, api.getFirstVisibleRowIndex() * 32); }
   };
   demo.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => actions[b.dataset.action]()));

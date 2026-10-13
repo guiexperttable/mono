@@ -105,9 +105,16 @@
 - [ ] Footer-Summen über gefilterte Zeilen: geht heute mit eigenem Footer-AreaModel + `getFilteredRows()`
       (instructions.md 5.4). Optional später eine fertige Klasse (z. B. `AreaModelAggregateFooter`).
 
-- [ ] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
-      `setFooterVisible()`, `isFooterVisible()` sind leere TODO-Stubs → implementieren
-      (Spalte: über `ColumnDef.isVisible` bzw. Breite 0 + `recalcColumnWidths`).
+- [x] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
+      `setFooterVisible()`, `isFooterVisible()` implementiert (Branch `fix/core-api`): Spalte über `ColumnDef.isVisible`
+      (Breite 0, Copy/Excel überspringen sie, Wieder-Einblenden stellt die alte Breite her; Index, Property oder
+      ColumnDef), Header/Footer über ein Flag im `TableModel` (Höhe 0, Daten bleiben). `TableModelIf` bekommt die
+      Methoden als optionale Member.
+- [ ] Sichtbarkeit – offen: bei Gewichts-Breiten („weight“) zählen ausgeblendete Spalten weiter in `usedWidth`
+      (`table-model.ts:619`, Lücke) · `AreaModelCellGroups.toggleHeaderGroup` überschreibt `isVisible` aller Spalten
+      (per API ausgeblendete Spalte kommt nach Gruppen-Toggle zurück und umgekehrt) · Pfeil-Navigation kann auf
+      ausgeblendete Spalten fallen und scrollt links/rechts nicht horizontal (`ensureColumnIsVisible` mit
+      `getScrollLeftForColumnIndex` wäre einfach).
 - [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
       Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
       (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
@@ -159,8 +166,9 @@
 - [x] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen. → Vitest 5 in `packages/table`
       (Phase 0 + 1 von `TESTPLAN`, Okt. 2026): 74 Unit-Specs (Node, ~2 s) + 1 Browser-Spec (Chromium); dafür Vite
       6.3.4 → 6.4.4 in allen Paketen (Builds byte-identisch). Siehe CLAUDE.md §6.
-- [ ] Tests Phase 2: Browser-Tests für `RenderScope`/`TableScope`/`TableApi`, Renderer, Maus/Tastatur, CRUD-Dialoge
-      (heute ~38 % Zeilenabdeckung im Rendering-Teil, DOM-freie Teile 92–100 %).
+- [x] Tests Phase 2: Browser-Tests für Rendering, Maus, Renderer, Editor, Spans/Header-Gruppen, Lebenszyklus, Theming,
+      Baum, TableApi, CRUD (Branch `test/browser-rendering`, 10 Specs, 226 Tests) – Rendering-Abdeckung 43 → 96 %.
+      Gefundene Fehler: Abschnitt „Gefunden durch die Browser-Tests“.
 - [x] Tests Phase 3: wiederverwendbarer Workflow `.github/workflows/test-core.yml` (`test:types`, `docs:check`,
       `test:unit`, `test:browser` mit Chromium, Coverage-Artefakt) – aufgerufen von `ci.yml` (Push/PR) und von
       `npm-publish.yml` (Job `publish` hat `needs: test` → rote Tests = kein Release).
@@ -185,24 +193,49 @@ Verhalten steht als `// NOTE:` in den Specs.
       Verhaltensänderung: Buchstaben öffnen den Editor nicht mehr – nur noch F2 (laut Mapping).
 - [ ] Optional: Excel-artig „Enter“ bzw. Tippen startet das Editieren (heute nur F2). Pfeile springen nicht in fixierte
       Spalten-Bereiche horizontal ins Bild (`ensureRowIsVisible` scrollt nur vertikal).
-- [ ] `onFocusChanged` feuert bei Mausklick **zweimal** (`selection-service.ts:79`: `fm.setFocus` feuert schon über den
-      Focus-Listener von `TableScope`, danach noch `tableScope.onFocusChanged(fm)`).
-- [ ] **Strg/⌘-Klick ergänzt die Selektion nicht** (`selection/selection-service.ts:85`): jeder Klick ohne Shift
-      leert vorher die Selektion; Strg+Alt-Klick („Zelle abwählen“) arbeitet dadurch immer auf leerer Selektion.
-- [ ] **Strg+A, Strg+C kopiert nur eine Zelle** (`service/copy-service.ts:31`): `selectAll()` setzt nur ein Flag,
-      keine Range.
-- [ ] **Baum + Filter** (`data/tablemodel/areamodel/area-model-tree.ts`): Aufklappen/Zuklappen
-      (`recalcVisibleTreeRows`, `:50`) verwirft den Filter; ein Filter nach dem Aufklappen findet die neuen Zeilen nicht
-      (`flattenRows` veraltet); `doSort` (`:131`) verwirft den Filter – und weil `externalFilterChanged` danach neu
-      sortiert, wirkt ein Filter auf einem sortierten Baum gar nicht. `doSort([])` (`:124`) wirft einen TypeError
-      (erreichbar über `api.reSort()`).
-- [ ] **Abgewählte Zellen lassen sich nie wieder auswählen** (`selection/selection-model.ts:179/202`): negative Ranges
-      werden nur von `clear()` entfernt → `togglePoint` (Leertaste), `addSelection` nach `removeSelection`,
-      `MultiRowsSelectionModel.toggleRow`, `selectAll()` betroffen. `removeSelection` einer mehrzeiligen Range bei Typ
-      `row` entfernt nur die erste Zeile.
-- [ ] **`getMergedRowIndices()` hängt** bei Selektionstyp `column` (Schleife bis `MAX_SAFE_INTEGER`,
-      `selection-model.ts:146`) – nicht als Test möglich. Außerdem unsortiert (Doku: „sorted“) und prüft negative
-      Ranges nur in Spalte 0.
+- [x] `onFocusChanged` feuerte bei Mausklick **zweimal** (`mouse-handler.ts`: `fm.clear()` vor `setFocus()`;
+      `selection-service.ts`: zusätzlich `tableScope.onFocusChanged(fm)`). Jetzt einmal je echter Änderung
+      (Branch `fix/selection`).
+- [x] **Strg/⌘-Klick ergänzt die Selektion** (`selection-service.ts`): Klick = neue Selektion, Shift-Klick = Bereich ab
+      letztem Klick, Strg/⌘-Klick = Zelle (bzw. Zeile/Spalte) **umschalten**, Strg/⌘+Alt-Klick = Zelle abwählen; jeder
+      Klick ohne Shift ist Startpunkt für den nächsten Shift-Klick.
+- [x] **Strg+A, Strg+C kopiert den ganzen (sichtbaren) Body** (`copy-service.ts`), gedeckelt durch
+      `CopyService.maxCopyCells` (1.000.000; darüber Ablehnung + `console.warn`). `selectAll()` ist bei Typ `"none"`
+      (Default-Modell) wirkungslos.
+- [x] **Klicks wurden nicht gezeichnet** (`mouse-handler.ts`: Repaint auskommentiert) – Fokusrahmen/Selektion erst
+      beim nächsten Scrollen. Jetzt verzögertes Repaint (~1 ms), aber nicht bei
+      Klicks in `input`/`select`/`textarea`/`button`/Links/`contenteditable` einer Zelle (sonst verlieren Eingabefelder
+      eigener Renderer Fokus und Text).
+- [x] **Baum + Filter** (`area-model-tree.ts`, Branch `fix/tree-filter`): eine Pipeline – alle Zeilen (in Sortier-
+      Reihenfolge) → sichtbar (alle Eltern aufgeklappt) → Filter – für Aufklappen, Zuklappen, Filter, Sortieren und
+      „alle auf/zu“. Der Filter bleibt erhalten, findet auch Treffer unter zugeklappten Knoten (deren Vorfahren bleiben
+      sichtbar, zugeklappt) und wirkt auf sortierten Bäumen. `doSort([])` ist ein No-op. „Alle auf/zu“ berechnet die
+      Scrollhöhe neu (`repaintHard`).
+- [ ] Baum – gefunden, nicht behoben: `api.reSort()` nutzt nur gespeicherte Sortier-Items (`autoRestoreOptions`), sonst
+      wirkungslos – für alle Tabellen (`table-scope.ts` `reSort`); `api.sort(fn)` ist auf Bäumen ein No-op
+      (`AbstractAreaModel.sort`) · Filter-Prädikat läuft bei jedem Auf-/Zuklappen über alle Knoten (1 Mio. Knoten ≈ 110 ms;
+      `keep` hängt nicht vom Aufklapp-Zustand ab → nur bei Filteränderung neu berechnen) und bei aktiver Sortierung doppelt
+      · `AreaModelTree.getRowCount()` prüft `isVisible` je Zeile (könnte die Array-Länge liefern) ·
+      `TreeCheckboxModel.checkAll()` O(n²) bei vielen Geschwistern · zwei Klicks < 500 ms auf das „alle auf/zu“-Icon bzw.
+      denselben Pfeil gelten als Doppelklick (`mouse-handler.ts:89`) · Eltern ohne sichtbare Kinder (gefiltert) zeigen
+      trotzdem einen Pfeil · Mehrspalten-Sortierung im Baum nutzt nur das letzte Item · keine `TableApi`-Methode zum
+      Auf-/Zuklappen (heute `TableScope.toggleExpandCollapseAll` bzw. `recalcVisibleTreeRows()` + `repaintHard()`).
+- [x] **Abgewählte Zellen lassen sich wieder auswählen** (`selection-model.ts`): „letzte Operation je Zelle gewinnt“ –
+      `addSelection`/`togglePoint`/`firstClick`/`toggleRow` heben negative Ranges für ihre Zellen auf (Rechteck-Differenz,
+      auch unbegrenzte Zeilen/Spalten), `selectAll()` verwirft sie. `removeSelection` bei Typ `row`/`column` entfernt
+      die ganze Spanne.
+- [x] **`getMergedRowIndices(rowCount?)`** terminiert (ohne `rowCount` werden unbegrenzte Spalten-Selektionen
+      übersprungen), sortiert, prüft alle Spalten der negativen Ranges.
+- [ ] Selektion – gefunden, nicht behoben (Branch `fix/selection`):
+      Typ `"cell"`: ein einfacher Klick selektiert nichts (`firstClick` kennt nur row/column), die Schulung
+      (`training/selection-and-copy.astro`) sagt „one cell“ · Header-/Footer-Klicks prüfen `areaIdent` nicht (leeren die
+      Selektion, setzen Fokus auf Body-Zelle) · `onSelectionChanged` feuert mehrfach je Klick · `setSelectionModel()`
+      meldet `TableScope` nicht am neuen Modell an · Ziehen leert immer (kein Strg+Ziehen für zweiten Bereich) · ein
+      Doppelklick erreicht `onMouseClicked` dreimal (mit Strg: an/aus/an) · `hasSelection()` bleibt nach Abwählen aller
+      Zellen `true` (Copy liefert leere Zellen) · Strg+Alt (auch bei Mausbewegung) ruft `debugOnce()` →
+      `console.clear()` (`table-scope.ts:331`) · Beispiel-Zellenzählung `(r2-r1+1)*(c2-c1+1)` in `SelectionModelIf` und
+      `training/demos/selection-and-copy.ts` für row/column sinnlos (~9e15) · Klick-Repaint baut alle sichtbaren Zellen
+      neu (Komponenten-Renderer werden neu gemountet) – besser nur Fokus-/Selektions-Overlay neu zeichnen.
 
 **Mittel:**
 - [ ] Mehrspaltiges `doSort([a, b])` (`area-model-object-array.ts:533`): das **letzte** Item wird Primärschlüssel
@@ -225,14 +258,86 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] `setColumnWidth` aktualisiert die x-Positionen nicht (`table-model.ts:119`) → `GeMouseEvent.columnLeft` veraltet.
 - [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`); `buildByTypedRows(rows, [])` wirft
       (`table-factory.ts:371`).
-- [ ] `TreeFactory`: `deepMaxLimit` off-by-one (`tree-factory.ts:98`); `TreeCheckboxModel.checkAll()` endlose Rekursion
-      (`tree-checkbox-model.ts:29`).
+- [x] `TreeFactory`: `deepMaxLimit` off-by-one behoben (Zeilen bis Tiefe n, vorher n + 1); `TreeCheckboxModel.checkAll()`
+      endlose Rekursion behoben (Argument optional, Default: ganzer Baum; entfernt weiterhin die Häkchen).
 - [ ] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei).
 - [ ] `CssVars` Blackboard-Theme: Tippfehler `otransparent` (`css-vars.ts:225`).
 - [ ] `SchemeGenerator.renderTypeScriptInterfaces` liefert beim zweiten Aufruf `[]` (`scheme-generator-service.ts:83`).
 - [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
+
+## Gefunden durch die Browser-Tests (Okt. 2026)
+
+Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`packages/table/src/**/*.browser.spec.ts`).
+
+**Spaltenbreiten, Scrollen, fixierte Spalten**
+- [ ] %-Spaltenbreiten werden bis zum ersten ResizeObserver-Callback (~500 ms) für 400 px berechnet
+      (`table-model.ts:63` Default `parentSize`) · `recalcColumnWidths(clientWidth)` ignoriert die neue Breite
+      (`render-scope.ts:254`, nach Host-Resize eine Runde hinterher) · jeder ResizeObserver-Callback baut die Breiten neu
+      aus den ColumnDefs (`table-model.ts:510`) – per `setColumnWidth`/`autoResizeColumns`/Ziehen gesetzte Breiten gehen
+      verloren, auch durch den ersten Callback ~500 ms nach dem Mounten.
+- [ ] Ost-Trennlinie prüft `getFixedLeftColumnCount()` (`ele-scope.ts:208`) · Header/East-Area trägt `data-area="body"`
+      (`ele-scope.ts:92`) · Scroll-Inhalt 1 px höher als die Zeilen (`ele-scope.ts:314` vs `render-scope.ts:284`) –
+      `scrollToIndex(0, n)` lässt in der unteren Hälfte 1 px von Zeile n-1 sehen.
+- [ ] Row-Div-Cache wird nie geleert (`convenience-dom.service.ts:570/577`): jede je gerenderte Zeile bleibt mit ihren
+      Zellen referenziert (Speicher wächst beim Scrollen).
+
+**Maus**
+- [ ] Scroll-Viewport überdeckt den Footer (`ele-scope.ts:162`): Footer-Klicks/-Hover kommen als Body-Events mit −1 an
+      · Doppelklick-Sortierung: Event wird nach dem Repaint veröffentlicht – `areaIdent`/`sideIdent` undefined
+      (`mouse-handler.ts:167/201`, `table-scope.ts:317`) · Spalten-Drag: schneller Drag zeigt falsche Spalte im Ghost
+      (`table-scope.ts:384/393`), Ghost rendert **alle** Body-Zeilen der Spalte (`render-scope.ts:1433`), Style-Tippfehler
+      `'overfllow'` – Ghost nicht beschnitten (`render-scope.ts:1385`) · Hover über Header markiert Body-Zeile 0
+      (`render-scope.ts:1253`) · Hover-Spalte einer fixierten West-Spalte nach horizontalem Scrollen verschoben
+      (`render-scope.ts:1297`) · zweiter Klick auf dieselbe Zeilen-Checkbox < 500 ms wird als Doppelklick verschluckt
+      (`mouse-handler.ts:89`; DOM und Modell laufen auseinander) · Header-Checkbox von `CheckboxColumnDef` hakt nichts an
+      (`table-scope.ts:491`).
+
+**Renderer & Editor**
+- [ ] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle
+      (`number-cell-renderer.ts:25`, `positive-and-negative-number-renderer.ts:21`); fehlendes Anführungszeichen
+      `data-row-index=${rowIndex}"` (`positive-and-negative-number-renderer.ts:25`) · ungültiges Datum: `RangeError`
+      bricht den Render-Durchlauf ab, Tabelle bleibt leer (`date-to-iso-cell-renderer.ts:20`, `date-to-tec-cell-renderer.ts:21`).
+- [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Wert nicht escaped – `"` schneidet den Text ab, leere
+      Zelle zeigt „undefined“ (`input-cell-renderer.ts:28`) · Span-Modell wird nie neu aufgebaut: `setRows()` mit weniger
+      Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
+- [ ] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 (`css/table-tree.css:42/46`).
+
+**CRUD** (`crud/*`)
+- [ ] **HTML-Injection**: Werte unescaped in `innerHTML` (`crud-object-view.ts:61`) · Edit liest per `FormData`: Zahlen
+      als Strings, Checkbox „on“, nicht angehakte Checkbox fehlt (Boolean nie wieder `false`) (`crud-object-edit.ts:34`) ·
+      verschachtelte `<form>`: Felder nach einem Unterobjekt gehen verloren (`:63/85`) · Wert nicht escaped (`:68`) ·
+      CREATE sendet das leere Objekt, Eingaben gehen verloren (`crud-table-model-factory.ts:177`) ·
+      `getIdByObject` liefert immer `o['id']` (`crud-options.ts:42`).
+
+Weitere fragwürdige Stellen (als `// NOTE:` in den Specs): `setColumnWidth()` zeichnet nicht neu · Doppelklick feuert
+`onMouseClicked` dreimal · Strg+Alt ruft `debugOnce()`/`console.clear()` · voreingestellter `sortState` zeigt das Icon,
+sortiert aber nicht · Spaltenziehen ignoriert min/max · Kontextmenü-Drossel 50 ms · `setRows/addRows/…` zeichnen nicht neu,
+`setRows` verwirft Filter + Sortierung (Icon bleibt) · alle Span-Bereiche werden bei jedem Render gezeichnet ·
+Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderVisible: false` uneinheitlich · Zeile 0 jeder
+Objekt-Tabelle hat `ge-focused-row` · CRUD: Dialog bleibt nach Escape im DOM, flache Kopie beim Editieren, CLONE behält die
+id, `deleteItem` per GET.
+
+## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **Tastatur**: Shortcuts funktionieren (vorher löste jede Taste `START_EDITING` aus); Buchstaben öffnen den Editor
+  nicht mehr (nur F2); Tab verlässt die Tabelle; Pfeile navigieren.
+- **Maus/Selektion**: Strg/⌘-Klick schaltet Zellen/Zeilen um (Einzelmodus: Strg-Klick auf die selektierte Zeile wählt
+  sie ab – Master/Detail-Ansichten prüfen), Strg/⌘+Alt-Klick wählt ab; Klicks werden sofort gezeichnet;
+  `onFocusChanged` einmal je Änderung (vorher zweimal, auch ohne Änderung); `getMergedRowIndices(rowCount?)` sortiert.
+- **Baum**: ein Filter bleibt beim Auf-/Zuklappen und Sortieren erhalten und findet Treffer unter zugeklappten Knoten
+  (Vorfahren sichtbar); das Filter-Prädikat bekommt weiterhin die `TreeRow`, `index`/`array` beziehen sich jetzt auf alle
+  Zeilen; `api.reSort()` wirft nicht mehr; „alle auf/zu“ aktualisiert die Scrollleiste; `deepMaxLimit: n` erzeugt keine
+  Zeilen tiefer als n (vorher n + 1).
+- **API**: `scrollToIndex(x, y)` scrollt horizontal zur Spalte (fixierte West-Spalte → x = 0, `-1` behält x);
+  `setColumnVisible/setHeaderVisible/setFooterVisible` funktionieren (`setColumnVisible` liefert jetzt `boolean`);
+  `isHeaderVisible()/isFooterVisible()` melden den echten Zustand; Selektion auf eigenem `AreaModel` wird gezeichnet
+  (`isSelectable()` Default `true`).
+- **Pakete**: `exports` mit Typen für `import`; relative `.d.ts`-Importe mit `.js` (node16/nodenext); `vue3-table` ist
+  ESM (`"type": "module"`).
+- **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
+  `selectAll()` bei Typ `"none"` ohne Wirkung.
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 
@@ -257,20 +362,21 @@ Verhalten steht als `// NOTE:` in den Specs.
 
 ## Gefunden beim Bau der Startseite (Okt. 2026)
 
-- [ ] `TableApi.scrollToIndex(indexX, indexY)` ignoriert `indexX`: `TableScope.scrollToIndex` ruft immer
-      `scrollToPixel(0, py)` auf (`// TODO calc indexX -> px`) und setzt die horizontale Position damit auf 0 zurück.
-      Die API-Doku verspricht eine Spalte (`@param indexX`, Beispiel `scrollToIndex(3, 10)`). Behelf auf der Startseite:
-      `scrollToPixel(x, getFirstVisibleRowIndex() * rowHeight)`. → x aus den Spaltenbreiten berechnen (fixierte Spalten
-      in west/east brauchen keinen horizontalen Scroll).
-- [ ] Zellen eines eigenen `AreaModel` sind nicht auswählbar: `AreaModel.isSelectable()` gibt `false` zurück
-      (`AbstractAreaModel` und damit alle Factory-Modelle: `true`). Mit `SelectionModel("range")` ist beim Ziehen nichts zu
-      sehen, obwohl `getSelectionModel().getRanges()` den Bereich enthält. Die Doku von `AreaModelIf.isSelectable` sagt
-      dagegen „All cells are selectable by default“. → Default `true` für den Body? Sonst in Kapitel 17 und 22 erwähnen.
-- [ ] Typen bei `skipLibCheck: false`: `vue-tsc` meldet in `@guiexpert/vue3-table@3.1.90` TS7016 („Could not find a
-      declaration file for module '@guiexpert/table' … index.cjs implicitly has an 'any' type“). Ursache: die `exports` von
-      `@guiexpert/table` haben keine `types`-Bedingung, und `vue3-table` ist `"type": "commonjs"` → seine `.d.ts` lösen
-      über `require` auf `index.cjs` auf, für die es keine Typen gibt. Mit `skipLibCheck: true` (Vite-Vorlagen) unsichtbar.
-      → in allen Paketen `"exports": { ".": { "types": "./index.d.ts", "import": …, "require": … } }`; Wrapper als ESM.
+- [x] `TableApi.scrollToIndex(indexX, indexY)` scrollt jetzt zur Spalte (erste Spalte des scrollbaren Mittelteils,
+      im Rahmen des Scrollbereichs); fixierte West-Spalte = zurück an den Anfang (x = 0, wie bisher), fixierte Ost-Spalte
+      und `-1` = horizontale Position behalten. `ensureRowIsVisible` (und damit die Pfeiltasten) behält x.
+- [ ] `scrollToIndex` vertikal leicht daneben: der ungedeckelte Pfad nimmt `py` direkt als `scrollTop`, der Scrollbereich
+      enthält aber den Footer (`ele-scope.ts:164`) und 1 px Extra-Höhe (`ele-scope.ts:314`) → mit Footer ist die Zielzeile
+      ~17 px angeschnitten (erste ganz sichtbare = Ziel + 1). Gedeckelter Pfad exakt.
+- [x] Zellen eines eigenen `AreaModel` sind auswählbar: `AreaModel.isSelectable()` Default `true` (wie
+      `AbstractAreaModel` und die Doku); Opt-out: überschreiben und `false` liefern.
+- [x] Typen bei `skipLibCheck: false` (TS7016 in `vue3-table`): `exports` aller Pakete mit
+      `"import": { "types": "./index.d.ts", "default": "./index.js" }, "require": "./index.cjs"`; `vue3-table` ist jetzt
+      `"type": "module"` (Node-`import()` ging vorher gar nicht); relative Importe in den `.d.ts` bekommen `.js`
+      (`scripts/fix-dts-imports.mjs` im `afterBuild` von vite-plugin-dts) – nötig für `moduleResolution` node16/nodenext.
+      Geprüft mit gepackten Tarballs: bundler 0 Fehler, node16-ESM 0 (bis auf svelte-table), node16-CJS wie vorher TS7016.
+- [ ] Typen – offen: CJS-Konsumenten mit `moduleResolution: node16` bekommen weiterhin TS7016 (keine `.d.cts`) ·
+      svelte-table: `.d.ts` importiert `./GuiexpertTable.svelte` (Svelte-Konvention; unter node16 TS2307).
 
 ## Erledigt beim Aufsetzen (Okt. 2026)
 

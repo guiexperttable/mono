@@ -4,6 +4,7 @@ import Vue from "@vitejs/plugin-vue";
 import Components from "unplugin-vue-components/vite";
 import {viteStaticCopy} from "vite-plugin-static-copy";
 import dts from "vite-plugin-dts";
+import { fixDtsImports } from "../../scripts/fix-dts-imports.mjs";
 
 export default  defineConfig({
   assetsInclude: /\.(pdf|jpg|png|svg)$/,
@@ -23,6 +24,8 @@ export default  defineConfig({
       // keep "@guiexpert/table" in the .d.ts files (the alias below would turn it into ../../table/src)
       aliasesExclude: [/^@guiexpert\/table$/],
       tsconfigPath: join(__dirname, "tsconfig.lib.json"),
+      // explicit ".js" in relative imports – needed by "moduleResolution": "node16"/"nodenext"
+      afterBuild: () => { fixDtsImports(join(__dirname, "dist")); },
     }),
     Vue(),
     Components({

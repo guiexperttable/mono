@@ -109,9 +109,15 @@ describe('AreaModel', () => {
       expect(model.getCustomStyleAt(0, 0)).toBeUndefined();
     });
 
-    it('is neither editable, selectable, filterable nor checkable', () => {
+    // Regression (TODO.md "Gefunden beim Bau der Startseite"): the default was false – a selection on an own
+    // AreaModel was never drawn, unlike AbstractAreaModel (all factory models) and the AreaModelIf doc.
+    it('is selectable like the built-in models', () => {
+      expect(model.isSelectable(0, 0)).toBe(true);
+      expect(model.isSelectable(5, 3)).toBe(true);
+    });
+
+    it('is neither editable, filterable nor checkable', () => {
       expect(model.isEditable(0, 0)).toBe(false);
-      expect(model.isSelectable(0, 0)).toBe(false);
       expect(model.isFilterable()).toBe(false);
       expect(model.isRowCheckable(0)).toBe(false);
       expect(model.isRowChecked(0)).toBeUndefined();

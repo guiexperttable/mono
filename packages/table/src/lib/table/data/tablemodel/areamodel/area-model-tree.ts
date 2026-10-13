@@ -12,7 +12,32 @@ import {TreeRowIf} from "../../common/tree-row-if";
  * Represents a  tree-based table model.
  * Extends the AbstractAreaModel class.
  *
+ * The displayed rows always come from one pipeline: all tree rows (in their current, possibly sorted order)
+ * → rows whose parents are all expanded → active filter. Everything that changes one of these inputs
+ * ({@link recalcVisibleTreeRows} after an expand/collapse, {@link externalFilterChanged}, {@link doSort},
+ * {@link toggleExpandCollapseAll}) runs the whole pipeline, so a filter survives expanding, collapsing and sorting.
+ *
+ * Filter semantics: the filter function receives the {@link TreeRowIf tree row} – your object is `row.data`.
+ * It is called for **every** row, also for rows below collapsed parents. A row is shown if it or one of its
+ * descendants matches (`row.keep`) and all its parents are expanded. So a match below a collapsed node keeps
+ * that node visible (still collapsed); expanding it reveals the path to the match. The children of a matching
+ * row are not kept automatically.
+ *
  * @template S - The type of the row data.
+ *
+ * @example
+ * // a tree table with a live search over the labels
+ * const filter = { text: "" };
+ * const tableOptions: TableOptionsIf = {
+ *   ...new TableOptions(),
+ *   externalFilterFunction: (row: TreeRowIf<OrderNode>) => row.data.label.toLowerCase().includes(filter.text)
+ * };
+ * const rows = TreeFactory.buildTreeRows<OrderNode>(nodes, { expanded: false });
+ * const tableModel = TableFactory.createTableModel({ rows, columnDefs, tableOptions });
+ * searchInput.addEventListener("input", () => {
+ *   filter.text = searchInput.value.toLowerCase();
+ *   tableApi.externalFilterChanged(); // parents of matches stay visible; expanding and sorting keep the filter
+ * });
  *
  * @category Tree & checkboxes
  */
@@ -25,8 +50,10 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   protected sorterService: SorterService = new SorterService();
 
   private readonly service = new TreeRowService();
-  private filteredFlattenRows: TreeRowIf<S>[];
-  private flattenRows: TreeRowIf<S>[];
+  /** the displayed rows: all parents expanded and accepted by the filter */
+  private filteredFlattenRows: TreeRowIf<S>[] = [];
+  /** the visible rows (all parents expanded), not filtered */
+  private flattenRows: TreeRowIf<S>[] = [];
   private lastPredictFn?: FilterFunction<any>;
 
   constructor(
@@ -37,8 +64,7 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   ) {
     super(areaIdent, columnDefs, defaultRowHeight);
     this.properties = columnDefs.map(def => def.property);
-    this.flattenRows = this.service.flattenTree(rows);
-    this.filteredFlattenRows = [...this.flattenRows];
+    this.refreshDisplayedRows();
   }
 
   override changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
@@ -47,10 +73,28 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     super.changeColumnOrder(sourceColumnIndex, targetColumnIndex);
   }
 
+  /**
+   * Rebuilds the displayed rows after the `expanded` state of rows has changed and applies the active filter
+   * (see {@link externalFilterChanged}) again. The table calls it on every expand/collapse click. Call it
+   * yourself after changing `row.expanded` from code, then repaint with `tableApi.repaintHard()`
+   * (the row count changes).
+   *
+   * @example
+   * // expand all first-level rows from code
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * for (const row of treeModel.rows) row.expanded = true;
+   * treeModel.recalcVisibleTreeRows();
+   * tableApi.repaintHard();
+   */
   recalcVisibleTreeRows() {
-    this.filteredFlattenRows = this.service.flattenTree(this.rows);
+    this.refreshDisplayedRows();
   }
 
+  /**
+   * The displayed rows: all parents expanded and accepted by the active filter, in display order.
+   *
+   * @returns {TreeRowIf<S>[]} the displayed tree rows (do not modify the array)
+   */
   getFilteredFlattenRows(): TreeRowIf<S>[] {
     return this.filteredFlattenRows;
   }
@@ -115,29 +159,68 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     return t[property];
   }
 
+  /**
+   * Filters the tree; the function is remembered and applied again on every expand/collapse
+   * ({@link recalcVisibleTreeRows}), {@link toggleExpandCollapseAll} and {@link doSort}.
+   *
+   * The function is called once for **every** tree row in depth-first order – also for rows below collapsed
+   * parents – with the {@link TreeRowIf tree row} (not your object: use `row.data`), the index of the row in
+   * this depth-first list and the list itself. Shown are the rows that match or have a matching descendant
+   * (`row.keep = true`) and whose parents are all expanded. A match below a collapsed node therefore keeps the
+   * collapsed node visible. Usually called by `tableApi.externalFilterChanged()` with
+   * `tableOptions.externalFilterFunction`.
+   *
+   * @param {FilterFunction<S>} predictFn - returns a truthy value for the rows to show
+   *
+   * @example
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * treeModel.externalFilterChanged((row: TreeRowIf<OrderNode>) => row.data.total > 1000);
+   * tableApi.repaintHard();
+   *
+   * // remove the filter
+   * treeModel.externalFilterChanged(() => true);
+   */
   externalFilterChanged<S>(predictFn: FilterFunction<S>): void {
     this.lastPredictFn = predictFn;
-    this.doFiltering();
+    this.refreshDisplayedRows();
   }
 
+  /**
+   * Sorts the rows of every level (children stay below their parent) by the **last** sort item and keeps the
+   * active filter. The `rows` array and the children arrays are reordered in place, so the order survives
+   * expanding, collapsing and filtering. Sort state `""` keeps the current order.
+   *
+   * @param {SortItem[]} sortItems - only the last item is used; an empty list does nothing
+   * @returns {boolean} `true` if the rows were sorted, `false` for an empty list
+   *
+   * @example
+   * tableModel.getBodyModel().doSort([new SortItem(1, "desc")]);
+   * tableApi.repaint();
+   */
   override doSort(sortItems: SortItem[]): boolean {
-    const { columnIndex, sortState } = sortItems[sortItems.length - 1];
+    const sortItem = sortItems[sortItems.length - 1];
+    if (!sortItem) {
+      return false; // nothing to sort – keep the current order (like the flat models)
+    }
+    const { columnIndex, sortState } = sortItem;
     const f = sortState === "asc" ? 1 :
       sortState === "desc" ? -1 : 0;
 
     const property = this.properties[columnIndex];
     this.treeSort(this.rows, property, f);
 
-    this.flattenRows = this.service.flattenTree(this.rows);
-    this.filteredFlattenRows = [...this.flattenRows];
+    this.refreshDisplayedRows();
     return true;
   }
 
+  /**
+   * Expands or collapses every row on every level and applies the active filter again.
+   *
+   * @param {boolean} expanded - `true` expands, `false` collapses all rows
+   */
   toggleExpandCollapseAll(expanded: boolean) {
     this.expandAllRecursive(this.rows, expanded);
-
-    this.flattenRows = this.service.flattenTree(this.rows);
-    this.doFiltering();
+    this.refreshDisplayedRows();
   }
 
   setAllParentsOk(item: TreeRowIf<any>) {
@@ -194,40 +277,46 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     }
   }
 
-  private doFiltering() {
+  /**
+   * The one pipeline behind the displayed rows: all rows (current order) → visible (all parents expanded)
+   * → active filter.
+   */
+  private refreshDisplayedRows(): void {
+    this.flattenRows = this.service.flattenTree(this.rows ?? []);
     if (!this.lastPredictFn) {
-      this.filteredFlattenRows = [...(this.flattenRows ? this.flattenRows : [])];
-    } else {
-
-      if (!this.flattenRows) {
-        this.flattenRows = [];
-      }
-
-      let maxDeep = 0;
-      this.flattenRows.forEach(v => {
-        maxDeep = Math.max(maxDeep, v.deep);
-      });
-
-      const okRows = this.flattenRows.filter(
-        (value, index, array) => {
-          // @ts-ignore
-          return this.lastPredictFn(value, index, array);
-        }
-      );
-      this.flattenRows.forEach(v => v.keep = false);
-      this.flattenRows.forEach(v => {
-        if (okRows.includes(v)) {
-          v.keep = true;
-          this.setAllParentsOk(v);
-        }
-      });
-
-      this.filteredFlattenRows = this.flattenRows.filter(
-        (value, _index, _array) => {
-          return value.keep;
-        }
-      );
+      this.filteredFlattenRows = [...this.flattenRows];
+      return;
     }
+    this.markKeptRows(this.lastPredictFn);
+    this.filteredFlattenRows = this.flattenRows.filter(row => row.keep);
+  }
+
+  /**
+   * Sets `keep` on every row (also below collapsed parents): true for matching rows and all their ancestors.
+   */
+  private markKeptRows(predictFn: FilterFunction<any>): void {
+    const allRows = this.collectAllRows(this.rows ?? [], []);
+    allRows.forEach(row => row.keep = false);
+    allRows.forEach((row, index) => {
+      if (predictFn(row, index, allRows)) {
+        row.keep = true;
+        // every kept row already has kept ancestors → stop at the first one
+        for (let p = row.parent; p && !p.keep; p = p.parent) {
+          p.keep = true;
+        }
+      }
+    });
+  }
+
+  /** all rows depth-first, independent of the expanded state */
+  private collectAllRows(rows: TreeRowIf<S>[], ret: TreeRowIf<S>[]): TreeRowIf<S>[] {
+    for (const row of rows) {
+      ret.push(row);
+      if (row.children?.length) {
+        this.collectAllRows(row.children, ret);
+      }
+    }
+    return ret;
   }
 
   private getPropertyValue(o: any, props: string[]): any {

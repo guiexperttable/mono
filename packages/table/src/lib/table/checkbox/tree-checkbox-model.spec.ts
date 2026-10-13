@@ -194,21 +194,47 @@ describe('TreeCheckboxModel', () => {
       const rows = TreeFactory.buildTreeRows<Node>([{ name: 'X' }, { name: 'Y' }]);
       const cm = new TreeCheckboxModel<TreeRowIf<Node>>(rows);
       cm.checkRow(rows[0], true);
-      // NOTE: TreeFactory gives leaves children = [], an empty array is enough to recurse (see BUG below).
-      // Leaves built by hand with children = undefined avoid the recursion.
-      rows.forEach(r => (r.children = undefined));
       cm.checkAll(rows);
       // NOTE: like CheckboxModel.checkAll(), it unchecks (the name suggests the opposite).
       expect(cm.getCheckedRows()).toEqual([]);
     });
 
-    // BUG: checkAll() recurses with this.checkAll(children), but iterates this.allRootNodes again instead of the
-    // argument → endless recursion (RangeError: Maximum call stack size exceeded) as soon as a root has children.
-    it.fails('works for a tree with children', () => {
+    it('works with leaves whose children are undefined', () => {
+      const rows = TreeFactory.buildTreeRows<Node>([{ name: 'X' }, { name: 'Y' }]);
+      const cm = new TreeCheckboxModel<TreeRowIf<Node>>(rows);
+      cm.checkRow(rows[0], true);
+      rows.forEach(r => (r.children = undefined));
+      cm.checkAll(rows);
+      expect(cm.getCheckedRows()).toEqual([]);
+    });
+
+    // Regression: checkAll() recursed with this.checkAll(children), but iterated this.allRootNodes again instead of
+    // the argument → endless recursion (RangeError: Maximum call stack size exceeded) as soon as a root had children.
+    it('works for a tree with children', () => {
       const { cm, R } = tree();
       cm.checkRow(R, true);
       expect(() => cm.checkAll([R])).not.toThrow();
       expect(cm.getCheckedRows()).toEqual([]);
+    });
+
+    it('unchecks only the given rows with their descendants and updates their parents', () => {
+      const { cm, R, S, C2 } = tree();
+      cm.checkRow(R, true);
+      cm.checkRow(S, true);
+      cm.checkAll([C2]);
+      expect(names(cm.getCheckedRows())).toEqual(['C1', 'S']);
+      expect(R.checked).toBe(false);
+      expect(cm.isRowChecked(R)).toBe('semi');
+      expect(cm.isRowChecked(C2)).toBe('none');
+    });
+
+    it('unchecks the whole tree without argument', () => {
+      const { cm, R, S, G1 } = tree();
+      cm.checkRow(R, true);
+      cm.checkRow(S, true);
+      cm.checkAll();
+      expect(cm.getCheckedRows()).toEqual([]);
+      expect(cm.isRowChecked(G1)).toBe('none');
     });
   });
 });

@@ -53,8 +53,19 @@ export interface SelectionModelIf {
    */
   getRanges(): CellRange[];
 
-  /** The indices of all rows that contain at least one selected cell, sorted. */
-  getMergedRowIndices() : number[];
+  /**
+   * The indices of all rows that contain at least one selected cell, sorted ascending.
+   *
+   * Ranges that cover all rows (selection type `"column"`) and {@link selectAll} need `rowCount` to be listed;
+   * without it they are skipped. Implementations written before `rowCount` existed may ignore it.
+   *
+   * @param rowCount - number of body rows (optional): limits the result to `0 … rowCount - 1`
+   *
+   * @example
+   * const sm = tableApi.getSelectionModel();
+   * const rowIndices = sm?.getMergedRowIndices(tableModel.getBodyModel().getRowCount()) ?? [];
+   */
+  getMergedRowIndices(rowCount?: number) : number[];
 
   /** Removes the whole selection. */
   clear(): void;
@@ -65,16 +76,19 @@ export interface SelectionModelIf {
   /** Is nothing selected? */
   hasNoSelection(): boolean;
 
-  /** Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9, columns 0–3). */
+  /**
+   * Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9, columns 0–3).
+   * Cells removed before ({@link removeSelection}) are selected again – the last operation wins.
+   */
   addSelection(range: CellRange): void;
 
-  /** Removes a rectangle from the selection. */
+  /** Removes a rectangle from the selection (also from "all selected"); a later {@link addSelection} selects it again. */
   removeSelection(range: CellRange): void;
 
   /** In how many selected ranges is this cell (0 = not selected)? */
   getSelectionCount(rowIndex: number, columnIndex: number): number;
 
-  /** Selects all cells (⌘/Ctrl+A). */
+  /** Selects all cells (⌘/Ctrl+A) – also those removed from the selection before. */
   selectAll(): void;
 
   /** Was everything selected with {@link selectAll}? */

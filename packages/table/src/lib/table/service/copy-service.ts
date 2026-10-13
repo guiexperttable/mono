@@ -8,11 +8,25 @@ import { CellRange } from '../data/common/cell-range';
 /** @category Export & clipboard */
 export class CopyService implements CopyServiceIf {
 
+  /**
+   * Upper limit for the number of cells {@link createContent} copies (e.g. after Ctrl+A on a table with millions
+   * of rows). Larger selections are rejected instead of building a huge string and blocking the browser.
+   *
+   * @example
+   * CopyService.maxCopyCells = 5_000_000; // allow bigger copies
+   */
+  public static maxCopyCells = 1_000_000;
+
   public static columnSeparatorChar = '\t';
   public static rowSeparatorChar = '\n';
 
   /**
    * Returns the content to be copied based on the provided table model, selection model, and focus model.
+   *
+   * - Selection: the bounding box of all selected ranges, one line per row, cells separated by TAB; cells inside the
+   *   box that are not selected become empty strings, hidden columns are left out.
+   * - Everything selected ({@link SelectionModelIf.selectAll}, ⌘/Ctrl+A): all displayed body rows × all columns.
+   * - No selection: the text of the focused cell.
    *
    * @param {TableModelIf} tableModel - The table model for data retrieval.
    * @param {SelectionModelIf} selectionModel - The selection model to determine the selected range.
@@ -29,11 +43,17 @@ export class CopyService implements CopyServiceIf {
     return new Promise<string>((resolve, reject) => {
 
       if (selectionModel?.hasSelection()) {
-        const range: CellRange | undefined = this.mergeRanges(selectionModel.getRanges());
+        const range: CellRange | undefined = selectionModel.isAllSelected()
+          ? new CellRange(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER) // clipped to the body below
+          : this.mergeRanges(selectionModel.getRanges());
 
         if (range) {
           range.c2 = Math.min(range.c2, tableModel.getColumnCount() - 1);
           range.r2 = Math.min(range.r2, tableModel.getBodyModel().getRowCount() - 1);
+          const cellCount = Math.max(0, range.r2 - range.r1 + 1) * Math.max(0, range.c2 - range.c1 + 1);
+          if (cellCount > CopyService.maxCopyCells) {
+            return reject(`Cannot copy ${cellCount} cells – more than CopyService.maxCopyCells (${CopyService.maxCopyCells}).`);
+          }
           const content: Array<string> = [];
 
           for (let rowIndex = range.r1; rowIndex <= range.r2; rowIndex++) {

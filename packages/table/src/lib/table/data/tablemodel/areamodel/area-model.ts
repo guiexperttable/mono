@@ -685,23 +685,24 @@ export class AreaModel implements AreaModelIf {
 
   /**
    * Determines whether the cell at the specified row and column indices is selectable.
-   * If true, the user can select the cell.
-   * The base implementation returns false (not selectable) and should be overridden by
-   * subclasses that support cell selection.
-   * 
+   * The table draws the selection (of the {@link SelectionModel}) only on selectable body cells.
+   *
+   * Default: `true` – all cells are selectable, like in all built-in area models
+   * (up to 1.1.90 the default of `AreaModel` was `false`: a selection on an own model was not drawn).
+   * Override it to exclude cells, e.g. a column of row numbers.
+   *
    * @param {number} _rowIndex - The index of the row
    * @param {number} _columnIndex - The index of the column
    * @returns {boolean} True if the cell is selectable, false otherwise
-   * 
+   *
    * @example
-   * // Override in a subclass to implement cell selectability
-   * isSelectable(rowIndex: number, columnIndex: number): boolean {
-   *   // All cells in the body are selectable
-   *   return this.areaIdent === 'body';
+   * // Override in a subclass: the first column (row numbers) never shows a selection
+   * override isSelectable(_rowIndex: number, columnIndex: number): boolean {
+   *   return columnIndex > 0;
    * }
    */
   isSelectable(_rowIndex: number, _columnIndex: number): boolean {
-    return false;
+    return true;
   }
 
   /**

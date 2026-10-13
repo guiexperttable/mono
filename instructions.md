@@ -643,8 +643,13 @@ const tableOptions: TableOptionsIf = {
 
 - Without `getSelectionModel` / `getFocusModel` every table creates its **own** models (since 1.1.90; before, all
   tables without them shared one selection and focus). The default selection type is `"none"`.
-- Mouse: click = focus, shift-click = range from the last click, Ctrl/⌘-click = add a cell (mode `"multi"`),
-  drag over body cells = range (type `"range"`, since 1.1.88).
+- Mouse: click = focus (and a new selection), shift-click = range from the last click, Ctrl/⌘-click = toggle the
+  cell (row/column for those types; mode `"multi"` keeps the rest of the selection), Ctrl/⌘+Alt-click = remove the
+  cell, drag over body cells = range (type `"range"`, since 1.1.88).
+- Ctrl/⌘+A selects all (not for type `"none"`), Ctrl/⌘+C then copies the displayed body – at most
+  `CopyService.maxCopyCells` cells (default 1,000,000; larger selections are not copied).
+- `selectionModel.getMergedRowIndices(rowCount)` returns the sorted indices of all rows with a selected cell (pass
+  the row count when whole columns can be selected).
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
 - API: `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
   `tableApi.getSelectionModel()`.
@@ -688,6 +693,13 @@ const tableModel = TableFactory.createTableModel({
 
 Row checkboxes in a tree: set `showCheckboxWihoutExtraColumn: true` in the options (checkbox inside the first
 column) and listen to `checkboxChanged`. Arrow icons are configured with `tableOptions.treeOptions`.
+
+Filtering a tree (`externalFilterFunction` + `tableApi.externalFilterChanged()`): the function receives the `TreeRow`
+(use `row.data`) and is checked for **every** node, also below collapsed nodes. A node is shown if it or one of its
+descendants matches and all its parents are expanded – the ancestors of a match stay visible (a collapsed ancestor
+stays collapsed). The filter stays active when nodes are expanded, collapsed or sorted (since 1.1.91).
+Expanding from code: set `treeRow.expanded = true`, then `treeAreaModel.recalcVisibleTreeRows()` and
+`tableApi.repaintHard()`.
 Showcases: *Tree table*, *Tree table with row checkbox*.
 
 ### 6.7 Inline editing
@@ -828,14 +840,17 @@ definition. Showcase: *Look and Feel* (https://gui.expert/showcase/laf).
 `recalcColumnWidths()`, `repaint()`, `repaintHard()`, `getTableModel()`, `getBodyModel()`, `setLoggingActive(true)`,
 `destroy()` (since 1.1.86 – releases listeners, observers and cell renderers before you drop or replace the table).
 
+Since 1.1.91: `scrollToIndex(col, row)` also scrolls horizontally to the column (a fixed west column scrolls back to the
+start, `-1` keeps the horizontal position); `setColumnVisible(column, visible)` (index, property or column definition;
+showing it again restores the previous width), `isColumnVisible(column)`, `setHeaderVisible(visible)`,
+`setFooterVisible(visible)`, `isHeaderVisible()`, `isFooterVisible()`.
+
 ---
 
 ## 7. Not available yet
 
 To avoid surprises – these are **not** implemented in the current releases:
 
-- `tableApi.setColumnVisible()`, `setHeaderVisible()`, `setFooterVisible()` exist but are empty stubs.
-  To hide a column, give its column definition `isVisible: () => false` (width becomes 0).
 - No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
   (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).

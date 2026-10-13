@@ -130,6 +130,52 @@ export interface TableModelIf {
   isFooterVisibe(): boolean;
 
   /**
+   * Optional: shows or hides the header (height 0, the rows stay in the model). Implemented by {@link TableModel};
+   * {@link TableApi.setHeaderVisible} uses it and repaints.
+   *
+   * @param {boolean} visible - false hides the header
+   *
+   * @example
+   * tableModel.setHeaderVisible?.(false);
+   */
+  setHeaderVisible?(visible: boolean): void;
+
+  /**
+   * Optional: shows or hides the footer (height 0, the rows stay in the model). Implemented by {@link TableModel};
+   * {@link TableApi.setFooterVisible} uses it and repaints.
+   *
+   * @param {boolean} visible - false hides the footer
+   *
+   * @example
+   * tableModel.setFooterVisible?.(false);
+   */
+  setFooterVisible?(visible: boolean): void;
+
+  /**
+   * Optional: shows or hides a column (width 0, definition, position and width are kept). Implemented by
+   * {@link TableModel}; {@link TableApi.setColumnVisible} uses it and repaints.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @param {boolean} visible - false hides the column
+   * @returns {boolean} false if there is no such column definition
+   *
+   * @example
+   * tableModel.setColumnVisible?.(3, false);
+   */
+  setColumnVisible?(column: number | string | ColumnDefIf, visible: boolean): boolean;
+
+  /**
+   * Optional: whether a column is shown. Implemented by {@link TableModel}.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @returns {boolean} false for hidden and for unknown columns
+   *
+   * @example
+   * tableModel.isColumnVisible?.("category");
+   */
+  isColumnVisible?(column: number | string | ColumnDefIf): boolean;
+
+  /**
    * Determines if the row checkbox is visible.
    *
    * @return {boolean} True if the row checkbox is visible, false otherwise.

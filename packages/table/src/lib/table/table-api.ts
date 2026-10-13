@@ -234,7 +234,8 @@ export class TableApi {
    *
    * @example
    * // Scroll only vertically, keeping the current horizontal position
-   * tableApi.scrollToPixel(undefined, 300);
+   * // (an omitted or undefined px means 0; for rows use scrollToIndex(-1, rowIndex))
+   * tableApi.scrollToPixel(tableApi.getTableScope().scrollViewport.scrollLeft, 300);
    *
    * @example
    * // Example in a component that needs precise scrolling control
@@ -272,20 +273,29 @@ export class TableApi {
   /**
    * Scrolls the table to display the specified row and column indices at the top-left corner of the viewport.
    *
-   * This method allows programmatic scrolling to a specific position in the table grid based on row and column indices.
-   * It uses the underlying TableScope's scrolling mechanism to navigate to the target location.
+   * The row becomes the first row of the body, the column the first column of the scrollable (center) part –
+   * as far as the scroll range allows: the last columns and rows cannot move further than to the right/bottom edge.
    *
-   * @param {number} indexX - The horizontal index (column) to scroll to. Defaults to 0 (leftmost column).
+   * Fixed columns (`fixedLeftColumnCount` / `fixedRightColumnCount`) are always visible: a fixed west column scrolls
+   * back to the start (x = 0), a fixed east column – and `-1` or any other index outside the columns – keeps the
+   * current horizontal position.
+   *
+   * @param {number} indexX - The column index (model index, fixed columns included) to scroll to.
+   *   Defaults to 0 (first column). `-1` keeps the horizontal position.
    * @param {number} indexY - The vertical index (row) to scroll to. Defaults to 0 (topmost row).
    * @returns {void}
    *
    * @example
    * // Scroll to the 5th row, keeping the current horizontal scroll position
-   * tableApi.scrollToIndex(0, 5);
+   * tableApi.scrollToIndex(-1, 5);
    *
    * @example
    * // Scroll to column 3, row 10
    * tableApi.scrollToIndex(3, 10);
+   *
+   * @example
+   * // Scroll to column 3, keeping the rows that are currently shown
+   * tableApi.scrollToIndex(3, tableApi.getFirstVisibleRowIndex());
    *
    * @see {@link scrollToPixel} - For scrolling to specific pixel coordinates
    * @see {@link ensureRowIsVisible} - For scrolling to make a specific row visible
@@ -295,66 +305,128 @@ export class TableApi {
   }
 
   /**
-   * Sets whether the header is visible or not.
+   * Shows or hides the header and repaints the table.
    *
-   * @param _visible - A boolean value indicating whether the header should be visible. Default value is true.
+   * A hidden header takes no space – the body moves up and shows more rows. The header rows stay in the model
+   * (labels, sort icons, header groups), so `setHeaderVisible(true)` brings them back unchanged.
+   * Requires a {@link TableModel} (what all factories create).
    *
-   * @return undefined
+   * @param {boolean} [visible=true] - false hides the header
+   * @returns {void}
+   *
+   * @example
+   * // a compact view without column headers
+   * tableApi.setHeaderVisible(false);
+   *
+   * @example
+   * // toggle from a button
+   * document.querySelector("#toggle-header")!.addEventListener("click", () =>
+   *   tableApi.setHeaderVisible(!tableApi.isHeaderVisible()));
    */
-  setHeaderVisible(_visible: boolean = true) {
-    // TODO setHeaderVisible
+  setHeaderVisible(visible: boolean = true) {
+    this.tableScope.setHeaderVisible(visible);
   }
 
   /**
-   * Sets the visibility of a column in the table.
+   * Shows or hides a column and repaints the table.
    *
-   * @param {_column} - The column index or column definition to set visibility for.
-   * @param {_visible=true} - The flag to set visibility to. true for visible, false for hidden.
+   * The column keeps its definition, its position (also when other columns are dragged) and its width:
+   * a hidden column is just not rendered (width 0), not copied ({@link copyToClipboard}) and not exported
+   * ({@link downloadExcel}). Showing it again restores the previous width. Works for fixed columns, too.
    *
-   * @return {void} - There is no return value.
+   * The same as {@link ColumnDefIf.isVisible} – this method sets it to {@link TrueFn} / {@link FalseFn} (an own
+   * `isVisible` function of the column is replaced). Columns without a column definition (e.g. `bodyData` +
+   * `columnSizes` without `columnDefs`) can't be hidden.
+   *
+   * @param {number | string | ColumnDefIf} column - column index (fixed columns included), property (e.g. `"category"`)
+   *   or the column definition
+   * @param {boolean} [visible=true] - false hides the column
+   * @returns {boolean} false if the column (definition) does not exist
+   *
+   * @example
+   * // hide a column by property, show it again later
+   * tableApi.setColumnVisible("category", false);
+   * tableApi.setColumnVisible("category", true);
+   *
+   * @example
+   * // a checkbox list "visible columns"
+   * tableApi.getTableModel().getColumnDefs()?.forEach((columnDef, index) => {
+   *   const checkbox = document.createElement("input");
+   *   checkbox.type = "checkbox";
+   *   checkbox.checked = tableApi.isColumnVisible(index);
+   *   checkbox.addEventListener("change", () => tableApi.setColumnVisible(columnDef, checkbox.checked));
+   *   document.body.append(checkbox, columnDef.headerLabel);
+   * });
    */
-  setColumnVisible(_column: number | ColumnDefIf, _visible: boolean = true) {
-    // TODO setColumnVisible
+  setColumnVisible(column: number | string | ColumnDefIf, visible: boolean = true): boolean {
+    return this.tableScope.setColumnVisible(column, visible);
   }
 
   /**
-   * Returns whether a column is visible or not.
+   * Returns whether a column is visible ({@link ColumnDefIf.isVisible}, see {@link setColumnVisible}).
+   * Columns without a column definition are always visible.
    *
-   * @param {number | ColumnDefIf} _column - The column index or the column definition.
-   * @return {boolean} - True if the column is visible, false otherwise.
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @return {boolean} - True if the column is visible, false if it is hidden or does not exist.
+   *
+   * @example
+   * if (!tableApi.isColumnVisible("category")) {
+   *   tableApi.setColumnVisible("category", true);
+   * }
    */
-  isColumnVisible(_column: number | ColumnDefIf): boolean {
-    // TODO isColumnVisible
-    return true;
+  isColumnVisible(column: number | string | ColumnDefIf): boolean {
+    const tableModel = this.tableScope.tableModel;
+    if (tableModel.isColumnVisible) {
+      return tableModel.isColumnVisible(column);
+    }
+    const columnDefs = tableModel.getColumnDefs() ?? [];
+    const columnDef = typeof column === "number"
+      ? columnDefs[column]
+      : typeof column === "string" ? columnDefs.filter(cd => cd.property === column)[0] : column;
+    return columnDef ? columnDef.isVisible?.() !== false
+      : typeof column === "number" && column >= 0 && column < tableModel.getColumnCount();
   }
 
   /**
-   * Checks if the header is visible.
+   * Checks if the header is visible: it has at least one row and is not hidden with {@link setHeaderVisible}.
    *
    * @return {boolean} - Returns true if the header is visible, otherwise returns false.
+   *
+   * @example
+   * const headerShown = tableApi.isHeaderVisible();
    */
   isHeaderVisible(): boolean {
-    return true; // TODO isHeaderVisible
+    return this.tableScope.tableModel.isHeaderVisibe();
   }
 
   /**
-   * Sets the visibility of the footer.
+   * Shows or hides the footer and repaints the table.
    *
-   * @param {boolean} _visible - Indicates whether the footer should be visible or not. Default value is true.
+   * A hidden footer takes no space – the body gets taller. Its rows stay in the model, so `setFooterVisible(true)`
+   * brings them back (an own footer model, e.g. totals, is asked for its values again).
+   * Requires a {@link TableModel} (what all factories create).
    *
-   * @return {void} - This method does not return any value.
+   * @param {boolean} [visible=true] - false hides the footer
+   * @returns {void}
+   *
+   * @example
+   * // show the totals footer only while a filter is active
+   * tableApi.setFooterVisible(!!tableOptions.externalFilterFunction);
    */
-  setFooterVisible(_visible: boolean = true) {
-    // TODO setFooterVisible
+  setFooterVisible(visible: boolean = true) {
+    this.tableScope.setFooterVisible(visible);
   }
 
   /**
-   * Determines if the footer is visible.
+   * Determines if the footer is visible: it has at least one row and is not hidden with {@link setFooterVisible}.
    *
    * @returns {boolean} True if the footer is visible, false otherwise.
+   *
+   * @example
+   * const footerShown = tableApi.isFooterVisible();
    */
   isFooterVisible(): boolean {
-    return true; // TODO isFooterVisible
+    return this.tableScope.tableModel.isFooterVisibe();
   }
 
 
@@ -381,8 +453,8 @@ export class TableApi {
    * tableApi.repaint();
    *
    * @example
-   * // After changing column visibility, repaint to reflect changes
-   * tableApi.setColumnVisible(0, false);
+   * // After changing values in the row objects yourself, repaint to show them
+   * orders[0].status = "paid";
    * tableApi.repaint();
    *
    * @returns {void}
@@ -442,8 +514,9 @@ export class TableApi {
    * });
    *
    * @example
-   * // Example 4: Using after changing column visibility
-   * tableApi.setColumnVisible(2, false);
+   * // Example 4: Using after changing ColumnDefIf.isVisible yourself
+   * // (setColumnVisible() does this on its own)
+   * column.isVisible = FalseFn;
    * tableApi.repaintHard();
    *
    * @returns {void} This method doesn't return a value

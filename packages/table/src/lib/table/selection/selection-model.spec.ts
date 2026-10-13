@@ -1,8 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
+import { runInNewContext } from 'node:vm';
 import { CellRange, SelectionModel } from '@guiexpert/table';
 import type { EventSelectionChangedListenerIf, ExtendedSelectionType, SelectionMode } from '@guiexpert/table';
 
 const MAX = Number.MAX_SAFE_INTEGER;
+
+/**
+ * Runs a synchronous function with a hard time limit: node:vm terminates even an endless loop inside `fn`
+ * (a vitest timeout can't interrupt synchronous code and the worker would hang).
+ */
+function runWithin<T>(ms: number, fn: () => T): T {
+  return runInNewContext('fn()', { fn }, { timeout: ms }) as T;
+}
 
 function listenerSpy() {
   const onSelectionChanged = vi.fn();
@@ -69,19 +78,21 @@ describe('SelectionModel', () => {
 
     it('ignores removeSelection() (no negative range is recorded)', () => {
       const sm = new SelectionModel('none');
-      sm.selectAll();
       sm.removeSelection(CellRange.singleCell(1, 1));
       expect(sm.isInNegativeRange(1, 1)).toBe(false);
-      expect(sm.isSelected(1, 1)).toBe(true);
     });
 
-    it('still allows selectAll()', () => {
-      // NOTE: selectAll() ignores the selection type – even a table with selectionType "none" becomes "all selected".
+    // Regression: selectAll() ignored the type – Ctrl+A in a default table (selection model of type "none") made
+    // everything "selected", and Ctrl+C then copied the whole body (millions of cells).
+    it('ignores selectAll()', () => {
       const sm = new SelectionModel('none');
+      const listener = { onSelectionChanged: vi.fn() };
+      sm.addEventSelectionChangedListener(listener);
       sm.selectAll();
-      expect(sm.isAllSelected()).toBe(true);
-      expect(sm.isSelected(5, 5)).toBe(true);
-      expect(sm.hasSelection()).toBe(true);
+      expect(sm.isAllSelected()).toBe(false);
+      expect(sm.isSelected(5, 5)).toBe(false);
+      expect(sm.hasSelection()).toBe(false);
+      expect(listener.onSelectionChanged).not.toHaveBeenCalled();
     });
   });
 
@@ -164,22 +175,43 @@ describe('SelectionModel', () => {
       expect(sm.isInNegativeRange(2, 3)).toBe(true);
     });
 
-    // BUG: negative ranges are never removed (only clear() resets them), so a cell that was toggled off stays off forever.
-    it.fails('togglePoint() selects a cell again after it was toggled off', () => {
+    // Regression: negative ranges were only removed by clear(), so a cell that was toggled off stayed off forever.
+    it('togglePoint() selects a cell again after it was toggled off', () => {
       const sm = new SelectionModel('cell', 'multi');
       sm.togglePoint(2, 3);
       sm.togglePoint(2, 3);
       sm.togglePoint(2, 3);
       expect(sm.isSelected(2, 3)).toBe(true);
+      expect(sm.isInNegativeRange(2, 3)).toBe(false);
     });
 
-    // BUG: same root cause – addSelection() does not lift an earlier removeSelection() of that cell.
-    it.fails('addSelection() selects a cell again after removeSelection() of the same cell', () => {
+    it('togglePoint() on/off/on keeps a single range (no stacked overlay)', () => {
+      const sm = new SelectionModel('cell', 'multi');
+      sm.togglePoint(2, 3);
+      sm.togglePoint(2, 3);
+      sm.togglePoint(2, 3);
+      expect(sm.getSelectionCount(2, 3)).toBe(1);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(2, 3)]);
+    });
+
+    // Regression: same root cause – addSelection() did not lift an earlier removeSelection() of that cell.
+    it('addSelection() selects a cell again after removeSelection() of the same cell', () => {
       const sm = new SelectionModel('cell', 'single');
       sm.addSelection(CellRange.singleCell(1, 1));
       sm.removeSelection(CellRange.singleCell(1, 1));
       sm.addSelection(CellRange.singleCell(1, 1));
       expect(sm.isSelected(1, 1)).toBe(true);
+    });
+
+    it('addSelection() in multi mode selects a removed cell again, too', () => {
+      const sm = new SelectionModel('cell', 'multi');
+      sm.addSelection(CellRange.singleCell(1, 1));
+      sm.addSelection(CellRange.singleCell(1, 2));
+      sm.removeSelection(CellRange.singleCell(1, 1));
+      sm.addSelection(CellRange.singleCell(1, 1));
+      expect(sm.isSelected(1, 1)).toBe(true);
+      expect(sm.isSelected(1, 2)).toBe(true);
+      expect(sm.isInNegativeRange(1, 1)).toBe(false);
     });
   });
 
@@ -230,15 +262,34 @@ describe('SelectionModel', () => {
       expect(sm.isSelected(3, 1000)).toBe(false);
     });
 
-    // BUG: SelectionModelIf documents removeSelection() as "Removes a rectangle", but for type "row" the range is
-    // reduced to CellRange.singleRow(range.r1) – rows 3 and 4 stay selected.
-    it.fails('removeSelection() of a multi-row range removes all of its rows', () => {
+    // Regression: for type "row" removeSelection() reduced the range to CellRange.singleRow(range.r1) – rows 3 and 4
+    // stayed selected.
+    it('removeSelection() of a multi-row range removes all of its rows', () => {
       const sm = new SelectionModel('row', 'multi');
       sm.addSelection(new CellRange(2, 0, 4, 0));
       sm.removeSelection(new CellRange(2, 0, 4, 0));
       expect(sm.isSelected(2, 0)).toBe(false);
       expect(sm.isSelected(3, 0)).toBe(false);
       expect(sm.isSelected(4, 0)).toBe(false);
+      expect(sm.isInNegativeRange(4, 1000)).toBe(true);
+    });
+
+    it('addSelection() of one row inside a removed multi-row range selects only that row again', () => {
+      // the removed range (rows 1–4, all columns) is split above/below the re-added row
+      const sm = new SelectionModel('row', 'multi');
+      sm.addSelection(new CellRange(0, 0, 5, 0));
+      sm.removeSelection(new CellRange(1, 0, 4, 0));
+      sm.addSelection(CellRange.singleRow(2));
+      expect([0, 1, 2, 3, 4, 5].map(r => sm.isSelected(r, 7))).toEqual([true, false, true, false, false, true]);
+      expect(sm.getMergedRowIndices()).toEqual([0, 2, 5]);
+    });
+
+    it('firstClick() selects a removed row again', () => {
+      const sm = new SelectionModel('row', 'multi');
+      sm.firstClick(3, 0);
+      sm.removeSelection(CellRange.singleCell(3, 2));
+      sm.firstClick(3, 1);
+      expect(sm.isSelected(3, 99)).toBe(true);
     });
 
     it('togglePoint() selects and deselects the whole row', () => {
@@ -311,9 +362,37 @@ describe('SelectionModel', () => {
       expect(sm.isSelected(0, 6)).toBe(true);
     });
 
-    // BUG (not testable – it would hang the test worker): getMergedRowIndices() iterates r1…r2 = 0…MAX_SAFE_INTEGER
-    // for a column selection (also after firstClick with type "column") and never returns. Listed in TODO.md.
-    // Once fixed, add a test here.
+    // Regression: like type "row", removeSelection() reduced the range to its first column (c1).
+    it('removeSelection() of a multi-column range removes all of its columns', () => {
+      const sm = new SelectionModel('column', 'multi');
+      sm.addSelection(new CellRange(0, 1, 0, 4));
+      sm.removeSelection(new CellRange(5, 2, 5, 3));
+      expect([1, 2, 3, 4].map(c => sm.isSelected(77, c))).toEqual([true, false, false, true]);
+    });
+
+    it('firstClick() selects a removed column again', () => {
+      const sm = new SelectionModel('column', 'multi');
+      sm.firstClick(0, 5);
+      sm.removeSelection(CellRange.singleCell(7, 5));
+      sm.firstClick(2, 5);
+      expect(sm.isSelected(1_000_000, 5)).toBe(true);
+    });
+
+    // Regression: getMergedRowIndices() iterated r1…r2 = 0…MAX_SAFE_INTEGER for a column selection (also after
+    // firstClick with type "column") and never returned. runWithin() aborts a hanging call instead of the worker.
+    it('getMergedRowIndices() returns (skipping the all-rows range) for a column selection', () => {
+      const sm = new SelectionModel('column', 'multi');
+      sm.firstClick(3, 1);
+      expect(sm.getRanges()[0].r2).toBe(MAX); // the range really covers "all rows"
+      expect(runWithin(2000, () => sm.getMergedRowIndices())).toEqual([]);
+    });
+
+    it('getMergedRowIndices(rowCount) lists all rows for a column selection', () => {
+      const sm = new SelectionModel('column', 'multi');
+      sm.firstClick(3, 1);
+      expect(runWithin(2000, () => sm.getMergedRowIndices(4))).toEqual([0, 1, 2, 3]);
+      expect(sm.getMergedRowIndices(0)).toEqual([]);
+    });
   });
 
   describe('selectionType "range"', () => {
@@ -377,30 +456,89 @@ describe('SelectionModel', () => {
       expect(sm.getMergedRowIndices()).toEqual([1, 2, 3]);
     });
 
-    it('getMergedRowIndices() returns the rows in insertion order', () => {
+    it('getMergedRowIndices() sorts and de-duplicates the rows of overlapping ranges added in any order', () => {
+      // (before: insertion order – see the regression test below)
       const sm = new SelectionModel('range', 'multi');
-      sm.addSelection(new CellRange(5, 0, 6, 0));
-      sm.addSelection(new CellRange(1, 0, 2, 0));
-      // NOTE: SelectionModelIf documents the result as "sorted"; see the it.fails test below.
-      expect(sm.getMergedRowIndices()).toEqual([5, 6, 1, 2]);
+      sm.addSelection(new CellRange(7, 0, 8, 0));
+      sm.addSelection(new CellRange(0, 2, 0, 2));
+      sm.addSelection(new CellRange(3, 1, 7, 1));
+      expect(sm.getMergedRowIndices()).toEqual([0, 3, 4, 5, 6, 7, 8]);
     });
 
-    // BUG: SelectionModelIf.getMergedRowIndices() JSDoc promises "sorted", the implementation returns insertion order.
-    it.fails('getMergedRowIndices() returns the row indices sorted', () => {
+    // Regression: SelectionModelIf.getMergedRowIndices() JSDoc promises "sorted", the implementation returned
+    // insertion order.
+    it('getMergedRowIndices() returns the row indices sorted', () => {
       const sm = new SelectionModel('range', 'multi');
       sm.addSelection(new CellRange(5, 0, 6, 0));
       sm.addSelection(new CellRange(1, 0, 2, 0));
       expect(sm.getMergedRowIndices()).toEqual([1, 2, 5, 6]);
     });
 
-    // BUG: getMergedRowIndices() checks the negative ranges only for column 0, so a row whose first cell was
-    // deselected disappears although other cells of that row are still selected ("rows with at least one selected cell").
-    it.fails('getMergedRowIndices() keeps a row that still has selected cells after column 0 was deselected', () => {
+    // Regression: getMergedRowIndices() checked the negative ranges only for column 0, so a row whose first cell was
+    // deselected disappeared although other cells of that row were still selected.
+    it('getMergedRowIndices() keeps a row that still has selected cells after column 0 was deselected', () => {
       const sm = new SelectionModel('range', 'multi');
       sm.addSelection(new CellRange(0, 0, 2, 3));
       sm.removeSelection(CellRange.singleCell(1, 0));
       expect(sm.isSelected(1, 2)).toBe(true);
       expect(sm.getMergedRowIndices()).toEqual([0, 1, 2]);
+    });
+
+    it('getMergedRowIndices() leaves out a row whose cells were all removed (by several negative ranges)', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 3));
+      sm.removeSelection(new CellRange(1, 0, 1, 1));
+      sm.removeSelection(new CellRange(0, 2, 1, 3));
+      expect(sm.getMergedRowIndices()).toEqual([0, 2]);
+    });
+
+    it('getMergedRowIndices(rowCount) leaves out rows >= rowCount', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(2, 0, 9, 0));
+      expect(sm.getMergedRowIndices(5)).toEqual([2, 3, 4]);
+    });
+
+    it('addSelection() selects the re-added part of a removed rectangle again (the rest stays removed)', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 4, 4));
+      sm.removeSelection(new CellRange(1, 1, 3, 3));
+      sm.addSelection(CellRange.singleCell(2, 2));
+      expect(sm.isSelected(2, 2)).toBe(true);
+      // the 8 surrounding cells of the hole stay removed (hole split above/below/left/right)
+      for (const [r, c] of [[1, 1], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2], [3, 3]]) {
+        expect(sm.isSelected(r, c), `${r}/${c}`).toBe(false);
+      }
+      expect(sm.isSelected(0, 0)).toBe(true);
+      expect(sm.isSelected(4, 4)).toBe(true);
+    });
+
+    it('addSelection() of a rectangle that covers a removed one lifts it completely', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 4, 4));
+      sm.removeSelection(new CellRange(1, 1, 2, 2));
+      sm.addSelection(new CellRange(0, 0, 3, 3));
+      expect(sm.isInNegativeRange(1, 1)).toBe(false);
+      expect(sm.isInNegativeRange(2, 2)).toBe(false);
+      expect(sm.isSelected(2, 2)).toBe(true);
+    });
+
+    it('togglePoint() inside a range: off and on again leaves one range and no hole', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 2));
+      sm.togglePoint(1, 1);
+      expect(sm.isSelected(1, 1)).toBe(false);
+      sm.togglePoint(1, 1);
+      expect(sm.isSelected(1, 1)).toBe(true);
+      expect(sm.getSelectionCount(1, 1)).toBe(1);
+      expect(sm.getRanges()).toHaveLength(1);
+    });
+
+    it('single mode: a new range also drops the cells removed from the previous one', () => {
+      const sm = new SelectionModel('range', 'single');
+      sm.addSelection(new CellRange(0, 0, 4, 4));
+      sm.removeSelection(CellRange.singleCell(2, 2));
+      sm.addSelection(new CellRange(5, 5, 6, 6));
+      expect(sm.isInNegativeRange(2, 2)).toBe(false);
     });
   });
 
@@ -515,13 +653,34 @@ describe('SelectionModel', () => {
       expect(sm.isSelected(1, 2)).toBe(true);
     });
 
-    // BUG: selectAll() ("Selects all cells") keeps the old negative ranges, so earlier deselected cells stay unselected.
-    it.fails('selects cells that were deselected before', () => {
+    // Regression: selectAll() ("Selects all cells") kept the old negative ranges, so earlier deselected cells stayed
+    // unselected.
+    it('selects cells that were deselected before', () => {
       const sm = new SelectionModel('cell', 'multi');
       sm.addSelection(CellRange.singleCell(1, 1));
       sm.removeSelection(CellRange.singleCell(1, 1));
       sm.selectAll();
       expect(sm.isSelected(1, 1)).toBe(true);
+    });
+
+    it('togglePoint() off and on keeps "all selected"', () => {
+      const sm = new SelectionModel('cell', 'multi');
+      sm.selectAll();
+      sm.togglePoint(1, 1);
+      expect(sm.isSelected(1, 1)).toBe(false);
+      sm.togglePoint(1, 1);
+      expect(sm.isSelected(1, 1)).toBe(true);
+      expect(sm.isAllSelected()).toBe(true);
+      expect(sm.isSelected(50, 50)).toBe(true);
+    });
+
+    it('getMergedRowIndices(rowCount) lists all rows except fully removed ones', () => {
+      const sm = new SelectionModel('row', 'multi');
+      sm.selectAll();
+      sm.removeSelection(CellRange.singleRow(2));
+      expect(sm.getMergedRowIndices(4)).toEqual([0, 1, 3]);
+      // without rowCount "all rows" can't be listed (see 'does not create a range')
+      expect(sm.getMergedRowIndices()).toEqual([]);
     });
   });
 
@@ -660,6 +819,16 @@ describe('SelectionModel', () => {
         return onSelectionChanged.mock.calls.length;
       });
       expect(counts).toEqual([1, 1, 0, 0]);
+    });
+
+    it('togglePoint() fires once when it selects a removed cell again', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 2));
+      sm.togglePoint(1, 1);
+      const { listener, onSelectionChanged } = listenerSpy();
+      sm.addEventSelectionChangedListener(listener);
+      sm.togglePoint(1, 1);
+      expect(onSelectionChanged).toHaveBeenCalledTimes(1);
     });
 
     it('selectAll() and clear() fire once each', () => {

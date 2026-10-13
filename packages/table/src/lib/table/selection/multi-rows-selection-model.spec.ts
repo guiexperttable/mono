@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { MultiRowsSelectionModel, SelectionModel } from '@guiexpert/table';
+import { CellRange, MultiRowsSelectionModel, SelectionModel } from '@guiexpert/table';
 import type { ObjectArrayHolderIf } from '@guiexpert/table';
 
 interface Item {
@@ -86,13 +86,42 @@ describe('MultiRowsSelectionModel', () => {
       expect(selectedRows(sm)).toEqual([]);
     });
 
-    // BUG: unselectRow() adds a negative range that is never removed, so the row can't be selected again (only clear() helps).
-    it.fails('selects a row again after it was toggled off', () => {
+    // Regression: unselectRow() added a negative range that was never removed, so the row could not be selected again
+    // (only clear() helped).
+    it('selects a row again after it was toggled off', () => {
       const sm = new MultiRowsSelectionModel(holder());
       sm.toggleRow(2);
       sm.toggleRow(2);
       sm.toggleRow(2);
       expect(selectedRows(sm)).toEqual([2]);
+      expect(sm.getSelectionCount(2, 0)).toBe(1); // no second, overlapping range
+    });
+
+    it('selectRow() selects a row again after unselectRow()', () => {
+      const sm = new MultiRowsSelectionModel(holder());
+      sm.selectRow(1);
+      sm.unselectRow(1);
+      sm.selectRow(1);
+      expect(selectedRows(sm)).toEqual([1]);
+    });
+
+    it('toggles a row of "all selected" off and on again without losing "all selected"', () => {
+      const sm = new MultiRowsSelectionModel(holder());
+      sm.selectAll();
+      sm.toggleRow(1);
+      expect(selectedRows(sm)).toEqual([0, 2, 3]);
+      sm.toggleRow(1);
+      expect(selectedRows(sm)).toEqual([0, 1, 2, 3]);
+      expect(sm.isAllSelected()).toBe(true);
+    });
+
+    it('fires one event per toggle', () => {
+      const sm = new MultiRowsSelectionModel(holder());
+      const spy = withListener(sm);
+      sm.toggleRow(2);
+      sm.toggleRow(2);
+      sm.toggleRow(2);
+      expect(spy).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -121,6 +150,19 @@ describe('MultiRowsSelectionModel', () => {
       const sm = new MultiRowsSelectionModel(holder());
       sm.selectAll();
       expect(sm.getSelectedRowItems(ALL)).toBe(ALL);
+    });
+
+    it('leaves out rows removed from "all selected"', () => {
+      const sm = new MultiRowsSelectionModel(holder());
+      sm.selectAll();
+      sm.unselectRow(2);
+      expect(sm.getSelectedRowItems(ALL)).toEqual([ALL[0], ALL[1], ALL[3]]);
+    });
+
+    it('ignores selected row indices beyond the given array', () => {
+      const sm = new MultiRowsSelectionModel(holder());
+      sm.addSelection(new CellRange(2, 0, 1_000_000, 0));
+      expect(sm.getSelectedRowItems(ALL)).toEqual([ALL[2], ALL[3]]);
     });
 
     it('applies the (displayed) row indices to whatever array is passed in', () => {

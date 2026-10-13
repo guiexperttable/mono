@@ -42,6 +42,7 @@ import { EventSelectionChangedListenerIf } from './selection/event-selection-cha
 import { ResizeHandler } from './resize-handler';
 import { ExcelService } from './service/excel-service';
 import { ExcelServiceIf } from './service/excel-service.if';
+import { ColumnDefIf } from './data/tablemodel/column/column-def.if';
 
 
 /**
@@ -214,7 +215,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const fm = this.getFocusModel ? this.getFocusModel() : undefined;
       this.copyService
         .createContent(this.tableModel, sm, fm)
-        .then(txt => this.copyService.copyContent(txt));
+        .then(txt => this.copyService.copyContent(txt))
+        .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
     }
     return false;
   }
@@ -468,7 +470,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (isAreaModelTree(bodyAreaModel)) {
       const amt: AreaModelTree<any> = bodyAreaModel as AreaModelTree<any>;
       amt.toggleExpandCollapseAll(expand);
-      this.repaint();
+      this.repaintHard(); // the row count changed → recalc the scroll height, not only the visible rows
       this.storeStateCollapsedExpandService?.collapsedStateAll(expand);
     }
   }
@@ -516,6 +518,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   debounceRepaint() {
     this.debounce(this.repaint.bind(this), 1);
+  }
+
+  /**
+   * Cancels a repaint scheduled by {@link debounceRepaint}.
+   *
+   * @returns true if a repaint was pending
+   */
+  cancelPendingRepaint(): boolean {
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+      return true;
+    }
+    return false;
   }
 
   publishGeMouseEvent(evt: GeMouseEvent) {
@@ -631,16 +647,53 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /**
-   * Scrolls to the specified index in the table.
+   * Scrolls to a column and a row: the row becomes the first row of the viewport, the column the first column of the
+   * scrollable center area (as far as the scroll range allows).
    *
-   * @param {number} _indexX - The horizontal index of the table where scrolling is needed.
-   * @param {number} indexY - The vertical index of the table where scrolling is needed.
+   * A fixed west column scrolls back to the start (x = 0, like before columns were supported). A fixed east column,
+   * `-1` or any other index outside the column range keeps the current horizontal position.
+   *
+   * @param {number} indexX - The column index (model index over west + center + east), `-1` = keep the horizontal position.
+   * @param {number} indexY - The row index of the body.
    * @return {void}
    */
-  scrollToIndex(_indexX: number, indexY: number) {
+  scrollToIndex(indexX: number, indexY: number) {
     const bodyAreaModel = this.tableModel.getAreaModel('body');
     const py = bodyAreaModel.getYPosByRowIndex(indexY);
-    this.scrollToPixel(0, py); // TODO calc indexX -> px
+    this.scrollToPixel(this.getScrollLeftForColumnIndex(indexX), py);
+  }
+
+  /**
+   * The horizontal scroll position (`scrollLeft` of the scroll viewport) that shows a column as the first column of
+   * the scrollable center area, clamped to the scroll range.
+   * A fixed west column returns 0 (start); fixed east columns and indices outside the columns return the current position.
+   *
+   * @param {number} columnIndex - model column index (west + center + east)
+   * @returns {number} scrollLeft in scroll bar pixels
+   */
+  protected getScrollLeftForColumnIndex(columnIndex: number): number {
+    const viewport = this.scrollViewport;
+    const firstCenterColumn = this.tableModel.getFixedLeftColumnCount();
+    const lastCenterColumn = this.tableModel.getColumnCount() - this.tableModel.getFixedRightColumnCount() - 1;
+    if (columnIndex >= 0 && columnIndex < firstCenterColumn) {
+      return 0; // fixed west column: back to the start – as scrollToIndex(0, y) always did
+    }
+    if (!(columnIndex >= firstCenterColumn && columnIndex <= lastCenterColumn)) {
+      return viewport.scrollLeft; // fixed east column (always visible), -1, NaN or out of range
+    }
+    let contentLeft = 0; // hidden columns have width 0
+    for (let c = firstCenterColumn; c < columnIndex; c++) {
+      contentLeft += this.tableModel.getColumnWidth(c);
+    }
+    // The rendering maps scrollLeft linearly onto the content (scrollFactorX, see adjustColumnsToRowParent):
+    // content offset = scrollLeft / scrollerRange * contentRange. The two ranges differ by the east area and
+    // the vertical scroll bar.
+    const contentRange = this.tableModel.getContentWidthInPixel() - this.areaBodyCenterGeo.width;
+    const scrollerRange = viewport.scrollWidth - viewport.clientWidth;
+    if (contentRange <= 0 || scrollerRange <= 0) {
+      return 0; // all center columns fit
+    }
+    return Math.min(1, contentLeft / contentRange) * scrollerRange;
   }
 
   override adjustAfterScrolling() {
@@ -974,6 +1027,50 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.tableModel.setColumnWidth(columnIndex, width);
   }
 
+  /**
+   * Shows or hides a column and repaints (see {@link TableApi.setColumnVisible}).
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @param {boolean} visible - false hides the column
+   * @returns {boolean} false if the column has no column definition (or the table model can't hide columns)
+   */
+  setColumnVisible(column: number | string | ColumnDefIf, visible: boolean): boolean {
+    if (!this.tableModel.setColumnVisible?.(column, visible)) {
+      return false;
+    }
+    this.recalcWrappers(); // content width, wrapper div, fixed areas, repaint
+    return true;
+  }
+
+  /**
+   * Shows or hides the header and repaints (see {@link TableApi.setHeaderVisible}).
+   *
+   * @param {boolean} visible - false hides the header
+   */
+  setHeaderVisible(visible: boolean): void {
+    this.setAreaVisible('header', visible);
+  }
+
+  /**
+   * Shows or hides the footer and repaints (see {@link TableApi.setFooterVisible}).
+   *
+   * @param {boolean} visible - false hides the footer
+   */
+  setFooterVisible(visible: boolean): void {
+    this.setAreaVisible('footer', visible);
+  }
+
+  private setAreaVisible(area: 'header' | 'footer', visible: boolean): void {
+    const tableModel = this.tableModel;
+    const setter = area === 'header' ? tableModel.setHeaderVisible : tableModel.setFooterVisible;
+    if (!setter) {
+      console.warn(`set${area === 'header' ? 'Header' : 'Footer'}Visible() needs a table model with this method (e.g. TableModel), this one has none:`, tableModel);
+      return;
+    }
+    setter.call(tableModel, visible);
+    this.recalcWrappers(); // area heights → scroll viewport and body height, repaint
+  }
+
   autoResizeColumns(recalcWrappers: boolean= true) {
     // Resize columns
     const columnWidthes = this.calcAutoColumnWidths();
@@ -1032,7 +1129,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * The method performs the following:
    * 1. Checks if the row is above the current viewport (before first visible row)
    * 2. Checks if the row is below the current viewport (after last visible row)
-   * 3. Scrolls to make the row visible if needed
+   * 3. Scrolls to make the row visible if needed – vertically only, the horizontal position is kept
    *
    * @param {number} rowIndex - The index of the row to make visible
    * @returns {boolean} Returns true if scrolling was needed and performed, false if the row was already visible
@@ -1051,12 +1148,13 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const lastVisibleRowIndex = this.getLastFullVisibleRowIndex();
     const displayedRowCount = this.getDisplayedRowCount();
 
+    // column -1: keep the horizontal position (column 0 would scroll back to the first column)
     if (rowIndex < firstVisibleRowIndex) {
-      this.scrollToIndex(0, rowIndex);
+      this.scrollToIndex(-1, rowIndex);
       return true;
     }
     if (rowIndex > lastVisibleRowIndex) {
-      this.scrollToIndex(0, rowIndex - displayedRowCount + 1);
+      this.scrollToIndex(-1, rowIndex - displayedRowCount + 1);
       return true;
     }
     return false;

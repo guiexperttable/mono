@@ -14,6 +14,11 @@ export class CopyService implements CopyServiceIf {
   /**
    * Returns the content to be copied based on the provided table model, selection model, and focus model.
    *
+   * - Selection: the bounding box of all selected ranges, one line per row, cells separated by TAB; cells inside the
+   *   box that are not selected become empty strings, hidden columns are left out.
+   * - Everything selected ({@link SelectionModelIf.selectAll}, ⌘/Ctrl+A): all displayed body rows × all columns.
+   * - No selection: the text of the focused cell.
+   *
    * @param {TableModelIf} tableModel - The table model for data retrieval.
    * @param {SelectionModelIf} selectionModel - The selection model to determine the selected range.
    * @param {FocusModelIf} focusModel - The focus model to determine the focused cell.
@@ -29,7 +34,9 @@ export class CopyService implements CopyServiceIf {
     return new Promise<string>((resolve, reject) => {
 
       if (selectionModel?.hasSelection()) {
-        const range: CellRange | undefined = this.mergeRanges(selectionModel.getRanges());
+        const range: CellRange | undefined = selectionModel.isAllSelected()
+          ? new CellRange(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER) // clipped to the body below
+          : this.mergeRanges(selectionModel.getRanges());
 
         if (range) {
           range.c2 = Math.min(range.c2, tableModel.getColumnCount() - 1);

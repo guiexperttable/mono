@@ -127,8 +127,9 @@ describe('CopyService', () => {
         .resolves.toBe('');
     });
 
-    // BUG: selectAll() sets only a flag (no ranges) → mergeRanges() finds nothing and only the focused cell is copied.
-    it.fails('copies the whole body after selectAll() (Ctrl+A, Ctrl+C)', async () => {
+    // Regression: selectAll() sets only a flag (no ranges) → mergeRanges() found nothing and only the focused cell
+    // was copied.
+    it('copies the whole body after selectAll() (Ctrl+A, Ctrl+C)', async () => {
       const sm = new SelectionModel('range', 'multi');
       sm.selectAll();
       const text = await new CopyService().createContent(model(), sm, focusAt(0, 0));
@@ -138,10 +139,34 @@ describe('CopyService', () => {
       expect(lines[0]).toBe('1\tAnn\tBerlin');
     });
 
-    it('after selectAll() copies only the focused cell (current behaviour)', async () => {
+    it('after selectAll() ignores the focused cell and leaves removed cells empty', async () => {
+      // (before the fix only the focused cell was copied)
+      const sm = new SelectionModel('cell', 'multi');
+      sm.selectAll();
+      sm.removeSelection(CellRange.singleCell(1, 1));
+      await expect(new CopyService().createContent(model(), sm, focusAt(1, 1))).resolves.toBe('1\tAnn\tBerlin\n2\t\tParis\n3\tCid\tnull');
+    });
+
+    it('after selectAll() copies the displayed rows only and skips hidden columns', async () => {
+      const tableModel = TableFactory.createTableModel({
+        rows,
+        columnDefs: [
+          ColumnDef.create({ property: 'id', headerLabel: 'ID' }),
+          ColumnDef.create({ property: 'name', headerLabel: 'Name', isVisible: () => false }),
+          ColumnDef.create({ property: 'city', headerLabel: 'City' }),
+        ],
+      });
+      tableModel.getBodyModel().externalFilterChanged((r: Row) => r.id !== 2);
       const sm = new SelectionModel('range', 'multi');
       sm.selectAll();
-      await expect(new CopyService().createContent(model(), sm, focusAt(1, 1))).resolves.toBe('Bob');
+      await expect(new CopyService().createContent(tableModel, sm, focusAt(0, 0))).resolves.toBe('1\tBerlin\n3\tnull');
+    });
+
+    it('after selectAll() resolves with "" for an empty table', async () => {
+      const tableModel = TableFactory.createTableModel({ rows: [], properties: ['a', 'b'] });
+      const sm = new SelectionModel('range', 'multi');
+      sm.selectAll();
+      await expect(new CopyService().createContent(tableModel, sm, focusAt(0, 0))).resolves.toBe('');
     });
   });
 

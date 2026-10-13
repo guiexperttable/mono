@@ -7,6 +7,7 @@ import { RendererCleanupFnType } from './renderer/renderer-cleanup-fn.type';
 import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { SideIdent } from './data/side-ident.type';
 import { DivScope } from './data/div-scope.type';
+import type { AreaModelTree } from './data/tablemodel/areamodel/area-model-tree';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { ArgsAdjustColumnsToRowParentParams } from './data/common/args-adjust-columns-to-row-parent-params';
 import { ArgsRenderCellDiv } from './data/common/args-render-cell-div';
@@ -713,6 +714,7 @@ export class RenderScope extends EleScope {
         // center -------------------------------------------
         let geo = { left, width, height, top, index };
         let rowDiv = this.dom.addRowDiv(centerArea, geo, index, areaIdent, 'center');
+        const rowDivs = [rowDiv];
         const centerStartCol = fixedLeftColumnCount;
 
         this.adjustColumnsToRowParent({
@@ -732,6 +734,7 @@ export class RenderScope extends EleScope {
         if (padding.left > 0) {
           geo = { left, width: this.areaBodyWestGeo.width, height, top, index };
           rowDiv = this.dom.addRowDiv(westArea, geo, index, areaIdent, 'west');
+          rowDivs.push(rowDiv);
           this.adjustColumnsToRowParent({
             areaIdent,
             sideIdent: 'west',
@@ -764,12 +767,18 @@ export class RenderScope extends EleScope {
           });
         }
 
-        // "collapse / expand all" event handler action attribute:
-        if (areaIdent === 'header' && this.tree && index === rowCount - 1) {
+        // "collapse / expand all" event handler action attribute – above the tree arrows, i.e. in the header cell of
+        // the arrow column (before: always at x = 16 of the last row div – over the header checkbox of a
+        // CheckboxColumnDef, in the east area with fixed right columns, not moving with horizontal scrolling)
+        const arrowHeaderCell = areaIdent === 'header' && this.tree && index === rowCount - 1
+          ? this.findCellDiv(rowDivs, this.getTreeArrowColumnIndex())
+          : undefined;
+        if (arrowHeaderCell?.parentElement) {
+          const iconLeft = (parseFloat(arrowHeaderCell.style.left) || 0) + 16;
           const div =
             this.dom.applyStyle(
               this.dom.setAttribute(
-                this.dom.addDiv(rowDiv, new GeoData(16, 20, 20, 8)),
+                this.dom.addDiv(arrowHeaderCell.parentElement as HTMLDivElement, new GeoData(iconLeft, 20, 20, 8)),
                 'data-ge-action', 'toggleExpandCollapseAll'
               ),
               { 'cursor': 'pointer' }
@@ -849,6 +858,17 @@ export class RenderScope extends EleScope {
         }
       }
     }
+  }
+
+  /** The cell div of a column among the children of the given row divs. */
+  private findCellDiv(rowDivs: HTMLDivElement[], columnIndex: number): HTMLDivElement | undefined {
+    for (const rowDiv of rowDivs) {
+      const cell = rowDiv.querySelector<HTMLDivElement>(`:scope > .ge-table-col-div[data-col-index="${columnIndex}"]`);
+      if (cell) {
+        return cell;
+      }
+    }
+    return undefined;
   }
 
   /** Removes the cached row divs that are no longer in the area (see `ConvenienceDomService.addRowDiv`). */
@@ -1145,7 +1165,11 @@ export class RenderScope extends EleScope {
 
     if (arrowIndexOk && isTreeRow(rowObject)) {
       const tr = rowObject as TreeRow<any>;
-      if (tr.children?.length) {
+      // with a filter: no arrow if none of the children is shown (AreaModelTree.hasDisplayedChildren)
+      const hasChildren = 'hasDisplayedChildren' in areaModel && typeof areaModel.hasDisplayedChildren === 'function'
+        ? (areaModel as AreaModelTree<any>).hasDisplayedChildren(tr)
+        : !!tr.children?.length;
+      if (hasChildren) {
         if (tr.expanded) {
           treeArrow = 'expanded';
         } else {

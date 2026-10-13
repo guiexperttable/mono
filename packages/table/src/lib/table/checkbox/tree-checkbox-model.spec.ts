@@ -237,4 +237,20 @@ describe('TreeCheckboxModel', () => {
       expect(cm.isRowChecked(G1)).toBe('none');
     });
   });
+
+  // Regression: checkAll() re-checked the parent once per child, checkRow() once per descendant – O(n²); 20,000
+  // siblings took many seconds.
+  it('checkRow() and checkAll() stay fast with many siblings', () => {
+    const children = Array.from({ length: 20_000 }, (_, i) => ({ id: i }));
+    const [root] = TreeFactory.buildTreeRows([{ id: -1, children }]);
+    const model = new TreeCheckboxModel([root]);
+    const start = performance.now();
+    model.checkRow(root, true);
+    expect(model.isRowChecked(root)).toBe('full');
+    model.checkAll(root.children!);
+    expect(model.isRowChecked(root)).toBe('none');
+    model.checkRow(root.children![5], true);
+    expect(model.isRowChecked(root)).toBe('semi');
+    expect(performance.now() - start).toBeLessThan(2_000);
+  });
 });

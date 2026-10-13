@@ -368,10 +368,23 @@ describe('setRows / addRows / addRowsAt / removeRows (TableApi)', () => {
     expect(firstNames(host)).toEqual(['Name 99', 'Name 98', 'Name 97']);
     api.setRows(createRows(100));
     api.repaintHard();
-    // NOTE: the new rows are shown in their given order while the header still says "descending" (TODO.md);
-    // api.reSort() is a no-op without autoRestoreOptions (it re-applies the STORED sort items only).
+    // NOTE: the new rows are shown in their given order while the header still says "descending" (TODO.md) –
+    // api.reSort() sorts them again.
     expect(firstNames(host)).toEqual(['Name 0', 'Name 1', 'Name 2']);
     expect(getCellDiv(host, 'header', 'center', 0, 0).querySelector('.ge-header-sorted-desc')).not.toBeNull();
+    // Regression: reSort() only re-applied the sort items stored by autoRestoreOptions – without them nothing.
+    api.reSort();
+    expect(firstNames(host)).toEqual(['Name 99', 'Name 98', 'Name 97']);
+  });
+
+  it('reSort() re-applies the last sort(fn)', async () => {
+    const rows = createRows(10);
+    const { host, api } = mountTable(objectModel(rows));
+    await nextFrame();
+    api.sort((a: Row, b: Row) => b.value - a.value);
+    rows[0].value = 1_000; // data changed: row 0 belongs to the top now
+    api.reSort();
+    expect(firstNames(host)).toEqual(['Name 0', 'Name 9', 'Name 8']);
   });
 
   it('addRows() appends, addRowsAt() inserts, removeRows() removes – each without repaint', async () => {

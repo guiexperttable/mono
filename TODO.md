@@ -225,15 +225,20 @@ Verhalten steht als `// NOTE:` in den Specs.
       „alle auf/zu“. Der Filter bleibt erhalten, findet auch Treffer unter zugeklappten Knoten (deren Vorfahren bleiben
       sichtbar, zugeklappt) und wirkt auf sortierten Bäumen. `doSort([])` ist ein No-op. „Alle auf/zu“ berechnet die
       Scrollhöhe neu (`repaintHard`).
-- [ ] Baum – gefunden, nicht behoben: `api.reSort()` nutzt nur gespeicherte Sortier-Items (`autoRestoreOptions`), sonst
-      wirkungslos – für alle Tabellen (`table-scope.ts` `reSort`); `api.sort(fn)` ist auf Bäumen ein No-op
-      (`AbstractAreaModel.sort`) · Filter-Prädikat läuft bei jedem Auf-/Zuklappen über alle Knoten (1 Mio. Knoten ≈ 110 ms;
-      `keep` hängt nicht vom Aufklapp-Zustand ab → nur bei Filteränderung neu berechnen) und bei aktiver Sortierung doppelt
-      · `AreaModelTree.getRowCount()` prüft `isVisible` je Zeile (könnte die Array-Länge liefern) ·
-      `TreeCheckboxModel.checkAll()` O(n²) bei vielen Geschwistern · (zwei Klicks < 500 ms auf „alle auf/zu“ bzw.
-      denselben Pfeil galten als Doppelklick – behoben, Branch `fix/mouse`) · Eltern ohne sichtbare Kinder (gefiltert) zeigen
-      trotzdem einen Pfeil · Mehrspalten-Sortierung im Baum nutzt nur das letzte Item · keine `TableApi`-Methode zum
-      Auf-/Zuklappen (heute `TableScope.toggleExpandCollapseAll` bzw. `recalcVisibleTreeRows()` + `repaintHard()`).
+- [x] Baum – behoben (Branch `fix/tree-2`): `api.reSort()` nutzte nur die von `autoRestoreOptions` gespeicherten
+      Sortier-Items (sonst wirkungslos, für alle Tabellen) – jetzt die letzte `sort(fn)` bzw. die Spalten mit
+      `sortState` · `api.sort(fn)` war auf Bäumen ein No-op – sortiert jetzt die Geschwister jeder Ebene (die Funktion
+      bekommt die `TreeRow`s, wie der Filter) · das Filter-Prädikat lief bei jedem Auf-/Zuklappen über alle Knoten und
+      bei aktiver Sortierung doppelt – jetzt nur bei `externalFilterChanged()` und `recalcVisibleTreeRows()` (neuer
+      Parameter `refilter`, die Tabelle nutzt `false`); zugeklappte Teilbäume werden beim Aufbau der sichtbaren Zeilen
+      gar nicht mehr durchlaufen · `getRowCount()` = Länge der Liste · `TreeCheckboxModel.checkAll()`/`checkRow()`
+      O(n²) → linear, `isRowChecked()` ein Durchlauf · Eltern ohne angezeigte Kinder (gefiltert) zeigen keinen Pfeil
+      (`AreaModelTree.hasDisplayedChildren()`) · Mehrspalten-Sortierung: erstes Item = Primärschlüssel (Baum und
+      `AreaModelObjectArray`, s. „Mittel“) · `TableApi.expandAll()`, `collapseAll()`, `setRowExpanded(rowIndex, expanded)`
+      (merkt den Zustand wie ein Klick; `TableScope.setTreeRowExpanded()`) · Header-Checkbox einer `CheckboxColumnDef`
+      im Baum hakt den ganzen Baum an/ab · das „alle auf/zu“-Icon lag immer bei x = 16 der Header-Zeile – über der
+      Header-Checkbox, bei fixierten Ost-Spalten in der Ost-Area, ohne horizontales Scrollen; jetzt im Header der
+      Pfeil-Spalte.
 - [x] **Abgewählte Zellen lassen sich wieder auswählen** (`selection-model.ts`): „letzte Operation je Zelle gewinnt“ –
       `addSelection`/`togglePoint`/`firstClick`/`toggleRow` heben negative Ranges für ihre Zellen auf (Rechteck-Differenz,
       auch unbegrenzte Zeilen/Spalten), `selectAll()` verwirft sie. `removeSelection` bei Typ `row`/`column` entfernt
@@ -256,8 +261,8 @@ Verhalten steht als `// NOTE:` in den Specs.
       besser nur Fokus-/Selektions-Overlay neu zeichnen (größerer Umbau in `RenderScope`).
 
 **Mittel:**
-- [ ] Mehrspaltiges `doSort([a, b])` (`area-model-object-array.ts:533`): das **letzte** Item wird Primärschlüssel
-      (JSDoc: „name desc, then age asc“).
+- [x] Mehrspaltiges `doSort([a, b])`: das **letzte** Item war Primärschlüssel (JSDoc: „name desc, then age asc“) –
+      jetzt das erste (Branch `fix/tree-2`).
 - [ ] Variable Zeilenhöhen: `TableModel.getAreaHeight` (`table-model.ts:275`) ignoriert `getRowHeight()`, sobald
       `defaultRowHeights.body` gesetzt ist (Factory setzt immer 34) → falsche Scrollhöhe; `AbstractAreaModel.getYPosByRowIndex`
       (`abstract-area-model.ts:95`) ignoriert ein überschriebenes `getRowHeight()` → `scrollToIndex` daneben.
@@ -397,6 +402,11 @@ Objekt-Tabelle hat `ge-focused-row`.
   ab dem ersten Zeichnen und nach jedem Host-Resize (vorher 400 px bis ~500 ms nach dem Mounten bzw. eine Runde
   hinterher) und lassen Platz für die senkrechte Scrollleiste. `scrollToIndex()` trifft die Zeile exakt (auch mit Footer).
   Ost-Trennlinie bei nur rechts fixierten Spalten.
+- **Baum/Sortierung**: `api.reSort()` sortiert nach der aktuellen Sortierung (letzte `sort(fn)` bzw. Spalten-Icons),
+  auch ohne `autoRestoreOptions`; `api.sort(fn)` sortiert Bäume (Funktion bekommt `TreeRow`s); `doSort([a, b])`: das
+  **erste** Item ist der Primärschlüssel (vorher das letzte); neu `api.expandAll()`, `collapseAll()`, `setRowExpanded()`;
+  der Baum-Filter läuft nicht mehr bei jedem Auf-/Zuklappen (der `index`-Parameter des Prädikats bezieht sich auf die
+  Reihenfolge beim letzten `externalFilterChanged()`); Eltern ohne angezeigte Kinder zeigen keinen Pfeil.
 - **Selektion**: ein Klick selektiert bei Typ `"cell"`/`"range"` die Zelle (vorher nichts); `onSelectionChanged` einmal je
   Klick (vorher bis zu dreimal), `addSelection()` feuert einmal (vorher zweimal), bei Typ `"none"` gar nicht;
   Header-/Footer-Klicks lassen Selektion und Fokus in Ruhe; Shift-Klicks ändern das Rechteck vom selben Anker aus;

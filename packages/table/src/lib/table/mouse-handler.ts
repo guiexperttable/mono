@@ -29,7 +29,6 @@ export class MouseHandler {
   geMouseEvent?: GeMouseEvent;
   geMouseEventOld?: GeMouseEvent;
 
-  private expandedAll = true;
   private lastClickedCellKey = '';
   /** The second click of a double click that was already reported (clickCount 2) – its "dblclick" is not. */
   private reportedDoubleClick?: { time: number; cellKey: string };
@@ -107,8 +106,7 @@ export class MouseHandler {
     }
 
     if (mouseTargetData.action === 'toggleExpandCollapseAll') {
-      this.expandedAll = !this.expandedAll;
-      this.tableScope.toggleExpandCollapseAll(this.expandedAll);
+      this.tableScope.toggleExpandCollapseAll(!this.tableScope.allExpanded);
       event.preventDefault();
       event.stopPropagation();
 
@@ -131,15 +129,7 @@ export class MouseHandler {
         event.preventDefault();
         event.stopPropagation();
         const tr: TreeRowIf<any> = mouseTargetData.row as TreeRow<any>;
-        tr.expanded = !tr.expanded;
-
-        if ("recalcVisibleTreeRows" in mouseTargetData.areaModel) {
-          // @ts-ignore
-          mouseTargetData.areaModel.recalcVisibleTreeRows();
-        }
-        this.tableScope.tableModel.recalcSize(this.tableScope.hostElement.clientWidth);
-        this.tableScope.adjustContainersAndRows();
-        this.updateCollapsedExpandedState(tr);
+        this.tableScope.setTreeRowExpanded(tr, !tr.expanded);
       }
     }
 
@@ -212,16 +202,7 @@ export class MouseHandler {
             event.preventDefault();
             event.stopPropagation();
             const tr: TreeRowIf<any> = row as TreeRow<any>;
-            tr.expanded = !tr.expanded;
-
-            if ("recalcVisibleTreeRows" in areaModel) {
-              // @ts-ignore
-              areaModel.recalcVisibleTreeRows();
-            }
-            this.tableScope.tableModel.recalcSize(this.tableScope.hostElement.clientWidth);
-            this.tableScope.adjustContainersAndRows();
-
-            this.updateCollapsedExpandedState(tr);
+            this.tableScope.setTreeRowExpanded(tr, !tr.expanded);
           }
         }
       }
@@ -274,31 +255,6 @@ export class MouseHandler {
       'input, select, textarea, button, a[href], [contenteditable]:not([contenteditable="false"])');
     return !!interactive && this.tableScope.hostElement.contains(interactive);
   }
-
-  /**
-   * Update the collapsed/expanded state of a tree row.
-   *
-   * @param {TreeRowIf<any>} tr - The tree row object.
-   * @returns {void}
-   */
-  private updateCollapsedExpandedState(tr: TreeRowIf<any>) {
-    // store expanded/collapsed:
-    const getRowId = this.tableScope.tableOptions?.autoRestoreOptions?.getRowId;
-    if (getRowId) {
-      // first toggle: a row that is now expanded means "the table started collapsed" → store expanded ids
-      this.tableScope.storeStateCollapsedExpandService?.initModeIfEmpty(tr.expanded ? "expanded" : "collapsed");
-      const mode = this.tableScope.storeStateCollapsedExpandService?.collapsedExpandedStateGet().mode;
-      const push = (mode === "collapsed" && !tr.expanded) || (mode === "expanded" && tr.expanded);
-      const remove = (mode === "collapsed" && tr.expanded) || (mode === "expanded" && !tr.expanded);
-      const rowId = getRowId(tr.data);
-      if (push) {
-        this.tableScope.storeStateCollapsedExpandService?.collapsedStateIdsPush(rowId);
-      } else if (remove) {
-        this.tableScope.storeStateCollapsedExpandService?.collapsedStateIdsRemove(rowId);
-      }
-    }
-  }
-
 
   private getArrowColumnIndex(): number {
     const rowCheckboxVisible = this.tableScope.tableModel.isRowCheckboxVisible();

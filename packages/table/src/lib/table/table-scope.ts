@@ -514,8 +514,50 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (isAreaModelTree(bodyAreaModel)) {
       const amt: AreaModelTree<any> = bodyAreaModel as AreaModelTree<any>;
       amt.toggleExpandCollapseAll(expand);
+      this.allExpanded = expand;
       this.repaintHard(); // the row count changed → recalc the scroll height, not only the visible rows
       this.storeStateCollapsedExpandService?.collapsedStateAll(expand);
+    }
+  }
+
+  /** The last "expand / collapse all" state – the header icon toggles it. */
+  allExpanded = true;
+
+  /**
+   * Expands or collapses one row of a tree table, repaints, and remembers the state (`autoRestoreOptions`).
+   *
+   * @param {TreeRowIf<any>} row - a tree row of the body model
+   * @param {boolean} expanded - the new state
+   * @returns {boolean} false if the body is no tree or the state was already set
+   */
+  setTreeRowExpanded(row: TreeRowIf<any>, expanded: boolean): boolean {
+    const bodyAreaModel = this.tableModel.getBodyModel();
+    if (!isAreaModelTree(bodyAreaModel) || row.expanded === expanded) {
+      return false;
+    }
+    row.expanded = expanded;
+    (bodyAreaModel as AreaModelTree<any>).recalcVisibleTreeRows(false); // the filter result does not change
+    this.repaintHard(); // the row count changed
+    this.storeTreeRowState(row);
+    return true;
+  }
+
+  /** Remembers the expanded/collapsed state of a row (autoRestoreOptions.getRowId). */
+  private storeTreeRowState(tr: TreeRowIf<any>) {
+    const getRowId = this.tableOptions?.autoRestoreOptions?.getRowId;
+    const service = this.storeStateCollapsedExpandService;
+    if (getRowId && service) {
+      // first toggle: a row that is now expanded means "the table started collapsed" → store expanded ids
+      service.initModeIfEmpty(tr.expanded ? "expanded" : "collapsed");
+      const mode = service.collapsedExpandedStateGet().mode;
+      const push = (mode === "collapsed" && !tr.expanded) || (mode === "expanded" && tr.expanded);
+      const remove = (mode === "collapsed" && tr.expanded) || (mode === "expanded" && !tr.expanded);
+      const rowId = getRowId(tr.data);
+      if (push) {
+        service.collapsedStateIdsPush(rowId);
+      } else if (remove) {
+        service.collapsedStateIdsRemove(rowId);
+      }
     }
   }
 
@@ -1017,7 +1059,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         restore(row.children);
       });
       restore(amtr.rows);
-      amtr.recalcVisibleTreeRows();
+      amtr.recalcVisibleTreeRows(false);
     }
   }
 
@@ -1151,8 +1193,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   reSort() {
-    let sortItems = this.storeSortingService?.getSortItems()??[];
-    this.tableModel.doSort(sortItems);
+    // the current sort order: the last sort(fn), otherwise the columns with a sortState (header icons) – before only
+    // the items stored by autoRestoreOptions were used, so reSort() did nothing without them
+    this.reapplySorting();
     this.repaint();
   }
 

@@ -245,8 +245,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.350 Tests) |
-  | `test:browser` | echtes Chromium (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.440 Tests) |
+  | `test:browser` | echtes Chromium, ~290 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -262,8 +262,14 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `// NOTE:`. **Jeder Bugfix bekommt zuerst einen roten Test.**
   - `src/index.spec.ts` hält alle Exportnamen als Snapshot fest: neuer Export → `pnpm exec vitest run -u src/index.spec.ts`
     und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
-  - Abdeckung (Okt. 2026): DOM-freie Teile (`data/`, `factory/`, `selection/`, `service/`, `action/` …) 92–100 %,
-    Rendering (`RenderScope`/`TableScope`/`TableApi`/Renderer) erst ~38 % → Browser-Tests sind der nächste Schritt (`TODO.md`).
+  - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~89 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
+    `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
+    `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
+    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility` …).
+  - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
+    `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
+    `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
+    `columnIndices`, `stylePx`, `createRows`, `destroyAllTables`.
   - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
     Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests

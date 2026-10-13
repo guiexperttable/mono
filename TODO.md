@@ -166,8 +166,9 @@
 - [x] Unit-Tests (Vitest) für Area-Modelle, Factories, SelectionModel einführen. → Vitest 5 in `packages/table`
       (Phase 0 + 1 von `TESTPLAN`, Okt. 2026): 74 Unit-Specs (Node, ~2 s) + 1 Browser-Spec (Chromium); dafür Vite
       6.3.4 → 6.4.4 in allen Paketen (Builds byte-identisch). Siehe CLAUDE.md §6.
-- [ ] Tests Phase 2: Browser-Tests für `RenderScope`/`TableScope`/`TableApi`, Renderer, Maus/Tastatur, CRUD-Dialoge
-      (heute ~38 % Zeilenabdeckung im Rendering-Teil, DOM-freie Teile 92–100 %).
+- [x] Tests Phase 2: Browser-Tests für Rendering, Maus, Renderer, Editor, Spans/Header-Gruppen, Lebenszyklus, Theming,
+      Baum, TableApi, CRUD (Branch `test/browser-rendering`, 10 Specs, 226 Tests) – Rendering-Abdeckung 43 → 96 %.
+      Gefundene Fehler: Abschnitt „Gefunden durch die Browser-Tests“.
 - [x] Tests Phase 3: wiederverwendbarer Workflow `.github/workflows/test-core.yml` (`test:types`, `docs:check`,
       `test:unit`, `test:browser` mit Chromium, Coverage-Artefakt) – aufgerufen von `ci.yml` (Push/PR) und von
       `npm-publish.yml` (Job `publish` hat `needs: test` → rote Tests = kein Release).
@@ -265,6 +266,58 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
+
+## Gefunden durch die Browser-Tests (Okt. 2026)
+
+Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`packages/table/src/**/*.browser.spec.ts`).
+
+**Spaltenbreiten, Scrollen, fixierte Spalten**
+- [ ] %-Spaltenbreiten werden bis zum ersten ResizeObserver-Callback (~500 ms) für 400 px berechnet
+      (`table-model.ts:63` Default `parentSize`) · `recalcColumnWidths(clientWidth)` ignoriert die neue Breite
+      (`render-scope.ts:254`, nach Host-Resize eine Runde hinterher) · jeder ResizeObserver-Callback baut die Breiten neu
+      aus den ColumnDefs (`table-model.ts:510`) – per `setColumnWidth`/`autoResizeColumns`/Ziehen gesetzte Breiten gehen
+      verloren, auch durch den ersten Callback ~500 ms nach dem Mounten.
+- [ ] Ost-Trennlinie prüft `getFixedLeftColumnCount()` (`ele-scope.ts:208`) · Header/East-Area trägt `data-area="body"`
+      (`ele-scope.ts:92`) · Scroll-Inhalt 1 px höher als die Zeilen (`ele-scope.ts:314` vs `render-scope.ts:284`) –
+      `scrollToIndex(0, n)` lässt in der unteren Hälfte 1 px von Zeile n-1 sehen.
+- [ ] Row-Div-Cache wird nie geleert (`convenience-dom.service.ts:570/577`): jede je gerenderte Zeile bleibt mit ihren
+      Zellen referenziert (Speicher wächst beim Scrollen).
+
+**Maus**
+- [ ] Scroll-Viewport überdeckt den Footer (`ele-scope.ts:162`): Footer-Klicks/-Hover kommen als Body-Events mit −1 an
+      · Doppelklick-Sortierung: Event wird nach dem Repaint veröffentlicht – `areaIdent`/`sideIdent` undefined
+      (`mouse-handler.ts:167/201`, `table-scope.ts:317`) · Spalten-Drag: schneller Drag zeigt falsche Spalte im Ghost
+      (`table-scope.ts:384/393`), Ghost rendert **alle** Body-Zeilen der Spalte (`render-scope.ts:1433`), Style-Tippfehler
+      `'overfllow'` – Ghost nicht beschnitten (`render-scope.ts:1385`) · Hover über Header markiert Body-Zeile 0
+      (`render-scope.ts:1253`) · Hover-Spalte einer fixierten West-Spalte nach horizontalem Scrollen verschoben
+      (`render-scope.ts:1297`) · zweiter Klick auf dieselbe Zeilen-Checkbox < 500 ms wird als Doppelklick verschluckt
+      (`mouse-handler.ts:89`; DOM und Modell laufen auseinander) · Header-Checkbox von `CheckboxColumnDef` hakt nichts an
+      (`table-scope.ts:491`).
+
+**Renderer & Editor**
+- [ ] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle
+      (`number-cell-renderer.ts:25`, `positive-and-negative-number-renderer.ts:21`); fehlendes Anführungszeichen
+      `data-row-index=${rowIndex}"` (`positive-and-negative-number-renderer.ts:25`) · ungültiges Datum: `RangeError`
+      bricht den Render-Durchlauf ab, Tabelle bleibt leer (`date-to-iso-cell-renderer.ts:20`, `date-to-tec-cell-renderer.ts:21`).
+- [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Wert nicht escaped – `"` schneidet den Text ab, leere
+      Zelle zeigt „undefined“ (`input-cell-renderer.ts:28`) · Span-Modell wird nie neu aufgebaut: `setRows()` mit weniger
+      Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
+- [ ] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 (`css/table-tree.css:42/46`).
+
+**CRUD** (`crud/*`)
+- [ ] **HTML-Injection**: Werte unescaped in `innerHTML` (`crud-object-view.ts:61`) · Edit liest per `FormData`: Zahlen
+      als Strings, Checkbox „on“, nicht angehakte Checkbox fehlt (Boolean nie wieder `false`) (`crud-object-edit.ts:34`) ·
+      verschachtelte `<form>`: Felder nach einem Unterobjekt gehen verloren (`:63/85`) · Wert nicht escaped (`:68`) ·
+      CREATE sendet das leere Objekt, Eingaben gehen verloren (`crud-table-model-factory.ts:177`) ·
+      `getIdByObject` liefert immer `o['id']` (`crud-options.ts:42`).
+
+Weitere fragwürdige Stellen (als `// NOTE:` in den Specs): `setColumnWidth()` zeichnet nicht neu · Doppelklick feuert
+`onMouseClicked` dreimal · Strg+Alt ruft `debugOnce()`/`console.clear()` · voreingestellter `sortState` zeigt das Icon,
+sortiert aber nicht · Spaltenziehen ignoriert min/max · Kontextmenü-Drossel 50 ms · `setRows/addRows/…` zeichnen nicht neu,
+`setRows` verwirft Filter + Sortierung (Icon bleibt) · alle Span-Bereiche werden bei jedem Render gezeichnet ·
+Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderVisible: false` uneinheitlich · Zeile 0 jeder
+Objekt-Tabelle hat `ge-focused-row` · CRUD: Dialog bleibt nach Escape im DOM, flache Kopie beim Editieren, CLONE behält die
+id, `deleteItem` per GET.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
 

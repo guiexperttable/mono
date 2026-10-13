@@ -16,6 +16,7 @@ import {isCheckboxColumnDef} from "../../instanceof-workaround";
 import { FalseFn, TrueFn } from "../common/boolean-function";
 import { SizeIf } from '../common/size.if';
 import { Size } from '../common/size';
+import { setApiColumnVisibility } from './column/column-visibility';
 import { TableScope } from '../../table-scope';
 
 
@@ -196,6 +197,9 @@ export class TableModel implements TableModelIf {
    * @return {void} - This method does not return a value.
    */
   recalcSize(clientWidth: number) {
+    if (clientWidth > 0) {
+      this.parentSize = clientWidth; // also used by setColumnVisible() for weight widths
+    }
     this.recalcColumnWidths(clientWidth);
     this.recalcHeightAndPadding();
   }
@@ -463,6 +467,9 @@ export class TableModel implements TableModelIf {
    *
    * Works through {@link ColumnDefIf.isVisible}: it is replaced by {@link TrueFn} / {@link FalseFn} (an own
    * `isVisible` function of the column is replaced, too). Columns without a column definition can't be hidden.
+   * With header groups ({@link AreaModelCellGroups}) the column is shown only if neither this method nor a collapsed
+   * group hides it – expanding the group does not bring back a column hidden here, and vice versa.
+   * Weight widths (`new Size(1, "weight")`) are shared among the shown columns.
    * Recalculates the content width, the padding (fixed columns) and the x positions. Only changes the model –
    * {@link TableApi.setColumnVisible} also repaints the table.
    *
@@ -478,10 +485,14 @@ export class TableModel implements TableModelIf {
     if (!columnDef) {
       return false;
     }
-    columnDef.isVisible = visible ? TrueFn : FalseFn;
+    // combined with the visibility of a header group (a group toggle must not bring the column back)
+    setApiColumnVisibility(columnDef, visible);
     const withFlag = columnDef as ColumnDefIf & { visible?: unknown };
     if (typeof withFlag.visible === "boolean") {
       withFlag.visible = visible; // ColumnDef: keep its flag in sync
+    }
+    if (this.columnDefs?.some(def => def.width?.unit === "weight")) {
+      this.recalcColumnWidths(this.parentSize); // weight columns share the width of the shown columns
     }
     this.recalcContentWidthInPx();
     this.recalcPadding();
@@ -636,16 +647,20 @@ export class TableModel implements TableModelIf {
         return 0;
       });
 
-      const usedWidth = this.columnSizes.reduce((sum, currentValue)=> sum + currentValue);
+      // hidden columns take no space: they neither use width nor get a share of the rest (before, a hidden column
+      // left a gap of its width next to the weight columns)
+      const isShown = (def: ColumnDefIf) => def.isVisible?.() !== false;
+      const usedWidth = this.columnSizes.reduce((sum, size, i) => isShown(this.columnDefs[i]) ? sum + size : sum, 0);
       const leftWidth = clientWidth - usedWidth;
-      if (leftWidth > 0 && widthsWithWeights.length) {
-        const sumWeights = widthsWithWeights
+      const shownWeights = widthsWithWeights.filter(isShown);
+      if (leftWidth > 0 && shownWeights.length) {
+        const sumWeights = shownWeights
           .map(cd => cd.width.value)
           .reduce((sum, currentValue) => sum + currentValue);
 
         for (let i = 0; i < this.columnDefs.length; i++) {
           const def = this.columnDefs[i];
-          if (def.width.unit === "weight") {
+          if (def.width.unit === "weight" && isShown(def)) {
             this.columnSizes[i] = def.width.value * leftWidth / sumWeights;
           }
         }

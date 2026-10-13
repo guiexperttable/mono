@@ -17,7 +17,7 @@ import {
  *   re-creates it from `data`. Data set on an element that is not connected yet is shown when it is connected.
  * - Events are dispatched on the element as bubbling `CustomEvent`s (payload in `detail`): `tableReady`,
  *   `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
- *   `modelChanged`, `selectionChanged`, `focusChanged`, `scroll` – and `contextmenu`, which does **not** bubble
+ *   `modelChanged`, `selectionChanged`, `focusChanged` – and `scroll` and `contextmenu`, which do **not** bubble
  *   (the browser's own `contextmenu` MouseEvent reaches a listener on the element, too: check
  *   `e instanceof CustomEvent`).
  */
@@ -110,7 +110,8 @@ export class GuiexpertTable extends HTMLElement {
         onMouseDragging: (evt: GeMouseEvent) => dispatch("mouseDragging", evt),
         onMouseDraggingEnd: (evt: GeMouseEvent) => dispatch("mouseDraggingEnd", evt),
         onMouseMoved: (evt: GeMouseEvent) => dispatch("mouseMoved", evt),
-        onScroll: (evt: GeScrollEvent) => dispatch("scroll", evt)
+        // not bubbling (like the native event): window/document "scroll" listeners must not see every table scroll
+        onScroll: (evt: GeScrollEvent) => dispatch("scroll", evt, false)
       };
 
       const tableScope = new TableScope(

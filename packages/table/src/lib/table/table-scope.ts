@@ -943,9 +943,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         }
         const [rowIdx, colIdx] = fm.getFocus();
         const newRowIdx = Math.min(Math.max(rowIdx + dy, 0), rowCount - 1);
-        const newColIdx = Math.min(Math.max(colIdx + dx, 0), columnCount - 1);
+        const newColIdx = this.getNextShownColumnIndex(colIdx, dx, columnCount);
         if (newRowIdx !== rowIdx || newColIdx !== colIdx) {
           fm.setFocus(newRowIdx, newColIdx);
+          this.ensureColumnIsVisible(newColIdx); // first: ensureRowIsVisible() keeps the horizontal position
           this.ensureRowIsVisible(newRowIdx);
           this.repaint();
         }
@@ -953,6 +954,35 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       }
     }
     return false;
+  }
+
+  /**
+   * The column index `dx` steps from `colIdx`, skipping hidden columns (width 0, e.g. `setColumnVisible(…, false)`).
+   * Stays inside the columns; if there is no shown column in that direction, the focus stays where it is.
+   */
+  private getNextShownColumnIndex(colIdx: number, dx: number, columnCount: number): number {
+    if (!dx) {
+      const col = Math.min(Math.max(colIdx, 0), columnCount - 1);
+      if (colIdx < 0 && this.tableModel.getColumnWidth(col) <= 0) {
+        // no focus yet (-1): the first shown column instead of a hidden one
+        return this.getNextShownColumnIndex(-1, 1, columnCount);
+      }
+      return col;
+    }
+    const step = dx > 0 ? 1 : -1;
+    let ret = colIdx;
+    let c = colIdx;
+    for (let n = Math.abs(dx); n > 0; n--) {
+      c += step;
+      while (c >= 0 && c < columnCount && this.tableModel.getColumnWidth(c) <= 0) {
+        c += step;
+      }
+      if (c < 0 || c >= columnCount) {
+        break;
+      }
+      ret = c;
+    }
+    return Math.min(Math.max(ret, 0), columnCount - 1);
   }
 
   /**
@@ -1264,6 +1294,54 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return true;
     }
     return false;
+  }
+
+  /**
+   * Ensures that a column of the scrollable center area is fully visible by scrolling horizontally if necessary –
+   * the counterpart of {@link ensureRowIsVisible}. A column left of the viewport becomes the first visible column,
+   * a column right of it the last one (a column wider than the viewport: the first). The vertical position is kept.
+   *
+   * Fixed west/east columns are always visible: nothing to do.
+   *
+   * @param {number} columnIndex - model column index (west + center + east)
+   * @returns {boolean} true if the table was scrolled, false if the column was already visible (or is fixed / hidden / out of range)
+   *
+   * @example
+   * tableScope.ensureColumnIsVisible(12);
+   */
+  ensureColumnIsVisible(columnIndex: number): boolean {
+    const firstCenterColumn = this.tableModel.getFixedLeftColumnCount();
+    const lastCenterColumn = this.tableModel.getColumnCount() - this.tableModel.getFixedRightColumnCount() - 1;
+    if (!(columnIndex >= firstCenterColumn && columnIndex <= lastCenterColumn)) {
+      return false;
+    }
+    const width = this.tableModel.getColumnWidth(columnIndex);
+    const viewport = this.scrollViewport;
+    const viewWidth = this.areaBodyCenterGeo.width;
+    const contentRange = this.tableModel.getContentWidthInPixel() - viewWidth;
+    const scrollerRange = viewport.scrollWidth - viewport.clientWidth;
+    if (width <= 0 || contentRange <= 0 || scrollerRange <= 0) {
+      return false; // hidden, or all center columns fit
+    }
+    let left = 0;
+    for (let c = firstCenterColumn; c < columnIndex; c++) {
+      left += this.tableModel.getColumnWidth(c);
+    }
+    // the same linear mapping as the rendering (scrollFactorX, see adjustColumnsToRowParent)
+    const offset = Math.min(1, Math.max(0, viewport.scrollLeft / scrollerRange)) * contentRange;
+    let target: number;
+    if (left < offset - 0.5) {
+      target = left;
+    } else if (left + width > offset + viewWidth + 0.5) {
+      target = width > viewWidth ? left : left + width - viewWidth;
+    } else {
+      return false;
+    }
+    const scrollLeft = Math.min(1, Math.max(0, target / contentRange)) * scrollerRange;
+    // scrollLeft is rounded by the browser – round towards the side that must be fully visible
+    viewport.scrollLeft = target === left ? Math.floor(scrollLeft) : Math.ceil(scrollLeft);
+    this.adjustAfterScrolling(); // render the new position now (a scroll event may not fire)
+    return true;
   }
 
 

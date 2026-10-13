@@ -26,14 +26,14 @@
       Daten vor dem Einhängen zeigten nur 1 Zeile, `data` ohne `tableOptions` warf, `contextmenu`-Event wurde vom Core
       verschluckt, Entfernen/Wieder-Einfügen (auch mit neuen Daten in derselben Task). Smoke-Tests für alle Wrapper
       (`pnpm test:wrappers`, CI-Job `test-wrappers`, Publish wartet darauf).
-- [ ] Wrapper – gefunden, nicht behoben: Solid: `contextmenu`-CustomEvent kommt nie an (auf dem Host-Div dispatcht, vom
-      Core als zweiter Rechtsklick < 50 ms mit `stopImmediatePropagation` geschluckt, `table-scope.ts:448`; `it.fails` in
-      `GuiexpertTable.browser.spec.tsx`) – Core-Fix: `MouseHandler.onContextmenu` ignoriert Nicht-`MouseEvent`s · Solid und
-      Web Component dispatchen ein bubbelndes `scroll`-CustomEvent (erreicht globale `scroll`-Listener) · Solid exportiert
-      `GuiexpertTableProps` als Namespace (`packages/solid-table/src/index.ts:3,9`) · Vue `inheritAttrs: false` verwirft
-      `class`/`style` am Element (`GuiexpertTable.vue:31`) · vue3-table-Build meldet TS-Fehler aus totem
-      `cypress/plugins/index.ts` (`tsconfig.lib.json` schließt `**/*.ts` ein); Jest-Reste (`jest.config.ts`,
-      `tsconfig.spec.json`) in react/preact/vue/solid.
+- [x] Wrapper – gefunden beim Testen, behoben (Branch `fix/visibility-wrappers`): Solid: `contextmenu`-CustomEvent kam
+      nie an (auf dem Host-Div dispatcht, vom Core als zweiter Rechtsklick < 50 ms geschluckt) – Core-Fix:
+      `MouseHandler.onContextmenu` ignoriert Nicht-`MouseEvent`s · Solid und Web Component dispatchen `scroll` nicht
+      mehr bubbelnd (erreichte globale `scroll`-Listener) · Solid exportierte `GuiexpertTableProps` als Namespace →
+      `export *` der Typen · Vue: `inheritAttrs: false` entfernt (`class`/`style`/Attribute landen am Element) ·
+      vue3-table: totes `cypress/` gelöscht, `tsconfig.lib.json` nur noch `src/**` (Build ohne TS-Fehler) · Jest-Reste
+      (`jest.config.ts`, `tsconfig.spec.json`) in react/preact/vue/solid gelöscht (Tests laufen mit Vitest). Offen:
+      devDependency `solid-jest` (bleibt, um die Lockdatei nicht anzufassen).
 
 - [x] **Alle Wrapper + demo-table-models bündelten eine komplette Kopie des Cores** (~210 KB je Paket, obwohl
       `@guiexpert/table` Abhängigkeit ist) → Core + Framework im Vite-Build extern (React 215 KB → 2 KB).
@@ -122,11 +122,12 @@
       (Breite 0, Copy/Excel überspringen sie, Wieder-Einblenden stellt die alte Breite her; Index, Property oder
       ColumnDef), Header/Footer über ein Flag im `TableModel` (Höhe 0, Daten bleiben). `TableModelIf` bekommt die
       Methoden als optionale Member.
-- [ ] Sichtbarkeit – offen: bei Gewichts-Breiten („weight“) zählen ausgeblendete Spalten weiter in `usedWidth`
-      (`table-model.ts:619`, Lücke) · `AreaModelCellGroups.toggleHeaderGroup` überschreibt `isVisible` aller Spalten
-      (per API ausgeblendete Spalte kommt nach Gruppen-Toggle zurück und umgekehrt) · Pfeil-Navigation kann auf
-      ausgeblendete Spalten fallen und scrollt links/rechts nicht horizontal (`ensureColumnIsVisible` mit
-      `getScrollLeftForColumnIndex` wäre einfach).
+- [x] Sichtbarkeit (Branch `fix/visibility-wrappers`): Gewichts-Breiten („weight“) verteilen den Platz nur noch auf
+      angezeigte Spalten (vorher zählten ausgeblendete in `usedWidth` → Lücke) · API und Header-Gruppen entscheiden
+      gemeinsam (`column/column-visibility.ts`): eine per `setColumnVisible` ausgeblendete Spalte bleibt nach dem
+      Aufklappen ihrer Gruppe aus und umgekehrt (vorher überschrieb `toggleHeaderGroup` `isVisible`) ·
+      `AreaModelCellGroups` gibt nichts mehr per `console.table` aus · Pfeiltasten überspringen ausgeblendete Spalten
+      und scrollen horizontal: neu `api.ensureColumnIsVisible(col)` (Gegenstück zu `ensureRowIsVisible`).
 - [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
       Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
       (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
@@ -205,8 +206,8 @@ Verhalten steht als `// NOTE:` in den Specs.
       (öffentliche Mappings bleiben gleich). Pfeil-Navigation (erstmals wirksam) bleibt am ersten/letzten Zeilen-/
       Spaltenrand stehen und scrollt die fokussierte Zeile ins Bild. Browser-Test `keyboard.browser.spec.ts`.
       Verhaltensänderung: Buchstaben öffnen den Editor nicht mehr – nur noch F2 (laut Mapping).
-- [ ] Optional: Excel-artig „Enter“ bzw. Tippen startet das Editieren (heute nur F2). Pfeile springen nicht in fixierte
-      Spalten-Bereiche horizontal ins Bild (`ensureRowIsVisible` scrollt nur vertikal).
+- [ ] Optional: Excel-artig „Enter“ bzw. Tippen startet das Editieren (heute nur F2). (Pfeile scrollen seit
+      `fix/visibility-wrappers` auch horizontal: `ensureColumnIsVisible`.)
 - [x] `onFocusChanged` feuerte bei Mausklick **zweimal** (`mouse-handler.ts`: `fm.clear()` vor `setFocus()`;
       `selection-service.ts`: zusätzlich `tableScope.onFocusChanged(fm)`). Jetzt einmal je echter Änderung
       (Branch `fix/selection`).
@@ -420,6 +421,14 @@ Objekt-Tabelle hat `ge-focused-row`.
   auf eine Checkbox, einen Baum-Pfeil, „alle auf/zu“ oder eine Header-Gruppe schalten zweimal um (vorher wurde der
   zweite als Doppelklick verschluckt); die Header-Checkbox einer `CheckboxColumnDef` hakt alle Body-Zeilen an/ab;
   `onCheckboxChanged` bekommt eine Kopie des Arrays; ein Doppelklick, der sortiert, meldet `areaIdent` "header".
+- **Spalten-Sichtbarkeit**: Pfeiltasten überspringen ausgeblendete Spalten und scrollen die fokussierte Spalte
+  horizontal ins Bild (neu `api.ensureColumnIsVisible()`); Gewichts-Breiten verteilen sich auf die angezeigten Spalten;
+  mit Header-Gruppen gilt: angezeigt nur, wenn weder `setColumnVisible(…, false)` noch eine zugeklappte Gruppe die
+  Spalte ausblendet; `AreaModelCellGroups` schreibt nichts mehr in die Konsole (`console.table`).
+- **Wrapper (2)**: Solid exportiert die Props-Typen direkt (`import type { GuiexpertTableProps }` – vorher ein
+  Namespace-Objekt); das `scroll`-CustomEvent von Solid und Web Component bubbelt nicht mehr (Listener direkt auf dem
+  Element registrieren); Solid: `contextmenu`-CustomEvent kommt an; Vue: `class`, `style` und andere Attribute am
+  `<GuiexpertTable>` landen am Wurzel-Element (vorher verworfen).
 - **Datums-Renderer**: ein ungültiges Datum wird unverändert angezeigt (vorher leerte es bei `DateToIsoCellRenderer`/
   `DateToTecCellRenderer` die ganze Tabelle, `DateToLocaleDateCellRenderer` zeigte „Invalid Date“). Baum: Einrückung
   bis Tiefe 9 (Tiefe 5 war wie Tiefe 6 eingerückt).

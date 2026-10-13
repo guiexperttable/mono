@@ -68,6 +68,11 @@ export class MouseHandler {
    * @return {void}
    */
   private onContextmenu(evt: MouseEvent) {
+    if (!(evt instanceof MouseEvent)) {
+      // a "contextmenu" CustomEvent of a wrapper (Solid dispatches its events on the host div) – no right click;
+      // before, it was taken for a second right click within 50 ms and stopped (it never reached the listeners)
+      return;
+    }
     this.mouseEvent = evt;
     const mouseMoveEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
     this.tableScope.contextmenu(mouseMoveEvent);

@@ -272,6 +272,26 @@ describe('TableModel', () => {
         tm.recalcSize(150);
         expect(widths(tm)).toEqual([200, 0]);
       });
+
+      // Regression: hidden columns kept their share – a hidden px column still took its width away from the weight
+      // columns, a hidden weight column its part of the weights (the shown columns did not fill the table).
+      it('are shared among the shown columns only (setColumnVisible)', () => {
+        const tm = create({
+          columnDefs: [
+            new ColumnDef('a', 'A', px100),
+            new ColumnDef('b', 'B', new Size(1, 'weight')),
+            new ColumnDef('c', 'C', new Size(3, 'weight')),
+          ],
+        });
+        tm.recalcSize(500);
+        tm.setColumnVisible('a', false);
+        expect(widths(tm)).toEqual([0, 125, 375]);
+        tm.setColumnVisible('c', false);
+        expect(widths(tm)).toEqual([0, 500, 0]);
+        tm.setColumnVisible('a', true);
+        tm.setColumnVisible('c', true);
+        expect(widths(tm)).toEqual([100, 100, 300]);
+      });
     });
 
     describe('overridingColumnWidth', () => {

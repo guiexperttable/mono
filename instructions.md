@@ -857,7 +857,8 @@ definition. Showcase: *Look and Feel* (https://gui.expert/showcase/laf).
 Since 1.1.91: `scrollToIndex(col, row)` also scrolls horizontally to the column (a fixed west column scrolls back to the
 start, `-1` keeps the horizontal position); `setColumnVisible(column, visible)` (index, property or column definition;
 showing it again restores the previous width), `isColumnVisible(column)`, `setHeaderVisible(visible)`,
-`setFooterVisible(visible)`, `isHeaderVisible()`, `isFooterVisible()`.
+`setFooterVisible(visible)`, `isHeaderVisible()`, `isFooterVisible()`, `ensureColumnIsVisible(col)` (scrolls
+horizontally only if needed – the counterpart of `ensureRowIsVisible`; the arrow keys use both and skip hidden columns).
 
 ---
 

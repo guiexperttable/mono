@@ -33,7 +33,7 @@ import { TreeRowIf } from './data/common/tree-row-if';
  *
  * | Task | Methods |
  * |---|---|
- * | scroll | {@link scrollToIndex}, {@link ensureRowIsVisible}, {@link scrollToPixel}, {@link getFirstVisibleRowIndex} |
+ * | scroll | {@link scrollToIndex}, {@link ensureRowIsVisible}, {@link ensureColumnIsVisible}, {@link scrollToPixel}, {@link getFirstVisibleRowIndex} |
  * | sort | {@link sortByColumn}, {@link sort}, {@link reSort} |
  * | filter | {@link externalFilterChanged} (with {@link TableOptionsIf.externalFilterFunction}) |
  * | export | {@link copyToClipboard}, {@link downloadExcel} |
@@ -1332,6 +1332,29 @@ export class TableApi {
    */
   ensureRowIsVisible(rowIndex:number):boolean{
     return this.tableScope.ensureRowIsVisible(rowIndex);
+  }
+
+  /**
+   * Ensures that a column is fully visible by scrolling horizontally if necessary – the counterpart of
+   * {@link ensureRowIsVisible}. A column left of the viewport becomes the first visible column, a column right of it
+   * the last one. The vertical position is kept. The arrow keys use it for the focused cell.
+   *
+   * Fixed columns (`fixedLeftColumnCount` / `fixedRightColumnCount`) are always visible, hidden columns
+   * ({@link setColumnVisible}) can't be scrolled to: both return `false`.
+   *
+   * @param {number} columnIndex - The column index (model index over west + center + east)
+   * @returns {boolean} true if the table was scrolled, false if the column was already visible
+   *
+   * @example
+   * // show the column of a search hit (rowIndex/columnIndex from your own search)
+   * const rowIndex = 1200, columnIndex = 14;
+   * tableApi.ensureColumnIsVisible(columnIndex);
+   * tableApi.ensureRowIsVisible(rowIndex);
+   *
+   * @see {@link scrollToIndex} - scrolls a column and row to the top left
+   */
+  ensureColumnIsVisible(columnIndex: number): boolean {
+    return this.tableScope.ensureColumnIsVisible(columnIndex);
   }
 
   /**

@@ -28,7 +28,7 @@ import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } fro
  * object creates a new table.
  */
 export default defineComponent({
-  inheritAttrs: false,
+  // class, style and other attributes go to the root div (before: inheritAttrs: false dropped them)
   props: {
     tableModel: {
       required: true,

@@ -36,7 +36,8 @@ export default (props: GuiexpertTableProps) => {
    */
   const emit = (name: string, detail: any, callback?: (detail: any) => unknown) => {
     if (callback) callback(detail);
-    if (ref) ref.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
+    // "scroll" does not bubble (like the native event) – otherwise every table scroll reaches window/document listeners
+    if (ref) ref.dispatchEvent(new CustomEvent(name, { detail, bubbles: name !== "scroll" }));
   };
 
   // the callbacks are read at call time: callback props may change without re-creating the table

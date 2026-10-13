@@ -13,6 +13,7 @@ import { CellGroupExtCellRenderer } from '../../../renderer/cell-group-ext-cell-
 import { MouseTargetData } from '../../event/mouse-target-data';
 import { HeaderGroupOptionsIf } from '../../options/header-group-options.if';
 import { HeaderGroupOptions } from '../../options/header-group-options';
+import { setGroupColumnVisibility } from '../column/column-visibility';
 
 // TODO next steps:   fix this model
 /** @category Header groups */
@@ -43,18 +44,12 @@ export class AreaModelCellGroups implements AreaModelIf {
   }
 
   init(){
-    // console.info(this.groupExts);
-    // console.info(this.getAllLeafs());
-    // console.info(this.getMaxRowCount());
-    for (const g of this.groupExts) {
-      g.log(this.getMaxRowCount());
-      // console.info(g.getAllRowCounts(g));
-    }
     this.arr = this.buildArray();
 
     if (!this.columnDefs?.length && this.areaIdent === 'header') {
       this.columnDefs = CellgroupFactory.buildColumnDefs(this.groups);
-      // console.info('this.columnDefs', this.columnDefs);
+      // the group decides the visibility together with setColumnVisible()
+      this.columnDefs.forEach(def => setGroupColumnVisibility(def, def.isVisible));
     }
   }
 
@@ -86,7 +81,6 @@ export class AreaModelCellGroups implements AreaModelIf {
 
     const arrs = Array.from(Array(maxRow).keys()).map((_r) => []);
     const ret = CellgroupFactory.buildArrayOfArrays(flatten, arrs);
-    console.table(ret);
 
     /*
 
@@ -242,8 +236,12 @@ Gold A     Gold B    Gold C   Gold D    Gold Sum    HOH Loc    HOH A    HOH B   
     const previous = new Map(this.columnDefs.map(def => [def.property, def]));
     const merged = fresh.map(def => {
       const old = previous.get(def.property);
-      if (!old) return def;
-      old.isVisible = def.isVisible;
+      if (!old) {
+        setGroupColumnVisibility(def, def.isVisible);
+        return def;
+      }
+      // the group decides together with setColumnVisible() (before, the group overwrote a column hidden by the API)
+      setGroupColumnVisibility(old, def.isVisible);
       return old;
     });
     this.columnDefs = merged;

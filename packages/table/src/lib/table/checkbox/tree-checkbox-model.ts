@@ -22,12 +22,22 @@ export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxMode
     this.autoCheckParent(row.parent as T);
   }
 
-  checkAll(_arr: T[]): void {
-    for (const node of this.allRootNodes) {
-      node.checked = false;
-      if (node.children) {
-        this.checkAll(node.children as T[]);
-      }
+  /**
+   * Unchecks the given rows and all their descendants – despite its name, like {@link CheckboxModel.checkAll}
+   * (which clears all checked rows). The parents of the given rows are updated ("semi" or "none").
+   *
+   * @param arr - the rows to uncheck together with their descendants; default: the root nodes (whole tree)
+   *
+   * @example
+   * const checkboxModel = new TreeCheckboxModel(TreeFactory.buildTreeRows<OrderNode>(nodes));
+   * checkboxModel.checkAll(); // uncheck every row of the tree
+   */
+  checkAll(arr: T[] = this.allRootNodes): void {
+    for (const node of arr) {
+      this.uncheckRecursive(node);
+    }
+    for (const node of arr) {
+      this.autoCheckParent(node.parent as T);
     }
   }
 
@@ -110,6 +120,15 @@ export class TreeCheckboxModel<T extends TreeRowIf<any>> implements CheckboxMode
     return true;
   }
 
+
+  private uncheckRecursive(row: T): void {
+    row.checked = false;
+    if (row.children) {
+      for (const child of row.children) {
+        this.uncheckRecursive(child as T);
+      }
+    }
+  }
 
   private addSelectedRecursive(nodes: T[], ret: T[]) {
     for (const n of nodes) {

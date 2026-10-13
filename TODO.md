@@ -311,8 +311,9 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
 **Renderer & Editor**
 - [x] `NumberCellRenderer` und `PositiveAndNegativeNumberRenderer` zeigen 0 als leere Zelle; fehlendes Anführungszeichen
       `data-row-index=${rowIndex}"` (`positive-and-negative-number-renderer.ts`) – behoben (Branch `fix/crud`).
-- [ ] Ungültiges Datum: `RangeError` bricht den Render-Durchlauf ab, Tabelle bleibt leer (`date-to-iso-cell-renderer.ts:20`,
-      `date-to-tec-cell-renderer.ts:21`).
+- [x] Ungültiges Datum: `RangeError` brach den Render-Durchlauf ab, Tabelle blieb leer (`DateToIsoCellRenderer`,
+      `DateToTecCellRenderer`). Jetzt zeigen alle Datums-Renderer einen ungültigen Wert unverändert an (Branch
+      `fix/date-renderers`; `DateToLocaleDateCellRenderer` zeigte „Invalid Date“).
 - [x] **HTML-Injection in Renderern** (Branch `fix/crud`): neue Hilfsfunktion `escapeHtml()` (exportiert); Werte werden
       escaped in `InputCellRenderer` (Editor: `"` schnitt den Text ab, leere Zelle zeigte „undefined“),
       `SelectCellRenderer` (Optionen), `NumberCellRenderer`, `PositiveAndNegativeNumberRenderer`,
@@ -320,7 +321,8 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
       Die übrigen `innerHTML`-Renderer schreiben nur Zahlen/Konstanten.
 - [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Span-Modell wird nie neu aufgebaut: `setRows()` mit
       weniger Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
-- [ ] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 (`css/table-tree.css:42/46`).
+- [x] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 – jetzt 0 … 9 je 20 px (Branch
+      `fix/date-renderers`).
 
 **CRUD** (`crud/*`)
 - [x] Behoben (Branch `fix/crud`): **HTML-Injection** – View/Edit escapen Titel, Namen und Werte · Edit liest typgerecht
@@ -378,6 +380,9 @@ Objekt-Tabelle hat `ge-focused-row`.
   `ActionsCellRenderer` (`data-id`) zeigen Daten als **Text** – wer bisher bewusst HTML in Header-Gruppen-Labels oder
   Select-Optionen geschrieben hat, braucht einen eigenen Renderer. Neue Hilfsfunktion `escapeHtml()` für eigene Renderer.
   `NumberCellRenderer`/`PositiveAndNegativeNumberRenderer` zeigen 0 an (vorher leer).
+- **Datums-Renderer**: ein ungültiges Datum wird unverändert angezeigt (vorher leerte es bei `DateToIsoCellRenderer`/
+  `DateToTecCellRenderer` die ganze Tabelle, `DateToLocaleDateCellRenderer` zeigte „Invalid Date“). Baum: Einrückung
+  bis Tiefe 9 (Tiefe 5 war wie Tiefe 6 eingerückt).
 - **CRUD**: `deleteItem` sendet per Default `DELETE` (vorher GET); CLONE/CREATE senden das Objekt **ohne** id-Property;
   `updateItem`/`createItem` senden `Content-Type: application/json` (bei Cross-Origin-Servern ggf. CORS-Header erlauben);
   `{id}` in URLs wird URL-kodiert; die REST-Promises werden bei HTTP-Fehlerstatus und fehlender URL rejected, eine leere

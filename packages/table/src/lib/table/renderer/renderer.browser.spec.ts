@@ -165,15 +165,15 @@ describe('built-in cell renderers', () => {
       }
     });
 
-    // BUG: date-to-iso-cell-renderer.ts / date-to-tec-cell-renderer.ts call toISOString() without try/catch (unlike
-    // DateToIntlDDMMYYYYCellRenderer) – ONE invalid date throws a RangeError out of the render pass and the whole
-    // table stays empty.
-    it.fails('DateToIsoCellRenderer: an invalid date does not break the table', async () => {
-      await renderCell(new DateToIsoCellRenderer(), 'not a date');
-    });
-
-    it.fails('DateToTecCellRenderer: an invalid date does not break the table', async () => {
-      await renderCell(new DateToTecCellRenderer(), 'not a date');
+    // Regression: date-to-iso-cell-renderer.ts / date-to-tec-cell-renderer.ts called toISOString() without a check –
+    // ONE invalid date threw a RangeError out of the render pass and the whole table stayed empty.
+    it('an invalid date is shown as it is and does not break the table', async () => {
+      for (const renderer of [new DateToIsoCellRenderer(), new DateToTecCellRenderer(), new DateToLocaleDateCellRenderer()]) {
+        const { cell, host } = await renderCell(renderer, 'not a date');
+        expect(cell.textContent).toBe('not a date');
+        expect(getCellDiv(host, 'body', 'center', 0, 0).textContent).toBe('0'); // the rest of the row is rendered
+        destroyAllTables();
+      }
     });
   });
 

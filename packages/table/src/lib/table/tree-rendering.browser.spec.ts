@@ -79,14 +79,17 @@ describe('tree rendering', () => {
     expect(getCellDiv(host, 'body', 'center', 0, 1).classList).not.toContain('ge-table-col-tree');
   });
 
-  // BUG: css/table-tree.css declares ".ge-table-tree-deep-5" twice (116px and 136px) – the second one was meant
-  // for depth 6. Depth 5 is indented like depth 6 should be, depth 6+ is not indented any further.
-  it.fails('depth 5 is indented by 116 px', async () => {
-    let node: Node = { id: 5, name: 'L5' };
-    for (let deep = 4; deep >= 0; deep--) node = { id: deep, name: 'L' + deep, children: [node] };
+  // Regression: css/table-tree.css declared ".ge-table-tree-deep-5" twice (116px and 136px) – depth 5 was indented
+  // like depth 6, depth 6+ was not indented any further.
+  it('every depth up to 9 is indented by another 20 px', async () => {
+    let node: Node = { id: 9, name: 'L9' };
+    for (let deep = 8; deep >= 0; deep--) node = { id: deep, name: 'L' + deep, children: [node] };
     const { host } = await mountTree({ nodes: [node] });
-    expect(getCellDiv(host, 'body', 'center', 5, 0).classList).toContain('ge-table-tree-deep-5');
-    expect(getComputedStyle(getCellDiv(host, 'body', 'center', 5, 0)).paddingLeft).toBe('116px');
+    const paddings = [4, 5, 6, 7, 8, 9].map(r => {
+      expect(getCellDiv(host, 'body', 'center', r, 0).classList).toContain('ge-table-tree-deep-' + r);
+      return getComputedStyle(getCellDiv(host, 'body', 'center', r, 0)).paddingLeft;
+    });
+    expect(paddings).toEqual(['96px', '116px', '136px', '156px', '176px', '196px']);
   });
 });
 

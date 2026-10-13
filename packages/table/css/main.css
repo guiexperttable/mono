@@ -432,8 +432,20 @@ html[data-theme="dark"] {
   padding-left: 116px;
 }
 
-.ge-table-col-tree.ge-table-tree-deep-5 {
+.ge-table-col-tree.ge-table-tree-deep-6 {
   padding-left: 136px;
+}
+
+.ge-table-col-tree.ge-table-tree-deep-7 {
+  padding-left: 156px;
+}
+
+.ge-table-col-tree.ge-table-tree-deep-8 {
+  padding-left: 176px;
+}
+
+.ge-table-col-tree.ge-table-tree-deep-9 {
+  padding-left: 196px;
 }
 
 .ge-table-col-div.ge-table-col-tree.ge-table-tree-cell {

@@ -15,6 +15,7 @@
     "build:core": "pnpm --filter @guiexpert/table build",
     "test:core": "pnpm --filter @guiexpert/table test",
     "test:core:unit": "pnpm --filter @guiexpert/table test:unit",
+    "test:wrappers": "pnpm --filter \"./packages/*-table\" --workspace-concurrency=1 test",
     "build:libs": "pnpm --filter \"./packages/*\" build",
     "build:angular": "pnpm --filter \"./angular-builds/*\" build",
     "build:angular:ng14": "pnpm --filter angular-build-ng14 build",

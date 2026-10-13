@@ -160,9 +160,12 @@ ele.data = new TableModelAndOptions(generateSimpleModel(1000, 100), new TableOpt
 </div>
 ```
 
-Events are dispatched as bubbling `CustomEvent`s with the payload in `detail`: `tableReady`, `mouseClicked`,
-`mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`, `modelChanged`,
-`selectionChanged`, `focusChanged`, `scroll`.
+Events are dispatched on the element as bubbling `CustomEvent`s with the payload in `detail`: `tableReady`,
+`mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`, `modelChanged`,
+`selectionChanged`, `focusChanged`, `scroll` – and `contextmenu`, which does not bubble (a listener on the element also
+gets the browser's own `contextmenu` event: check `e instanceof CustomEvent`).
+Since 1.1.91: a new `el.data` re-creates the table; removing the element destroys the table, inserting it again
+re-creates it (`tableReady` again); data set before the element is in the document is shown when it is inserted.
 
 ### 4.3 React
 
@@ -249,6 +252,9 @@ function onMouseClicked(evt: GeMouseEvent) { console.info(evt.rowIndex, evt.colu
 </script>
 ```
 
+A new `tableModel` or `tableOptions` object re-creates the table (since 1.1.91; the old one is destroyed, `tableReady`
+fires again). Keep the model in a plain constant or a `shallowRef` – a deep `ref()` would wrap it in a reactive proxy.
+
 Alternatively register it globally with the default export plugin:
 `app.use(GuiexpertTablePlugin)` (`import GuiexpertTablePlugin from "@guiexpert/vue3-table"`).
 Props: `tableModel`, `tableOptions`, `debounceMouseClickDelay` (default 150 ms, `0` = every click immediately; since
@@ -316,13 +322,14 @@ import { TableOptions } from "@guiexpert/table";
 import { generateSimpleModel } from "@guiexpert/demo-table-models";
 
 const tableModel = generateSimpleModel(1000, 100);
+const tableOptions = new TableOptions();   // create once – a new object re-creates the table (since 1.1.91)
 
 export function SimpleTable() {
   return (
     <div class="table-div">
       <GuiexpertTable
         tableModel={tableModel}
-        tableOptions={new TableOptions()}
+        tableOptions={tableOptions}
         mouseClicked={(evt) => console.info(evt)} />
     </div>
   );
@@ -339,12 +346,15 @@ import { GuiexpertTable } from "@guiexpert/solid-table";
 import { TableOptions } from "@guiexpert/table";
 import { generateSimpleModel } from "@guiexpert/demo-table-models";
 
+const tableModel = generateSimpleModel(1000, 100);
+const tableOptions = new TableOptions();
+
 export function SimpleTable() {
   return (
     <div class="table-div">
       <GuiexpertTable
-        tableModel={generateSimpleModel(1000, 100)}
-        tableOptions={new TableOptions()}
+        tableModel={tableModel}
+        tableOptions={tableOptions}
         tableReady={(api) => console.info("ready", api)}
         mouseClicked={(evt) => console.info(evt)} />
     </div>

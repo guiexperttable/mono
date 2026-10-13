@@ -19,9 +19,21 @@
 - [x] **Angular-Wrapper** (`packages/angular-table/src`): reagiert nicht auf `ngOnChanges` (neues `tableModel` wird
       ignoriert). → `ngOnChanges` baut die Tabelle bei neuem `tableModel`/`tableOptions` neu auf, `ngOnDestroy`
       ruft `destroy()`. Geprüft mit ng22-Build (JIT-Testseite, Signal-Input, Modellwechsel, Klick-Zählung).
-- [ ] **Preact-, Vue-, Solid-, Web-Component-Wrapper**: übernehmen ein neues `tableModel` ebenfalls noch nicht
-      (Init nur beim Mounten). Jetzt einfach: alte Tabelle mit `TableScope.destroy()` freigeben, neu erzeugen –
-      Vorlage React (`useEffect`) bzw. Svelte (`$:`).
+- [x] **Preact-, Vue-, Solid-, Web-Component-Wrapper** übernehmen ein neues `tableModel`/`tableOptions` (Branch
+      `fix/wrapper-model-change`): alte Tabelle mit `destroy()` freigeben, neu erzeugen, `tableReady` erneut; Unmount =
+      `destroy()`. Dabei behoben: Preact rief `mouseMoved` nie auf und fror Callbacks beim Mounten ein; Vue teilte ein
+      `new TableOptions()` als Prop-Default zwischen allen Instanzen (Selektionsmodell „wanderte“); Web Component:
+      Daten vor dem Einhängen zeigten nur 1 Zeile, `data` ohne `tableOptions` warf, `contextmenu`-Event wurde vom Core
+      verschluckt, Entfernen/Wieder-Einfügen (auch mit neuen Daten in derselben Task). Smoke-Tests für alle Wrapper
+      (`pnpm test:wrappers`, CI-Job `test-wrappers`, Publish wartet darauf).
+- [ ] Wrapper – gefunden, nicht behoben: Solid: `contextmenu`-CustomEvent kommt nie an (auf dem Host-Div dispatcht, vom
+      Core als zweiter Rechtsklick < 50 ms mit `stopImmediatePropagation` geschluckt, `table-scope.ts:448`; `it.fails` in
+      `GuiexpertTable.browser.spec.tsx`) – Core-Fix: `MouseHandler.onContextmenu` ignoriert Nicht-`MouseEvent`s · Solid und
+      Web Component dispatchen ein bubbelndes `scroll`-CustomEvent (erreicht globale `scroll`-Listener) · Solid exportiert
+      `GuiexpertTableProps` als Namespace (`packages/solid-table/src/index.ts:3,9`) · Vue `inheritAttrs: false` verwirft
+      `class`/`style` am Element (`GuiexpertTable.vue:31`) · vue3-table-Build meldet TS-Fehler aus totem
+      `cypress/plugins/index.ts` (`tsconfig.lib.json` schließt `**/*.ts` ein); Jest-Reste (`jest.config.ts`,
+      `tsconfig.spec.json`) in react/preact/vue/solid.
 
 - [x] **Alle Wrapper + demo-table-models bündelten eine komplette Kopie des Cores** (~210 KB je Paket, obwohl
       `@guiexpert/table` Abhängigkeit ist) → Core + Framework im Vite-Build extern (React 215 KB → 2 KB).
@@ -173,7 +185,9 @@
       `test:unit`, `test:browser` mit Chromium, Coverage-Artefakt) – aufgerufen von `ci.yml` (Push/PR) und von
       `npm-publish.yml` (Job `publish` hat `needs: test` → rote Tests = kein Release).
 - [ ] GitHub → Settings → Branches → Regel für `main`: „Require status checks to pass“ mit
-      `test-core / Test @guiexpert/table` und `build` (nur im GitHub-UI möglich).
+      `test-core / Test @guiexpert/table`, `test-wrappers / Test framework wrappers` und `build` (nur im GitHub-UI).
+- [ ] Tests Phase 4 (Rest): Playwright-E2E gegen die Website-Showcases; Angular-Wrapper-Smoke-Test (ng22); weitere
+      Browser (Firefox/WebKit) als `instances`.
 - [ ] Später: Vite 7/8 (ändert das ausgelieferte Bundle; Vite 8 = Rolldown, `vite-plugin-babel` warnt) – erst mit
       ausreichend Browser-Tests. `ts-todo-demo` (Vite 6.2.6) und preact-/solid-Demo (Vite ^5) noch nicht angeglichen.
 
@@ -336,6 +350,11 @@ id, `deleteItem` per GET.
   (`isSelectable()` Default `true`).
 - **Pakete**: `exports` mit Typen für `import`; relative `.d.ts`-Importe mit `.js` (node16/nodenext); `vue3-table` ist
   ESM (`"type": "module"`).
+- **Wrapper**: Preact, Vue, Solid und Web Component bauen die Tabelle bei neuem `tableModel`/`tableOptions` neu auf
+  (Inline-`tableOptions={…}` erzeugt sie bei jedem Render neu – Options einmal erzeugen); Vue: `tableOptions`-Default je
+  Instanz; Preact: `mouseMoved` wird aufgerufen. Web Component: Events auf dem Element (`event.target`), `contextmenu`
+  nicht bubbling, Entfernen = `destroy()`, Wieder-Einfügen = Neuaufbau mit erneutem `tableReady`, `tableReady` eines noch
+  nicht eingehängten Elements erst beim Einhängen, `el.data = undefined` gibt die Tabelle frei.
 - **Kopieren**: Strg+A, Strg+C kopiert den sichtbaren Body (max. `CopyService.maxCopyCells` = 1.000.000 Zellen);
   `selectAll()` bei Typ `"none"` ohne Wirkung.
 

@@ -50,6 +50,7 @@ mono/
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
 | Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
+| Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`) |
 | Alle Bibliotheken | `pnpm build:libs` |
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
@@ -193,11 +194,11 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 | Paket | Komponente / Element | Inputs | Hinweise |
 |---|---|---|---|
 | react-table | `<GuiexpertTable tableModel tableOptions … />` | Callback-Props `mouseClicked`, `selectionChanged`, `tableReady`, `scroll`, `licenseKey` … | `useEffect([tableModel, tableOptions])` → neues Objekt = Neuaufbau (Modell/Options mit `useMemo` stabil halten), Container 100 % × 100 % |
-| vue3-table | `<GuiexpertTable :tableModel :tableOptions @tableReady @mouseClicked …>` | Events als Vue-Events | Default-Export = Plugin; `debounceMouseClickDelay` deklariert, aber wirkungslos |
-| preact-table | `GuiexpertTable` | Callback-Props analog React | |
+| vue3-table | `<GuiexpertTable :tableModel :tableOptions @tableReady @mouseClicked …>` | Events als Vue-Events | Default-Export = Plugin; `debounceMouseClickDelay` (Default 150 ms, `0` = sofort); `watch` auf Modell/Options → Neuaufbau; Modell als Konstante/`shallowRef` |
+| preact-table | `GuiexpertTable` | Callback-Props analog React | neues Modell/Options-Objekt = Neuaufbau (Options einmal erzeugen, nicht inline) |
 | svelte-table | `GuiexpertTable` | Svelte-Events (`on:tableReady`, `e.detail`) **und** Callback-Props `onTableReady`, `onMouseClicked` … (Runes-Modus) | Paket = Svelte-**Quellcode** (plain JS + `.d.ts`, Build `build.mjs`), läuft unter Svelte 4 und 5; neues Modell = Neuaufbau |
-| solid-table | `GuiexpertTable` | Props deklariert, aber **nicht aufgerufen** – Events kommen als DOM-`CustomEvent` (bubbling) | s. `TODO.md` |
-| webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` (`mouseClicked`, `tableReady` …) |
+| solid-table | `GuiexpertTable` | Callback-Props (zusätzlich DOM-`CustomEvent`s, bubbling) | `createEffect` auf Modell/Options → Neuaufbau; `contextmenu`-CustomEvent kommt nicht an (s. `TODO.md`) |
+| webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` auf dem Element (`contextmenu` nicht bubbling); Entfernen = `destroy()`, Wieder-Einfügen = Neuaufbau |
 | angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
@@ -270,6 +271,11 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
     `columnIndices`, `stylePx`, `createRows`, `destroyAllTables`.
+  - **Wrapper-Tests**: je Wrapper-Paket `vitest.config.ts` + `*.browser.spec.*` neben dem Code (Smoke: Mount →
+    `tableReady`, Zeilen, Klick-Event, Modellwechsel = Neuaufbau + `destroy()`, Unmount = `destroy()`); Core per Alias aus
+    `packages/table/src`; gemeinsame Helfer `packages/table/test-utils/wrapper-test-utils.ts` (ohne `vitest`-Import).
+    Svelte läuft zweimal: Svelte 5 (`@sveltejs/vite-plugin-svelte` 5) und Svelte 4 (devDependency `"svelte4":
+    "npm:svelte@^4.2.20"`, kleines Compile-Plugin in der Config). CI: `.github/workflows/test-wrappers.yml`.
   - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
     Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests

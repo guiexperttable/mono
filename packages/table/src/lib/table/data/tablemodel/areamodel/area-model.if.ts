@@ -697,8 +697,9 @@ export interface AreaModelIf {
 
   /**
    * Determines whether the cell at the specified row and column indices is selectable.
-   * If true, the user can select the cell.
-   * 
+   * If true, the user can select the cell: the table draws the selection only on selectable body cells.
+   * All built-in models and {@link AreaModel} return `true` (except the hidden and cover-grid models).
+   *
    * @param {number} rowIndex - The index of the row
    * @param {number} columnIndex - The index of the column
    * @returns {boolean} True if the cell is selectable, false otherwise

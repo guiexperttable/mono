@@ -29,16 +29,16 @@ const frameworks: Array<CompatibilityItem> = [
     icon: "frameworks/preact",
     url: "preact/",
   },
-  // {
-  //   title: "Svelte",
-  //   icon: "frameworks/svelte",
-  //   url: "svelte/",
-  // },
-  // {
-  //   title: "Solid",
-  //   icon: "frameworks/solid",
-  //   url: "solid/",
-  // },
+  {
+    title: "Svelte",
+    icon: "frameworks/svelte",
+    url: "svelte/",
+  },
+  {
+    title: "Solid",
+    icon: "frameworks/solid",
+    url: "/training/one-model-every-framework/",
+  },
   {
     title: "WebComponent",
     icon: "frameworks/lit",
@@ -50,9 +50,8 @@ const frameworks: Array<CompatibilityItem> = [
 
 <ContentSection title="Get started" id="getstarted">
   <Fragment slot="lead">
-    "GUI Expert Table" is written in TypeScript and works very well with plain JavaScript.
-    It is <span class="text-primary">framework-agnostic</span> and designed to seamlessly integrate with
-    the major frameworks:
+    One package, a model and a container with a height – in
+    <span class="text-primary">plain JavaScript</span> or the framework you already use:
   </Fragment>
   <CompatibilityList
     items={frameworks}
@@ -61,7 +60,8 @@ const frameworks: Array<CompatibilityItem> = [
   />
   <p class="max-w-xl text-center">
     New to the table? The <a class="text-primary" href="/training/">training</a> walks you through it in 34 short
-    chapters – with live demos, from the first table to two million rows.
+    chapters with live demos – from the first table to two million rows. The
+    <a class="text-primary" href="/doc/">documentation</a> explains the concepts behind it.
   </p>
   <p class="text-right text-sm">
     <a class="text-primary" href="/training/">Training: step by step &rarr;</a> &nbsp;

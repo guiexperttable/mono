@@ -22,7 +22,7 @@ const links: Array<FooterLink> = [
 ];
 ---
 
-<footer class="relative flex h-64 items-center justify-center">
+<footer class="relative flex h-64 flex-col items-center justify-center gap-6">
   <div class="absolute inset-0 overflow-hidden opacity-40">
     <HeroImage />
   </div>
@@ -41,4 +41,11 @@ const links: Array<FooterLink> = [
       ))
     }
   </ul>
+  <nav class="relative flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm" aria-label="Legal and more">
+    <a href="/imprint/">Imprint</a>
+    <a href="/license/">License</a>
+    <a href="/doc/">Documentation</a>
+    <a href="/posts/">Articles</a>
+    <span class="text-offset">© {new Date().getFullYear()} Dr. Marc Kronberg</span>
+  </nav>
 </footer>

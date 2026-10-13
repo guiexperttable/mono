@@ -1,36 +1,29 @@
 ---
 import IndexLayout from '../layouts/IndexLayout.astro';
+import Header from "../components/header.astro";
+import Hero from "../components/home/hero.astro";
+import Intro from "~/components/intro.astro";
 import Features from "~/components/features.astro";
 import Compatibility from "../components/getstarted.astro";
-import Footer from "~/components/footer.astro";
-import Intro from "~/components/intro.astro";
 import Showcase from "~/components/showcase.astro";
-import Posts from "~/components/posts.astro";
-// import Splash from "~/components/splash.astro";
-import Splash from "~/components/splash-text-and-table.astro";
-import Header from "../components/header.astro";
-import Imprint from "../components/imprint.astro";
-// import Cube from "../components/cube.astro";
-// import ProgressCircle from "../components/progress-circle.astro";
-
+import WhatsNew from "../components/home/whats-new.astro";
+import Footer from "~/components/footer.astro";
 ---
-<IndexLayout title="GUI Expert Welcome" >
+<IndexLayout
+  title="GuiExpert Table – fast data grid for Angular, React, Vue, Svelte and JavaScript"
+  description="A data grid for millions of rows: virtual scrolling in both directions, one TypeScript core without runtime dependencies, components for Angular, React, Vue, Svelte, Solid, Preact and Web Components. MIT licensed.">
 
-  <Header splashMode={true} />
-  <Splash />
+  <Header splashMode={false} smallGap={true} />
+  <Hero />
 
-  <div class="space-y-24 px-8 py-32" id="container">
-    <!--Cube /-->
-    <Intro />
+  <div class="space-y-24 px-8 py-24 max-sm:px-4" id="container">
     <Features />
+    <Intro />
     <Compatibility />
     <Showcase />
-    <Posts />
-    <Imprint />
+    <WhatsNew />
   </div>
 
   <Footer />
 
 </IndexLayout>
-
-<!--<ProgressCircle />-->

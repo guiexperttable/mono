@@ -39,7 +39,6 @@ export function mountTable(tableModel: TableModelIf, opts: MountOptions = {}): M
 
   const tableOptions: TableOptionsIf = { ...new TableOptions(), ...(opts.tableOptions ?? {}) };
   const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, opts.eventListener ?? new EventAdapter());
-  scope.firstInit();
   const api = scope.getApi();
 
   let destroyed = false;
@@ -52,7 +51,9 @@ export function mountTable(tableModel: TableModelIf, opts: MountOptions = {}): M
       host.remove();
     },
   };
+  // registered before the first render: if a renderer throws in firstInit(), destroyAllTables() still cleans up
   mounted.push(table);
+  scope.firstInit();
   return table;
 }
 

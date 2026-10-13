@@ -123,7 +123,8 @@ describe('onMouseClicked – GeMouseEvent', () => {
   });
 
   it('two quick clicks on the same cell: clickCount 1, then 2 – on different cells: 1 and 1', async () => {
-    const { host, clicked } = await mountMouseTable();
+    const { host, scope, clicked } = await mountMouseTable();
+    scope.mouseHandler.doubleClickDelay = 60_000; // deterministic, independent of the machine speed
     const cellA = getCellDiv(host, 'body', 'center', 1, 1);
     await userEvent.click(cellA);
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 1));
@@ -132,7 +133,8 @@ describe('onMouseClicked – GeMouseEvent', () => {
   });
 
   it('a double click on a body cell fires onMouseClicked three times', async () => {
-    const { host, clicked } = await mountMouseTable();
+    const { host, scope, clicked } = await mountMouseTable();
+    scope.mouseHandler.doubleClickDelay = 60_000;
     await userEvent.dblClick(getCellDiv(host, 'body', 'center', 4, 0));
     // NOTE: click (1) + click (2, same cell within doubleClickDelay) + dblclick (2) – the double click is reported twice.
     expect(clicked.map(e => e.clickCount)).toEqual([1, 2, 2]);
@@ -377,6 +379,26 @@ describe('column drag & drop (columnsDraggable)', () => {
     expect(host.querySelector('.ge-table-drop-zone')).toBeNull();
   });
 
+  it('the ghost column uses the renderers, classes and styles of the column', async () => {
+    const columnDefs = [
+      ColumnDef.create({
+        property: 'id', headerLabel: 'ID', width: px100, bodyClasses: ['my-id'],
+        bodyRenderer: { render: (cell, _r, _c, _a, _m, value) => { cell.textContent = `#${value}`; return undefined; } },
+      }),
+      ColumnDef.create({ property: 'name', width: px100 }),
+    ];
+    const { host } = await mountMouseTable({ columnDefs, rows: 5 });
+    const header0 = getCellDiv(host, 'header', 'center', 0, 0);
+    fireMouse(header0, 'mousedown');
+    fireMouse(header0, 'mousemove', { clientX: header0.getBoundingClientRect().left + 60 });
+    await nextFrame();
+    const ghostCells = Array.from(host.querySelectorAll<HTMLElement>('.ge-table-dragging-column [data-area="body"].ge-table-col-div'));
+    expect(ghostCells.map(c => c.textContent)).toEqual(['#0', '#1', '#2', '#3', '#4']);
+    expect(ghostCells.every(c => c.classList.contains('my-id'))).toBe(true);
+    fireMouse(header0, 'mouseup');
+    await nextFrame();
+  });
+
   // BUG: table-scope.ts:384/393 – the column is moved BEFORE the ghost is rendered with the START index; when the
   // first mouse move is already over another column (fast drag), the ghost shows the column that now sits at the
   // start index instead of the dragged one.
@@ -472,6 +494,9 @@ describe('context menu (onContextmenu)', () => {
 
   it('a right click reports the cell as GeMouseEvent', async () => {
     const { host, contextmenu } = await mountMouseTable();
+    // NOTE: table-scope.ts:438 initialises the 50 ms throttle with the creation time – a context menu within the
+    // first 50 ms after creating the table is swallowed. Let the clock run past it:
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1_000);
     let defaultPrevented: boolean | undefined;
     host.addEventListener('contextmenu', e => { defaultPrevented = e.defaultPrevented; });
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 1), { button: 'right' });
@@ -483,7 +508,7 @@ describe('context menu (onContextmenu)', () => {
 
   it('a second context menu within 50 ms is swallowed', async () => {
     const { host, contextmenu } = await mountMouseTable();
-    await new Promise(resolve => setTimeout(resolve, 60)); // lastContextmenu is initialised with the creation time
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1_000); // past the throttle of the creation time
     const cell = getCellDiv(host, 'body', 'center', 2, 1);
     fireMouse(cell, 'contextmenu');
     const second = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });

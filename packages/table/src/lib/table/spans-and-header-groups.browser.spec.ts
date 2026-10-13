@@ -44,12 +44,21 @@ class SpanBodyModel extends AreaModelObjectArrayWithColumndefs<Row> {
   }
 }
 
-function mountSpanTable(opts: { columns?: number; rows?: number; fixedLeft?: number } = {}) {
+/** Like SpanBodyModel, plus (4,7) rowspan 2 – column 7 is a fixed east column in the test below. */
+class EastSpanBodyModel extends SpanBodyModel {
+  override getRowspanAt(rowIndex: number, columnIndex: number): number {
+    return rowIndex === 4 && columnIndex === 7 ? 2 : super.getRowspanAt(rowIndex, columnIndex);
+  }
+}
+
+function mountSpanTable(opts: { columns?: number; rows?: number; fixedLeft?: number; fixedRight?: number; modelClass?: typeof SpanBodyModel } = {}) {
   const columnDefs = Array.from({ length: opts.columns ?? 8 }, (_, c) => ColumnDef.create({ property: 'c' + c, width: px100 }));
   const rows: Row[] = Array.from({ length: opts.rows ?? 100 },
     (_, r) => Object.fromEntries(columnDefs.map((cd, c) => [cd.property, `${r}/${c}`])));
-  const bodyAreaModel = new SpanBodyModel('body', rows, columnDefs, 34);
-  return mountTable(TableFactory.createTableModel({ bodyAreaModel, columnDefs, fixedLeftColumnCount: opts.fixedLeft ?? 0 }));
+  const bodyAreaModel = new (opts.modelClass ?? SpanBodyModel)('body', rows, columnDefs, 34);
+  return mountTable(TableFactory.createTableModel({
+    bodyAreaModel, columnDefs, fixedLeftColumnCount: opts.fixedLeft ?? 0, fixedRightColumnCount: opts.fixedRight ?? 0,
+  }));
 }
 
 /** All DOM elements of a cell (a cell may be drawn more than once). */
@@ -122,6 +131,16 @@ describe('col-/rowspan in the body (getColspanAt / getRowspanAt)', () => {
     expect(stylePx(big, 'height')).toBe(3 * 34);
     expect(cellDiv(host, 'body', 'center', 4, 0)).toBeNull();
     expect(columnIndices(renderedRows(host, 'west')[5])).toEqual([]);
+  });
+
+  it('a rowspan cell in a fixed east column is drawn in the east area', async () => {
+    const { host } = mountSpanTable({ fixedRight: 1, modelClass: EastSpanBodyModel });
+    await nextFrame();
+    const big = getCellDiv(host, 'body', 'east', 4, 7);
+    expect(stylePx(big, 'height')).toBe(2 * 34);
+    expect(stylePx(big, 'left')).toBe(0);
+    expect(stylePx(big, 'top')).toBe(4 * 34);
+    expect(columnIndices(renderedRows(host, 'east')[5])).toEqual([]);
   });
 
   // BUG: the ColAndRowspanModels are built once in the RenderScope constructor (render-scope.ts:146) and never

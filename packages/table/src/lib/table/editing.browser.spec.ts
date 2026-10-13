@@ -119,6 +119,17 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(editorInput(host)).toBeNull();
   });
 
+  it('updateCells() for the cell being edited re-renders the editor with the new value', async () => {
+    const { host, fm, api, scope } = await mountEditTable();
+    fm.setFocus(3, 1);
+    await userEvent.keyboard('{F2}');
+    await userEvent.keyboard('typed');
+    api.updateCells([{ area: 'body', rowIndex: 3, columnIndex: 1, value: 'From server', cssClasses: {} }]);
+    // NOTE: a live update of the edited cell replaces the editor – the typed text is gone, the editor stays open.
+    expect(scope.isEditing()).toBe(true);
+    expect(editorInput(host)!.value).toBe('From server');
+  });
+
   // BUG: no Escape handling at all (ShortcutService ignores keys in inputs, InputCellRenderer has no key handler) –
   // the editor stays open and the typed text is committed as soon as the input loses the focus.
   it.fails('Escape cancels the editing and keeps the old value', async () => {

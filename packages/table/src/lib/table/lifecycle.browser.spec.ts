@@ -177,7 +177,7 @@ describe('destroy()', () => {
     viewport.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('resize'));
     host.style.width = '600px';
-    await new Promise(resolve => setTimeout(resolve, 50)); // > resizeEventDebounceDelay
+    for (let i = 0; i < 3; i++) await nextFrame(); // ≈ 6 frames: resize observation + debounce (10 ms) are long over
     expect(adjustAfterScrolling).not.toHaveBeenCalled();
     expect(adjustContainers).not.toHaveBeenCalled();
     expect(recalc).not.toHaveBeenCalled();
@@ -222,17 +222,16 @@ describe('ResizeObserver (host size)', () => {
     expect(stylePx(host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!, 'height')).toBe(1000 - 34);
   });
 
-  it('several resizes within resizeEventDebounceDelay are handled once', async () => {
-    const { host, scope } = mountTable(objectModel(), { tableOptions: { resizeEventDebounceDelay: 100 } });
+  it('several resizes within resizeEventDebounceDelay are handled once (with the last size)', async () => {
+    const { host, scope } = mountTable(objectModel(), { tableOptions: { resizeEventDebounceDelay: 250 } });
     const recalc = vi.spyOn(scope, 'recalcColumnWidths');
     await vi.waitFor(() => expect(recalc).toHaveBeenCalledTimes(1)); // the initial observation
     recalc.mockClear();
-    for (const height of [550, 600, 650]) {
-      host.style.height = height + 'px';
+    for (const width of [700, 650, 600]) {
+      host.style.width = width + 'px';
       await nextFrame();
     }
-    await vi.waitFor(() => expect(recalc).toHaveBeenCalled());
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await vi.waitFor(() => expect(recalc).toHaveBeenLastCalledWith(600));
     expect(recalc).toHaveBeenCalledTimes(1);
   });
 });

@@ -241,7 +241,8 @@ describe('checkbox renderers', () => {
     listener.onCheckboxChanged = rows => changed.push(rows);
     const rows = createRows(10);
     const columnDefs = [new CheckboxColumnDef(), ColumnDef.create({ property: 'name', width: px100 })] as ColumnDefIf[];
-    const { host } = mountTable(TableFactory.createTableModel({ rows, columnDefs }), { eventListener: listener });
+    const { host, scope } = mountTable(TableFactory.createTableModel({ rows, columnDefs }), { eventListener: listener });
+    scope.mouseHandler.doubleClickDelay = 60_000; // "quick" independent of the machine speed
     await nextFrame();
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 0).querySelector('input')!);
     await userEvent.click(getCellDiv(host, 'body', 'center', 2, 0).querySelector('input')!);

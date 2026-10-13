@@ -9,7 +9,7 @@
     "directory": "packages/vue3-table"
   },
   "homepage": "https://gui.expert",
-  "type": "commonjs",
+  "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
   "lib": {
@@ -28,6 +28,7 @@
   },
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.js",
       "require": "./index.cjs"
     }

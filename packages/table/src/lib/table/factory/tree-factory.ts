@@ -27,7 +27,7 @@ export interface TreeFactoryOptions<T> {
   childrenProperty?: string;
   /** Expanded state of the rows. Default: true (everything open, as before). */
   expanded?: boolean | TreeRowExpandedFn<T>;
-  /** Maximum depth. Default: 12. */
+  /** Maximum depth of a row (0 = top level only); deeper children are skipped with a console warning. Default: 12. */
   deepMaxLimit?: number;
 }
 
@@ -59,7 +59,7 @@ export class TreeFactory {
    *
    * @param data - the top-level objects
    * @param childrenPropertyOrOptions - name of the children property (default "children") or {@link TreeFactoryOptions}
-   * @param deepMaxLimit - maximum depth (default 12; ignored when options are passed)
+   * @param deepMaxLimit - maximum depth of a row, 0 = top level only (default 12; ignored when options are passed)
    * @param expanded - expanded state of the rows (default true; ignored when options are passed)
    *
    * @example
@@ -87,6 +87,23 @@ export class TreeFactory {
   }
 
 
+  /**
+   * Appends the child rows of `data` (recursively) to `parent` – used by {@link buildTreeRows}.
+   * No row deeper than `deepMaxLimit` is created: the children of a row at depth `deepMaxLimit` are
+   * skipped with a console warning.
+   *
+   * @param data - the object whose children are added
+   * @param childrenProperty - name of the children property (default "children")
+   * @param parent - the tree row of `data` (default: a new, expanded top-level row)
+   * @param deep - depth of `parent` (0 = top level)
+   * @param deepMaxLimit - maximum depth of a created row (default 12)
+   * @param expanded - expanded state of the new rows (default true)
+   * @returns `parent`
+   *
+   * @example
+   * const root = TreeFactory.buildTreeRow<OrderNode>(nodes[0], "children");
+   * console.log(root.children?.length);
+   */
   static buildTreeRow<T>(
     data: T,
     childrenProperty: string = "children",
@@ -95,13 +112,14 @@ export class TreeFactory {
     deepMaxLimit: number = 12,
     expanded: boolean | TreeRowExpandedFn<T> = true): TreeRowIf<T> {
 
-    if (deep > deepMaxLimit) {
-      console.warn("Max deep limit reached: ", deep);
-      return parent;
-    }
     const isExpanded = TreeFactory.toExpandedFn<T>(expanded);
     // @ts-ignore
     const children: T[] | undefined = data[childrenProperty];
+    if (children?.length && deep >= deepMaxLimit) {
+      // the children would be deeper than the limit
+      console.warn("Max deep limit reached: ", deep);
+      return parent;
+    }
     if (children) {
       for (const r of children) {
         const tr = new TreeRow<T>(r, isExpanded(r, deep + 1), [], parent, deep + 1);

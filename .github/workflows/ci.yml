@@ -1,4 +1,4 @@
-# Build check for the whole mono repo (no publishing, no secrets).
+# Build check for the whole mono repo + tests of the core (no publishing, no secrets).
 name: CI
 
 on:
@@ -7,7 +7,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  # types, JSDoc examples, unit tests (Node), browser tests (Chromium) of @guiexpert/table – runs parallel to the build
+  test-core:
+    uses: ./.github/workflows/test-core.yml
+
   build:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,85 @@
+# Tests of the core package @guiexpert/table (Vitest 5, see CLAUDE.md §6):
+#   type check of the specs · JSDoc @example check · unit tests (Node) · browser tests (headless Chromium)
+#
+# Reusable workflow – called by
+#   - ci.yml           on every push to main and every pull request
+#   - npm-publish.yml  before publishing: a release is only published after green tests
+name: Test core
+
+on:
+  workflow_call:
+    inputs:
+      use-cache:
+        description: 'Use the pnpm store and Playwright browser caches (false for release builds – avoids cache poisoning)'
+        type: boolean
+        default: true
+      coverage:
+        description: 'Create a coverage report and upload it as artifact'
+        type: boolean
+        default: true
+
+jobs:
+  test-core:
+    name: Test @guiexpert/table
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ inputs.use-cache && 'pnpm' || '' }}
+          package-manager-cache: ${{ inputs.use-cache }}
+
+      # only the core package and its devDependencies – much faster than the whole workspace
+      - run: pnpm install --frozen-lockfile --filter @guiexpert/table
+
+      - name: Type check (specs + test-utils)
+        run: pnpm --filter @guiexpert/table test:types
+
+      - name: JSDoc examples compile (docs:check)
+        run: pnpm --filter @guiexpert/table docs:check
+
+      - name: Unit tests (Node)
+        run: pnpm --filter @guiexpert/table test:unit
+
+      - name: Cache Playwright browsers
+        if: inputs.use-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('packages/table/package.json') }}
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @guiexpert/table exec playwright install --with-deps chromium
+
+      - name: Browser tests (Chromium)
+        run: pnpm --filter @guiexpert/table test:browser
+
+      - name: Screenshots of failed browser tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-test-failures
+          path: packages/table/.vitest/
+          if-no-files-found: ignore
+
+      - name: Coverage (unit + browser)
+        if: inputs.coverage
+        run: pnpm --filter @guiexpert/table test:coverage
+
+      - name: Upload coverage report
+        if: inputs.coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-table
+          path: packages/table/coverage/
+          if-no-files-found: ignore

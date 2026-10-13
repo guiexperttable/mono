@@ -251,7 +251,10 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
   - Abdeckung (Okt. 2026): DOM-freie Teile (`data/`, `factory/`, `selection/`, `service/`, `action/` …) 92–100 %,
     Rendering (`RenderScope`/`TableScope`/`TableApi`/Renderer) erst ~38 % → Browser-Tests sind der nächste Schritt (`TODO.md`).
-  - CI führt die Tests noch **nicht** aus (`ci.yml` baut nur) – s. `TODO.md`.
+  - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
+    Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
+    `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
+    Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
   (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 26 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
@@ -280,9 +283,12 @@ Angular-Demo an lokale Builds koppeln, CI-Workflow für Angular).
 - `.github/workflows/npm-publish.yml`: bei **`release: published`** → veröffentlicht alle 9 Pakete (8 Libs + Angular
   14–22), soweit die Version noch nicht auf npm ist. Manuell: Standard **Dry-Run**, Eingabe `only` für einzelne Pakete.
   Ein GitHub-Release ist also ein echter npm-Release! Der Workflow läuft mit dem Stand des Release-Tags.
+  Vorher laufen die Core-Tests (`test-core.yml`, Job `test`) – nur wenn sie grün sind, startet der Job `publish`.
+  Der Test-Job bekommt kein `id-token`.
 - Trusted Publisher auf npmjs.com je Paket: `guiexperttable` / `mono` / `npm-publish.yml` (Dateiname nie ändern,
   sonst schlägt das Publish fehl).
-- `ci.yml`: Build-Check (Core, Libs, Angular 14–22) bei Push/PR, ohne Secrets.
+- `ci.yml`: Build-Check (Core, Libs, Angular 14–22) + Core-Tests (`test-core.yml`) bei Push/PR, ohne Secrets,
+  `permissions: contents: read`.
 
 ---
 

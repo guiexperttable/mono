@@ -161,8 +161,11 @@
       6.3.4 → 6.4.4 in allen Paketen (Builds byte-identisch). Siehe CLAUDE.md §6.
 - [ ] Tests Phase 2: Browser-Tests für `RenderScope`/`TableScope`/`TableApi`, Renderer, Maus/Tastatur, CRUD-Dialoge
       (heute ~38 % Zeilenabdeckung im Rendering-Teil, DOM-freie Teile 92–100 %).
-- [ ] Tests Phase 3: `ci.yml` um `test:types`, `test:unit`, `test:browser` (+ `playwright install --with-deps chromium`)
-      ergänzen; `npm-publish.yml` erst nach grünen Tests veröffentlichen lassen (Release = npm-Publish!).
+- [x] Tests Phase 3: wiederverwendbarer Workflow `.github/workflows/test-core.yml` (`test:types`, `docs:check`,
+      `test:unit`, `test:browser` mit Chromium, Coverage-Artefakt) – aufgerufen von `ci.yml` (Push/PR) und von
+      `npm-publish.yml` (Job `publish` hat `needs: test` → rote Tests = kein Release).
+- [ ] GitHub → Settings → Branches → Regel für `main`: „Require status checks to pass“ mit
+      `test-core / Test @guiexpert/table` und `build` (nur im GitHub-UI möglich).
 - [ ] Später: Vite 7/8 (ändert das ausgelieferte Bundle; Vite 8 = Rolldown, `vite-plugin-babel` warnt) – erst mit
       ausreichend Browser-Tests. `ts-todo-demo` (Vite 6.2.6) und preact-/solid-Demo (Vite ^5) noch nicht angeglichen.
 

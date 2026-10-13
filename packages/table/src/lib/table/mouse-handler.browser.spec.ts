@@ -362,7 +362,7 @@ describe('column drag & drop (columnsDraggable)', () => {
     expect(ghost.style.display).toBe('block');
     expect(stylePx(ghost, 'width')).toBe(100);
     expect(ghost.querySelector('[data-area="header"]')!.textContent).toBe('ID');
-    expect(ghost.querySelectorAll('[data-area="body"].ge-table-col-div').length).toBe(100); // every row of the column
+    expect(ghost.querySelector('[data-area="body"][data-row-index="0"]')!.textContent).toBe('0');
 
     fireMouse(getCellDiv(host, 'header', 'center', 0, 2), 'mousemove');
     await nextFrame();
@@ -377,6 +377,33 @@ describe('column drag & drop (columnsDraggable)', () => {
     await nextFrame();
     expect(ghost.style.display).toBe('none');
     expect(host.querySelector('.ge-table-drop-zone')).toBeNull();
+  });
+
+  // BUG: render-scope.ts:1433 renders EVERY body row of the column into the ghost (not only the visible ones) – a
+  // header drag in a table with millions of rows creates millions of divs and freezes the page.
+  it.fails('the ghost column renders only the visible rows', async () => {
+    const { host } = await mountMouseTable({ rows: 2_000 });
+    const header0 = getCellDiv(host, 'header', 'center', 0, 0);
+    fireMouse(header0, 'mousedown');
+    fireMouse(header0, 'mousemove', { clientX: header0.getBoundingClientRect().left + 60 });
+    await nextFrame();
+    const ghostCells = host.querySelectorAll('.ge-table-dragging-column [data-area="body"].ge-table-col-div').length;
+    fireMouse(header0, 'mouseup');
+    expect(ghostCells).toBeLessThanOrEqual(renderedRows(host).length);
+  });
+
+  // BUG: render-scope.ts:1385 sets the style 'overfllow' (typo) instead of overflow – the ghost (host height) is not
+  // clipped, its rows spill out below the table while dragging.
+  it.fails('the ghost column is clipped to the table height', async () => {
+    const { host } = await mountMouseTable();
+    const header0 = getCellDiv(host, 'header', 'center', 0, 0);
+    fireMouse(header0, 'mousedown');
+    fireMouse(header0, 'mousemove', { clientX: header0.getBoundingClientRect().left + 60 });
+    await nextFrame();
+    const ghost = host.querySelector<HTMLElement>('.ge-table-dragging-column')!;
+    const overflow = getComputedStyle(ghost).overflowY;
+    fireMouse(header0, 'mouseup');
+    expect(overflow).not.toBe('visible');
   });
 
   it('the ghost column uses the renderers, classes and styles of the column', async () => {

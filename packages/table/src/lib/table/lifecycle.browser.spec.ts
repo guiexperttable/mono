@@ -161,6 +161,24 @@ describe('scrollToIndex() (vertical)', () => {
   });
 });
 
+describe('virtual scrolling – DOM kept alive', () => {
+
+  // BUG: convenience-dom.service.ts getDivOrCreateDiv() caches every row div by row index (DivScope.cache) and never
+  // evicts – each row ever scrolled into view stays referenced as detached div WITH its cells. Scrolling through a
+  // table with millions of rows grows memory without bound (here: 100 positions → ~1,400 cached row subtrees).
+  it.fails('the row div cache does not grow with every row that was ever rendered', async () => {
+    const { api, scope } = mountTable(objectModel(createRows(100_000)));
+    await nextFrame();
+    for (let i = 0; i < 100; i++) {
+      api.scrollToIndex(0, i * 500);
+      scope.repaint(); // render now instead of waiting for the scroll event
+    }
+    const cache = (scope as unknown as { areaBodyCenter: { cache: Record<number, HTMLDivElement> } }).areaBodyCenter.cache;
+    const detached = Object.values(cache).filter(div => !div.isConnected);
+    expect(detached.length).toBeLessThan(100);
+  });
+});
+
 describe('destroy()', () => {
 
   it('empties the host and stops reacting to scroll, window resize and host resize', async () => {

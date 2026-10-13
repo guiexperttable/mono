@@ -21,6 +21,7 @@ import {
   NumberCellRenderer,
   PositiveAndNegativeNumberRenderer,
   ProgressBarCellRenderer,
+  Renderer,
   SimpleArrayCellRenderer,
   SimpleDomService,
   StarRatingCellRenderer,
@@ -198,6 +199,16 @@ describe('built-in cell renderers', () => {
   it('SimpleArrayCellRenderer: comma separated values', async () => {
     expect(label((await renderCell(new SimpleArrayCellRenderer(), ['a', 'b', 'c'])).cell)).toBe('a, b, c');
     expect((await renderCell(new SimpleArrayCellRenderer(), [])).cell.textContent).toBe('');
+  });
+
+  it('Renderer.bodyRenderer() builds a renderer map for the body only', async () => {
+    const columnDefs = [
+      new ColumnDef('id', 'Id', px100, undefined, Renderer.bodyRenderer(new TrueFalseCellRenderer())),
+    ];
+    const { host } = mountTable(TableFactory.createTableModel({ rows: [{ id: true }], columnDefs }));
+    await nextFrame();
+    expect(getCellDiv(host, 'body', 'center', 0, 0).textContent).toBe('✅');
+    expect(getCellDiv(host, 'header', 'center', 0, 0).textContent).toBe('Id');
   });
 
   it('the text of a value is set as text, not as HTML (default rendering without renderer)', async () => {

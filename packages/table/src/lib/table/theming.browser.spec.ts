@@ -127,6 +127,15 @@ describe('border options (TableOptions)', () => {
     expect(last.className).toBe('ge-table-body-center-vertical-border');
   });
 
+  it('the full-width line under the header uses the class of the west vertical border', async () => {
+    const { host } = await mountStyledTable({}, { fixedLeft: 0 });
+    const lines = Array.from(host.querySelectorAll<HTMLElement>(':scope > .ge-table-body-west-vertical-border'));
+    // NOTE: render-scope.ts:347 – the horizontal line between header and body (width = host width, height 1) is
+    // drawn with the class "ge-table-body-west-vertical-border" (copy & paste of the line above it).
+    expect(lines).toHaveLength(1);
+    expect([stylePx(lines[0], 'top'), stylePx(lines[0], 'width'), stylePx(lines[0], 'height')]).toEqual([34, 800, 1]);
+  });
+
   it('headerSeparatorBorderVisible / footerSeparatorBorderVisible', async () => {
     const shown = (await mountStyledTable()).host;
     const header = area(shown, ':scope > .ge-table-header-border');

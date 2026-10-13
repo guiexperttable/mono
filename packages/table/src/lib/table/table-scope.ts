@@ -749,19 +749,31 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /**
-   * Changes the focus cell using the specified deltas.
+   * Changes the focus cell using the specified deltas (keyboard navigation).
+   * The new focus stays inside the body (first/last row and column) and the focused row is scrolled into view.
+   * `onFocusChanged` is fired by the focus model itself (TableScope listens to it).
    *
    * @param {number} dx - The delta for the column index.
    * @param {number} dy - The delta for the row index.
-   * @return {boolean} - True if the focus cell was changed, false otherwise.
+   * @return {boolean} - True if the key was handled (a focus model exists and the table is not editing), false otherwise.
    */
   private changeFocusCell(dx: number, dy: number): boolean {
     if (!this.isEditing() && this.getFocusModel) {
       const fm = this.getFocusModel();
       if (fm) {
+        const rowCount = this.tableModel.getBodyModel().getRowCount();
+        const columnCount = this.tableModel.getColumnCount();
+        if (rowCount < 1 || columnCount < 1) {
+          return false;
+        }
         const [rowIdx, colIdx] = fm.getFocus();
-        fm.setFocus(rowIdx + dy, colIdx + dx);
-        this.repaint();
+        const newRowIdx = Math.min(Math.max(rowIdx + dy, 0), rowCount - 1);
+        const newColIdx = Math.min(Math.max(colIdx + dx, 0), columnCount - 1);
+        if (newRowIdx !== rowIdx || newColIdx !== colIdx) {
+          fm.setFocus(newRowIdx, newColIdx);
+          this.ensureRowIsVisible(newRowIdx);
+          this.repaint();
+        }
         return true;
       }
     }

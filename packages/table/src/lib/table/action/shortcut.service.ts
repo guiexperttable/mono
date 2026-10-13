@@ -4,7 +4,7 @@ import { ShortcutActionIdMapping } from "./shortcut-actionid-mapping.type";
 import { WindowsShortcutActionIdMapping } from "./windows-shortcut-actionId-mapping";
 import { OsxShortcutActionIdMapping } from "./osx-shortcut-actionId-mapping";
 import { OnActionTriggeredIf } from "./on-action-triggered.if";
-import { createHarmonizedShortcutByKeyboardEvent } from './shortcut-util';
+import { createHarmonizedShortcutByKeyboardEvent, harmonizeShortcut } from './shortcut-util';
 
 
 /**
@@ -123,8 +123,8 @@ export class ShortcutService {
       console.debug("ShortcutService shortcut  :",  shortcut);
     }
     for (const key in this.shortcutActionIdMapping) {
-      const k = createHarmonizedShortcutByKeyboardEvent(evt);
-      if (k === shortcut) {
+      // compare with the (harmonized) mapping key – "ctrl+c", "meta+c", "arrowup" … – not with the event itself
+      if (harmonizeShortcut(key) === shortcut) {
         if (this.isDebug()) {
           console.debug("ShortcutService action    :", this.shortcutActionIdMapping[key]);
         }

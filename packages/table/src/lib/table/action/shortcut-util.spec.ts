@@ -31,6 +31,11 @@ describe('harmonizeShortcut', () => {
     ['↩', 'enter'],
     ['escape', 'esc'],
     ['ctrl+*', 'ctrl multiply'],
+    ['arrowup', 'up'],
+    ['arrowdown', 'down'],
+    ['arrowleft', 'left'],
+    ['shift+arrowright', 'shift right'],
+    ['up', 'up'],
   ])('maps the alias "%s" to "%s"', (input, expected) => {
     expect(harmonizeShortcut(input)).toBe(expected);
   });

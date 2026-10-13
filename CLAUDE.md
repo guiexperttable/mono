@@ -147,6 +147,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
+  Mapping-Schlüssel werden mit `harmonizeShortcut` normalisiert („ctrl+c“, „meta+c“ = „cmd c“, „arrowup“ = „up“).
+  Editor öffnen: F2. Erst seit Okt. 2026 wirksam – vorher löste jede Taste `START_EDITING` aus (s. `TODO.md`).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
 - Persistenz: `tableOptions.autoRestoreOptions` (Scroll-Pos, Sortierung, Collapsed/Expanded; `getStorageKeyFn`).

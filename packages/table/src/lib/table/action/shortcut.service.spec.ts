@@ -10,7 +10,7 @@ import {
   WindowsShortcutActionIdMapping,
 } from '@guiexpert/table';
 import type { ActionId, OnActionTriggeredIf, ShortcutActionIdMapping, TableScope } from '@guiexpert/table';
-import { keyEvent, type KeyEventInit } from '../../../../test-utils/key-event';
+import { KEY_EVENTS_BY_MAPPING_KEY, keyEvent, type KeyEventInit } from '../../../../test-utils/key-event';
 
 type KeyHandler = (evt: KeyboardEvent) => void;
 
@@ -201,7 +201,7 @@ describe('ShortcutService', () => {
       debug.mockClear();
       fake.keydown()!(keydownEvent({ key: 'c', code: 'KeyC', ctrlKey: true }));
       expect(debug).toHaveBeenCalledWith('ShortcutService shortcut  :', 'ctrl c');
-      expect(debug).toHaveBeenCalledWith('ShortcutService emit      :', expect.any(String));
+      expect(debug).toHaveBeenCalledWith('ShortcutService emit      :', 'COPY_2_CLIPBOARD');
     });
 
     it.each(['INPUT', 'SELECT', 'TEXTAREA'])('ignores keys typed into an %s (cell editor)', (tagName) => {
@@ -220,17 +220,16 @@ describe('ShortcutService', () => {
       expect(fake.onActionTriggered).not.toHaveBeenCalled();
     });
 
-    // BUG: findEntity compares the event's shortcut with itself instead of with the mapping key
-    // (`createHarmonizedShortcutByKeyboardEvent(evt)` twice) → every key triggers the FIRST mapping entry (START_EDITING).
-    it.fails('Ctrl+C triggers COPY_2_CLIPBOARD (Windows)', () => {
+    // Regression: findEntity compared the event's shortcut with itself instead of with the mapping key
+    // → every key triggered the FIRST mapping entry (START_EDITING).
+    it('Ctrl+C triggers COPY_2_CLIPBOARD (Windows)', () => {
       const fake = fakeScope();
       new ShortcutService(fake.scope);
       fake.keydown()!(keydownEvent({ key: 'c', code: 'KeyC', ctrlKey: true }));
       expect(fake.onActionTriggered).toHaveBeenCalledWith('COPY_2_CLIPBOARD');
     });
 
-    // BUG: same root cause as above.
-    it.fails('Cmd+A triggers SELECT_ALL (Mac)', () => {
+    it('Cmd+A triggers SELECT_ALL (Mac)', () => {
       stubPlatform('MacIntel');
       const fake = fakeScope();
       new ShortcutService(fake.scope);
@@ -238,20 +237,57 @@ describe('ShortcutService', () => {
       expect(fake.onActionTriggered).toHaveBeenCalledWith('SELECT_ALL');
     });
 
-    // BUG: same root cause – a key without any shortcut must not trigger an action.
-    it.fails('a key without shortcut (plain "x") triggers no action', () => {
+    it('a key without shortcut (plain "x") triggers no action and is not prevented', () => {
       const fake = fakeScope();
       new ShortcutService(fake.scope);
-      fake.keydown()!(keydownEvent({ key: 'x', code: 'KeyX' }));
+      const evt = keydownEvent({ key: 'x', code: 'KeyX' });
+      fake.keydown()!(evt);
       expect(fake.onActionTriggered).not.toHaveBeenCalled();
+      expect(evt.preventDefault).not.toHaveBeenCalled();
     });
 
-    // BUG: same root cause – an own shortcut from tableOptions is never found.
-    it.fails('an own shortcut from tableOptions.shortcutActionIdMapping triggers its action', () => {
+    it('Tab triggers no action and is not prevented (focus can leave the table)', () => {
+      const fake = fakeScope();
+      new ShortcutService(fake.scope);
+      const evt = keydownEvent({ key: 'Tab', code: 'Tab' });
+      fake.keydown()!(evt);
+      expect(fake.onActionTriggered).not.toHaveBeenCalled();
+      expect(evt.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('an own shortcut from tableOptions.shortcutActionIdMapping triggers its action', () => {
       const fake = fakeScope({ shortcutActionIdMapping: { 'f9': 'COPY_2_CLIPBOARD' } });
       new ShortcutService(fake.scope);
       fake.keydown()!(keydownEvent({ key: 'F9', code: 'F9' }));
       expect(fake.onActionTriggered).toHaveBeenCalledWith('COPY_2_CLIPBOARD');
+    });
+  });
+  describe('built-in shortcuts – every mapping entry triggers exactly its action', () => {
+    const cases: Array<[string, string, Record<string, ActionId>]> = [
+      ['Win32', 'Windows', new WindowsShortcutActionIdMapping().get()],
+      ['MacIntel', 'Mac', new OsxShortcutActionIdMapping().get()],
+    ];
+    for (const [platform, label, mapping] of cases) {
+      for (const [key, actionId] of Object.entries(mapping)) {
+        it(`${label}: "${key}" → ${actionId}`, () => {
+          stubPlatform(platform);
+          const init = KEY_EVENTS_BY_MAPPING_KEY[key];
+          expect(init, `no key event known for "${key}"`).toBeDefined();
+          const fake = fakeScope();
+          new ShortcutService(fake.scope);
+          fake.keydown()!(keydownEvent(init!));
+          expect(fake.onActionTriggered).toHaveBeenCalledTimes(1);
+          expect(fake.onActionTriggered).toHaveBeenCalledWith(actionId);
+        });
+      }
+    }
+
+    it('an own mapping may use "arrowup" or "up" for the arrow keys', () => {
+      const fake = fakeScope({ shortcutActionIdMapping: { 'shift+arrowup': 'SELECT_ALL', 'shift+down': 'DESELECT_ALL' } });
+      new ShortcutService(fake.scope);
+      fake.keydown()!(keydownEvent({ key: 'ArrowUp', code: 'ArrowUp', shiftKey: true }));
+      fake.keydown()!(keydownEvent({ key: 'ArrowDown', code: 'ArrowDown', shiftKey: true }));
+      expect(fake.onActionTriggered.mock.calls).toEqual([['SELECT_ALL'], ['DESELECT_ALL']]);
     });
   });
 });

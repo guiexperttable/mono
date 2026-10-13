@@ -220,6 +220,9 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 - TypeScript, strikt objektorientiert; Interfaces in eigenen Dateien mit Suffix **`.if.ts`** (`TableModelIf`, `AreaModelIf`).
 - Event-Typen mit Präfix `Ge…`; CSS-Klassen/Variablen mit Präfix `ge-table-`.
 - **Keine Runtime-Abhängigkeiten im Core.** Neue Features ohne Fremd-Libs umsetzen.
+- **Daten nie unescaped in `innerHTML`** (Zellwerte, Labels, ids, Server-Daten): `escapeHtml()` (`common/escape-html.ts`,
+  auch für Attribute in `"…"`) oder Text-APIs (`domService.createText`, `textContent`). Browser-Test mit
+  `<img src="x" onerror=…>` als Wert (Muster: `renderer/renderer.browser.spec.ts` „HTML injection“).
 - `instanceof` über Paketgrenzen vermeiden → `instanceof-workaround.ts` (`isAreaModelTree`, `isTreeRow`) nutzen/erweitern.
 - Jede neue öffentliche Datei in `packages/table/src/index.ts` exportieren (sonst fehlt sie im npm-Paket und in typedoc).
 - Umfangreiche JSDoc mit `@example` ist Standard (wird zu https://gui.expert/api).
@@ -235,7 +238,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 270 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 275 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -246,8 +249,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.440 Tests) |
-  | `test:browser` | echtes Chromium, ~290 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.450 Tests) |
+  | `test:browser` | echtes Chromium, ~315 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt

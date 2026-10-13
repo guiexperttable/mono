@@ -234,7 +234,8 @@ export class TableApi {
    *
    * @example
    * // Scroll only vertically, keeping the current horizontal position
-   * tableApi.scrollToPixel(undefined, 300);
+   * // (an omitted or undefined px means 0; for rows use scrollToIndex(-1, rowIndex))
+   * tableApi.scrollToPixel(tableApi.getTableScope().scrollViewport.scrollLeft, 300);
    *
    * @example
    * // Example in a component that needs precise scrolling control
@@ -272,20 +273,28 @@ export class TableApi {
   /**
    * Scrolls the table to display the specified row and column indices at the top-left corner of the viewport.
    *
-   * This method allows programmatic scrolling to a specific position in the table grid based on row and column indices.
-   * It uses the underlying TableScope's scrolling mechanism to navigate to the target location.
+   * The row becomes the first row of the body, the column the first column of the scrollable (center) part –
+   * as far as the scroll range allows: the last columns and rows cannot move further than to the right/bottom edge.
    *
-   * @param {number} indexX - The horizontal index (column) to scroll to. Defaults to 0 (leftmost column).
+   * Fixed columns (`fixedLeftColumnCount` / `fixedRightColumnCount`) are always visible: a column index of a fixed
+   * column – and `-1` or any other index outside the columns – keeps the current horizontal position.
+   *
+   * @param {number} indexX - The column index (model index, fixed columns included) to scroll to.
+   *   Defaults to 0 (first column). `-1` keeps the horizontal position.
    * @param {number} indexY - The vertical index (row) to scroll to. Defaults to 0 (topmost row).
    * @returns {void}
    *
    * @example
    * // Scroll to the 5th row, keeping the current horizontal scroll position
-   * tableApi.scrollToIndex(0, 5);
+   * tableApi.scrollToIndex(-1, 5);
    *
    * @example
    * // Scroll to column 3, row 10
    * tableApi.scrollToIndex(3, 10);
+   *
+   * @example
+   * // Scroll to column 3, keeping the rows that are currently shown
+   * tableApi.scrollToIndex(3, tableApi.getFirstVisibleRowIndex());
    *
    * @see {@link scrollToPixel} - For scrolling to specific pixel coordinates
    * @see {@link ensureRowIsVisible} - For scrolling to make a specific row visible

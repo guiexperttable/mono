@@ -248,6 +248,23 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] `ColumnDef`-Felder erben die Doku von `ColumnDefIf` nicht (typedoc) – ggf. `@inheritDoc`.
 - [ ] Demo-Repo `krocon/guiexpert-table-step-by-step-demo`: Tags `ep-001` … `ep-034` pushen (die Schulung verlinkt sie).
 
+## Gefunden beim Bau der Startseite (Okt. 2026)
+
+- [ ] `TableApi.scrollToIndex(indexX, indexY)` ignoriert `indexX`: `TableScope.scrollToIndex` ruft immer
+      `scrollToPixel(0, py)` auf (`// TODO calc indexX -> px`) und setzt die horizontale Position damit auf 0 zurück.
+      Die API-Doku verspricht eine Spalte (`@param indexX`, Beispiel `scrollToIndex(3, 10)`). Behelf auf der Startseite:
+      `scrollToPixel(x, getFirstVisibleRowIndex() * rowHeight)`. → x aus den Spaltenbreiten berechnen (fixierte Spalten
+      in west/east brauchen keinen horizontalen Scroll).
+- [ ] Zellen eines eigenen `AreaModel` sind nicht auswählbar: `AreaModel.isSelectable()` gibt `false` zurück
+      (`AbstractAreaModel` und damit alle Factory-Modelle: `true`). Mit `SelectionModel("range")` ist beim Ziehen nichts zu
+      sehen, obwohl `getSelectionModel().getRanges()` den Bereich enthält. Die Doku von `AreaModelIf.isSelectable` sagt
+      dagegen „All cells are selectable by default“. → Default `true` für den Body? Sonst in Kapitel 17 und 22 erwähnen.
+- [ ] Typen bei `skipLibCheck: false`: `vue-tsc` meldet in `@guiexpert/vue3-table@3.1.90` TS7016 („Could not find a
+      declaration file for module '@guiexpert/table' … index.cjs implicitly has an 'any' type“). Ursache: die `exports` von
+      `@guiexpert/table` haben keine `types`-Bedingung, und `vue3-table` ist `"type": "commonjs"` → seine `.d.ts` lösen
+      über `require` auf `index.cjs` auf, für die es keine Typen gibt. Mit `skipLibCheck: true` (Vite-Vorlagen) unsichtbar.
+      → in allen Paketen `"exports": { ".": { "types": "./index.d.ts", "import": …, "require": … } }`; Wrapper als ESM.
+
 ## Erledigt beim Aufsetzen (Okt. 2026)
 
 - [x] Ein gemeinsamer Angular-Quellcode für Angular 14–22 (`packages/angular-table` + `angular-builds/ngNN`);

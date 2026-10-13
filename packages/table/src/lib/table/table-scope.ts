@@ -519,6 +519,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.debounce(this.repaint.bind(this), 1);
   }
 
+  /**
+   * Cancels a repaint scheduled by {@link debounceRepaint}.
+   *
+   * @returns true if a repaint was pending
+   */
+  cancelPendingRepaint(): boolean {
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+      return true;
+    }
+    return false;
+  }
+
   publishGeMouseEvent(evt: GeMouseEvent) {
     this.eventListener.onMouseClicked?.(evt);
   }

@@ -106,7 +106,7 @@ export class RenderScope extends EleScope {
   /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
   protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
 
-  private debounceTimeout?: ReturnType<typeof setTimeout> | null;
+  protected debounceTimeout?: ReturnType<typeof setTimeout> | null;
   private editorRenderer?: CellRendererIf;
   private editorRendererColumn?: number;
   private editorRendererRow?: number;
@@ -1354,7 +1354,10 @@ export class RenderScope extends EleScope {
     if (this.debounceTimeout) {
       clearTimeout(this.debounceTimeout);
     }
-    this.debounceTimeout = setTimeout(fn.bind(this), delay);
+    this.debounceTimeout = setTimeout(() => {
+      this.debounceTimeout = null;
+      fn.call(this);
+    }, delay);
   }
 
 

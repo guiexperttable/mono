@@ -30,6 +30,7 @@ export class MouseHandler {
   private expandedAll = true;
   private lastClickedCellKey = '';
   private mouseDown = false;
+  private repaintAfterMouseUp = false;
   private dragging = false;
 
   constructor(
@@ -272,6 +273,11 @@ export class MouseHandler {
 
 
   private onMouseDown(evt: MouseEvent) {
+    // A click repaint must not happen between mousedown and mouseup/click/dblclick: it would replace the pressed cell
+    // element, and the browser would not see a click (or double click) on it. Hold it back until mouseup.
+    if (this.tableScope.cancelPendingRepaint()) {
+      this.repaintAfterMouseUp = true;
+    }
 
     if (!this.dragging) {
       this.mouseEvent = evt;
@@ -298,6 +304,11 @@ export class MouseHandler {
 
   private onMouseUp(evt: MouseEvent) {
     this.mouseEvent = evt;
+    if (this.repaintAfterMouseUp) {
+      // deferred: "click" and "dblclick" of this mouseup are dispatched first
+      this.repaintAfterMouseUp = false;
+      this.tableScope.debounceRepaint();
+    }
     if (this.dragging) {
       requestAnimationFrame(this.mouseDraggingEndOnFrame.bind(this));
     }

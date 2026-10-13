@@ -250,3 +250,21 @@ describe('click repaint and defaults', () => {
     await expect(createContent.mock.results[0]!.value).resolves.toBe('');
   });
 });
+
+// A repaint between mousedown and mouseup replaces the pressed cell element – the browser then sees no click / no
+// double click on it (flaky double-click sorting/editing under load). The click repaint waits for the mouseup.
+describe('click repaint and mouse button', () => {
+  it('a pending click repaint is held back while the button is down and runs after mouseup', async () => {
+    const { host, scope, fm } = await mountSelectionTable('range', 'multi');
+    const repaint = vi.spyOn(scope, 'repaint');
+    const target = cell(host, 3, 1);
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));   // schedules the repaint (1 ms)
+    expect(fm.getFocus()).toEqual([3, 1]);
+    target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, detail: 2 })); // 2nd click starts at once
+    await new Promise(resolve => setTimeout(resolve, 30));
+    expect(repaint).not.toHaveBeenCalled();
+    expect(target.isConnected).toBe(true);
+    target.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, detail: 2 }));
+    await vi.waitFor(() => expect(repaint).toHaveBeenCalled());
+  });
+});

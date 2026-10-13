@@ -4,6 +4,7 @@ import type { ExtendedSelectionType, SelectionMode, TableScope } from '@guiexper
 
 /**
  * SelectionService only needs a few members of TableScope – a hand-written fake keeps the test DOM-free.
+ * Like TableScope, the fake listens to the focus model (that is how onFocusChanged reaches the user).
  */
 function setup(type: ExtendedSelectionType = 'range', mode: SelectionMode = 'multi') {
   const sm = new SelectionModel(type, mode);
@@ -15,6 +16,7 @@ function setup(type: ExtendedSelectionType = 'range', mode: SelectionMode = 'mul
     onSelectionChanged: vi.fn(),
     repaint: vi.fn(),
   };
+  fm.addEventFocusChangedListener(scope);
   const service = new SelectionService(scope as unknown as TableScope);
   return { sm, fm, scope, service };
 }
@@ -50,9 +52,19 @@ describe('SelectionService', () => {
       expect(scope.onFocusChanged).toHaveBeenCalledWith(fm);
     });
 
+    // Regression: setFocus() already fires via the focus model listener, the service called onFocusChanged again.
+    it('reports a focus change exactly once per click', () => {
+      const { scope, service } = setup();
+      service.onMouseClicked(mouse(2, 3), undefined);
+      expect(scope.onFocusChanged).toHaveBeenCalledTimes(1);
+      service.onMouseClicked(mouse(4, 1, { ctrlKey: true }), undefined);
+      expect(scope.onFocusChanged).toHaveBeenCalledTimes(2);
+    });
+
     it('does not report a focus change when the cell already has the focus', () => {
       const { fm, scope, service } = setup();
       fm.setFocus(2, 3);
+      scope.onFocusChanged.mockClear();
       service.onMouseClicked(mouse(2, 3), undefined);
       expect(scope.onFocusChanged).not.toHaveBeenCalled();
     });
@@ -124,9 +136,9 @@ describe('SelectionService', () => {
       expect(sm.getRanges()).toEqual([CellRange.singleCell(2, 2)]);
     });
 
-    // BUG: every click without shift clears the selection first, so ctrl/meta-click can never add to an existing
-    // selection (and ctrl+alt-click "remove this cell" always works on an empty selection).
-    it.fails('ctrl-click adds the cell to the existing selection', () => {
+    // Regression: every click without shift cleared the selection first, so ctrl/meta-click could never add to an
+    // existing selection (and ctrl+alt-click "remove this cell" always worked on an empty selection).
+    it('ctrl-click adds the cell to the existing selection', () => {
       const { sm, service } = setup('range', 'multi');
       sm.addSelection(CellRange.singleCell(0, 0));
       service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
@@ -134,10 +146,82 @@ describe('SelectionService', () => {
       expect(sm.isSelected(2, 2)).toBe(true);
     });
 
+    it('ctrl-clicks on several cells select all of them', () => {
+      const { sm, service } = setup('cell', 'multi');
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
+      service.onMouseClicked(mouse(3, 0, { metaKey: true }), undefined);
+      service.onMouseClicked(mouse(5, 2, { ctrlKey: true }), undefined);
+      expect([sm.isSelected(1, 1), sm.isSelected(3, 0), sm.isSelected(5, 2)]).toEqual([true, true, true]);
+    });
+
+    it('ctrl-click on a selected cell deselects it and keeps the rest', () => {
+      const { sm, service } = setup('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 2));
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(false);
+      expect(sm.isSelected(0, 0)).toBe(true);
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(true);
+    });
+
     it('ctrl+alt-click records the clicked cell as removed', () => {
       const { sm, service } = setup('range');
       service.onMouseClicked(mouse(2, 2, { ctrlKey: true, altKey: true }), undefined);
       expect(sm.isInNegativeRange(2, 2)).toBe(true);
+    });
+
+    it('ctrl+alt-click removes the clicked cell from the existing selection', () => {
+      const { sm, service } = setup('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 2));
+      service.onMouseClicked(mouse(1, 1, { metaKey: true, altKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(false);
+      expect(sm.isSelected(2, 2)).toBe(true);
+      // never adds: a second ctrl+alt-click keeps it removed
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true, altKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(false);
+    });
+
+    it('ctrl-click adds and removes whole rows for selection type "row"', () => {
+      const { sm, service } = setup('row', 'multi');
+      service.onMouseClicked(mouse(1, 0), undefined);
+      service.onMouseClicked(mouse(4, 2, { ctrlKey: true }), undefined);
+      expect(sm.getMergedRowIndices()).toEqual([1, 4]);
+      service.onMouseClicked(mouse(1, 2, { ctrlKey: true }), undefined);
+      expect(sm.getMergedRowIndices()).toEqual([4]);
+    });
+
+    it('single mode: ctrl-click replaces the selection with the clicked cell (the model keeps one range)', () => {
+      const { sm, service } = setup('cell', 'single');
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
+      service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(false);
+      expect(sm.isSelected(2, 2)).toBe(true);
+      service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
+      expect(sm.isSelected(2, 2)).toBe(false);
+    });
+
+    it('a plain click after ctrl-clicks starts a new selection', () => {
+      const { sm, service } = setup('cell', 'multi');
+      service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
+      service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
+      service.onMouseClicked(mouse(3, 3), undefined);
+      expect(sm.hasSelection()).toBe(false);
+    });
+
+    it('a ctrl-click is the anchor of the next shift-click', () => {
+      const { sm, service } = setup('range', 'multi');
+      service.onMouseClicked(mouse(0, 0), undefined);
+      service.onMouseClicked(mouse(5, 5, { ctrlKey: true }), undefined);
+      service.onMouseClicked(mouse(6, 7, { shiftKey: true }), undefined);
+      expect(sm.getRanges()).toContainEqual(new CellRange(5, 5, 6, 7));
+      expect(sm.isSelected(5, 5)).toBe(true);
+    });
+
+    it('shift-click without anchor keeps the selection (like before)', () => {
+      const { sm, service } = setup('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 1, 1));
+      service.onMouseClicked(mouse(4, 4, { shiftKey: true }), undefined);
+      expect(sm.isSelected(1, 1)).toBe(true);
     });
   });
 
@@ -148,6 +232,7 @@ describe('SelectionService', () => {
       expect(changed).toBe(true);
       expect(sm.getRanges()).toEqual([new CellRange(1, 1, 3, 4)]);
       expect(fm.getFocus()).toEqual([3, 4]); // the anchor (drag start) gets the focus
+      expect(scope.onFocusChanged).toHaveBeenCalledTimes(1);
       expect(scope.onFocusChanged).toHaveBeenCalledWith(fm);
       expect(scope.onSelectionChanged).toHaveBeenCalledWith(sm);
     });

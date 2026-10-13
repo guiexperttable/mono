@@ -52,8 +52,7 @@ export class SelectionService implements OnActionTriggeredIf {
     sm.addSelection(this.createRangeByEvents(evt, startEvt));
     const fm = this.getFocusModel?.();
     if (fm && !fm.hasFocus(startEvt.rowIndex, startEvt.columnIndex)) {
-      fm.setFocus(startEvt.rowIndex, startEvt.columnIndex);
-      this.tableScope.onFocusChanged(fm);
+      fm.setFocus(startEvt.rowIndex, startEvt.columnIndex); // fires onFocusChanged (TableScope listens to the model)
     }
     this.previousEvt = startEvt.clone();
     this.ignoreNextClick = evt.rowIndex !== startEvt.rowIndex || evt.columnIndex !== startEvt.columnIndex;
@@ -61,6 +60,22 @@ export class SelectionService implements OnActionTriggeredIf {
     return true;
   }
 
+  /**
+   * Moves the focus to the clicked cell and changes the selection:
+   *
+   * - click: a new selection – the old one is cleared; type `"row"`/`"column"` selects the clicked row/column.
+   * - Shift+click: adds the range from the previous click (the anchor) to this cell; the anchor is used up.
+   * - ⌘/Ctrl+click: toggles the clicked cell (row/column for those types) and keeps the rest of the selection.
+   *   In mode `"single"` the model keeps one range only, so a newly selected cell replaces the selection.
+   * - ⌘/Ctrl+Alt+click: removes the clicked cell from the selection.
+   *
+   * Every click without Shift becomes the anchor of the next Shift+click.
+   * `onFocusChanged` is fired by the focus model itself (TableScope listens to it) – once per focus change.
+   *
+   * @param {GeMouseEvent} evt - the click
+   * @param {GeMouseEvent | undefined} _previousEvt - not used (the service keeps its own anchor)
+   * @returns {boolean} true if focus or selection may have changed (repaint needed)
+   */
   onMouseClicked(evt: GeMouseEvent, _previousEvt: GeMouseEvent | undefined): boolean {
     if (this.ignoreNextClick) {
       this.ignoreNextClick = false;
@@ -74,42 +89,36 @@ export class SelectionService implements OnActionTriggeredIf {
       const fm = this.getFocusModel();
       if (sm && fm) {
 
-        // Focus:
+        // Focus (the model fires onFocusChanged):
         if (!fm.hasFocus(evt.rowIndex, evt.columnIndex)) {
           fm.setFocus(evt.rowIndex, evt.columnIndex);
-          this.tableScope.onFocusChanged(fm);
           dirty = true;
         }
 
         // Selection:
-        if (!evt.originalEvent?.shiftKey) {
-          if (sm.hasSelection()) {
-            sm.clear();
-            dirty = true;
-          }
-        }
-        if (evt.originalEvent?.shiftKey && this.previousEvt) {
+        const shiftKey = !!evt.originalEvent?.shiftKey;
+        const ctrlKey = !!(evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey);
+        const altKey = !!evt.originalEvent?.altKey;
+
+        if (shiftKey && this.previousEvt) {
           sm.addSelection(this.createRangeByEvents(evt, this.previousEvt));
           deletePreviousEvent = true;
-          dirty = true;
 
-
-        } else if (evt.originalEvent?.altKey && (evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey)) {
+        } else if (ctrlKey && altKey) {
           sm.removeSelection(CellRange.singleCell(evt.rowIndex, evt.columnIndex));
-          deletePreviousEvent = true;
-          dirty = true;
 
-        } else if (evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey) {
-          sm.addSelection(CellRange.singleCell(evt.rowIndex, evt.columnIndex));
-          deletePreviousEvent = true;
-          dirty = true;
+        } else if (ctrlKey) {
+          sm.togglePoint(evt.rowIndex, evt.columnIndex);
 
         } else {
-          // no special key.
+          // no special key (or Shift without anchor): a new selection.
           // for selection type  'row' and 'column' we have to select the current row (or column):
+          if (!shiftKey && sm.hasSelection()) {
+            sm.clear();
+          }
           sm.firstClick(evt.rowIndex, evt.columnIndex);
-          dirty = true;
         }
+        dirty = true;
         this.tableScope.onSelectionChanged(sm);
       }
     }

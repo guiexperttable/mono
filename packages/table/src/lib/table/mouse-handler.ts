@@ -133,9 +133,8 @@ export class MouseHandler {
     }
 
     if (mouseTargetData.areaIdent === "body") {
-      const fm = this.tableScope.focusModel();
-      fm?.clear();
-      fm?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
+      // fires onFocusChanged once, and only if the focus moves (a clear() before it fired twice per click)
+      this.tableScope.focusModel()?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }
 
     this.publishGeMouseEvent(event, 1);

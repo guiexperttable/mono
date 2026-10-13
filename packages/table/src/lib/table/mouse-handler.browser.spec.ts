@@ -103,8 +103,8 @@ describe('onMouseClicked – GeMouseEvent', () => {
     expect(clicked[0]).toMatchObject({ rowIndex: 0, columnIndex: 1, areaIdent: 'header', sideIdent: 'center', action: 'drag-column' });
   });
 
-  // BUG: ele-scope.ts:162 – the scroll viewport (created after the footer areas) is as high as header-less table
-  // (h - padding.top) and covers the footer: a real click on a footer cell hits the viewport and is reported as a
+  // BUG: ele-scope.ts:162 – the scroll viewport (created after the footer areas) is as high as the table minus the
+  // header (h - padding.top) and covers the footer: a real click on a footer cell hits the viewport and is reported as a
   // BODY click with rowIndex/columnIndex -1 (hover and onMouseMoved likewise). Only the body east area is lifted
   // above it (z-index in table-classes.css).
   it.fails('a click on a footer cell is reported as footer click', async () => {

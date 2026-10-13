@@ -57,7 +57,7 @@ describe('CrudObjectView', () => {
     expect(dialog.isConnected).toBe(true);
   });
 
-  // BUG: crud-object-view.ts:77 writes labels and values unescaped into innerHTML – a value like "<img onerror=…>"
+  // BUG: crud-object-view.ts:61 writes labels and values unescaped into innerHTML – a value like "<img onerror=…>"
   // becomes markup (HTML injection with data from the server).
   it.fails('shows a value with markup as text', async () => {
     new CrudObjectView({ id: 1, note: '<b>bold</b>' }).openDialog();
@@ -118,7 +118,7 @@ describe('CrudObjectEdit', () => {
     expect(original.address.city).toBe('Paris');
   });
 
-  // BUG: crud-object-edit.ts:41 reads the form with FormData – every value comes back as string: a number property
+  // BUG: crud-object-edit.ts:34 reads the form with FormData – every value comes back as string: a number property
   // is saved as "37" (and a checked checkbox as "on").
   it.fails('Save keeps numbers as numbers', async () => {
     const onSave = vi.fn();
@@ -137,7 +137,7 @@ describe('CrudObjectEdit', () => {
     expect(onSave.mock.calls[0][0].vip).toBe(false);
   });
 
-  // BUG: crud-object-edit.ts:75 nests a <form> per nested object; the HTML parser drops the inner <form> tag, its
+  // BUG: crud-object-edit.ts:63/85 nests a <form> per nested object; the HTML parser drops the inner <form> tag, its
   // </form> closes the OUTER form → every field after a nested object is outside the form and its changes are lost.
   it.fails('a field after a nested object is saved', async () => {
     const onSave = vi.fn();
@@ -148,7 +148,7 @@ describe('CrudObjectEdit', () => {
     expect(onSave.mock.calls[0][0].name).toBe('Grace');
   });
 
-  // BUG: crud-object-edit.ts:85 writes the value unescaped into value="…" – a double quote cuts the text.
+  // BUG: crud-object-edit.ts:68 writes the value unescaped into value="…" – a double quote cuts the text.
   it.fails('shows a value with double quotes completely', async () => {
     new CrudObjectEdit('id', { id: 1, name: 'The "Best" Shop' }).openDialog(() => undefined);
     expect(field(editDialog()!, 'name').value).toBe('The "Best" Shop');

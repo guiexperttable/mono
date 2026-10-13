@@ -142,7 +142,7 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(rows[3].name).toBe('Name 3');
   });
 
-  // BUG: input-cell-renderer.ts:46 writes the value unescaped into value="…" – a double quote ends the attribute
+  // BUG: input-cell-renderer.ts:28 writes the value unescaped into value="…" – a double quote ends the attribute
   // (the rest of the text is lost, and committing the edit truncates the value).
   it.fails('the editor shows a value with double quotes completely', async () => {
     const rows: Row[] = [{ id: 0, name: 'He said "hi"', value: 1, status: 'open' }];
@@ -152,7 +152,7 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(editorInput(host)!.value).toBe('He said "hi"');
   });
 
-  // BUG: input-cell-renderer.ts:46 – an empty cell (undefined) opens the editor with the text "undefined"
+  // BUG: input-cell-renderer.ts:28 – an empty cell (undefined) opens the editor with the text "undefined"
   // (the table itself shows an empty cell).
   it.fails('an empty cell opens an empty editor', async () => {
     const rows: Row[] = [{ id: 0, value: 1, status: 'open' }];

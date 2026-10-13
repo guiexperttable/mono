@@ -77,7 +77,7 @@ describe('built-in cell renderers', () => {
       expect((await renderCell(new NumberCellRenderer(), '12')).cell.classList).toContain('ge-cell-error');
     });
 
-    // BUG: number-cell-renderer.ts:44 `if (cellValue)` – the number 0 renders an empty cell.
+    // BUG: number-cell-renderer.ts:25 `if (cellValue)` – the number 0 renders an empty cell.
     it.fails('renders the number 0', async () => {
       const { cell } = await renderCell(new NumberCellRenderer(), 0);
       expect(cell.textContent?.trim()).toBe('0');
@@ -94,14 +94,14 @@ describe('built-in cell renderers', () => {
       expect(neg.classList).toContain('ge-negative-text-color');
     });
 
-    // BUG: positive-and-negative-number-renderer.ts:40 `data-row-index=${rowIndex}"` – the opening quote is missing,
+    // BUG: positive-and-negative-number-renderer.ts:25 `data-row-index=${rowIndex}"` – the opening quote is missing,
     // the attribute value is `0"` → a click on the label div is reported with rowIndex NaN.
     it.fails('the label div carries the row index', async () => {
       const { cell } = await renderCell(new PositiveAndNegativeNumberRenderer(), 5);
       expect(cell.querySelector('.ge-table-label-div')!.getAttribute('data-row-index')).toBe('0');
     });
 
-    // BUG: positive-and-negative-number-renderer.ts:38 `if (cellValue)` – the number 0 renders an empty cell.
+    // BUG: positive-and-negative-number-renderer.ts:21 `if (cellValue)` – the number 0 renders an empty cell.
     it.fails('renders the number 0', async () => {
       const { cell } = await renderCell(new PositiveAndNegativeNumberRenderer(), 0);
       expect(cell.textContent?.trim()).toBe('0');
@@ -123,7 +123,7 @@ describe('built-in cell renderers', () => {
       const { cell } = await renderCell(new ProgressBarCellRenderer('done', 10, true), 'ignored', { done: 7 });
       expect(cell.querySelector<HTMLElement>('.ge-table-progress-bar')!.style.width).toBe('70%');
       expect(cell.querySelector('.ge-table-label-div')!.getAttribute('title')).toBe('70%');
-      // NOTE: progress-bar-cell-renderer.ts:44 adds the class of the star rating (ge-star-rating-div, yellow text),
+      // NOTE: progress-bar-cell-renderer.ts:30 adds the class of the star rating (ge-star-rating-div, yellow text),
       // not ge-progressbar-div like NumberCellProgressBarCellRenderer.
       expect(cell.classList).toContain('ge-star-rating-div');
     });

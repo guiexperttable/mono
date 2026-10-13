@@ -1,7 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import ContentSection from "~/components/content-section.astro";
-import GetStartedFooter from "~/components/getstarted/common/get-started-footer.astro";
+import "../styles/home.css";
 import Glogo from "./glogo.astro";
 
 const id = 'div' + Math.random().toString(36).slice(2, 11);
@@ -9,35 +9,32 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
 ---
 
-<ContentSection title="HTML Data Table" id="intro">
+<ContentSection title="More than text in a cell" id="intro">
   <Glogo slot="eyebrow" class="h-24 text-white md:h-32" size="100" />
   <Fragment slot="lead">
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1" style="overflow-x: clip;">
+    <div class="w-full" style="max-width: 920px; overflow-x: clip;">
       <div class:list={[id, 'table-div', 'cpu-table']}></div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid w-full max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
       <p>
-        The "GUI Expert Table" is designed to seamlessly integrate with <span class="text-primary">Angular</span>
-        but also works with <span class="text-primary">plain JavaScript,
-        React, Preact, Vue.js, Svelte, and Solid</span>. It is framework-agnostic. </p>
-
+        A <span class="text-primary">cell renderer</span> is one function that receives the cell's element: box plots,
+        sparklines, progress bars, icons – or a component of your framework. </p>
       <p>
-        The underlying UI model is highly flexible, allowing you to create a wide range of tables, including
-        <span class="text-primary">flat
-          tables, tree tables</span>, columns with rowspan cells, and much more. </p>
+        Renderers run <span class="text-primary">only for visible cells</span>, so rich content costs the same at 100
+        rows as at a million. Sorting, filtering, copying and Excel export still work on the raw values. </p>
       <p>
-        "GUI Expert Table" can be easily used for simple flat tables with the help of the table model factory helper,
-        but it's also suitable for handling very complex tables.
-        It has been <span class="text-primary">optimized for performance</span>, making it ideal
-        for managing <span class="text-primary">large datasets</span> or handling real-time updates
-        with hundreds of updates per second, all rendered at
-        60 frames per second (fps). </p>
+        The same model drives <span class="text-primary">header groups, tree tables, rowspans</span> and footers with
+        totals. The demo above recalculates and repaints its cells many times per second. </p>
     </div>
+    <p class="home-links">
+      <a href="/training/cell-renderers/">Cell renderers →</a>
+      <a href="/training/framework-components/">Components in cells →</a>
+      <a href="/training/live-data/">Live data →</a>
+      <a href="https://github.com/guiexperttable/mono/tree/main/packages/demo-table-models/src/lib">Demo models on GitHub →</a>
+    </p>
   </Fragment>
-
-  <GetStartedFooter />
 
 </ContentSection>
 
@@ -294,7 +291,8 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
   const ele = document.querySelector('.' + id);
 
-  ele.style.width = `920px`;
+  ele.style.width = `100%`;
+  ele.style.maxWidth = `920px`;
   ele.style.height = `350px`;
   ele.style.fontSize = `14px`;
   ele.style.border = `0`;
@@ -310,8 +308,15 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
   const tableApi = tableScope.getApi();
 
-  // Start fake realtime updates:
-  sendUpdateTableModelEvents();
+  // Fake realtime updates – only while the table is on screen, so it never slows down the rest of the page:
+  let visible = false;
+  updateData();
+  tableApi.updateCells([], true);
+  new IntersectionObserver(entries => {
+    const wasVisible = visible;
+    visible = entries[0].isIntersecting;
+    if (visible && !wasVisible) sendUpdateTableModelEvents();
+  }).observe(ele);
 
   function updateData() {
     for (let i = 0; i < rows.length; i++) {
@@ -344,6 +349,7 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   }
 
   function sendUpdateTableModelEvents() {
+    if (!visible) return;
     updateData();
     tableApi.updateCells([], true);
     triggerUpdate();

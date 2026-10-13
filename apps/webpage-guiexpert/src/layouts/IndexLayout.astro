@@ -3,11 +3,18 @@ import "@fontsource-variable/inter";
 import "~/styles/tailwind.css";
 import "~/styles/index.css";
 
-const { title } = Astro.props;
+interface Props {
+  title: string;
+  /** meta description; default: the general description of GuiExpert Table */
+  description?: string;
+}
+
+const {
+  title,
+  description = "GuiExpert Table – a fast, framework-agnostic data grid for millions of rows. Angular, React, Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. MIT licensed."
+} = Astro.props;
 const { generator, site } = Astro;
 const image = new URL("social.jpg", site);
-const description =
-  "Build fast and fancy data grids. GUI Expert Table is the UI-agnostic fancy table component for your next web app.";
 ---
 
 <!doctype html>
@@ -22,7 +29,7 @@ const description =
     <meta name="description" content={description} />
 
     <!-- social media -->
-    <meta property="og:title" content="GUI Expert Table" />
+    <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />

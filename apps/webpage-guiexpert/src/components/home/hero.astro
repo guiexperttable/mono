@@ -1,0 +1,262 @@
+---
+/**
+ * Home page hero: the promise, two calls to action, the install command – and the proof next to it:
+ * a live table with 1,000,000 computed rows (an own AreaModel, nothing is held in an array).
+ */
+import corePkg from "../../../../../packages/table/package.json";
+import "../../styles/home.css";
+
+const id = "hero-table-" + Math.random().toString(36).slice(2, 9);
+const rowCount = 1_000_000;
+const install = "npm i @guiexpert/table";
+---
+
+<section class="home-hero ge-linear-gradient-bg">
+  <div class="home-hero-inner">
+    <div class="home-hero-text">
+      <p class="home-eyebrow">Open source · MIT licence · v{corePkg.version}</p>
+      <h1>Millions of rows.<br />Any framework.<br />Still smooth.</h1>
+      <p class="home-lead">
+        GuiExpert Table renders only the cells you can see – vertically and horizontally. One TypeScript core without
+        runtime dependencies, components for Angular, React, Vue, Svelte, Solid, Preact and Web Components – and
+        sorting, filtering, selection, editing, tree tables and Excel export included.
+      </p>
+      <div class="home-cta">
+        <a class="home-btn home-btn-primary" href="/getstarted/">Get started →</a>
+        <a class="home-btn home-btn-ghost" href="/training/">Learn it step by step</a>
+      </div>
+      <div class="home-install">
+        <code><span aria-hidden="true">$</span> {install}</code>
+        <button type="button" data-copy={install} aria-label="Copy the install command">Copy</button>
+      </div>
+      <ul class="home-trust">
+        <li>MIT – free for commercial use</li>
+        <li>0 runtime dependencies</li>
+        <li>8 frameworks</li>
+        <li><a href="https://github.com/guiexperttable/mono">Source on GitHub</a></li>
+      </ul>
+    </div>
+
+    <div class="home-demo" aria-label="Live demo: a table with one million rows">
+      <div class="home-demo-bar">
+        <b>Live · {rowCount.toLocaleString("en-US")} orders</b>
+        <span class="home-demo-stats">
+          <span><b data-stat="cells">–</b> cells in the DOM</span>
+          <span><b data-stat="fps">–</b> fps</span>
+        </span>
+      </div>
+      <div class:list={["home-demo-table", id]}></div>
+      <div class="home-demo-actions">
+        <button type="button" data-action="play">▶ Scroll through all rows</button>
+        <button type="button" data-action="end">Jump to row {rowCount.toLocaleString("en-US")}</button>
+        <button type="button" data-action="right">Last column →</button>
+        <button type="button" data-action="top">↑ Top</button>
+      </div>
+      <p class="home-demo-hint">
+        Scroll in both directions, drag to select a range, copy it with Ctrl/⌘ + C.
+        “Order” and “Total” stay fixed. Every value is computed when its cell becomes visible.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ id, rowCount }} type="module">
+  import {
+    AreaModel, ColumnDef, EventAdapter, NumberCellProgressBarCellRenderer, SelectionModel, SimpleDomService,
+    TableFactory, TableOptions, TableScope, px70, px80, px90, px100, px110, px120, px130, px150, px160
+  } from "/scripts/table/index.js";
+
+  // ── deterministic sample data: the same row always shows the same values ──
+  const CUSTOMERS = ["Blue Harbor Ltd.", "Alpine Tools", "Brightline AG", "Cedar & Co.", "Delta Supplies",
+    "Elmwood GmbH", "Fjord Systems", "Granite Labs", "Harbor Retail", "Ironbridge", "Juniper Trade",
+    "Keystone Office", "Lumen Media", "Maple Logistics", "Nordlicht GmbH", "Orchid Studio"];
+  const CITIES = [["Berlin", "Germany"], ["Hamburg", "Germany"], ["Munich", "Germany"], ["Vienna", "Austria"],
+    ["Zurich", "Switzerland"], ["Paris", "France"], ["Lyon", "France"], ["Madrid", "Spain"], ["Milan", "Italy"],
+    ["Amsterdam", "Netherlands"], ["Copenhagen", "Denmark"], ["Stockholm", "Sweden"], ["London", "UK"],
+    ["Dublin", "Ireland"], ["New York", "USA"], ["Toronto", "Canada"]];
+  const PRODUCTS = [["Laptop 14\"", "Hardware", 1199], ["Monitor 27\"", "Hardware", 329], ["Keyboard", "Accessories", 89],
+    ["Mouse", "Accessories", 39], ["Docking station", "Accessories", 219], ["Headset", "Audio", 149],
+    ["Webcam", "Video", 99], ["Office licence", "Software", 129], ["Cloud backup", "Services", 59],
+    ["Support plan", "Services", 399], ["Tablet", "Hardware", 549], ["Printer", "Hardware", 279]];
+  const STATUS = ["Open", "Paid", "Shipped", "Delivered", "Delivered", "Delivered", "Returned", "Cancelled"];
+  const FULFILMENT = { Open: [0, 25], Paid: [20, 50], Shipped: [60, 95], Delivered: [100, 100], Returned: [100, 100],
+    Cancelled: [0, 0] };
+  const CHANNELS = ["Web", "Shop", "Phone", "Partner"];
+  const REPS = ["A. Becker", "M. Rossi", "J. Smith", "L. Dubois", "K. Nowak", "S. Jensen", "E. García", "T. Müller"];
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const nf = new Intl.NumberFormat("en-US");
+  const money = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  function rand(row, salt) {                       // 0 … 1, stable per row and salt
+    let x = Math.imul(row + 1, 0x9e3779b1) ^ Math.imul(salt + 1, 0x85ebca6b);
+    x = Math.imul(x ^ (x >>> 15), 0x2c1b3c6d);
+    x = Math.imul(x ^ (x >>> 12), 0x297a2d39);
+    return ((x ^ (x >>> 15)) >>> 0) / 4294967296;
+  }
+  const pick = (arr, row, salt) => arr[Math.floor(rand(row, salt) * arr.length)];
+  const qty = row => 1 + Math.floor(rand(row, 7) * 20);
+  const discount = row => [0, 0, 0, 5, 10, 15][Math.floor(rand(row, 9) * 6)];
+  const total = row => {
+    const p = pick(PRODUCTS, row, 5);
+    return qty(row) * p[2] * (1 - discount(row) / 100);
+  };
+  const DAY = 24 * 3600 * 1000, START = Date.UTC(2019, 0, 1);
+
+  // ── columns: "Order" fixed left, "Total" fixed right, 27 columns in between ──
+  const right = { bodyClasses: ["ge-table-text-align-right"], headerClasses: ["ge-table-text-align-right"] };
+  const left = { bodyClasses: ["ge-table-text-align-left"], headerClasses: ["ge-table-text-align-left"] };
+  const col = (headerLabel, width, extra = {}) => ColumnDef.create({ headerLabel, width, ...extra });
+  const columnDefs = [
+    col("Order", px100, left),
+    col("Date", px100, left), col("Customer", px160, left), col("City", px110, left), col("Country", px110, left),
+    col("Product", px150, left), col("Category", px110, left), col("Qty", px70, right), col("Unit price", px100, right),
+    col("Discount", px90, right), col("Status", px100, left), col("Fulfilment", px130), col("Rating", px100, left),
+    col("Channel", px90, left), col("Sales rep", px110, left),
+    ...MONTHS.map(m => col(m, px80, right)),
+    col("Margin", px90, right),
+    col("Total", px120, right)
+  ];
+  const C = { ORDER: 0, DATE: 1, CUSTOMER: 2, CITY: 3, COUNTRY: 4, PRODUCT: 5, CATEGORY: 6, QTY: 7, PRICE: 8, DISCOUNT: 9,
+    STATUS: 10, FULFILMENT: 11, RATING: 12, CHANNEL: 13, REP: 14, MONTH0: 15, MARGIN: 27, TOTAL: 28 };
+
+  const starRenderer = {
+    render(cellDiv, _r, _c, _a, _m, value) {
+      cellDiv.innerHTML = `<div class="ge-table-label-div"><span class="ge-table-label home-stars">${"★".repeat(value)}<span>${"★".repeat(5 - value)}</span></span></div>`;
+      return undefined;
+    }
+  };
+
+  class OrdersModel extends AreaModel {
+    constructor(count) {
+      super();
+      this.count = count;
+      this.bar = new NumberCellProgressBarCellRenderer(100, false);
+    }
+    getRowCount() { return this.count; }
+    getRowHeight() { return 32; }
+    getConstantRowHeight() { return 32; }          // all rows equally high → constant-time scrolling
+    getYPosByRowIndex(row) { return row * 32; }
+    getValueAt(row, c) {
+      switch (c) {
+        case C.ORDER: return "#" + String(row + 1).padStart(7, "0");
+        case C.DATE: return new Date(START + Math.floor(rand(row, 1) * 2400) * DAY).toISOString().slice(0, 10);
+        case C.CUSTOMER: return pick(CUSTOMERS, row, 2);
+        case C.CITY: return pick(CITIES, row, 3)[0];
+        case C.COUNTRY: return pick(CITIES, row, 3)[1];
+        case C.PRODUCT: return pick(PRODUCTS, row, 5)[0];
+        case C.CATEGORY: return pick(PRODUCTS, row, 5)[1];
+        case C.QTY: return qty(row);
+        case C.PRICE: return money.format(pick(PRODUCTS, row, 5)[2]);
+        case C.DISCOUNT: return discount(row) ? discount(row) + " %" : "–";
+        case C.STATUS: return pick(STATUS, row, 11);
+        case C.FULFILMENT: {                       // follows the status
+          const [min, max] = FULFILMENT[pick(STATUS, row, 11)];
+          return Math.round(min + rand(row, 12) * (max - min));
+        }
+        case C.RATING: return 1 + Math.floor(rand(row, 13) * 5);
+        case C.CHANNEL: return pick(CHANNELS, row, 14);
+        case C.REP: return pick(REPS, row, 15);
+        case C.MARGIN: return (8 + Math.round(rand(row, 16) * 270) / 10).toFixed(1) + " %";
+        case C.TOTAL: return money.format(total(row));
+        default: return nf.format(Math.floor(rand(row, 20 + c) * 500));   // Jan … Dec
+      }
+    }
+    isSelectable() { return true; }                 // AreaModel cells are not selectable by default
+    getCellRenderer(_row, c) {
+      if (c === C.FULFILMENT) return this.bar;
+      if (c === C.RATING) return starRenderer;
+      return undefined;
+    }
+    getCustomClassesAt(row, c) {
+      if (c !== C.STATUS) return [];
+      return ["home-status", "home-status-" + pick(STATUS, row, 11).toLowerCase()];
+    }
+  }
+
+  // ── the table ──
+  const selectionModel = new SelectionModel("range", "multi");
+  const tableOptions = {
+    ...new TableOptions(),
+    hoverColumnVisible: false,
+    defaultRowHeights: { header: 36, body: 32, footer: 0 },
+    getSelectionModel: () => selectionModel
+  };
+  const tableModel = TableFactory.createTableModel({
+    bodyAreaModel: new OrdersModel(rowCount),
+    columnDefs,
+    tableOptions,
+    fixedLeftColumnCount: 1,
+    fixedRightColumnCount: 1
+  });
+
+  const host = document.querySelector("." + id);
+  const demo = host.closest(".home-demo");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  scope.firstInit();
+  const api = scope.getApi();
+
+  // ── live numbers: cells in the DOM and frames per second ──
+  const cellsOut = demo.querySelector('[data-stat="cells"]');
+  const fpsOut = demo.querySelector('[data-stat="fps"]');
+  setInterval(() => {
+    cellsOut.textContent = host.querySelectorAll(".ge-table-col-div").length.toLocaleString("en-US");
+  }, 500);
+  let frames = 0, since = performance.now();
+  (function tick(now) {
+    frames++;
+    if (now - since >= 1000) {
+      fpsOut.textContent = String(Math.round(frames * 1000 / (now - since)));
+      frames = 0;
+      since = now;
+    }
+    requestAnimationFrame(tick);
+  })(since);
+
+  // ── buttons ──
+  const playButton = demo.querySelector('[data-action="play"]');
+  let playing = false;
+  function stop() {
+    playing = false;
+    playButton.textContent = "▶ Scroll through all rows";
+  }
+  // the native scroll container of the table: animating it is exactly what a user's scrolling does
+  const viewport = [...host.querySelectorAll("div")].reduce((a, d) => (d.scrollHeight > (a ? a.scrollHeight : 0) ? d : a), null);
+  function play() {
+    if (playing) return stop();
+    playing = true;
+    playButton.textContent = "■ Stop";
+    const end = viewport.scrollHeight - viewport.clientHeight;
+    let from = viewport.scrollTop;
+    if (from > end - 10) from = 0;
+    const duration = 9000, start = performance.now();
+    const step = now => {
+      if (!playing) return;
+      const p = Math.min(1, (now - start) / duration);
+      const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      viewport.scrollTop = from + (end - from) * eased;
+      if (p < 1) requestAnimationFrame(step); else stop();
+    };
+    requestAnimationFrame(step);
+  }
+  const actions = {
+    play,
+    end: () => { stop(); api.scrollToIndex(0, rowCount - 1); },
+    top: () => { stop(); api.scrollToIndex(0, 0); },
+    // scrollToIndex() only scrolls vertically – scrollToPixel() takes x (clamped) and the content y
+    right: () => { stop(); api.scrollToPixel(1e7, api.getFirstVisibleRowIndex() * 32); }
+  };
+  demo.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => actions[b.dataset.action]()));
+  host.addEventListener("wheel", () => playing && stop(), { passive: true });
+  host.addEventListener("touchstart", () => playing && stop(), { passive: true });
+
+  // ── copy the install command ──
+  document.querySelectorAll(".home-install [data-copy]").forEach(button => button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(button.dataset.copy);
+      button.textContent = "Copied ✓";
+    } catch {
+      button.textContent = "Select & copy";
+    }
+    setTimeout(() => (button.textContent = "Copy"), 1800);
+  }));
+</script>

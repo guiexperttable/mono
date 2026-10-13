@@ -1,0 +1,52 @@
+---
+/** Home page: recent releases and new material – replaces the old list of 2024 posts. */
+import ContentSection from "~/components/content-section.astro";
+import { CHAPTERS } from "../../training/chapters";
+import "../../styles/home.css";
+---
+
+<ContentSection title="What's new" id="news">
+  <Fragment slot="lead">
+    Recent releases – and a <span class="text-primary">new way to learn</span> the table.
+  </Fragment>
+  <div class="home-news">
+    <article>
+      <span class="tag">v1.1.90 · October 2026</span>
+      <h3>Sort from code, smaller Excel files</h3>
+      <ul>
+        <li><code>sortByColumn()</code> sorts from your own button – header icon included
+          (<a href="/training/sorting/">sorting</a>)</li>
+        <li>Excel files are compressed without a library – about ten times smaller
+          (<a href="/training/excel-export/">Excel export</a>)</li>
+        <li>Tree tables can start collapsed (<a href="/training/tree-table/">tree table</a>)</li>
+        <li>Every table gets its own selection and focus model</li>
+      </ul>
+    </article>
+    <article>
+      <span class="tag">v1.1.88 – 1.1.89 · October 2026</span>
+      <h3>Range selection, editing, state</h3>
+      <ul>
+        <li>Select a range by dragging the mouse (<a href="/training/selection-and-copy/">selection</a>)</li>
+        <li>A changed filter keeps the current sort order</li>
+        <li>Inline editing works on cells with renderers; the editor keeps the focus
+          (<a href="/training/inline-editing/">editing</a>)</li>
+        <li>Restored state includes sort icon, scroll position and open tree nodes
+          (<a href="/training/persist-state/">persist state</a>)</li>
+      </ul>
+    </article>
+    <article>
+      <span class="tag">New on gui.expert</span>
+      <h3>Training and documentation</h3>
+      <ul>
+        <li><a href="/training/">Training</a>: {CHAPTERS.length} short chapters with live demos – from the first table to
+          live data</li>
+        <li><a href="/doc/">Documentation</a>: concepts, building blocks and a complete CSS reference</li>
+        <li><a href="/api/">API reference</a> with examples compiled against the real code</li>
+      </ul>
+    </article>
+  </div>
+  <p class="home-links">
+    <a href="https://github.com/guiexperttable/mono/releases">All releases on GitHub →</a>
+    <a href="/posts/">Articles →</a>
+  </p>
+</ContentSection>

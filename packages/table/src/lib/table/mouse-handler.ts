@@ -217,10 +217,13 @@ export class MouseHandler {
       this.geMouseEvent.clickCount = clickCount;
     }
 
-    this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
+    const dirty = this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
     this.tableScope.publishGeMouseEvent(this.geMouseEvent);
-    if (clickCount===1) {
-      // this.tableScope.debounceRepaint();
+    if (dirty) {
+      // paint the new focus and selection (before, a click only became visible with the next scroll).
+      // Deferred: a synchronous repaint replaces the clicked cell, and the browser then sends the following
+      // "dblclick" to the detached element – double-click editing would no longer work.
+      this.tableScope.debounceRepaint();
     }
   }
 

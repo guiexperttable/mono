@@ -6,8 +6,10 @@
  * @typeParam T - the type of your objects
  *
  * @example
- * // expand all first-level rows, then repaint
- * for (const row of rows) row.expanded = true;
+ * // expand all first-level rows: change `expanded`, rebuild the displayed rows, repaint
+ * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+ * for (const row of treeModel.rows) row.expanded = true;
+ * treeModel.recalcVisibleTreeRows(); // without it the table keeps showing the old rows
  * tableApi.repaintHard();
  *
  * @see Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
@@ -29,6 +31,6 @@ export interface TreeRowIf<T> {
   deep: number;
   /** Checkbox state (with `showCheckboxWihoutExtraColumn` or a checkbox column). */
   checked: boolean;
-  /** Internal: kept by the filter because a descendant matches. */
+  /** Internal, set by the filter: the row or one of its descendants matches (also below collapsed rows). */
   keep: boolean;
 }

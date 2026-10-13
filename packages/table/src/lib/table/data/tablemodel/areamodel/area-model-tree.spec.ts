@@ -200,8 +200,11 @@ describe('AreaModelTree', () => {
     it('re-applies an active filter', () => {
       const { model } = createModel({ expanded: false });
       model.externalFilterChanged(byName('A1x'));
+      expect(shown(model)).toEqual(['A']);
       model.toggleExpandCollapseAll(true);
       expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
+      model.toggleExpandCollapseAll(false);
+      expect(shown(model)).toEqual(['A']);
     });
   });
 
@@ -251,15 +254,41 @@ describe('AreaModelTree', () => {
       expect(model.getRowCount()).toBe(0);
     });
 
-    it('ignores rows hidden under a collapsed parent', () => {
-      const { model } = createModel({ expanded: false });
+    it('looks into collapsed nodes: a match below a collapsed parent keeps its (collapsed) ancestors visible', () => {
+      const { model, rows } = createModel({ expanded: false });
       model.externalFilterChanged(byName('A1x'));
-      // NOTE: only visible rows are filtered, so a matching grandchild of a collapsed node does not keep its parents.
-      expect(model.getRowCount()).toBe(0);
+      // Changed (fix/tree-filter): before, only the visible rows were filtered and this showed no row at all.
+      expect(shown(model)).toEqual(['A']);
+      expect(find(rows, 'A').expanded).toBe(false); // the filter does not change the expanded state
+      expect(['A', 'A1', 'A1x'].map(n => find(rows, n).keep)).toEqual([true, true, true]);
     });
 
-    // BUG: recalcVisibleTreeRows() (called on every expand/collapse click) rebuilds the row list without the filter.
-    it.fails('keeps an active filter when a node is collapsed and recalcVisibleTreeRows() is called', () => {
+    it('expanding the kept ancestors step by step reveals the path to the match', () => {
+      const { model, rows } = createModel({ expanded: false });
+      model.externalFilterChanged(byName('A1x'));
+      find(rows, 'A').expanded = true;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A', 'A1']);
+      find(rows, 'A1').expanded = true;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
+    });
+
+    it('calls the predicate for every row, also below collapsed parents (index/array = all rows depth-first)', () => {
+      const { model, rows } = createModel({ expanded: false });
+      const predicate = vi.fn(() => true);
+      model.externalFilterChanged(predicate);
+      expect(predicate).toHaveBeenCalledTimes(7);
+      const calls = predicate.mock.calls as unknown as [TreeRowIf<Node>, number, TreeRowIf<Node>[]][];
+      expect(calls.map(([r, i]) => [r.data.name, i])).toEqual(
+        [['B', 0], ['B2', 1], ['B1', 2], ['A', 3], ['A1', 4], ['A1x', 5], ['C', 6]]);
+      expect(calls[0][2]).toEqual(flatten(rows));
+      // collapsed rows stay collapsed: only the top level is displayed
+      expect(shown(model)).toEqual(['B', 'A', 'C']);
+    });
+
+    // Regression: recalcVisibleTreeRows() (called on every expand/collapse click) rebuilt the rows without the filter.
+    it('keeps an active filter when a node is collapsed and recalcVisibleTreeRows() is called', () => {
       const { model, rows } = createModel();
       model.externalFilterChanged(byName('A1x'));
       find(rows, 'B').expanded = false;
@@ -267,14 +296,35 @@ describe('AreaModelTree', () => {
       expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
     });
 
-    // BUG: recalcVisibleTreeRows() does not update the internal flattenRows, so a later filter misses rows that
-    // became visible by expanding a node.
-    it.fails('finds rows that became visible by expanding a node', () => {
+    it('keeps an active filter when a kept node is collapsed and expanded again', () => {
+      const { model, rows } = createModel();
+      model.externalFilterChanged(byName('A1x'));
+      find(rows, 'A').expanded = false;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A']);
+      find(rows, 'A').expanded = true;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
+    });
+
+    // Regression: recalcVisibleTreeRows() did not update the internal flattenRows, so a later filter missed rows
+    // that became visible by expanding a node.
+    it('finds rows that became visible by expanding a node', () => {
       const { model, rows } = createModel({ expanded: false });
       find(rows, 'A').expanded = true;
       model.recalcVisibleTreeRows();
       model.externalFilterChanged(byName('A1'));
       expect(shown(model)).toEqual(['A', 'A1']);
+    });
+
+    it('the displayed rows always match getRowCount() and getFilteredFlattenRows()', () => {
+      const { model, rows } = createModel();
+      model.externalFilterChanged((r: TreeRowIf<Node>) => r.data.size >= 10);
+      find(rows, 'A1').expanded = false;
+      model.recalcVisibleTreeRows();
+      expect(model.getFilteredFlattenRows().map(r => r.data.name)).toEqual(['B', 'B2', 'B1', 'A', 'A1']);
+      expect(model.getRowCount()).toBe(5);
+      expect(shown(model)).toEqual(['B', 'B2', 'B1', 'A', 'A1']);
     });
   });
 
@@ -368,19 +418,56 @@ describe('AreaModelTree', () => {
       expect(f).toBe(-1);
     });
 
-    // BUG: doSort() rebuilds the displayed rows from all visible rows and drops the active filter
-    // (AreaModelObjectArray.doSort() sorts the filtered rows and keeps the filter).
-    it.fails('keeps an active filter', () => {
+    // Regression: doSort() rebuilt the displayed rows from all visible rows and dropped the active filter.
+    it('keeps an active filter', () => {
       const { model } = createModel();
       model.externalFilterChanged(byName('A1x'));
       model.doSort([new SortItem(0, 'asc')]);
       expect(shown(model)).toEqual(['A', 'A1', 'A1x']);
     });
 
-    // BUG: doSort([]) crashes (destructures sortItems[-1]); the flat area models accept an empty list.
-    it.fails('accepts an empty sort item list', () => {
+    it('keeps an active filter and sorts the kept rows', () => {
+      const { model } = createModel();
+      model.externalFilterChanged((r: TreeRowIf<Node>) => r.data.size >= 10);
+      model.doSort([new SortItem(1, 'desc')]);
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B', 'B1', 'B2']);
+      model.doSort([new SortItem(0, 'asc')]);
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B', 'B1', 'B2']);
+      model.doSort([new SortItem(0, 'desc')]);
+      expect(shown(model)).toEqual(['B', 'B2', 'B1', 'A', 'A1', 'A1x']);
+    });
+
+    it('filter → sort → collapse/expand keeps filter and order', () => {
+      const { model, rows } = createModel();
+      model.externalFilterChanged((r: TreeRowIf<Node>) => r.data.size >= 10);
+      model.doSort([new SortItem(0, 'asc')]);
+      find(rows, 'B').expanded = false;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B']);
+      find(rows, 'B').expanded = true;
+      model.recalcVisibleTreeRows();
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B', 'B1', 'B2']);
+    });
+
+    it('a filter set after sorting keeps the sort order', () => {
+      const { model } = createModel();
+      model.doSort([new SortItem(0, 'asc')]);
+      model.externalFilterChanged((r: TreeRowIf<Node>) => r.data.size >= 10);
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B', 'B1', 'B2']);
+    });
+
+    // Regression: doSort([]) crashed (destructured sortItems[-1]); reachable via api.reSort().
+    it('accepts an empty sort item list', () => {
       const { model } = createModel();
       expect(() => model.doSort([])).not.toThrow();
+    });
+
+    it('an empty sort item list keeps the current order and filter and returns false', () => {
+      const { model } = createModel();
+      model.doSort([new SortItem(0, 'asc')]);
+      model.externalFilterChanged((r: TreeRowIf<Node>) => r.data.size >= 10);
+      expect(model.doSort([])).toBe(false);
+      expect(shown(model)).toEqual(['A', 'A1', 'A1x', 'B', 'B1', 'B2']);
     });
   });
 

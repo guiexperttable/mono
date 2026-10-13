@@ -19,6 +19,8 @@
     "i": "pnpm i",
     "patch-version": "node patch.js",
     "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {

@@ -248,3 +248,50 @@ describe('AreaModelTree + filter (real browser)', () => {
     expect(shown(host)).toEqual(['America', 'USA', 'Boston', 'Asia', 'Japan', 'Tokyo']);
   });
 });
+
+describe('AreaModelTree – expand/collapse all (real browser)', () => {
+
+  function mountBigTree() {
+    // 100 collapsed parents with 10 children each
+    const data: Place[] = Array.from({ length: 100 }, (_, i) => ({
+      name: 'P' + i, people: i,
+      children: Array.from({ length: 10 }, (_, j) => ({ name: `C${i}-${j}`, people: j })),
+    }));
+    const rows = TreeFactory.buildTreeRows<Place>(data, { expanded: false });
+    const tableModel = TableFactory.createTableModel({
+      rows, columnDefs: [ColumnDef.create({ property: 'name', headerLabel: 'Name', width: px200 })],
+    });
+    const table = mountTable(tableModel);
+    table.scope.mouseHandler.doubleClickDelay = 0; // two quick clicks on the icon would count as a double click
+    return { ...table, tableModel };
+  }
+
+  async function clickExpandCollapseAllIcon(host: HTMLElement) {
+    const icon = host.querySelector<HTMLElement>('[data-ge-action="toggleExpandCollapseAll"]');
+    if (!icon) throw new Error('no expand/collapse-all icon');
+    icon.click();
+    await nextFrame();
+  }
+
+  // Regression: TableScope.toggleExpandCollapseAll() only repainted – the scroll height stayed at the old row count,
+  // so after "expand all" the rows below the old height could not be reached.
+  it('the header icon recalculates the scroll height', async () => {
+    const { host, api, tableModel } = mountBigTree();
+    await nextFrame();
+    const rowHeight = tableModel.getBodyModel().getRowHeight(0);
+    expect(tableModel.getContentHeightInPixel()).toBe(100 * rowHeight);
+
+    await clickExpandCollapseAllIcon(host); // first click: collapse all
+    await clickExpandCollapseAllIcon(host); // second click: expand all
+    expect(tableModel.getBodyModel().getRowCount()).toBe(1100);
+    expect(tableModel.getContentHeightInPixel()).toBe(1100 * rowHeight);
+
+    api.scrollToIndex(0, 1099);
+    await nextFrame();
+    expect(api.getLastFullVisibleRowIndex()).toBe(1099);
+    expect(shown(host).at(-1)).toBe('C99-9');
+
+    await clickExpandCollapseAllIcon(host); // collapse all
+    expect(tableModel.getContentHeightInPixel()).toBe(100 * rowHeight);
+  });
+});

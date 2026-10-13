@@ -469,7 +469,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (isAreaModelTree(bodyAreaModel)) {
       const amt: AreaModelTree<any> = bodyAreaModel as AreaModelTree<any>;
       amt.toggleExpandCollapseAll(expand);
-      this.repaint();
+      this.repaintHard(); // the row count changed → recalc the scroll height, not only the visible rows
       this.storeStateCollapsedExpandService?.collapsedStateAll(expand);
     }
   }

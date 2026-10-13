@@ -16,7 +16,9 @@ export class MouseHandler {
 
 
   /**
-   * Represents the delay in milliseconds between two consecutive double clicks.
+   * Programmatic clicks (`element.click()`, `event.detail === 0`): two clicks on the same cell within this delay (ms)
+   * count as a double click. Real mouse clicks use the click count of the browser (`event.detail`), i.e. the
+   * double-click speed of the operating system.
    *
    * @type {number}
    */
@@ -29,6 +31,8 @@ export class MouseHandler {
 
   private expandedAll = true;
   private lastClickedCellKey = '';
+  /** The second click of a double click that was already reported (clickCount 2) – its "dblclick" is not. */
+  private reportedDoubleClick?: { time: number; cellKey: string };
   private mouseDown = false;
   private repaintAfterMouseUp = false;
   private dragging = false;
@@ -81,21 +85,23 @@ export class MouseHandler {
   private onHostElementClicked(event: MouseEvent) {
     const now = Date.now();
     const eventTarget = this.tableScope.getMouseEventTarget(event); // a footer cell below the scroll viewport
-    // a double click = two clicks on the SAME cell within doubleClickDelay
-    // (before, two quick clicks on different cells – e.g. two tree arrows – swallowed the second one)
-    const target = eventTarget instanceof Element ? eventTarget : null;
-    const cellKey = target?.closest?.('[data-col-index]')
-      ? ['data-area', 'data-row-index', 'data-col-index']
-        .map(key => target.closest('[' + key + ']')?.getAttribute(key) ?? '').join(':')
-      : '';
-    const secondClick = now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey;
+    const cellKey = this.getCellKey(eventTarget);
+    // The second click of a double click: the browser counts the clicks (event.detail, OS double-click speed).
+    // Programmatic clicks (element.click(), detail 0): two clicks on the SAME cell within doubleClickDelay.
+    const secondClick = event.detail >= 2
+      || (event.detail === 0 && now - this.lastClicked < this.doubleClickDelay && cellKey === this.lastClickedCellKey);
     this.lastClicked = now;
     this.lastClickedCellKey = cellKey;
 
     const mouseTargetData: MouseTargetData = new MouseTargetData(eventTarget, this.tableScope);
+    if (secondClick) {
+      this.reportedDoubleClick = { time: now, cellKey };
+    }
     if (secondClick && !this.isClickAction(mouseTargetData)) {
-      // the second click of a double click: only reported – the "dblclick" event does the work (sort, edit, toggle).
-      // A click on a checkbox, an arrow or a toggle icon is no part of a double click: two quick clicks = two toggles.
+      // reported with clickCount 2 – focus and selection were handled by the first click; the "dblclick" event that
+      // follows sorts / edits / toggles and is not reported again (a double click arrived three times before, and a
+      // Ctrl+double click toggled the selection on/off/on).
+      // A click on a checkbox, an arrow or a toggle icon always does its job: two quick clicks = two toggles.
       this.publishGeMouseEvent(event, 2);
       return;
     }
@@ -144,6 +150,15 @@ export class MouseHandler {
 
     this.publishGeMouseEvent(event, secondClick ? 2 : 1);
   };
+
+  /** "area:row:column" of the cell of an event target ('' outside of a cell). */
+  private getCellKey(eventTarget: EventTarget | null): string {
+    const target = eventTarget instanceof Element ? eventTarget : null;
+    return target?.closest?.('[data-col-index]')
+      ? ['data-area', 'data-row-index', 'data-col-index']
+        .map(key => target.closest('[' + key + ']')?.getAttribute(key) ?? '').join(':')
+      : '';
+  }
 
   /** A click that triggers an action on its own: row checkbox, tree arrow, "expand/collapse all", header group toggle. */
   private isClickAction(mouseTargetData: MouseTargetData): boolean {
@@ -212,7 +227,12 @@ export class MouseHandler {
       }
     }
 
-    this.publishGeMouseEvent(event, 2, geMouseEvent);
+    // usually already reported by its second click (clickCount 2) – only a "dblclick" without one is reported here
+    const reported = this.reportedDoubleClick;
+    if (!reported || Date.now() - reported.time > this.doubleClickDelay || reported.cellKey !== this.getCellKey(eventTarget)) {
+      this.publishGeMouseEvent(event, 2, geMouseEvent);
+    }
+    this.reportedDoubleClick = undefined;
   };
 
 

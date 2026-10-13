@@ -132,12 +132,12 @@ describe('SelectionModel', () => {
       expect(sm.isSelected(3, 3)).toBe(true);
     });
 
-    it('firstClick() selects nothing', () => {
-      // NOTE: only "row" and "column" react to firstClick(); a plain click never selects a cell for "cell"/"range".
+    // Regression: only "row" and "column" reacted to firstClick(); a plain click never selected a cell for "cell"/"range".
+    it('firstClick() selects the clicked cell', () => {
       const sm = new SelectionModel('cell');
       sm.firstClick(2, 3);
-      expect(sm.getRanges()).toEqual([]);
-      expect(sm.isSelected(2, 3)).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(2, 3)]);
+      expect(sm.isSelected(2, 3)).toBe(true);
     });
 
     it('removeSelection() deselects one cell', () => {
@@ -414,10 +414,10 @@ describe('SelectionModel', () => {
       expect(sm.isSelected(2, 5)).toBe(false);
     });
 
-    it('firstClick() selects nothing', () => {
+    it('firstClick() selects the clicked cell', () => {
       const sm = new SelectionModel('range');
       sm.firstClick(1, 1);
-      expect(sm.hasSelection()).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(1, 1)]);
     });
 
     it('single mode: a new range replaces the previous one', () => {
@@ -692,13 +692,33 @@ describe('SelectionModel', () => {
       expect(sm.hasNoSelection()).toBe(false);
     });
 
-    it('hasSelection() ignores negative ranges', () => {
+    // Regression: no cell was selected any more, but hasSelection() stayed true (it only looked at the positive ranges).
+    it('hasSelection() is false once every selected cell is removed again', () => {
       const sm = new SelectionModel('cell');
       sm.addSelection(CellRange.singleCell(0, 0));
       sm.removeSelection(CellRange.singleCell(0, 0));
-      // NOTE: no cell is selected any more, but hasSelection() only looks at the positive ranges.
       expect(sm.isSelected(0, 0)).toBe(false);
+      expect(sm.hasSelection()).toBe(false);
+    });
+
+    it('hasSelection(): a range removed piece by piece is dropped when nothing of it is left (also unbounded rows)', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 1, 1));
+      sm.addSelection(new CellRange(5, 5, 5, 5));
+      sm.removeSelection(new CellRange(0, 0, 0, 1));
       expect(sm.hasSelection()).toBe(true);
+      sm.removeSelection(new CellRange(1, 0, 1, 0));
+      sm.removeSelection(new CellRange(1, 1, 1, 1));
+      expect(sm.getRanges()).toEqual([new CellRange(5, 5, 5, 5)]);
+      sm.removeSelection(new CellRange(5, 5, 5, 5));
+      expect(sm.hasSelection()).toBe(false);
+
+      const rows = new SelectionModel('row', 'multi');
+      rows.addSelection(new CellRange(2, 0, 3, 0)); // rows 2 … 3, all columns
+      rows.removeSelection(CellRange.singleCell(2, 7));
+      expect(rows.hasSelection()).toBe(true);
+      rows.removeSelection(CellRange.singleCell(3, 1));
+      expect(rows.hasSelection()).toBe(false);
     });
 
     it('clear() removes ranges, negative ranges and the "all selected" flag', () => {
@@ -779,22 +799,39 @@ describe('SelectionModel', () => {
       expect(onSelectionChanged).not.toHaveBeenCalled();
     });
 
-    it('addSelection() fires twice', () => {
+    // Regression: addRange() fired and addSelection() fired again – listeners got two events for one change.
+    it('addSelection() fires once', () => {
       const sm = new SelectionModel('cell');
       const { listener, onSelectionChanged } = listenerSpy();
       sm.addEventSelectionChangedListener(listener);
       sm.addSelection(CellRange.singleCell(0, 0));
-      // NOTE: addRange() fires and addSelection() fires again – listeners get two events for one change.
-      expect(onSelectionChanged).toHaveBeenCalledTimes(2);
+      expect(onSelectionChanged).toHaveBeenCalledTimes(1);
       expect(onSelectionChanged).toHaveBeenCalledWith(sm);
     });
 
-    it('addSelection() still fires once for type "none" although nothing changed', () => {
+    it('addSelection() does not fire for type "none" (nothing changes)', () => {
       const sm = new SelectionModel('none');
       const { listener, onSelectionChanged } = listenerSpy();
       sm.addEventSelectionChangedListener(listener);
       sm.addSelection(CellRange.singleCell(0, 0));
+      expect(onSelectionChanged).not.toHaveBeenCalled();
+    });
+
+    it('createSnapshot() / restoreSnapshot() save and restore ranges, removed cells and "all selected"', () => {
+      const sm = new SelectionModel('range', 'multi');
+      sm.addSelection(new CellRange(0, 0, 2, 2));
+      sm.removeSelection(CellRange.singleCell(1, 1));
+      const snapshot = sm.createSnapshot();
+      sm.clear();
+      sm.selectAll();
+      const { listener, onSelectionChanged } = listenerSpy();
+      sm.addEventSelectionChangedListener(listener);
+      sm.restoreSnapshot(snapshot);
       expect(onSelectionChanged).toHaveBeenCalledTimes(1);
+      expect(sm.isAllSelected()).toBe(false);
+      expect([sm.isSelected(0, 0), sm.isSelected(1, 1), sm.isSelected(3, 3)]).toEqual([true, false, false]);
+      sm.addSelection(CellRange.singleCell(3, 3));
+      expect(snapshot.ranges).toHaveLength(1); // the snapshot is a copy
     });
 
     it('removeSelection() fires once, but not for type "none"', () => {
@@ -810,7 +847,7 @@ describe('SelectionModel', () => {
       expect(b.onSelectionChanged).not.toHaveBeenCalled();
     });
 
-    it('firstClick() fires once for "row"/"column" and not at all for "cell"/"range"', () => {
+    it('firstClick() fires once for "row"/"column"/"cell"/"range"', () => {
       const counts = (['row', 'column', 'cell', 'range'] as ExtendedSelectionType[]).map(type => {
         const sm = new SelectionModel(type);
         const { listener, onSelectionChanged } = listenerSpy();
@@ -818,7 +855,7 @@ describe('SelectionModel', () => {
         sm.firstClick(1, 1);
         return onSelectionChanged.mock.calls.length;
       });
-      expect(counts).toEqual([1, 1, 0, 0]);
+      expect(counts).toEqual([1, 1, 1, 1]);
     });
 
     it('togglePoint() fires once when it selects a removed cell again', () => {

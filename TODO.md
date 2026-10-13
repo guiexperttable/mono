@@ -240,16 +240,20 @@ Verhalten steht als `// NOTE:` in den Specs.
       die ganze Spanne.
 - [x] **`getMergedRowIndices(rowCount?)`** terminiert (ohne `rowCount` werden unbegrenzte Spalten-Selektionen
       übersprungen), sortiert, prüft alle Spalten der negativen Ranges.
-- [ ] Selektion – gefunden, nicht behoben (Branch `fix/selection`):
-      Typ `"cell"`: ein einfacher Klick selektiert nichts (`firstClick` kennt nur row/column), die Schulung
-      (`training/selection-and-copy.astro`) sagt „one cell“ · Header-/Footer-Klicks prüfen `areaIdent` nicht (leeren die
-      Selektion, setzen Fokus auf Body-Zelle) · `onSelectionChanged` feuert mehrfach je Klick · `setSelectionModel()`
-      meldet `TableScope` nicht am neuen Modell an · Ziehen leert immer (kein Strg+Ziehen für zweiten Bereich) · ein
-      Doppelklick erreicht `onMouseClicked` dreimal (mit Strg: an/aus/an) · `hasSelection()` bleibt nach Abwählen aller
-      Zellen `true` (Copy liefert leere Zellen) · Strg+Alt (auch bei Mausbewegung) ruft `debugOnce()` →
-      `console.clear()` (`table-scope.ts:331`) · Beispiel-Zellenzählung `(r2-r1+1)*(c2-c1+1)` in `SelectionModelIf` und
-      `training/demos/selection-and-copy.ts` für row/column sinnlos (~9e15) · Klick-Repaint baut alle sichtbaren Zellen
-      neu (Komponenten-Renderer werden neu gemountet) – besser nur Fokus-/Selektions-Overlay neu zeichnen.
+- [x] Selektion – behoben (Branch `fix/selection-2`): Typ `"cell"` (und `"range"`): ein einfacher Klick selektiert die
+      Zelle · Header-/Footer-Klicks ändern Selektion und Fokus nicht mehr · `onSelectionChanged` einmal je Klick
+      (`TableScope.holdSelectionEvents()`; `addSelection()` feuerte selbst doppelt) · `setSelectionModel()` meldet die
+      Tabelle am neuen Modell an (und am alten ab) · Strg/⌘+Ziehen fügt einen weiteren Bereich hinzu
+      (`SelectionModel.createSnapshot()/restoreSnapshot()`) · ein Doppelklick erreicht `onMouseClicked` zweimal
+      (clickCount 1 und 2) statt dreimal, die Selektion nur einmal (Strg: kein an/aus/an); ob zwei Klicks ein Doppelklick
+      sind, entscheidet der Browser (`event.detail`, Doppelklick-Tempo des Betriebssystems) – zwei getrennte schnelle
+      Klicks sind zwei Klicks (`doubleClickDelay` gilt nur noch für `element.click()`) · `hasSelection()` wird `false`,
+      wenn alle Zellen abgewählt sind (vollständig abgewählte Bereiche fallen weg) · Strg+Alt rief `debugOnce()` →
+      `console.clear()` (entfernt) · Zellenzählung im Beispiel von `SelectionModelIf` und in der Schulungs-Demo
+      (für row/column ~9e15) → `getMergedRowIndices(rowCount)` · wiederholter Shift-Klick ändert das Rechteck vom selben
+      Anker aus (vorher: zweiter Shift-Klick ohne Anker = neue Selektion).
+- [ ] Selektion – offen: Klick-Repaint baut alle sichtbaren Zellen neu (Komponenten-Renderer werden neu gemountet) –
+      besser nur Fokus-/Selektions-Overlay neu zeichnen (größerer Umbau in `RenderScope`).
 
 **Mittel:**
 - [ ] Mehrspaltiges `doSort([a, b])` (`area-model-object-array.ts:533`): das **letzte** Item wird Primärschlüssel
@@ -353,8 +357,7 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
 - [ ] `{ ...new CrudOptions(), getIdKey: () => 'uuid' }`: das kopierte `getIdByObject` ruft noch das `getIdKey` der
       Original-Instanz (Arrow-Function) – die Factory selbst nutzt `getIdKey()` und ist nicht betroffen.
 
-Weitere fragwürdige Stellen (als `// NOTE:` in den Specs): `setColumnWidth()` zeichnet nicht neu · Doppelklick feuert
-`onMouseClicked` dreimal · Strg+Alt ruft `debugOnce()`/`console.clear()` · voreingestellter `sortState` zeigt das Icon,
+Weitere fragwürdige Stellen (als `// NOTE:` in den Specs): `setColumnWidth()` zeichnet nicht neu · voreingestellter `sortState` zeigt das Icon,
 sortiert aber nicht · Spaltenziehen ignoriert min/max · Kontextmenü-Drossel 50 ms · `setRows/addRows/…` zeichnen nicht neu,
 `setRows` verwirft Filter + Sortierung (Icon bleibt) · alle Span-Bereiche werden bei jedem Render gezeichnet ·
 Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderVisible: false` uneinheitlich · Zeile 0 jeder
@@ -394,6 +397,14 @@ Objekt-Tabelle hat `ge-focused-row`.
   ab dem ersten Zeichnen und nach jedem Host-Resize (vorher 400 px bis ~500 ms nach dem Mounten bzw. eine Runde
   hinterher) und lassen Platz für die senkrechte Scrollleiste. `scrollToIndex()` trifft die Zeile exakt (auch mit Footer).
   Ost-Trennlinie bei nur rechts fixierten Spalten.
+- **Selektion**: ein Klick selektiert bei Typ `"cell"`/`"range"` die Zelle (vorher nichts); `onSelectionChanged` einmal je
+  Klick (vorher bis zu dreimal), `addSelection()` feuert einmal (vorher zweimal), bei Typ `"none"` gar nicht;
+  Header-/Footer-Klicks lassen Selektion und Fokus in Ruhe; Shift-Klicks ändern das Rechteck vom selben Anker aus;
+  Strg/⌘+Ziehen = weiterer Bereich; `hasSelection()` ist nach dem Abwählen aller Zellen `false`; `setSelectionModel()`
+  meldet Änderungen des neuen Modells; Strg+Alt leert nicht mehr die Browser-Konsole.
+- **Doppelklick**: `onMouseClicked` kommt je Doppelklick zweimal (clickCount 1, dann 2 – das `dblclick` wird nicht mehr
+  zusätzlich gemeldet); der Browser entscheidet, was ein Doppelklick ist (`event.detail`), zwei getrennte Klicks auf
+  dieselbe Zelle sind zwei Einzelklicks (vorher < 500 ms = Doppelklick).
 - **Editor**: Escape bricht das Editieren ab (vorher übernahm der nächste Blur den Text).
 - **Maus**: Footer-Zellen melden Klick/Hover/Kontextmenü als Footer-Events (vorher Body mit −1); zwei schnelle Klicks
   auf eine Checkbox, einen Baum-Pfeil, „alle auf/zu“ oder eine Header-Gruppe schalten zweimal um (vorher wurde der

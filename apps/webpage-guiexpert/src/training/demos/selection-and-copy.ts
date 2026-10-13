@@ -12,14 +12,15 @@ function createOptions(type: ExtendedSelectionType): TableOptionsIf {
 import { EventAdapter, type SelectionModelIf } from "@guiexpert/table";
 
 class SelectionEvents extends EventAdapter {
-  constructor(private readonly show: (text: string) => void) {
+  constructor(private readonly show: (text: string) => void, private readonly getRowCount: () => number) {
     super();
   }
   override onSelectionChanged(model: SelectionModelIf): void {
-    const ranges = model.getRanges().filter(r => !r.gammaRange);   // skip special ranges
-    if (!ranges.length) return this.show("nothing selected");
-    const cells = ranges.reduce((n, r) => n + (r.r2 - r.r1 + 1) * (r.c2 - r.c1 + 1), 0);
-    this.show(`${cells} cells in ${ranges.length} range(s) · ⌘/Ctrl+C copies`);
+    if (!model.hasSelection()) return this.show("nothing selected");
+    // rows with at least one selected cell – "row"/"column" ranges are unbounded (r2/c2 = MAX_SAFE_INTEGER)
+    const rows = model.getMergedRowIndices(this.getRowCount());
+    const ranges = model.getRanges().filter(r => !r.gammaRange).length;   // skip special ranges
+    this.show(`${rows.length} row(s), ${ranges} range(s) · ⌘/Ctrl+C copies`);
   }
 }
 // #endregion events
@@ -40,7 +41,8 @@ export default function (ctx: DemoContext) {
     buttons.forEach(b => b.toggleAttribute("aria-pressed", b === pressed));
     pressed.setAttribute("aria-pressed", "true");
     const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs: createOrderColumns() });
-    scope = new TableScope(ctx.host, tableModel, new SimpleDomService(), createOptions(type), new SelectionEvents(ctx.info));
+    const events = new SelectionEvents(ctx.info, () => tableModel.getBodyModel().getRowCount());
+    scope = new TableScope(ctx.host, tableModel, new SimpleDomService(), createOptions(type), events);
     scope.firstInit();
     ctx.info(type === "range" ? "drag with the mouse · Shift+click · ⌘/Ctrl+click" : `selection type "${type}" – click`);
   }

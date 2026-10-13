@@ -15,6 +15,7 @@ function setup(type: ExtendedSelectionType = 'range', mode: SelectionMode = 'mul
     onFocusChanged: vi.fn(),
     onSelectionChanged: vi.fn(),
     repaint: vi.fn(),
+    holdSelectionEvents: (fn: () => void) => fn(),
   };
   fm.addEventFocusChangedListener(scope);
   const service = new SelectionService(scope as unknown as TableScope);
@@ -69,11 +70,11 @@ describe('SelectionService', () => {
       expect(scope.onFocusChanged).not.toHaveBeenCalled();
     });
 
-    it('clears an existing selection', () => {
+    it('replaces an existing selection with the clicked cell', () => {
       const { sm, service } = setup('range');
       sm.addSelection(new CellRange(0, 0, 1, 1));
       service.onMouseClicked(mouse(5, 5), undefined);
-      expect(sm.hasSelection()).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(5, 5)]);
     });
 
     it('selects the clicked row for selection type "row"', () => {
@@ -89,11 +90,40 @@ describe('SelectionService', () => {
       expect(sm.isSelected(999, 1)).toBe(true);
     });
 
-    it('selects nothing for selection type "cell" (only focus)', () => {
+    // Regression: a plain click selected nothing for type "cell" (only the focus moved).
+    it('selects the clicked cell for selection type "cell"', () => {
       const { sm, fm, service } = setup('cell', 'single');
       service.onMouseClicked(mouse(4, 1), undefined);
-      expect(sm.hasSelection()).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(4, 1)]);
       expect(fm.hasFocus(4, 1)).toBe(true);
+    });
+
+    // Regression: header/footer clicks cleared the selection and focused the body cell with the same indices.
+    it.each(['header', 'footer'] as const)('ignores a click in the %s', (area) => {
+      const { sm, fm, scope, service } = setup('cell', 'multi');
+      service.onMouseClicked(mouse(2, 2), undefined);
+      scope.onSelectionChanged.mockClear();
+      expect(service.onMouseClicked(mouse(0, 1, {}, area), undefined)).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(2, 2)]);
+      expect(fm.getFocus()).toEqual([2, 2]);
+      expect(scope.onSelectionChanged).not.toHaveBeenCalled();
+    });
+
+    it('ignores the double click (clickCount 2) – the first click did the work', () => {
+      const { sm, service } = setup('cell', 'multi');
+      service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
+      const dbl = mouse(2, 2, { ctrlKey: true });
+      dbl.clickCount = 2;
+      expect(service.onMouseClicked(dbl, undefined)).toBe(false);
+      expect(sm.isSelected(2, 2)).toBe(true);
+    });
+
+    it('all changes of one click are reported in one batch', () => {
+      const { service, scope } = setup('row', 'multi');
+      const hold = vi.fn((fn: () => void) => fn());
+      scope.holdSelectionEvents = hold;
+      service.onMouseClicked(mouse(1, 1), undefined);
+      expect(hold).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -115,12 +145,14 @@ describe('SelectionService', () => {
       expect(sm.isSelected(1, 1)).toBe(true);
     });
 
-    it('shift-click consumes the anchor: a second shift-click does not extend again', () => {
+    it('shift-click keeps the anchor: the next shift-click replaces the rectangle', () => {
       const { sm, service } = setup('range');
       service.onMouseClicked(mouse(0, 0), undefined);
       service.onMouseClicked(mouse(1, 1, { shiftKey: true }), undefined);
       service.onMouseClicked(mouse(5, 5, { shiftKey: true }), undefined);
-      expect(sm.getRanges()).toEqual([new CellRange(0, 0, 1, 1)]);
+      expect(sm.getRanges()).toEqual([new CellRange(0, 0, 5, 5)]);
+      service.onMouseClicked(mouse(2, 0, { shiftKey: true }), undefined);
+      expect(sm.getRanges()).toEqual([new CellRange(0, 0, 2, 0)]);
     });
 
     it('ctrl-click selects the clicked cell', () => {
@@ -205,7 +237,7 @@ describe('SelectionService', () => {
       service.onMouseClicked(mouse(1, 1, { ctrlKey: true }), undefined);
       service.onMouseClicked(mouse(2, 2, { ctrlKey: true }), undefined);
       service.onMouseClicked(mouse(3, 3), undefined);
-      expect(sm.hasSelection()).toBe(false);
+      expect(sm.getRanges()).toEqual([CellRange.singleCell(3, 3)]);
     });
 
     it('a ctrl-click is the anchor of the next shift-click', () => {

@@ -8,9 +8,11 @@ import { EventSelectionChangedListenerIf } from './event-selection-changed-liste
  *
  * @example
  * override onSelectionChanged(model: SelectionModelIf): void {
- *   const ranges = model.getRanges().filter(r => !r.gammaRange);     // skip special ranges
- *   const cells = ranges.reduce((n, r) => n + (r.r2 - r.r1 + 1) * (r.c2 - r.c1 + 1), 0);
- *   console.log(`${cells} cells selected`);
+ *   // rows with at least one selected cell – also for "row"/"column" selections (their ranges are unbounded:
+ *   // r2/c2 = Number.MAX_SAFE_INTEGER, so (r2 - r1 + 1) * (c2 - c1 + 1) is no cell count)
+ *   const rowCount = tableModel.getBodyModel().getRowCount();
+ *   const rows = model.getMergedRowIndices(rowCount);
+ *   console.log(model.hasSelection() ? `${rows.length} rows with selected cells` : "nothing selected");
  * }
  *
  * @see Training: [Select cells, rows and ranges – and copy them](https://gui.expert/training/selection-and-copy/)

@@ -42,7 +42,7 @@ async function mountSelectionTable(type: ExtendedSelectionType = 'range', mode: 
     },
   });
   await settle();
-  return { ...table, fm, sm, onFocusChanged };
+  return { ...table, fm, sm, listener, onFocusChanged };
 }
 
 /** The rendered div of a body cell (center area). */
@@ -125,18 +125,12 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
   });
 
   it('ctrl+alt-click removes a cell from the selection', async () => {
-    // TableScope dumps debug info on ctrl+alt clicks (console.clear + console.info) – keep the test output clean
-    const clear = vi.spyOn(console, 'clear').mockImplementation(() => undefined);
-    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    try {
-      const { host, sm } = await mountSelectionTable('range');
-      sm.addSelection(new CellRange(0, 0, 1, 2));
-      await clickCell(host, 0, 2, 'Control', 'Alt');
-      expect(selectedCells(sm)).toEqual(['0/0', '0/1', '1/0', '1/1', '1/2']);
-    } finally {
-      clear.mockRestore();
-      info.mockRestore();
-    }
+    const clear = vi.spyOn(console, 'clear');
+    const { host, sm } = await mountSelectionTable('range');
+    sm.addSelection(new CellRange(0, 0, 1, 2));
+    await clickCell(host, 0, 2, 'Control', 'Alt');
+    expect(selectedCells(sm)).toEqual(['0/0', '0/1', '1/0', '1/1', '1/2']);
+    expect(clear).not.toHaveBeenCalled(); // Regression: Ctrl+Alt ran debug code (console.clear + console.info)
   });
 
   // Regression: a deselected cell stayed deselected forever (negative ranges were only removed by clear()).
@@ -266,5 +260,111 @@ describe('click repaint and mouse button', () => {
     expect(target.isConnected).toBe(true);
     target.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, detail: 2 }));
     await vi.waitFor(() => expect(repaint).toHaveBeenCalled());
+  });
+});
+
+describe('selection – open points of the first selection work (Okt. 2026)', () => {
+
+  async function mountWithListener(type: ExtendedSelectionType, mode: SelectionMode = 'multi') {
+    const table = await mountSelectionTable(type, mode);
+    const selectionChanged = vi.spyOn(table.listener, 'onSelectionChanged');
+    return { ...table, selectionChanged };
+  }
+
+  // Regression: firstClick() only knew "row" and "column" – a plain click selected nothing for type "cell".
+  it('type "cell": a plain click selects the clicked cell (and only that one)', async () => {
+    const { host, sm } = await mountSelectionTable('cell', 'multi');
+    await clickCell(host, 2, 1);
+    expect(selectedCells(sm)).toEqual(['2/1']);
+    await clickCell(host, 4, 2);
+    expect(selectedCells(sm)).toEqual(['4/2']);
+  });
+
+  // Regression: a click fired up to three onSelectionChanged events (clear(), the new range, the service itself).
+  it('onSelectionChanged fires once per click', async () => {
+    const { host, sm, selectionChanged } = await mountWithListener('row', 'multi');
+    sm.addSelection(CellRange.singleRow(5));
+    selectionChanged.mockClear();
+    await clickCell(host, 2, 1);
+    expect(selectionChanged).toHaveBeenCalledTimes(1);
+    expect(selectionChanged).toHaveBeenCalledWith(sm);
+    await clickCell(host, 3, 1, 'Shift');
+    expect(selectionChanged).toHaveBeenCalledTimes(2);
+  });
+
+  // Regression: header (and footer) clicks were handled like body clicks – they cleared the selection and moved the
+  // focus to the body cell with the same indices.
+  it('a click on a header cell keeps selection and focus', async () => {
+    const { host, sm, fm } = await mountSelectionTable('cell', 'multi');
+    await clickCell(host, 3, 2);
+    await userEvent.click(host.querySelector<HTMLElement>('.ge-table-header-center .ge-table-col-div[data-col-index="1"]')!);
+    await settle();
+    expect(selectedCells(sm)).toEqual(['3/2']);
+    expect(fm.getFocus()).toEqual([3, 2]);
+  });
+
+  // Regression: the second click of a double click went through the selection again – with Ctrl the cell was
+  // toggled on/off/on.
+  it('a Ctrl+double click toggles the cell once', async () => {
+    const { host, sm } = await mountSelectionTable('cell', 'multi');
+    await userEvent.dblClick(cell(host, 2, 0), { modifiers: ['Control'] }); // column 0 is not editable
+    await settle();
+    expect(selectedCells(sm)).toEqual(['2/0']);
+  });
+
+  // Regression: hasSelection() stayed true after all selected cells were deselected (Copy produced empty cells).
+  it('hasSelection() is false after the only selected cell is ctrl-clicked away', async () => {
+    const { host, sm } = await mountSelectionTable('cell', 'multi');
+    await clickCell(host, 1, 1);
+    expect(sm.hasSelection()).toBe(true);
+    await clickCell(host, 4, 2, 'Control');
+    await clickCell(host, 1, 1, 'Control');
+    expect(selectedCells(sm)).toEqual(['4/2']);
+    await clickCell(host, 4, 2, 'Control');
+    expect(selectedCells(sm)).toEqual([]);
+    expect(sm.hasSelection()).toBe(false);
+  });
+
+  it('repeated shift-clicks change the rectangle from the same anchor', async () => {
+    const { host, sm } = await mountSelectionTable('range', 'multi');
+    await clickCell(host, 1, 0);
+    await clickCell(host, 3, 1, 'Shift');
+    await clickCell(host, 2, 2, 'Shift');
+    expect(sm.getRanges()).toEqual([new CellRange(1, 0, 2, 2)]);
+  });
+
+  // Regression: a drag always cleared the selection – no second range with Ctrl+drag.
+  it('Ctrl+drag adds a second range (type "range")', async () => {
+    const { host, sm } = await mountSelectionTable('range', 'multi');
+    await clickCell(host, 0, 0);
+    await clickCell(host, 1, 1, 'Shift');
+    // drag with mouse events, Ctrl held from mousedown on
+    const fire = (row: number, col: number, type: string) => {
+      const target = cell(host, row, col);
+      const r = target.getBoundingClientRect();
+      target.dispatchEvent(new MouseEvent(type, {
+        bubbles: true, cancelable: true, clientX: r.left + 5, clientY: r.top + 5, ctrlKey: true, buttons: 1 }));
+    };
+    fire(3, 0, 'mousedown');
+    fire(3, 1, 'mousemove');
+    await nextFrame();
+    fire(4, 2, 'mousemove');
+    await nextFrame();
+    fire(4, 2, 'mouseup');
+    await settle();
+    expect(selectedCells(sm)).toEqual(['0/0', '0/1', '1/0', '1/1', '3/0', '3/1', '3/2', '4/0', '4/1', '4/2']);
+  });
+
+  // Regression: setSelectionModel() did not register the table at the new model – its changes were not reported.
+  it('setSelectionModel(): changes of the new model reach onSelectionChanged, the old one is detached', async () => {
+    const { api, sm, selectionChanged } = await mountWithListener('cell');
+    const newModel = new SelectionModel('row', 'multi');
+    api.setSelectionModel(newModel);
+    selectionChanged.mockClear();
+    newModel.addSelection(CellRange.singleRow(2));
+    expect(selectionChanged).toHaveBeenCalledWith(newModel);
+    selectionChanged.mockClear();
+    sm.addSelection(CellRange.singleCell(1, 1));
+    expect(selectionChanged).not.toHaveBeenCalled();
   });
 });

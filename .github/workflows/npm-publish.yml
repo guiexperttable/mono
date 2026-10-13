@@ -35,7 +35,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Nothing is published unless the core tests are green (same workflow as in CI, but without caches).
+  test:
+    uses: ./.github/workflows/test-core.yml
+    permissions:
+      contents: read       # no id-token for the tests
+    with:
+      use-cache: false
+      coverage: false
+
   publish:
+    needs: test
     runs-on: ubuntu-24.04    # pinned for reproducible releases; trusted publishing requires GitHub-hosted runners
     steps:
       - uses: actions/checkout@v7

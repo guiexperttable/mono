@@ -12,6 +12,10 @@ Paket bekommt auf npmjs.com einen Herkunftsnachweis (Provenance).
 
 Bereits veröffentlichte Versionen werden übersprungen – ein abgebrochener Lauf kann einfach neu gestartet werden.
 
+**Vorher laufen die Core-Tests** (Job `test`, wiederverwendbarer Workflow `.github/workflows/test-core.yml`: Typen,
+JSDoc-Beispiele, Unit- und Browser-Tests von `@guiexpert/table`). Erst wenn sie grün sind, startet der Job `publish` –
+auch beim Dry-Run. Rote Tests = kein Release.
+
 Vor dem ersten Upload prüft das Skript in GitHub Actions für **jedes** ausgewählte Paket, ob npm die OIDC-Anmeldung
 akzeptiert (`trusted publishing ok` / `FAILED` im Log). Schlägt eine fehl, wird gar nichts veröffentlicht. Das gilt
 auch für den Dry-Run – er testet also die npm-Einrichtung mit.

@@ -19,6 +19,8 @@
     "i": "pnpm i",
     "patch-version": "node patch.js",
     "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -50,6 +52,9 @@
     "ts-node": "10.9.1",
     "tsconfig": "^7.0.0",
     "typescript": "5.2.2",
-    "@babel/core": "~7.28.6"
+    "@babel/core": "~7.28.6",
+    "vitest": "5.0.4",
+    "@vitest/browser-playwright": "5.0.4",
+    "playwright": "1.64.0"
   }
 }

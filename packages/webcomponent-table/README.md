@@ -45,7 +45,7 @@ This is the UI-agnostic table component for your next web app. 😊
 
 ## Get Started
 
-Add the following two NPM packages to your existing preact project (run this in your project root directory):
+Add the following two NPM packages to your project (run this in your project root directory):
 
 ```
 npm install --save @guiexpert/table @guiexpert/webcomponent-table
@@ -61,10 +61,10 @@ this.innerHTML = `
 
 Import the following classes in your component:
 ```
-import { TableComponent } from "@guiexpert/webcomponent-table";
+import { GuiexpertTable } from "@guiexpert/webcomponent-table";
 import {
   GeMouseEvent,
-  TableApi
+  TableApi,
   TableFactory,
   TableModelIf,
   TableOptions,
@@ -73,7 +73,7 @@ import {
 ```
 
 
-Add a tableModel and tableOption property and a onTableReady method to the component. Set model and option via setData(tableModel, tableOptions):
+Register the element once (the package does not do it itself), then set model and options via `setData({ tableModel, tableOptions })` (or `el.data = { tableModel, tableOptions }`):
 
 ```
 const tableModel: TableModelIf = TableFactory.createTableModel({
@@ -90,11 +90,13 @@ function onTableReady(api: TableApi) {
   console.info("onTableReady API:", api);
 }
 
-const table = this.querySelector("guiexpert-table") as TableComponent;
+customElements.define("guiexpert-table", GuiexpertTable);   // once per page
+
+const table = this.querySelector("guiexpert-table") as GuiexpertTable;
 table.addEventListener("tableReady", (e) => console.info("table api:", (e as CustomEvent).detail));
 const tableOptions = new TableOptions();
 
-table.setData(tableModel, tableOptions);
+table.setData({ tableModel, tableOptions });
 ```
 
 There are numerous possibilities to create table models.

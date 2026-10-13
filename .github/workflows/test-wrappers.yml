@@ -1,0 +1,63 @@
+# Smoke tests of the framework wrappers (React, Preact, Vue 3, Svelte 4 + 5, Solid, Web Component) in headless
+# Chromium (Vitest 5 browser mode, see CLAUDE.md §6). The wrappers import the core from packages/table/src –
+# no build needed.
+#
+# Reusable workflow – called by
+#   - ci.yml           on every push to main and every pull request
+#   - npm-publish.yml  before publishing: a release is only published after green tests
+name: Test wrappers
+
+on:
+  workflow_call:
+    inputs:
+      use-cache:
+        description: 'Use the pnpm store and Playwright browser caches (false for release builds – avoids cache poisoning)'
+        type: boolean
+        default: true
+
+jobs:
+  test-wrappers:
+    name: Test framework wrappers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      CYPRESS_INSTALL_BINARY: 0   # @cypress/vue (vue3-table devDependency) – the Cypress binary is not needed
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ inputs.use-cache && 'pnpm' || '' }}
+          package-manager-cache: ${{ inputs.use-cache }}
+
+      # only the wrapper packages and their devDependencies
+      - run: pnpm install --frozen-lockfile --filter "./packages/*-table"
+
+      - name: Cache Playwright browsers
+        if: inputs.use-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-wrappers-${{ hashFiles('packages/*-table/package.json') }}
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @guiexpert/react-table exec playwright install --with-deps chromium
+
+      - name: Wrapper tests (Chromium)
+        run: pnpm test:wrappers
+
+      - name: Screenshots of failed browser tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: wrapper-test-failures
+          path: packages/*-table/.vitest/
+          if-no-files-found: ignore

@@ -20,6 +20,8 @@
     "i": "pnpm i",
     "patch-version": "node patch.js",
     "build": "node build.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -46,7 +48,7 @@
     "svelte-check": "^2.10.2",
     "svelte-jester": "^2.3.2",
     "svelte-preprocess": "^5.0.4",
-    "@sveltejs/vite-plugin-svelte": "^2.5.2",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
     "@testing-library/svelte": "^4.0.5",
     "@tsconfig/svelte": "^4.0.1",
     "eslint-plugin-svelte3": "^4.0.0",
@@ -63,7 +65,11 @@
     "ts-node": "10.9.1",
     "tsconfig": "^7.0.0",
     "typescript": "5.2.2",
-    "@babel/core": "~7.28.6"
+    "@babel/core": "~7.28.6",
+    "vitest": "5.0.4",
+    "@vitest/browser-playwright": "5.0.4",
+    "playwright": "1.64.0",
+    "svelte4": "npm:svelte@^4.2.20"
   },
   "description": "Svelte 4 and 5 wrapper of the GuiExpert Table (@guiexpert/table)."
 }

@@ -29,7 +29,10 @@ export default  defineConfig({
     }),
     Vue(),
     Components({
-      dirs: ["src/lib"]
+      dirs: ["src/lib"],
+      // no auto-detected library types (e.g. RouterLink/RouterView whenever some workspace package installs
+      // vue-router) – otherwise components.d.ts changes depending on node_modules and dirties the git tree
+      types: [],
     }),
     viteStaticCopy({
       targets: [

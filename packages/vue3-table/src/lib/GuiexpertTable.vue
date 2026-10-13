@@ -18,9 +18,15 @@ import {
   TableModelIf, TableOptionsIf,
   GeScrollEvent
 } from '@guiexpert/table';
-import { defineComponent, onBeforeUnmount, onMounted, PropType, ref } from 'vue';
+import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
 
+/**
+ * Vue 3 wrapper of the GuiExpert Table.
+ * A new `tableModel` or `tableOptions` object (new reference) re-creates the table; the previous table is released
+ * with `TableScope.destroy()`, as on unmount. Keep both objects stable (e.g. `shallowRef`), otherwise every new
+ * object creates a new table.
+ */
 export default defineComponent({
   inheritAttrs: false,
   props: {
@@ -30,7 +36,8 @@ export default defineComponent({
     },
     tableOptions: {
       required: false,
-      default: new TableOptions(),
+      // factory: every table gets its own options object (the core writes to it, e.g. setSelectionModel)
+      default: () => new TableOptions(),
       type: Object as PropType<TableOptionsIf>
     },
     /**
@@ -64,6 +71,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const root = ref(null);
     let clickTimer: ReturnType<typeof setTimeout> | undefined;
+    let tableScope: TableScope | undefined;
 
     const emitMouseClicked = (evt: GeMouseEvent) => {
       const delay = props.debounceMouseClickDelay;
@@ -78,11 +86,18 @@ export default defineComponent({
       }, delay);
     };
 
-    onBeforeUnmount(() => {
+    /** Releases the table (listeners, resize observer, cell renderers) and drops a pending debounced click. */
+    const destroyTable = () => {
       if (clickTimer) clearTimeout(clickTimer);
-    });
+      clickTimer = undefined;
+      tableScope?.destroy();
+      tableScope = undefined;
+    };
+
+    onBeforeUnmount(destroyTable);
 
     const initTable = (ele: HTMLDivElement) => {
+      destroyTable();
 
       const listener = {
 
@@ -127,11 +142,12 @@ export default defineComponent({
         },
       };
 
-      const tableScope = new TableScope(
-        ele, props.tableModel, new SimpleDomService(), props.tableOptions, listener
+      const scope = new TableScope(
+        ele, props.tableModel, new SimpleDomService(), props.tableOptions ?? new TableOptions(), listener
       );
-      tableScope.firstInit();
-      emit("tableReady", tableScope.getApi());
+      tableScope = scope;
+      scope.firstInit();
+      emit("tableReady", scope.getApi());
     };
 
 
@@ -141,7 +157,16 @@ export default defineComponent({
       }
     });
 
-    if (props.licenseKey) LicenseManager.getInstance().setLicenseKey(props.licenseKey);
+    // A new tableModel or tableOptions object re-creates the table (the previous one is destroyed).
+    watch([() => props.tableModel, () => props.tableOptions], () => {
+      if (root.value) {
+        initTable(root.value as HTMLDivElement);
+      }
+    });
+
+    watch(() => props.licenseKey, (licenseKey) => {
+      if (licenseKey) LicenseManager.getInstance().setLicenseKey(licenseKey);
+    }, { immediate: true });
 
     return {
       root

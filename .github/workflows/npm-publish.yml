@@ -44,8 +44,16 @@ jobs:
       use-cache: false
       coverage: false
 
+  # … and the framework wrappers (they are published in the same release)
+  test-wrappers:
+    uses: ./.github/workflows/test-wrappers.yml
+    permissions:
+      contents: read       # no id-token for the tests
+    with:
+      use-cache: false
+
   publish:
-    needs: test
+    needs: [test, test-wrappers]
     runs-on: ubuntu-24.04    # pinned for reproducible releases; trusted publishing requires GitHub-hosted runners
     steps:
       - uses: actions/checkout@v7

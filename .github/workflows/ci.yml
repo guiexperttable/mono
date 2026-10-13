@@ -18,43 +18,7 @@ jobs:
   # smoke tests of the framework wrappers (React, Preact, Vue 3, Svelte 4 + 5, Solid, Web Component) in headless
   # Chromium – they import the core from packages/table/src, so no build is needed; runs parallel to the build
   test-wrappers:
-    name: Test framework wrappers
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    env:
-      CYPRESS_INSTALL_BINARY: 0   # @cypress/vue (vue3-table devDependency) – the Cypress binary is not needed
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: pnpm/action-setup@v6   # version from "packageManager" in package.json
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
-      # only the wrapper packages and their devDependencies
-      - run: pnpm install --frozen-lockfile --filter "./packages/*-table"
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-wrappers-${{ hashFiles('packages/*-table/package.json') }}
-
-      - name: Install Chromium for Playwright
-        run: pnpm --filter @guiexpert/react-table exec playwright install --with-deps chromium
-
-      - name: Wrapper tests (Chromium)
-        run: pnpm test:wrappers
-
-      - name: Screenshots of failed browser tests
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: wrapper-test-failures
-          path: packages/*-table/.vitest/
-          if-no-files-found: ignore
+    uses: ./.github/workflows/test-wrappers.yml
 
   build:
     runs-on: ubuntu-latest

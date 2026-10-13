@@ -16,8 +16,10 @@ import {
  * - The table lives while the element is in the document: removing the element destroys it, inserting it again
  *   re-creates it from `data`. Data set on an element that is not connected yet is shown when it is connected.
  * - Events are dispatched on the element as bubbling `CustomEvent`s (payload in `detail`): `tableReady`,
- *   `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
- *   `modelChanged`, `selectionChanged`, `focusChanged`, `scroll`.
+ *   `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
+ *   `modelChanged`, `selectionChanged`, `focusChanged`, `scroll` – and `contextmenu`, which does **not** bubble
+ *   (the browser's own `contextmenu` MouseEvent reaches a listener on the element, too: check
+ *   `e instanceof CustomEvent`).
  */
 export class GuiexpertTable extends HTMLElement {
 
@@ -52,6 +54,10 @@ export class GuiexpertTable extends HTMLElement {
     this._data = data;
     if (this.isConnected) {
       this.createTable(data);
+    } else {
+      // not in the document (e.g. removed and re-inserted within one task): drop the table of the previous data,
+      // connectedCallback() creates the new one
+      this.destroyTable();
     }
   }
 
@@ -89,15 +95,16 @@ export class GuiexpertTable extends HTMLElement {
 
       // Dispatched on the element itself, not on the inner div: that div is the TableScope host and the core
       // listens there for the native events (a "contextmenu" CustomEvent on it would be swallowed by the core).
-      const dispatch = (name: string, detail: unknown) => {
-        this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
+      const dispatch = (name: string, detail: unknown, bubbles = true) => {
+        this.dispatchEvent(new CustomEvent(name, { detail, bubbles }));
       };
 
       const listener: EventListenerIf = {
         onSelectionChanged: (model: SelectionModelIf) => dispatch("selectionChanged", model),
         onFocusChanged: (model: FocusModelIf) => dispatch("focusChanged", model),
         onCheckboxChanged: (evt: any[]) => dispatch("checkboxChanged", evt),
-        onContextmenu: (evt: GeMouseEvent) => dispatch("contextmenu", evt),
+        // not bubbling: page-level "contextmenu" handlers (document/window) expect the browser's MouseEvent only
+        onContextmenu: (evt: GeMouseEvent) => dispatch("contextmenu", evt, false),
         onModelChanged: (evt: GeModelChangeEvent) => dispatch("modelChanged", evt),
         onMouseClicked: (evt: GeMouseEvent) => dispatch("mouseClicked", evt),
         onMouseDragging: (evt: GeMouseEvent) => dispatch("mouseDragging", evt),

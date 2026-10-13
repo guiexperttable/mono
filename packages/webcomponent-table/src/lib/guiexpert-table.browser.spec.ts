@@ -75,6 +75,23 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(cellOf(events.contextmenu[0])).toEqual({ areaIdent: 'body', rowIndex: 1, columnIndex: 1 });
   });
 
+  // review: a bubbling "contextmenu" CustomEvent (clientX undefined) reached page-level context-menu handlers
+  it('the "contextmenu" CustomEvent does not bubble to document (only the native event does)', async () => {
+    const { el } = createTableElement();
+    el.data = data(createModel(5));
+    await nextFrame();
+    const seen: string[] = [];
+    const onDocument = (e: Event) => seen.push(e.constructor.name);
+    document.addEventListener('contextmenu', onDocument);
+    try {
+      await userEvent.click(bodyCell(el, 1, 1), { button: 'right' });
+    } finally {
+      document.removeEventListener('contextmenu', onDocument);
+    }
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen).not.toContain('CustomEvent');
+  });
+
   it('new data re-creates the table and destroys the old one', async () => {
     const destroy = vi.spyOn(TableScope.prototype, 'destroy');
     const { el, events } = createTableElement();
@@ -159,6 +176,23 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(events.tableReady).toHaveLength(1);
     expect(isDestroyed(events.tableReady[0])).toBe(false);
     expect(rowTexts(el)).toHaveLength(5);
+  });
+
+  // review: data set while the element was removed and re-inserted in the same task was lost (old table stayed)
+  it('new data set while the element is removed and re-inserted in one task is shown', async () => {
+    const { host, el, events } = createTableElement();
+    el.data = data(createModel(5));
+    await nextFrame();
+    const firstApi = events.tableReady[0];
+
+    el.remove();
+    el.data = data(createModel(3));
+    host.appendChild(el);
+    await nextFrame();
+
+    expect(isDestroyed(firstApi)).toBe(true);
+    expect(tableCount(el)).toBe(1);
+    expect(rowTexts(el)).toHaveLength(3);
   });
 
   it('a data property set before customElements.define() is picked up on upgrade', async () => {

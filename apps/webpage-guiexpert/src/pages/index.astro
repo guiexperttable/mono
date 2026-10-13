@@ -2,9 +2,10 @@
 import IndexLayout from '../layouts/IndexLayout.astro';
 import Header from "../components/header.astro";
 import Hero from "../components/home/hero.astro";
-import Intro from "~/components/intro.astro";
+import Why from "../components/home/why.astro";
 import Features from "~/components/features.astro";
-import Compatibility from "../components/getstarted.astro";
+import CodeTabs from "../components/home/code-tabs.astro";
+import Intro from "~/components/intro.astro";
 import Showcase from "~/components/showcase.astro";
 import WhatsNew from "../components/home/whats-new.astro";
 import Footer from "~/components/footer.astro";
@@ -17,9 +18,10 @@ import Footer from "~/components/footer.astro";
   <Hero />
 
   <div class="space-y-24 px-8 py-24 max-sm:px-4" id="container">
+    <Why />
     <Features />
+    <CodeTabs />
     <Intro />
-    <Compatibility />
     <Showcase />
     <WhatsNew />
   </div>

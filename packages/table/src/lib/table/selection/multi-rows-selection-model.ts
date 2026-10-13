@@ -19,16 +19,17 @@ export class MultiRowsSelectionModel<T> extends SelectionModel {
 
   /**
    * Retrieves the selected rows from an array of all table rows.
+   * The selection holds row indices of the displayed rows – pass the displayed (filtered, sorted) rows.
    *
    * @param {T[]} allrows - The array of all rows from the table model.
-   * @returns {T[]} - The selected rows from the given array.
+   * @returns {T[]} - The selected rows from the given array (the array itself if everything is selected).
    */
   getSelectedRowItems(allrows: T[]): T[] {
-    const selectedRowIds = this.getMergedRowIndices();
-    if (this.isAllSelected()) {
+    if (this.isAllSelected() && !this.negativeRanges.length) {
       return allrows;
     }
-    return allrows.filter((_r, i) => selectedRowIds.includes(i));
+    const selectedRowIds = new Set(this.getMergedRowIndices(allrows.length));
+    return allrows.filter((_r, i) => selectedRowIds.has(i));
   };
 
   /**
@@ -104,7 +105,7 @@ export class MultiRowsSelectionModel<T> extends SelectionModel {
   }
 
   /**
-   * Toggles the selection state of a row.
+   * Toggles the selection state of a row. A row that was toggled off can be toggled on again.
    *
    * @param {number} rowIndex - The index of the row to toggle.
    *
@@ -113,6 +114,8 @@ export class MultiRowsSelectionModel<T> extends SelectionModel {
   toggleRow(rowIndex: number) {
     if (this.isSelected(rowIndex, 0)) {
       this.unselectRow(rowIndex);
+    } else if (this.reselectPoint(rowIndex, 0)) {
+      this.fireChangeEvent();
     } else {
       this.selectRow(rowIndex);
     }

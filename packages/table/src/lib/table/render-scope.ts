@@ -238,6 +238,10 @@ export class RenderScope extends EleScope {
    * @return {void} This method does not return any value.
    */
   repaintHard() {
+    // rows were added/removed (setRows, filter, tree toggle …): the col-/rowspan ranges must match the new rows
+    for (const areaIdent of ['header', 'body', 'footer'] as const) {
+      this.colAndRowspanModels[areaIdent]?.initIfRowCountChanged();
+    }
     this.tableModel.recalcHeightAndPadding();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
@@ -821,6 +825,9 @@ export class RenderScope extends EleScope {
       if (ranges.length) {
 
         for (const range of ranges) {
+          if (range.r1 >= rowCount || range.c1 >= columnCount) {
+            continue; // stale range (rows removed without repaintHard) – its row no longer exists
+          }
           let xStart = 0;
           let child: HTMLDivElement = centerArea.child;
           let sideIdent: SideIdent = 'center';

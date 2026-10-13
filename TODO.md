@@ -325,8 +325,11 @@ Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`pa
       `SelectCellRenderer` (Optionen), `NumberCellRenderer`, `PositiveAndNegativeNumberRenderer`,
       `DateToIntlDDMMYYYYCellRenderer`, `CellGroupExtCellRenderer` (Header-Gruppen-Label), `ActionsCellRenderer` (`data-id`).
       Die übrigen `innerHTML`-Renderer schreiben nur Zahlen/Konstanten.
-- [ ] Editor: kein Escape zum Abbrechen (Blur übernimmt den Text) · Span-Modell wird nie neu aufgebaut: `setRows()` mit
-      weniger Zeilen + `repaintHard()` → TypeError (`render-scope.ts:146`).
+- [x] Behoben (Branch `fix/editor-spans`): Editor – Escape bricht ab (alter Wert bleibt, kein `onModelChanged`, Fokus
+      zurück an die Tabelle; ein umgebender `<dialog>` schließt nicht mit) · Span-Modell wurde nie neu aufgebaut
+      (`setRows()` mit weniger Zeilen + `repaintHard()` → TypeError) – `repaintHard()` baut die Col-/Rowspan-Bereiche
+      neu, wenn sich die Zeilenzahl geändert hat (`ColAndRowspanModel.initIfRowCountChanged()`); veraltete Bereiche
+      werden übersprungen.
 - [x] Baum-CSS: `.ge-table-tree-deep-5` doppelt, keine Regel für Tiefe 6 – jetzt 0 … 9 je 20 px (Branch
       `fix/date-renderers`).
 
@@ -391,6 +394,7 @@ Objekt-Tabelle hat `ge-focused-row`.
   ab dem ersten Zeichnen und nach jedem Host-Resize (vorher 400 px bis ~500 ms nach dem Mounten bzw. eine Runde
   hinterher) und lassen Platz für die senkrechte Scrollleiste. `scrollToIndex()` trifft die Zeile exakt (auch mit Footer).
   Ost-Trennlinie bei nur rechts fixierten Spalten.
+- **Editor**: Escape bricht das Editieren ab (vorher übernahm der nächste Blur den Text).
 - **Maus**: Footer-Zellen melden Klick/Hover/Kontextmenü als Footer-Events (vorher Body mit −1); zwei schnelle Klicks
   auf eine Checkbox, einen Baum-Pfeil, „alle auf/zu“ oder eine Header-Gruppe schalten zweimal um (vorher wurde der
   zweite als Doppelklick verschluckt); die Header-Checkbox einer `CheckboxColumnDef` hakt alle Body-Zeilen an/ab;

@@ -130,16 +130,53 @@ describe('InputCellRenderer (default editor of TableOptions.getEditRenderer)', (
     expect(editorInput(host)!.value).toBe('From server');
   });
 
-  // BUG: no Escape handling at all (ShortcutService ignores keys in inputs, InputCellRenderer has no key handler) –
-  // the editor stays open and the typed text is committed as soon as the input loses the focus.
-  it.fails('Escape cancels the editing and keeps the old value', async () => {
-    const { host, fm, rows, scope } = await mountEditTable();
+  // Regression: there was no Escape handling at all (ShortcutService ignores keys in inputs, InputCellRenderer has no
+  // key handler) – the editor stayed open and the typed text was committed as soon as the input lost the focus.
+  it('Escape cancels the editing and keeps the old value', async () => {
+    const { host, fm, rows, scope, modelChanges } = await mountEditTable();
     fm.setFocus(3, 1);
     await userEvent.keyboard('{F2}');
     await userEvent.keyboard('Typo{Escape}');
     expect(scope.isEditing()).toBe(false);
     expect(editorInput(host)).toBeNull();
     expect(rows[3].name).toBe('Name 3');
+    expect(cellText(host, 3, 1)).toBe('Name 3');
+    expect(modelChanges).toEqual([]);
+    expect(document.activeElement).toBe(host); // keyboard navigation continues
+    await userEvent.keyboard('{F2}'); // and the editor opens again
+    expect(editorInput(host)!.value).toBe('Name 3');
+  });
+
+  it('Escape in a select editor keeps the old value', async () => {
+    const { host, fm, rows, scope } = await mountEditTable();
+    fm.setFocus(4, 3);
+    await userEvent.keyboard('{F2}');
+    const select = host.querySelector<HTMLSelectElement>('select.ge-table-cell-editor-select')!;
+    select.value = 'void'; // changed, but not committed yet (no "change" event)
+    select.focus();
+    await userEvent.keyboard('{Escape}');
+    expect(scope.isEditing()).toBe(false);
+    expect(rows[4].status).toBe('open');
+  });
+
+  it('Escape in the editor does not close a surrounding <dialog>', async () => {
+    const dialog = document.createElement('dialog');
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    try {
+      const { host, fm, scope } = await mountEditTable();
+      dialog.appendChild(host); // outside of the modal dialog everything is inert
+      await nextFrame();
+      host.focus();
+      fm.setFocus(3, 1);
+      await userEvent.keyboard('{F2}');
+      expect(scope.isEditing()).toBe(true);
+      await userEvent.keyboard('{Escape}');
+      expect(scope.isEditing()).toBe(false);
+      expect(dialog.open).toBe(true);
+    } finally {
+      dialog.remove();
+    }
   });
 
   // Regression: input-cell-renderer.ts wrote the value unescaped into value="…" – a double quote ended the attribute

@@ -221,6 +221,24 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     return false;
   }
 
+  /**
+   * Closes the cell editor without changing the model (Escape in the editor).
+   *
+   * @param {HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement} [editor] - the editor element: its value is reset
+   *        first, so the blur caused by closing does not commit the typed text ("change" event)
+   */
+  cancelEditing(editor?: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+    if (editor instanceof HTMLSelectElement) {
+      const defaultOption = Array.from(editor.options).find(o => o.defaultSelected);
+      editor.selectedIndex = defaultOption ? defaultOption.index : -1;
+    } else if (editor) {
+      editor.value = editor.defaultValue;
+    }
+    this.resetEditorRenderer();
+    this.hostElement.focus(); // keyboard navigation continues (the editor loses the focus without a change)
+    this.repaint();
+  }
+
   updateModelValueAfterEdit(areaIdent: AreaIdent, rowIndex: number, columnIndex: number, value: string) {
     if (areaIdent === 'body') {
       const bodyAreaModel = this.tableModel.getAreaModel(areaIdent);

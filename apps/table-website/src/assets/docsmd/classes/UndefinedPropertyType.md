@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / UndefinedPropertyType
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / UndefinedPropertyType
 
 # Class: UndefinedPropertyType
 
@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:26](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L26)
+[src/lib/common/generator/domain/property-type.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L38)
 
 ## Properties
 
@@ -49,7 +49,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:26](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L26)
+[src/lib/common/generator/domain/property-type.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L38)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:25](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L25)
+[src/lib/common/generator/domain/property-type.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L37)

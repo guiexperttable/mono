@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / UrlInfo
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / UrlInfo
 
 # Class: UrlInfo
 
@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[lib/table/crud/url-info.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/url-info.ts#L4)
+[src/lib/table/crud/url-info.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/url-info.ts#L5)
 
 ## Properties
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[lib/table/crud/url-info.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/url-info.ts#L4)
+[src/lib/table/crud/url-info.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/url-info.ts#L5)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/url-info.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/url-info.ts#L4)
+[src/lib/table/crud/url-info.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/url-info.ts#L5)

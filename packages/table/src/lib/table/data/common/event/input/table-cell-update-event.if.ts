@@ -3,6 +3,8 @@ import { AreaIdent } from "../../../tablemodel/area-ident.type";
 /**
  * One event defines one table cell update operation.
  * You can send an array of these event via TableApi#updateCells(events: TableCellUpdateEventIf[], repaintAll: boolean = false).
+ *
+ * @category Events
  */
 export interface TableCellUpdateEventIf {
 

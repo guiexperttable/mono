@@ -40,6 +40,8 @@ import { EventSelectionChangedListenerIf } from './event-selection-changed-liste
  * @method togglePoint(row: number, col: number): void - Toggles the selection state of a point at the specified row and column in a grid.
  * @method isSelected(row: number, col: number): boolean - Checks if a specific cell in a grid is selected.
  * @method addRange(range: CellRange): void - Adds a range of cells to the selection.
+ *
+ * @category Selection & focus
  */
 export class SelectionModel implements SelectionModelIf {
 

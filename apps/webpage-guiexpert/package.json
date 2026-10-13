@@ -16,7 +16,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write **/*.astro .",
-    "clean": "rimraf dist .astro node_modules"
+    "clean": "rimraf dist .astro node_modules",
+    "check:training": "node ../../packages/table/node_modules/typescript/bin/tsc -p tsconfig.training.json",
+    "screenshots:training": "node scripts/training-screenshots.mjs"
   },
   "devDependencies": {
     "@guiexpert/demo-table-models": "workspace:*",

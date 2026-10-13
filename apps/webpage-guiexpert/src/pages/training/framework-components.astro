@@ -1,0 +1,52 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="framework-components">
+
+  <h2 id="why">Why components?</h2>
+  <p>
+    A <ChapterLink slug="cell-renderers" label="cell renderer" /> builds DOM by hand. If your design system already has a
+    <code>&lt;StatusChip&gt;</code>, a tooltip or a menu button as a component, you can put the component itself into the cell.
+    Each wrapper package has an adapter that turns a component into a <ApiLink name="CellRendererIf" />.
+  </p>
+  <p>The shared model of the framework demos accepts optional body renderers per property:</p>
+  <Snippet file="examples/model/order-table.ts" title="src/model/order-table.ts" />
+
+  <h2 id="react">React</h2>
+  <Snippet file="examples/react/StatusChip.tsx" title="frameworks/react/src/StatusChip.tsx" />
+  <Snippet file="examples/react/App.tsx" title="frameworks/react/src/App.tsx" mark="ComponentRendererWrapper" />
+  <p>The component gets <code>cellValue</code>, <code>rowIndex</code>, <code>columnIndex</code>, <code>areaIdent</code> and
+    <code>areaModel</code> as props. It is rendered as a real React element – hooks like <code>useState</code> work.</p>
+  <Figure src="fw-react" caption="The status column: a React component per visible cell (hover shows the dot)." />
+
+  <h2 id="angular">Angular</h2>
+  <p>The component implements <code>ComponentRendererIf</code> – the table calls <code>setData()</code> instead of setting inputs:</p>
+  <Snippet file="examples/angular/status-chip.ts" title="frameworks/angular/src/app/status-chip.ts" />
+  <p><code>RenderWrapperFactory.create(Component, changeDetectorRef)</code> builds the renderer once:</p>
+  <Snippet file="examples/angular/app.ts" title="frameworks/angular/src/app/app.ts" mark={["RenderWrapperFactory", "statusRenderer"]} />
+
+  <h2 id="others">Vue, Svelte, Solid, Preact</h2>
+  <p>Their wrapper packages export a <code>ComponentRendererWrapper</code> as well – same idea, the component receives the cell
+    data as props.</p>
+
+  <h2 id="lifecycle">Lifecycle</h2>
+  <ul>
+    <li>Components are created <strong>only for visible cells</strong> and destroyed when the cell scrolls out of view – tested:
+      after 20 scroll steps there are still 19 components in the DOM, not hundreds.</li>
+    <li>That means: no long-lived state in the cell component. Keep state in your data (the row) or in a store.</li>
+    <li>Components are heavier than plain renderers. For 10 columns × 30 visible rows that is no problem; for a heatmap with 400
+      cells per screen prefer <ChapterLink slug="heatmap" label="classes and styles from the model" />.</li>
+  </ul>
+  <Callout type="version">
+    <p>React/Preact: since 18.1.86 resp. 10.1.86 the components are rendered as elements (before, they were called as functions
+      and hooks broke). Solid: cell roots are cleaned up since 1.1.86.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Colour from the value – <ChapterLink slug="heatmap" />.</p>
+</TrainingLayout>

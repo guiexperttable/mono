@@ -1,5 +1,6 @@
 import { AnyPropertyType, PropertyItem } from './property-type';
 
+/** @category Utilities */
 export class ValueInfo {
   public property: string = '';
   public value: any = '';

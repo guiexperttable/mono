@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CopyService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CopyService
 
 # Class: CopyService
 
@@ -22,7 +22,6 @@
 - [copyContent](CopyService.md#copycontent)
 - [copyToClipboard](CopyService.md#copytoclipboard)
 - [createContent](CopyService.md#createcontent)
-- [mergeRanges](CopyService.md#mergeranges)
 
 ## Constructors
 
@@ -42,7 +41,7 @@
 
 #### Defined in
 
-[lib/table/service/copy-service.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L10)
+[src/lib/table/service/copy-service.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L11)
 
 ___
 
@@ -52,7 +51,7 @@ ___
 
 #### Defined in
 
-[lib/table/service/copy-service.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L11)
+[src/lib/table/service/copy-service.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L12)
 
 ## Methods
 
@@ -80,7 +79,7 @@ A promise that resolves when the content has been successfully copied to the cli
 
 #### Defined in
 
-[lib/table/service/copy-service.ts:66](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L66)
+[src/lib/table/service/copy-service.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L68)
 
 ___
 
@@ -110,7 +109,7 @@ A promise that resolves with the copied text if successful, or rejects if an err
 
 #### Defined in
 
-[lib/table/service/copy-service.ts:78](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L78)
+[src/lib/table/service/copy-service.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L80)
 
 ___
 
@@ -144,28 +143,4 @@ Throws an error if neither selection nor focus is defined.
 
 #### Defined in
 
-[lib/table/service/copy-service.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L22)
-
-___
-
-### mergeRanges
-
-▸ **mergeRanges**(`ranges`): `undefined` \| [`CellRange`](CellRange.md)
-
-Merges an array of CellRanges into a single merged CellRange.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `ranges` | [`CellRange`](CellRange.md)[] | The array of CellRanges to be merged. |
-
-#### Returns
-
-`undefined` \| [`CellRange`](CellRange.md)
-
-- The merged CellRange, or undefined if the ranges array is empty.
-
-#### Defined in
-
-[lib/table/service/copy-service.ts:114](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/service/copy-service.ts#L114)
+[src/lib/table/service/copy-service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L23)

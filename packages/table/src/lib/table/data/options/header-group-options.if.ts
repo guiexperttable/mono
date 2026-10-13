@@ -32,10 +32,9 @@ import { IconIf } from "./icon.if";
  *     classes: ["my-collapsed-icon-class"]
  *   }
  * };
+
  *
- * This example creates an object conforming to the `HeaderGroupOptionsIf`
- * interface where `iconExpanded` and `iconCollapsed` each hold the specifications
- * for the expanded and collapsed states of a header group component respectively.
+ * @category Header groups
  */
 export interface HeaderGroupOptionsIf {
   iconExpanded: IconIf;

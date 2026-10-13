@@ -21,66 +21,119 @@ import { TableOptions } from "../data/options/table-options";
 import {isTreeRow} from "../instanceof-workaround";
 
 
-export type CreateTableModelPara = {
-  headerAreaModel: AreaModelIf,
-  bodyAreaModel: AreaModelIf,
-  footerAreaModel: AreaModelIf,
-  fixedLeftColumnCount: number,
-  fixedRightColumnCount: number,
-  rowCheckboxVisible: boolean,
-  defaultRowHeights: DefaultRowHeightsIf,
-  columnDefs: ColumnDefIf[],
-  columnSizes: number[],
-  overridingColumnWidth: number,
-  columnCount: number,
-  parentSize: number,
-  getSelectionModel: GetT<SelectionModelIf>,
-  rows: any[],
-  properties: string[],
-  bodyData: any[][],
-  headerData: string[][], // multi-line header
-  footerData: string[][], // multi-line footerData
-  tableOptions: TableOptionsIf
+/**
+ * Parameters of {@link TableFactory.createTableModel} – pass any subset (`Partial<CreateTableModelPara>`).
+ *
+ * Three typical combinations:
+ *
+ * | You have … | Pass | Training |
+ * |---|---|---|
+ * | an array of objects | `rows` (+ `properties` or `columnDefs`) | [chapter 12](https://gui.expert/training/array-to-table-model/), [13](https://gui.expert/training/column-definitions/) |
+ * | rows of values (CSV, matrix) | `headerData`, `bodyData`, `footerData`, `columnSizes` | [chapter 14](https://gui.expert/training/array-of-arrays/) |
+ * | own area models | `headerAreaModel`, `bodyAreaModel`, `footerAreaModel` + `columnDefs` | [chapter 15–17](https://gui.expert/training/custom-area-model/) |
+ *
+ * Everything not given is derived: column definitions from `properties` or the keys of the first row
+ * (header label = key in upper case, width 200 px), area models from the data, row heights from
+ * `tableOptions.defaultRowHeights`.
+ *
+ * @example
+ * const tableModel = TableFactory.createTableModel({
+ *   rows: orders,                                   // Order[]
+ *   columnDefs: [new ColumnDef("id", "ID", px80, allRight), new ColumnDef("customer", "Customer", px180)],
+ *   fixedLeftColumnCount: 1,
+ *   tableOptions
+ * });
+ *
+ * @category Table model
+ */
+export interface CreateTableModelPara {
+  /** Model of the header. Default: one header row from the `headerLabel`s of `columnDefs`, or `headerData`. */
+  headerAreaModel: AreaModelIf;
+  /** Model of the body. Default: built from `rows` (objects or tree rows) or `bodyData`. See {@link AreaModel} for own models. */
+  bodyAreaModel: AreaModelIf;
+  /** Model of the footer. Default: `footerData`, otherwise no footer. Totals that follow the filter: an own {@link AreaModel}. */
+  footerAreaModel: AreaModelIf;
+  /** Number of columns fixed on the left (side "west"). Default 0. */
+  fixedLeftColumnCount: number;
+  /** Number of columns fixed on the right (side "east"). Default 0. */
+  fixedRightColumnCount: number;
+  /** Show a checkbox column for every row. Default false. */
+  rowCheckboxVisible: boolean;
+  /** Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34. */
+  defaultRowHeights: DefaultRowHeightsIf;
+  /** The columns: property, header label, width, classes, renderers, sorting, editing. See {@link ColumnDef}. */
+  columnDefs: ColumnDefIf[];
+  /** Column widths in px – the simple alternative to `columnDefs` (e.g. with `bodyData`). */
+  columnSizes: number[];
+  /** A width in px for all columns; -1 (default) = use the column definitions. */
+  overridingColumnWidth: number;
+  /** Number of columns. Default: derived from `columnDefs`, `headerData` or `columnSizes`. */
+  columnCount: number;
+  /** Width of the parent element in px, used for percentage column widths before the first render (default 400). */
+  parentSize: number;
+  /** Selection model factory. Default: `tableOptions.getSelectionModel`. */
+  getSelectionModel: GetT<SelectionModelIf>;
+  /** The rows as objects (`T[]`) or tree rows from {@link TreeFactory.buildTreeRows}. */
+  rows: any[];
+  /** Which properties of `rows` become columns, in this order (ignored if `columnDefs` is given). */
+  properties: string[];
+  /** The body as rows of values (`any[][]`). */
+  bodyData: any[][];
+  /** Header rows as values – several rows are possible. */
+  headerData: string[][];
+  /** Footer rows as values (static – they don't follow filter or edits). */
+  footerData: string[][];
+  /** Options of the table; the factory reads `defaultRowHeights`, `getSelectionModel` and `showCheckboxWihoutExtraColumn`. */
+  tableOptions: TableOptionsIf;
+}
 
-};
-
+/**
+ * Creates {@link TableModelIf table models} from data – the usual way to start a table.
+ *
+ * - {@link createTableModel} – the universal entry point with named parameters ({@link CreateTableModelPara}).
+ * - {@link buildByTypedRows} – rows + column definitions (+ options, fixed columns).
+ * - {@link createByObjectArray} – rows + header/footer rows as data.
+ * - {@link createByAreaModels} – three area models of your own.
+ *
+ * Trees: build the rows with {@link TreeFactory.buildTreeRows} first, then pass them as `rows`.
+ *
+ * @example
+ * // all keys of the first row become columns
+ * const simple = TableFactory.createTableModel({ rows: orders });
+ *
+ * // choose and order the columns – typed
+ * const properties: (keyof Order)[] = ["id", "date", "customer", "total"];
+ * const selected = TableFactory.createTableModel({ rows: orders, properties });
+ *
+ * // rows of values with a header and a footer row
+ * const csv = TableFactory.createTableModel({
+ *   headerData: [["ID", "City"]],
+ *   bodyData: [[1, "Berlin"], [2, "Paris"]],
+ *   footerData: [["", "2 rows"]],
+ *   columnSizes: [80, 160]
+ * });
+ *
+ * @see Training: [Array&lt;T&gt; → TableModel](https://gui.expert/training/array-to-table-model/),
+ *   [Array of arrays](https://gui.expert/training/array-of-arrays/)
+ *
+ * @category Table model
+ */
 export class TableFactory {
 
   /**
-   * TableFactory
+   * Creates a table model from any subset of {@link CreateTableModelPara}.
+   * Missing parts are derived (see {@link CreateTableModelPara}).
    *
-   * This class is responsible for creating table models based on various
-   * parameters and configurations. TableFactory provides different methods
-   * to create these models that must comply with TableModelIf interface.
+   * @param p - rows, column definitions, area models, fixed columns, options …
+   * @returns the table model for `new TableScope(host, tableModel, …)` or the `tableModel` input of a framework wrapper
    *
-   * Methods:
-   *
-   * createTableModel(p: Partial<{...}>): TableModelIf
-   * Receives a set of parameters as a Partial object with a number of properties
-   * and returns an instance of an object that complies to TableModelIf interface.
-   * Refer to the method's documentation for details.
-   *
-   * buildByTypedRowsParam(param: {rows: T[]; columnDefs: ColumnDefIf[]; tableOptions?: TableOptionsIf; fixedLeftColumnCount?: number; fixedRightColumnCount?: number}): TableModelIf
-   * Receives a parameter object with essential properties needed to build the table model,
-   * including rows (type T array), column definitions (ColumnDefIf array),
-   * optional table options (TableOptionsIf object), and optional fixed column counts,
-   * and returns an instance of TableModelIf.
-   *
-   * buildByTypedRows(rows: T[], columnDefs: ColumnDefIf[], tableOptions?: TableOptionsIf, fixedLeftColumnCount?: number, fixedRightColumnCount?: number): TableModelIf
-   * Similar to `buildByTypedRowsParam` but accepts separate parameters instead of a single parameter object.
-   *
-   * createByObjectArrayParam(param: {rows: T[]; header?: string[][]; footer?: string[][]; fixedLeftColumnCount?: number; fixedRightColumnCount?: number; rowCheckboxVisible?: boolean; defaultRowHeights?: DefaultRowHeightsIf; columnDefs?: ColumnDefIf[]; columnSizes?: number[]}): TableModelIf
-   * Similar to `createTableModel` but accepts an object parameter with properties required to create a table, including row data, header and footer multi-line data, fixed column counts, visibility of row checkbox, default row heights, column definitions, and column sizes, and returns a TableModelIf instance.
-   *
-   * createByAreaModels(headerAreaModel: AreaModelIf, bodyAreaModel: AreaModelIf, footerAreaModel: AreaModelIf, fixedLeftColumnCount: number, fixedRightColumnCount: number, rowCheckboxVisible: boolean, defaultRowHeights: DefaultRowHeightsIf): TableModelIf
-   * Accepts area models for header, body, and footer, along with fixed column counts, visibility of row checkbox, and default row heights, to create a table model.
-   *
-   * createByAreaModelsParam(param: {headerAreaModel?: AreaModelIf; bodyAreaModel: AreaModelIf; footerAreaModel?: AreaModelIf; fixedLeftColumnCount?: number; fixedRightColumnCount?: number; rowCheckboxVisible?: boolean; defaultRowHeights?: DefaultRowHeightsIf; columnDefs?: ColumnDefIf[]; columnSizes?: number[]; overridingColumnWidth?: number; columnCount?: number}): TableModelIf
-   * Similar to `createByAreaModels` but accepts an object parameter with the required and optional properties to create the table model.
-   *
-   * createByObjectArray(rows: T[], header: string[][], footer: string[][], fixedLeftColumnCount: number, fixedRightColumnCount: number, rowCheckboxVisible: boolean, defaultRowHeights: DefaultRowHeightsIf): TableModelIf
-   * Allows to create a table model utilizing object array data for rows, header, and footer along with the specified configurations.
-   * Please consult each method's documentation for detailed explanation of their functionality.
+   * @example
+   * const tableModel = TableFactory.createTableModel({
+   *   rows: orders,
+   *   columnDefs,
+   *   fixedLeftColumnCount: 1,
+   *   footerAreaModel: new OrderTotalsFooterModel(() => tableModel.getBodyModel())
+   * });
    */
   public static createTableModel(p: Partial<CreateTableModelPara>): TableModelIf {
 
@@ -387,16 +440,8 @@ export class TableFactory {
    *   rowCheckboxVisible: true,
    *   defaultRowHeights: new DefaultRowHeights(40, 50, 40),
    *   columnDefs: [
-   *     {
-   *       property: 'name',
-   *       headerLabel: 'Name',
-   *       width: 100
-   *     },
-   *     {
-   *       property: 'age',
-   *       headerLabel: 'Age',
-   *       width: 50
-   *     }
+   *     new ColumnDef('name', 'Name', px100),
+   *     new ColumnDef('age', 'Age', px50)
    *   ],
    *   columnSizes: [100, 50]
    * };
@@ -597,19 +642,12 @@ export class TableFactory {
    *
    * Note: You need to import the `AreaModelArrayOfArrays` and `AreaModelHidden` classes from the respective package/module before using this method.
    *
+   * Simpler with named parameters: {@link createTableModel}.
+   *
    * @example
-   * ```typescript
-   * // Given the following array of objects:
-   * const rows = [{field1: 'data11', field2: 'data12'}, {field1: 'data21', field2: 'data22'}];
-   *
-   * // And a set of column definitions:
-   * const columnDefs: ColumnDefIf[] = [{headerLabel: 'Field 1', property: 'field1'}, {headerLabel: 'Field 2', property: 'field2'}];
-   *
-   * // You can create a TableModel like following:
-   * let tableModel = TableFactory.createByObjectArray(rows, undefined, undefined, 0, 0, false, new DefaultRowHeights(), columnDefs);
-   * ```
-   *
-   * Reference: For more details regarding the `DefaultRowHeightsIf`, `ColumnDefIf`, `AreaModelIf`, and `AreaModelArrayOfArrays` classes/interfaces, please refer to the respective API documents.
+   * const rows = [{ field1: "data11", field2: "data12" }, { field1: "data21", field2: "data22" }];
+   * const columnDefs: ColumnDefIf[] = [new ColumnDef("field1", "Field 1"), new ColumnDef("field2", "Field 2")];
+   * const tableModel = TableFactory.createByObjectArray(rows, undefined, undefined, 0, 0, false, new DefaultRowHeights(), columnDefs);
    */
   public static createByObjectArray<T>(
     rows: T[],

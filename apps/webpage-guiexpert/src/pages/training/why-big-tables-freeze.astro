@@ -1,0 +1,68 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="why-big-tables-freeze">
+
+  <h2 id="problem">The problem</h2>
+  <p>
+    You have to show orders, measurements, log lines, positions – and there are many of them. The obvious solution is a
+    plain HTML table: one <code>&lt;tr&gt;</code> per record, one <code>&lt;td&gt;</code> per value. It is simple, it is
+    accessible, and for a few hundred rows it is perfect.
+  </p>
+  <p>Here it is, written in the most straightforward way – the code from the first video:</p>
+  <Snippet file="demos/naive-table.ts" region="render" title="naive-table.ts" />
+
+  <h2 id="try">Try it</h2>
+  <p>
+    Start the demo with 1,000 rows, then try 5,000 and 20,000. Click a column header to sort. Watch the numbers in the
+    toolbar – and how long the page does not react at all.
+  </p>
+  <LiveDemo name="naive-table" title="The naive table" height={380}
+            caption="20,000 rows block this page for several seconds. The step-by-step demo goes up to 100,000 rows – that takes minutes." />
+
+  <h2 id="numbers">The numbers</h2>
+  <p>Measured in Chromium (headless, Linux VM, October 2026) until the browser has really painted:</p>
+  <table>
+    <thead><tr><th class="num">Rows</th><th class="num">DOM elements</th><th class="num">First render</th><th class="num">Sort (rebuild everything)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1,000</td><td class="num">12,014</td><td class="num">0.2 s</td><td class="num">0.2 s</td></tr>
+      <tr><td class="num">10,000</td><td class="num">120,014</td><td class="num">2.7 s</td><td class="num">2.9 s</td></tr>
+      <tr><td class="num">25,000</td><td class="num">300,014</td><td class="num">11.7 s</td><td class="num">11.9 s</td></tr>
+      <tr><td class="num">50,000</td><td class="num">600,014</td><td class="num">41.5 s</td><td class="num">44.4 s</td></tr>
+      <tr><td class="num">100,000</td><td class="num">1,200,014</td><td class="num">&gt; 2 min (browser blocked)</td><td class="num">–</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Twice the rows does <strong>not</strong> mean twice the time: from 25,000 to 50,000 rows the render time grows by a
+    factor of 3.5. Layout, style calculation and memory grow faster than the number of rows. And sorting is just as
+    expensive as the first render, because every cell has to be built again:
+  </p>
+  <Snippet file="demos/naive-table.ts" region="sort" />
+
+  <h2 id="more">And that is only displaying</h2>
+  <p>A real data grid needs much more than drawing rows. All of this is still missing:</p>
+  <ul>
+    <li>fixed header and fixed columns while scrolling – <ChapterLink slug="fixed-columns" /></li>
+    <li>column widths, resizing, moving columns – <ChapterLink slug="table-options" /></li>
+    <li>sorting with own rules and filtering – <ChapterLink slug="sorting" />, <ChapterLink slug="filtering" /></li>
+    <li>selection with mouse and keyboard, copy to the clipboard – <ChapterLink slug="selection-and-copy" /></li>
+    <li>Excel export – <ChapterLink slug="excel-export" /></li>
+    <li>tree structures, merged cells, inline editing, live updates – parts 6 and 7</li>
+  </ul>
+
+  <Callout type="note" title="Pagination is not the answer">
+    <p>Splitting the data into pages of 50 rows hides the problem, but it changes the product: users can no longer scroll,
+      search with the browser, select across pages or compare row 12 with row 4,812. The rest of this training shows how to
+      keep <em>all</em> rows in one scrollable table.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>
+    The way out is a simple idea: draw only what is visible. In <ChapterLink slug="virtual-scrolling" /> you build it
+    yourself in about 20 lines – and see why you still want a library for it.
+  </p>
+</TrainingLayout>

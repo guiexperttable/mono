@@ -3,6 +3,8 @@
  *
  * @param {number} [delay=500] - The delay threshold in milliseconds.
  * @returns {Function} - The decorated method descriptor.
+ *
+ * @category Utilities
  */
 export function AvoidDoubleExecution(delay:number = 500) {
   return function (_target: any, _key: string, descriptor: PropertyDescriptor) {

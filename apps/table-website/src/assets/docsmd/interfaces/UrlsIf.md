@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / UrlsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / UrlsIf
 
 # Interface: UrlsIf
 
@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[lib/table/crud/urls.if.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/urls.if.ts#L6)
+[src/lib/table/crud/urls.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/urls.if.ts#L7)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/urls.if.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/urls.if.ts#L9)
+[src/lib/table/crud/urls.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/urls.if.ts#L10)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/urls.if.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/urls.if.ts#L4)
+[src/lib/table/crud/urls.if.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/urls.if.ts#L5)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/urls.if.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/urls.if.ts#L7)
+[src/lib/table/crud/urls.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/urls.if.ts#L8)
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/urls.if.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/urls.if.ts#L8)
+[src/lib/table/crud/urls.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/urls.if.ts#L9)

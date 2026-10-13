@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CellgroupFactory
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CellgroupFactory
 
 # Class: CellgroupFactory
 
@@ -45,7 +45,7 @@
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:102](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L102)
+[src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L103)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L9)
+[src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L10)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:54](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L54)
+[src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L55)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:80](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L80)
+[src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L81)
 
 ___
 
@@ -131,4 +131,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:134](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L134)
+[src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cellgroup-factory.ts#L135)

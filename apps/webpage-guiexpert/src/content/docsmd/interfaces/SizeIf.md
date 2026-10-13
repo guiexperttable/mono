@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SizeIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SizeIf
 
 # Interface: SizeIf
+
+Represents the size of an object or element.
 
 ## Implemented by
 
@@ -17,11 +19,11 @@
 
 ### unit
 
-• **unit**: ``"px"`` \| ``"%"``
+• **unit**: [`SizeUnitType`](../modules.md#sizeunittype)
 
 #### Defined in
 
-[lib/table/data/common/size.if.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/size.if.ts#L3)
+[src/lib/table/data/common/size.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/size.if.ts#L11)
 
 ___
 
@@ -31,4 +33,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/size.if.ts:2](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/size.if.ts#L2)
+[src/lib/table/data/common/size.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/size.if.ts#L10)

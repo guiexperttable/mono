@@ -23,6 +23,7 @@ import { CrudObjectEdit } from './crud-object-edit';
 import { ActionEvent } from '../renderer/action/action-event';
 
 
+/** @category CRUD */
 export class CrudTableModelFactory implements ActionEventListenerIf {
 
   public tableModel: TableModelIf | undefined;

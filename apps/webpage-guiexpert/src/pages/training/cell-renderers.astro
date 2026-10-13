@@ -1,0 +1,70 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="cell-renderers">
+
+  <h2 id="value-vs-look">Value and look are separate</h2>
+  <p>
+    Without a renderer, a cell shows its value as text. A <ApiLink name="CellRendererIf" /> takes over the
+    <strong>look</strong> – the value stays what it is. Sorting, filtering, copying and Excel export keep working with the raw
+    value: <code>4142.7</code> stays a number even when the cell shows “4.142,70 €”.
+  </p>
+
+  <h2 id="built-in">Built-in renderers</h2>
+  <Snippet file="demos/cell-renderers.ts" region="apply" title="src/model/order-renderers.ts" />
+  <p>A selection of what the core ships:</p>
+  <table>
+    <thead><tr><th>Renderer</th><th>Shows</th></tr></thead>
+    <tbody>
+      <tr><td><ApiLink name="DateToLocaleDateCellRenderer" /></td><td>a date in the user's locale</td></tr>
+      <tr><td><ApiLink name="NumberCellProgressBarCellRenderer" /></td><td>a number as bar (maximum, with or without text)</td></tr>
+      <tr><td><ApiLink name="StarRatingCellRenderer" /></td><td>★★★☆☆</td></tr>
+      <tr><td><ApiLink name="NumberCellRenderer" /></td><td>formatted numbers</td></tr>
+      <tr><td><ApiLink name="CheckboxCellRenderer" /></td><td>a checkbox for booleans</td></tr>
+      <tr><td><ApiLink name="ActionsCellRenderer" /></td><td>buttons in a cell</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="own">An own renderer</h2>
+  <p>
+    One method: <ApiLink name="CellRendererIf.render" />. It gets the empty cell <code>div</code>, the position, the area model, the
+    value and a <ApiLink name="DomServiceIf" /> to create elements:
+  </p>
+  <Snippet file="demos/cell-renderers.ts" region="badge" title="StatusBadgeRenderer" />
+  <Snippet file="demos/cell-renderers.ts" region="euro" title="EuroRenderer" />
+  <Code lang="css" title="style.css" code={`.status-badge { display: inline-block; margin-top: 5px; padding: 0 10px; line-height: 20px; border-radius: 10px; }
+.status-paid { background: #dcfce7; color: #166534; }
+.status-cancelled { background: #f3f4f6; color: #6b7280; text-decoration: line-through; }`} />
+  <LiveDemo name="cell-renderers" title="Renderers on" height={400}
+            caption="Untick “renderers” to see the raw values. Double-click “Total” to sort – by the number, not the text." />
+
+  <h2 id="rules">Rules</h2>
+  <ul>
+    <li><strong>Renderers run only for visible cells</strong> – and again on every repaint and scroll. Keep them cheap: no
+      <code>fetch</code>, no heavy computing; prepare values in the model.</li>
+    <li>Prefer DOM methods over <code>innerHTML</code> – values may come from users.</li>
+    <li>Return a <ApiLink name="RendererCleanupFnType" label="cleanup function" /> if you attach listeners or timers; it is called
+      before the cell is drawn again.</li>
+    <li>Per area: <ApiLink name="ColumnDefIf.rendererMap" /><code>.header / .body / .footer</code>, or when creating the column:
+      <code>ColumnDef.create({"{ …, bodyRenderer: new EuroRenderer() }"})</code>.</li>
+    <li>An own area model (the footer of <ChapterLink slug="footer-totals" />) chooses renderers itself with
+      <ApiLink name="AreaModelIf.getCellRenderer" />.</li>
+  </ul>
+  <Callout type="tip" title="Only colours?">
+    <p>For colours and fonts you don't need a renderer: CSS classes and inline styles per cell come from the model –
+      <ChapterLink slug="heatmap" />.</p>
+  </Callout>
+
+  <h2 id="showcase">More</h2>
+  <p>The showcases <a href="/showcase/large/run/">Large dataset</a> and <a href="/showcase/order/run/">Order table</a> combine
+    several built-in renderers.</p>
+
+  <h2 id="next">Next</h2>
+  <p>A real React or Angular component per cell: <ChapterLink slug="framework-components" />.</p>
+</TrainingLayout>

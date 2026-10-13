@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / PropertyType
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / PropertyType
 
 # Interface: PropertyType
 
@@ -28,7 +28,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L14)
+[src/lib/common/generator/domain/property-type.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L24)
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L13)
+[src/lib/common/generator/domain/property-type.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L23)

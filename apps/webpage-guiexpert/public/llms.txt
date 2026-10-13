@@ -19,6 +19,8 @@
 - [Demo Table Models](https://github.com/guiexperttable/mono/tree/main/packages/demo-table-models): Sample data, e.g., crypto-data and order-data types.
 
 ## Getting Started & Docs
+- [Training: GuiExpert Table step by step](https://gui.expert/training/): 34 short chapters with live demos – from the first table to millions of rows, sorting, filtering, Excel export, editing and live data.
+- [API reference](https://gui.expert/api/): every class, interface and option, with type-checked examples.
 - [README file](https://github.com/guiexperttable/mono/blob/main/README.md): Overview and project structure.
 - Choose your stack and import `@guiexpert/table` + appropriate adapter.
 

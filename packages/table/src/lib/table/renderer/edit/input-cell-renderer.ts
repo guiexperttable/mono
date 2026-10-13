@@ -5,6 +5,7 @@ import { DomServiceIf } from "../../service/dom-service.if";
 import { RendererCleanupFnType } from "../renderer-cleanup-fn.type";
 
 
+/** @category Renderers & editing */
 export class InputCellRenderer implements CellRendererIf {
 
 

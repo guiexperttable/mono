@@ -1,8 +1,30 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ColumnDefIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ColumnDefIf
 
 # Interface: ColumnDefIf
 
-Represents a column definition of one table column.
+Describes one column: which property it shows, header label, width, CSS classes, renderers,
+sorting, editing and visibility. Create it with [ColumnDef](../classes/ColumnDef.md) – `new ColumnDef(property, label, width, classes)`
+or [ColumnDef.create](../classes/ColumnDef.md#create) with named parameters.
+
+Column indices (e.g. in [AreaModelIf.getValueAt](AreaModelIf.md#getvalueat)) are positions in the `columnDefs` array –
+fixed columns and hidden columns included.
+
+**`Example`**
+
+```ts
+const columnDefs: ColumnDefIf[] = [
+  new ColumnDef("id", "ID", px80, allRight),
+  ColumnDef.create({
+    property: "total", headerLabel: "Total", width: px120,
+    headerClasses: ["ge-table-text-align-right"], bodyClasses: ["ge-table-text-align-right"],
+    sortable: TrueFn, sortState: "desc"
+  })
+];
+```
+
+**`See`**
+
+Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)
 
 ## Implemented by
 
@@ -36,11 +58,12 @@ Represents a column definition of one table column.
 
 • **classes**: [`AreaObjectMapType`](../modules.md#areaobjectmaptype)\<`string`[]\>
 
-Represents an object that maps an area to a collection of objects.
+CSS classes per area – `classes.header`, `.body`, `.footer`. The constants [bodyLeft](../modules.md#bodyleft), [allRight](../modules.md#allright) …
+are ready-made maps for the alignment.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:75](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L75)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L78)
 
 ___
 
@@ -48,11 +71,11 @@ ___
 
 • `Optional` **editInputPipe**: [`editInputPipe`](editInputPipe.md)
 
-Represents an edit input pipe.
+Converts the text of the editor before it is written into the model, e.g. [editInputPipeForNumber](../modules.md#editinputpipefornumber).
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:153](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L153)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L120)
 
 ___
 
@@ -60,15 +83,15 @@ ___
 
 • `Optional` **editable**: [`BooleanFunction`](../modules.md#booleanfunction)
 
-Determines if a column is editable or not.
+The cells of this column can be edited (double-click or F2), e.g. `TrueFn`.
 
-**`Param`**
+**`See`**
 
-The variable to check.
+Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:122](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L122)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L104)
 
 ___
 
@@ -76,21 +99,17 @@ ___
 
 • `Optional` **getEditRenderer**: [`GetEditRenderer`](../modules.md#geteditrenderer)
 
-Retrieves the edit renderer for the column.
+The editor of this column. Default: `TableOptions.getEditRenderer` (a text input, [InputCellRenderer](../classes/InputCellRenderer.md)).
 
-**`Name`**
+**`Example`**
 
-getEditRenderer
-
-**`Function`**
-
-**`Param`**
-
-The element for which to retrieve the edit renderer.
+```ts
+getEditRenderer: () => new SelectCellRenderer(["open", "paid"].map(s => new ValueLabel(s, s)))
+```
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:138](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L138)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L118)
 
 ___
 
@@ -98,11 +117,11 @@ ___
 
 • **headerLabel**: `string`
 
-Represents the label for a header.
+Text of the header cell (used when the header is built from the column definitions).
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:42](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L42)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L56)
 
 ___
 
@@ -110,11 +129,17 @@ ___
 
 • `Optional` **isVisible**: [`BooleanFunction`](../modules.md#booleanfunction)
 
-Determines if the column is visible or not.
+Whether the column is shown. Hidden columns are not rendered, copied or exported.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "category", headerLabel: "Category", isVisible: FalseFn })
+```
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:129](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L129)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L111)
 
 ___
 
@@ -122,11 +147,11 @@ ___
 
 • **maxWidth**: [`SizeIf`](SizeIf.md)
 
-Represents the maximum width of a column.
+Upper limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:63](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L63)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L62)
 
 ___
 
@@ -134,11 +159,11 @@ ___
 
 • **minWidth**: [`SizeIf`](SizeIf.md)
 
-Represents the minimum width of a column.
+Lower limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:57](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L57)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L60)
 
 ___
 
@@ -146,11 +171,11 @@ ___
 
 • **property**: `string`
 
-Represents a property name of the table row element.
+Property of the row object shown in this column (`"customer"`). With nested objects a path like `"address.city"`.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:36](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L36)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L54)
 
 ___
 
@@ -158,11 +183,23 @@ ___
 
 • **rendererMap**: [`AreaObjectMapType`](../modules.md#areaobjectmaptype)\<[`CellRendererIf`](CellRendererIf.md)\>
 
-**`Template`**
+Cell renderers per area – `rendererMap.header`, `.body`, `.footer`.
+Without a renderer the value is shown as text.
+
+**`Example`**
+
+```ts
+column.rendererMap.body = new NumberCellProgressBarCellRenderer(20, false);
+column.rendererMap.footer = new EuroRenderer();     // an own CellRendererIf
+```
+
+**`See`**
+
+Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:69](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L69)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L73)
 
 ___
 
@@ -170,20 +207,21 @@ ___
 
 • `Optional` **sortComparator**: [`ValueRowSortComparator`](../modules.md#valuerowsortcomparator)
 
-Represents a function that compares two values for sorting purposes.
-The function takes two values and optionally their corresponding row objects,
-compares them, and returns a number.
-If the result is negative, it means 'valueA' comes before 'valueB' in the sorted order.
-If the result is positive, it means 'valueB' comes before 'valueA' in the sorted order.
-If the result is zero, it means the two values are considered equal for sorting purposes.
+Own comparison of two cell values (and their rows), like for `Array.prototype.sort`.
+
+**`Example`**
+
+```ts
+sortComparator: (a: string, b: string) => a.localeCompare(b, "de")     // "Müller" before "Nordlicht"
+```
 
 **`See`**
 
-ValueRowSortComparator
+Training: [Sorting](https://gui.expert/training/sorting/)
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:100](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L100)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L91)
 
 ___
 
@@ -191,11 +229,11 @@ ___
 
 • `Optional` **sortIconVisible**: [`BooleanFunction`](../modules.md#booleanfunction)
 
-Determines if the sort icon is visible.
+Show the sort icon in the header. Default: follows `sortable` resp. `sortState`.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:89](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L89)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L82)
 
 ___
 
@@ -203,11 +241,12 @@ ___
 
 • `Optional` **sortState**: [`SortState`](../modules.md#sortstate)
 
-Represents the state of sorting for a list.
+The sort icon shown in the header: `"asc"`, `"desc"` or `""` (none). It only sets the icon –
+sort the rows once with [TableModelIf.doSort](TableModelIf.md#dosort) to match it.
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:109](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L109)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L96)
 
 ___
 
@@ -215,11 +254,11 @@ ___
 
 • `Optional` **sortStatesOrder**: [`SortState`](../modules.md#sortstate)[]
 
-Represents the order of multiple sort states.
+Order of the sort states on repeated double-clicks. Default: `TableOptions.sortOrder` (`["asc", "desc"]`).
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:115](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L115)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L98)
 
 ___
 
@@ -227,15 +266,11 @@ ___
 
 • `Optional` **sortable**: [`BooleanFunction`](../modules.md#booleanfunction)
 
-Determines whether or not a column can be sorted.
-
-**`Param`**
-
-Specifies if an item is sortable.
+The column can be sorted by a double-click on its header (e.g. `TrueFn`).
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:82](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L82)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L80)
 
 ___
 
@@ -243,8 +278,8 @@ ___
 
 • **width**: [`SizeIf`](SizeIf.md)
 
-Represents the size of a column along the width dimension.
+Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. See [SizeUnitType](../modules.md#sizeunittype).
 
 #### Defined in
 
-[lib/table/data/tablemodel/column/column-def.if.ts:48](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L48)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L58)

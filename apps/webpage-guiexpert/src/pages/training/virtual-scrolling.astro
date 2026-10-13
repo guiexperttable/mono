@@ -1,0 +1,65 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import VirtualScroll from "../../components/training/diagrams/VirtualScroll.astro";
+---
+<TrainingLayout slug="virtual-scrolling">
+
+  <h2 id="idea">The idea</h2>
+  <p>
+    A screen shows maybe 20 rows at a time. So why build 100,000? <strong>Virtual scrolling</strong> keeps the data in
+    memory and puts only the visible rows into the DOM. When the user scrolls, the same few rows are filled with
+    other data.
+  </p>
+  <VirtualScroll />
+  <ol>
+    <li>An empty <strong>spacer</strong> is as high as <em>all</em> rows together – the browser draws a real scrollbar for it.</li>
+    <li>On every scroll event: first visible row = <code>scrollTop / rowHeight</code>, number of rows = viewport height / row height.</li>
+    <li>Only these rows go into the DOM, moved down by <code>first × rowHeight</code>.</li>
+  </ol>
+
+  <h2 id="code">Built by hand in 20 lines</h2>
+  <Snippet file="demos/virtual-scroll.ts" region="dom" lang="html" title="the DOM" />
+  <Snippet file="demos/virtual-scroll.ts" region="scroller" title="virtual-scroll.ts" />
+
+  <h2 id="try">Try it</h2>
+  <LiveDemo name="virtual-scroll" title="Virtual scrolling by hand" height={380}
+            caption="Switch to 1,000,000 rows: the number of DOM elements stays the same, rendering takes about a millisecond." />
+  <table>
+    <thead><tr><th class="num">Rows</th><th class="num">DOM elements</th><th class="num">Load</th><th class="num">Render per scroll step</th></tr></thead>
+    <tbody>
+      <tr><td class="num">100,000</td><td class="num">≈ 360</td><td class="num">0.2 s</td><td class="num">≈ 1 ms</td></tr>
+      <tr><td class="num">1,000,000</td><td class="num">≈ 360</td><td class="num">1.1 s</td><td class="num">≈ 1 ms</td></tr>
+    </tbody>
+  </table>
+  <p>Compare that with the 1.2 million DOM elements of <ChapterLink slug="why-big-tables-freeze" label="the naive table" />.</p>
+
+  <h2 id="limits">Why a library then?</h2>
+  <p>The 20 lines only scroll vertically. Everything else from chapter 1 is still missing – plus a few hard problems:</p>
+  <ul>
+    <li><strong>Horizontal virtual scrolling</strong> – 40 or 400 columns should not all be in the DOM either.</li>
+    <li><strong>Fixed header and fixed columns</strong> that stay in place while the rest scrolls.</li>
+    <li><strong>Different row heights</strong> – then <code>scrollTop / rowHeight</code> no longer works.</li>
+    <li><strong>Browser limits</strong>: 1 million rows × 30 px = 30 million pixels. Chrome allows about 33 million, Firefox
+      much less. A spacer for 2 million rows simply stops working.</li>
+    <li>Sorting, filtering, selection, keyboard, copy, export, renderers, editing …</li>
+  </ul>
+  <p>
+    The GuiExpert Table virtualises rows <strong>and</strong> columns, caps the scroll height so that 2 million rows run
+    smoothly, and – if all rows have the same height – finds the first visible row in O(1) via
+    <ApiLink name="AreaModelIf.getConstantRowHeight" /> (<ChapterLink slug="custom-area-model" />).
+    At runtime <ApiLink name="TableApi.getFirstVisibleRowIndex" /> tells you which row is at the top.
+  </p>
+
+  <Callout type="tip" title="See it with two million rows">
+    <p>The showcases <a href="/showcase/large/run/">Large dataset</a> and <a href="/showcase/fps/run/">Render speed</a>
+      run the real table with 2 million rows and show the frame rate while you scroll.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Build it yourself or use a library – and if a library, which one? <ChapterLink slug="build-buy-or-guiexpert" /> compares the options honestly.</p>
+</TrainingLayout>

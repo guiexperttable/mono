@@ -6,6 +6,8 @@ import { AreaObjectMapType } from "./area-map.type";
  * @template T - The type of objects stored in the map.
  * @class
  * @implements {AreaObjectMapType<T>}
+ *
+ * @category Columns
  */
 export class AreaObjectMap<T> implements AreaObjectMapType<T> {
 

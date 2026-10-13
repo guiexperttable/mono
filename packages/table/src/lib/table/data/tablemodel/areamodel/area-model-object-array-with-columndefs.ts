@@ -30,10 +30,10 @@ import { AreaIdent } from "../area-ident.type";
  *   { id: 3, name: 'Bob', age: 40 }
  * ];
  *
- * const columnDefs = [
- *   { property: 'id', headerLabel: 'ID', width: new Size(50, 'px') },
- *   { property: 'name', headerLabel: 'Name', width: new Size(150, 'px') },
- *   { property: 'age', headerLabel: 'Age', width: new Size(100, 'px') }
+ * const columnDefs: ColumnDefIf[] = [
+ *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+ *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+ *   new ColumnDef('age', 'Age', new Size(100, 'px'))
  * ];
  *
  * const bodyAreaModel = new AreaModelObjectArrayWithColumndefs<any>(
@@ -48,9 +48,9 @@ import { AreaIdent } from "../area-ident.type";
  * function createTableModel() {
  *   const rows = fetchDataFromServer();
  *   const columnDefs = [
- *     { property: 'id', headerLabel: 'ID', width: new Size(50, 'px') },
- *     { property: 'name', headerLabel: 'Name', width: new Size(150, 'px') },
- *     { property: 'age', headerLabel: 'Age', width: new Size(100, 'px') }
+ *     new ColumnDef('id', 'ID', new Size(50, 'px')),
+ *     new ColumnDef('name', 'Name', new Size(150, 'px')),
+ *     new ColumnDef('age', 'Age', new Size(100, 'px'))
  *   ];
  *
  *   const tableModel = TableFactory.buildByTypedRowsParam({
@@ -82,6 +82,8 @@ import { AreaIdent } from "../area-ident.type";
  * @see {@link AreaModelObjectArray} - The parent class that provides the core functionality
  * @see {@link ColumnDefIf} - The interface that defines the structure of column definitions
  * @see {@link CrudTableModelFactory} - A factory class that uses this class for CRUD operations
+ *
+ * @category Area models
  */
 
 export class AreaModelObjectArrayWithColumndefs<T> extends AreaModelObjectArray<T> {
@@ -103,10 +105,10 @@ export class AreaModelObjectArrayWithColumndefs<T> extends AreaModelObjectArray<
    *   { id: 2, name: 'Jane', age: 25 }
    * ];
    *
-   * const columnDefs = [
-   *   { property: 'id', headerLabel: 'ID', width: new Size(50, 'px') },
-   *   { property: 'name', headerLabel: 'Name', width: new Size(150, 'px') },
-   *   { property: 'age', headerLabel: 'Age', width: new Size(100, 'px') }
+   * const columnDefs: ColumnDefIf[] = [
+   *   new ColumnDef('id', 'ID', new Size(50, 'px')),
+   *   new ColumnDef('name', 'Name', new Size(150, 'px')),
+   *   new ColumnDef('age', 'Age', new Size(100, 'px'))
    * ];
    *
    * const bodyAreaModel = new AreaModelObjectArrayWithColumndefs(

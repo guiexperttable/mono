@@ -1,14 +1,23 @@
+/**
+ * A rectangle of cells: rows `r1`…`r2`, columns `c1`…`c2` (inclusive, body indices as displayed).
+ * {@link SelectionModelIf.getRanges} returns the selection as a list of them.
+ *
+ * @example
+ * const firstTenRows = new CellRange(0, 0, 9, tableModel.getColumnCount() - 1);
+ * tableApi.getSelectionModel()?.addSelection(firstTenRows);
+ * tableApi.repaint();
+ *
+ * @category Selection & focus
+ */
 export class CellRange {
 
 
   /**
-   * Represents a constructor for a class.
-   * @constructor
-   * @param {number} r1 - The value for r1.
-   * @param {number} c1 - The value for c1.
-   * @param {number} r2 - The value for r2.
-   * @param {number} c2 - The value for c2.
-   * @param {boolean} [gammaRange=false] - The value for gammaRange. Defaults to false. gammaRange will be used for AreaModelCellGroups, but it's not implemented yet!
+   * @param r1 - first row
+   * @param c1 - first column
+   * @param r2 - last row (inclusive)
+   * @param c2 - last column (inclusive)
+   * @param gammaRange - reserved for {@link AreaModelCellGroups}, not used yet (default false)
    */
   constructor(
     public r1: number,

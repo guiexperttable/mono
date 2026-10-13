@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / EventSelectionChangedListenerIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / EventSelectionChangedListenerIf
 
 # Interface: EventSelectionChangedListenerIf
 
@@ -36,4 +36,4 @@
 
 #### Defined in
 
-[lib/table/selection/event-selection-changed-listener.if.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/selection/event-selection-changed-listener.if.ts#L6)
+[src/lib/table/selection/event-selection-changed-listener.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/event-selection-changed-listener.if.ts#L7)

@@ -1,3 +1,4 @@
+/** @category Columns */
 export interface ValueLabelIf {
 
   value: any;

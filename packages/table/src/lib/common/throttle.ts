@@ -1,3 +1,4 @@
+/** @category Utilities */
 export function throttle<T extends (...args: any[]) => any>(func: T, wait: number = 500): (...args: Parameters<T>) => void {
   let timeout: number | null = null;
   let lastCallTime: number = 0;

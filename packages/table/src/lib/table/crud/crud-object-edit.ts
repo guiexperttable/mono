@@ -1,3 +1,4 @@
+/** @category CRUD */
 export class CrudObjectEdit<T extends Record<string, any>> {
 
   private object: T;

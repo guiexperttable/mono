@@ -6,6 +6,8 @@ import { ObjectArrayHolderIf } from '../data/tablemodel/areamodel/object-array-h
 /**
  * Class representing a multi-row selection model.
  * @extends SelectionModel
+ *
+ * @category Selection & focus
  */
 export class MultiRowsSelectionModel<T> extends SelectionModel {
 

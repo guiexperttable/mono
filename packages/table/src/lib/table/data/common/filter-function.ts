@@ -5,5 +5,7 @@
  * @param {number} index The index of the current element being evaluated.
  * @param {T[]} array The array that the filter function was called upon.
  * @returns {unknown} The result of the filter function evaluation: `true` if the element should be included, `false` otherwise.
+ *
+ * @category Sorting & filtering
  */
 export type FilterFunction<T> = (value: T, index: number, array: T[]) => unknown;

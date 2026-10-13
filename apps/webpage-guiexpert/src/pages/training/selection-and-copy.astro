@@ -1,0 +1,59 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="selection-and-copy">
+
+  <h2 id="model">A selection model per table</h2>
+  <p>
+    What can be selected is decided by a <ApiLink name="SelectionModel" />. It takes a type
+    (<ApiLink name="ExtendedSelectionType" />) and a mode (<ApiLink name="SelectionMode" />):
+  </p>
+  <Snippet file="demos/selection-and-copy.ts" region="options" />
+  <table>
+    <thead><tr><th>Type</th><th>A click selects …</th></tr></thead>
+    <tbody>
+      <tr><td><code>"cell"</code></td><td>one cell</td></tr>
+      <tr><td><code>"row"</code> / <code>"column"</code></td><td>the whole row / column</td></tr>
+      <tr><td><code>"range"</code></td><td>a rectangle – drag with the mouse or Shift+click</td></tr>
+      <tr><td><code>"none"</code></td><td>nothing</td></tr>
+    </tbody>
+  </table>
+  <p>Mode <code>"multi"</code> adds more selections with ⌘/Ctrl+click; <code>"single"</code> replaces the selection.</p>
+
+  <h2 id="keyboard">Mouse and keyboard</h2>
+  <ul>
+    <li>Drag = range (since 1.1.88), <kbd>Shift</kbd>+click = range up to here, <kbd>⌘/Ctrl</kbd>+click = another cell.</li>
+    <li><kbd>⌘/Ctrl</kbd>+<kbd>C</kbd> copies, <kbd>⌘/Ctrl</kbd>+<kbd>A</kbd> selects all, arrow keys move the focus.</li>
+    <li>Shortcuts can be remapped or switched off (<code>shortcutActionIdMapping</code>, <code>shortcutActionsDisabled</code> in
+      <ApiLink name="TableOptionsIf" />).</li>
+  </ul>
+
+  <h2 id="events">React to the selection</h2>
+  <Snippet file="demos/selection-and-copy.ts" region="events" />
+  <p>
+    <ApiLink name="EventListenerIf.onSelectionChanged" /> gets the model; <ApiLink name="SelectionModelIf.getRanges" /> returns
+    the selected rectangles (<code>r1, c1, r2, c2</code>). Event listeners in general: <ChapterLink slug="events-and-context-menu" />.
+  </p>
+
+  <h2 id="copy">Copy</h2>
+  <Snippet file="demos/selection-and-copy.ts" region="copy" />
+  <p>
+    <ApiLink name="TableApi.copyToClipboard" /> resolves with the copied text – tab-separated, one line per row. Pasted into
+    Excel, Numbers or Google Sheets it lands in cells.
+  </p>
+  <LiveDemo name="selection-and-copy" title="Selection types" height={400}
+            caption="Switch the type with the buttons. In “range” drag across cells, then press ⌘/Ctrl+C or “copy”." />
+
+  <Callout type="version">
+    <p>Since 1.1.88 hidden columns (here “Category”) are not copied and copying with nothing selected resolves instead of waiting
+      forever. Since 1.1.90 every table gets its own selection model – before, tables without <code>getSelectionModel</code> shared one.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Clicks, double-clicks and a context menu of your own: <ChapterLink slug="events-and-context-menu" />.</p>
+</TrainingLayout>

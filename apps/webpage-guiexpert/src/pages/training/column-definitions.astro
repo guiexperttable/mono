@@ -1,0 +1,80 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="column-definitions">
+
+  <h2 id="columns">One ColumnDef per column</h2>
+  <p>
+    A <ApiLink name="ColumnDef" /> describes a column: which property it shows, the header label, the width, CSS classes,
+    renderers, sorting and editing. Two ways to create one:
+  </p>
+  <ul>
+    <li><code>new ColumnDef(property, headerLabel, width, classes)</code> – short, for the common case;</li>
+    <li><ApiLink name="ColumnDef.create" /><code>({"{ … }"})</code> – named parameters for everything else.</li>
+  </ul>
+  <Snippet file="demos/column-definitions.ts" region="columns" title="src/model/order-columns.ts" />
+  <p>With own columns, build the model with <ApiLink name="TableFactory.buildByTypedRows" /> (or pass <code>columnDefs</code> to
+    <ApiLink name="TableFactory.createTableModel" />):</p>
+  <Snippet file="demos/column-definitions.ts" region="model" />
+  <LiveDemo name="column-definitions" title="Order columns" height={380}
+            caption="Drag a column border to resize it. “Price” is 8 % of the table width, clamped to 80–200 px. “Category” is hidden." />
+
+  <h2 id="sizes">Widths</h2>
+  <p>
+    Widths are <ApiLink name="Size" /> objects with a unit (<ApiLink name="SizeUnitType" />). For pixel values the core exports
+    constants from <code>px0</code> to <code>px500</code> (<code>px80</code>, <code>px100</code>, <code>px120</code> …); for anything
+    else use <code>new Size(37, "px")</code>. Without a width a <code>ColumnDef</code> is 100 px wide.
+  </p>
+  <table>
+    <thead><tr><th>Unit</th><th>Example</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>"px"</code></td><td><code>px120</code></td><td>fixed width</td></tr>
+      <tr><td><code>"%"</code></td><td><code>new Size(8, "%")</code></td><td>share of the table width, clamped by <ApiLink name="ColumnDefIf.minWidth" label="minWidth" /> / <code>maxWidth</code></td></tr>
+      <tr><td><code>"weight"</code></td><td><code>new Size(1, "weight")</code></td><td>the space left after px and % columns, split by weight</td></tr>
+    </tbody>
+  </table>
+  <p><code>minWidth</code> and <code>maxWidth</code> only apply to percentage widths – resizing with the mouse
+    (<ChapterLink slug="table-options" />) is not limited by them.</p>
+
+  <h2 id="alignment">Alignment and CSS classes</h2>
+  <p>The fourth constructor argument maps areas to CSS classes. Ready-made maps:</p>
+  <table>
+    <thead><tr><th>Constant</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>bodyLeft</code> / <code>bodyRight</code></td><td>body cells left / right aligned</td></tr>
+      <tr><td><code>allLeft</code> / <code>allRight</code> / <code>allCenter</code></td><td>header, body and footer – use <code>allRight</code> for numbers</td></tr>
+    </tbody>
+  </table>
+  <p>With <code>ColumnDef.create</code> pass <code>headerClasses</code>, <code>bodyClasses</code>, <code>footerClasses</code> – any class of
+    your own stylesheet works, e.g. <code>["ge-table-text-align-right", "num"]</code>.</p>
+
+  <h2 id="hide">Hide a column</h2>
+  <Code lang="ts" code={`ColumnDef.create({ property: "category", headerLabel: "Category", isVisible: FalseFn })`} />
+  <p>
+    <ApiLink name="ColumnDefIf.isVisible" /> is a function – it may also depend on state (<code>() =&gt; showDetails</code>), followed
+    by <ApiLink name="TableApi.repaint" />. Hidden columns are not copied and not exported (<ChapterLink slug="excel-export" />).
+  </p>
+  <Callout type="pitfall" title="setColumnVisible() is still a stub">
+    <p><ApiLink name="TableApi.setColumnVisible" /> exists in the API but does nothing yet. Use <code>isVisible</code> on the
+      ColumnDef.</p>
+  </Callout>
+
+  <h2 id="all-fields">Everything a ColumnDef can do</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Chapter</th></tr></thead>
+    <tbody>
+      <tr><td><code>sortable</code>, <code>sortComparator</code>, <code>sortState</code></td><td><ChapterLink slug="sorting" /></td></tr>
+      <tr><td><code>headerRenderer</code>, <code>bodyRenderer</code>, <code>footerRenderer</code> (<code>rendererMap</code>)</td><td><ChapterLink slug="cell-renderers" /></td></tr>
+      <tr><td><code>editable</code>, <code>editInputPipe</code>, <code>getEditRenderer</code></td><td><ChapterLink slug="inline-editing" /></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="next">Next</h2>
+  <p>No objects at all, just rows of strings: <ChapterLink slug="array-of-arrays" />.</p>
+</TrainingLayout>

@@ -8,6 +8,7 @@ import { OnActionTriggeredIf } from "../action/on-action-triggered.if";
 import { ActionId } from "../action/action-id.type";
 
 
+/** @category Internals */
 export class SelectionService implements OnActionTriggeredIf {
 
   getSelectionModel?: GetT<SelectionModelIf>;

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / LicenseManager
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / LicenseManager
 
 # Class: LicenseManager
 
@@ -9,53 +9,10 @@ Usage: LicenseManager.getInstance().setLicenseKey('Your API key');
 
 ## Table of contents
 
-### Constructors
-
-- [constructor](LicenseManager.md#constructor)
-
-### Properties
-
-- [alreadySet](LicenseManager.md#alreadyset)
-- [instance](LicenseManager.md#instance)
-
 ### Methods
 
 - [setLicenseKey](LicenseManager.md#setlicensekey)
 - [getInstance](LicenseManager.md#getinstance)
-
-## Constructors
-
-### constructor
-
-• **new LicenseManager**(): [`LicenseManager`](LicenseManager.md)
-
-#### Returns
-
-[`LicenseManager`](LicenseManager.md)
-
-#### Defined in
-
-[lib/table/license-manager.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/license-manager.ts#L14)
-
-## Properties
-
-### alreadySet
-
-• `Private` **alreadySet**: `boolean` = `false`
-
-#### Defined in
-
-[lib/table/license-manager.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/license-manager.ts#L10)
-
-___
-
-### instance
-
-▪ `Static` `Private` **instance**: [`LicenseManager`](LicenseManager.md)
-
-#### Defined in
-
-[lib/table/license-manager.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/license-manager.ts#L9)
 
 ## Methods
 
@@ -81,7 +38,7 @@ and appended into the head section of the document
 
 #### Defined in
 
-[lib/table/license-manager.ts:35](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/license-manager.ts#L35)
+[src/lib/table/license-manager.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/license-manager.ts#L37)
 
 ___
 
@@ -95,4 +52,4 @@ ___
 
 #### Defined in
 
-[lib/table/license-manager.ts:18](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/license-manager.ts#L18)
+[src/lib/table/license-manager.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/license-manager.ts#L20)

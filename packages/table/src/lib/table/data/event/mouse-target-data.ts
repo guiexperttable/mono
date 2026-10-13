@@ -25,6 +25,8 @@ import { TableScope } from "../../table-scope";
  *
  * @example
  * const mouseTarget = new MouseTargetData(eventTarget, tableScope);
+ *
+ * @category Internals
  */
 export class MouseTargetData {
 

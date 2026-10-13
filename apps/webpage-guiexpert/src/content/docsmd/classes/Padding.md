@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / Padding
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / Padding
 
 # Class: Padding
+
+Represents padding values for the top, right, bottom, and left sides of an element.
 
 ## Table of contents
 
@@ -36,7 +38,7 @@
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:2](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/padding.ts#L2)
+[src/lib/table/data/tablemodel/padding.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L7)
 
 ## Properties
 
@@ -46,7 +48,7 @@
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/padding.ts#L5)
+[src/lib/table/data/tablemodel/padding.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L10)
 
 ___
 
@@ -56,7 +58,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/padding.ts#L6)
+[src/lib/table/data/tablemodel/padding.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L11)
 
 ___
 
@@ -66,7 +68,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/padding.ts#L4)
+[src/lib/table/data/tablemodel/padding.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L9)
 
 ___
 
@@ -76,4 +78,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/padding.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/tablemodel/padding.ts#L3)
+[src/lib/table/data/tablemodel/padding.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/padding.ts#L8)

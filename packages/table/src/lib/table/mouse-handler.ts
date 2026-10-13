@@ -9,6 +9,8 @@ import {isTreeRow} from "./instanceof-workaround";
 /**
  * Class representing a MouseHandler.
  * @class
+ *
+ * @category Internals
  */
 export class MouseHandler {
 

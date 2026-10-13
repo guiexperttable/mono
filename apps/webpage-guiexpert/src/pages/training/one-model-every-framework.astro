@@ -1,0 +1,56 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="one-model-every-framework">
+
+  <h2 id="same-model">The same model everywhere</h2>
+  <p>
+    All framework demos import <strong>one</strong> function – <code>createOrderTableModel()</code> from
+    <ChapterLink slug="web-component-and-cdn" hash="#custom-element" label="chapter 6" />. The
+    <ApiLink name="TableModelIf" /> knows nothing about frameworks; only the event syntax differs.
+  </p>
+  <table>
+    <thead><tr><th>Framework</th><th>Package</th><th>Events</th></tr></thead>
+    <tbody>
+      <tr><td>Plain TS</td><td><code>@guiexpert/table</code></td><td><ApiLink name="EventAdapter" /> / own <ApiLink name="EventListenerIf" /></td></tr>
+      <tr><td>Web Component</td><td><code>@guiexpert/webcomponent-table</code></td><td><code>addEventListener("tableReady", e =&gt; e.detail)</code></td></tr>
+      <tr><td>React / Preact / Solid</td><td><code>@guiexpert/react-table</code> / <code>preact-table</code> / <code>solid-table</code></td><td>props <code>{"tableReady={api => …}"}</code></td></tr>
+      <tr><td>Vue 3</td><td><code>@guiexpert/vue3-table</code></td><td><code>@tableReady="onReady"</code></td></tr>
+      <tr><td>Svelte 4 / 5</td><td><code>@guiexpert/svelte-table</code></td><td><code>on:tableReady</code> resp. Svelte 5: <code>{"onTableReady={api => …}"}</code></td></tr>
+      <tr><td>Angular 14–22</td><td><code>@guiexpert/angular-table@NN</code></td><td><code>(tableReady)="onReady($event)"</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="svelte">Svelte 5 (runes)</h2>
+  <Code lang="bash" frame="terminal" code="npm i @guiexpert/table @guiexpert/svelte-table" />
+  <Snippet file="examples/svelte/App.svelte" title="frameworks/svelte/src/App.svelte" />
+  <p>
+    The package ships Svelte <strong>source</strong>, compiled by your Svelte – so it runs under Svelte 4 and 5. In Svelte 5
+    use the callback props (<code>onTableReady</code>, <code>onMouseClicked</code> …); in Svelte 4 the
+    <code>on:tableReady</code> events with <code>e.detail</code>.
+  </p>
+  <Figure src="fw-svelte" caption="Svelte 5 with runes." />
+
+  <h2 id="solid">Solid</h2>
+  <Snippet file="examples/solid/App.tsx" title="frameworks/solid/src/App.tsx" />
+  <Callout type="pitfall" title="Two Solid runtimes">
+    <p>Without <code>dedupe</code>, Vite may bundle a second copy of <code>solid-js</code> for the wrapper – the table then never starts.</p>
+  </Callout>
+  <Snippet file="examples/solid/vite.config.ts" title="frameworks/solid/vite.config.ts" />
+
+  <h2 id="preact">Preact</h2>
+  <Snippet file="examples/preact/App.tsx" title="frameworks/preact/src/App.tsx" />
+
+  <h2 id="takeaway">Takeaway</h2>
+  <p>
+    Write your table model and options once, in plain TypeScript, and test them without a framework. Switching from React to
+    Vue – or using the same table in an Angular admin app and a Svelte dashboard – only changes a dozen lines of glue code.
+    Part 4 is all about that model: <ChapterLink slug="table-model-areas" />.
+  </p>
+</TrainingLayout>

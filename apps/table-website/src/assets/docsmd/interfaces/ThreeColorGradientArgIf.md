@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ThreeColorGradientArgIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ThreeColorGradientArgIf
 
 # Interface: ThreeColorGradientArgIf
 
@@ -27,7 +27,7 @@ Interface for defining the arguments of a three-color gradient.
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L14)
+[src/lib/table/color/three-color-gradient-arg.if.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L16)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L13)
+[src/lib/table/color/three-color-gradient-arg.if.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L15)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L12)
+[src/lib/table/color/three-color-gradient-arg.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L14)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L11)
+[src/lib/table/color/three-color-gradient-arg.if.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L13)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L10)
+[src/lib/table/color/three-color-gradient-arg.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L12)
 
 ___
 
@@ -77,4 +77,4 @@ ___
 
 #### Defined in
 
-[lib/table/color/three-color-gradient-arg.if.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L9)
+[src/lib/table/color/three-color-gradient-arg.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/three-color-gradient-arg.if.ts#L11)

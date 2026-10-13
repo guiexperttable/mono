@@ -9,6 +9,7 @@ import { SortItem } from "../../common/sort-item";
 import { HasDefaultRowHeightIf } from "./has-default-row-height-if";
 
 
+/** @category Area models */
 export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRowHeightIf {
 
   public rowSelectionModel: CheckboxModelIf<any> | undefined = undefined;

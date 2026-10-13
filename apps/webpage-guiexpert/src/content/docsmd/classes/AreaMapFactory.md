@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AreaMapFactory
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AreaMapFactory
 
 # Class: AreaMapFactory
 
@@ -28,16 +28,20 @@
 
 ▸ **body**(`bodyRenderer`): [`AreaObjectMap`](AreaObjectMap.md)\<[`CellRendererIf`](../interfaces/CellRendererIf.md)\>
 
+A factory that creates a new AreaObjectMap with the given body renderer.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `bodyRenderer` | [`CellRendererIf`](../interfaces/CellRendererIf.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `bodyRenderer` | [`CellRendererIf`](../interfaces/CellRendererIf.md) | The renderer for the body of the map. |
 
 #### Returns
 
 [`AreaObjectMap`](AreaObjectMap.md)\<[`CellRendererIf`](../interfaces/CellRendererIf.md)\>
 
+The newly created AreaObjectMap.
+
 #### Defined in
 
-[lib/table/data/common/area-map-factory.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/area-map-factory.ts#L6)
+[src/lib/table/data/common/area-map-factory.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/area-map-factory.ts#L13)

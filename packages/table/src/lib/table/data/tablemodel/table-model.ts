@@ -35,6 +35,8 @@ import { TableScope } from '../../table-scope';
  *  |  footer/west   |  footer/center    | footer/east  |
  *  +----------------+-------------------+--------------+ </pre>
  *
+ *
+ * @category Table model
  */
 export class TableModel implements TableModelIf {
 

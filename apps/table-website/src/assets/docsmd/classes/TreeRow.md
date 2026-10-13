@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeRow
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeRow
 
 # Class: TreeRow\<T\>
 
@@ -61,7 +61,7 @@ Represents a (table) row in a tree structure. It's a container object for T with
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L11)
+[src/lib/table/data/common/tree-row.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L13)
 
 ## Properties
 
@@ -69,13 +69,15 @@ Represents a (table) row in a tree structure. It's a container object for T with
 
 • **checked**: `boolean` = `false`
 
+Checkbox state (with `showCheckboxWihoutExtraColumn` or a checkbox column).
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[checked](../interfaces/TreeRowIf.md#checked)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L17)
+[src/lib/table/data/common/tree-row.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L19)
 
 ___
 
@@ -83,13 +85,15 @@ ___
 
 • **children**: `undefined` \| [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>[]
 
+The child rows, undefined for leaves.
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[children](../interfaces/TreeRowIf.md#children)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L14)
+[src/lib/table/data/common/tree-row.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L16)
 
 ___
 
@@ -97,13 +101,15 @@ ___
 
 • **data**: `T`
 
+Your object. Column values are read from it (`columnDef.property`).
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[data](../interfaces/TreeRowIf.md#data)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L12)
+[src/lib/table/data/common/tree-row.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L14)
 
 ___
 
@@ -111,13 +117,15 @@ ___
 
 • **deep**: `number` = `0`
 
+Depth in the tree: 0 = top level.
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[deep](../interfaces/TreeRowIf.md#deep)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:16](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L16)
+[src/lib/table/data/common/tree-row.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L18)
 
 ___
 
@@ -125,13 +133,15 @@ ___
 
 • **expanded**: `boolean` = `true`
 
+Are the children visible?
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[expanded](../interfaces/TreeRowIf.md#expanded)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L13)
+[src/lib/table/data/common/tree-row.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L15)
 
 ___
 
@@ -139,13 +149,15 @@ ___
 
 • **keep**: `boolean` = `false`
 
+Internal: kept by the filter because a descendant matches.
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[keep](../interfaces/TreeRowIf.md#keep)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:18](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L18)
+[src/lib/table/data/common/tree-row.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L20)
 
 ___
 
@@ -153,13 +165,15 @@ ___
 
 • **parent**: `undefined` \| [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>
 
+The parent row, undefined on the top level.
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[parent](../interfaces/TreeRowIf.md#parent)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:15](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L15)
+[src/lib/table/data/common/tree-row.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L17)
 
 ___
 
@@ -167,10 +181,12 @@ ___
 
 • **type**: ``""`` \| ``"TreeRow"`` = `'TreeRow'`
 
+Marker to recognise tree rows across package boundaries (see `isTreeRow()`).
+
 #### Implementation of
 
 [TreeRowIf](../interfaces/TreeRowIf.md).[type](../interfaces/TreeRowIf.md#type)
 
 #### Defined in
 
-[lib/table/data/common/tree-row.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/tree-row.ts#L9)
+[src/lib/table/data/common/tree-row.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row.ts#L11)

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / Renderer
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / Renderer
 
 # Class: Renderer
 
@@ -40,4 +40,4 @@
 
 #### Defined in
 
-[lib/table/renderer/renderer.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/renderer.ts#L7)
+[src/lib/table/renderer/renderer.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/renderer.ts#L8)

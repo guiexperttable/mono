@@ -3,7 +3,7 @@
 **Become a master at creating web applications with large tables.**
 UI-agnostic, high-performance data table for the browser – one core, wrappers for every major framework.
 
-Website & showcases: https://gui.expert · API: https://gui.expert/api · License: MIT (see below)
+Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside
 

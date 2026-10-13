@@ -1,0 +1,52 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="inline-editing">
+
+  <h2 id="columns">Make columns editable</h2>
+  <p>Editing is switched on per column. Three fields of the <ApiLink name="ColumnDefIf" /> matter:</p>
+  <Snippet file="demos/inline-editing.ts" region="editing" title="src/model/order-editing.ts" />
+  <ul>
+    <li><ApiLink name="ColumnDefIf.editable" label="editable" /> – a function, may depend on the row
+      (<code>() =&gt; !locked</code>).</li>
+    <li><ApiLink name="ColumnDefIf.editInputPipe" label="editInputPipe" /> – converts the text of the input field before it is
+      written into the model: <code>editInputPipeForNumber</code> turns <code>"12"</code> into <code>12</code>.</li>
+    <li><ApiLink name="ColumnDefIf.getEditRenderer" label="getEditRenderer" /> – the editor. Default: a text input
+      (<ApiLink name="InputCellRenderer" />); here a <ApiLink name="SelectCellRenderer" /> with <ApiLink name="ValueLabel" /> options.</li>
+  </ul>
+  <p>Start editing: double-click a cell, or press <kbd>F2</kbd> on the focused cell. The value is taken over when the editor fires
+    its <code>change</code> event – <kbd>Enter</kbd> or leaving the field for a text input, picking an option for a select.</p>
+
+  <h2 id="after">After the edit</h2>
+  <p>
+    The table writes the new value into your object (via <ApiLink name="AreaModelIf.setValue" />) and reports it:
+    <ApiLink name="EventListenerIf.onModelChanged" /> with a <ApiLink name="GeModelChangeEvent" />. Derived values are your job:
+  </p>
+  <Snippet file="demos/inline-editing.ts" region="events" />
+  <Snippet file="demos/inline-editing.ts" region="wire" />
+  <LiveDemo name="inline-editing" title="Edit quantity and status" height={400}
+            caption="Double-click a quantity, type 20, press Enter: total and footer update. Double-click a status: a select box." />
+
+  <Callout type="tip" title="The row stays where it is">
+    <p>After an edit the row is not moved, even if the table is sorted by that column – users would lose it. Re-sort explicitly
+      with <ApiLink name="TableApi.reSort" /> when it makes sense (e.g. on a button).</p>
+  </Callout>
+  <Callout type="version">
+    <p>Needs <code>@guiexpert/table@1.1.89</code>: the editor now opens on cells with renderers (bars, badges, components), only in
+      the body, keeps its focus, and shortcuts like ⌘/Ctrl+A no longer destroy your input.</p>
+  </Callout>
+
+  <h2 id="saving">Saving</h2>
+  <p>
+    The table has no notion of a backend. Send the change from <code>onModelChanged</code> – the event contains row and column,
+    the new value is already in your object – and, if the server rejects it, write the old value back and repaint.
+  </p>
+
+  <h2 id="next">Next</h2>
+  <p>Not the user changes the values, the market does: <ChapterLink slug="live-data" />.</p>
+</TrainingLayout>

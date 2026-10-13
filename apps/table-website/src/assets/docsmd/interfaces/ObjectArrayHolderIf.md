@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ObjectArrayHolderIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ObjectArrayHolderIf
 
 # Interface: ObjectArrayHolderIf\<T\>
 
@@ -31,7 +31,7 @@
 
 #### Defined in
 
-[lib/table/data/tablemodel/areamodel/object-array-holder.if.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts#L5)
+[src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts#L6)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/tablemodel/areamodel/object-array-holder.if.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts#L6)
+[src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/object-array-holder.if.ts#L7)

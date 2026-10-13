@@ -10,6 +10,8 @@
  * @param {any} row - The row to be checked.
  *
  * @return {boolean} - true if the row is a tree row, false otherwise.
+ *
+ * @category Utilities
  */
 export function isTreeRow(row: any): boolean {
   return row && row['type'] === 'TreeRow';
@@ -22,6 +24,8 @@ export function isTreeRow(row: any): boolean {
  *
  * @param {any} model - The model object to check.
  * @return {boolean} - True if the model is an AreaModelTree, false otherwise.
+ *
+ * @category Utilities
  */
 export function isAreaModelTree(model: any): boolean {
   return model && model['type'] === 'AreaModelTree';
@@ -33,6 +37,8 @@ export function isAreaModelTree(model: any): boolean {
  *
  * @param {any} o - The object to be checked.
  * @returns {boolean} - True if the object is a CheckboxColumnDef, false otherwise.
+ *
+ * @category Utilities
  */
 export function isCheckboxColumnDef(o: any): boolean {
   return o && o['type'] === 'CheckboxColumnDef';

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CrudObjectView
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CrudObjectView
 
 # Class: CrudObjectView\<T\>
 
@@ -14,14 +14,8 @@
 
 - [constructor](CrudObjectView.md#constructor)
 
-### Properties
-
-- [object](CrudObjectView.md#object)
-
 ### Methods
 
-- [generateHtmlTable](CrudObjectView.md#generatehtmltable)
-- [generateTableRows](CrudObjectView.md#generatetablerows)
 - [getCombinedKey](CrudObjectView.md#getcombinedkey)
 - [getLabel](CrudObjectView.md#getlabel)
 - [openDialog](CrudObjectView.md#opendialog)
@@ -50,60 +44,9 @@
 
 #### Defined in
 
-[lib/table/crud/crud-object-view.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L5)
-
-## Properties
-
-### object
-
-• `Private` **object**: `T`
-
-#### Defined in
-
-[lib/table/crud/crud-object-view.ts:3](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L3)
+[src/lib/table/crud/crud-object-view.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L6)
 
 ## Methods
-
-### generateHtmlTable
-
-▸ **generateHtmlTable**(`obj`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `obj` | `T` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/table/crud/crud-object-view.ts:39](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L39)
-
-___
-
-### generateTableRows
-
-▸ **generateTableRows**(`obj`, `parentKey?`): `string`
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `obj` | `any` | `undefined` |
-| `parentKey` | `string` | `''` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/table/crud/crud-object-view.ts:55](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L55)
-
-___
 
 ### getCombinedKey
 
@@ -122,7 +65,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-object-view.ts:31](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L31)
+[src/lib/table/crud/crud-object-view.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L32)
 
 ___
 
@@ -142,7 +85,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-object-view.ts:35](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L35)
+[src/lib/table/crud/crud-object-view.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L36)
 
 ___
 
@@ -156,4 +99,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-object-view.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-object-view.ts#L9)
+[src/lib/table/crud/crud-object-view.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L10)

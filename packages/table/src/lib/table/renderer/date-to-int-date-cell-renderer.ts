@@ -5,6 +5,7 @@ import { AreaIdent } from "../data/tablemodel/area-ident.type";
 import { RendererCleanupFnType } from "./renderer-cleanup-fn.type";
 
 
+/** @category Renderers & editing */
 export class DateToIntlDDMMYYYYCellRenderer implements CellRendererIf {
 
   readonly formatter = new Intl.DateTimeFormat("de-DE", {

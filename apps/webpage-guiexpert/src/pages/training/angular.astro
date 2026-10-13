@@ -1,0 +1,55 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import Figure from "../../components/training/Figure.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="angular">
+
+  <h2 id="version">Pick the right package version</h2>
+  <p>
+    The major version of <code>@guiexpert/angular-table</code> follows your Angular major. All nine packages are built from
+    one source.
+  </p>
+  <table>
+    <thead><tr><th>Your Angular</th><th>Install</th></tr></thead>
+    <tbody>
+      <tr><td>22 (latest)</td><td><code>npm i @guiexpert/table @guiexpert/angular-table@22</code></td></tr>
+      <tr><td>14 … 21</td><td>the same major, e.g. Angular 17: <code>npm i @guiexpert/table @guiexpert/angular-table@17</code> (dist tag <code>a17</code>)</td></tr>
+    </tbody>
+  </table>
+  <p>The table CSS ships with the component – you don't import <code>main.css</code> in Angular.</p>
+
+  <h2 id="component">The component</h2>
+  <Snippet file="examples/angular/app.ts" title="frameworks/angular/src/app/app.ts" />
+  <Snippet file="examples/angular/styles.css" title="src/styles.css" />
+  <Figure src="fw-angular" caption="Angular 22 with signals: the button changes the signal, computed() creates a new model, the table is rebuilt." />
+
+  <h2 id="rules">Rules for Angular</h2>
+  <ul>
+    <li><code>TableComponent</code> is <strong>standalone</strong> – put it into <code>imports</code>. Selector:
+      <code>&lt;guiexpert-table&gt;</code>.</li>
+    <li>It uses <code>OnPush</code> and initialises <strong>outside the Angular zone</strong>: scrolling 100,000 rows does not
+      trigger change detection.</li>
+    <li>A <strong>new <code>[tableModel]</code> object rebuilds the table</strong> (<code>ngOnChanges</code>) – here via
+      <code>computed()</code>; <code>ngOnDestroy</code> cleans up.</li>
+    <li>Outputs: <code>(tableReady)</code>, <code>(mouseClicked)</code>, <code>(selectionChanged)</code>, <code>(contextmenu)</code>,
+      <code>(mouseDraggingEnded)</code> … <code>$event</code> is the <ApiLink name="TableApi" /> resp. <ApiLink name="GeMouseEvent" />.</li>
+    <li>The element needs <code>display: block</code> and a height.</li>
+  </ul>
+  <Callout type="pitfall" title="Angular CLI 22 and Node">
+    <p>Angular CLI 22 needs Node ≥ 22.22.3. With an older Node the dev server refuses to start – that has nothing to do with the table.</p>
+  </Callout>
+
+  <h2 id="cells">Angular components inside cells</h2>
+  <p>
+    <code>RenderWrapperFactory.create(MyComponent, cdr)</code> turns a component that implements <code>ComponentRendererIf</code>
+    into a cell renderer – see <ChapterLink slug="framework-components" />.
+  </p>
+
+  <h2 id="next">Next</h2>
+  <p>Svelte, Solid, Preact and a side-by-side comparison of all wrappers: <ChapterLink slug="one-model-every-framework" />.</p>
+</TrainingLayout>

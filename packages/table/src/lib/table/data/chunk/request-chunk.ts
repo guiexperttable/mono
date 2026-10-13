@@ -1,5 +1,6 @@
 import {RequestChunkIf} from "./request-chunk.if";
 
+/** @category Utilities */
 export class RequestChunk implements RequestChunkIf {
 
   constructor(

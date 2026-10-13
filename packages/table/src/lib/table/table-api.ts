@@ -13,344 +13,63 @@ import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-obj
 
 
 /**
- * # TableApi
- * 
- * The TableApi class provides a comprehensive interface for programmatically interacting with a table component.
- * After creating a table component, each component gets its own TableApi instance that serves as the primary
- * means for developers to control and interact with the rendered table.
- * 
- * ## Overview
- * 
- * TableApi acts as a facade over the internal table implementation, providing a clean, well-documented API
- * that abstracts away the complexity of the underlying table mechanics. It delegates most operations to the
- * TableScope instance, which contains the actual implementation details.
- * 
- * ## Core Functionality
- * 
- * The TableApi provides methods for:
- * 
- * ### Data Management
- * - Setting, adding, and removing rows
- * - Updating individual cells or ranges of cells
- * - Finding and filtering rows based on criteria
- * - Sorting data with custom comparators
- * 
- * ### Visual Control
- * - Scrolling to specific positions (by pixel or row/column index)
- * - Controlling visibility of header, footer, and columns
- * - Adjusting column widths (manually or automatically)
- * - Repainting the table (normal or hard repaint)
- * 
- * ### Selection and Focus
- * - Managing cell, row, or column selection
- * - Clearing selections
- * - Ensuring specific rows are visible in the viewport
- * 
- * ### Export and Clipboard
- * - Copying selected data to clipboard
- * - Exporting table data to Excel
- * 
- * ### Events and Actions
- * - Triggering specific actions programmatically
- * - Responding to external filter changes
- * 
- * ### Debugging
- * - Enabling/disabling logging for troubleshooting
- * 
- * ## Usage Patterns
- * 
- * The TableApi is designed to be used in several common patterns:
- * 
- * ### 1. Direct Method Calls
- * 
- * The most straightforward usage is to call methods directly on the TableApi instance:
- * 
- * ```typescript
- * // Get the API from your table component
- * const api = tableComponent.api;
- * 
- * // Call methods directly
- * api.setRows(newData);
- * api.scrollToIndex(0, 10);
- * api.repaint();
- * ```
- * 
- * ### 2. Chaining Operations
- * 
- * While the TableApi doesn't support method chaining directly (most methods return void),
- * you can group related operations together:
- * 
- * ```typescript
- * // Perform a sequence of related operations
- * function updateTableSection(api, newRows, startIndex) {
- *   api.addRowsAt(newRows, startIndex);
- *   api.ensureRowIsVisible(startIndex);
- *   api.repaint();
- * }
- * ```
- * 
- * ### 3. Event-Driven Updates
- * 
- * Use the TableApi to respond to external events:
- * 
- * ```typescript
- * // Update table in response to user input
- * searchInput.addEventListener('input', (e) => {
- *   const searchText = e.target.value;
- *   tableOptions.externalFilterFunction = row => row.name.includes(searchText);
- *   tableApi.externalFilterChanged();
- * });
- * ```
- * 
- * ### 4. Integration with Application State
- * 
- * Synchronize table state with application state:
- * 
- * ```typescript
- * // In a state management effect or watcher
- * function onAppStateChanged(newState) {
- *   if (newState.tableData !== currentTableData) {
- *     tableApi.setRows(newState.tableData);
- *     tableApi.repaint();
- *     currentTableData = newState.tableData;
- *   }
- * }
- * ```
- * 
- * ## Performance Considerations
- * 
- * The TableApi provides methods that are optimized for different performance scenarios:
- * 
- * - For frequent small updates: Use `updateCells()` with `repaintAll=false`
- * - For complete data replacement: Use `setRows()`
- * - For structural changes: Follow with `repaintHard()`
- * - For visual-only changes: Use `repaint()`
- * 
- * ## Common Use Cases
- * 
- * ### Real-time Data Updates
- * 
- * ```typescript
- * // Update specific cells with new values from a data stream
- * dataStream.subscribe(update => {
- *   const cellUpdates = update.changes.map(change => ({
- *     area: 'body',
- *     rowIndex: change.rowIndex,
- *     columnIndex: change.columnIndex,
- *     value: change.newValue,
- *     cssClasses: { 'updated': true }
- *   }));
- *   
- *   tableApi.updateCells(cellUpdates);
- * });
- * ```
- * 
- * ### Interactive Filtering
- * 
- * ```typescript
- * // Set up filter controls
- * function applyFilters(filters) {
- *   tableOptions.externalFilterFunction = row => {
- *     return Object.entries(filters).every(([key, value]) => {
- *       if (!value) return true; // Skip empty filters
- *       return row[key].toString().includes(value);
- *     });
- *   };
- *   
- *   tableApi.externalFilterChanged();
- * }
- * ```
- * 
- * ### Custom Sorting
- * 
- * ```typescript
- * // Apply multi-column sorting
- * function sortByMultipleColumns(sortConfig) {
- *   tableApi.sort((a, b) => {
- *     for (const {column, direction} of sortConfig) {
- *       const aValue = a[column];
- *       const bValue = b[column];
- *       const comparison = compare(aValue, bValue);
- *       
- *       if (comparison !== 0) {
- *         return direction === 'asc' ? comparison : -comparison;
- *       }
- *     }
- *     return 0;
- *   });
- * }
- * 
- * function compare(a, b) {
- *   if (typeof a === 'string' && typeof b === 'string') {
- *     return a.localeCompare(b);
- *   }
- *   return a < b ? -1 : a > b ? 1 : 0;
- * }
- * ```
- * 
- * ### Row Management
- * 
- * ```typescript
- * // Add, update, and remove rows based on user interactions
- * function onAddRow(newRow) {
- *   tableApi.addRows([newRow]);
- *   tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
- * }
- * 
- * function onUpdateRow(updatedRow) {
- *   tableApi.updateRows([updatedRow], (a, b) => a.id === b.id);
- * }
- * 
- * function onDeleteRow(rowToDelete) {
- *   tableApi.removeRows([rowToDelete], (a, b) => a.id === b.id);
- * }
- * ```
- * 
- * ### Export and Reporting
- * 
- * ```typescript
- * // Set up export buttons
- * exportButton.addEventListener('click', () => {
- *   tableApi.downloadExcel('report.xlsx', 'Report Generator');
- * });
- * 
- * copyButton.addEventListener('click', () => {
- *   tableApi.copyToClipboard()
- *     .then(() => showNotification('Data copied to clipboard'))
- *     .catch(err => showError('Failed to copy data', err));
- * });
- * ```
- * 
- * ### Responsive Behavior
- * 
- * ```typescript
- * // Handle window resize events
- * window.addEventListener('resize', () => {
- *   tableApi.autoResizeColumns();
- *   tableApi.repaintHard();
- * });
- * ```
- * 
- * ## Integration with Frameworks
- * 
- * ### React
- * 
- * ```jsx
- * function DataTable({ data, onRowSelect }) {
- *   const tableRef = useRef(null);
- *   
- *   useEffect(() => {
- *     if (tableRef.current && tableRef.current.api) {
- *       tableRef.current.api.setRows(data);
- *       tableRef.current.api.repaint();
- *     }
- *   }, [data]);
- *   
- *   return <div ref={tableRef} className="table-container" />;
- * }
- * ```
- * 
- * ### Vue
- * 
- * ```vue
- * <template>
- *   <div ref="tableContainer"></div>
- * </template>
- * 
- * <script>
- * export default {
- *   props: ['tableData'],
- *   watch: {
- *     tableData(newData) {
- *       if (this.tableApi) {
- *         this.tableApi.setRows(newData);
- *         this.tableApi.repaint();
- *       }
- *     }
- *   },
- *   mounted() {
- *     // Initialize table and get API reference
- *     this.tableApi = initializeTable(this.$refs.tableContainer).api;
- *   }
- * }
- * </script>
- * ```
- * 
- * ### Angular
- * 
- * ```typescript
- * @Component({
- *   selector: 'app-data-table',
- *   template: '<div #tableContainer></div>'
- * })
- * export class DataTableComponent implements OnInit, OnChanges {
- *   @Input() data: any[];
- *   @ViewChild('tableContainer') tableContainer: ElementRef;
- *   
- *   private tableApi: TableApi;
- *   
- *   ngOnInit() {
- *     this.tableApi = initializeTable(this.tableContainer.nativeElement).api;
- *   }
- *   
- *   ngOnChanges(changes) {
- *     if (changes.data && this.tableApi) {
- *       this.tableApi.setRows(this.data);
- *       this.tableApi.repaint();
- *     }
- *   }
- * }
- * ```
- * 
- * ## Error Handling
- * 
- * The TableApi methods generally don't throw exceptions, but instead log warnings to the console
- * when operations cannot be completed (e.g., when trying to use row operations on an incompatible
- * area model type). It's good practice to check console warnings during development.
- * 
- * For asynchronous operations like clipboard access, proper error handling should be used:
- * 
- * ```typescript
- * tableApi.copyToClipboard()
- *   .then(content => {
- *     console.log('Copied to clipboard:', content);
- *   })
- *   .catch(error => {
- *     console.error('Failed to copy to clipboard:', error);
- *     // Show user-friendly error message
- *   });
- * ```
- * 
- * ## Debugging
- * 
- * For troubleshooting complex table behavior, the logging system can be enabled:
- * 
- * ```typescript
- * // Enable detailed logging
- * tableApi.setLoggingActive(true);
- * 
- * // Perform operations that need debugging
- * tableApi.updateCells([...]);
- * tableApi.scrollToIndex(5, 10);
- * 
- * // Check if logging is active
- * const isLogging = tableApi.isLoggingActive();
- * 
- * // Disable logging when done
- * tableApi.setLoggingActive(false);
- * ```
- * 
- * ## Advanced Usage
- * 
- * For advanced scenarios, you can access the underlying TableScope:
- * 
- * ```typescript
- * const tableScope = tableApi.getTableScope();
- * // Now you can access internal implementation details
- * // Note: This is generally not recommended unless absolutely necessary
- * ```
- * 
- * @class TableApi
+ * The public API of one table – everything you do with a table after it has been created:
+ * scrolling, sorting, filtering, selection, copy, Excel export, updating cells and rows, repainting.
+ *
+ * Every table has exactly one `TableApi`. You never create it yourself – you get it:
+ *
+ * | Where | How |
+ * |---|---|
+ * | Plain TypeScript | `new TableScope(host, model, new SimpleDomService(), options, listener).firstInit().getApi()` |
+ * | Web Component | `el.addEventListener("tableReady", e => e.detail)` |
+ * | React / Preact / Solid | `<GuiexpertTable tableReady={api => …} />` |
+ * | Vue 3 | `<GuiexpertTable @tableReady="api => …" />` |
+ * | Svelte 5 | `<GuiexpertTable onTableReady={api => …} />` |
+ * | Angular | `<guiexpert-table (tableReady)="onReady($event)" />` |
+ *
+ * ## The most important methods
+ *
+ * | Task | Methods |
+ * |---|---|
+ * | scroll | {@link scrollToIndex}, {@link ensureRowIsVisible}, {@link scrollToPixel}, {@link getFirstVisibleRowIndex} |
+ * | sort | {@link sortByColumn}, {@link sort}, {@link reSort} |
+ * | filter | {@link externalFilterChanged} (with {@link TableOptionsIf.externalFilterFunction}) |
+ * | export | {@link copyToClipboard}, {@link downloadExcel} |
+ * | change data | {@link updateCells}, {@link setRows}, {@link addRows}, {@link updateRows}, {@link removeRows} |
+ * | redraw | {@link repaint} (same row count), {@link repaintHard} (row count or heights changed) |
+ * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths} |
+ * | lifecycle | {@link destroy} |
+ *
+ * @example
+ * // plain TypeScript: create a table and talk to it
+ * const tableModel = TableFactory.createTableModel({ rows: orders });
+ * const tableApi = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter())
+ *   .firstInit()
+ *   .getApi();
+ *
+ * tableApi.scrollToIndex(0, 50_000);                  // column 0, row 50,000
+ * tableApi.sortByColumn("total", "desc");             // like a double-click on the header
+ * await tableApi.copyToClipboard();                   // the current selection, tab-separated
+ * await tableApi.downloadExcel("orders.xlsx");        // the current view as .xlsx
+ *
+ * @example
+ * // live data: change single cells, only the visible ones are redrawn
+ * tableApi.updateCells([
+ *   new TableCellUpdateEvent("body", 3, 2, 101.5, { "tick-up": true }),
+ *   new TableCellUpdateEvent("body", 3, 3, 0.42)
+ * ]);
+ *
+ * @example
+ * // replace the rows of an object-array table – the row count changes, so repaint hard
+ * tableApi.setRows(newOrders);
+ * tableApi.externalFilterChanged();                   // only if a filter function is set
+ * tableApi.repaintHard();
+ *
+ * @see Training: [Your first table](https://gui.expert/training/first-table/),
+ *   [Sorting](https://gui.expert/training/sorting/), [Filtering](https://gui.expert/training/filtering/),
+ *   [Excel export](https://gui.expert/training/excel-export/), [Live data](https://gui.expert/training/live-data/)
+ *
+ * @category Table & API
  */
 export class TableApi {
 
@@ -541,58 +260,6 @@ export class TableApi {
    *   }
    * }
    *
-   * @example
-   * // Advanced usage with animated scrolling
-   * class SmoothScroller {
-   *   private tableApi: TableApi;
-   *   private animationFrameId: number | null = null;
-   *
-   *   constructor(tableApi: TableApi) {
-   *     this.tableApi = tableApi;
-   *   }
-   *
-   *   smoothScrollTo(targetX: number, targetY: number, duration: number = 500) {
-   *     // Cancel any ongoing animation
-   *     if (this.animationFrameId !== null) {
-   *       cancelAnimationFrame(this.animationFrameId);
-   *     }
-   *
-   *     const startTime = performance.now();
-   *     const startX = this.tableApi.getTableScope().getScrollLeft();
-   *     const startY = this.tableApi.getTableScope().getScrollTop();
-   *     const distanceX = targetX - startX;
-   *     const distanceY = targetY - startY;
-   *
-   *     const step = (currentTime: number) => {
-   *       const elapsed = currentTime - startTime;
-   *       const progress = Math.min(elapsed / duration, 1);
-   *
-   *       // Use easing function for smooth animation
-   *       const easeProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease-out
-   *
-   *       const currentX = startX + distanceX * easeProgress;
-   *       const currentY = startY + distanceY * easeProgress;
-   *
-   *       this.tableApi.scrollToPixel(currentX, currentY);
-   *
-   *       if (progress < 1) {
-   *         this.animationFrameId = requestAnimationFrame(step);
-   *       } else {
-   *         this.animationFrameId = null;
-   *       }
-   *     };
-   *
-   *     this.animationFrameId = requestAnimationFrame(step);
-   *   }
-   *
-   *   cancelAnimation() {
-   *     if (this.animationFrameId !== null) {
-   *       cancelAnimationFrame(this.animationFrameId);
-   *       this.animationFrameId = null;
-   *     }
-   *   }
-   * }
-   *
    * @see {@link scrollToIndex} - For scrolling based on row and column indices
    * @see {@link ensureRowIsVisible} - For scrolling to make a specific row visible
    */
@@ -619,51 +286,6 @@ export class TableApi {
    * @example
    * // Scroll to column 3, row 10
    * tableApi.scrollToIndex(3, 10);
-   *
-   * @example
-   * // Example in a component that needs to navigate to specific content
-   * class TableNavigator {
-   *   private tableApi: TableApi;
-   *
-   *   constructor(tableApi: TableApi) {
-   *     this.tableApi = tableApi;
-   *   }
-   *
-   *   goToCell(columnIndex: number, rowIndex: number) {
-   *     // Navigate directly to the specified cell position
-   *     this.tableApi.scrollToIndex(columnIndex, rowIndex);
-   *
-   *     // Optional: Select the cell after navigating to it
-   *     const selectionModel = this.tableApi.getSelectionModel();
-   *     if (selectionModel) {
-   *       selectionModel.selectCell(rowIndex, columnIndex);
-   *     }
-   *   }
-   * }
-   *
-   * @example
-   * // Advanced usage with search functionality
-   * class TableSearcher {
-   *   findAndScrollToMatch(searchTerm: string) {
-   *     const tableModel = this.tableApi.getTableModel();
-   *     const bodyModel = tableModel.getAreaModel('body');
-   *
-   *     // Search for the term in the table data
-   *     for (let row = 0; row < bodyModel.getRowCount(); row++) {
-   *       for (let col = 0; col < tableModel.getColumnCount(); col++) {
-   *         const cellContent = bodyModel.getValueAt(row, col)?.toString() || '';
-   *
-   *         if (cellContent.includes(searchTerm)) {
-   *           // Found a match, scroll to it
-   *           this.tableApi.scrollToIndex(col, row);
-   *           return true;
-   *         }
-   *       }
-   *     }
-   *
-   *     return false; // No match found
-   *   }
-   * }
    *
    * @see {@link scrollToPixel} - For scrolling to specific pixel coordinates
    * @see {@link ensureRowIsVisible} - For scrolling to make a specific row visible
@@ -755,7 +377,7 @@ export class TableApi {
    *
    * @example
    * // Update selection and repaint to show the visual change
-   * tableApi.getSelectionModel().selectCell(2, 3);
+   * tableApi.getSelectionModel()?.togglePoint(2, 3);
    * tableApi.repaint();
    *
    * @example
@@ -856,19 +478,8 @@ export class TableApi {
    * the selection is cleared.
    *
    * @example
-   * // Clear all selections in the table
+   * // Clear all selections in the table (e.g. from a "reset" button)
    * tableApi.clearSelection();
-   *
-   * // Example usage in a component
-   * class MyComponent {
-   *   @ViewChild('tableComponent') tableComponent: TableComponent;
-   *
-   *   resetTableSelection(): void {
-   *     if (this.tableComponent?.api) {
-   *       this.tableComponent.api.clearSelection();
-   *     }
-   *   }
-   * }
    *
    * @returns {void}
    */
@@ -1032,7 +643,7 @@ export class TableApi {
   downloadExcel(
     fileName: string = 'table.xlsx',
     author: string = ''
-  ) {
+  ): Promise<void> {
     const matrix: Array<Array<any>> = [];
     const tableModel = this.tableScope.tableModel;
     const columns: number[] = []; // visible columns only – what the table shows
@@ -1048,7 +659,8 @@ export class TableApi {
         matrix.push(columns.map(c => areaModel.getValueAt(r, c)));
       }
     }
-    return this.tableScope.excelService.downloadExcel(matrix, fileName, author);
+    // a custom ExcelServiceIf may return void – the API always returns a Promise
+    return Promise.resolve(this.tableScope.excelService.downloadExcel(matrix, fileName, author));
   }
 
 
@@ -1111,7 +723,7 @@ export class TableApi {
    *
    * // Add a selection change listener
    * selectionModel?.addEventSelectionChangedListener({
-   *   selectionChanged: () => {
+   *   onSelectionChanged: () => {
    *     console.log('Selection has changed');
    *   }
    * });
@@ -1182,6 +794,10 @@ export class TableApi {
   /**
    * Sets the rows data for the table body, replacing any existing rows.
    *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
+   * Does **not** repaint and resets filtering and sorting of the body: afterwards call
+   * {@link externalFilterChanged} (if a filter function is set) and {@link repaintHard} (the row count changed).
+   *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects to set as the table's rows
    * 
@@ -1190,8 +806,6 @@ export class TableApi {
    * It only works with tables that use AreaModelObjectArray as their body model.
    * 
    * @return {void} - This method doesn't return anything.
-   * 
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
    */
   setRows<T>(rows: T[]){
     const bodyModel = this.getBodyModel();
@@ -1207,6 +821,10 @@ export class TableApi {
   /**
    * Adds new rows to the end of the table body.
    *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
+   * Does **not** repaint and resets filtering and sorting of the body: afterwards call
+   * {@link externalFilterChanged} (if a filter function is set) and {@link repaintHard} (the row count changed).
+   *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects to append to the table's existing rows
    * 
@@ -1216,7 +834,11 @@ export class TableApi {
    * 
    * @return {void} - This method doesn't return anything.
    * 
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
+   *
+   * @example
+   * tableApi.addRows([{ id: 100_001, customer: "New GmbH" }]);
+   * tableApi.repaintHard();
+   * tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
    */
   addRows<T>(rows: T[]){
     const bodyModel = this.getBodyModel();
@@ -1232,6 +854,10 @@ export class TableApi {
   /**
    * Inserts new rows at a specific position in the table body.
    *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
+   * Does **not** repaint and resets filtering and sorting of the body: afterwards call
+   * {@link externalFilterChanged} (if a filter function is set) and {@link repaintHard} (the row count changed).
+   *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects to insert into the table
    * @param {number} rowIndex - The index position where the new rows should be inserted
@@ -1242,8 +868,6 @@ export class TableApi {
    * It only works with tables that use AreaModelObjectArray as their body model.
    * 
    * @return {void} - This method doesn't return anything.
-   * 
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
    */
   addRowsAt<T>(rows: T[], rowIndex: number){
     const bodyModel = this.getBodyModel();
@@ -1259,6 +883,10 @@ export class TableApi {
   /**
    * Removes specified rows from the table body.
    *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
+   * Does **not** repaint and resets filtering and sorting of the body: afterwards call
+   * {@link externalFilterChanged} (if a filter function is set) and {@link repaintHard} (the row count changed).
+   *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects to remove from the table
    * @param {(a: T, b: T) => boolean} predicate - A comparison function that determines if two rows match
@@ -1270,8 +898,6 @@ export class TableApi {
    * It only works with tables that use AreaModelObjectArray as their body model.
    * 
    * @return {void} - This method doesn't return anything.
-   * 
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
    */
   removeRows<T>(rows: T[], predicate: (a: T, b: T) => boolean = (a, b) => a === b){
     const bodyModel = this.getBodyModel();
@@ -1286,6 +912,8 @@ export class TableApi {
 
   /**
    * Searches for and returns rows from the table body that match the given criteria.
+   *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
    *
    * @template T - The type of elements in the rows array
    * 
@@ -1309,13 +937,11 @@ export class TableApi {
    *
    * @example
    * // Find rows with simple equality comparison
-   * const matchingRows = table.findRows([row1, row2]);
+   * const matchingRows = tableApi.findRows([orders[0], orders[1]]);
    *
    * @example
    * // Find rows with custom comparison logic
-   * const matchingRows = table.findRows([row1, row2], (a, b) => a.id === b.id);
-   *
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
+   * const matchingRows = tableApi.findRows<Order>([{ ...orders[0] }], (a, b) => a.id === b.id);
    */
   findRows<T>(rows: T[], predicate: (a: T, b: T) => boolean = (a, b) => a === b): T[] {
     const bodyModel = this.getBodyModel();
@@ -1365,12 +991,6 @@ export class TableApi {
    *   (criteria, row) => row.name.toLowerCase().includes(criteria.name!.toLowerCase())
    * );
    * 
-   * // Find a person within age range
-   * const ageCriteria = { minAge: 25, maxAge: 35 };
-   * const person3 = tableApi.findRowFromFilteredRowsByAllCriteria<Person>(
-   *   ageCriteria,
-   *   (criteria, row) => row.age >= criteria.minAge! && row.age <= criteria.maxAge!
-   * );
    * ```
    * 
    * @throws {Warning} Logs a warning to console if the body model is not an instance of AreaModelObjectArray
@@ -1419,17 +1039,16 @@ export class TableApi {
    * // Find a product row with partial match on name
    * const criteria = { name: "Phone" };
    * const product = tableApi.findRowFromAllRowsByAllCriteria(criteria,
-   *   (criteria, row) => row.name.includes(criteria.name)
+   *   (criteria, row) => row.name.includes(criteria.name!)
    * );
    * 
    * @example
    * // Find an order with complex matching logic
-   * const criteria = { total: 100, status: "pending" };
-   * const order = tableApi.findRowFromAllRowsByAllCriteria(criteria,
+   * const criteria = { total: 100, status: "paid" as const };
+   * const order = tableApi.findRowFromAllRowsByAllCriteria<Order>(criteria,
    *   (criteria, row) => {
-   *     return row.total > criteria.total && 
-   *            row.status === criteria.status &&
-   *            row.items.length > 0;
+   *     return row.total > criteria.total! &&
+   *            row.status === criteria.status;
    *   }
    * );
    * 
@@ -1451,6 +1070,9 @@ export class TableApi {
   /**
    * Updates existing rows in the table body with new data.
    *
+   * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
+   * The properties are copied into the existing objects; nothing is repainted – call {@link repaint} afterwards.
+   *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects containing the updated values
    * @param {(a: T, b: T) => boolean} predicate - A comparison function that determines which rows to update
@@ -1464,8 +1086,6 @@ export class TableApi {
    * It only works with tables that use AreaModelObjectArray as their body model.
    * 
    * @return {void} - This method doesn't return anything.
-   * 
-   * @throws {Warning} Logs a console warning if the table's body model is not an AreaModelObjectArray
    */
   updateRows<T>(rows: T[], predicate: (a: T, b: T) => boolean = (a, b) => a === b): void {
     const bodyModel = this.getBodyModel();
@@ -1533,7 +1153,7 @@ export class TableApi {
    * 
    * @example
    * // Sort table rows by a specific property in ascending order
-   * table.api.sort((a, b) => {
+   * tableApi.sort((a: Person, b: Person) => {
    *   if (a.name < b.name) return -1;
    *   if (a.name > b.name) return 1;
    *   return 0;
@@ -1541,22 +1161,22 @@ export class TableApi {
    * 
    * @example
    * // Sort numbers in descending order
-   * table.api.sort((a, b) => b.value - a.value);
+   * tableApi.sort((a: { value: number }, b: { value: number }) => b.value - a.value);
    * 
    * @example
    * // Sort with multiple criteria
-   * table.api.sort((a, b) => {
+   * tableApi.sort((a: Order, b: Order) => {
    *   // First sort by status
    *   const statusCompare = a.status.localeCompare(b.status);
    *   if (statusCompare !== 0) return statusCompare;
    *   
    *   // Then sort by name if status is equal
-   *   return a.name.localeCompare(b.name);
+   *   return a.customer.localeCompare(b.customer);
    * });
    * 
    * @example
    * // Case-insensitive string sorting
-   * table.api.sort((a, b) => 
+   * tableApi.sort((a: Person, b: Person) =>
    *   a.name.toLowerCase().localeCompare(b.name.toLowerCase())
    * );
    */
@@ -1581,35 +1201,6 @@ export class TableApi {
    * @example
    * // Ensure row 5 is visible in the viewport
    * tableApi.ensureRowIsVisible(5);
-   *
-   * @example
-   * // Example usage in a component
-   * class MyTableComponent {
-   *   private tableApi: TableApi;
-   *
-   *   scrollToSpecificRow(rowIndex: number) {
-   *     // This will scroll the row into view if it's not visible
-   *     const didScroll = this.tableApi.ensureRowIsVisible(rowIndex);
-   *
-   *     if (didScroll) {
-   *       console.log(`Table scrolled to show row ${rowIndex}`);
-   *     } else {
-   *       console.log(`Row ${rowIndex} was already visible`);
-   *     }
-   *   }
-   * }
-   *
-   * @example
-   * // Example with row selection
-   * class TableHandler {
-   *   selectAndShowRow(rowIndex: number) {
-   *     // First ensure the row is visible
-   *     this.tableApi.ensureRowIsVisible(rowIndex);
-   *
-   *     // Then perform selection
-   *     this.selectionModel.selectRow(rowIndex);
-   *   }
-   * }
    *
    * @throws {Error} Implicitly may throw if rowIndex is not a number or if required properties are undefined
    *
@@ -1686,7 +1277,7 @@ export class TableApi {
    * const firstFullVisibleRow = tableApi.getFirstFullVisibleRowIndex();
    *
    * // Check if a specific row is fully visible
-   * const isRowFullyVisible = (rowIndex) => {
+   * const isRowFullyVisible = (rowIndex: number) => {
    *   const firstFullVisible = tableApi.getFirstFullVisibleRowIndex();
    *   const lastFullVisible = tableApi.getLastFullVisibleRowIndex();
    *   return rowIndex >= firstFullVisible && rowIndex <= lastFullVisible;

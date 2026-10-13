@@ -1,5 +1,7 @@
 /**
  * Represents the indices (position) of a cell in a table area.
+ *
+ * @category Events
  */
 export class GeCellIndices {
 

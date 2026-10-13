@@ -52,6 +52,7 @@ Basic usage involves:
 
 ## Documentation
 - Demos: https://gui.expert/demos
+- Training (34 chapters, step by step): https://gui.expert/training/
 - Documentation: https://gui.expert/doc
 - API: https://gui.expert/api
 

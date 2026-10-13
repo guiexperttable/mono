@@ -47,6 +47,29 @@ interface ZipEntry {
   method: 0 | 8;          // 0 = stored, 8 = deflate
 }
 
+/**
+ * Writes real `.xlsx` files (Office Open XML) without any library – compressed with the browser's
+ * built-in `CompressionStream`. Numbers stay numbers, everything else becomes text.
+ *
+ * {@link TableApi.downloadExcel} exports what the table shows; use the ExcelService directly for any other data.
+ *
+ * @example
+ * // all rows, own columns – independent of filter and sorting
+ * const body = tableApi.getBodyModel() as AreaModelObjectArray<Order>;
+ * const matrix = [
+ *   ["ID", "Customer", "Total"],
+ *   ...body.getAllRows().map(o => [o.id, o.customer, o.total])
+ * ];
+ * await new ExcelService().downloadExcel(matrix, "orders.xlsx", "GuiExpert");
+ *
+ * @example
+ * // a Blob instead of a download, e.g. for an upload
+ * const blob = await new ExcelService().createExcelBlob(matrix);
+ *
+ * @see Training: [Excel export without a library](https://gui.expert/training/excel-export/)
+ *
+ * @category Export & clipboard
+ */
 export class ExcelService implements ExcelServiceIf {
 
   /**

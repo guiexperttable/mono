@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ActionEventIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ActionEventIf
 
 # Interface: ActionEventIf
 
@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[lib/table/renderer/action/action-event.if.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/action/action-event.if.ts#L4)
+[src/lib/table/renderer/action/action-event.if.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/action-event.if.ts#L5)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[lib/table/renderer/action/action-event.if.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/action/action-event.if.ts#L5)
+[src/lib/table/renderer/action/action-event.if.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/action-event.if.ts#L6)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[lib/table/renderer/action/action-event.if.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/action/action-event.if.ts#L7)
+[src/lib/table/renderer/action/action-event.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/action-event.if.ts#L8)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[lib/table/renderer/action/action-event.if.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/action/action-event.if.ts#L8)
+[src/lib/table/renderer/action/action-event.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/action-event.if.ts#L9)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[lib/table/renderer/action/action-event.if.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/action/action-event.if.ts#L6)
+[src/lib/table/renderer/action/action-event.if.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/action-event.if.ts#L7)

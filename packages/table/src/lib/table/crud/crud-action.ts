@@ -1,4 +1,5 @@
 
+/** @category CRUD */
 export class CrudAction {
 
   constructor(

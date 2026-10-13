@@ -8,90 +8,53 @@ import { CheckedType } from "../../common/checked-type";
 
 
 /**
- * @class AreaModel
- * @implements {AreaModelIf}
- * @description
- * The AreaModel class is a base implementation of the AreaModelIf interface.
- * It represents a model for a specific area of a table (header, body, or footer)
- * and provides methods for accessing and manipulating data within that area.
- * 
- * In the GuiExpert Table library, a table is divided into three main areas:
- * - Header: Contains column titles and optional filter/sort controls
- * - Body: Contains the main data of the table
- * - Footer: Contains summary information or additional controls
- * 
- * Each of these areas can be further divided into three sections:
- * - West: Fixed columns on the left side
- * - Center: Scrollable columns in the middle
- * - East: Fixed columns on the right side
- * 
- * <pre>
- *  +----------------+-------------------+--------------+
- *  |  header/west   |  header/center    | header/east  |
- *  +----------------+-------------------+--------------+
- *  |  body/west     |  body/center      | body/east    |
- *  +----------------+-------------------+--------------+
- *  |  footer/west   |  footer/center    | footer/east  |
- *  +----------------+-------------------+--------------+
- * </pre>
- * 
- * This base AreaModel class provides default implementations for all methods
- * required by the AreaModelIf interface. Most methods return default values
- * or do nothing, making this class suitable as a starting point for creating
- * more specialized area models.
- * 
+ * Base class for area models of your own – every method of {@link AreaModelIf} has a sensible default,
+ * override only what you need (at least {@link getRowCount}, {@link getValueAt} and {@link getRowHeight}).
+ *
+ * A table consists of three area models – header, body and footer ({@link AreaIdent}) – and asks them only for
+ * the cells that are visible. That makes models possible that compute values on demand (millions of rows,
+ * server data) or summarise other models (footer totals).
+ *
  * @example
- * // Creating a basic area model for the header
- * const headerModel = new AreaModel();
- * headerModel.areaIdent = "header";
- * 
- * @example
- * // Extending AreaModel to create a custom implementation
- * class CustomAreaModel extends AreaModel {
- *   private data: any[][];
- *   
- *   constructor(data: any[][]) {
+ * // a body with two million rows – no array behind it
+ * class TwoMillionRows extends AreaModel {
+ *   constructor() {
  *     super();
- *     this.data = data;
+ *     this.areaIdent = "body";
  *   }
- *   
- *   getRowCount(): number {
- *     return this.data.length;
+ *   override getRowCount(): number { return 2_000_000; }
+ *   override getRowHeight(_rowIndex: number): number { return 34; }
+ *   override getConstantRowHeight(): number { return 34; }   // all rows equally high → O(1) scrolling
+ *   override getValueAt(row: number, col: number): any {
+ *     return col === 0 ? row + 1 : `cell ${row}/${col}`;
  *   }
- *   
- *   getValueAt(rowIndex: number, columnIndex: number): any {
- *     if (rowIndex < 0 || rowIndex >= this.data.length) return undefined;
- *     const row = this.data[rowIndex];
- *     if (columnIndex < 0 || columnIndex >= row.length) return undefined;
- *     return row[columnIndex];
- *   }
- *   
- *   // Override other methods as needed...
  * }
- * 
+ * const tableModel = TableFactory.createTableModel({
+ *   bodyAreaModel: new TwoMillionRows(),
+ *   columnDefs: [new ColumnDef("id", "ID", px100, allRight), new ColumnDef("text", "Text", px200)]
+ * });
+ *
  * @example
- * // Using AreaModel with a TableModel
- * import { TableFactory, TableModelIf } from "@guiexpert/table";
- * 
- * // Create a table model with custom area models
- * const tableModel: TableModelIf = TableFactory.createTableModel();
- * 
- * // Set custom area models
- * const headerModel = new CustomAreaModel([["ID", "Name", "Age"]]);
- * headerModel.areaIdent = "header";
- * tableModel.setAreaModel("header", headerModel);
- * 
- * const bodyModel = new CustomAreaModel([
- *   [1, "John", 30],
- *   [2, "Jane", 25],
- *   [3, "Bob", 40]
- * ]);
- * bodyModel.areaIdent = "body";
- * tableModel.setAreaModel("body", bodyModel);
- * 
- * @see {@link AreaModelIf} - The interface that this class implements
- * @see {@link AbstractAreaModel} - An abstract implementation with common functionality
- * @see {@link AreaModelObjectArray} - An implementation for object array data
+ * // a footer that sums the rows the body currently shows (after filter and sorting)
+ * class TotalsFooter extends AreaModel {
+ *   constructor(private readonly getBody: () => AreaModelObjectArray<Order>) {
+ *     super();
+ *     this.areaIdent = "footer";
+ *   }
+ *   override getRowCount(): number { return 1; }
+ *   override getRowHeight(_rowIndex: number): number { return 34; }
+ *   override getValueAt(_row: number, col: number): any {
+ *     const rows = this.getBody().getFilteredRows();
+ *     return col === 0 ? `${rows.length} orders` : col === 5 ? rows.reduce((s, o) => s + o.total, 0) : "";
+ *   }
+ * }
+ *
+ * @see {@link AreaModelObjectArray} (objects), {@link AreaModelArrayOfArrays} (rows of values), {@link AreaModelTree} (trees)
+ * @see Training: [The TableModel: three times three areas](https://gui.expert/training/table-model-areas/),
+ *   [Own AreaModel: two million rows](https://gui.expert/training/custom-area-model/),
+ *   [Footer totals](https://gui.expert/training/footer-totals/)
+ *
+ * @category Area models
  */
 export class AreaModel implements AreaModelIf {
 
@@ -148,31 +111,29 @@ export class AreaModel implements AreaModelIf {
 
   /**
    * Sorts the rows in this area based on the provided sort items.
-   * This method is called when the user clicks on a sortable column header.
+   * Called when the user double-clicks a sortable column header (and by {@link TableApi.sortByColumn}).
    * The base implementation returns false (no sorting performed) and should be
-   * overridden by subclasses that support sorting.
-   * 
+   * overridden by subclasses that hold their rows themselves.
+   *
    * @param {SortItem[]} _sortItems - An array of sort items, each containing a column index and sort direction
    * @returns {boolean} True if sorting was performed, false otherwise
-   * 
+   *
    * @example
-   * // Override in a subclass to implement sorting
-   * doSort(sortItems: SortItem[]): boolean {
-   *   if (!sortItems.length) return false;
-   *   
-   *   // Apply sorting to the rows
-   *   this.rows.sort((a, b) => {
+   * class SortableRows extends AreaModel {
+   *   constructor(private readonly rows: any[][]) {
+   *     super();
+   *     this.areaIdent = "body";
+   *   }
+   *   override getRowCount(): number { return this.rows.length; }
+   *   override getValueAt(row: number, col: number): any { return this.rows[row][col]; }
+   *
+   *   override doSort(sortItems: SortItem[]): boolean {
+   *     if (!sortItems.length) return false;
    *     const { columnIndex, sortState } = sortItems[0];
-   *     const valueA = this.getValueAt(this.rows.indexOf(a), columnIndex);
-   *     const valueB = this.getValueAt(this.rows.indexOf(b), columnIndex);
-   *     
-   *     const direction = sortState === 'asc' ? 1 : -1;
-   *     if (valueA < valueB) return -1 * direction;
-   *     if (valueA > valueB) return 1 * direction;
-   *     return 0;
-   *   });
-   *   
-   *   return true;
+   *     const direction = sortState === "asc" ? 1 : -1;
+   *     this.rows.sort((a, b) => (a[columnIndex] < b[columnIndex] ? -1 : a[columnIndex] > b[columnIndex] ? 1 : 0) * direction);
+   *     return true;
+   *   }
    * }
    */
   doSort(_sortItems: SortItem[]): boolean {

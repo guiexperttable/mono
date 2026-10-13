@@ -2,6 +2,7 @@ import { IconIf } from "./icon.if";
 import { TreeOptionsIf } from "./tree-options.if";
 import { Icon } from "./icon";
 
+/** @category Options */
 export class TreeOptions implements TreeOptionsIf {
 
   constructor(

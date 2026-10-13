@@ -1,6 +1,16 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SortItem
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SortItem
 
 # Class: SortItem
+
+One sort instruction: column index + direction. Used by [TableModelIf.doSort](../interfaces/TableModelIf.md#dosort) and
+[AreaModelIf.doSort](../interfaces/AreaModelIf.md#dosort).
+
+**`Example`**
+
+```ts
+// sort once by column 10 descending (and match the header icon set with sortState: "desc")
+tableModel.doSort([new SortItem(10, "desc")]);
+```
 
 ## Table of contents
 
@@ -21,10 +31,10 @@
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
-| `sortState` | [`SortState`](../modules.md#sortstate) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | Column index (west + center + east). |
+| `sortState` | [`SortState`](../modules.md#sortstate) | `"asc"`, `"desc"` or `""` (unsorted). |
 
 #### Returns
 
@@ -32,7 +42,7 @@
 
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/sort-item.ts#L5)
+[src/lib/table/data/common/sort-item.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L15)
 
 ## Properties
 
@@ -40,9 +50,11 @@
 
 • **columnIndex**: `number`
 
+Column index (west + center + east).
+
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/sort-item.ts#L6)
+[src/lib/table/data/common/sort-item.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L17)
 
 ___
 
@@ -50,6 +62,8 @@ ___
 
 • **sortState**: [`SortState`](../modules.md#sortstate)
 
+`"asc"`, `"desc"` or `""` (unsorted).
+
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/sort-item.ts#L7)
+[src/lib/table/data/common/sort-item.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L19)

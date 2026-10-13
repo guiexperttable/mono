@@ -1,0 +1,49 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import Pipeline from "../../components/training/diagrams/Pipeline.astro";
+---
+<TrainingLayout slug="footer-totals">
+
+  <h2 id="idea">A footer is an area model</h2>
+  <p>
+    <code>footerData</code> (<ChapterLink slug="array-of-arrays" />) is static. A footer that shows totals of exactly the rows
+    the user sees is a small class of its own: it extends <ApiLink name="AreaModel" /> and reads the
+    <strong>displayed</strong> rows of the body with <ApiLink name="AreaModelObjectArray.getFilteredRows" /> – after filter and
+    sorting.
+  </p>
+  <Pipeline />
+
+  <h2 id="code">The footer model</h2>
+  <Snippet file="demos/shared/order-totals-footer.ts" title="src/model/order-totals-footer.ts" />
+  <ul>
+    <li><strong>One row</strong>: <code>getRowCount()</code> returns 1, <code>getRowHeight()</code> its height.</li>
+    <li><strong>By property, not by position</strong>: the switch looks at <code>columnDefs[columnIndex].property</code>. Hidden or
+      moved columns (<ChapterLink slug="fixed-columns" />) don't break it.</li>
+    <li><strong>Sum once per filter result</strong>: <code>getValueAt()</code> is called for every visible footer cell on every
+      repaint – the cache keeps that cheap even for 100,000 rows.</li>
+    <li><code>getCellRenderer()</code> lets the footer render the total as euro (<ChapterLink slug="cell-renderers" />).</li>
+  </ul>
+
+  <h2 id="wire">Plug it in</h2>
+  <Snippet file="demos/footer-totals.ts" region="model" />
+  <p>
+    The footer needs the body model, which only exists after <code>createTableModel</code> – so it gets a
+    <strong>function</strong> (<code>() =&gt; tableModel.getBodyModel()</code>) instead of the model itself. Pass it as
+    <code>footerAreaModel</code> (<ApiLink name="CreateTableModelPara" />).
+  </p>
+  <LiveDemo name="footer-totals" title="Totals that follow the filter" height={400}
+            caption="Type “berlin” – the footer shows the number of orders and the sums of only these rows." />
+
+  <Callout type="tip" title="After edits">
+    <p>When values change (<ChapterLink slug="inline-editing" />, <ChapterLink slug="live-data" />), the row array stays the same
+      object – call <code>invalidate()</code> and <ApiLink name="TableApi.repaint" />.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>A model without any array behind it – two million rows computed on demand: <ChapterLink slug="custom-area-model" />.</p>
+</TrainingLayout>

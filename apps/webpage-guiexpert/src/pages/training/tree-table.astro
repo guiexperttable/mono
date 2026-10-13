@@ -1,0 +1,55 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="tree-table">
+
+  <h2 id="data">Hierarchical data</h2>
+  <p>5,000 orders, grouped by country → customer → order. Every node has its own totals and a unique id:</p>
+  <Snippet file="demos/tree-table.ts" region="data" title="src/model/order-tree.ts" />
+
+  <h2 id="tree-rows">From objects to tree rows</h2>
+  <p>
+    <ApiLink name="TreeFactory.buildTreeRows" /> wraps every object into a <ApiLink name="TreeRow" /> (with
+    <code>expanded</code> state and children). <ApiLink name="TableFactory.createTableModel" /> recognises tree rows and creates an
+    <ApiLink name="AreaModelTree" /> – the first column gets the arrows.
+  </p>
+  <Snippet file="demos/tree-table.ts" region="model" />
+  <ul>
+    <li><code>childrenProperty</code> – where the children are in your objects.</li>
+    <li><code>expanded: false</code> – start collapsed (default: everything open). Also a function:
+      <code>(row, deep) =&gt; deep === 0</code> opens only the first level.</li>
+  </ul>
+
+  <h2 id="checkboxes">Checkboxes</h2>
+  <Snippet file="demos/tree-table.ts" region="table" />
+  <p>
+    <ApiLink name="TableOptionsIf.showCheckboxWihoutExtraColumn" /> (sic) puts a checkbox into the tree column, right after the arrow.
+    <ApiLink name="EventListenerIf.onCheckboxChanged" /> gets all checked rows; checking a parent checks its children.
+  </p>
+  <LiveDemo name="tree-table" title="Orders as a tree" height={440}
+            caption="Click ▸ to expand, Alt+click in the first column works too. The icon top left expands or collapses everything." />
+
+  <Callout type="tip" title="Renderers work in trees">
+    <p>Total and status use the renderers of <ChapterLink slug="cell-renderers" />. Parent rows have no status – the badge renderer
+      simply draws nothing for empty values.</p>
+  </Callout>
+  <Callout type="version">
+    <p><code>expanded</code> in <code>buildTreeRows</code> since 1.1.90. Since 1.1.89 empty parent cells show nothing instead of
+      “undefined”, and two quick clicks on different arrows are no longer swallowed as a double-click.</p>
+  </Callout>
+  <Callout type="note" title="Remember what was open">
+    <p>With <code>autoRestoreOptions</code> and <code>getRowId</code> the table remembers expanded nodes across reloads –
+      <ChapterLink slug="persist-state" />.</p>
+  </Callout>
+
+  <h2 id="showcases">Showcases</h2>
+  <p><a href="/showcase/treetable/run/">Tree table</a> and <a href="/showcase/treetablecheckbox/run/">Tree table with checkboxes</a>.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Part 7: the table becomes editable – <ChapterLink slug="inline-editing" />.</p>
+</TrainingLayout>

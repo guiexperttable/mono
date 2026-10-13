@@ -1,0 +1,57 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import Pipeline from "../../components/training/diagrams/Pipeline.astro";
+---
+<TrainingLayout slug="filtering">
+
+  <h2 id="idea">Your UI, the table's question</h2>
+  <p>
+    The GuiExpert Table has no built-in filter row – on purpose. Your app knows best whether a filter is a search field, a
+    slider, a date range or a sidebar with checkboxes. The table asks one question per row:
+    <strong>show this row?</strong> You answer it with <ApiLink name="TableOptionsIf.externalFilterFunction" />.
+  </p>
+
+  <h2 id="function">The filter function</h2>
+  <Snippet file="demos/filtering.ts" region="filter" title="src/order-filter.ts" />
+  <p>Plain TypeScript – testable without a browser. The state lives in a small object your UI writes to.</p>
+
+  <h2 id="wire">Connect it</h2>
+  <Snippet file="demos/filtering.ts" region="options" />
+  <Snippet file="demos/filtering.ts" region="input" />
+  <p>
+    <ApiLink name="TableApi.externalFilterChanged" /> runs the function for every row, keeps the current sort order and repaints.
+    <ApiLink name="TableApi.getBodyModel" /><code>.getRowCount()</code> then returns the number of remaining rows.
+  </p>
+  <LiveDemo name="filtering" title="Live search over 100,000 orders" height={400}
+            caption="Type “berlin”, then move the slider. The footer sums only the remaining rows (chapter 16)." />
+
+  <h2 id="flow">What happens</h2>
+  <Pipeline />
+  <ul>
+    <li>The footer of <ChapterLink slug="footer-totals" /> follows the filter automatically.</li>
+    <li><ApiLink name="TableApi.copyToClipboard" /> and <ApiLink name="TableApi.downloadExcel" /> work on the filtered view
+      (<ChapterLink slug="excel-export" />).</li>
+    <li>The original array is never changed – clear the filter and all rows are back.</li>
+  </ul>
+
+  <Callout type="tip" title="Fast enough without debounce">
+    <p>Filtering 100,000 orders takes a few milliseconds – you can filter on every keystroke. For millions of rows or expensive
+      checks, debounce the input (the core exports a <code>debounce</code> helper).</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since <code>@guiexpert/table@1.1.88</code> the sort order survives filtering. Before, the table fell back to the original
+      order while the sort icon stayed.</p>
+  </Callout>
+
+  <h2 id="showcases">More filter UIs</h2>
+  <p>The showcase <a href="/showcase/idfilter/run/">Slider filter</a> uses a range input instead of a search field – the same
+    mechanism with another UI.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Selecting cells, rows and ranges – and copying them to Excel: <ChapterLink slug="selection-and-copy" />.</p>
+</TrainingLayout>

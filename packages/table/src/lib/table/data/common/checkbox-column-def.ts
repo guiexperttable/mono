@@ -10,6 +10,8 @@ import { AreaObjectMap } from "./area-map";
  * A pre-defined column definition for a checkbox representation.
  *
  * @implements {ColumnDefIf}
+ *
+ * @category Columns
  */
 export class CheckboxColumnDef implements ColumnDefIf {
 

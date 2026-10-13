@@ -1,6 +1,22 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / MouseTargetData
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / MouseTargetData
 
 # Class: MouseTargetData
+
+The MouseTargetData class is used to process and provide information about user interaction, especially mouse events, with specific areas and elements of a table built using HTML Div elements, Span elements, and Input elements.
+
+The class encapsulates different types of data related to the element on which an event was targeted.
+Data such as the targeted row and column indices, the area on the table identified (header, body, or footer),
+the model of the table area the user interacted with, attributes of the HTML Input Element
+(value and type), associated action, content row, and CSS class applied to the element.
+
+The constructor expects an `EventTarget` and `TableScope` objects as parameters -
+data encapsulated in the `EventTarget` object will be used to populate the properties of the `MouseTargetData` object.
+
+**`Example`**
+
+```ts
+const mouseTarget = new MouseTargetData(eventTarget, tableScope);
+```
 
 ## Table of contents
 
@@ -39,7 +55,7 @@
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:18](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L18)
+[src/lib/table/data/event/mouse-target-data.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L44)
 
 ## Properties
 
@@ -47,9 +63,11 @@
 
 • **action**: ``null`` \| `string` = `null`
 
+The associated action with the HTML Element (retrieved through "data-ge-action" data attribute). Default is `null`.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:13](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L13)
+[src/lib/table/data/event/mouse-target-data.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L39)
 
 ___
 
@@ -57,9 +75,11 @@ ___
 
 • `Optional` **areaIdent**: [`AreaIdent`](../modules.md#areaident)
 
+The identification of the targeted area on an interaction event. Possible value can be 'header', 'body', 'footer'.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L9)
+[src/lib/table/data/event/mouse-target-data.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L35)
 
 ___
 
@@ -67,9 +87,11 @@ ___
 
 • `Optional` **areaModel**: [`AreaModelIf`](../interfaces/AreaModelIf.md)
 
+The model of the table area the user interacted with.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L10)
+[src/lib/table/data/event/mouse-target-data.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L36)
 
 ___
 
@@ -77,9 +99,11 @@ ___
 
 • **className**: `string` = `""`
 
+The CSS class name applied to the target element. Default is an empty string.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:15](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L15)
+[src/lib/table/data/event/mouse-target-data.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L41)
 
 ___
 
@@ -87,9 +111,11 @@ ___
 
 • **colIdx**: `number` = `-1`
 
+The index of the targeted column on an interaction event. Default value is -1.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L8)
+[src/lib/table/data/event/mouse-target-data.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L34)
 
 ___
 
@@ -97,9 +123,11 @@ ___
 
 • **inputType**: ``null`` \| `string` = `null`
 
+The type of the HTML Input Element (retrieved through "data-input-type" data attribute). Default is `null`.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L14)
+[src/lib/table/data/event/mouse-target-data.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L40)
 
 ___
 
@@ -107,9 +135,11 @@ ___
 
 • `Optional` **row**: `any`
 
+The specific row the user interacted with.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L11)
+[src/lib/table/data/event/mouse-target-data.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L37)
 
 ___
 
@@ -117,9 +147,11 @@ ___
 
 • **rowIdx**: `number` = `-1`
 
+The index of the targeted row on an interaction event. Default value is -1.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L7)
+[src/lib/table/data/event/mouse-target-data.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L33)
 
 ___
 
@@ -127,6 +159,8 @@ ___
 
 • `Optional` **value**: `any`
 
+The value(s) associated with the HTML Input Element the user interacted with.
+
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:12](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/event/mouse-target-data.ts#L12)
+[src/lib/table/data/event/mouse-target-data.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L38)

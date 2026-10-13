@@ -1,6 +1,7 @@
 import { CheckedType } from "../data/common/checked-type";
 import { CheckboxModelIf } from "./checkbox-model.if";
 
+/** @category Tree & checkboxes */
 export class CheckboxModel<T> implements CheckboxModelIf<T> {
 
   protected checkedRows: Array<T> = [];

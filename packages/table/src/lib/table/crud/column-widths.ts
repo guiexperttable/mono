@@ -1,6 +1,7 @@
 import { ColumnWidthsIf } from './column-widths.if';
 
 
+/** @category CRUD */
 export class ColumnWidths implements ColumnWidthsIf {
 
   constructor(

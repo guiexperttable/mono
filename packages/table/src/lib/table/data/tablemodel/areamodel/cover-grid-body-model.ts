@@ -7,6 +7,7 @@ import { SortItem } from '../../common/sort-item';
 import { AreaIdent } from '../area-ident.type';
 import { SorterService } from '../../../service/sorter.service';
 
+/** @category Area models */
 export class CoverGridBodyModel<T> implements AreaModelIf {
 
   public rowSelectionModel: CheckboxModelIf<any> | undefined = undefined;
@@ -15,6 +16,7 @@ export class CoverGridBodyModel<T> implements AreaModelIf {
   public filteredItems: T[] = [];
 
 
+  /** @internal */
   protected sorterService: SorterService = new SorterService();
 
 

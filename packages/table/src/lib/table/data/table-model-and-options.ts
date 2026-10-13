@@ -6,6 +6,8 @@ import { TableOptions } from "./options/table-options";
 
 /**
  * Container object for one table model and one table options object.
+ *
+ * @category Table model
  */
 export class TableModelAndOptions implements TableModelAndOptionsIf {
   constructor(

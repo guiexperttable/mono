@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CheckboxModelIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CheckboxModelIf
 
 # Interface: CheckboxModelIf\<T\>
 
@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L9)
+[src/lib/table/checkbox/checkbox-model.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L10)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:15](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L15)
+[src/lib/table/checkbox/checkbox-model.if.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L16)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L11)
+[src/lib/table/checkbox/checkbox-model.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L12)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L5)
+[src/lib/table/checkbox/checkbox-model.if.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L6)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L13)
+[src/lib/table/checkbox/checkbox-model.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L14)
 
 ___
 
@@ -137,4 +137,4 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.if.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L7)
+[src/lib/table/checkbox/checkbox-model.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.if.ts#L8)

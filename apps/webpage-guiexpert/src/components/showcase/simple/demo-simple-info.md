@@ -38,7 +38,7 @@ export class SelfwrittenAreaModel extends AbstractAreaModel<number> {
 
 
 
-To avoid extending your Markdown config from MDX, set [the `extendMarkdownConfig` option](/en/guides/integrations-guide/mdx/#extendmarkdownconfig) (enabled by default) to `false`:
+To avoid extending your Markdown config from MDX, set [the `extendMarkdownConfig` option](https://docs.astro.build/en/guides/integrations-guide/mdx/#extendmarkdownconfig) (enabled by default) to `false`:
 
 ```ts title="astro.config.mjs"
 import { defineConfig } from 'astro/config';

@@ -1,3 +1,4 @@
+/** @category Internals */
 export class CollapsedExpandedData {
 
   constructor(

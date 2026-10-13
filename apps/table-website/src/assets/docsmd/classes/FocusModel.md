@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / FocusModel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / FocusModel
 
 # Class: FocusModel
 
@@ -41,8 +41,8 @@ focusModel.setFocus(2, 3);
 
 **`See`**
 
- - [FocusType](./FocusType.md)
- - [EventFocusChangedListenerIf](./EventFocusChangedListenerIf.md)
+ - [FocusType](../modules.md#focustype)
+ - [EventFocusChangedListenerIf](../interfaces/EventFocusChangedListenerIf.md)
 
 **`Implements`**
 
@@ -60,7 +60,6 @@ focusModel.setFocus(2, 3);
 
 - [changed](FocusModel.md#changed)
 - [columnIndex](FocusModel.md#columnindex)
-- [listenerArr](FocusModel.md#listenerarr)
 - [rowIndex](FocusModel.md#rowindex)
 - [selectionType](FocusModel.md#selectiontype)
 
@@ -95,7 +94,7 @@ focusModel.setFocus(2, 3);
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:58](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L58)
+[src/lib/table/focus/focus-model.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L60)
 
 ## Properties
 
@@ -105,7 +104,7 @@ focusModel.setFocus(2, 3);
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:54](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L54)
+[src/lib/table/focus/focus-model.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L56)
 
 ___
 
@@ -115,17 +114,7 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:53](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L53)
-
-___
-
-### listenerArr
-
-• `Private` **listenerArr**: [`EventFocusChangedListenerIf`](../interfaces/EventFocusChangedListenerIf.md)[] = `[]`
-
-#### Defined in
-
-[lib/table/focus/focus-model.ts:56](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L56)
+[src/lib/table/focus/focus-model.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L55)
 
 ___
 
@@ -135,7 +124,7 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:52](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L52)
+[src/lib/table/focus/focus-model.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L54)
 
 ___
 
@@ -145,13 +134,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:59](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L59)
+[src/lib/table/focus/focus-model.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L61)
 
 ## Methods
 
 ### addEventFocusChangedListener
 
 ▸ **addEventFocusChangedListener**(`listener`): `void`
+
+Get notified when the focus moves.
 
 #### Parameters
 
@@ -169,13 +160,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:67](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L67)
+[src/lib/table/focus/focus-model.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L69)
 
 ___
 
 ### clear
 
 ▸ **clear**(): `void`
+
+No cell has the focus afterwards.
 
 #### Returns
 
@@ -187,13 +180,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:93](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L93)
+[src/lib/table/focus/focus-model.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L95)
 
 ___
 
 ### clearChanged
 
 ▸ **clearChanged**(): `void`
+
+Resets [hasChanged](../interfaces/FocusModelIf.md#haschanged).
 
 #### Returns
 
@@ -205,7 +200,7 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:85](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L85)
+[src/lib/table/focus/focus-model.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L87)
 
 ___
 
@@ -219,13 +214,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:81](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L81)
+[src/lib/table/focus/focus-model.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L83)
 
 ___
 
 ### getEventFocusChangedListeners
 
 ▸ **getEventFocusChangedListeners**(): [`EventFocusChangedListenerIf`](../interfaces/EventFocusChangedListenerIf.md)[]
+
+The registered listeners.
 
 #### Returns
 
@@ -237,13 +234,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:63](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L63)
+[src/lib/table/focus/focus-model.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L65)
 
 ___
 
 ### getFocus
 
 ▸ **getFocus**(): [`number`, `number`]
+
+`[rowIndex, columnIndex]` of the focused cell (-1 if none).
 
 #### Returns
 
@@ -255,13 +254,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:116](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L116)
+[src/lib/table/focus/focus-model.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L118)
 
 ___
 
 ### hasChanged
 
 ▸ **hasChanged**(): `boolean`
+
+Did the focus change since [clearChanged](../interfaces/FocusModelIf.md#clearchanged)?
 
 #### Returns
 
@@ -273,13 +274,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:89](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L89)
+[src/lib/table/focus/focus-model.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L91)
 
 ___
 
 ### hasFocus
 
 ▸ **hasFocus**(`rowIndex`, `columnIndex`): `boolean`
+
+Has this cell the focus?
 
 #### Parameters
 
@@ -298,13 +301,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:112](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L112)
+[src/lib/table/focus/focus-model.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L114)
 
 ___
 
 ### removeEventFocusChangedListener
 
 ▸ **removeEventFocusChangedListener**(`listener`): `void`
+
+Stop notifications.
 
 #### Parameters
 
@@ -322,13 +327,15 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:73](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L73)
+[src/lib/table/focus/focus-model.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L75)
 
 ___
 
 ### setFocus
 
 ▸ **setFocus**(`rowIndex`, `columnIndex`): `void`
+
+Moves the focus to a body cell.
 
 #### Parameters
 
@@ -347,4 +354,4 @@ ___
 
 #### Defined in
 
-[lib/table/focus/focus-model.ts:100](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/focus/focus-model.ts#L100)
+[src/lib/table/focus/focus-model.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.ts#L102)

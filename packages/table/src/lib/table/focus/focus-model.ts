@@ -41,11 +41,13 @@ import { EventFocusChangedListenerIf } from './event-focus-changed-listener.if';
  * focusModel.setFocus(2, 3);
  * ```
  *
- * @see [FocusType](./FocusType.md)
- * @see [EventFocusChangedListenerIf](./EventFocusChangedListenerIf.md)
+ * @see {@link FocusType}
+ * @see {@link EventFocusChangedListenerIf}
  *
  * @class
  * @implements {FocusModelIf}
+ *
+ * @category Selection & focus
  */
 export class FocusModel implements FocusModelIf {
 

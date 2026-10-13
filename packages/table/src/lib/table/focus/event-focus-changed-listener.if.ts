@@ -30,11 +30,13 @@ import { FocusModelIf } from './focus-model.if';
  * ```
  *
  * ## See Also
- * - [FocusModelIf](./FocusModel.md) for focus management.
- * - [EventAdapter](./EventAdapter.md) for a class that implements this and other listener interfaces.
+ * - {@link FocusModelIf} for focus management.
+ * - {@link EventAdapter} for a class that implements this and other listener interfaces.
  *
  * @interface
  * @method onFocusChanged - method to be called with an instance of the `FocusModelIf` interface whenever a focus event occurs
+ *
+ * @category Events
  */
 export interface EventFocusChangedListenerIf {
   onFocusChanged(model: FocusModelIf): void;

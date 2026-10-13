@@ -4,5 +4,7 @@
  * The arrow type determines the visual representation of the arrow icon associated with a tree node.
  *
  * @typedef {("none" | "hidden" | "collapsed" | "expanded")} TreeArrowType
+ *
+ * @category Tree & checkboxes
  */
 export type TreeArrowType = "none" | "hidden" | "collapsed" | "expanded";

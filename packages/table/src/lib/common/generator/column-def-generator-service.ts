@@ -11,6 +11,7 @@ import {
 } from './domain/property-type';
 
 
+/** @category Utilities */
 export class ColumnDefGenerator {
 
   public rootPropertyType: PropertyType | null = null;

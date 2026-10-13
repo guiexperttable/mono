@@ -24,6 +24,8 @@ import { TableScope } from '../../table-scope';
  *  |  footer/west   |  footer/center    | footer/east  |
  *  +----------------+-------------------+--------------+</pre>
  *
+ *
+ * @category Table model
  */
 export interface TableModelIf {
 

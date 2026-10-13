@@ -1,3 +1,4 @@
+/** @category Utilities */
 export interface RequestChunkIf {
   emmitDataKey: string;
   emmitCancelKey: string;

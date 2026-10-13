@@ -1,0 +1,60 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="sorting">
+
+  <h2 id="dblclick">Double-click on the header</h2>
+  <p>
+    A column with <ApiLink name="ColumnDefIf.sortable" label="sortable" /> sorts on a <strong>double-click</strong> on its header:
+    ascending → descending → ascending … Without a comparator, values are compared with <code>&lt;</code> / <code>&gt;</code> –
+    fine for numbers and ISO dates, not for names or workflow states.
+  </p>
+
+  <h2 id="comparator">Own comparators</h2>
+  <Snippet file="demos/sorting.ts" region="columns" title="src/model/order-columns.ts" />
+  <ul>
+    <li><ApiLink name="ColumnDefIf.sortComparator" label="sortComparator" /> gets two cell values (and the two rows, if you need
+      them) and returns a negative number, 0 or a positive number – like <code>Array.prototype.sort</code>.</li>
+    <li><code>localeCompare(b, "de")</code> sorts “Müller” before “Nordlicht” – the default comparison puts umlauts at the end.</li>
+    <li>A rank array sorts status values in workflow order: open → paid → shipped → cancelled.</li>
+  </ul>
+
+  <h3 id="initial">Sorted from the start</h3>
+  <p>
+    <ApiLink name="ColumnDefIf.sortState" label="sortState" /> only sets the arrow in the header. Sort the rows once to match it,
+    with <ApiLink name="TableModelIf.doSort" /> and a <ApiLink name="SortItem" />:
+  </p>
+  <Snippet file="demos/sorting.ts" region="doSort" />
+
+  <h2 id="code">Sorting from code</h2>
+  <Snippet file="demos/sorting.ts" region="api" />
+  <ul>
+    <li><ApiLink name="TableApi.sortByColumn" /> – exactly like a double-click: by property name or column index, with the header
+      icon. Without a direction it toggles; <code>sortByColumn("total", "desc")</code> sets it.</li>
+    <li><ApiLink name="TableApi.sort" /> – any comparator on the <strong>row objects</strong>, e.g. by two fields. The header icons
+      are cleared, because they would not match.</li>
+    <li><ApiLink name="TableApi.reSort" /> – after data changes (<ChapterLink slug="inline-editing" />) apply the last sort again.</li>
+  </ul>
+  <LiveDemo name="sorting" title="Sorting 100,000 orders" height={400}
+            caption="Double-click “Customer”, then “Status”. Try the buttons – the toolbar shows how long sorting 100,000 rows takes." />
+
+  <Callout type="tip" title="Stable sort">
+    <p>Sorting is stable: sort by customer first, then by status – within each status the customers stay in order.</p>
+  </Callout>
+  <Callout type="pitfall" title="ColumnDef.create() and sortable">
+    <p>Pass <code>sortable</code> directly to <code>ColumnDef.create()</code>. Before 1.1.88 a column created without it never showed
+      the sort icon, even after setting <code>sortable = TrueFn</code> later.</p>
+  </Callout>
+  <Callout type="version">
+    <p><code>sortByColumn()</code> exists since <code>@guiexpert/table@1.1.90</code>. Since 1.1.88 filtering keeps the sort order
+      (<ChapterLink slug="filtering" />).</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p><ChapterLink slug="filtering" /> – a live search over 100,000 rows.</p>
+</TrainingLayout>

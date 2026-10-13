@@ -21,6 +21,8 @@ import { IconIf } from "./icon.if";
  * Note that the `classes` property in `IconIf` expects an array of strings, each string indicating a CSS class that should be applied to the icon.
  *
  * @interface
+ *
+ * @category Options
  */
 export interface SortedOptionsIf {
 

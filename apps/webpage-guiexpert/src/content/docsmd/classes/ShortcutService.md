@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ShortcutService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ShortcutService
 
 # Class: ShortcutService
+
+Represents a service for managing shortcuts and triggering actions based on keyboard events.
 
 ## Table of contents
 
@@ -10,22 +12,13 @@
 
 ### Properties
 
-- [listener](ShortcutService.md#listener)
-- [shortcutActionIdMapping](ShortcutService.md#shortcutactionidmapping)
 - [tableScope](ShortcutService.md#tablescope)
 
 ### Methods
 
 - [addListener](ShortcutService.md#addlistener)
-- [areTokensEquals](ShortcutService.md#aretokensequals)
-- [emit](ShortcutService.md#emit)
-- [findEnty](ShortcutService.md#findenty)
-- [getTokenByEvent](ShortcutService.md#gettokenbyevent)
+- [getShortcutActionMapping](ShortcutService.md#getshortcutactionmapping)
 - [init](ShortcutService.md#init)
-- [isDebug](ShortcutService.md#isdebug)
-- [isLocalhost](ShortcutService.md#islocalhost)
-- [isMacintosh](ShortcutService.md#ismacintosh)
-- [onKeyDown](ShortcutService.md#onkeydown)
 
 ## Constructors
 
@@ -45,29 +38,9 @@
 
 #### Defined in
 
-[lib/table/action/shortcut.service.ts:14](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L14)
+[src/lib/table/action/shortcut.service.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L20)
 
 ## Properties
-
-### listener
-
-• `Private` **listener**: [`OnActionTriggeredIf`](../interfaces/OnActionTriggeredIf.md)[] = `[]`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:12](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L12)
-
-___
-
-### shortcutActionIdMapping
-
-• `Private` **shortcutActionIdMapping**: [`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping) = `{}`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L11)
-
-___
 
 ### tableScope
 
@@ -75,7 +48,7 @@ ___
 
 #### Defined in
 
-[lib/table/action/shortcut.service.ts:15](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L15)
+[src/lib/table/action/shortcut.service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L21)
 
 ## Methods
 
@@ -83,11 +56,13 @@ ___
 
 ▸ **addListener**(`listener`): `void`
 
+Adds a listener to the list of listeners.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `listener` | [`OnActionTriggeredIf`](../interfaces/OnActionTriggeredIf.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `listener` | [`OnActionTriggeredIf`](../interfaces/OnActionTriggeredIf.md) | The listener to be added. |
 
 #### Returns
 
@@ -95,88 +70,25 @@ ___
 
 #### Defined in
 
-[lib/table/action/shortcut.service.ts:22](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L22)
+[src/lib/table/action/shortcut.service.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L34)
 
 ___
 
-### areTokensEquals
+### getShortcutActionMapping
 
-▸ **areTokensEquals**(`tokens1`, `tokens2`): `boolean`
+▸ **getShortcutActionMapping**(): [`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping)
 
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `tokens1` | `string`[] |
-| `tokens2` | `string`[] |
+Retrieves the shortcut action mapping object.
 
 #### Returns
 
-`boolean`
+[`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping)
+
+- The shortcut action mapping object.
 
 #### Defined in
 
-[lib/table/action/shortcut.service.ts:98](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L98)
-
-___
-
-### emit
-
-▸ **emit**(`actionId`): `boolean`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `actionId` | ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:67](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L67)
-
-___
-
-### findEnty
-
-▸ **findEnty**(`evt`): `undefined` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"``
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `evt` | `KeyboardEvent` |
-
-#### Returns
-
-`undefined` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"``
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:81](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L81)
-
-___
-
-### getTokenByEvent
-
-▸ **getTokenByEvent**(`evt`): `string`[]
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `evt` | `KeyboardEvent` |
-
-#### Returns
-
-`string`[]
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:114](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L114)
+[src/lib/table/action/shortcut.service.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L178)
 
 ___
 
@@ -184,67 +96,8 @@ ___
 
 ▸ **init**(): `void`
 
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:28](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L28)
-
-___
-
-### isDebug
-
-▸ **isDebug**(): `boolean`
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:47](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L47)
-
-___
-
-### isLocalhost
-
-▸ **isLocalhost**(): `boolean`
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:51](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L51)
-
-___
-
-### isMacintosh
-
-▸ **isMacintosh**(): `boolean`
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/table/action/shortcut.service.ts:43](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L43)
-
-___
-
-### onKeyDown
-
-▸ **onKeyDown**(`evt`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `evt` | `KeyboardEvent` |
+Initializes the ShortcutService by assigning shortcut action id mappings based on the current operating system.
+Also adds key down event listener to the table host element.
 
 #### Returns
 
@@ -252,4 +105,4 @@ ___
 
 #### Defined in
 
-[lib/table/action/shortcut.service.ts:56](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/action/shortcut.service.ts#L56)
+[src/lib/table/action/shortcut.service.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L44)

@@ -1,6 +1,7 @@
 import { AreaObjectMap } from "./area-map";
 import { CellRendererIf } from "../../renderer/cell-render.if";
 
+/** @category Columns */
 export class AreaMapFactory {
 
   /**

@@ -1,14 +1,42 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / AutoRestoreOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AutoRestoreOptions
 
 # Class: AutoRestoreOptions\<T\>
 
-The AutoRestoreOptionsIf interface is utilized to encapsulate options
-for managing auto-restoring settings across different states of the application.
-This interface is generic and can be used with any type.
+Defaults for [TableOptionsIf.autoRestoreOptions](../interfaces/TableOptionsIf.md#autorestoreoptions): everything off. Spread it and switch on what the table
+should remember in `localStorage` (one key per table).
 
-**`Typeparam`**
+**`Example`**
 
-T - Any type that this interface is going to use.
+```ts
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  autoRestoreOptions: {
+    ...new AutoRestoreOptions<Order>(),
+    getStorageKeyFn: () => "orders-table",          // unique per table
+    autoRestoreSortingState: true,
+    autoRestoreScrollPosition: true
+  }
+};
+```
+
+**`Example`**
+
+```ts
+// trees: remember expanded nodes – needs a stable id per node
+const treeOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  autoRestoreOptions: {
+    ...new AutoRestoreOptions<OrderNode>(),
+    getStorageKeyFn: () => "order-tree",
+    getRowId: (node: OrderNode) => node.id,
+    autoRestoreCollapsedExpandedState: true
+  }
+};
+```
+
+**`See`**
+
+Training: [Remember the state](https://gui.expert/training/persist-state/)
 
 ## Type parameters
 
@@ -71,7 +99,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L10)
+[src/lib/table/data/options/auto-restore-options.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L41)
 
 ___
 
@@ -88,7 +116,7 @@ the expanded/collapsed state of T elements will be preserved after changes in th
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L7)
+[src/lib/table/data/options/auto-restore-options.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L38)
 
 ___
 
@@ -105,7 +133,7 @@ in the list of T elements will be preserved after changes in the application sta
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L8)
+[src/lib/table/data/options/auto-restore-options.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L39)
 
 ___
 
@@ -122,7 +150,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L11)
+[src/lib/table/data/options/auto-restore-options.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L42)
 
 ___
 
@@ -139,7 +167,7 @@ T elements will be preserved after changes in the application state.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L6)
+[src/lib/table/data/options/auto-restore-options.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L37)
 
 ___
 
@@ -156,7 +184,7 @@ If not provided, a constant key 'autorestoreoptionsif' will be used.
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L14)
+[src/lib/table/data/options/auto-restore-options.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L45)
 
 ## Methods
 
@@ -180,7 +208,7 @@ AutoRestoreOptionsIf.getRowId
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L28)
+[src/lib/table/data/options/auto-restore-options.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L59)
 
 ___
 
@@ -206,4 +234,4 @@ AutoRestoreOptionsIf.isSame
 
 #### Defined in
 
-[lib/table/data/options/auto-restore-options.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/auto-restore-options.ts#L17)
+[src/lib/table/data/options/auto-restore-options.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L48)

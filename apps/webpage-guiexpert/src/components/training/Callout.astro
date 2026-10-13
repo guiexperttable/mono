@@ -1,0 +1,15 @@
+---
+/** A box for tips, pitfalls and version notes. */
+interface Props {
+  type?: "tip" | "pitfall" | "note" | "version";
+  title?: string;
+}
+
+const { type = "note", title } = Astro.props;
+const DEFAULT_TITLE = { tip: "Tip", pitfall: "Pitfall", note: "Good to know", version: "Version" };
+const ICON = { tip: "💡", pitfall: "⚠️", note: "ℹ️", version: "🏷️" };
+---
+<aside class:list={["callout", `callout-${type}`]}>
+  <p class="callout-title"><span aria-hidden="true">{ICON[type]}</span> {title ?? DEFAULT_TITLE[type]}</p>
+  <div class="callout-body"><slot /></div>
+</aside>

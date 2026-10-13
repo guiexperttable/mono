@@ -46,6 +46,20 @@ import { HeaderGroupOptionsIf } from './header-group-options.if';
  * | getSelectionModel                | Retrieves the selection model for a specific object.                                              |
  * | getFocusModel                    | Retrieves the focus model of the component.                                                       |
  * | shortcutActionIdMapping          | Represents a mapping of shortcut action IDs.                                                     |
+ *
+ * Start from the defaults in {@link TableOptions} and change only what you need.
+ *
+ * @example
+ * const tableOptions: TableOptionsIf = {
+ *   ...new TableOptions(),
+ *   hoverColumnVisible: false,
+ *   columnsDraggable: false,
+ *   defaultRowHeights: { header: 40, body: 30, footer: 36 }
+ * };
+ *
+ * @see Training: [TableOptions: behaviour and look](https://gui.expert/training/table-options/)
+ *
+ * @category Options
  */
 export interface TableOptionsIf {
 
@@ -167,20 +181,18 @@ export interface TableOptionsIf {
   footerVerticalSeparator: boolean;
 
   /**
-   * Represents the default row heights (for header, body and footer) for a given table.
-   *
-   * @typedef {number[]} DefaultRowHeightsIf
-   * @description An array of numbers representing the default height for each row in a table.
+   * Row heights of header, body and footer in px (default 34 / 34 / 34). Read by {@link TableFactory.createTableModel}
+   * when it creates the area models – pass the options there as `tableOptions`, too.
    */
   defaultRowHeights: DefaultRowHeightsIf;
 
+  /** Reserved – currently not evaluated (tree tables always show the expand-all / collapse-all icon in the top left header cell). */
   headerToggleExpandCollapseIcons: boolean;
 
-
+  /** Icons and behaviour of tree tables (arrows, indentation). See {@link TreeOptionsIf}. */
   treeOptions: TreeOptionsIf;
 
-
-
+  /** Icons of collapsible header groups ({@link AreaModelCellGroups}). */
   headerGroupOptions: HeaderGroupOptionsIf;
 
   /**
@@ -188,64 +200,75 @@ export interface TableOptionsIf {
    * If true and the row is checkable, a checkbox is rendered in the first column.
    * If false and the row is checkable, a checkbox is rendered in an extra column left to the first column.
    *
-   * @type {boolean}
+   * @see Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
    */
   showCheckboxWihoutExtraColumn: boolean;
 
   /**
-   * Represents the external filter function that will be used to filter the table rows.
+   * Your filter: called for every row, return `true` to show it. After changing the filter criteria call
+   * {@link TableApi.externalFilterChanged} – the table filters again and keeps the sort order.
    *
-   * @typedef {FilterFunction<any> | undefined} externalFilterFunction
+   * @example
+   * const filter = { text: "" };
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   externalFilterFunction: (order: Order) => order.customer.toLowerCase().includes(filter.text)
+   * };
+   * searchInput.addEventListener("input", () => {
+   *   filter.text = searchInput.value.toLowerCase();
+   *   tableApi.externalFilterChanged();
+   * });
+   *
+   * @see Training: [Filtering with a live search](https://gui.expert/training/filtering/)
    */
   externalFilterFunction: FilterFunction<any> | undefined;
 
-  /**
-   * Represents a sorted options object.
-   *
-   * @class
-   * @classdesc The SortedOptions represents a class that defines sorted icons, which will displayed in the header (if column is sortable).
-   */
+  /** The sort icons shown in sortable header cells. */
   sortedOptions: SortedOptionsIf;
+
   /**
-   * Represents the sort order of the columns.
-   *
-   * @typedef {SortState[]} sortOrder
+   * The order of the sort states on repeated double-clicks on a header, default `["asc", "desc"]`.
+   * Add `""` to get "unsorted" as third state. Per column: {@link ColumnDefIf.sortStatesOrder}.
    */
   sortOrder: SortState[],
 
+  /**
+   * Remember sorting, scroll position and expanded tree nodes in `localStorage`. Off by default.
+   *
+   * @see {@link AutoRestoreOptions}
+   * @see Training: [Remember the state](https://gui.expert/training/persist-state/)
+   */
   autoRestoreOptions?: AutoRestoreOptionsIf<any>;
 
   /**
-   * Retrieves the edit renderer for a specific action.
+   * The editor for a cell, if the column has no own {@link ColumnDefIf.getEditRenderer}.
+   * Default: a text input ({@link InputCellRenderer}).
    *
-   * @function
-   * @name getEditRenderer
-   * @param {string} action - The action for which to retrieve the edit renderer.
-   * @returns {GetEditRenderer} - The edit renderer for the specified action.
+   * @see Training: [Inline editing](https://gui.expert/training/inline-editing/)
    */
   getEditRenderer?: GetEditRenderer;
+
   /**
-   * Retrieves the selection model for a specific object.
+   * Returns the selection model of the table. Without it every table creates its own `new SelectionModel()`
+   * of type `"none"` – nothing can be selected.
    *
-   * @param {SelectionModelIf} targetObj - The target object to retrieve the selection model from.
-   * @return {GetT<SelectionModelIf>} - The selection model for the given object.
+   * @example
+   * const selectionModel = new SelectionModel("row", "single");
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), getSelectionModel: () => selectionModel };
+   *
+   * @see Training: [Select cells, rows and ranges](https://gui.expert/training/selection-and-copy/)
    */
   getSelectionModel?: GetT<SelectionModelIf>;
-  /**
-   * Retrieves the focus model of the component.
-   *
-   * @returns {GetT<FocusModelIf>} The focus model of the component.
-   */
+
+  /** Returns the focus model of the table. Default: every table creates its own {@link FocusModel}. */
   getFocusModel?: GetT<FocusModelIf>;
 
   /**
-   * Represents a mapping of shortcut action IDs.
-   *
-   * @typedef {Object} ShortcutActionIdMapping
-   * @property {string} [shortcutId] - The ID of the shortcut.
-   * @property {string} [actionId] - The ID of the action associated with the shortcut.
+   * Own keyboard shortcuts: maps a shortcut (e.g. `"ctrl+c"`, `"f2"`) to an {@link ActionId}.
+   * Default: {@link WindowsShortcutActionIdMapping} resp. {@link OsxShortcutActionIdMapping}.
    */
   shortcutActionIdMapping?: ShortcutActionIdMapping;
 
+  /** Switch off all keyboard shortcuts of the table (copy, select all, navigation, F2 …). */
   shortcutActionsDisabled: boolean;
 }

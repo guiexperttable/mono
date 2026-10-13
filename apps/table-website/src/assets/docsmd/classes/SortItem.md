@@ -1,8 +1,16 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SortItem
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SortItem
 
 # Class: SortItem
 
-Represents a sortable column with its sort order..
+One sort instruction: column index + direction. Used by [TableModelIf.doSort](../interfaces/TableModelIf.md#dosort) and
+[AreaModelIf.doSort](../interfaces/AreaModelIf.md#dosort).
+
+**`Example`**
+
+```ts
+// sort once by column 10 descending (and match the header icon set with sortState: "desc")
+tableModel.doSort([new SortItem(10, "desc")]);
+```
 
 ## Table of contents
 
@@ -23,10 +31,10 @@ Represents a sortable column with its sort order..
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `columnIndex` | `number` |
-| `sortState` | [`SortState`](../modules.md#sortstate) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | Column index (west + center + east). |
+| `sortState` | [`SortState`](../modules.md#sortstate) | `"asc"`, `"desc"` or `""` (unsorted). |
 
 #### Returns
 
@@ -34,7 +42,7 @@ Represents a sortable column with its sort order..
 
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/sort-item.ts#L8)
+[src/lib/table/data/common/sort-item.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L15)
 
 ## Properties
 
@@ -42,9 +50,11 @@ Represents a sortable column with its sort order..
 
 • **columnIndex**: `number`
 
+Column index (west + center + east).
+
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/sort-item.ts#L9)
+[src/lib/table/data/common/sort-item.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L17)
 
 ___
 
@@ -52,6 +62,8 @@ ___
 
 • **sortState**: [`SortState`](../modules.md#sortstate)
 
+`"asc"`, `"desc"` or `""` (unsorted).
+
 #### Defined in
 
-[lib/table/data/common/sort-item.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/sort-item.ts#L10)
+[src/lib/table/data/common/sort-item.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-item.ts#L19)

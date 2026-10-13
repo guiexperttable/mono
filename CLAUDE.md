@@ -49,6 +49,7 @@ mono/
 |---|---|
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
+| Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
 | Alle Bibliotheken | `pnpm build:libs` |
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
@@ -63,6 +64,8 @@ mono/
   die `vite-plugin-babel` brechen.
 - `@babel/core: ~7.28.6` steht als devDependency in allen Paketen mit `vite-plugin-babel` – sonst erfüllt pnpm die
   Peer-Dependency mit Babel 8 aus `@angular/compiler-cli@22`.
+- Vite **6.4.4** (exakt gepinnt) in allen Paketen/Demos – Vitest 5 braucht ≥ 6.4. Nicht ohne Weiteres auf 7/8 heben:
+  das ändert das ausgelieferte Bundle (Vite 8 = Rolldown, `vite-plugin-babel` warnt), s. `TODO.md`.
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
 - Website (Astro 7): Tailwind 3 läuft über `postcss.config.cjs` + `src/styles/tailwind.css` – `@astrojs/tailwind` unterstützt
@@ -216,9 +219,43 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   `apps/angular-table-demo/instructions.md` (deutsch, Demo-Übersicht). Stand Okt. 2026 gegen den Code geprüft: alle
   `ts`-Blöcke kompilieren (strict, TS 6, Angular-22-Typen). **Bei API-Änderungen mitpflegen** und erneut prüfen
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
-- Es gibt praktisch **keine Unit-Tests**. Verifikation heute: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Rowspan*, *Sorting*, *Input filter*).
-- Wer Tests ergänzt: Vitest passt zum Vite-Setup; Area-Modelle/Factories/SelectionModel sind DOM-frei testbar.
+- **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
+  (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
+  Stand Okt. 2026: 243 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
+  Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
+- **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
+  HTML nach `apps/webpage-guiexpert/public/api` (`index.html` → `overview.html`, weil `/api/` die Astro-Seite `api.astro` ist),
+  JSON nach `src/content/docs/doctype.json`, Link-Index `src/training/api-index.json` (s. §11). Konfiguration: `typedoc.json`,
+  Startseite: `typedoc-readme.md`.
+- **Tests (Core, Vitest 5)** – `packages/table`, Konfiguration `vitest.config.ts` (unabhängig von `vite.config.ts`):
+  | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
+  |---|---|
+  | `test` | Unit + Browser |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.350 Tests) |
+  | `test:browser` | echtes Chromium (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
+  | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
+  - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
+    `browser`, Helfer `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `destroyAllTables`).
+    Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`) – nie im npm-Paket.
+  - Importe wie Anwender: `from '@guiexpert/table'` (Alias → `src/index.ts`).
+  - Unit-Projekt läuft mit `isolate: false` (geteilter Modulzustand je Worker, sonst ~18 s statt ~2 s): keine
+    Zustandsreste zwischen Tests, Singletons im `beforeEach` zurücksetzen; `test-utils/unit-setup.ts` stellt Timer,
+    Globals und Mocks nach jedem Test zurück. Reihenfolge-Unabhängigkeit prüfen mit `test:unit --sequence.shuffle`.
+  - **Charakterisierungstests**: Specs halten das heutige Verhalten fest. Bekannte Fehler stehen als
+    `it.fails('<richtiges Verhalten>')` + `// BUG:` (grün, solange der Fehler besteht; nach dem Fix rot → `it.fails`
+    in `it` umwandeln). Liste: `TODO.md` „Gefunden durch die Unit-Tests“. Fragwürdiges, evtl. gewolltes Verhalten:
+    `// NOTE:`. **Jeder Bugfix bekommt zuerst einen roten Test.**
+  - `src/index.spec.ts` hält alle Exportnamen als Snapshot fest: neuer Export → `pnpm exec vitest run -u src/index.spec.ts`
+    und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
+  - Abdeckung (Okt. 2026): DOM-freie Teile (`data/`, `factory/`, `selection/`, `service/`, `action/` …) 92–100 %,
+    Rendering (`RenderScope`/`TableScope`/`TableApi`/Renderer) erst ~38 % → Browser-Tests sind der nächste Schritt (`TODO.md`).
+  - CI führt die Tests noch **nicht** aus (`ci.yml` baut nur) – s. `TODO.md`.
+- Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 26 Live-Demos der Schulung (§11).
+  Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
+  („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
 ## 7. Offene Punkte
 
@@ -298,3 +335,44 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
+
+---
+
+## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
+
+Englisch, 34 Kapitel = 34 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
+
+```
+apps/webpage-guiexpert/src/
+├── training/chapters.ts        # Register: Teile, Kapitel (slug, Titel, Lead, Lernziele, Folge, API-Symbole, Showcases, since)
+├── training/demos/*.ts         # eine Live-Demo pro Datei: export default (ctx: DemoContext) => cleanup?
+│   └── shared/                 # orders.ts (Testdaten, fester Seed), order-columns.ts, order-totals-footer.ts, demo.ts, demo.css
+├── training/api-index.json     # generiert (scripts/build-api-index.mjs) aus dem typedoc-JSON
+├── training/runtime.ts         # startet Demos per Klick (?demos = alle sofort, für Screenshots)
+├── components/training/        # Snippet, LiveDemo, ApiLink, ChapterLink, Callout, Figure, TrainingNav, diagrams/*.astro (SVG)
+├── layouts/TrainingLayout.astro, styles/training.css
+├── pages/training/index.astro + <slug>.astro (ein File pro Kapitel)
+└── assets/training/shots/      # demo-<name>-light|dark.png (Poster der Live-Demos), fw-*.png (Framework-Demos)
+```
+
+`apps/webpage-guiexpert/training-examples/` enthält den Framework-Code aus dem Demo-Repo (React, Vue, Svelte, …) –
+nur Anzeige (`<Snippet file="examples/…" />`), wird nicht kompiliert. Er liegt **bewusst außerhalb von `src/`**:
+Astro scannt beim Dev-Start `src/**` nach Abhängigkeiten, und die Frameworks sind keine Dependencies der Website
+(sonst: „Failed to run dependency scan … react … could not be resolved“).
+
+- **Code auf der Seite = Code der Demo**: `<Snippet file="demos/x.ts" region="r" />` zeigt den Bereich zwischen
+  `// #region r` und `// #endregion r` (mehrere gleichnamige Blöcke werden zusammengefügt). Anzeige-Umschreibungen:
+  `… // @show: <code>` ersetzt die Zeile, `// @hide` blendet sie aus, `./shared/orders` → `./data/orders`.
+- **Links werden beim Build geprüft**: `<ApiLink name="TableApi.sortByColumn" />` gegen `api-index.json`, `<ChapterLink slug=…>`
+  gegen das Register, Showcases gegen `src/pages/showcase/*/run.astro`, fehlende Screenshots (`<Figure>`) im Produktions-Build.
+  Nach API-Umbenennungen: `typedoc:website` (erneuert den Index) und `pnpm build:webpage-guiexpert`.
+- Demos importieren `@guiexpert/table` → Alias in `astro.config.mjs` auf `packages/table/dist` (vorher `pnpm build:core`).
+  Demo-CSS wird in `LiveDemo.astro` importiert – **CSS-Imports in Client-Skripten fehlen im Produktions-Build**.
+- Typprüfung der Demos: `pnpm --filter webpage-guiexpert check:training` (`tsconfig.training.json`, gegen `packages/table/dist`,
+  also nach `pnpm build:core`; `verbatimModuleSyntax` wie Astro – Typ-Importe mit `type`).
+- Screenshots: `pnpm dev` (bzw. `astro preview`), dann `SHOTS_OUT=/tmp/shots node scripts/training-screenshots.mjs http://localhost:4321`
+  (Playwright + Chromium nötig), danach nach `src/assets/training/shots/` kopieren (direkt hineinschreiben löst Reloads aus).
+- Neues Kapitel: Eintrag in `chapters.ts`, Seite `pages/training/<slug>.astro` mit `<TrainingLayout slug=…>`, Demo in
+  `training/demos/`, Screenshot-Eintrag in `scripts/training-screenshots.mjs`.
+

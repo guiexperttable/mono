@@ -3,6 +3,7 @@ import { ColumnDefIf } from "../column/column-def.if";
 import { ColumnDef } from "../column/column-def";
 import { CellGroupExt } from "./cell-group-ext";
 
+/** @category Header groups */
 export class CellgroupFactory {
 
 

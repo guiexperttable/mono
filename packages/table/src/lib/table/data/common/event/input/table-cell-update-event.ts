@@ -2,16 +2,20 @@ import { TableCellUpdateEventIf } from "./table-cell-update-event.if";
 import { AreaIdent } from "../../../tablemodel/area-ident.type";
 
 /**
- * Represents an event that occurs when a table cell is updated.
+ * A new value for one cell – the input of {@link TableApi.updateCells}.
+ * The value is written into the area model; if the cell is visible, only this cell is redrawn.
+ * `cssClasses` are applied to the current drawing of the cell (e.g. a short "flash"); permanent colours
+ * belong into the model ({@link AreaModelIf.getCustomClassesAt}).
  *
- * @class
- * @implements TableCellUpdateEventIf
+ * @example
+ * tableApi.updateCells([
+ *   new TableCellUpdateEvent("body", row, 2, price, { "tick-up": up, "tick-down": !up }),
+ *   new TableCellUpdateEvent("body", row, 4, volume)
+ * ]);
  *
- * @param {AreaIdent} area - The identification of the area where the cell belongs.
- * @param {number} rowIndex - The index of the row where the cell is located.
- * @param {number} columnIndex - The index of the column where the cell is located.
- * @param {any} value - The new value for the cell.
- * @param {Object.<string, boolean>} cssClasses - An object containing CSS classes to be applied to the cell.
+ * @see Training: [Live data without rebuilding the table](https://gui.expert/training/live-data/)
+ *
+ * @category Events
  */
 export class TableCellUpdateEvent implements TableCellUpdateEventIf {
 

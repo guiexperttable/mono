@@ -1,0 +1,78 @@
+---
+/**
+ * Shows code from a file below src/training/ – the same file the live demo runs.
+ *   <Snippet file="demos/first-table.ts" region="scope" title="main.ts" />
+ * A region is marked in the file with `// #region scope` … `// #endregion scope`
+ * (in HTML/Vue/Svelte: `<!-- #region scope -->` … `<!-- #endregion scope -->`).
+ * Unknown files or regions fail the build.
+ *
+ * Display rewrites (the demo runs inside the training page, the reader's app does not):
+ *   `… // @show: <code>`  → the line is shown as <code> (same indentation)
+ *   `… // @hide`          → the line is not shown
+ *   `from "./shared/x"`    → shown as `from "./x"` (orders: `./data/orders`)
+ */
+import { Code } from "astro-expressive-code/components";
+
+interface Props {
+  file: string;
+  region?: string;
+  title?: string;
+  lang?: string;
+  /** lines to highlight, expressive-code syntax, e.g. "3-5" or [2, 4] */
+  mark?: string | number | (string | number)[];
+}
+
+// demos/… → src/training/demos (compiled and run); examples/… → training-examples (display only).
+// The framework examples live OUTSIDE src/ on purpose: Astro's dependency scan covers src/**, and
+// react, vue, svelte, … are not dependencies of this website.
+const demoFiles = import.meta.glob<string>("/src/training/demos/**/*", { query: "?raw", import: "default", eager: true });
+const exampleFiles = import.meta.glob<string>("/training-examples/**/*", { query: "?raw", import: "default", eager: true });
+
+const { file, region, title, mark } = Astro.props;
+const path = file.startsWith("examples/") ? `/training-examples/${file.slice("examples/".length)}` : `/src/training/${file}`;
+const source = file.startsWith("examples/") ? exampleFiles[path] : demoFiles[path];
+if (source === undefined) throw new Error(`Snippet: file ${path.slice(1)} not found`);
+
+const MARKER = /^\s*(\/\/|<!--|\/\*)\s*#(end)?region\b.*$/;
+
+function extract(text: string, name?: string): string {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  // several blocks with the same name are joined (e.g. the imports at the top + the code in a function)
+  const blocks: string[][] = [];
+  if (name) {
+    const startRe = new RegExp(`#region ${name}(\\s|$|-->|\\*/)`), endRe = new RegExp(`#endregion ${name}(\\s|$|-->|\\*/)`);
+    let start = -1;
+    lines.forEach((l, i) => {
+      if (startRe.test(l)) start = i;
+      else if (endRe.test(l) && start >= 0) { blocks.push(lines.slice(start + 1, i)); start = -1; }
+    });
+    if (!blocks.length) throw new Error(`Snippet: region "${name}" not found in src/training/${file}`);
+  } else {
+    blocks.push(lines);
+  }
+  return blocks.map(clean).join("\n\n");
+}
+
+function rewrite(line: string): string | undefined {
+  if (/\/\/ @hide\s*$/.test(line)) return undefined;
+  const show = line.match(/^(\s*).*?\/\/ @show: (.*)$/);
+  if (show) return show[1] + show[2];
+  return line
+    .replace(/from "\.\/shared\/orders"/g, 'from "./data/orders"')
+    .replace(/from "\.\/shared\//g, 'from "./')
+    .replace(/from "(\.\.\/)+src\/model\//g, 'from "./model/');          // examples from the demo repository
+}
+
+function clean(block: string[]): string {
+  let selected = block.filter(l => !MARKER.test(l)).map(rewrite).filter((l): l is string => l !== undefined);
+  while (selected.length && !selected[0].trim()) selected.shift();
+  while (selected.length && !selected[selected.length - 1].trim()) selected.pop();
+  const indent = Math.min(...selected.filter(l => l.trim()).map(l => l.match(/^ */)![0].length));
+  return selected.map(l => l.slice(indent)).join("\n");
+}
+
+const ext = file.split(".").pop()!;
+const lang = Astro.props.lang ?? ({ mts: "ts", tsx: "tsx", vue: "vue", svelte: "svelte", html: "html", css: "css", mjs: "js" }[ext] ?? ext);
+const markProp = mark === undefined ? undefined : Array.isArray(mark) ? mark : [mark];
+---
+<Code code={extract(source, region)} lang={lang} title={title} mark={markProp as any} wrap preserveIndent />

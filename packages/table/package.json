@@ -22,10 +22,17 @@
     "build": "vite build && npm run concat-css:main && npm run concat-css:dist",
     "concat-css:main": "cat css/table*.css > css/main.css",
     "concat-css:dist": "cat css/table*.css > dist/css/main.css",
-    "typedoc:json": "npx typedoc --json ../../apps/table-website/src/assets/json/doctype.json src/index.ts",
-    "typedoc:docs-html": "npx typedoc --out ../../apps/table-website/src/assets/docs src/index.ts",
-    "typedoc:docs-html-custom-css": "npx typedoc --customCss ./doc.css --out ../../apps/table-website/src/assets/docs src/index.ts",
-    "typedoc:docs-md": "npx typedoc --plugin typedoc-plugin-markdown --out ../../apps/table-website/src/assets/docsmd src/index.ts",
+    "typedoc:website": "node scripts/typedoc-website.mjs",
+    "typedoc:json": "npx typedoc --json ../../apps/table-website/src/assets/json/doctype.json",
+    "typedoc:docs-html": "npx typedoc --out ../../apps/table-website/src/assets/docs",
+    "typedoc:docs-md": "npx typedoc --plugin typedoc-plugin-markdown --out ../../apps/table-website/src/assets/docsmd",
+    "docs:check": "node scripts/check-doc-examples.mjs",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:browser": "vitest run --project browser",
+    "test:watch": "vitest --project unit",
+    "test:coverage": "vitest run --coverage",
+    "test:types": "tsc -p tsconfig.spec.json --noEmit",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -46,7 +53,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "vite": "6.3.4",
+    "vite": "6.4.4",
     "vite-plugin-dts": "^3.7.2",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-static-copy": "^0.17.0",
@@ -58,6 +65,10 @@
     "typedoc-plugin-rename-defaults": "^0.7.0",
     "typedoc-plugin-markdown": "3.17.1",
     "typescript": "5.2.2",
-    "@babel/core": "~7.28.6"
+    "@babel/core": "~7.28.6",
+    "vitest": "5.0.4",
+    "@vitest/browser-playwright": "5.0.4",
+    "@vitest/coverage-v8": "5.0.4",
+    "playwright": "1.64.0"
   }
 }

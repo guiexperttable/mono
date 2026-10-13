@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SchemeGenerator
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SchemeGenerator
 
 # Class: SchemeGenerator
 
@@ -71,19 +71,11 @@ console.log(new SchemeGenerator().renderTypeScriptInterfaces(rootPropertyType).j
 ### Properties
 
 - [orOperator](SchemeGenerator.md#oroperator)
-- [renderTypeScriptInterfacesDone](SchemeGenerator.md#rendertypescriptinterfacesdone)
-- [renderTypeScriptInterfacesFifo](SchemeGenerator.md#rendertypescriptinterfacesfifo)
-- [rootName](SchemeGenerator.md#rootname)
 - [rootPropertyType](SchemeGenerator.md#rootpropertytype)
 
 ### Methods
 
-- [containsUndefinedPropertyType](SchemeGenerator.md#containsundefinedpropertytype)
-- [propertyItem2InterfaceDateType](SchemeGenerator.md#propertyitem2interfacedatetype)
-- [renderType](SchemeGenerator.md#rendertype)
 - [renderTypeScriptInterfaces](SchemeGenerator.md#rendertypescriptinterfaces)
-- [renderTypeScriptInterfacesFifoNext](SchemeGenerator.md#rendertypescriptinterfacesfifonext)
-- [renderTypeScriptInterfacesRecursive](SchemeGenerator.md#rendertypescriptinterfacesrecursive)
 
 ## Constructors
 
@@ -103,37 +95,7 @@ console.log(new SchemeGenerator().renderTypeScriptInterfaces(rootPropertyType).j
 
 #### Defined in
 
-[lib/common/generator/scheme-generator-service.ts:76](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L76)
-
-___
-
-### renderTypeScriptInterfacesDone
-
-• `Private` **renderTypeScriptInterfacesDone**: `string`[] = `[]`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:81](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L81)
-
-___
-
-### renderTypeScriptInterfacesFifo
-
-• `Private` **renderTypeScriptInterfacesFifo**: [`ObjectPropertyType`](ObjectPropertyType.md)[] = `[]`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:80](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L80)
-
-___
-
-### rootName
-
-• `Private` **rootName**: `string` = `'Root'`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:79](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L79)
+[src/lib/common/generator/scheme-generator-service.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/scheme-generator-service.ts#L78)
 
 ___
 
@@ -143,70 +105,9 @@ ___
 
 #### Defined in
 
-[lib/common/generator/scheme-generator-service.ts:77](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L77)
+[src/lib/common/generator/scheme-generator-service.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/scheme-generator-service.ts#L79)
 
 ## Methods
-
-### containsUndefinedPropertyType
-
-▸ **containsUndefinedPropertyType**(`propertyItem`): `boolean`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `propertyItem` | [`PropertyItem`](PropertyItem.md) |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:207](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L207)
-
-___
-
-### propertyItem2InterfaceDateType
-
-▸ **propertyItem2InterfaceDateType**(`propertyItem`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `propertyItem` | [`PropertyItem`](PropertyItem.md) |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:173](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L173)
-
-___
-
-### renderType
-
-▸ **renderType**(`propertyType`, `propertyItem`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `propertyType` | [`PropertyType`](../interfaces/PropertyType.md) |
-| `propertyItem` | [`PropertyItem`](PropertyItem.md) |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:192](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L192)
-
-___
 
 ### renderTypeScriptInterfaces
 
@@ -224,46 +125,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/scheme-generator-service.ts:84](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L84)
-
-___
-
-### renderTypeScriptInterfacesFifoNext
-
-▸ **renderTypeScriptInterfacesFifoNext**(`buf`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `buf` | `string`[] |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:102](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L102)
-
-___
-
-### renderTypeScriptInterfacesRecursive
-
-▸ **renderTypeScriptInterfacesRecursive**(`pt?`, `buf?`, `name?`): `string`[]
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `pt` | ``null`` \| [`PropertyType`](../interfaces/PropertyType.md) | `undefined` |
-| `buf` | `string`[] | `[]` |
-| `name` | `string` | `undefined` |
-
-#### Returns
-
-`string`[]
-
-#### Defined in
-
-[lib/common/generator/scheme-generator-service.ts:111](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/scheme-generator-service.ts#L111)
+[src/lib/common/generator/scheme-generator-service.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/scheme-generator-service.ts#L86)

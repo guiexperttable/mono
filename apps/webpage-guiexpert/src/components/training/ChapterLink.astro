@@ -1,0 +1,17 @@
+---
+/** Link to another chapter: <ChapterLink slug="sorting" /> → "Chapter 20 · Sorting". Unknown slugs fail the build. */
+import { chapterBySlug, chapterUrl } from "../../training/chapters";
+
+interface Props {
+  slug: string;
+  /** own link text instead of "Chapter NN · nav title" */
+  label?: string;
+  /** "#anchor" inside the chapter */
+  hash?: string;
+}
+
+const { slug, label, hash = "" } = Astro.props;
+const chapter = chapterBySlug(slug);
+const text = label ?? `chapter ${chapter.no} (${chapter.nav})`;
+---
+<a class="chapter-link" href={chapterUrl(slug) + hash} title={chapter.title}>{text}</a>

@@ -1,6 +1,7 @@
 import { DomServiceIf } from "./dom-service.if";
 
 
+/** @category DOM */
 export class SimpleDomService implements DomServiceIf {
 
 

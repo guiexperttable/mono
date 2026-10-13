@@ -1,5 +1,7 @@
 /**
  * Represents padding values for the top, right, bottom, and left sides of an element.
+ *
+ * @category Table model
  */
 export class Padding {
   constructor(

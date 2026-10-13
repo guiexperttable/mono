@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / OnActionTriggeredIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / OnActionTriggeredIf
 
 # Interface: OnActionTriggeredIf
 
@@ -35,4 +35,4 @@ Triggers an action based on the provided action ID.
 
 #### Defined in
 
-[lib/table/action/on-action-triggered.if.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/action/on-action-triggered.if.ts#L12)
+[src/lib/table/action/on-action-triggered.if.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/on-action-triggered.if.ts#L13)

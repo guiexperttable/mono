@@ -9,6 +9,7 @@ import { HeaderGroupOptionsIf } from '../data/options/header-group-options.if';
 import { IconIf } from '../data/options/icon.if';
 
 
+/** @category Header groups */
 export class CellGroupExtCellRenderer implements CellRendererIf {
 
   private static toggleHeaderGroup = 'toggleHeaderGroup';

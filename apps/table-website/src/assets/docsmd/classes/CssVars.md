@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CssVars
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CssVars
 
 # Class: CssVars
 
@@ -31,7 +31,7 @@
 
 #### Defined in
 
-[lib/table/css-vars.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/css-vars.ts#L4)
+[src/lib/table/css-vars.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/css-vars.ts#L5)
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 #### Defined in
 
-[lib/table/css-vars.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/css-vars.ts#L6)
+[src/lib/table/css-vars.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/css-vars.ts#L7)

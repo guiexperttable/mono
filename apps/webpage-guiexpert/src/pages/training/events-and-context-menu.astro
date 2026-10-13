@@ -1,0 +1,61 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="events-and-context-menu">
+
+  <h2 id="adapter">EventAdapter: override what you need</h2>
+  <p>
+    The fifth argument of the <ApiLink name="TableScope" /> is an <ApiLink name="EventListenerIf" />. <ApiLink name="EventAdapter" />
+    implements every method empty – extend it and override only your events:
+  </p>
+  <Snippet file="demos/events-and-context-menu.ts" region="events" title="src/order-events.ts" />
+  <p>A <ApiLink name="GeMouseEvent" /> tells you where it happened:</p>
+  <table>
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>areaIdent</code>, <code>sideIdent</code></td><td>header / body / footer – west / center / east</td></tr>
+      <tr><td><code>rowIndex</code>, <code>columnIndex</code></td><td>the cell (−1 outside of cells)</td></tr>
+      <tr><td><code>clickCount</code></td><td>1 = click, 2 = double-click</td></tr>
+      <tr><td><code>originalEvent</code></td><td>the browser's <code>MouseEvent</code> (position, modifier keys)</td></tr>
+    </tbody>
+  </table>
+  <p>The other events: <ApiLink name="EventListenerIf.onModelChanged" label="onModelChanged" /> (edits, <ChapterLink slug="inline-editing" />),
+    <ApiLink name="EventListenerIf.onSelectionChanged" label="onSelectionChanged" /> (<ChapterLink slug="selection-and-copy" />),
+    <ApiLink name="EventListenerIf.onCheckboxChanged" label="onCheckboxChanged" /> (<ChapterLink slug="tree-table" />),
+    <code>onScroll</code>, <code>onMouseMoved</code>, <code>onMouseDragging</code>, <code>onFocusChanged</code>.</p>
+
+  <h2 id="row">From the displayed row to your object</h2>
+  <p>
+    <code>rowIndex</code> is the row as <strong>displayed</strong> – after filter and sorting. Never index your original array with it.
+    Ask the body model: <ApiLink name="AreaModelIf.getRowByIndex" />.
+  </p>
+
+  <h2 id="menu">A context menu of your own</h2>
+  <p>
+    There is no built-in context menu – so yours looks and works exactly like the rest of your app. About 30 lines, no library:
+  </p>
+  <Snippet file="demos/events-and-context-menu.ts" region="menu" title="src/context-menu.ts" />
+  <p>Wire events, menu and API together:</p>
+  <Snippet file="demos/events-and-context-menu.ts" region="wire" title="src/main.ts" />
+  <LiveDemo name="events-and-context-menu" title="Double-click and context menu" height={400}
+            caption="Double-click a row: the toolbar shows the order. Right-click: own menu – filter to one customer, copy, export." />
+
+  <h2 id="frameworks">In the framework wrappers</h2>
+  <p>The same events arrive as props or outputs: <code>mouseClicked</code>, <code>contextmenu</code>, <code>selectionChanged</code> …
+    (<ChapterLink slug="one-model-every-framework" />).</p>
+  <Callout type="pitfall" title="Single click vs. double click">
+    <p>A double click also produces a first click with <code>clickCount === 1</code>. If both do something different, handle the
+      single click with a short delay – or use the debounced <code>mouseClicked</code> of the Vue and Angular wrappers.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.89 a double-click is only reported for two clicks on the <strong>same</strong> cell.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>The menu's last entry exports to Excel – how that works: <ChapterLink slug="excel-export" />.</p>
+</TrainingLayout>

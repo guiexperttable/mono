@@ -1,10 +1,73 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableApi
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableApi
 
 # Class: TableApi
 
-The TableApi class provides a set of methods to interact with a table's functionality.
-It enables actions such as updating cells, scrolling, managing visibility, handling selection,
-copying to the clipboard, downloading data, and triggering specific actions programmatically.
+The public API of one table – everything you do with a table after it has been created:
+scrolling, sorting, filtering, selection, copy, Excel export, updating cells and rows, repainting.
+
+Every table has exactly one `TableApi`. You never create it yourself – you get it:
+
+| Where | How |
+|---|---|
+| Plain TypeScript | `new TableScope(host, model, new SimpleDomService(), options, listener).firstInit().getApi()` |
+| Web Component | `el.addEventListener("tableReady", e => e.detail)` |
+| React / Preact / Solid | `<GuiexpertTable tableReady={api => …} />` |
+| Vue 3 | `<GuiexpertTable @tableReady="api => …" />` |
+| Svelte 5 | `<GuiexpertTable onTableReady={api => …} />` |
+| Angular | `<guiexpert-table (tableReady)="onReady($event)" />` |
+
+## The most important methods
+
+| Task | Methods |
+|---|---|
+| scroll | [scrollToIndex](TableApi.md#scrolltoindex), [ensureRowIsVisible](TableApi.md#ensurerowisvisible), [scrollToPixel](TableApi.md#scrolltopixel), [getFirstVisibleRowIndex](TableApi.md#getfirstvisiblerowindex) |
+| sort | [sortByColumn](TableApi.md#sortbycolumn), [sort](TableApi.md#sort), [reSort](TableApi.md#resort) |
+| filter | [externalFilterChanged](TableApi.md#externalfilterchanged) (with [TableOptionsIf.externalFilterFunction](../interfaces/TableOptionsIf.md#externalfilterfunction)) |
+| export | [copyToClipboard](TableApi.md#copytoclipboard), [downloadExcel](TableApi.md#downloadexcel) |
+| change data | [updateCells](TableApi.md#updatecells), [setRows](TableApi.md#setrows), [addRows](TableApi.md#addrows), [updateRows](TableApi.md#updaterows), [removeRows](TableApi.md#removerows) |
+| redraw | [repaint](TableApi.md#repaint) (same row count), [repaintHard](TableApi.md#repainthard) (row count or heights changed) |
+| columns | [autoResizeColumns](TableApi.md#autoresizecolumns), [setColumnWidth](TableApi.md#setcolumnwidth), [recalcColumnWidths](TableApi.md#recalccolumnwidths) |
+| lifecycle | [destroy](TableApi.md#destroy) |
+
+**`Example`**
+
+```ts
+// plain TypeScript: create a table and talk to it
+const tableModel = TableFactory.createTableModel({ rows: orders });
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter())
+  .firstInit()
+  .getApi();
+
+tableApi.scrollToIndex(0, 50_000);                  // column 0, row 50,000
+tableApi.sortByColumn("total", "desc");             // like a double-click on the header
+await tableApi.copyToClipboard();                   // the current selection, tab-separated
+await tableApi.downloadExcel("orders.xlsx");        // the current view as .xlsx
+```
+
+**`Example`**
+
+```ts
+// live data: change single cells, only the visible ones are redrawn
+tableApi.updateCells([
+  new TableCellUpdateEvent("body", 3, 2, 101.5, { "tick-up": true }),
+  new TableCellUpdateEvent("body", 3, 3, 0.42)
+]);
+```
+
+**`Example`**
+
+```ts
+// replace the rows of an object-array table – the row count changes, so repaint hard
+tableApi.setRows(newOrders);
+tableApi.externalFilterChanged();                   // only if a filter function is set
+tableApi.repaintHard();
+```
+
+**`See`**
+
+Training: [Your first table](https://gui.expert/training/first-table/),
+  [Sorting](https://gui.expert/training/sorting/), [Filtering](https://gui.expert/training/filtering/),
+  [Excel export](https://gui.expert/training/excel-export/), [Live data](https://gui.expert/training/live-data/)
 
 ## Table of contents
 
@@ -23,6 +86,7 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 - [autoResizeColumns](TableApi.md#autoresizecolumns)
 - [clearSelection](TableApi.md#clearselection)
 - [copyToClipboard](TableApi.md#copytoclipboard)
+- [destroy](TableApi.md#destroy)
 - [downloadExcel](TableApi.md#downloadexcel)
 - [ensureRowIsVisible](TableApi.md#ensurerowisvisible)
 - [externalFilterChanged](TableApi.md#externalfilterchanged)
@@ -31,7 +95,10 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 - [findRows](TableApi.md#findrows)
 - [getBodyModel](TableApi.md#getbodymodel)
 - [getDisplayedRowCount](TableApi.md#getdisplayedrowcount)
+- [getFirstFullVisibleRowIndex](TableApi.md#getfirstfullvisiblerowindex)
 - [getFirstVisibleRowIndex](TableApi.md#getfirstvisiblerowindex)
+- [getLastFullVisibleRowIndex](TableApi.md#getlastfullvisiblerowindex)
+- [getLastVisibleRowIndex](TableApi.md#getlastvisiblerowindex)
 - [getSelectionModel](TableApi.md#getselectionmodel)
 - [getShortcutActionMapping](TableApi.md#getshortcutactionmapping)
 - [getTableModel](TableApi.md#gettablemodel)
@@ -39,6 +106,7 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 - [isColumnVisible](TableApi.md#iscolumnvisible)
 - [isFooterVisible](TableApi.md#isfootervisible)
 - [isHeaderVisible](TableApi.md#isheadervisible)
+- [isLoggingActive](TableApi.md#isloggingactive)
 - [reSort](TableApi.md#resort)
 - [recalcColumnWidths](TableApi.md#recalccolumnwidths)
 - [recalcWrappers](TableApi.md#recalcwrappers)
@@ -51,9 +119,11 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 - [setColumnWidth](TableApi.md#setcolumnwidth)
 - [setFooterVisible](TableApi.md#setfootervisible)
 - [setHeaderVisible](TableApi.md#setheadervisible)
+- [setLoggingActive](TableApi.md#setloggingactive)
 - [setRows](TableApi.md#setrows)
 - [setSelectionModel](TableApi.md#setselectionmodel)
 - [sort](TableApi.md#sort)
+- [sortByColumn](TableApi.md#sortbycolumn)
 - [triggerAction](TableApi.md#triggeraction)
 - [updateCells](TableApi.md#updatecells)
 - [updateRows](TableApi.md#updaterows)
@@ -76,7 +146,7 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 
 #### Defined in
 
-[lib/table/table-api.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L22)
+[src/lib/table/table-api.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L77)
 
 ## Properties
 
@@ -86,7 +156,7 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 
 #### Defined in
 
-[lib/table/table-api.ts:23](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L23)
+[src/lib/table/table-api.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L78)
 
 ## Methods
 
@@ -95,6 +165,10 @@ copying to the clipboard, downloading data, and triggering specific actions prog
 ▸ **addRows**\<`T`\>(`rows`): `void`
 
 Adds new rows to the end of the table body.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
+Does **not** repaint and resets filtering and sorting of the body: afterwards call
+[externalFilterChanged](TableApi.md#externalfilterchanged) (if a filter function is set) and [repaintHard](TableApi.md#repainthard) (the row count changed).
 
 #### Type parameters
 
@@ -119,13 +193,17 @@ Adds new rows to the end of the table body.
 This method appends the provided array of data objects to the end of the existing rows in the table body.
 It only works with tables that use AreaModelObjectArray as their body model.
 
-**`Throws`**
+**`Example`**
 
-Logs a console warning if the table's body model is not an AreaModelObjectArray
+```ts
+tableApi.addRows([{ id: 100_001, customer: "New GmbH" }]);
+tableApi.repaintHard();
+tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:380](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L380)
+[src/lib/table/table-api.ts:843](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L843)
 
 ___
 
@@ -134,6 +212,10 @@ ___
 ▸ **addRowsAt**\<`T`\>(`rows`, `rowIndex`): `void`
 
 Inserts new rows at a specific position in the table body.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
+Does **not** repaint and resets filtering and sorting of the body: afterwards call
+[externalFilterChanged](TableApi.md#externalfilterchanged) (if a filter function is set) and [repaintHard](TableApi.md#repainthard) (the row count changed).
 
 #### Type parameters
 
@@ -160,13 +242,9 @@ This method inserts the provided array of data objects at the specified index po
 Existing rows at or after the specified index will be shifted down.
 It only works with tables that use AreaModelObjectArray as their body model.
 
-**`Throws`**
-
-Logs a console warning if the table's body model is not an AreaModelObjectArray
-
 #### Defined in
 
-[lib/table/table-api.ts:407](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L407)
+[src/lib/table/table-api.ts:872](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L872)
 
 ___
 
@@ -190,7 +268,7 @@ Automatically resizes all columns to fit their content.
 
 #### Defined in
 
-[lib/table/table-api.ts:292](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L292)
+[src/lib/table/table-api.ts:745](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L745)
 
 ___
 
@@ -198,16 +276,30 @@ ___
 
 ▸ **clearSelection**(): `void`
 
-Clears the current selection of the table.
-The table will be rendered automatically.
+Clears the current selection in the table.
+
+This method removes any selected cells, rows, or columns in the table.
+It provides a convenient way to programmatically clear all selections in the table
+without having to access the underlying selection model directly.
+
+When called, this method delegates to the table scope's clearSelection method with
+a parameter value of true, which ensures the table is automatically repainted after
+the selection is cleared.
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```ts
+// Clear all selections in the table (e.g. from a "reset" button)
+tableApi.clearSelection();
+```
+
 #### Defined in
 
-[lib/table/table-api.ts:182](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L182)
+[src/lib/table/table-api.ts:486](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L486)
 
 ___
 
@@ -217,40 +309,128 @@ ___
 
 Copies the selected data from the table to the clipboard.
 
+This method leverages the copyService to extract and copy the currently selected data
+from the table. It works with the current selection state and focus position to determine
+what content should be copied.
+
+The copied data is formatted as tab-separated text that can be pasted into spreadsheet
+applications like Excel or text editors while maintaining the tabular structure.
+
 #### Returns
 
 `Promise`\<`string`\>
 
-- A promise that resolves with the copied data as a string.
+A promise that resolves with the copied data as a string.
+  The string contains the tab-separated representation of the selected table data.
+
+**`Example`**
+
+```ts
+// Copy the currently selected data to clipboard
+tableApi.copyToClipboard().then(content => {
+  console.log('Copied to clipboard:', content);
+});
+
+// Using with a button click handler
+function onCopyButtonClick() {
+  if (tableApi) {
+    tableApi.copyToClipboard()
+      .then(content => {
+        console.log('Successfully copied data to clipboard');
+        // Optionally do something with the copied content
+      })
+      .catch(error => {
+        console.error('Failed to copy to clipboard:', error);
+      });
+  }
+}
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:227](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L227)
+[src/lib/table/table-api.ts:606](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L606)
 
 ___
 
-### downloadExcel
+### destroy
 
-▸ **downloadExcel**(`fileName?`, `author?`): `void`
+▸ **destroy**(): `void`
 
-Generates and downloads an Excel file based on the table data.
-
-#### Parameters
-
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `fileName` | `string` | `'table.xlsx'` | The name of the Excel file to be downloaded. Defaults to 'table.xlsx'. |
-| `author` | `string` | `''` | The author of the Excel file. If not provided, it will remain empty. |
+Releases the table: removes all DOM listeners (incl. the window resize listener), stops the
+resize observer, calls the cleanup functions of all cell renderers and clears the host element.
+The framework wrappers call it automatically when they are unmounted or receive a new table model.
 
 #### Returns
 
 `void`
 
-No return value. Initiates a file download of the Excel document.
+**`Example`**
+
+```ts
+// Plain TS: replace the table with a new model
+tableApi.destroy();
+const scope = new TableScope(hostDiv, newModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+scope.firstInit();
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:242](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L242)
+[src/lib/table/table-api.ts:407](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L407)
+
+___
+
+### downloadExcel
+
+▸ **downloadExcel**(`fileName?`, `author?`): `Promise`\<`void`\>
+
+Downloads the current table data as an Excel file.
+
+This method extracts all visible data from the table (including header, body, and footer areas),
+converts it into a matrix format, and triggers a download of an Excel file containing this data.
+
+The method works by:
+1. Creating an empty matrix to hold all table data
+2. Iterating through each area of the table (header, body, footer)
+3. For each area, iterating through all rows and columns to extract cell values
+4. Passing the complete data matrix to the Excel service for file generation and download
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `fileName` | `string` | `'table.xlsx'` | The name of the Excel file to be downloaded (default: 'table.xlsx') |
+| `author` | `string` | `''` | Optional metadata for the Excel file to specify the author (default: '') |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+resolves when the (compressed) file has been handed to the browser
+
+**`Example`**
+
+```ts
+// Download table data with default filename
+tableApi.downloadExcel();
+```
+
+**`Example`**
+
+```ts
+// Download table data with custom filename and author
+tableApi.downloadExcel('sales-report.xlsx', 'John Doe');
+```
+
+**`Example`**
+
+```ts
+// Download table data with custom filename only
+tableApi.downloadExcel('quarterly-data.xlsx');
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:643](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L643)
 
 ___
 
@@ -286,41 +466,6 @@ Returns true if scrolling was needed and performed, false if the row was already
 tableApi.ensureRowIsVisible(5);
 ```
 
-**`Example`**
-
-```ts
-// Example usage in a component
-class MyTableComponent {
-  private tableApi: TableApi;
-
-  scrollToSpecificRow(rowIndex: number) {
-    // This will scroll the row into view if it's not visible
-    const didScroll = this.tableApi.ensureRowIsVisible(rowIndex);
-
-    if (didScroll) {
-      console.log(`Table scrolled to show row ${rowIndex}`);
-    } else {
-      console.log(`Row ${rowIndex} was already visible`);
-    }
-  }
-}
-```
-
-**`Example`**
-
-```ts
-// Example with row selection
-class TableHandler {
-  selectAndShowRow(rowIndex: number) {
-    // First ensure the row is visible
-    this.tableApi.ensureRowIsVisible(rowIndex);
-
-    // Then perform selection
-    this.selectionModel.selectRow(rowIndex);
-  }
-}
-```
-
 **`Throws`**
 
 Implicitly may throw if rowIndex is not a number or if required properties are undefined
@@ -332,7 +477,7 @@ Implicitly may throw if rowIndex is not a number or if required properties are u
 
 #### Defined in
 
-[lib/table/table-api.ts:763](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L763)
+[src/lib/table/table-api.ts:1210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1210)
 
 ___
 
@@ -340,15 +485,55 @@ ___
 
 ▸ **externalFilterChanged**(): `void`
 
-Notifies that the external filter has changed.
+Notifies the table that an external filter has been changed and needs to be applied.
+
+This method is used when an external filter condition (defined by `tableOptions.externalFilterFunction`)
+has changed and the table needs to refresh its display to reflect the new filtering criteria.
+
+When called, this method:
+1. Applies the external filter function to all rows
+2. Clears the current selection (by default)
+3. Scrolls to the top of the table
+4. Recalculates table dimensions
+5. Repaints the table to display only the filtered rows
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```typescript
+// Define an external filter function in your table options
+const tableOptions = {
+  externalFilterFunction: (row: MyRowType) => {
+    // Return true to include the row, false to filter it out
+    return row.status === 'active';
+  }
+};
+
+// Initialize your table with these options
+const tableApi = new TableApi(tableScope);
+
+// Later, when filter criteria change (e.g., in a search input handler)
+function onFilterTextChanged() {
+  // Update the filter function if needed
+  tableOptions.externalFilterFunction = (row: MyRowType) => {
+    return row.name.includes(searchText);
+  };
+
+  // Apply the updated filter
+  tableApi.externalFilterChanged();
+}
+```
+
+**`See`**
+
+TableScope.externalFilterChanged
+
 #### Defined in
 
-[lib/table/table-api.ts:48](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L48)
+[src/lib/table/table-api.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L213)
 
 ___
 
@@ -394,7 +579,7 @@ const user = tableApi.findRowFromAllRowsByAllCriteria(criteria,
 // Find a product row with partial match on name
 const criteria = { name: "Phone" };
 const product = tableApi.findRowFromAllRowsByAllCriteria(criteria,
-  (criteria, row) => row.name.includes(criteria.name)
+  (criteria, row) => row.name.includes(criteria.name!)
 );
 ```
 
@@ -402,12 +587,11 @@ const product = tableApi.findRowFromAllRowsByAllCriteria(criteria,
 
 ```ts
 // Find an order with complex matching logic
-const criteria = { total: 100, status: "pending" };
-const order = tableApi.findRowFromAllRowsByAllCriteria(criteria,
+const criteria = { total: 100, status: "paid" as const };
+const order = tableApi.findRowFromAllRowsByAllCriteria<Order>(criteria,
   (criteria, row) => {
-    return row.total > criteria.total && 
-           row.status === criteria.status &&
-           row.items.length > 0;
+    return row.total > criteria.total! &&
+           row.status === criteria.status;
   }
 );
 ```
@@ -418,7 +602,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[lib/table/table-api.ts:597](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L597)
+[src/lib/table/table-api.ts:1057](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1057)
 
 ___
 
@@ -472,12 +656,6 @@ const person2 = tableApi.findRowFromFilteredRowsByAllCriteria<Person>(
   (criteria, row) => row.name.toLowerCase().includes(criteria.name!.toLowerCase())
 );
 
-// Find a person within age range
-const ageCriteria = { minAge: 25, maxAge: 35 };
-const person3 = tableApi.findRowFromFilteredRowsByAllCriteria<Person>(
-  ageCriteria,
-  (criteria, row) => row.age >= criteria.minAge! && row.age <= criteria.maxAge!
-);
 ```
 
 **`Throws`**
@@ -493,7 +671,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[lib/table/table-api.ts:543](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L543)
+[src/lib/table/table-api.ts:1004](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1004)
 
 ___
 
@@ -502,6 +680,8 @@ ___
 ▸ **findRows**\<`T`\>(`rows`, `predicate?`): `T`[]
 
 Searches for and returns rows from the table body that match the given criteria.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
 
 #### Type parameters
 
@@ -535,23 +715,19 @@ The method uses a predicate function to determine matches between rows.
 
 ```ts
 // Find rows with simple equality comparison
-const matchingRows = table.findRows([row1, row2]);
+const matchingRows = tableApi.findRows([orders[0], orders[1]]);
 ```
 
 **`Example`**
 
 ```ts
 // Find rows with custom comparison logic
-const matchingRows = table.findRows([row1, row2], (a, b) => a.id === b.id);
+const matchingRows = tableApi.findRows<Order>([{ ...orders[0] }], (a, b) => a.id === b.id);
 ```
-
-**`Throws`**
-
-Logs a console warning if the table's body model is not an AreaModelObjectArray
 
 #### Defined in
 
-[lib/table/table-api.ts:479](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L479)
+[src/lib/table/table-api.ts:946](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L946)
 
 ___
 
@@ -570,7 +746,7 @@ The area model interface that provides access to the table's body data,
 
 #### Defined in
 
-[lib/table/table-api.ts:337](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L337)
+[src/lib/table/table-api.ts:790](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L790)
 
 ___
 
@@ -593,7 +769,47 @@ applying any filtering, pagination, or other visibility constraints.
 
 #### Defined in
 
-[lib/table/table-api.ts:776](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L776)
+[src/lib/table/table-api.ts:1223](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1223)
+
+___
+
+### getFirstFullVisibleRowIndex
+
+▸ **getFirstFullVisibleRowIndex**(): `number`
+
+Retrieves the index of the first fully visible row in the table's viewport.
+
+A row is considered "fully visible" when it's completely within the visible area of the table.
+This differs from the regular "visible" row, which might be partially visible at the edges of the viewport.
+
+This method is useful for:
+- Determining which rows are completely in view for operations that require full visibility
+- Implementing pagination or virtualization logic that needs to know complete row visibility
+- Supporting keyboard navigation that should skip partially visible rows
+
+#### Returns
+
+`number`
+
+The index of the first fully visible row, or -1 if no rows are fully visible
+
+**`Example`**
+
+```ts
+// Get the first fully visible row index
+const firstFullVisibleRow = tableApi.getFirstFullVisibleRowIndex();
+
+// Check if a specific row is fully visible
+const isRowFullyVisible = (rowIndex: number) => {
+  const firstFullVisible = tableApi.getFirstFullVisibleRowIndex();
+  const lastFullVisible = tableApi.getLastFullVisibleRowIndex();
+  return rowIndex >= firstFullVisible && rowIndex <= lastFullVisible;
+};
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1286](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1286)
 
 ___
 
@@ -637,7 +853,95 @@ if (firstVisibleIndex >= 0) {
 
 #### Defined in
 
-[lib/table/table-api.ts:811](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L811)
+[src/lib/table/table-api.ts:1258](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1258)
+
+___
+
+### getLastFullVisibleRowIndex
+
+▸ **getLastFullVisibleRowIndex**(): `number`
+
+Returns the index of the last fully visible row in the table's viewport.
+
+This method retrieves the last row that is completely visible within the current
+viewport of the table. A row is considered "fully visible" when its entire height
+is visible without any portion being cut off by the viewport boundaries.
+
+The distinction between "visible" and "fully visible" is important when scrolling:
+- A row can be partially visible (some portion is in view)
+- A row can be fully visible (the entire row is in view)
+
+#### Returns
+
+`number`
+
+The index of the last fully visible row in the table.
+If no row is fully visible or the table is empty, the method might return -1.
+
+**`Example`**
+
+```typescript
+// Get the index of the last fully visible row
+const lastVisibleRowIndex = tableApi.getLastFullVisibleRowIndex();
+
+// Use this information to determine if a specific row is fully visible
+const isRowFullyVisible = rowIndex <= lastVisibleRowIndex && rowIndex >= tableApi.getFirstFullVisibleRowIndex();
+
+// Can be used with scrolling operations to ensure certain rows are visible
+if (rowIndex > lastVisibleRowIndex) {
+  tableApi.ensureRowIsVisible(rowIndex);
+}
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1350](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1350)
+
+___
+
+### getLastVisibleRowIndex
+
+▸ **getLastVisibleRowIndex**(): `number`
+
+Returns the index of the last row that is visible in the table's viewport.
+
+This method retrieves the last visible row index from the table scope, which keeps
+track of which rows are currently visible as the user scrolls through the table.
+
+This can be useful for:
+- Implementing virtualized scrolling optimizations
+- Determining if specific rows are currently in view
+- Implementing features that need to know the visible range of rows
+
+#### Returns
+
+`number`
+
+The index of the last visible row in the table viewport
+
+**`Example`**
+
+```ts
+// Check if a specific row is currently visible in the viewport
+const lastVisibleIndex = tableApi.getLastVisibleRowIndex();
+const firstVisibleIndex = tableApi.getFirstVisibleRowIndex();
+const isRowVisible = rowIndex >= firstVisibleIndex && rowIndex <= lastVisibleIndex;
+```
+
+**`Example`**
+
+```ts
+// Get the range of visible rows
+const visibleRowsRange = {
+  first: tableApi.getFirstVisibleRowIndex(),
+  last: tableApi.getLastVisibleRowIndex()
+};
+console.log(`Visible rows: ${visibleRowsRange.first} to ${visibleRowsRange.last}`);
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1318](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1318)
 
 ___
 
@@ -645,18 +949,53 @@ ___
 
 ▸ **getSelectionModel**(): `undefined` \| [`SelectionModelIf`](../interfaces/SelectionModelIf.md)
 
-Retrieves the selection model of the table.
+Returns the current selection model for the table.
+
+The selection model manages cell selection state, including single cells, ranges, rows, and columns.
+This method provides access to the selection model instance, allowing operations like:
+- Checking if cells are selected
+- Getting selection ranges
+- Modifying selections
+- Adding/removing selection event listeners
 
 #### Returns
 
 `undefined` \| [`SelectionModelIf`](../interfaces/SelectionModelIf.md)
 
-The selection model of the table,
-or undefined if no selection model is available.
+The current selection model if available, otherwise undefined.
+
+**`Example`**
+
+```ts
+// Get the selection model
+const selectionModel = tableApi.getSelectionModel();
+
+// Check if a specific cell is selected
+if (selectionModel?.isSelected(3, 2)) {
+  console.log('Cell at row 3, column 2 is selected');
+}
+
+// Get all selected ranges
+const ranges = selectionModel?.getRanges();
+console.log('Selected ranges:', ranges);
+
+// Clear all selections
+selectionModel?.clear();
+
+// Toggle selection of a cell
+selectionModel?.togglePoint(5, 1);
+
+// Add a selection change listener
+selectionModel?.addEventSelectionChangedListener({
+  onSelectionChanged: () => {
+    console.log('Selection has changed');
+  }
+});
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:279](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L279)
+[src/lib/table/table-api.ts:731](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L731)
 
 ___
 
@@ -664,17 +1003,47 @@ ___
 
 ▸ **getShortcutActionMapping**(): [`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping)
 
-Retrieves the mapping of shortcuts to corresponding action in the current table scope.
+Retrieves the shortcut action mapping from the table's shortcut service.
+
+This method provides access to the keyboard shortcut configuration that defines
+which keys trigger specific actions in the table. The mapping contains key-value
+pairs where:
+- Keys are string representations of keyboard shortcuts (e.g., "ctrl+c", "shift+arrow_down")
+- Values are ActionId values representing the corresponding table actions
+
+This mapping can be useful for:
+- Displaying available shortcuts to users
+- Creating custom shortcut documentation
+- Dynamically checking which actions are available via keyboard
+- Extending or integrating with the table's shortcut system
 
 #### Returns
 
 [`ShortcutActionIdMapping`](../modules.md#shortcutactionidmapping)
 
-The mapping of shortcuts to corresponding action.
+An object mapping shortcut key combinations to their corresponding action IDs.
+         For example: { "ctrl+c": "COPY_2_CLIPBOARD", "arrow_down": "NAVIGATE_DOWN" }
+
+**`Example`**
+
+```ts
+// Get all available shortcuts in the table
+const shortcuts = tableApi.getShortcutActionMapping();
+
+// Check if a specific shortcut exists
+if (shortcuts["ctrl+c"]) {
+  console.log("Copy shortcut is available with action:", shortcuts["ctrl+c"]);
+}
+
+// Display available shortcuts in the UI
+Object.entries(shortcuts).forEach(([key, actionId]) => {
+  console.log(`${key}: ${actionId}`);
+});
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:216](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L216)
+[src/lib/table/table-api.ts:567](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L567)
 
 ___
 
@@ -693,7 +1062,7 @@ The table model interface that provides access to the table's data structure,
 
 #### Defined in
 
-[lib/table/table-api.ts:327](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L327)
+[src/lib/table/table-api.ts:780](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L780)
 
 ___
 
@@ -701,17 +1070,36 @@ ___
 
 ▸ **getTableScope**(): [`TableScope`](TableScope.md)
 
-Retrieves the current scope of the table.
+Returns the TableScope instance associated with this TableApi.
+
+The TableScope provides access to the core functionality and internal state of the table component,
+including rendering, event handling, selection, and other low-level operations.
+
+This method is useful for advanced customization scenarios where you need direct access
+to the table's internal structure and behaviors.
 
 #### Returns
 
 [`TableScope`](TableScope.md)
 
-The current scope of the table.
+The TableScope instance that controls this table component
+
+**`Example`**
+
+```ts
+// Access the TableScope to perform a custom operation
+const tableApi = new TableApi(myTableScope);
+const tableScope = tableApi.getTableScope();
+
+// Example: Manually trigger a context menu at a specific location
+const mouseEvent = new MouseEvent('contextmenu');
+const geMouseEvent = tableScope.createGeMouseEvent(mouseEvent);
+tableScope.contextmenu(geMouseEvent);
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:269](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L269)
+[src/lib/table/table-api.ts:688](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L688)
 
 ___
 
@@ -735,7 +1123,7 @@ Returns whether a column is visible or not.
 
 #### Defined in
 
-[lib/table/table-api.ts:105](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L105)
+[src/lib/table/table-api.ts:326](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L326)
 
 ___
 
@@ -753,7 +1141,7 @@ True if the footer is visible, false otherwise.
 
 #### Defined in
 
-[lib/table/table-api.ts:135](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L135)
+[src/lib/table/table-api.ts:356](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L356)
 
 ___
 
@@ -771,7 +1159,65 @@ Checks if the header is visible.
 
 #### Defined in
 
-[lib/table/table-api.ts:115](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L115)
+[src/lib/table/table-api.ts:336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L336)
+
+___
+
+### isLoggingActive
+
+▸ **isLoggingActive**(): `boolean`
+
+Checks whether logging is currently active for the table component.
+
+This method returns the current state of logging for the table. When logging is active,
+the table outputs detailed information about its operations to the console, including:
+
+- Rendering processes and lifecycle events
+- Data modifications and updates
+- Event handling and user interactions
+- Performance metrics and state changes
+
+Logging can be toggled using the `setLoggingActive(boolean)` method.
+
+#### Returns
+
+`boolean`
+
+True if logging is currently enabled, false otherwise.
+
+**`Example`**
+
+```ts
+// Check if logging is enabled
+if (tableApi.isLoggingActive()) {
+  console.log("Table logging is currently active");
+}
+
+// Conditionally enable logging only if it's not already active
+if (!tableApi.isLoggingActive()) {
+  tableApi.setLoggingActive(true);
+
+  // Perform operations that need debugging
+  tableApi.updateCells([
+    {
+      area: "body",
+      rowIndex: 2,
+      columnIndex: 3,
+      value: "New Value",
+      cssClasses: { "highlight": true }
+    }
+  ]);
+
+  // Run some additional operations...
+
+  // Disable logging when finished
+  tableApi.setLoggingActive(false);
+}
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1443)
 
 ___
 
@@ -795,7 +1241,7 @@ the sort columns or direction.
 
 #### Defined in
 
-[lib/table/table-api.ts:659](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L659)
+[src/lib/table/table-api.ts:1135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1135)
 
 ___
 
@@ -817,7 +1263,7 @@ Recalculates the column widths of the table.
 
 #### Defined in
 
-[lib/table/table-api.ts:171](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L171)
+[src/lib/table/table-api.ts:463](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L463)
 
 ___
 
@@ -839,7 +1285,7 @@ It ensures that all wrapper elements are properly sized to match their content.
 
 #### Defined in
 
-[lib/table/table-api.ts:305](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L305)
+[src/lib/table/table-api.ts:758](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L758)
 
 ___
 
@@ -848,6 +1294,10 @@ ___
 ▸ **removeRows**\<`T`\>(`rows`, `predicate?`): `void`
 
 Removes specified rows from the table body.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
+Does **not** repaint and resets filtering and sorting of the body: afterwards call
+[externalFilterChanged](TableApi.md#externalfilterchanged) (if a filter function is set) and [repaintHard](TableApi.md#repainthard) (the row count changed).
 
 #### Type parameters
 
@@ -873,13 +1323,9 @@ Removes specified rows from the table body.
 This method removes rows from the table body that match any of the provided rows based on the predicate function.
 It only works with tables that use AreaModelObjectArray as their body model.
 
-**`Throws`**
-
-Logs a console warning if the table's body model is not an AreaModelObjectArray
-
 #### Defined in
 
-[lib/table/table-api.ts:435](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L435)
+[src/lib/table/table-api.ts:902](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L902)
 
 ___
 
@@ -889,16 +1335,46 @@ ___
 
 Repaints the table.
 
-This method calls the repaint method of the tableScope object
-to update and redraw the table based on the latest data.
+This method refreshes the visual representation of the table by delegating to the
+tableScope's repaint functionality. Use this method whenever the table's visual state
+needs to be updated after data changes, selection changes, or any modifications that
+affect the rendered output.
+
+Repainting the table ensures that all visible cells, rows, and styling reflect the
+current state of the underlying data model and configuration settings.
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```ts
+// Update data and repaint the table
+const tableApi = new TableApi(tableScope);
+tableApi.setRows(newData);
+tableApi.repaint();
+```
+
+**`Example`**
+
+```ts
+// Update selection and repaint to show the visual change
+tableApi.getSelectionModel()?.togglePoint(2, 3);
+tableApi.repaint();
+```
+
+**`Example`**
+
+```ts
+// After changing column visibility, repaint to reflect changes
+tableApi.setColumnVisible(0, false);
+tableApi.repaint();
+```
+
 #### Defined in
 
-[lib/table/table-api.ts:145](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L145)
+[src/lib/table/table-api.ts:390](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L390)
 
 ___
 
@@ -906,18 +1382,61 @@ ___
 
 ▸ **repaintHard**(): `void`
 
-Repaints the table scope with hard repaint.
-Repaints the UI by resetting the size of the wrapper div,
-adjusting the containers and rows, and performing additional adjustments
-after scrolling.
+Performs a complete repaint of the table by triggering a hard repaint on the underlying table scope.
+
+A hard repaint is more thorough than a regular repaint and performs the following operations:
+- Recalculates the height and padding of the table model
+- Resets the size of the wrapper div elements
+- Adjusts containers and rows positioning
+- Makes additional adjustments after scrolling
+
+Use this method when regular repaint isn't sufficient, such as when:
+- Table dimensions have significantly changed
+- The structure of data has been modified (rows/columns added or removed)
+- The table layout needs complete recalculation
+- After major DOM changes affecting the table's container
 
 #### Returns
 
 `void`
 
+This method doesn't return a value
+
+**`Example`**
+
+```ts
+// Example 1: Basic usage
+tableApi.repaintHard();
+```
+
+**`Example`**
+
+```ts
+// Example 2: Using after major data changes
+tableApi.setRows(newDataSet);
+tableApi.repaintHard();
+```
+
+**`Example`**
+
+```ts
+// Example 3: Using after resizing a container
+window.addEventListener('resize', () => {
+  tableApi.repaintHard();
+});
+```
+
+**`Example`**
+
+```ts
+// Example 4: Using after changing column visibility
+tableApi.setColumnVisible(2, false);
+tableApi.repaintHard();
+```
+
 #### Defined in
 
-[lib/table/table-api.ts:159](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L159)
+[src/lib/table/table-api.ts:451](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L451)
 
 ___
 
@@ -925,24 +1444,44 @@ ___
 
 ▸ **scrollToIndex**(`indexX?`, `indexY?`): `void`
 
-Scrolls to the specified index in both horizontal and vertical directions.
+Scrolls the table to display the specified row and column indices at the top-left corner of the viewport.
+
+This method allows programmatic scrolling to a specific position in the table grid based on row and column indices.
+It uses the underlying TableScope's scrolling mechanism to navigate to the target location.
 
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `indexX` | `number` | `0` | The index of the column to scroll to in the horizontal direction. Default is 0. |
-| `indexY` | `number` | `0` | The index of the row to scroll to in the vertical direction. Default is 0. |
+| `indexX` | `number` | `0` | The horizontal index (column) to scroll to. Defaults to 0 (leftmost column). |
+| `indexY` | `number` | `0` | The vertical index (row) to scroll to. Defaults to 0 (topmost row). |
 
 #### Returns
 
 `void`
 
-undefined
+**`Example`**
+
+```ts
+// Scroll to the 5th row, keeping the current horizontal scroll position
+tableApi.scrollToIndex(0, 5);
+```
+
+**`Example`**
+
+```ts
+// Scroll to column 3, row 10
+tableApi.scrollToIndex(3, 10);
+```
+
+**`See`**
+
+ - [scrollToPixel](TableApi.md#scrolltopixel) - For scrolling to specific pixel coordinates
+ - [ensureRowIsVisible](TableApi.md#ensurerowisvisible) - For scrolling to make a specific row visible
 
 #### Defined in
 
-[lib/table/table-api.ts:72](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L72)
+[src/lib/table/table-api.ts:293](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L293)
 
 ___
 
@@ -950,22 +1489,78 @@ ___
 
 ▸ **scrollToPixel**(`px?`, `py?`): `void`
 
-Scrolls the table body to the specified pixel coordinates.
+Scrolls the table content to the specified pixel coordinates.
+
+This method allows programmatic scrolling of the table viewport to exact pixel positions.
+It delegates the scrolling operation to the underlying TableScope instance.
 
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `px` | `number` | `0` | The horizontal pixel coordinate to scroll to. Defaults to 0. |
-| `py` | `number` | `0` | The vertical pixel coordinate to scroll to. Defaults to 0. |
+| `px` | `number` | `0` | The horizontal pixel coordinate to scroll to. Defaults to 0 (leftmost position). |
+| `py` | `number` | `0` | The vertical pixel coordinate to scroll to. Defaults to 0 (topmost position). |
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```ts
+// Scroll to the top-left corner of the table
+tableApi.scrollToPixel(0, 0);
+```
+
+**`Example`**
+
+```ts
+// Scroll 200 pixels horizontally and 150 pixels vertically
+tableApi.scrollToPixel(200, 150);
+```
+
+**`Example`**
+
+```ts
+// Scroll only vertically, keeping the current horizontal position
+tableApi.scrollToPixel(undefined, 300);
+```
+
+**`Example`**
+
+```ts
+// Example in a component that needs precise scrolling control
+class TableScroller {
+  private tableApi: TableApi;
+
+  constructor(tableApi: TableApi) {
+    this.tableApi = tableApi;
+  }
+
+  scrollToPosition(x: number, y: number) {
+    // Scroll to exact pixel coordinates
+    this.tableApi.scrollToPixel(x, y);
+  }
+
+  scrollHalfway() {
+    const tableModel = this.tableApi.getTableModel();
+    const totalWidth = tableModel.getContentWidthInPixel();
+    const totalHeight = tableModel.getContentHeightInPixel();
+
+    // Scroll to the middle of the table content
+    this.tableApi.scrollToPixel(totalWidth / 2, totalHeight / 2);
+  }
+}
+```
+
+**`See`**
+
+ - [scrollToIndex](TableApi.md#scrolltoindex) - For scrolling based on row and column indices
+ - [ensureRowIsVisible](TableApi.md#ensurerowisvisible) - For scrolling to make a specific row visible
+
 #### Defined in
 
-[lib/table/table-api.ts:59](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L59)
+[src/lib/table/table-api.ts:266](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L266)
 
 ___
 
@@ -990,7 +1585,7 @@ Sets the visibility of a column in the table.
 
 #### Defined in
 
-[lib/table/table-api.ts:95](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L95)
+[src/lib/table/table-api.ts:316](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L316)
 
 ___
 
@@ -1015,7 +1610,7 @@ Sets the width of a specific column in the table.
 
 #### Defined in
 
-[lib/table/table-api.ts:317](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L317)
+[src/lib/table/table-api.ts:770](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L770)
 
 ___
 
@@ -1039,7 +1634,7 @@ Sets the visibility of the footer.
 
 #### Defined in
 
-[lib/table/table-api.ts:126](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L126)
+[src/lib/table/table-api.ts:347](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L347)
 
 ___
 
@@ -1063,7 +1658,71 @@ undefined
 
 #### Defined in
 
-[lib/table/table-api.ts:83](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L83)
+[src/lib/table/table-api.ts:304](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L304)
+
+___
+
+### setLoggingActive
+
+▸ **setLoggingActive**(`active`): `void`
+
+Checks whether logging is currently active for the table component.
+
+This method returns the current state of logging for the table. When logging is active,
+the table outputs detailed information about its operations to the console, including:
+
+- Rendering processes and lifecycle events
+- Data modifications and updates
+- Event handling and user interactions
+- Performance metrics and state changes
+
+Logging can be toggled using the `setLoggingActive(boolean)` method.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `active` | `boolean` |
+
+#### Returns
+
+`void`
+
+True if logging is currently enabled, false otherwise.
+
+**`Example`**
+
+```ts
+// Check if logging is enabled
+if (tableApi.isLoggingActive()) {
+  console.log("Table logging is currently active");
+}
+
+// Conditionally enable logging only if it's not already active
+if (!tableApi.isLoggingActive()) {
+  tableApi.setLoggingActive(true);
+
+  // Perform operations that need debugging
+  tableApi.updateCells([
+    {
+      area: "body",
+      rowIndex: 2,
+      columnIndex: 3,
+      value: "New Value",
+      cssClasses: { "highlight": true }
+    }
+  ]);
+
+  // Run some additional operations...
+
+  // Disable logging when finished
+  tableApi.setLoggingActive(false);
+}
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1397](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1397)
 
 ___
 
@@ -1072,6 +1731,10 @@ ___
 ▸ **setRows**\<`T`\>(`rows`): `void`
 
 Sets the rows data for the table body, replacing any existing rows.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
+Does **not** repaint and resets filtering and sorting of the body: afterwards call
+[externalFilterChanged](TableApi.md#externalfilterchanged) (if a filter function is set) and [repaintHard](TableApi.md#repainthard) (the row count changed).
 
 #### Type parameters
 
@@ -1096,13 +1759,9 @@ Sets the rows data for the table body, replacing any existing rows.
 This method replaces all existing rows in the table body with the provided array of data objects.
 It only works with tables that use AreaModelObjectArray as their body model.
 
-**`Throws`**
-
-Logs a console warning if the table's body model is not an AreaModelObjectArray
-
 #### Defined in
 
-[lib/table/table-api.ts:355](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L355)
+[src/lib/table/table-api.ts:810](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L810)
 
 ___
 
@@ -1110,22 +1769,40 @@ ___
 
 ▸ **setSelectionModel**(`sm`, `repaint?`): `void`
 
-Sets the selection model for the table scope.
+Sets the selection model for the table.
+
+This method allows you to replace the current selection model with a new one,
+which controls how cells, rows, or columns can be selected in the table.
 
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `sm` | [`SelectionModel`](SelectionModel.md) | `undefined` | The selection model to be set. |
-| `repaint?` | `boolean` | `true` | Indicates whether the table should be repainted after setting the selection model. Default value is true. |
+| `sm` | [`SelectionModel`](SelectionModel.md) | `undefined` | The new selection model to be set. This model defines the selection behavior including selection type (none, cell, row, column), selection mode (single, multi), and manages the selected ranges. |
+| `repaint?` | `boolean` | `true` | Whether to repaint the table after changing the selection model. Default is true, which immediately reflects the change visually. Set to false if you want to avoid immediate repainting. |
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```ts
+// Create a new selection model with row selection and multi-select mode
+const selectionModel = new SelectionModel("row", "multi");
+
+// Set the new selection model and repaint the table
+tableApi.setSelectionModel(selectionModel);
+
+// Set a selection model without repainting (if you plan to make more changes)
+tableApi.setSelectionModel(selectionModel, false);
+// ... make other changes ...
+tableApi.repaint(); // Now repaint once
+```
+
 #### Defined in
 
-[lib/table/table-api.ts:194](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L194)
+[src/lib/table/table-api.ts:518](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L518)
 
 ___
 
@@ -1155,7 +1832,7 @@ should follow the standard JavaScript array sort comparator pattern, returning:
 
 ```ts
 // Sort table rows by a specific property in ascending order
-table.api.sort((a, b) => {
+tableApi.sort((a: Person, b: Person) => {
   if (a.name < b.name) return -1;
   if (a.name > b.name) return 1;
   return 0;
@@ -1166,20 +1843,20 @@ table.api.sort((a, b) => {
 
 ```ts
 // Sort numbers in descending order
-table.api.sort((a, b) => b.value - a.value);
+tableApi.sort((a: { value: number }, b: { value: number }) => b.value - a.value);
 ```
 
 **`Example`**
 
 ```ts
 // Sort with multiple criteria
-table.api.sort((a, b) => {
+tableApi.sort((a: Order, b: Order) => {
   // First sort by status
   const statusCompare = a.status.localeCompare(b.status);
   if (statusCompare !== 0) return statusCompare;
   
   // Then sort by name if status is equal
-  return a.name.localeCompare(b.name);
+  return a.customer.localeCompare(b.customer);
 });
 ```
 
@@ -1187,14 +1864,46 @@ table.api.sort((a, b) => {
 
 ```ts
 // Case-insensitive string sorting
-table.api.sort((a, b) => 
+tableApi.sort((a: Person, b: Person) =>
   a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 );
 ```
 
 #### Defined in
 
-[lib/table/table-api.ts:707](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L707)
+[src/lib/table/table-api.ts:1183](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1183)
+
+___
+
+### sortByColumn
+
+▸ **sortByColumn**(`column`, `sortState?`): `boolean`
+
+Sorts by one column from code – e.g. from your own button – exactly like a double click on the
+column header: rows, header icon, filter (sort order survives filtering) and auto-restore.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `column` | `string` \| `number` | column index or property, e.g. `"total"` |
+| `sortState?` | [`SortState`](../modules.md#sortstate) | `"asc"` or `"desc"`; omitted: toggles like the header (asc → desc → …) |
+
+#### Returns
+
+`boolean`
+
+false if the column does not exist
+
+**`Example`**
+
+```ts
+document.querySelector("#by-total")!.addEventListener("click", () => tableApi.sortByColumn("total", "desc"));
+```
+
+#### Defined in
+
+[src/lib/table/table-api.ts:1121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1121)
 
 ___
 
@@ -1217,7 +1926,7 @@ This function can be invoked programmatically.
 
 #### Defined in
 
-[lib/table/table-api.ts:206](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L206)
+[src/lib/table/table-api.ts:530](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L530)
 
 ___
 
@@ -1225,24 +1934,97 @@ ___
 
 ▸ **updateCells**(`events`, `repaintAll?`): `void`
 
-Updates the cells in the table based on the provided events.
+Updates the cells in the table with the provided cell update events.
+
+This method allows you to update specific cells in the table without requiring a full table repaint,
+which can significantly improve performance when updating large tables frequently.
 
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `events` | [`TableCellUpdateEventIf`](../interfaces/TableCellUpdateEventIf.md)[] | `undefined` | The array of events representing the updates to perform on the cells. |
-| `repaintAll?` | `boolean` | `false` | Optional parameter indicating whether to repaint all cells or not. Default value is false. If true, the full table will be rendered. If false, the table cell will be rendered immediately. |
+| `events` | [`TableCellUpdateEventIf`](../interfaces/TableCellUpdateEventIf.md)[] | `undefined` | An array of cell update events, each defining a single cell update operation. Each event must specify: - area: The table area to update ('header', 'body', or 'footer') - rowIndex: The row index of the cell to update - columnIndex: The column index of the cell to update - value: The new value to set for the cell - cssClasses: Optional object mapping CSS class names to boolean values (true to add the class, false to remove it) |
+| `repaintAll?` | `boolean` | `false` | Whether to repaint the entire table after updating cells. - If true: All cells will be repainted after updating (slower but ensures visual consistency) - If false: Only the modified cells will be repainted (faster, recommended for frequent updates) |
 
 #### Returns
 
 `void`
 
-- This method doesn't return anything.
+**`Example`**
+
+```ts
+// Update a single cell with a new value and CSS classes
+tableApi.updateCells([{
+  area: 'body',
+  rowIndex: 3,
+  columnIndex: 2,
+  value: 42,
+  cssClasses: {
+    'highlight': true,   // Add 'highlight' class
+    'error': false       // Remove 'error' class if present
+  }
+}]);
+```
+
+**`Example`**
+
+```ts
+// Update multiple cells at once
+tableApi.updateCells([
+  {
+    area: 'body',
+    rowIndex: 1,
+    columnIndex: 1,
+    value: 'New Value 1',
+    cssClasses: { 'updated': true }
+  },
+  {
+    area: 'body',
+    rowIndex: 2,
+    columnIndex: 3,
+    value: 'New Value 2',
+    cssClasses: { 'updated': true }
+  }
+]);
+```
+
+**`Example`**
+
+```ts
+// Update cells and repaint the entire table
+tableApi.updateCells([
+  { area: 'body', rowIndex: 0, columnIndex: 0, value: 'Hello', cssClasses: { 'bg-green-0': true } },
+  { area: 'body', rowIndex: 1, columnIndex: 1, value: 'World', cssClasses: { 'bg-red-0': true } }
+], true);
+```
+
+**`Example`**
+
+```ts
+// High-performance animation example (update without full repaint)
+function animateCell() {
+  const value = Math.sin(Date.now() / 1000) * 50;
+  const cssClasses = {
+    'positive': value > 0,
+    'negative': value < 0
+  };
+
+  tableApi.updateCells([{
+    area: 'body',
+    rowIndex: 0,
+    columnIndex: 0,
+    value: Math.round(value),
+    cssClasses
+  }]);
+
+  requestAnimationFrame(animateCell);
+}
+animateCell();
+```
 
 #### Defined in
 
-[lib/table/table-api.ts:36](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L36)
+[src/lib/table/table-api.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L165)
 
 ___
 
@@ -1251,6 +2033,9 @@ ___
 ▸ **updateRows**\<`T`\>(`rows`, `predicate?`): `void`
 
 Updates existing rows in the table body with new data.
+
+Only works with an [AreaModelObjectArray](AreaModelObjectArray.md) body – logs a console warning otherwise.
+The properties are copied into the existing objects; nothing is repainted – call [repaint](TableApi.md#repaint) afterwards.
 
 #### Type parameters
 
@@ -1278,10 +2063,6 @@ For each row in the table, if the predicate returns true when compared with any 
 all properties from the provided row will be copied to the existing row.
 It only works with tables that use AreaModelObjectArray as their body model.
 
-**`Throws`**
-
-Logs a console warning if the table's body model is not an AreaModelObjectArray
-
 #### Defined in
 
-[lib/table/table-api.ts:629](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/table-api.ts#L629)
+[src/lib/table/table-api.ts:1090](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1090)

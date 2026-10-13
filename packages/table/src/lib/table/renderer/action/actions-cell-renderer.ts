@@ -8,6 +8,7 @@ import { ActionEvent } from './action-event';
 import { CrudAction } from '../../crud/crud-action';
 
 
+/** @category Renderers & editing */
 export class ActionsCellRenderer implements CellRendererIf {
 
 

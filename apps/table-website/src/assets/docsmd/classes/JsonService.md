@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / JsonService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / JsonService
 
 # Class: JsonService
 
@@ -73,4 +73,4 @@ Fixes an invalid json like this:
 
 #### Defined in
 
-[lib/common/generator/json-service.ts:41](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/json-service.ts#L41)
+[src/lib/common/generator/json-service.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/json-service.ts#L42)

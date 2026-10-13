@@ -1,5 +1,6 @@
 import { ActionId } from "./action-id.type";
 
+/** @category Keyboard */
 export interface OnActionTriggeredIf {
 
   /**

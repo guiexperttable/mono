@@ -1,6 +1,8 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeKeyEvent
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeKeyEvent
 
 # Class: GeKeyEvent
+
+Represents a keyboard event.
 
 ## Table of contents
 
@@ -23,7 +25,7 @@
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `status` | ``"down"`` \| ``"up"`` | `"down"` |
+| `status` | ``"up"`` \| ``"down"`` | `"down"` |
 | `originalEvent?` | `KeyboardEvent` | `undefined` |
 
 #### Returns
@@ -32,7 +34,7 @@
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-key-event.ts#L3)
+[src/lib/table/data/common/event/ge-key-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L10)
 
 ## Properties
 
@@ -42,14 +44,14 @@
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-key-event.ts#L5)
+[src/lib/table/data/common/event/ge-key-event.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L12)
 
 ___
 
 ### status
 
-• **status**: ``"down"`` \| ``"up"`` = `"down"`
+• **status**: ``"up"`` \| ``"down"`` = `"down"`
 
 #### Defined in
 
-[lib/table/data/common/event/ge-key-event.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/ge-key-event.ts#L4)
+[src/lib/table/data/common/event/ge-key-event.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-key-event.ts#L11)

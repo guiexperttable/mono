@@ -6,6 +6,8 @@ import { AreaModelObjectArray } from "../data/tablemodel/areamodel/area-model-ob
 
 /**
  * Works with AreaModelObjectArray only
+ *
+ * @category Renderers & editing
  */
 export class CheckboxBooleanPropertyCellRenderer<T> implements CellRendererIf {
 

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CellGroupExtCellRenderer
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CellGroupExtCellRenderer
 
 # Class: CellGroupExtCellRenderer
 
@@ -14,39 +14,76 @@
 
 ### Methods
 
+- [applyStyleString](CellGroupExtCellRenderer.md#applystylestring)
 - [render](CellGroupExtCellRenderer.md#render)
 
 ## Constructors
 
 ### constructor
 
-• **new CellGroupExtCellRenderer**(): [`CellGroupExtCellRenderer`](CellGroupExtCellRenderer.md)
-
-#### Returns
-
-[`CellGroupExtCellRenderer`](CellGroupExtCellRenderer.md)
-
-## Methods
-
-### render
-
-▸ **render**(`cellDiv`, `_rowIndex`, `_columnIndex`, `_areaIdent`, `_areaModel`, `cellValue`, `_domService`): `undefined` \| `Function`
+• **new CellGroupExtCellRenderer**(`headerGroupOptions?`): [`CellGroupExtCellRenderer`](CellGroupExtCellRenderer.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `cellDiv` | `HTMLDivElement` |
-| `_rowIndex` | `number` |
-| `_columnIndex` | `number` |
-| `_areaIdent` | [`AreaIdent`](../modules.md#areaident) |
-| `_areaModel` | [`AreaModelIf`](../interfaces/AreaModelIf.md) |
-| `cellValue` | `undefined` \| ``null`` \| [`CellGroupExt`](CellGroupExt.md) |
-| `_domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) |
+| `headerGroupOptions` | [`HeaderGroupOptionsIf`](../interfaces/HeaderGroupOptionsIf.md) |
+
+#### Returns
+
+[`CellGroupExtCellRenderer`](CellGroupExtCellRenderer.md)
+
+#### Defined in
+
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L17)
+
+## Methods
+
+### applyStyleString
+
+▸ **applyStyleString**(`domService`, `div`, `style`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) |
+| `div` | `HTMLDivElement` |
+| `style` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L114)
+
+___
+
+### render
+
+▸ **render**(`cellDiv`, `rowIndex`, `columnIndex`, `areaIdent`, `_areaModel`, `cellValue`, `domService`): `undefined` \| `Function`
+
+Fills the (empty) cell element.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellDiv` | `HTMLDivElement` | the cell element, already positioned and sized |
+| `rowIndex` | `number` | row in the area (as displayed) |
+| `columnIndex` | `number` | column index (west + center + east) |
+| `areaIdent` | [`AreaIdent`](../modules.md#areaident) | `"header"`, `"body"` or `"footer"` |
+| `_areaModel` | [`AreaModelIf`](../interfaces/AreaModelIf.md) | the model of this area (e.g. for `getRowByIndex(rowIndex)`) |
+| `cellValue` | `undefined` \| ``null`` \| [`CellGroupExt`](CellGroupExt.md) | the value of the cell (`areaModel.getValueAt(rowIndex, columnIndex)`) |
+| `domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) | create and change elements through it (works with Angular's Renderer2, too) |
 
 #### Returns
 
 `undefined` \| `Function`
+
+optionally a cleanup function, called before the cell is drawn again
 
 #### Implementation of
 
@@ -54,4 +91,4 @@
 
 #### Defined in
 
-[lib/table/renderer/cell-group-ext-cell-renderer.ts:11](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L11)
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L23)

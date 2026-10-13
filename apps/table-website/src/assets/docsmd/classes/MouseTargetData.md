@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / MouseTargetData
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / MouseTargetData
 
 # Class: MouseTargetData
 
@@ -55,7 +55,7 @@ const mouseTarget = new MouseTargetData(eventTarget, tableScope);
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:42](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L42)
+[src/lib/table/data/event/mouse-target-data.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L44)
 
 ## Properties
 
@@ -67,7 +67,7 @@ The associated action with the HTML Element (retrieved through "data-ge-action" 
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:37](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L37)
+[src/lib/table/data/event/mouse-target-data.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L39)
 
 ___
 
@@ -79,7 +79,7 @@ The identification of the targeted area on an interaction event. Possible value 
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:33](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L33)
+[src/lib/table/data/event/mouse-target-data.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L35)
 
 ___
 
@@ -91,7 +91,7 @@ The model of the table area the user interacted with.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:34](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L34)
+[src/lib/table/data/event/mouse-target-data.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L36)
 
 ___
 
@@ -103,7 +103,7 @@ The CSS class name applied to the target element. Default is an empty string.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:39](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L39)
+[src/lib/table/data/event/mouse-target-data.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L41)
 
 ___
 
@@ -115,7 +115,7 @@ The index of the targeted column on an interaction event. Default value is -1.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:32](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L32)
+[src/lib/table/data/event/mouse-target-data.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L34)
 
 ___
 
@@ -127,7 +127,7 @@ The type of the HTML Input Element (retrieved through "data-input-type" data att
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:38](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L38)
+[src/lib/table/data/event/mouse-target-data.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L40)
 
 ___
 
@@ -139,7 +139,7 @@ The specific row the user interacted with.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:35](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L35)
+[src/lib/table/data/event/mouse-target-data.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L37)
 
 ___
 
@@ -151,7 +151,7 @@ The index of the targeted row on an interaction event. Default value is -1.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:31](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L31)
+[src/lib/table/data/event/mouse-target-data.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L33)
 
 ___
 
@@ -163,4 +163,4 @@ The value(s) associated with the HTML Input Element the user interacted with.
 
 #### Defined in
 
-[lib/table/data/event/mouse-target-data.ts:36](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/event/mouse-target-data.ts#L36)
+[src/lib/table/data/event/mouse-target-data.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/event/mouse-target-data.ts#L38)

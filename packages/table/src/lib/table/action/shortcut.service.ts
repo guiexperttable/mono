@@ -9,6 +9,8 @@ import { createHarmonizedShortcutByKeyboardEvent } from './shortcut-util';
 
 /**
  * Represents a service for managing shortcuts and triggering actions based on keyboard events.
+ *
+ * @category Keyboard
  */
 export class ShortcutService {
 

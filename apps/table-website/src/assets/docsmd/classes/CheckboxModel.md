@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CheckboxModel
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CheckboxModel
 
 # Class: CheckboxModel\<T\>
 
@@ -29,7 +29,6 @@
 - [checkRow](CheckboxModel.md#checkrow)
 - [getCheckedRows](CheckboxModel.md#getcheckedrows)
 - [isRowChecked](CheckboxModel.md#isrowchecked)
-- [removeSelectedRow](CheckboxModel.md#removeselectedrow)
 - [setCheckedRows](CheckboxModel.md#setcheckedrows)
 
 ## Constructors
@@ -56,7 +55,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L6)
+[src/lib/table/checkbox/checkbox-model.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L7)
 
 ## Methods
 
@@ -80,7 +79,7 @@
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L17)
+[src/lib/table/checkbox/checkbox-model.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L18)
 
 ___
 
@@ -104,7 +103,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:49](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L49)
+[src/lib/table/checkbox/checkbox-model.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L50)
 
 ___
 
@@ -129,7 +128,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L28)
+[src/lib/table/checkbox/checkbox-model.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L29)
 
 ___
 
@@ -147,7 +146,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L8)
+[src/lib/table/checkbox/checkbox-model.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L9)
 
 ___
 
@@ -171,27 +170,7 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:42](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L42)
-
-___
-
-### removeSelectedRow
-
-▸ **removeSelectedRow**(`row`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `row` | `T` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[lib/table/checkbox/checkbox-model.ts:53](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L53)
+[src/lib/table/checkbox/checkbox-model.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L43)
 
 ___
 
@@ -215,4 +194,4 @@ ___
 
 #### Defined in
 
-[lib/table/checkbox/checkbox-model.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/checkbox/checkbox-model.ts#L12)
+[src/lib/table/checkbox/checkbox-model.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/checkbox/checkbox-model.ts#L13)

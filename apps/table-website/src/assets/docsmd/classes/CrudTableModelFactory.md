@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CrudTableModelFactory
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CrudTableModelFactory
 
 # Class: CrudTableModelFactory
 
@@ -22,11 +22,7 @@
 
 ### Methods
 
-- [calcAutoColumnWidths](CrudTableModelFactory.md#calcautocolumnwidths)
 - [createTableModel](CrudTableModelFactory.md#createtablemodel)
-- [extractProperties](CrudTableModelFactory.md#extractproperties)
-- [getPropertyValue](CrudTableModelFactory.md#getpropertyvalue)
-- [getValueByT](CrudTableModelFactory.md#getvaluebyt)
 - [onActionEvent](CrudTableModelFactory.md#onactionevent)
 - [openDialogForCreate](CrudTableModelFactory.md#opendialogforcreate)
 
@@ -48,7 +44,7 @@
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:29](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L29)
+[src/lib/table/crud/crud-table-model-factory.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L30)
 
 ___
 
@@ -58,7 +54,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:31](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L31)
+[src/lib/table/crud/crud-table-model-factory.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L32)
 
 ___
 
@@ -82,7 +78,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:33](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L33)
+[src/lib/table/crud/crud-table-model-factory.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L34)
 
 ___
 
@@ -92,7 +88,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L28)
+[src/lib/table/crud/crud-table-model-factory.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L29)
 
 ___
 
@@ -102,37 +98,9 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:30](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L30)
+[src/lib/table/crud/crud-table-model-factory.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L31)
 
 ## Methods
-
-### calcAutoColumnWidths
-
-▸ **calcAutoColumnWidths**\<`T`\>(`rows`, `props`, `labels?`): `number`[]
-
-#### Type parameters
-
-| Name |
-| :------ |
-| `T` |
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `rows` | `T`[] | `undefined` |
-| `props` | `string`[] | `undefined` |
-| `labels` | `string`[] | `props` |
-
-#### Returns
-
-`number`[]
-
-#### Defined in
-
-[lib/table/crud/crud-table-model-factory.ts:194](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L194)
-
-___
 
 ### createTableModel
 
@@ -149,7 +117,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `crudOptions` | [`CrudOptions`](CrudOptions.md) |
-| `p` | `Partial`\<[`CreateTableModelPara`](../modules.md#createtablemodelpara)\> |
+| `p` | `Partial`\<[`CreateTableModelPara`](../interfaces/CreateTableModelPara.md)\> |
 | `callback` | (`tableModelAndOptions`: [`TableModelAndOptionsIf`](../interfaces/TableModelAndOptionsIf.md)) => `void` |
 | `listenActionEvent` | (`actionEvent`: [`ActionEventIf`](../interfaces/ActionEventIf.md)) => `void` |
 
@@ -159,77 +127,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:37](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L37)
-
-___
-
-### extractProperties
-
-▸ **extractProperties**(`obj`, `parentKey?`, `result?`): `string`[]
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `obj` | `any` | `undefined` |
-| `parentKey` | `string` | `''` |
-| `result` | `string`[] | `[]` |
-
-#### Returns
-
-`string`[]
-
-#### Defined in
-
-[lib/table/crud/crud-table-model-factory.ts:252](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L252)
-
-___
-
-### getPropertyValue
-
-▸ **getPropertyValue**(`o`, `props`): `any`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `o` | `any` |
-| `props` | `string`[] |
-
-#### Returns
-
-`any`
-
-#### Defined in
-
-[lib/table/crud/crud-table-model-factory.ts:243](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L243)
-
-___
-
-### getValueByT
-
-▸ **getValueByT**\<`T`\>(`t`, `property`): `any`
-
-#### Type parameters
-
-| Name |
-| :------ |
-| `T` |
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `t` | `T` |
-| `property` | `string` |
-
-#### Returns
-
-`any`
-
-#### Defined in
-
-[lib/table/crud/crud-table-model-factory.ts:236](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L236)
+[src/lib/table/crud/crud-table-model-factory.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L38)
 
 ___
 
@@ -253,7 +151,7 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:121](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L121)
+[src/lib/table/crud/crud-table-model-factory.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L122)
 
 ___
 
@@ -267,4 +165,4 @@ ___
 
 #### Defined in
 
-[lib/table/crud/crud-table-model-factory.ts:114](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L114)
+[src/lib/table/crud/crud-table-model-factory.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L115)

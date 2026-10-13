@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ArgsRenderCellDiv
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ArgsRenderCellDiv
 
 # Interface: ArgsRenderCellDiv
 
@@ -32,7 +32,7 @@ The identifier of the area.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:23](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L23)
+[src/lib/table/data/common/args-render-cell-div.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L25)
 
 ___
 
@@ -44,7 +44,7 @@ The area model for the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:22](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L22)
+[src/lib/table/data/common/args-render-cell-div.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L24)
 
 ___
 
@@ -56,7 +56,7 @@ The height of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:29](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L29)
+[src/lib/table/data/common/args-render-cell-div.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L31)
 
 ___
 
@@ -68,7 +68,7 @@ The index of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:26](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L26)
+[src/lib/table/data/common/args-render-cell-div.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L28)
 
 ___
 
@@ -80,7 +80,7 @@ Indicates if the cell is in the last row of the model.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:32](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L32)
+[src/lib/table/data/common/args-render-cell-div.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L34)
 
 ___
 
@@ -92,7 +92,7 @@ The left position of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:27](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L27)
+[src/lib/table/data/common/args-render-cell-div.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L29)
 
 ___
 
@@ -104,7 +104,7 @@ The parent element of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:31](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L31)
+[src/lib/table/data/common/args-render-cell-div.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L33)
 
 ___
 
@@ -116,7 +116,7 @@ The index of the row.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:25](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L25)
+[src/lib/table/data/common/args-render-cell-div.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L27)
 
 ___
 
@@ -128,7 +128,7 @@ The identifier of the side.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:24](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L24)
+[src/lib/table/data/common/args-render-cell-div.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L26)
 
 ___
 
@@ -140,7 +140,7 @@ The top position of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:30](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L30)
+[src/lib/table/data/common/args-render-cell-div.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L32)
 
 ___
 
@@ -152,4 +152,4 @@ The width of the cell.
 
 #### Defined in
 
-[lib/table/data/common/args-render-cell-div.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L28)
+[src/lib/table/data/common/args-render-cell-div.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/args-render-cell-div.ts#L30)

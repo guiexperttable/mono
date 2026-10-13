@@ -1,5 +1,6 @@
 import { UrlInfoIf } from './url-info.if';
 
+/** @category CRUD */
 export interface UrlsIf {
   list: UrlInfoIf;
 

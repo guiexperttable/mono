@@ -1,0 +1,60 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="theming-dark-mode">
+
+  <h2 id="variables">Everything is a CSS variable</h2>
+  <p>
+    <code>main.css</code> (<ChapterLink slug="installation" />) defines more than 100 variables with the prefix
+    <code>--ge-table-</code>: backgrounds and text per area and side (<ChapterLink slug="table-model-areas" />), borders, zebra
+    rows, hover, focus, selection, progress bars, tree arrows. A light and a dark set are built in.
+  </p>
+  <Code lang="css" title="@guiexpert/table/css/table-color-vars.css (excerpt)" code={`html, html[data-theme="light"] {
+  --ge-table-bg: #fff;
+  --ge-table-header-center-bg: rgba(233, 233, 233, 0.5);
+  --ge-table-header-center-text: #000;
+  --ge-table-body-center-text: var(--ge-table-header-center-text);
+  …
+}
+html[data-theme="dark"] {
+  …
+}`} />
+
+  <h2 id="own-theme">Your own look</h2>
+  <p>Override the variables in a stylesheet that is loaded <strong>after</strong> <code>main.css</code>:</p>
+  <Snippet file="demos/theming.css" region="light" title="src/theme.css" />
+  <Snippet file="demos/theming.css" region="dark" />
+  <p>
+    Here the selectors end with <code>.brand-table</code>, so only this one table is themed – CSS variables are inherited, a class on
+    any parent is enough. Drop the class to theme every table of the app.
+  </p>
+
+  <h2 id="dark-mode">Light and dark</h2>
+  <p>The table follows the attribute <code>data-theme</code> on <code>&lt;html&gt;</code>:</p>
+  <Snippet file="demos/theming.ts" region="switch" />
+  <LiveDemo name="theming" title="Brand theme" height={400}
+            caption="“light / dark” switches this whole website – the table switches with it. Untick “brand theme” to compare with the default look." />
+
+  <Callout type="pitfall" title="The body follows the header">
+    <p>By default <code>--ge-table-body-center-text</code> is <code>var(--ge-table-header-center-text)</code>. Set a coloured header
+      text and the body turns the same colour – override the body text variables, too (as above).</p>
+  </Callout>
+  <Callout type="tip" title="Find a variable">
+    <p>Open the browser dev tools, select a cell and look at the computed styles – or search
+      <a href="https://github.com/guiexperttable/mono/blob/main/packages/table/css/table-color-vars.css">table-color-vars.css</a>.
+      From code: <ApiLink name="CssVars" />.</p>
+  </Callout>
+
+  <h2 id="showcase">More</h2>
+  <p>The showcase <a href="/showcase/laf/run/">Look and feel</a> switches between several complete themes. The
+    <a href="/doc/#css-classes">documentation</a> lists all CSS classes and variables.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Merged cells: <ChapterLink slug="rowspan-colspan" />.</p>
+</TrainingLayout>

@@ -39,6 +39,7 @@ This is the UI-agnostic table component for your next web app. 😊
 
 ## Links
 
+- [Training: GuiExpert Table step by step](https://gui.expert/training/)
 - [Demos](https://gui.expert/demos)
 - [Documentation](https://gui.expert/doc)
 - [API](https://gui.expert/api)

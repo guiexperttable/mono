@@ -6,5 +6,7 @@
  *  'weight': after the width is set for columns with unit 'px' and '%', the remaining width is divided among the weighted columns according to their respective weighting.
  *
  * @typedef {"px" | "%" | "weight"} SizeUnitType
+ *
+ * @category Columns
  */
 export type SizeUnitType = "px" | "%"  | "weight";

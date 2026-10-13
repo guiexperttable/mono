@@ -1,0 +1,134 @@
+/* Documentation page (/doc/). Builds on training.css: hero, facts, cards, prose, callouts, diagrams, "on this page". */
+
+.doc-hero { padding-bottom: 0; }
+
+.doc-paths { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.doc-paths .card-no { color: var(--color-primary); font-weight: 700; letter-spacing: 0.04em; }
+
+/* ── main column + "on this page" ─────────────────────────────────────── */
+.doc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 860px) 210px;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 5rem;
+}
+.doc-layout .training-toc { top: 88px; }
+
+/* contents block for screens without the sticky "on this page" column */
+.doc-contents {
+  display: none;
+  margin-top: 2.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-background-offset);
+}
+.doc-contents > p { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.doc-contents ol {
+  columns: 2;
+  column-gap: 2rem;
+  padding-left: 1.4rem;
+  list-style: decimal;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+.doc-contents li::marker { color: var(--color-text-offset); }
+.doc-contents a:hover { color: var(--color-secondary); }
+
+/* ── principles (overview) ─────────────────────────────────────────────── */
+.training-prose ul.doc-principles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+.training-prose ul.doc-principles li {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+.doc-principles b { display: block; margin-bottom: 0.25rem; }
+.doc-principles p { font-size: 0.92rem; line-height: 1.55; color: var(--color-text-offset); }
+
+/* ── checklist (performance) ───────────────────────────────────────────── */
+.training-prose ul.doc-checklist { list-style: none; padding-left: 0; display: grid; gap: 0.6rem; }
+.training-prose ul.doc-checklist li { position: relative; margin: 0; padding-left: 1.75rem; }
+.doc-checklist li::before {
+  content: "✓";
+  position: absolute;
+  left: 0.2rem;
+  top: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ── tables ────────────────────────────────────────────────────────────── */
+.training-prose table.doc-table td:first-child { white-space: nowrap; }
+.training-prose table.doc-table td.wrap { white-space: normal; }
+.doc-table .muted, .doc-muted { color: var(--color-text-offset); }
+.doc-table code { white-space: nowrap; }
+.training-prose table.doc-var-table { display: table; table-layout: fixed; width: 100%; }
+.doc-var-table th:first-child { width: 46%; }
+.doc-var-table td { font-size: 0.82rem; }
+.training-prose table.doc-table.doc-var-table td:first-child { white-space: normal; }
+.doc-var-table td code { white-space: normal; overflow-wrap: anywhere; }
+
+.swatch {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-right: 0.4em;
+  vertical-align: -0.12em;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%),
+                    linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 3px 3px;
+}
+.swatch > span { display: block; width: 100%; height: 100%; border-radius: 2px; }
+
+.training-prose details.doc-details {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+.doc-details summary { cursor: pointer; font-weight: 600; }
+.doc-details[open] summary { margin-bottom: 0.75rem; }
+.doc-details h4 {
+  margin: 1.25rem 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-offset);
+}
+
+/* ── help cards ────────────────────────────────────────────────────────── */
+.training-prose .doc-help { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.training-prose .doc-help > a.chapter-card.doc-card { text-decoration: none; color: inherit; }
+.training-prose .doc-help > a.chapter-card.doc-card b { color: var(--color-secondary); }
+
+/* ── responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .doc-layout { grid-template-columns: minmax(0, 860px); }
+  .doc-contents { display: block; }
+}
+@media (max-width: 1024px) {
+  .doc-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .doc-paths, .training-prose .doc-help, .training-prose ul.doc-principles { grid-template-columns: minmax(0, 1fr); }
+  .doc-contents ol { columns: 1; }
+  .doc-layout { padding: 0.5rem 1rem 3rem; }
+}
+.training-prose table.doc-table td.nowrap { white-space: nowrap; }
+@media (max-width: 640px) {
+  .training-prose table.doc-table td:first-child { white-space: normal; }
+}

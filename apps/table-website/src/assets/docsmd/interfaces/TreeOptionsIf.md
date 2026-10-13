@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeOptionsIf
 
 # Interface: TreeOptionsIf
 
@@ -67,7 +67,7 @@ const treeOptions: TreeOptionsIf = {
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:48](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/tree-options.if.ts#L48)
+[src/lib/table/data/options/tree-options.if.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L50)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/tree-options.if.ts#L46)
+[src/lib/table/data/options/tree-options.if.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L48)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:47](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/tree-options.if.ts#L47)
+[src/lib/table/data/options/tree-options.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L49)
 
 ___
 
@@ -97,4 +97,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:49](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/tree-options.if.ts#L49)
+[src/lib/table/data/options/tree-options.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L51)

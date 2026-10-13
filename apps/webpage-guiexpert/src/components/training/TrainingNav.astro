@@ -1,0 +1,43 @@
+---
+/** Sidebar of the training: all parts and chapters, the current one highlighted. */
+import { PARTS, chapterUrl, chaptersOf, pad } from "../../training/chapters";
+
+interface Props {
+  current?: string;
+}
+
+const { current } = Astro.props;
+---
+<nav class="training-nav" aria-label="Training chapters">
+  <details class="training-nav-mobile">
+    <summary>All chapters</summary>
+  </details>
+  <div class="training-nav-inner">
+    <a class="training-nav-home" href="/training/">GuiExpert Table <b>Training</b></a>
+    {PARTS.map(part => (
+      <div class="training-nav-part">
+        <p>{part.no} · {part.title}</p>
+        <ol>
+          {chaptersOf(part.id).map(ch => (
+            <li>
+              <a href={chapterUrl(ch.slug)} aria-current={ch.slug === current ? "page" : undefined}>
+                <span class="nav-no">{pad(ch.no)}</span> {ch.nav}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))}
+  </div>
+</nav>
+
+<script>
+  // mobile: the <details> toggles the chapter list
+  const nav = document.querySelector(".training-nav");
+  nav?.querySelector("details")?.addEventListener("toggle", e =>
+    nav.classList.toggle("open", (e.target as HTMLDetailsElement).open));
+  // keep the current chapter visible in the (scrollable) sidebar – without scrolling the page
+  const inner = nav?.querySelector<HTMLElement>(".training-nav-inner");
+  const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+  if (inner && active) inner.scrollTop = active.offsetTop - inner.clientHeight / 2;
+</script>

@@ -1,6 +1,24 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TableCellUpdateEvent
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TableCellUpdateEvent
 
 # Class: TableCellUpdateEvent
+
+A new value for one cell – the input of [TableApi.updateCells](TableApi.md#updatecells).
+The value is written into the area model; if the cell is visible, only this cell is redrawn.
+`cssClasses` are applied to the current drawing of the cell (e.g. a short "flash"); permanent colours
+belong into the model ([AreaModelIf.getCustomClassesAt](../interfaces/AreaModelIf.md#getcustomclassesat)).
+
+**`Example`**
+
+```ts
+tableApi.updateCells([
+  new TableCellUpdateEvent("body", row, 2, price, { "tick-up": up, "tick-down": !up }),
+  new TableCellUpdateEvent("body", row, 4, volume)
+]);
+```
+
+**`See`**
+
+Training: [Live data without rebuilding the table](https://gui.expert/training/live-data/)
 
 ## Implements
 
@@ -16,6 +34,7 @@
 
 - [area](TableCellUpdateEvent.md#area)
 - [columnIndex](TableCellUpdateEvent.md#columnindex)
+- [cssClasses](TableCellUpdateEvent.md#cssclasses)
 - [rowIndex](TableCellUpdateEvent.md#rowindex)
 - [value](TableCellUpdateEvent.md#value)
 
@@ -23,7 +42,7 @@
 
 ### constructor
 
-• **new TableCellUpdateEvent**(`area`, `rowIndex`, `columnIndex`, `value`): [`TableCellUpdateEvent`](TableCellUpdateEvent.md)
+• **new TableCellUpdateEvent**(`area`, `rowIndex`, `columnIndex`, `value`, `cssClasses?`): [`TableCellUpdateEvent`](TableCellUpdateEvent.md)
 
 #### Parameters
 
@@ -33,6 +52,7 @@
 | `rowIndex` | `number` |
 | `columnIndex` | `number` |
 | `value` | `any` |
+| `cssClasses` | `Object` |
 
 #### Returns
 
@@ -40,7 +60,7 @@
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L6)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L22)
 
 ## Properties
 
@@ -48,13 +68,15 @@
 
 • **area**: [`AreaIdent`](../modules.md#areaident)
 
+Represents an area identifier ("header" | "body" | "footer"), which defines the part of the table.
+
 #### Implementation of
 
 [TableCellUpdateEventIf](../interfaces/TableCellUpdateEventIf.md).[area](../interfaces/TableCellUpdateEventIf.md#area)
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L7)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L23)
 
 ___
 
@@ -62,13 +84,43 @@ ___
 
 • **columnIndex**: `number`
 
+Represents the index of a column in a data table.
+
 #### Implementation of
 
 [TableCellUpdateEventIf](../interfaces/TableCellUpdateEventIf.md).[columnIndex](../interfaces/TableCellUpdateEventIf.md#columnindex)
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L9)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L25)
+
+___
+
+### cssClasses
+
+• **cssClasses**: `Object` = `{}`
+
+Represents a collection of CSS classes with their corresponding boolean values.
+For each key-value pair of the object with a truthy value the corresponding key is used as a class name.
+For each key-value pair of the object with a falsy value the corresponding key will be removed from the class list of the cell div (dom node).
+Example:
+   {
+      low: val >= 0 && val <=5,
+      medium: val > 5 && val <= 10,
+      high: val > 10
+   }
+
+#### Index signature
+
+▪ [key: `string`]: `boolean`
+
+#### Implementation of
+
+[TableCellUpdateEventIf](../interfaces/TableCellUpdateEventIf.md).[cssClasses](../interfaces/TableCellUpdateEventIf.md#cssclasses)
+
+#### Defined in
+
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L27)
 
 ___
 
@@ -76,13 +128,15 @@ ___
 
 • **rowIndex**: `number`
 
+Represents the index of a row of the table.
+
 #### Implementation of
 
 [TableCellUpdateEventIf](../interfaces/TableCellUpdateEventIf.md).[rowIndex](../interfaces/TableCellUpdateEventIf.md#rowindex)
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L8)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L24)
 
 ___
 
@@ -90,10 +144,16 @@ ___
 
 • **value**: `any`
 
+The value can be any data type.
+It can store a string, number, boolean, object, function, or null.
+It is a flexible variable that can hold any value.
+
+This valie will be set to the area model for the cell (rowIndex, columnIndex).
+
 #### Implementation of
 
 [TableCellUpdateEventIf](../interfaces/TableCellUpdateEventIf.md).[value](../interfaces/TableCellUpdateEventIf.md#value)
 
 #### Defined in
 
-[lib/table/data/common/event/input/table-cell-update-event.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L10)
+[src/lib/table/data/common/event/input/table-cell-update-event.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/input/table-cell-update-event.ts#L26)

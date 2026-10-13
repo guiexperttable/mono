@@ -1,0 +1,280 @@
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CreateTableModelPara
+
+# Interface: CreateTableModelPara
+
+Parameters of [TableFactory.createTableModel](../classes/TableFactory.md#createtablemodel) – pass any subset (`Partial<CreateTableModelPara>`).
+
+Three typical combinations:
+
+| You have … | Pass | Training |
+|---|---|---|
+| an array of objects | `rows` (+ `properties` or `columnDefs`) | [chapter 12](https://gui.expert/training/array-to-table-model/), [13](https://gui.expert/training/column-definitions/) |
+| rows of values (CSV, matrix) | `headerData`, `bodyData`, `footerData`, `columnSizes` | [chapter 14](https://gui.expert/training/array-of-arrays/) |
+| own area models | `headerAreaModel`, `bodyAreaModel`, `footerAreaModel` + `columnDefs` | [chapter 15–17](https://gui.expert/training/custom-area-model/) |
+
+Everything not given is derived: column definitions from `properties` or the keys of the first row
+(header label = key in upper case, width 200 px), area models from the data, row heights from
+`tableOptions.defaultRowHeights`.
+
+**`Example`**
+
+```ts
+const tableModel = TableFactory.createTableModel({
+  rows: orders,                                   // Order[]
+  columnDefs: [new ColumnDef("id", "ID", px80, allRight), new ColumnDef("customer", "Customer", px180)],
+  fixedLeftColumnCount: 1,
+  tableOptions
+});
+```
+
+## Table of contents
+
+### Properties
+
+- [bodyAreaModel](CreateTableModelPara.md#bodyareamodel)
+- [bodyData](CreateTableModelPara.md#bodydata)
+- [columnCount](CreateTableModelPara.md#columncount)
+- [columnDefs](CreateTableModelPara.md#columndefs)
+- [columnSizes](CreateTableModelPara.md#columnsizes)
+- [defaultRowHeights](CreateTableModelPara.md#defaultrowheights)
+- [fixedLeftColumnCount](CreateTableModelPara.md#fixedleftcolumncount)
+- [fixedRightColumnCount](CreateTableModelPara.md#fixedrightcolumncount)
+- [footerAreaModel](CreateTableModelPara.md#footerareamodel)
+- [footerData](CreateTableModelPara.md#footerdata)
+- [getSelectionModel](CreateTableModelPara.md#getselectionmodel)
+- [headerAreaModel](CreateTableModelPara.md#headerareamodel)
+- [headerData](CreateTableModelPara.md#headerdata)
+- [overridingColumnWidth](CreateTableModelPara.md#overridingcolumnwidth)
+- [parentSize](CreateTableModelPara.md#parentsize)
+- [properties](CreateTableModelPara.md#properties)
+- [rowCheckboxVisible](CreateTableModelPara.md#rowcheckboxvisible)
+- [rows](CreateTableModelPara.md#rows)
+- [tableOptions](CreateTableModelPara.md#tableoptions)
+
+## Properties
+
+### bodyAreaModel
+
+• **bodyAreaModel**: [`AreaModelIf`](AreaModelIf.md)
+
+Model of the body. Default: built from `rows` (objects or tree rows) or `bodyData`. See [AreaModel](../classes/AreaModel.md) for own models.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L53)
+
+___
+
+### bodyData
+
+• **bodyData**: `any`[][]
+
+The body as rows of values (`any[][]`).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L81)
+
+___
+
+### columnCount
+
+• **columnCount**: `number`
+
+Number of columns. Default: derived from `columnDefs`, `headerData` or `columnSizes`.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L71)
+
+___
+
+### columnDefs
+
+• **columnDefs**: [`ColumnDefIf`](ColumnDefIf.md)[]
+
+The columns: property, header label, width, classes, renderers, sorting, editing. See [ColumnDef](../classes/ColumnDef.md).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L65)
+
+___
+
+### columnSizes
+
+• **columnSizes**: `number`[]
+
+Column widths in px – the simple alternative to `columnDefs` (e.g. with `bodyData`).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L67)
+
+___
+
+### defaultRowHeights
+
+• **defaultRowHeights**: [`DefaultRowHeightsIf`](DefaultRowHeightsIf.md)
+
+Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L63)
+
+___
+
+### fixedLeftColumnCount
+
+• **fixedLeftColumnCount**: `number`
+
+Number of columns fixed on the left (side "west"). Default 0.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L57)
+
+___
+
+### fixedRightColumnCount
+
+• **fixedRightColumnCount**: `number`
+
+Number of columns fixed on the right (side "east"). Default 0.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L59)
+
+___
+
+### footerAreaModel
+
+• **footerAreaModel**: [`AreaModelIf`](AreaModelIf.md)
+
+Model of the footer. Default: `footerData`, otherwise no footer. Totals that follow the filter: an own [AreaModel](../classes/AreaModel.md).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L55)
+
+___
+
+### footerData
+
+• **footerData**: `string`[][]
+
+Footer rows as values (static – they don't follow filter or edits).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L85)
+
+___
+
+### getSelectionModel
+
+• **getSelectionModel**: [`GetT`](../modules.md#gett)\<[`SelectionModelIf`](SelectionModelIf.md)\>
+
+Selection model factory. Default: `tableOptions.getSelectionModel`.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L75)
+
+___
+
+### headerAreaModel
+
+• **headerAreaModel**: [`AreaModelIf`](AreaModelIf.md)
+
+Model of the header. Default: one header row from the `headerLabel`s of `columnDefs`, or `headerData`.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L51)
+
+___
+
+### headerData
+
+• **headerData**: `string`[][]
+
+Header rows as values – several rows are possible.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L83)
+
+___
+
+### overridingColumnWidth
+
+• **overridingColumnWidth**: `number`
+
+A width in px for all columns; -1 (default) = use the column definitions.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L69)
+
+___
+
+### parentSize
+
+• **parentSize**: `number`
+
+Width of the parent element in px, used for percentage column widths before the first render (default 400).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L73)
+
+___
+
+### properties
+
+• **properties**: `string`[]
+
+Which properties of `rows` become columns, in this order (ignored if `columnDefs` is given).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L79)
+
+___
+
+### rowCheckboxVisible
+
+• **rowCheckboxVisible**: `boolean`
+
+Show a checkbox column for every row. Default false.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L61)
+
+___
+
+### rows
+
+• **rows**: `any`[]
+
+The rows as objects (`T[]`) or tree rows from [TreeFactory.buildTreeRows](../classes/TreeFactory.md#buildtreerows).
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L77)
+
+___
+
+### tableOptions
+
+• **tableOptions**: [`TableOptionsIf`](TableOptionsIf.md)
+
+Options of the table; the factory reads `defaultRowHeights`, `getSelectionModel` and `showCheckboxWihoutExtraColumn`.
+
+#### Defined in
+
+[src/lib/table/factory/table-factory.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L87)

@@ -1,0 +1,47 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="header-groups">
+
+  <h2 id="groups">Describe the groups</h2>
+  <p>
+    The header is an area model like the body (<ChapterLink slug="table-model-areas" />). <ApiLink name="AreaModelCellGroups" />
+    builds a multi-row header from a tree of <ApiLink name="CellGroupIf" />: a group has a label (<code>data</code>) and
+    <code>children</code>; a leaf has a <code>property</code> and becomes a column.
+  </p>
+  <Snippet file="demos/header-groups.ts" region="groups" title="header-groups.ts" />
+  <ul>
+    <li><code>toggle: true</code> – the group gets a ❯ button and can be collapsed.</li>
+    <li><code>visibility: "always"</code> – this column stays visible when the group is collapsed; the others disappear.</li>
+  </ul>
+
+  <h2 id="model">Build columns, header and body</h2>
+  <p>
+    <ApiLink name="CellgroupFactory.buildGroupExts" /> and <ApiLink name="CellgroupFactory.buildColumnDefs" /> derive the
+    column definitions from the groups. Header and body share them, so the body model must know them too –
+    <ApiLink name="AreaModelObjectArrayWithColumndefs" /> maps a column index to the property:
+  </p>
+  <Snippet file="demos/header-groups.ts" region="model" />
+  <LiveDemo name="header-groups" title="Grouped header" height={380}
+            caption="Click ❯ next to “Customer”: Country and City disappear, Customer stays. Column widths are kept." />
+
+  <Callout type="version">
+    <p>Since <code>@guiexpert/table@1.1.88</code> collapsing and expanding a group keeps widths, classes, renderers and sorting
+      of all columns. Before, every column fell back to 100 px.</p>
+  </Callout>
+
+  <h2 id="simple">Without groups: several header rows</h2>
+  <p>
+    If you only need two header rows without collapsing, <code>headerData</code> with two rows is enough
+    (<ChapterLink slug="array-of-arrays" />). Spanning header cells come from <ApiLink name="AreaModelIf.getColspanAt" /> –
+    exactly like in the body (<ChapterLink slug="rowspan-colspan" />).
+  </p>
+
+  <h2 id="next">Next</h2>
+  <p>The other end of the table: a footer with totals that follow the filter – <ChapterLink slug="footer-totals" />.</p>
+</TrainingLayout>

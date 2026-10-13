@@ -15,6 +15,7 @@ import { HeaderGroupOptionsIf } from '../../options/header-group-options.if';
 import { HeaderGroupOptions } from '../../options/header-group-options';
 
 // TODO next steps:   fix this model
+/** @category Header groups */
 export class AreaModelCellGroups implements AreaModelIf {
 
   public gammaCells = true;

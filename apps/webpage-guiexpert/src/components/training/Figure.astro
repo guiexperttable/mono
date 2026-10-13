@@ -1,0 +1,28 @@
+---
+/**
+ * A screenshot or picture with caption. Light/dark variants are switched with the site theme:
+ *   <Figure src="vue" caption="…" />   → src/assets/training/shots/vue-light.png (+ vue-dark.png if present)
+ */
+import { Image } from "astro:assets";
+
+interface Props {
+  src: string;
+  caption?: string;
+  alt?: string;
+  width?: number;
+}
+
+const shots = import.meta.glob<{ default: ImageMetadata }>("/src/assets/training/shots/*.png", { eager: true });
+const { src, caption, alt, width = 1100 } = Astro.props;
+const light = shots[`/src/assets/training/shots/${src}-light.png`]?.default ?? shots[`/src/assets/training/shots/${src}.png`]?.default;
+const dark = shots[`/src/assets/training/shots/${src}-dark.png`]?.default;
+// production build: a missing screenshot is an error; dev: a placeholder (run scripts/training-screenshots.mjs)
+if (!light && !import.meta.env.DEV) throw new Error(`Figure: screenshot src/assets/training/shots/${src}-light.png not found`);
+const text = alt ?? caption ?? src;
+---
+<figure class="training-figure">
+  {light ? <Image class:list={["shot", { "shot-light": !!dark }]} src={light} alt={text} width={Math.min(width, light.width)} />
+         : <div class="shot shot-missing">screenshot “{src}” missing</div>}
+  {dark && <Image class="shot shot-dark" src={dark} alt={text} width={Math.min(width, dark.width)} />}
+  {caption && <figcaption set:html={caption} />}
+</figure>

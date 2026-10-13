@@ -1,0 +1,88 @@
+---
+import IndexLayout from "../../layouts/IndexLayout.astro";
+import Header from "../../components/header.astro";
+import Figure from "../../components/training/Figure.astro";
+import BuildingBlocks from "../../components/training/diagrams/BuildingBlocks.astro";
+import { Code } from "astro-expressive-code/components";
+import { CHAPTERS, DEMO_REPO, PARTS, chapterUrl, chaptersOf, pad } from "../../training/chapters";
+import "../../styles/training.css";
+
+const minutes = CHAPTERS.reduce((sum, c) => sum + c.minutes, 0);
+const demos = Object.keys(import.meta.glob("/src/training/demos/*.ts")).length;
+---
+<IndexLayout title="Training · GuiExpert Table step by step">
+  <Header splashMode={false} smallGap={true} />
+
+  <div class="training-shell" style="display:block">
+    <section class="training-hero">
+      <p class="chapter-no">Free training · {CHAPTERS.length} chapters</p>
+      <h1><span class="gradient-text">GuiExpert Table</span><br />step by step</h1>
+      <p class="lead">
+        From “why does my table freeze?” to a table with two million rows, totals, sorting, filtering, Excel export, editing and
+        live data – in short chapters with code that runs right on the page.
+      </p>
+      <div class="training-cta">
+        <a class="btn-gradient" href={chapterUrl(CHAPTERS[0].slug)}>Start with chapter 1 →</a>
+        <a class="btn-outline" href={chapterUrl("first-table")}>Skip to the first table</a>
+        <a class="btn-outline" href="/api/">API reference</a>
+      </div>
+    </section>
+
+    <div class="training-facts">
+      <div><b>{CHAPTERS.length}</b><span>chapters</span></div>
+      <div><b>{demos}</b><span>live demos</span></div>
+      <div><b>≈ {Math.round(minutes / 60 * 10) / 10} h</b><span>reading time</span></div>
+      <div><b>8</b><span>frameworks</span></div>
+    </div>
+
+    <section class="training-section">
+      <h2>How it works</h2>
+      <p class="sub">Every chapter matches one 60-second episode of the video series and one git tag of the demo repository.</p>
+      <ol class="training-steps">
+        <li><b>Read</b><p>A problem, the idea behind the solution, and the code – every snippet is taken from the demo that runs on the page.</p></li>
+        <li><b>Run</b><p>Press “Run live demo”: 100,000 orders, two million rows, a live ticker. Change things, measure, compare.</p></li>
+        <li><b>Check out</b><p>The step-by-step repository has a tag per chapter: <code>git checkout ep-005</code> gives you exactly that state.</p></li>
+      </ol>
+      <Code lang="bash" frame="terminal" code={`git clone ${DEMO_REPO}.git
+cd guiexpert-table-step-by-step-demo
+git checkout ep-005      # the state of chapter 5
+npm i && npm run dev     # → http://localhost:5173`} />
+    </section>
+
+    <section class="training-section">
+      <h2>The four building blocks</h2>
+      <p class="sub">Everything in this training builds on them – in plain TypeScript and in every framework wrapper.</p>
+      <BuildingBlocks />
+    </section>
+
+    <section class="training-section" aria-label="All chapters">
+      <h2>All chapters</h2>
+      <p class="sub">Read them in order or jump to what you need – every chapter links to the chapters it builds on and to the API reference.</p>
+      {PARTS.map(part => (
+        <div class="part-block" id={`part-${part.id}`}>
+          <div class="part-head">
+            <span class="part-no">PART {part.no}</span>
+            <h3>{part.title}</h3>
+            <p>{part.lead}</p>
+          </div>
+          <div class="chapter-cards">
+            {chaptersOf(part.id).map(ch => (
+              <a class="chapter-card" href={chapterUrl(ch.slug)}>
+                <span class="card-no">Chapter {pad(ch.no)}</span>
+                <b>{ch.title}</b>
+                <p>{ch.lead}</p>
+                <span class="card-meta">⏱ {ch.minutes} min{ch.api.length ? ` · ${ch.api.length} API links` : ""}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <section class="training-section" style="padding-bottom: 5rem">
+      <h2>What you build</h2>
+      <p class="sub">The finale of chapter 34: one table with almost everything of this training.</p>
+      <Figure src="demo-finale" caption="100,000 orders with renderers, totals, fixed column, range selection, live search, context menu and brand theme." />
+    </section>
+  </div>
+</IndexLayout>

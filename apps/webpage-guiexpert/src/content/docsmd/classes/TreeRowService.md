@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeRowService
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeRowService
 
 # Class: TreeRowService
 
@@ -27,7 +27,7 @@
 
 ### flattenTree
 
-▸ **flattenTree**\<`T`\>(`rows`, `ret?`): [`TreeRow`](TreeRow.md)\<`T`\>[]
+▸ **flattenTree**\<`T`\>(`rows`, `ret?`): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>[]
 
 #### Type parameters
 
@@ -39,16 +39,16 @@
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `rows` | [`TreeRow`](TreeRow.md)\<`T`\>[] | `undefined` |
-| `ret` | [`TreeRow`](TreeRow.md)\<`T`\>[] | `[]` |
+| `rows` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>[] | `undefined` |
+| `ret` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>[] | `[]` |
 
 #### Returns
 
-[`TreeRow`](TreeRow.md)\<`T`\>[]
+[`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>[]
 
 #### Defined in
 
-[lib/table/service/tree-row.service.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/tree-row.service.ts#L5)
+[src/lib/table/service/tree-row.service.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L7)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `row` | [`TreeRow`](TreeRow.md)\<`any`\> |
+| `row` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`any`\> |
 
 #### Returns
 
@@ -68,4 +68,4 @@ ___
 
 #### Defined in
 
-[lib/table/service/tree-row.service.ts:21](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/service/tree-row.service.ts#L21)
+[src/lib/table/service/tree-row.service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L23)

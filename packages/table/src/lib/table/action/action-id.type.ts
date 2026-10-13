@@ -2,6 +2,8 @@
  * An array of action identifiers.
  *
  * @type {ReadonlyArray<string>}
+ *
+ * @category Keyboard
  */
 export const actionIds = [
   "COPY_2_CLIPBOARD",
@@ -31,6 +33,8 @@ export const actionIds = [
  * @typedef {string} ActionId
  * @memberof module:myModule
  * @see module:myModule.actionIds
+ *
+ * @category Keyboard
  */
 export type ActionId = typeof actionIds[number];
 

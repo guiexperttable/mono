@@ -1,6 +1,17 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / CellRange
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / CellRange
 
 # Class: CellRange
+
+A rectangle of cells: rows `r1`…`r2`, columns `c1`…`c2` (inclusive, body indices as displayed).
+[SelectionModelIf.getRanges](../interfaces/SelectionModelIf.md#getranges) returns the selection as a list of them.
+
+**`Example`**
+
+```ts
+const firstTenRows = new CellRange(0, 0, 9, tableModel.getColumnCount() - 1);
+tableApi.getSelectionModel()?.addSelection(firstTenRows);
+tableApi.repaint();
+```
 
 ## Table of contents
 
@@ -30,17 +41,15 @@
 
 • **new CellRange**(`r1`, `c1`, `r2`, `c2`, `gammaRange?`): [`CellRange`](CellRange.md)
 
-Represents a constructor for a class.
-
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `r1` | `number` | `undefined` | The value for r1. |
-| `c1` | `number` | `undefined` | The value for c1. |
-| `r2` | `number` | `undefined` | The value for r2. |
-| `c2` | `number` | `undefined` | The value for c2. |
-| `gammaRange?` | `boolean` | `false` | The value for gammaRange. Defaults to false. gammaRange will be used for AreaModelCellGroups, but it's not implemented yet! |
+| `r1` | `number` | `undefined` | first row |
+| `c1` | `number` | `undefined` | first column |
+| `r2` | `number` | `undefined` | last row (inclusive) |
+| `c2` | `number` | `undefined` | last column (inclusive) |
+| `gammaRange` | `boolean` | `false` | reserved for [AreaModelCellGroups](AreaModelCellGroups.md), not used yet (default false) |
 
 #### Returns
 
@@ -48,7 +57,7 @@ Represents a constructor for a class.
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:13](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L13)
+[src/lib/table/data/common/cell-range.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L22)
 
 ## Properties
 
@@ -56,11 +65,11 @@ Represents a constructor for a class.
 
 • **c1**: `number`
 
-The value for c1.
+first column
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:15](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L15)
+[src/lib/table/data/common/cell-range.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L24)
 
 ___
 
@@ -68,11 +77,11 @@ ___
 
 • **c2**: `number`
 
-The value for c2.
+last column (inclusive)
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:17](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L17)
+[src/lib/table/data/common/cell-range.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L26)
 
 ___
 
@@ -80,11 +89,11 @@ ___
 
 • **gammaRange**: `boolean` = `false`
 
-The value for gammaRange. Defaults to false. gammaRange will be used for AreaModelCellGroups, but it's not implemented yet!
+reserved for [AreaModelCellGroups](AreaModelCellGroups.md), not used yet (default false)
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:18](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L18)
+[src/lib/table/data/common/cell-range.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L27)
 
 ___
 
@@ -92,11 +101,11 @@ ___
 
 • **r1**: `number`
 
-The value for r1.
+first row
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:14](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L14)
+[src/lib/table/data/common/cell-range.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L23)
 
 ___
 
@@ -104,11 +113,11 @@ ___
 
 • **r2**: `number`
 
-The value for r2.
+last row (inclusive)
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:16](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L16)
+[src/lib/table/data/common/cell-range.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L25)
 
 ## Methods
 
@@ -129,7 +138,7 @@ The value for r2.
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:59](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L59)
+[src/lib/table/data/common/cell-range.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L68)
 
 ___
 
@@ -154,7 +163,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:21](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L21)
+[src/lib/table/data/common/cell-range.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L30)
 
 ___
 
@@ -175,7 +184,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:40](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L40)
+[src/lib/table/data/common/cell-range.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L49)
 
 ___
 
@@ -195,7 +204,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:53](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L53)
+[src/lib/table/data/common/cell-range.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L62)
 
 ___
 
@@ -215,4 +224,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/cell-range.ts:47](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/cell-range.ts#L47)
+[src/lib/table/data/common/cell-range.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/cell-range.ts#L56)

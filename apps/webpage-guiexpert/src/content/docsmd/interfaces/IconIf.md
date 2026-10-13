@@ -1,6 +1,16 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / IconIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / IconIf
 
 # Interface: IconIf
+
+Represents an Icon with content, css style and css classes.
+
+Example:
+
+new Icon(
+   ">",
+   "transform: rotate(90deg) translate(66%, -66%); transform-origin: 0 0;",
+   ["gt-table-tree-arrow-expanded"]
+)
 
 ## Implemented by
 
@@ -22,7 +32,7 @@
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.if.ts#L5)
+[src/lib/table/data/options/icon.if.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L20)
 
 ___
 
@@ -32,7 +42,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:3](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.if.ts#L3)
+[src/lib/table/data/options/icon.if.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L18)
 
 ___
 
@@ -42,4 +52,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/icon.if.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/icon.if.ts#L4)
+[src/lib/table/data/options/icon.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/icon.if.ts#L19)

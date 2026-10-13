@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / HasDefaultRowHeightIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / HasDefaultRowHeightIf
 
 # Interface: HasDefaultRowHeightIf
 
@@ -20,4 +20,4 @@
 
 #### Defined in
 
-[lib/table/data/tablemodel/areamodel/has-default-row-height-if.ts:2](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/tablemodel/areamodel/has-default-row-height-if.ts#L2)
+[src/lib/table/data/tablemodel/areamodel/has-default-row-height-if.ts:3](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/has-default-row-height-if.ts#L3)

@@ -1,3 +1,4 @@
+/** @category Columns */
 export type AreaObjectMapType<T> = {
   header?: T | undefined,
   body?: T | undefined,

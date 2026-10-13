@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / BooleanPropertyType
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / BooleanPropertyType
 
 # Class: BooleanPropertyType
 
@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L46)
+[src/lib/common/generator/domain/property-type.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L62)
 
 ## Properties
 
@@ -49,7 +49,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:46](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L46)
+[src/lib/common/generator/domain/property-type.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L62)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/property-type.ts:45](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/property-type.ts#L45)
+[src/lib/common/generator/domain/property-type.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L61)

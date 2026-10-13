@@ -13,12 +13,15 @@ import {TreeRowIf} from "../../common/tree-row-if";
  * Extends the AbstractAreaModel class.
  *
  * @template S - The type of the row data.
+ *
+ * @category Tree & checkboxes
  */
 export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
 
   public type = 'AreaModelTree';
 
   protected readonly properties: string[];
+  /** @internal */
   protected sorterService: SorterService = new SorterService();
 
   private readonly service = new TreeRowService();

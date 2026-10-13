@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ValueInfo
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ValueInfo
 
 # Class: ValueInfo
 
@@ -37,7 +37,7 @@
 
 #### Defined in
 
-[lib/common/generator/domain/value-info.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/value-info.ts#L6)
+[src/lib/common/generator/domain/value-info.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/value-info.ts#L7)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/value-info.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/value-info.ts#L4)
+[src/lib/common/generator/domain/value-info.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/value-info.ts#L5)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/value-info.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/value-info.ts#L7)
+[src/lib/common/generator/domain/value-info.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/value-info.ts#L8)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/value-info.ts:5](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/value-info.ts#L5)
+[src/lib/common/generator/domain/value-info.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/value-info.ts#L6)
 
 ## Methods
 
@@ -81,4 +81,4 @@ ___
 
 #### Defined in
 
-[lib/common/generator/domain/value-info.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/common/generator/domain/value-info.ts#L9)
+[src/lib/common/generator/domain/value-info.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/value-info.ts#L10)

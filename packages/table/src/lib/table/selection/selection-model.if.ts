@@ -1,10 +1,29 @@
 import { CellRange } from "../data/common/cell-range";
 import { EventSelectionChangedListenerIf } from './event-selection-changed-listener.if';
 
+/**
+ * What is selected in a table – a list of rectangles ({@link CellRange}). The implementation is {@link SelectionModel};
+ * every table gets its own, or you pass one via {@link TableOptionsIf.getSelectionModel}.
+ * Changes are reported to {@link EventListenerIf.onSelectionChanged}.
+ *
+ * @example
+ * override onSelectionChanged(model: SelectionModelIf): void {
+ *   const ranges = model.getRanges().filter(r => !r.gammaRange);     // skip special ranges
+ *   const cells = ranges.reduce((n, r) => n + (r.r2 - r.r1 + 1) * (r.c2 - r.c1 + 1), 0);
+ *   console.log(`${cells} cells selected`);
+ * }
+ *
+ * @see Training: [Select cells, rows and ranges – and copy them](https://gui.expert/training/selection-and-copy/)
+ *
+ * @category Selection & focus
+ */
 export interface SelectionModelIf {
 
+  /** The registered listeners (the table registers itself). */
   getEventSelectionChangedListeners(): EventSelectionChangedListenerIf[];
+  /** Get notified on every change of the selection. */
   addEventSelectionChangedListener(listener: EventSelectionChangedListenerIf): void;
+  /** Stop notifications. */
   removeEventSelectionChangedListener(listener: EventSelectionChangedListenerIf): void;
 
 
@@ -34,23 +53,33 @@ export interface SelectionModelIf {
    */
   getRanges(): CellRange[];
 
+  /** The indices of all rows that contain at least one selected cell, sorted. */
   getMergedRowIndices() : number[];
 
+  /** Removes the whole selection. */
   clear(): void;
 
+  /** Is anything selected? */
   hasSelection(): boolean;
 
+  /** Is nothing selected? */
   hasNoSelection(): boolean;
 
+  /** Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9, columns 0–3). */
   addSelection(range: CellRange): void;
 
+  /** Removes a rectangle from the selection. */
   removeSelection(range: CellRange): void;
 
+  /** In how many selected ranges is this cell (0 = not selected)? */
   getSelectionCount(rowIndex: number, columnIndex: number): number;
 
+  /** Selects all cells (⌘/Ctrl+A). */
   selectAll(): void;
 
+  /** Was everything selected with {@link selectAll}? */
   isAllSelected(): boolean;
 
+  /** Called by the table on a click: starts a selection at this cell, depending on selection type and mode. */
   firstClick(rowIndex: number, columnIndex: number): void;
 }

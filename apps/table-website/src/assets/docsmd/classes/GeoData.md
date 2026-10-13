@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / GeoData
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / GeoData
 
 # Class: GeoData
 
@@ -40,7 +40,7 @@ Represents geometric data with left, width, height, top coordinates and an optio
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:6](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L6)
+[src/lib/table/data/geo-data.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L8)
 
 ## Properties
 
@@ -50,7 +50,7 @@ Represents geometric data with left, width, height, top coordinates and an optio
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:9](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L9)
+[src/lib/table/data/geo-data.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L11)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:11](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L11)
+[src/lib/table/data/geo-data.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L13)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:7](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L7)
+[src/lib/table/data/geo-data.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L9)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:10](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L10)
+[src/lib/table/data/geo-data.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L12)
 
 ___
 
@@ -90,4 +90,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/geo-data.ts:8](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/geo-data.ts#L8)
+[src/lib/table/data/geo-data.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/geo-data.ts#L10)

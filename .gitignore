@@ -4,6 +4,10 @@ dist
 build
 **/build
 out-tsc
+coverage
+# Vitest: coverage report, browser-mode screenshots/attachments of failed tests
+__screenshots__
+.vitest
 .angular/
 .astro/
 .nx/

@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ValueLabelIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ValueLabelIf
 
 # Interface: ValueLabelIf
 
@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[lib/table/data/common/value-label.if.ts:4](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/value-label.if.ts#L4)
+[src/lib/table/data/common/value-label.if.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/value-label.if.ts#L5)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/common/value-label.if.ts:3](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/common/value-label.if.ts#L3)
+[src/lib/table/data/common/value-label.if.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/value-label.if.ts#L4)

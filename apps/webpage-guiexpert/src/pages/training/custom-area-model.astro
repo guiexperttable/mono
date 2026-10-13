@@ -1,0 +1,48 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+---
+<TrainingLayout slug="custom-area-model">
+
+  <h2 id="lazy">The table only asks for visible cells</h2>
+  <p>
+    <ChapterLink slug="table-model-areas" /> showed it: the table asks <code>getRowCount()</code> and <code>getValueAt()</code>
+    for the cells on screen. So a model doesn't need an array – it can <strong>compute</strong> each value when asked.
+  </p>
+  <Snippet file="demos/custom-area-model.ts" region="model" title="src/model/large-model.ts" />
+  <ul>
+    <li>Extend <ApiLink name="AreaModel" /> and override what you need – the base class has sensible defaults for the rest.</li>
+    <li><code>getValueAt()</code> is called for about 20 rows × 5 columns per frame, not for 2 million rows.</li>
+    <li><ApiLink name="AreaModelIf.getConstantRowHeight" /> tells the table that all rows are equally high: it finds the first
+      visible row by division instead of adding up heights – O(1) instead of O(n) per scroll frame.</li>
+  </ul>
+
+  <h2 id="table">Use it</h2>
+  <Snippet file="demos/custom-area-model.ts" region="table" />
+  <LiveDemo name="custom-area-model" title="2,000,000 rows, no array" height={400}
+            caption="Jump to the end: row 2,000,000 renders as fast as row 1. The toolbar shows frames per second while you scroll." />
+
+  <Callout type="version">
+    <p><code>getConstantRowHeight()</code> exists since <code>@guiexpert/table@1.1.85</code>. Without it, a scroll to the end of
+      2 million rows took about 27 ms per frame; with it about 5 ms.</p>
+  </Callout>
+
+  <h2 id="server">Data from a server, page by page</h2>
+  <p>
+    The same pattern works for remote data: <code>getRowCount()</code> returns the total from the server,
+    <code>getValueAt()</code> answers from a cache and requests missing pages. When a page arrives, repaint:
+  </p>
+  <Snippet file="demos/custom-area-model.ts" region="paged" title="paged-orders.ts (sketch)" />
+  <p>Sorting and filtering then belong on the server, too – the model cannot sort rows it has never seen.</p>
+
+  <h2 id="showcases">More</h2>
+  <p>The showcase <a href="/showcase/large/run/">Large dataset</a> uses the same idea with 2 million rows and renderers;
+    <a href="/showcase/fps/run/">Render speed</a> measures it.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Wide tables: <ChapterLink slug="fixed-columns" />.</p>
+</TrainingLayout>

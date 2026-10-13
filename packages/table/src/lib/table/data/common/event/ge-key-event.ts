@@ -2,6 +2,8 @@
  * Represents a keyboard event.
  *
  * @class GeKeyEvent
+ *
+ * @category Events
  */
 export class GeKeyEvent {
 

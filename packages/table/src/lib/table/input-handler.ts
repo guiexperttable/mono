@@ -6,6 +6,8 @@ import { AreaIdent, getAreaIdentByString } from "./data/tablemodel/area-ident.ty
  *
  * @class
  * @memberOf module:input
+ *
+ * @category Internals
  */
 export class InputHandler {
 

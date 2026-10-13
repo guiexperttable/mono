@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SortedOptions
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SortedOptions
 
 # Class: SortedOptions
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/sorted-options.ts#L7)
+[src/lib/table/data/options/sorted-options.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.ts#L8)
 
 ## Properties
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/sorted-options.ts#L8)
+[src/lib/table/data/options/sorted-options.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.ts#L9)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.ts:9](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/sorted-options.ts#L9)
+[src/lib/table/data/options/sorted-options.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.ts#L10)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.ts:10](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/sorted-options.ts#L10)
+[src/lib/table/data/options/sorted-options.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.ts#L11)

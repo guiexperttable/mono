@@ -7,6 +7,8 @@
  * @param {number} rowIndex - The index of the row.
  * @param {number} columnIndex - The index of the column.
  * @returns {any|undefined} - The modified input object or undefined.
+ *
+ * @category Renderers & editing
  */
 export interface editInputPipe {
   (input: any, rowIndex: number, columnIndex: number): any | undefined;

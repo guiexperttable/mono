@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / SortedOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / SortedOptionsIf
 
 # Interface: SortedOptionsIf
 
@@ -41,7 +41,7 @@ Note that the `classes` property in `IconIf` expects an array of strings, each s
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.if.ts:27](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/sorted-options.if.ts#L27)
+[src/lib/table/data/options/sorted-options.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.if.ts#L29)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.if.ts:28](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/sorted-options.if.ts#L28)
+[src/lib/table/data/options/sorted-options.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.if.ts#L30)
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/sorted-options.if.ts:29](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/data/options/sorted-options.if.ts#L29)
+[src/lib/table/data/options/sorted-options.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/sorted-options.if.ts#L31)

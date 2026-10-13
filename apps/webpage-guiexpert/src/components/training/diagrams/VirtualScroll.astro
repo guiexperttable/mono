@@ -1,0 +1,50 @@
+---
+/** Diagram: virtual scrolling – a tall spacer for the scrollbar, only the visible rows in the DOM (chapter 2). */
+const rows = Array.from({ length: 22 }, (_, i) => i);
+---
+<figure class="training-diagram">
+  <svg viewBox="0 0 860 330" role="img" aria-labelledby="vs-title">
+    <title id="vs-title">Of 100,000 rows only the about 15 rows inside the viewport are in the DOM; a spacer as high as all rows gives the scrollbar</title>
+    <defs>
+      <linearGradient id="vs-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6366f1" /><stop offset="0.5" stop-color="#d946ef" /><stop offset="1" stop-color="#ec4899" />
+      </linearGradient>
+    </defs>
+    <g font-family="Inter Variable, system-ui, sans-serif" font-size="13" fill="var(--color-text)">
+      <text x="20" y="22" font-weight="700">All rows (data)</text>
+      <text x="20" y="40" font-size="12" fill="var(--color-text-offset)">100,000 objects in memory</text>
+      {rows.map(i => (
+        <rect x="20" y={52 + i * 12} width="200" height="9" rx="2"
+              fill={i >= 8 && i <= 15 ? "url(#vs-grad)" : "var(--color-background-offset)"}
+              stroke="var(--color-border)" />
+      ))}
+      <text x="20" y="324" font-size="12" fill="var(--color-text-offset)">⋮ 99,978 more</text>
+
+      <path d="M224 148 L 330 92" stroke="var(--color-text-offset)" stroke-dasharray="4 3" fill="none" />
+      <path d="M224 238 L 330 262" stroke="var(--color-text-offset)" stroke-dasharray="4 3" fill="none" />
+
+      <text x="340" y="22" font-weight="700">The viewport (what you see)</text>
+      <text x="340" y="40" font-size="12" fill="var(--color-text-offset)">overflow: auto · fixed height</text>
+      <rect x="340" y="52" width="300" height="250" rx="10" fill="var(--color-background)" stroke="var(--color-secondary)" stroke-width="2" />
+      {Array.from({ length: 8 }, (_, i) => (
+        <g>
+          <rect x="352" y={92 + i * 21} width="252" height="17" rx="3" fill="var(--color-background-offset)" stroke="var(--color-border)" />
+          <text x="360" y={105 + i * 21} font-size="11" fill="var(--color-text-offset)">row {(50001 + i).toLocaleString("en")}</text>
+        </g>
+      ))}
+      <rect x="616" y="60" width="16" height="234" rx="8" fill="var(--color-background-offset)" />
+      <rect x="616" y="160" width="16" height="34" rx="8" fill="var(--color-secondary)" />
+      <text x="352" y="76" font-size="11" fill="var(--color-primary)">translateY(first × rowHeight)</text>
+
+      <text x="670" y="80" font-weight="700">Spacer</text>
+      <text x="670" y="98" font-size="12" fill="var(--color-text-offset)">height = rows × rowHeight</text>
+      <text x="670" y="114" font-size="12" fill="var(--color-text-offset)">→ a real scrollbar</text>
+      <text x="670" y="170" font-weight="700">On scroll</text>
+      <text x="670" y="188" font-size="12" fill="var(--color-text-offset)">first = scrollTop / rowHeight</text>
+      <text x="670" y="204" font-size="12" fill="var(--color-text-offset)">count = height / rowHeight</text>
+      <text x="670" y="260" font-weight="700" fill="var(--color-primary)">≈ 360 DOM elements</text>
+      <text x="670" y="278" font-size="12" fill="var(--color-text-offset)">for 1,000 or 1,000,000 rows</text>
+    </g>
+  </svg>
+  <figcaption>The DOM size depends on the height of the viewport – not on the number of rows.</figcaption>
+</figure>

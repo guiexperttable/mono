@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / editInputPipe
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / editInputPipe
 
 # Interface: editInputPipe
 
@@ -36,4 +36,4 @@ The index of the column.
 
 #### Defined in
 
-[lib/table/renderer/edit/edit-input-pipe.if.ts:12](https://github.com/guiexperttable/ge-table/blob/1d30aa1/packages/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L12)
+[src/lib/table/renderer/edit/edit-input-pipe.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L14)

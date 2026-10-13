@@ -1,4 +1,4 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / ColorRgb
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / ColorRgb
 
 # Class: ColorRgb
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[lib/table/color/color-rgb.ts:4](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/color-rgb.ts#L4)
+[src/lib/table/color/color-rgb.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.ts#L5)
 
 ## Properties
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[lib/table/color/color-rgb.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/color-rgb.ts#L7)
+[src/lib/table/color/color-rgb.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.ts#L8)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[lib/table/color/color-rgb.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/color-rgb.ts#L6)
+[src/lib/table/color/color-rgb.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.ts#L7)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 #### Defined in
 
-[lib/table/color/color-rgb.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/color/color-rgb.ts#L5)
+[src/lib/table/color/color-rgb.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/color/color-rgb.ts#L6)

@@ -1,6 +1,50 @@
-[@guiexpert/table](../README.md) / [Exports](../modules.md) / TreeOptionsIf
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / TreeOptionsIf
 
 # Interface: TreeOptionsIf
+
+This interface `TreeOptionsIf` represents the specific configuration and properties of a tree component, usually displayed in a User Interface (UI).
+The interface includes several properties that illustrate the statuses of tree's collapsible nodes. All properties represent the Icon characteristics in their different states in the tree.
+
+Property `arrowExpandCollapseAll` is an Icon configuration when an action to expand or collapse all nodes in the tree is performed.
+
+Property `arrowExpanded` describes Icon configuration when a single tree node is expanded.
+
+Property `arrowCollapsed` holds Icon configuration when a single tree node is collapsed.
+
+Property `arrowPlaceholder` entails Icon configuration signifying an placeholder arrow, generally used when tree nodes have no children.
+
+All properties of this interface are themselves objects based on another interface `IconIf`, symbolizing an icon configuration. Each icon has `content` - a string that represents icon, `style` - a string which determines the CSS styles applied to the icon, and `classes` - an array of strings for CSS class name(s) to be added to the icon.
+
+**`See`**
+
+[IconIf](IconIf.md)
+
+**`Example`**
+
+```ts
+const treeOptions: TreeOptionsIf = {
+  arrowExpandCollapseAll: {
+    content: '>>',
+    style: 'color: blue;',
+    classes: ['expand-collapse-all-icon-class'],
+  },
+  arrowExpanded: {
+    content: '>',
+    style: 'color: green;',
+    classes: ['expand-icon-class'],
+  },
+  arrowCollapsed: {
+    content: '<',
+    style: 'color: red;',
+    classes: ['collapse-icon-class'],
+  },
+  arrowPlaceholder: {
+    content: '-',
+    style: 'color: gray;',
+    classes: ['placeholder-icon-class'],
+  },
+};
+```
 
 ## Implemented by
 
@@ -23,7 +67,7 @@
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:7](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.if.ts#L7)
+[src/lib/table/data/options/tree-options.if.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L50)
 
 ___
 
@@ -33,7 +77,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:5](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.if.ts#L5)
+[src/lib/table/data/options/tree-options.if.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L48)
 
 ___
 
@@ -43,7 +87,7 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:6](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.if.ts#L6)
+[src/lib/table/data/options/tree-options.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L49)
 
 ___
 
@@ -53,4 +97,4 @@ ___
 
 #### Defined in
 
-[lib/table/data/options/tree-options.if.ts:8](https://github.com/guiexperttable/ge-table/blob/65d38fc/libs/table/src/lib/table/data/options/tree-options.if.ts#L8)
+[src/lib/table/data/options/tree-options.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/tree-options.if.ts#L51)

@@ -1,6 +1,7 @@
 
 import {TreeRowIf} from "../data/common/tree-row-if";
 
+/** @category Tree & checkboxes */
 export class TreeRowService {
 
   flattenTree<T>(

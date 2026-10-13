@@ -1,5 +1,6 @@
 import { CheckedType } from "../data/common/checked-type";
 
+/** @category Tree & checkboxes */
 export interface CheckboxModelIf<T> {
 
   getCheckedRows(): T[];

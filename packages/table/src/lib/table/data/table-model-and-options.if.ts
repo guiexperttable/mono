@@ -4,6 +4,8 @@ import { TableOptions } from "./options/table-options";
 
 /**
  * Interface for a container object for one table model and one table options object.
+ *
+ * @category Table model
  */
 export interface TableModelAndOptionsIf {
   tableModel: TableModelIf;

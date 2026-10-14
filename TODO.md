@@ -116,6 +116,7 @@
       Literal `${r + 1}`, Blattgröße fest `A1:B3`. Behoben und mit openpyxl geprüft.
 - [ ] Footer-Summen über gefilterte Zeilen: geht heute mit eigenem Footer-AreaModel + `getFilteredRows()`
       (instructions.md 5.4). Optional später eine fertige Klasse (z. B. `AreaModelAggregateFooter`).
+      → Prompt 005 (`prompts/005-aggregation-gesamtzeile.md`).
 
 - [x] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
       `setFooterVisible()`, `isFooterVisible()` implementiert (Branch `fix/core-api`): Spalte über `ColumnDef.isVisible`
@@ -133,6 +134,7 @@
       (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
 - [ ] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
       Filter/Sortierung/Baum-Toggle beachten).
+      → Voraussetzung in Prompt 011 (Master/Detail).
 - [x] Performance, Teil 3a: `adjustColumnsToRowParent` las pro Zeile `scrollViewport.scrollLeft` (Wert wurde nie
       benutzt) → erzwungenes Layout je Zeile. Entfernt (Baum 30 → 19,5 ms, Objekt-Array 10,4 → 7 ms, gesamt mit
       Teil 1: 2 Mio. Zeilen Ø 16,5 → 6,0 ms, max 28,7 → 9,6 ms).
@@ -149,11 +151,33 @@
 - [ ] `AsyncBodyAreaModelObjectArray` – unfertige Source-Leiche (nicht exportiert, fehlerhafte Indizes).
       Entscheiden: fertigstellen (Server-Side-Row-Model) oder löschen. *(später)*
 
-- [ ] **Pivot-Tabellen** (`PivotFactory`): nach Zeilenfeldern gruppieren, Werte eines Spaltenfelds als Spalten,
-      aggregieren (Summe, Anzahl, Mittelwert …) mit Zwischen- und Gesamtsummen – bei ag-Grid ein Enterprise-Feature.
-      Vollständiger Arbeitsauftrag in Phasen (API-Entwurf → Vitest → Code → Doku → Demos → Website → Training →
-      Demo-Repo → Video): **`TODO_Prompt.md`**. Die Website sagt heute noch „kein Pivot“ (`home/why.astro`, Training
-      `build-buy-or-guiexpert` und `checklist`) – erst mit dem Feature ändern.
+## Feature-Prompts (`prompts/`, Okt. 2026)
+
+Lücken gegenüber ag-Grid 36.2, je ein Arbeitsauftrag für eine neue Sitzung (API-Entwurf → Vitest → Code → Doku →
+Demos → Website → Training → Demo-Repo → Video). Index, Reihenfolge und Abhängigkeiten: **`prompts/README.md`**,
+gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
+
+- [ ] **001 Screenreader-Unterstützung (ARIA)** – heute kein einziges `aria-*`/`role` im Core; zuerst, weil alle
+      späteren Features die Regeln mit umsetzen (`prompts/001-aria-screenreader.md`).
+- [ ] **002 Overlays „Lädt…“ / „Keine Daten“** in plain HTML/CSS (`prompts/002-overlays-laden-keine-daten.md`).
+- [ ] **003 Zustand speichern vervollständigen + State-API** (`prompts/003-zustand-speichern.md`). Befund 14.10.2026:
+      `autoRestoreCheckedState` und `autoRestoreSelectedState` sind nur deklariert (stilles No-op), `isSame` ungenutzt;
+      Sortierung wird nach Spaltenindex gespeichert (vermutlich falsch nach Spalten-Drag, Test fehlt); Spaltenbreite,
+      -reihenfolge, -sichtbarkeit und Header-Gruppen werden nicht gespeichert; JSDoc behauptet einen Standard-Schlüssel,
+      ohne `getStorageKeyFn` wird aber nichts gespeichert.
+- [ ] **004 Zeilennummern** (`prompts/004-zeilennummern.md`).
+- [ ] **005 Aggregation und Gesamtzeile** (Helfer, fertiges Footer-Modell, Auswahl-Summen) – Grundlage für 006–008
+      (`prompts/005-aggregation-gesamtzeile.md`).
+- [ ] **006 Row Grouping** (`prompts/006-row-grouping.md`). Die Website sagt heute noch „Row grouping … – tree tables
+      instead“ (`home/why.astro`, Training `build-buy-or-guiexpert` und `checklist`) – erst mit dem Feature ändern.
+- [ ] **007 Pivot-Tabellen** (`prompts/007-pivot.md`), nach 005 und 006; gleiche Stellen auf der Website.
+- [ ] **008 Berechnete Spalten, „Show values as“, Formeln** (`prompts/008-formeln-berechnete-spalten-show-values-as.md`).
+- [ ] **009 Zeilen ziehen (Row Drag)** (`prompts/009-row-drag.md`).
+- [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
+      Zwischenablage als Folgeaufgaben.
+- [ ] **011 Master/Detail** (`prompts/011-master-detail.md`); enthält „Performance, Teil 2“ (variable Zeilenhöhen) als
+      Voraussetzung.
+- [ ] **012 Rechts-nach-links-Sprachen (RTL)** (`prompts/012-rtl.md`), bewusst zuletzt.
 
 ## Mono-Repo / Build
 

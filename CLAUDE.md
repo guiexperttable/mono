@@ -40,6 +40,7 @@ mono/
 │   └── version.mjs            # check | sync | patch | minor – ein Versionsschema für alle Pakete
 ├── instructions.md            # Entwickler-Doku aller Frameworks (geprüft, s. §6)
 ├── TODO.md                    # offene Code-Aufgaben
+├── prompts/                   # Feature-Prompts für neue Sitzungen (Index + Reihenfolge: prompts/README.md)
 └── llms.txt  README.md  LICENSE  pnpm-workspace.yaml (packages/*, angular-builds/*, apps/*)
 ```
 
@@ -289,6 +290,9 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
 ## 7. Offene Punkte
+
+Neue Features (Lücken gegenüber ag-Grid): **`prompts/README.md`** – je ein Arbeitsauftrag, nummeriert in
+sinnvoller Reihenfolge, gemeinsame Regeln in `prompts/000-arbeitsweise.md`.
 
 Siehe **`TODO.md`** (Wrapper-Bugs Solid/Vue/Svelte/React/Angular, API-Stubs, Performance `adjustArea`, Packaging,
 Angular-Demo an lokale Builds koppeln, CI-Workflow für Angular).

@@ -1,7 +1,12 @@
-# TODO-Prompt: Pivot-Tabellen in GuiExpert Table – API, Vitest, Code, Doku, Website, Training, Demo-Repo, Video
+# TODO-Prompt 007: Pivot-Tabellen – API, Vitest, Code, Doku, Website, Training, Demo-Repo, Video
 
 > Status: **offen** · angelegt 14.10.2026, erweitert 14.10.2026 · Ziel 1 (Code) **und** Ziel 2 (Content) aus CLAUDE.md
-> Verweis in `TODO.md` → Abschnitt „Core“.
+> Slug `pivot` (Branch `feat/pivot`, Design `prompts/007-pivot.design.md`) · Verweis in `TODO.md` → Abschnitt
+> „Feature-Prompts“. Gemeinsame Regeln: `prompts/000-arbeitsweise.md` (gilt bei Widersprüchen).
+>
+> **Voraussetzung: 005 (Aggregation) und 006 (Row Grouping)** (`prompts/005-aggregation-gesamtzeile.md`,
+> `prompts/006-row-grouping.md`). 005 liefert Aggregatoren, Gesamtzeile und Testfixture, 006 die Gruppierung und die
+> Gruppenzeilen. Pivot ergänzt nur die Spaltenschlüssel-Dimension.
 >
 > Diesen Prompt in einer neuen Sitzung im Mono-Repo (`guiexperttable/mono`) ausführen. Er ist eigenständig und setzt kein
 > Wissen aus früheren Chats voraus. Die Arbeit reicht über mehrere Sitzungen: Erledigtes in der **Definition of Done**
@@ -20,7 +25,7 @@ const model: TableModelIf = PivotFactory.create({ rows, rowFields, columnFields,
 
 | Phase | Ergebnis | Haltepunkt |
 |---|---|---|
-| 1 | API-Entwurf `PIVOT_API.md` (Bausteine, Signaturen, Entscheidungen, Beispiele) | 🛑 Freigabe abwarten |
+| 1 | API-Entwurf `prompts/007-pivot.design.md` (Bausteine, Signaturen, Entscheidungen, Beispiele) | 🛑 Freigabe abwarten |
 | 2 | Vitest-Specs (Unit, Browser, Wrapper, Typen) – zuerst rot | |
 | 3 | Implementierung im Core – Specs grün | |
 | 4 | Doku: JSDoc/API-Doc, `instructions.md`, READMEs, `llms.txt`, `CLAUDE.md`, `TODO.md` | |
@@ -34,11 +39,15 @@ const model: TableModelIf = PivotFactory.create({ rows, rowFields, columnFields,
 ### Arbeitsweise
 
 - Zuerst **`CLAUDE.md`** vollständig lesen (Konventionen §5, Tests §6, Lizenz §8, Sicherheit §9, Videos §10,
-  Training §11), dazu `TODO.md` und `instructions.md` §5.
+  Training §11), dazu `TODO.md`, `instructions.md` §5 und die Design-Dokumente von 005 und 006
+  (`prompts/005-aggregation-gesamtzeile.design.md`, `prompts/006-row-grouping.design.md`).
+- **Prüfen, ob 005 und 006 umgesetzt sind** (`TODO.md`, `prompts/README.md`, Ordner `src/lib/table/aggregation/` und
+  `rowgroup/` bzw. wie in deren Design-Dokumenten festgelegt). Wenn ja: wiederverwenden statt neu bauen. Wenn nein:
+  anhalten und fragen (zuerst 005/006 ausführen, Empfehlung, oder Phase 1 gemeinsam entwerfen).
 - Auf Branch **`feat/pivot`** (von `main`) arbeiten. Commits nur nach Rückfrage. **Kein** Push, `npm publish`,
   GitHub-Release, Website-Deploy (`deploy.cjs`) und kein Versionssprung ohne ausdrückliche Anweisung.
-- Zielversion für `since`-Angaben und Release-Notes: nächste Patch-Version nach `packages/table/package.json`
-  (Stand Okt. 2026: 1.1.90 → **1.1.91**). Nur eintragen, nicht hochzählen.
+- Zielversion für `since`-Angaben und Release-Notes: die Version des Releases, mit dem Pivot erscheint
+  (s. `000-arbeitsweise.md`; in `packages/table/package.json` nachsehen). Nur eintragen, nicht hochzählen.
 - Eine Taskliste mit einem Eintrag pro Phase führen.
 - Nach Phase 1 anhalten und den Entwurf vorlegen, inklusive der Entscheidungen zu Phase 7 (Kapitel-Platzierung)
   und Phase 8 (Demo-Repo).
@@ -46,6 +55,9 @@ const model: TableModelIf = PivotFactory.create({ rows, rowFields, columnFields,
 ---
 
 ## Hintergrund: Was eine Pivot-Tabelle ist
+
+Pivot = Row Grouping (Zeilen gruppieren und aggregieren) + Spaltenschlüssel (Werte eines Felds werden zu Spalten),
+ohne Detailzeilen. Den Vergleich mit Baumtabelle und Row Grouping zeigt `prompts/006-row-grouping.md` („Hintergrund“).
 
 Pivot ist **nicht** Transponieren. Beim Transponieren werden nur Zeilen und Spalten vertauscht, die Information bleibt
 gleich. Eine Pivot-Tabelle tut drei Dinge auf einmal:
@@ -104,12 +116,15 @@ Der Mittelwert der Mittelwerte wäre 77,5 und damit **falsch**. Summen und Zwisc
 
 ## Phase 1 – Bausteine prüfen und API entwerfen 🛑
 
-Ergebnis: **`PIVOT_API.md`** im Repo-Root. Danach anhalten und die Entscheidungen bestätigen lassen.
+Ergebnis: **`prompts/007-pivot.design.md`**. Danach anhalten und die Entscheidungen bestätigen lassen.
 
 ### 1a Vorhandene Bausteine
 
 Prüfe im Code (`packages/table/src/lib/table`), was sich wiederverwenden lässt:
 
+- **Engine aus 005 und 006** (Aggregatoren mit `init / add / merge / result` und Gesamtzeile aus 005; Gruppier-Engine,
+  Gruppenzeilen, CSS `ge-table-row-group*` aus 006; Fixture `test-utils/grouping-fixtures.ts`): Was lässt sich direkt nutzen,
+  was muss für die Spaltenschlüssel erweitert werden?
 - `factory/` (`table-factory.ts`, `tree-factory.ts`, `cover-grid-factory.ts`, je mit `.spec.ts`):
   `TableFactory.createTableModel`, `createByAreaModels`, `TreeFactory.buildTreeRows`,
   `CoverGridFactory.createCoverGridModel` (Namens- und Aufbaumuster für die neue Fabrik, z. B. `factory/pivot-factory.ts`)
@@ -138,9 +153,10 @@ Optionen, Empfehlung, Begründung.
      Generik `create<T>(…)`. Accessoren sind z. B. für „Quartal aus Datum“ nötig.
    - Ein Wertfeld (`valueField` + `aggregate`) oder mehrere (`values: [{ field, aggregate, label, renderer }]`)?
      Bei mehreren Werten: Unterspalten je Spaltenschlüssel (`Jan › Summe`, `Jan › Anzahl`).
-   - Aggregationen: `'sum' | 'count' | 'avg' | 'min' | 'max' | 'countDistinct'` plus eigene Funktion.
-     Für korrekte Zwischensummen ein Reducer-Interface (`init / add / merge / result`) statt `(values[]) => number`
-     erwägen (Fall 3). Verhalten bei nicht-numerischen Werten festlegen.
+   - Aggregationen: aus 005 übernehmen (`'sum' | 'count' | 'avg' | 'min' | 'max' |
+     'countDistinct'` plus eigener Reducer mit `init / add / merge / result`). Nur falls dort nicht vorhanden: hier
+     festlegen (Fall 3 zeigt, warum ein Reducer statt `(values[]) => number` nötig ist).
+   - Konfiguration möglichst ähnlich zu Row Grouping (`rowFields` ≈ `groupBy`), damit Anwender umsteigen können.
 2. **Ausgabe:** nur `TableModelIf` oder ein `PivotResult` (Modell + Metadaten: Spaltenschlüssel, Zeilenschlüssel,
    `getSourceRows(rowIndex, columnIndex)` für Drill-down)?
 3. **Zeilen:** flach vs. Baum (`AreaModelTree`), Zwischensummen oben/unten/aus, Sortierung der Gruppen
@@ -163,8 +179,8 @@ Optionen, Empfehlung, Begründung.
     (Kollisionsgefahr). Ziel z. B. 1 Mio. Quellzeilen in < 1 s (Node).
 11. **Interaktive Pivot-UI** (Felder per Drag & Drop umsortieren): **außerhalb des Scopes**. Die API muss aber eine
     geänderte Konfiguration ohne Umbau zulassen.
-12. **Ablage und Doku-Kategorie:** Ordner (Vorschlag `src/lib/table/pivot/` + `factory/pivot-factory.ts`), neue
-    typedoc-Kategorie (z. B. „Pivot“) in `packages/table/typedoc.json` → `categoryOrder`.
+12. **Ablage und Doku-Kategorie:** Ordner (Vorschlag `src/lib/table/pivot/` + `factory/pivot-factory.ts`, neben
+    `aggregation/` und `rowgroup/`); typedoc-Kategorie von 005/006 mitnutzen (z. B. „Grouping & aggregation“).
 13. **Training und Demo-Repo:** Entscheidungen aus Phase 7 (Kapitel-Platzierung) und Phase 8 (Repo) mit vorlegen.
 
 ### 1c Beispiele
@@ -178,18 +194,19 @@ Videoreihe markieren („Pivot in 60 Sekunden – ohne Enterprise-Lizenz“).
 ## Phase 2 – Tests zuerst (Vitest)
 
 Regeln aus CLAUDE.md §6: Specs **neben dem Code**, Importe wie Anwender (`from '@guiexpert/table'`). Erst gegen die
-API aus `PIVOT_API.md` schreiben (rot), dann implementieren (Phase 3, grün). Gemeinsame Fixtures (Referenzdaten
-Fall 1–3, Generator für große Datenmengen) in `packages/table/test-utils/pivot-fixtures.ts` ablegen.
-`test-utils/` kommt nie ins npm-Paket.
+API aus dem Design-Dokument schreiben (rot), dann implementieren (Phase 3, grün). Die Fixture aus 005
+(`packages/table/test-utils/grouping-fixtures.ts`: Referenzdaten, Generator für große Datenmengen) wiederverwenden und
+um die erwarteten Pivot-Ergebnisse ergänzen. `test-utils/` kommt nie ins npm-Paket. Die Aggregator-Tests gibt es schon
+(005); hier nur testen, was Pivot zusätzlich braucht.
 
 ### 2a Unit (Node, `*.spec.ts`, Projekt `unit`)
 
-z. B. `pivot/pivot-engine.spec.ts`, `pivot/pivot-aggregators.spec.ts`, `factory/pivot-factory.spec.ts`:
+z. B. `pivot/pivot-engine.spec.ts`, `factory/pivot-factory.spec.ts`:
 
 - [ ] Fall 1–3 exakt, inkl. Gesamtsummen. `avg` Gesamt Jan = 76,67 (`toBeCloseTo`), **nicht** 77,5
 - [ ] fehlende Kombination → `undefined` (nicht 0); der Platzhalter erscheint nur in der Anzeige
-- [ ] alle eingebauten Aggregationen (`sum`, `count`, `avg`, `min`, `max`, `countDistinct`) und ein eigener Reducer;
-      `merge` von Teilergebnissen = ein Durchlauf über alle Rohwerte
+- [ ] jede eingebaute Aggregation einmal über die Pivot-Fabrik (die Aggregatoren selbst testet 005) und ein
+      eigener Reducer; Zwischen- und Gesamtsummen per `merge` = ein Durchlauf über alle Rohwerte
 - [ ] Feld als Property-Pfad und als Accessor-Funktion (z. B. Quartal aus einem ISO-Datum)
 - [ ] Schlüssel-Randfälle: `null` / `undefined` / `''`, `1` vs. `'1'`, Trennzeichen im Schlüssel (`'a|b'` vs.
       `'a'` + `'|b'`, keine Kollision), `NaN`, `Date`
@@ -210,7 +227,7 @@ Das Unit-Projekt läuft mit `isolate: false`: kein Modulzustand, Singletons im `
 ### 2b Performance
 
 Keine Zeit-Assertions in `test:unit` (CI-Rechner schwanken). Stattdessen eine Bench-Datei mit `vitest bench`
-(1 Mio. Quellzeilen, Ziel < 1 s in Node) und das Ergebnis in `PIVOT_API.md` notieren. Die Coverage-Konfiguration in
+(1 Mio. Quellzeilen, Ziel < 1 s in Node) und das Ergebnis im Design-Dokument notieren. Die Coverage-Konfiguration in
 `packages/table/vitest.config.ts` schließt heute nur `*.spec.ts`, `*.demo.ts`, `*.if.ts` und `index.ts` aus. Eine
 `*.bench.ts` unter `src/` zählt also als unabgedeckter Code: in `exclude` aufnehmen oder außerhalb von `src/` ablegen.
 
@@ -250,7 +267,9 @@ Fehler, die dabei in bestehenden Klassen auftauchen: zuerst ein roter Test, bei 
 
 ## Phase 3 – Implementierung (Core)
 
-- Reihenfolge: DOM-freie `PivotEngine` → Aggregatoren → Area-Modelle (Header / Body / Footer) → `PivotFactory` → CSS.
+- Reihenfolge: DOM-freie `PivotEngine` auf Basis von 005 und 006 (Aggregatoren und Gruppierung nicht duplizieren) →
+  Area-Modelle (Header / Body / Footer; Gruppenzeilen von Row Grouping wiederverwenden) → `PivotFactory` → CSS.
+- Muss die gemeinsame Engine erweitert werden, nur additiv. Die Specs von 005 und 006 bleiben unverändert grün.
 - Regeln (CLAUDE.md §5): **0 Runtime-Abhängigkeiten**; Daten nie unescaped in `innerHTML`; `instanceof` über
   Paketgrenzen meiden (`instanceof-workaround.ts` erweitern, z. B. `isPivot…`); bestehende öffentliche APIs nicht
   brechen; bestehende Tippfehler-APIs nicht umbenennen.
@@ -267,11 +286,12 @@ Fehler, die dabei in bestehenden Klassen auftauchen: zuerst ein roter Test, bei 
 
 - [ ] **JSDoc** mit `@example` für jedes öffentliche Symbol (wird zu https://gui.expert/api) →
       `pnpm --filter @guiexpert/table docs:check` (Okt. 2026: 283 Beispiele, 0 Fehler)
-- [ ] neue Kategorie in `packages/table/typedoc.json` → `categoryOrder`; Pivot in `packages/table/typedoc-readme.md`
-      erwähnen
+- [ ] Pivot-Symbole in die Kategorie von 005/006 (z. B. „Grouping & aggregation“); Pivot in
+      `packages/table/typedoc-readme.md` erwähnen
 - [ ] **API-Doc neu erzeugen**: `pnpm --filter @guiexpert/table typedoc:website`. Das erneuert auch
       `apps/webpage-guiexpert/src/training/api-index.json`, ohne den die `<ApiLink>`s im Training nicht bauen
-- [ ] **`instructions.md`**: neuer Abschnitt in §5 „Creating table models“ (z. B. §5.6 „Pivot tables“): Fall 1,
+- [ ] **`instructions.md`**: neuer Abschnitt in §5 „Creating table models“ direkt nach „Row grouping“ (z. B. §5.7
+      „Pivot tables“), mit Verweis auf Row Grouping: Fall 1,
       Hierarchie, mehrere Werte, Filter und Neuberechnung, Grenzen (keine Drag-&-Drop-UI). Alle `ts`-Blöcke müssen
       kompilieren: Snippets extrahieren → `tsc` strict mit `paths` auf `packages/*/src` (CLAUDE.md §6)
 - [ ] `packages/angular-table/instructions.md`: kurzes Angular-Beispiel (Komponente + `PivotFactory`), gegen
@@ -307,14 +327,15 @@ Fehler, die dabei in bestehenden Klassen auftauchen: zuerst ein roter Test, bei 
   - Vorschaubild `src/assets/screens/thumbs/pivot.png` + Kachel in `src/components/showcase/index.astro`
   - optional `src/content/showcase/pivot.json` (`featured`)
 - [ ] **Feature-Liste**: `src/components/features.astro`
-- [ ] **Aussagen „kein Pivot“ korrigieren.** Heute steht an drei Stellen, Pivot sei nicht eingebaut:
-  - `src/components/home/why.astro`: Zeile `["Row grouping / pivot", "–", "✔", "– tree tables instead"]` und die
-    „Rule of thumb“ darunter
-  - `src/pages/training/build-buy-or-guiexpert.astro`: Tabellenzeile „Row grouping / pivot“ und Absatz darunter
+- [ ] **Aussagen „kein Pivot“ korrigieren.** Row Grouping teilt die gemeinsame Vergleichszeile „Row grouping / pivot“
+      in zwei Zeilen auf. Hier wird die Zeile „Pivot tables“ auf ✔ gesetzt. Falls Row Grouping die Zeile noch nicht
+      aufgeteilt hat, beides hier erledigen. Betroffene Stellen:
+  - `src/components/home/why.astro`: Vergleichstabelle `ROWS` und die „Rule of thumb“ darunter
+  - `src/pages/training/build-buy-or-guiexpert.astro`: Tabellenzeile(n) und Absatz darunter
   - `src/pages/training/checklist.astro`: Liste dessen, was nicht eingebaut ist
-  - Ehrlich bleiben: was weiterhin fehlt (Drag-&-Drop-Pivot-UI, Row Grouping mit Aggregation per Maus,
-    Server-Side-Row-Model), bleibt als fehlend stehen. Wortwahl nach CLAUDE.md §8: „MIT-lizenziert, kostenlos auch
-    kommerziell“, keine Preise; ag-Grid sachlich („dort ein Enterprise-Feature“)
+  - Ehrlich bleiben: was weiterhin fehlt (Drag-&-Drop-Pivot-UI bzw. Gruppenleiste, Server-Side-Row-Model), bleibt als
+    fehlend stehen. Wortwahl nach CLAUDE.md §8: „MIT-lizenziert, kostenlos auch kommerziell“, keine Preise; ag-Grid
+    sachlich („dort ein Enterprise-Feature“)
   - Beiträge unter `src/pages/post/` bzw. `src/components/post/` auf Vergleichsaussagen prüfen
 - [ ] API-Seiten: kommen aus Phase 4 (`typedoc:website`)
 - [ ] Bauen: `pnpm build:core && pnpm --filter @guiexpert/demo-table-models build && pnpm build:webpage-guiexpert`
@@ -326,32 +347,39 @@ Fehler, die dabei in bestehenden Klassen auftauchen: zuerst ein roter Test, bei 
 
 ## Phase 7 – Training-Kapitel (gui.expert/training)
 
-**Platzierung (in Phase 1 entscheiden):** Kapitelnummer `no` und `episode` hängen am Git-Tag `ep-NNN` des Demo-Repos.
-Es gibt 34 Kapitel, Kapitel 34 ist das Finale „Checklist“.
+**Platzierung (in Phase 1 bestätigen):** Kapitelnummer `no` und `episode` hängen am Git-Tag `ep-NNN` des Demo-Repos.
+Bis Okt. 2026 gibt es 34 Kapitel, Kapitel 34 ist das Finale „Checklist“. Neue Kapitel kommen hinten in
+Teil 8 (`PartId` `"advanced"`, s. `000-arbeitsweise.md`); 006 legt dort `row-grouping` an.
 
-- **Option A (Empfehlung):** neues Kapitel 35 / Folge 35 in einem neuen Teil 8 (z. B. `PartId` `"analysis"`,
-  „Analysis: pivot tables and aggregation“) nach dem Finale. Keine Umnummerierung, alle Tags und Links bleiben gültig.
-- **Option B:** in Teil 5 „Options & data“ einsortieren. Dann müssen alle Kapitel und Folgen dahinter umnummeriert
+- **Option A (Empfehlung):** Kapitel `pivot-tables` mit der nächsten freien Nummer in Teil 8, möglichst direkt nach
+  `row-grouping`.
+  Keine Umnummerierung, alle Tags und Links bleiben gültig. Hat Row Grouping anders entschieden, dessen Platzierung
+  folgen (Pivot steht immer direkt nach Row Grouping).
+- **Option B:** in einen der bestehenden Teile einsortieren. Dann müssen alle Kapitel und Folgen dahinter umnummeriert
   und die Tags im Demo-Repo verschoben werden, und bestehende Links brechen. Nur mit gutem Grund.
 
-Umsetzung (Muster: `header-groups`, `footer-totals`; Ablauf CLAUDE.md §11):
+Vorher in `chapters.ts` nachsehen, welche Nummer wirklich frei ist.
 
-- [ ] `src/training/chapters.ts`: ggf. `PartId` + `PARTS` erweitern; Eintrag in `CHAPTERS` (`slug: "pivot-tables"`,
-      `lead`, `learn`, `api` mit allen neuen Symbolen, `showcases: [{ name: "pivot", … }]`, `since: "1.1.91"`);
-      Kopfkommentar `ep-001 … ep-035`
+Umsetzung (Muster: `row-grouping`, `header-groups`; Ablauf CLAUDE.md §11):
+
+- [ ] `src/training/chapters.ts`: Eintrag in `CHAPTERS` (`slug: "pivot-tables"`, `part` wie `row-grouping`, `lead`,
+      `learn`, `api` mit allen neuen Symbolen, `showcases: [{ name: "pivot", … }]`, `since` = Release-Version, s.
+      „Arbeitsweise“); Kopfkommentar `ep-001 … ep-NNN`
 - [ ] Seite `src/pages/training/pivot-tables.astro` mit `<TrainingLayout slug="pivot-tables">`. Inhalt: Pivot vs.
-      Transponieren, Fall 1 → Hierarchie → zwei Wertfelder, die Mittelwert-Falle, Filter und Neuberechnung, Grenzen.
-      Querverweise per `<ChapterLink>` auf `header-groups`, `tree-table`, `footer-totals`, `filtering`,
-      `excel-export`, `build-buy-or-guiexpert`
+      Transponieren vs. Row Grouping, Fall 1 → Hierarchie → zwei Wertfelder, die Mittelwert-Falle, Filter und
+      Neuberechnung, Grenzen. Querverweise per `<ChapterLink>` auf `row-grouping`, `header-groups`, `tree-table`,
+      `footer-totals`, `filtering`, `excel-export`, `build-buy-or-guiexpert`; im Kapitel `row-grouping` umgekehrt auf
+      `pivot-tables` verweisen
 - [ ] Live-Demo `src/training/demos/pivot-tables.ts` (`export default (ctx: DemoContext) => cleanup?`), Daten aus
       `./shared/orders` (fester Seed; Felder `date`, `country`, `city`, `category`, `product`, `quantity`, `total` →
       z. B. Land > Stadt × Jahr > Quartal per Accessor aus `date`), Code-Bereiche mit `// #region` für `<Snippet>`
 - [ ] Screenshot-Eintrag in `scripts/training-screenshots.mjs`, Bilder
       `src/assets/training/shots/demo-pivot-tables-light.png` / `-dark.png`
 - [ ] Typprüfung: `pnpm --filter webpage-guiexpert check:training` (nach `pnpm build:core`)
-- [ ] Zahlen nachziehen („34 Kapitel“, „ep-034“, „26 Live-Demos“): `CLAUDE.md` §6 + §11, beide `llms.txt`,
-      `TODO.md`, `training-examples/README.md`, Kopfkommentar `chapters.ts`. Suche:
-      `grep -rn "34 chapters\|34 Kapitel\|34 short chapters\|ep-034\|26 Live-Demos" --exclude-dir=node_modules .`
+- [ ] Zahlen nachziehen (Kapitel-, Folgen- und Live-Demo-Zahl; Stand vor Row Grouping: „34 Kapitel“, „ep-034“,
+      „26 Live-Demos“): `CLAUDE.md` §6 + §11, beide `llms.txt`, `TODO.md`, `training-examples/README.md`,
+      Kopfkommentar `chapters.ts`. Suche (Zahlen anpassen):
+      `grep -rn "3[45] chapters\|3[45] Kapitel\|3[45] short chapters\|ep-03[45]\|2[67] Live-Demos" --exclude-dir=node_modules .`
 
 ---
 
@@ -362,13 +390,14 @@ Jedes Kapitel verlinkt einen Tag im Demo-Repo **`krocon/guiexpert-table-step-by-
 geklont werden.
 
 - **Entscheidung (in Phase 1 vorlegen):**
-  - **A (Empfehlung):** neue Folge im bestehenden Repo: Commit + Tag `ep-035`, Struktur wie die bisherigen Folgen
-    (ggf. `frameworks/`). Passt ohne Änderung zu `demoTagUrl()`.
+  - **A (Empfehlung):** neue Folge im bestehenden Repo: Commit + Tag **`ep-NNN`** (= Kapitelnummer, nach der Folge
+    von Row Grouping), Struktur wie die bisherigen Folgen (ggf. `frameworks/`). Passt ohne Änderung zu `demoTagUrl()`.
   - **B:** eigenes Repo, z. B. `krocon/guiexpert-table-pivot-demo`. Dann braucht `chapters.ts` einen abweichenden Link.
+  - Die Entscheidung von Row Grouping (Phase 8 dort) gilt hier sinngemäß. Beide Folgen gehören ins selbe Repo.
 - **Abhängigkeit:** prüfen, ob das Demo-Repo die veröffentlichten npm-Pakete nutzt. Dann gibt es `PivotFactory` dort
-  erst nach dem Release 1.1.91. Bis dahin auf einem Branch arbeiten und den Tag erst nach dem Release setzen.
-- **Offener Punkt aus `TODO.md`:** die Tags `ep-001` … `ep-034` sind evtl. noch nicht gepusht. `ep-035` zusammen mit
-  ihnen pushen.
+  erst nach dem Release mit Pivot. Bis dahin auf einem Branch arbeiten und den Tag erst nach dem Release setzen.
+- **Offener Punkt aus `TODO.md`:** die Tags `ep-001` … `ep-034` sind evtl. noch nicht gepusht. Fehlende Tags
+  zusammen mit dem neuen pushen.
 - Repo anlegen, pushen, Tags setzen: **nur nach ausdrücklicher Freigabe**.
 - Framework-Code, der im Training gezeigt wird, nach `apps/webpage-guiexpert/training-examples/` kopieren (README dort:
   Tag aktualisieren).
@@ -417,7 +446,7 @@ Danach:
 ## Definition of Done
 
 **Phase 1 – Entwurf**
-- [ ] `PIVOT_API.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
+- [ ] `prompts/007-pivot.design.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
 - [ ] Beispiele für Fall 1–3, zwei Spaltenfelder, zwei Wertfelder, mit erwarteten Ergebnissen
 - [ ] Entscheidungen Kapitel-Platzierung (Phase 7) und Demo-Repo (Phase 8) vorgelegt
 - [ ] 🛑 Entwurf freigegeben
@@ -433,7 +462,8 @@ Danach:
 
 **Phase 5–7 – Demos, Website, Training**
 - [ ] `createPivotModel` in `demo-table-models`, Pivot-Beispiel in `apps/table-demo` (Angular-Demo: Route + Hinweis)
-- [ ] Showcase `pivot` + Kachel + Feature-Liste; „kein Pivot“-Aussagen korrigiert (`why.astro`,
+- [ ] Showcase `pivot` + Kachel + Feature-Liste; Vergleichszeile „Pivot tables“ auf ✔, „kein Pivot“-Aussagen
+      korrigiert (`why.astro`,
       `build-buy-or-guiexpert`, `checklist`)
 - [ ] Training-Kapitel `pivot-tables` mit Live-Demo, Screenshots, `check:training` grün; Zahlen nachgezogen
 - [ ] `pnpm build:webpage-guiexpert` grün; kein Deploy

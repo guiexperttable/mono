@@ -52,6 +52,10 @@ Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
 
 ▸ **buildTreeRow**\<`T`\>(`data`, `childrenProperty?`, `parent?`, `deep?`, `deepMaxLimit?`, `expanded?`): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>
 
+Appends the child rows of `data` (recursively) to `parent` – used by [buildTreeRows](TreeFactory.md#buildtreerows).
+No row deeper than `deepMaxLimit` is created: the children of a row at depth `deepMaxLimit` are
+skipped with a console warning.
+
 #### Type parameters
 
 | Name |
@@ -60,22 +64,31 @@ Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `data` | `T` | `undefined` |
-| `childrenProperty` | `string` | `"children"` |
-| `parent` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\> | `undefined` |
-| `deep` | `number` | `0` |
-| `deepMaxLimit` | `number` | `12` |
-| `expanded` | `boolean` \| [`TreeRowExpandedFn`](../modules.md#treerowexpandedfn)\<`T`\> | `true` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `data` | `T` | `undefined` | the object whose children are added |
+| `childrenProperty` | `string` | `"children"` | name of the children property (default "children") |
+| `parent` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\> | `undefined` | the tree row of `data` (default: a new, expanded top-level row) |
+| `deep` | `number` | `0` | depth of `parent` (0 = top level) |
+| `deepMaxLimit` | `number` | `12` | maximum depth of a created row (default 12) |
+| `expanded` | `boolean` \| [`TreeRowExpandedFn`](../modules.md#treerowexpandedfn)\<`T`\> | `true` | expanded state of the new rows (default true) |
 
 #### Returns
 
 [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`T`\>
 
+`parent`
+
+**`Example`**
+
+```ts
+const root = TreeFactory.buildTreeRow<OrderNode>(nodes[0], "children");
+console.log(root.children?.length);
+```
+
 #### Defined in
 
-[src/lib/table/factory/tree-factory.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/tree-factory.ts#L90)
+[src/lib/table/factory/tree-factory.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/tree-factory.ts#L107)
 
 ___
 
@@ -97,7 +110,7 @@ Builds tree rows (input for `TableFactory.createTableModel({ rows })`) from nest
 | :------ | :------ | :------ | :------ |
 | `data` | `T`[] | `undefined` | the top-level objects |
 | `childrenPropertyOrOptions` | `string` \| [`TreeFactoryOptions`](../interfaces/TreeFactoryOptions.md)\<`T`\> | `"children"` | name of the children property (default "children") or [TreeFactoryOptions](../interfaces/TreeFactoryOptions.md) |
-| `deepMaxLimit` | `number` | `12` | maximum depth (default 12; ignored when options are passed) |
+| `deepMaxLimit` | `number` | `12` | maximum depth of a row, 0 = top level only (default 12; ignored when options are passed) |
 | `expanded` | `boolean` \| [`TreeRowExpandedFn`](../modules.md#treerowexpandedfn)\<`T`\> | `true` | expanded state of the rows (default true; ignored when options are passed) |
 
 #### Returns

@@ -30,6 +30,7 @@ dom.appendChild(cellDiv, badge);
 - [appendText](DomServiceIf.md#appendtext)
 - [createElement](DomServiceIf.md#createelement)
 - [createText](DomServiceIf.md#createtext)
+- [removeAttribute](DomServiceIf.md#removeattribute)
 - [removeClass](DomServiceIf.md#removeclass)
 - [setAttribute](DomServiceIf.md#setattribute)
 - [setStyle](DomServiceIf.md#setstyle)
@@ -152,6 +153,34 @@ Creates a text node.
 #### Defined in
 
 [src/lib/table/service/dom-service.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L31)
+
+___
+
+### removeAttribute
+
+▸ **removeAttribute**(`ele`, `key`): `void`
+
+Removes an attribute (used for ARIA attributes of reused row divs). Optional: without it the table calls
+`ele.removeAttribute(key)` itself.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ele` | `HTMLElement` |
+| `key` | `string` |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/service/dom-service.if.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/dom-service.if.ts#L48)
 
 ___
 

@@ -1,3 +1,4 @@
+import { escapeHtml } from "../../common/escape-html";
 import {CellRendererIf} from "./cell-render.if";
 import {DomServiceIf} from "../service/dom-service.if";
 import {AreaIdent} from "../data/tablemodel/area-ident.type";
@@ -14,7 +15,9 @@ export class ProgressBarCellRenderer<T> implements CellRendererIf {
   constructor(
     public property: string,
     public maxValue: number=100,
-    public labelVisible = false
+    public labelVisible = false,
+    /** Text for screen readers (the bar is an image). Default: `"75 %"`. @since 1.1.91 */
+    public ariaLabel: (percent: number, value: number) => string = (percent: number) => `${Math.round(percent)} %`
   ) {
   }
 
@@ -39,6 +42,8 @@ export class ProgressBarCellRenderer<T> implements CellRendererIf {
           data-row-index="${rowIndex}"
           data-col-index="${columnIndex}"
           data-area="${areaIdent}"
+          role="img"
+          aria-label="${escapeHtml(this.ariaLabel(per, count))}"
           title="${label}"
           style="position: relative; background: transparent; width: 100%; height: 100%;">
               <div class="ge-table-progress-container"

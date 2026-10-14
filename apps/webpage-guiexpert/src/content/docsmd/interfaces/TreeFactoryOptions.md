@@ -50,7 +50,7 @@ ___
 
 • `Optional` **deepMaxLimit**: `number`
 
-Maximum depth. Default: 12.
+Maximum depth of a row (0 = top level only); deeper children are skipped with a console warning. Default: 12.
 
 #### Defined in
 

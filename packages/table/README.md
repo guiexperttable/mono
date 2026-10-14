@@ -25,7 +25,8 @@ This is the UI-agnostic table component for your next web app. 😊
 - Row and Column Spanning
 - Fixed Columns (Left and Right)
 - Tree table (Hierarchical View)
-- Accessibility support: Keyboard Shortcuts
+- Accessibility: screen readers (WAI-ARIA grid/treegrid, row/column counts with virtual scrolling, announcements of
+  sorting, filter and copy) and full keyboard navigation (arrows, Home/End, Page Up/Down, header focus, Enter) – since 1.1.91
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

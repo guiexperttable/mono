@@ -28,7 +28,7 @@ import { EventAdapter } from './event-adapter';
 import { SimpleDomService } from './service/simple-dom-service';
 import { TableOptions } from './data/options/table-options';
 import { TreeRowIf } from './data/common/tree-row-if';
-import { isAreaModelTree } from './instanceof-workaround';
+import { isAreaModelTree, isCheckboxCellRenderer, isTreeRow } from './instanceof-workaround';
 import { LicenseManager } from './license-manager';
 import { SelectionModel } from './selection/selection-model';
 import { CopyService } from './service/copy-service';
@@ -43,6 +43,8 @@ import { ResizeHandler } from './resize-handler';
 import { ExcelService } from './service/excel-service';
 import { ExcelServiceIf } from './service/excel-service.if';
 import { ColumnDefIf } from './data/tablemodel/column/column-def.if';
+import { LiveAnnouncer } from './aria/live-announcer';
+import { CellGroupExt } from './data/tablemodel/cellgroup/cell-group-ext';
 
 
 /**
@@ -93,6 +95,17 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   protected keyEvent?: GeKeyEvent;
   private api = new TableApi(this);
 
+  /**
+   * The live region of this table: screen readers speak its messages (sorting, filter, copy …).
+   * Use {@link TableApi.announce} for own messages.
+   * @since 1.1.91
+   */
+  readonly liveAnnouncer: LiveAnnouncer;
+  /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
+  static filterAnnouncementDelayInMs = 400;
+  /** firstInit() has finished: announcements are made from now on (not for the initial filter). */
+  private initialized = false;
+
   private mouseStartAction = '';
   private mouseStartWidth = -1;
   private mouseStartColumnIndex = -1;
@@ -116,6 +129,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   ) {
     super(hostElement, tableModel, new ConvenienceDomService(domService), tableOptions);
     tableModel.setTableScope(this);
+    this.liveAnnouncer = new LiveAnnouncer(hostElement.ownerDocument, this.ariaIds.liveRegion(), domService);
 
     if (!eventListener) {
       this.eventListener = new EventAdapter();
@@ -150,6 +164,39 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (fm) {
       fm.addEventFocusChangedListener(this);
     }
+    // Keyboard users who tab into the table start on a cell (WAI-ARIA grid pattern) – not on a mouse click
+    // (that sets the focus cell itself) and not on a programmatic host.focus() (no side effect for apps).
+    const signal = this.listenerAbortController.signal;
+    hostElement.ownerDocument?.addEventListener('keydown', (evt: KeyboardEvent) => {
+      if (evt.key === 'Tab') this.lastTabKeyTime = Date.now();
+    }, { capture: true, signal });
+    hostElement.addEventListener('focus', () => this.onHostKeyboardFocus(), { signal });
+    // A click on a body cell or the scroll bar would focus the scroll viewport (tabindex -1) – the grid (host)
+    // must keep the focus, otherwise screen readers lose aria-activedescendant.
+    this.scrollViewport.addEventListener('focus', () => this.hostElement.focus({ preventScroll: true }), { signal });
+  }
+
+  /** Time of the last Tab key press on the page (the host is focused right after it). */
+  private lastTabKeyTime = 0;
+
+  /**
+   * The host got the keyboard focus (Tab): without a focus cell the first shown cell of the first visible row
+   * gets the focus, so screen readers announce a cell (`aria-activedescendant`).
+   */
+  private onHostKeyboardFocus() {
+    const keyboard = Date.now() - this.lastTabKeyTime < 1000;
+    const fm = this.focusModel();
+    if (!keyboard || !fm || this.headerFocus || this.isEditing()) {
+      return;
+    }
+    const [row, col] = fm.getFocus();
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    if ((row < 0 || col < 0) && rowCount > 0 && this.tableModel.getColumnCount() > 0) {
+      this.setFocusCell(Math.max(0, this.firstFullVisibleRowIndex), this.getFirstShownColumnIndex());
+    } else if (rowCount < 1 && this.getAriaGridInfo().headerRowCount > 0 && this.tableModel.getColumnCount() > 0) {
+      // no rows (empty table, nothing matches the filter): the header is what keyboard users can reach
+      this.setHeaderFocus(this.getAriaGridInfo().headerRowCount - 1, this.getFirstShownColumnIndex());
+    }
   }
 
   /**
@@ -177,6 +224,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {boolean} - Returns true if the action was triggered successfully, false otherwise.
    */
   onActionTriggered(actionId: ActionId): boolean {
+    if (this.headerFocus) {
+      const consumed = this.onHeaderAction(actionId);
+      if (consumed !== undefined) {
+        return consumed;
+      }
+    }
+    if (actionId === 'NAVIGATE_UP' && this.moveFocusIntoHeader()) {
+      return true;
+    }
+    const bodyNavigation = this.onBodyNavigation(actionId);
+    if (bodyNavigation !== undefined) {
+      return bodyNavigation;
+    }
     if (actionId === 'NAVIGATE_DOWN') {
       if (this.changeFocusCell(0, 1)) {
         return true;
@@ -215,8 +275,255 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const fm = this.getFocusModel ? this.getFocusModel() : undefined;
       this.copyService
         .createContent(this.tableModel, sm, fm)
-        .then(txt => this.copyService.copyContent(txt))
+        .then(txt => this.copyService.copyContent(txt).then(() => this.announceCopied(txt)))
         .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
+    }
+    return false;
+  }
+
+  /**
+   * Speaks a message to screen reader users (polite live region, see {@link LiveAnnouncer}).
+   *
+   * @param {string} text - plain text, e.g. "Orders loaded"
+   * @param {number} [delayInMs] - wait before the text is written (default {@link LiveAnnouncer.defaultDelayInMs})
+   * @since 1.1.91
+   */
+  announce(text: string, delayInMs?: number): void {
+    if (text && !this.isDestroyed()) {
+      this.liveAnnouncer.announce(text, delayInMs);
+    }
+  }
+
+  /** "12 cells copied" – the selected cells of the shown columns (without a selection: the focused cell). */
+  announceCopied(_text?: string): void {
+    this.announce(this.ariaTexts.copied(this.countCopiedCells()));
+  }
+
+  /** The number of cells a copy takes: selected cells of shown columns (like CopyService), otherwise 1 (focus). */
+  private countCopiedCells(): number {
+    const sm = this.selectionModel();
+    if (!sm?.hasSelection()) {
+      return 1;
+    }
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    const columnCount = this.tableModel.getColumnCount();
+    const shown = (c: number) => this.tableModel.getColumnDef(c)?.isVisible?.() !== false;
+    let shownColumns = 0;
+    for (let c = 0; c < columnCount; c++) if (shown(c)) shownColumns++;
+    if (sm.isAllSelected()) {
+      return rowCount * shownColumns;
+    }
+    const ranges = sm.getRanges();
+    if (!ranges.length) {
+      return 1;
+    }
+    const r1 = Math.max(0, Math.min(...ranges.map(r => r.r1)));
+    const r2 = Math.min(rowCount - 1, Math.max(...ranges.map(r => r.r2)));
+    const c1 = Math.max(0, Math.min(...ranges.map(r => r.c1)));
+    const c2 = Math.min(columnCount - 1, Math.max(...ranges.map(r => r.c2)));
+    if ((r2 - r1 + 1) * (c2 - c1 + 1) > CopyService.maxCopyCells) {
+      return 0; // not copied (too many cells)
+    }
+    let n = 0;
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) {
+        if (shown(c) && sm.isSelected(r, c)) n++;
+      }
+    }
+    return n;
+  }
+
+  /**
+   * The header cell with the keyboard focus (arrow up in the first body row moves the focus into the header).
+   *
+   * @returns {[number, number] | undefined} header row and column index of the cell, `undefined` if the focus is in the body
+   * @since 1.1.91
+   */
+  getHeaderFocus(): [number, number] | undefined {
+    return this.headerFocus ? [this.headerFocus[0], this.headerFocus[1]] : undefined;
+  }
+
+  /** Moves the body focus to a cell, scrolls it into view and repaints (also leaves the header). */
+  private setFocusCell(rowIndex: number, columnIndex: number): boolean {
+    const fm = this.focusModel();
+    if (!fm) {
+      return false;
+    }
+    this.headerFocus = undefined;
+    fm.setFocus(rowIndex, columnIndex);
+    this.ensureColumnIsVisible(columnIndex); // first: ensureRowIsVisible() keeps the horizontal position
+    this.ensureRowIsVisible(rowIndex);
+    this.repaint();
+    return true;
+  }
+
+  private getFirstShownColumnIndex(): number {
+    return this.getNextShownColumnIndex(-1, 1, this.tableModel.getColumnCount());
+  }
+
+  private getLastShownColumnIndex(): number {
+    const count = this.tableModel.getColumnCount();
+    return this.getNextShownColumnIndex(count, -1, count);
+  }
+
+  /** Home, End, Ctrl+Home, Ctrl+End, Page Up/Down and Enter in the body; `undefined` = not such an action. */
+  private onBodyNavigation(actionId: ActionId): boolean | undefined {
+    const fm = this.focusModel();
+    const pageActions: ActionId[] = ['NAVIGATE_ROW_START', 'NAVIGATE_ROW_END', 'NAVIGATE_FIRST_CELL',
+      'NAVIGATE_LAST_CELL', 'NAVIGATE_PAGE_UP', 'NAVIGATE_PAGE_DOWN', 'ACTIVATE_CELL'];
+    if (!pageActions.includes(actionId)) {
+      return undefined;
+    }
+    if (!fm || this.isEditing()) {
+      return false;
+    }
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    if (rowCount < 1 || this.tableModel.getColumnCount() < 1) {
+      return false;
+    }
+    const [row, col] = fm.getFocus();
+    const currentRow = Math.min(Math.max(row, 0), rowCount - 1);
+    const currentCol = col < 0 ? this.getFirstShownColumnIndex() : col;
+    const page = Math.max(1, this.displayedRowCount - 1);
+    switch (actionId) {
+      case 'NAVIGATE_ROW_START':
+        return this.setFocusCell(currentRow, this.getFirstShownColumnIndex());
+      case 'NAVIGATE_ROW_END':
+        return this.setFocusCell(currentRow, this.getLastShownColumnIndex());
+      case 'NAVIGATE_FIRST_CELL':
+        return this.setFocusCell(0, this.getFirstShownColumnIndex());
+      case 'NAVIGATE_LAST_CELL':
+        return this.setFocusCell(rowCount - 1, this.getLastShownColumnIndex());
+      case 'NAVIGATE_PAGE_UP':
+        return this.setFocusCell(Math.max(0, currentRow - page), currentCol);
+      case 'NAVIGATE_PAGE_DOWN':
+        return this.setFocusCell(Math.min(rowCount - 1, currentRow + page), currentCol);
+      default:
+        return row < 0 || col < 0 ? false : this.activateBodyCell(row, col);
+    }
+  }
+
+  /** Enter on a body cell: toggles its row checkbox, otherwise expands/collapses its tree row. */
+  private activateBodyCell(rowIndex: number, columnIndex: number): boolean {
+    const bodyModel = this.tableModel.getBodyModel();
+    const checkboxCell = bodyModel.isRowCheckable(rowIndex) && (
+      (this.tableOptions.showCheckboxWihoutExtraColumn && columnIndex === 0)
+      || isCheckboxCellRenderer(bodyModel.getCellRenderer(rowIndex, columnIndex)));
+    if (checkboxCell) {
+      this.toggleRowCheckbox(rowIndex, columnIndex, 'body');
+      return true;
+    }
+    const row = bodyModel.getRowByIndex(rowIndex);
+    if (isTreeRow(row) && isAreaModelTree(bodyModel)
+      && (bodyModel as AreaModelTree<any>).hasDisplayedChildren(row as TreeRowIf<any>)) {
+      const tr = row as TreeRowIf<any>;
+      return this.setTreeRowExpanded(tr, !tr.expanded);
+    }
+    return false;
+  }
+
+  /** Arrow up in the first body row: the focus moves to the lowest header row (same column). */
+  private moveFocusIntoHeader(): boolean {
+    const fm = this.focusModel();
+    if (!fm || this.isEditing() || this.headerFocus) {
+      return false;
+    }
+    const [row, col] = fm.getFocus();
+    const headerRows = this.getAriaGridInfo().headerRowCount;
+    const noRows = this.tableModel.getBodyModel().getRowCount() < 1;
+    if ((row !== 0 && !noRows) || headerRows < 1 || this.tableModel.getColumnCount() < 1) {
+      return false;
+    }
+    this.setHeaderFocus(headerRows - 1, col < 0 ? this.getFirstShownColumnIndex() : col);
+    return true;
+  }
+
+  /** Focuses a header cell – the origin of a span cell that covers (row, column) – and repaints. */
+  private setHeaderFocus(rowIndex: number, columnIndex: number) {
+    const range = this.colAndRowspanModels.header?.getRanges()
+      .find(r => r.isInRange(rowIndex, columnIndex));
+    this.headerFocus = range ? [range.r1, range.c1] : [rowIndex, columnIndex];
+    this.ensureColumnIsVisible(this.headerFocus[1]);
+    this.repaint();
+  }
+
+  /**
+   * Keys while a header cell has the focus. Returns `undefined` for actions that work as in the body (copy,
+   * select all …) – they leave the header focus as it is.
+   */
+  private onHeaderAction(actionId: ActionId): boolean | undefined {
+    const [row, col] = this.headerFocus!;
+    const headerModel = this.tableModel.getAreaModel('header');
+    const headerRows = this.getAriaGridInfo().headerRowCount;
+    const columnCount = this.tableModel.getColumnCount();
+    const colspan = Math.max(1, headerModel.getColspanAt(row, col) || 1);
+    const rowspan = Math.max(1, headerModel.getRowspanAt(row, col) || 1);
+    switch (actionId) {
+      case 'NAVIGATE_LEFT': {
+        const c = this.getNextShownColumnIndex(col, -1, columnCount);
+        if (c !== col) this.setHeaderFocus(row, c);
+        return true;
+      }
+      case 'NAVIGATE_RIGHT': {
+        const c = this.getNextShownColumnIndex(col + colspan - 1, 1, columnCount);
+        if (c > col + colspan - 1) this.setHeaderFocus(row, c);
+        return true;
+      }
+      case 'NAVIGATE_ROW_START':
+        this.setHeaderFocus(row, this.getFirstShownColumnIndex());
+        return true;
+      case 'NAVIGATE_ROW_END':
+        this.setHeaderFocus(row, this.getLastShownColumnIndex());
+        return true;
+      case 'NAVIGATE_UP':
+        if (row > 0) this.setHeaderFocus(row - 1, col);
+        return true;
+      case 'NAVIGATE_DOWN': {
+        if (row + rowspan < headerRows) {
+          this.setHeaderFocus(row + rowspan, col);
+          return true;
+        }
+        const rowCount = this.tableModel.getBodyModel().getRowCount();
+        if (rowCount < 1) {
+          return true; // no body rows: stay in the header
+        }
+        return this.setFocusCell(Math.max(0, this.firstFullVisibleRowIndex), col);
+      }
+      case 'NAVIGATE_FIRST_CELL':
+      case 'NAVIGATE_LAST_CELL':
+      case 'NAVIGATE_PAGE_UP':
+      case 'NAVIGATE_PAGE_DOWN':
+        this.headerFocus = undefined; // continue in the body
+        return undefined;
+      case 'ACTIVATE_CELL':
+        return this.activateHeaderCell(row, col, rowspan, headerRows);
+      case 'START_EDITING':
+      case 'TOGGLE_SELECTION':
+        return true; // nothing to edit or select in the header – and not the body cell behind it
+      default:
+        return undefined;
+    }
+  }
+
+  /** Enter on a header cell: a group with a toggle opens/closes, a sortable (lowest) header cell sorts. */
+  private activateHeaderCell(row: number, col: number, rowspan: number, headerRows: number): boolean {
+    const headerModel = this.tableModel.getAreaModel('header');
+    const value = headerModel.getValueAt(row, col) as CellGroupExt | undefined;
+    if (value && typeof value === 'object' && value.toggle && value.visibility !== 'always'
+      && 'toggleHeaderGroup' in headerModel) {
+      const target = new MouseTargetData(null, this);
+      target.rowIdx = row;
+      target.colIdx = col;
+      target.areaIdent = 'header';
+      target.areaModel = headerModel;
+      this.toggleHeaderGroup(target);
+      this.setHeaderFocus(row, col);
+      return true;
+    }
+    const columnDef = this.tableModel.getColumnDef(col);
+    if (row + rowspan >= headerRows && columnDef?.sortable?.()) {
+      this.sortByColumn(col);
+      return true;
     }
     return false;
   }
@@ -286,6 +593,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
     this.autoRestoreScrollPosition();
+    // the live region must exist before its first message – screen readers often miss a region inserted with text
+    this.liveAnnouncer.getElement();
+    this.initialized = true;
 
     return this;
   }
@@ -318,6 +628,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const fm = this.getFocusModel ? this.getFocusModel() : undefined;
     fm?.removeEventFocusChangedListener(this);
     this.disposeRendering();
+    this.liveAnnouncer.destroy();
+    this.removeHostAria();
     this.hostElement.innerText = "";
   }
 
@@ -589,6 +901,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @returns {void}
    */
   onMouseClicked(evt: GeMouseEvent, previousEvt: GeMouseEvent | undefined): boolean {
+    this.headerFocus = undefined; // the mouse sets the (body) focus
     if (evt.clickCount > 1) {
       // a double click: the first click did focus and selection, the dblclick handler sorts/edits/toggles
       // (resetting the editor here would close the editor the double click just opened)
@@ -685,6 +998,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       this.tableModel.recalcHeightAndPadding();
       this.resetSizeOfWrapperDiv();
       this.repaint();
+      if (this.initialized) {
+        const rowCount = this.tableModel.getBodyModel().getRowCount();
+        this.announce(this.ariaTexts.filtered(rowCount), TableScope.filterAnnouncementDelayInMs);
+      }
     }
   }
 
@@ -736,6 +1053,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     this.repaint();
     this.storeSortingService?.setSortItems([sortItem]);
+    if (done) {
+      this.announce(this.ariaTexts.sorted(this.getColumnAriaLabel(colIdx), newState));
+    }
     return true;
   }
 
@@ -1203,6 +1523,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return;
     }
     setter.call(tableModel, visible);
+    if (area === 'header' && !visible) {
+      this.headerFocus = undefined; // a hidden header cannot have the focus
+    }
     this.recalcWrappers(); // area heights → scroll viewport and body height, repaint
   }
 

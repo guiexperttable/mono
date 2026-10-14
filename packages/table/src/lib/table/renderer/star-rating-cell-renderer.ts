@@ -1,3 +1,4 @@
+import { escapeHtml } from "../../common/escape-html";
 import {CellRendererIf} from "./cell-render.if";
 import {DomServiceIf} from "../service/dom-service.if";
 import {AreaIdent} from "../data/tablemodel/area-ident.type";
@@ -12,7 +13,9 @@ import {AreaModelObjectArray} from "../data/tablemodel/areamodel/area-model-obje
 export class StarRatingCellRenderer<T> implements CellRendererIf {
 
   constructor(
-    public property: string
+    public property: string,
+    /** Text for screen readers (the stars are an image). Default: `"4 stars"`. @since 1.1.91 */
+    public ariaLabel: (stars: number) => string = (stars: number) => stars === 1 ? '1 star' : `${stars} stars`
   ) {
   }
 
@@ -39,7 +42,7 @@ export class StarRatingCellRenderer<T> implements CellRendererIf {
       const text = sb.join(' ');
       cellDiv.innerHTML = `
           <div class="ge-table-label-div" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}" style="position: relative; background: transparent; width: 100%; height: 100%;">
-            <div class="ge-table-label" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}">${text}</div>
+            <div class="ge-table-label" data-row-index="${rowIndex}" data-col-index="${columnIndex}" data-area="${areaIdent}" role="img" aria-label="${escapeHtml(this.ariaLabel(count))}">${text}</div>
           </div>`;
     }
 

@@ -37,7 +37,7 @@ Class representing a MouseHandler.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L35)
+[src/lib/table/mouse-handler.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L39)
 
 ## Properties
 
@@ -45,11 +45,13 @@ Class representing a MouseHandler.
 
 • **doubleClickDelay**: `number` = `500`
 
-Represents the delay in milliseconds between two consecutive double clicks.
+Programmatic clicks (`element.click()`, `event.detail === 0`): two clicks on the same cell within this delay (ms)
+count as a double click. Real mouse clicks use the click count of the browser (`event.detail`), i.e. the
+double-click speed of the operating system.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L23)
+[src/lib/table/mouse-handler.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L25)
 
 ___
 
@@ -59,7 +61,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L27)
+[src/lib/table/mouse-handler.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L29)
 
 ___
 
@@ -69,7 +71,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L28)
+[src/lib/table/mouse-handler.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L30)
 
 ___
 
@@ -79,7 +81,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L25)
+[src/lib/table/mouse-handler.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L27)
 
 ___
 
@@ -89,7 +91,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L26)
+[src/lib/table/mouse-handler.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L28)
 
 ___
 
@@ -99,4 +101,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L36)
+[src/lib/table/mouse-handler.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L40)

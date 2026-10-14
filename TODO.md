@@ -132,6 +132,12 @@
 - [x] Performance: `RenderScope.adjustArea` iterierte ab Zeile 0 bis zur ersten sichtbaren Zeile (O(n) pro
       Scroll-Frame). Branch `perf/constant-row-height`: `getConstantRowHeight()` → Startindex direkt berechnet
       (2 Mio. Zeilen, Tabellenende: 28,7 → 14,6 ms; Ausgabe an 265 Positionen identisch, Messung s. Commit).
+- [x] **Hover-Zeile/-Spalte versetzt bei großen Tabellen** (gefunden in `apps/table-demo`, 1000 × 100 mit 2 Header- und
+      2 Footer-Zeilen, 2 + 2 fixierten Spalten): `adjustHoverRows`/`getColumnLeftInHost` rechneten mit
+      `scrollTop`/`scrollLeft` des Scroll-Viewports. Dessen Bereich ist aber nicht der gerenderte Inhaltsbereich
+      (Viewport reicht über den Footer, Wrapper + 1 px, East-Spalten und vertikale Scrollleiste) – der Versatz wuchs mit
+      der Scrollposition (Mitte ~34 px, Ende ~67 px). Jetzt mit dem gerenderten Versatz (`contentScrollTop`,
+      neu `getContentScrollLeft()`); Browser-Test für oben links / Mitte / Ende.
 - [ ] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
       Filter/Sortierung/Baum-Toggle beachten).
       → Voraussetzung in Prompt 011 (Master/Detail).
@@ -157,8 +163,13 @@ Lücken gegenüber ag-Grid 36.2, je ein Arbeitsauftrag für eine neue Sitzung (A
 Demos → Website → Training → Demo-Repo → Video). Index, Reihenfolge und Abhängigkeiten: **`prompts/README.md`**,
 gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
 
-- [ ] **001 Screenreader-Unterstützung (ARIA)** – heute kein einziges `aria-*`/`role` im Core; zuerst, weil alle
-      späteren Features die Regeln mit umsetzen (`prompts/001-aria-screenreader.md`).
+- [x] **001 Screenreader-Unterstützung (ARIA)** – Branch `feat/aria`, Design `prompts/001-aria-screenreader.design.md`:
+      `role="grid"`/`"treegrid"`, Zeilen/Zellen mit Index und Zählung über alle Zeilen (Virtual Scrolling),
+      `aria-activedescendant`, Header-Fokus, Pos1/Ende/Bild/Enter, Live-Region, `ariaTexts`, axe-core in den Browser-Specs.
+      Offen: manuelle Tests mit NVDA/JAWS/VoiceOver (Protokoll im Design-Dokument § 8) – **vor dem Release**.
+- [ ] ARIA-Folgepunkte: Tooltip bei Tastaturfokus sichtbar machen (`title` erreicht nur Screenreader) · Spaltenbreite
+      und -reihenfolge per Tastatur · „alle auf-/zuklappen“-Icon im Baum-Header per Tastatur (heute `aria-hidden`,
+      Enter je Knoten) · Demo-Repo-Folge `ep-035` (nach dem Release).
 - [ ] **002 Overlays „Lädt…“ / „Keine Daten“** in plain HTML/CSS (`prompts/002-overlays-laden-keine-daten.md`).
 - [ ] **003 Zustand speichern vervollständigen + State-API** (`prompts/003-zustand-speichern.md`). Befund 14.10.2026:
       `autoRestoreCheckedState` und `autoRestoreSelectedState` sind nur deklariert (stilles No-op), `isSame` ungenutzt;
@@ -469,6 +480,22 @@ Objekt-Tabelle hat `ge-focused-row`.
   selbst); die Tabelle zeigt gespeicherte/neue Zeilen sofort; Actions-Spalte und DELETE nutzen `getIdKey()`; keine
   `console.info`-Ausgaben mehr. Edit-Dialog: Zahlen bleiben Zahlen, Booleans werden als `true`/`false` gespeichert.
 
+- **Barrierefreiheit (1.1.91)**: die Tabelle ist ein WAI-ARIA-`grid` (Baum: `treegrid`) – neue Attribute an Host,
+  Zeilen und Zellen (bestehende Klassen und `data-*` unverändert); neue Optionen `ariaLabel`, `ariaLabelledBy`,
+  `ariaDescribedBy`, `ariaTexts`, neu `tableApi.announce()`/`getHeaderFocus()`, `DomServiceIf.removeAttribute?()`.
+  Verhaltensänderungen: **Pos1/Ende/Bild↑/Bild↓/Enter** werden von der Tabelle verarbeitet (vorher scrollte z. B.
+  Bild↓ die Seite; Enter nur, wenn es etwas auslöst); ↑ in der ersten Zeile führt in den Header; **Tab** in die Tabelle
+  setzt den Fokus auf die erste sichtbare Zelle (`onFocusChanged`); der Scroll-Viewport ist kein eigener Tab-Stopp
+  mehr (`tabindex="-1"`, vorher in Chrome ≥ 130 zweiter Tab-Stopp); teilweise markierte Checkbox = natives
+  `indeterminate` statt blassem ✓; Span-Zellen liegen in einem eigenen Div `.ge-table-span-row`; Fokusrahmen 2 px
+  (`ConvenienceDomService.focusBorderWidthInPx`); Light-Theme: Sterne `#a86f00`, Fortschrittsbalken `#1e874b`
+  (Kontrast ≥ 3 : 1); Live-Region-Div in `document.body` (beim `firstInit()` angelegt, mit `destroy()` entfernt);
+  Host-Fokusring `.ge-table:focus-visible` (2 px); während eine Header-Zelle den Fokus hat, ist der Body-Fokusrahmen
+  ausgeblendet; Checkboxen und Action-Buttons/-Links in Zellen haben `tabindex="-1"` (kein Tab-Stopp je Zeile mehr –
+  bedient per Maus bzw. Enter auf der Fokuszelle), Tasten auf einem fokussierten Button/Link gehören ihm;
+  `MaleFemaleToIconCellRenderer` legt das Symbol in ein `span[role=img]`; `ConvenienceDomService.addDiv()` setzt
+  `aria-hidden`; `destroy()` stellt vorherige ARIA-Attribute des Hosts wieder her.
+
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 
 - [x] Schulung `/training/` (34 Kapitel, 26 Live-Demos) + API-Doc überarbeitet (Kategorien, typedoc.json, `docs:check`:
@@ -489,6 +516,8 @@ Objekt-Tabelle hat `ge-focused-row`.
 - [ ] `TableOptions.headerToggleExpandCollapseIcons` wird nirgends ausgewertet.
 - [ ] `ColumnDef`-Felder erben die Doku von `ColumnDefIf` nicht (typedoc) – ggf. `@inheritDoc`.
 - [ ] Demo-Repo `krocon/guiexpert-table-step-by-step-demo`: Tags `ep-001` … `ep-034` pushen (die Schulung verlinkt sie).
+      Neu: `ep-035` (Kapitel 35 „Accessibility“) nach dem Release 1.1.91 anlegen – Code-Vorlage
+      `apps/webpage-guiexpert/src/training/demos/accessibility.ts`.
 
 ## Gefunden beim Bau der Startseite (Okt. 2026)
 

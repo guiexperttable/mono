@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L11)
+[src/lib/table/renderer/number-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L12)
 
 ## Properties
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L13)
+[src/lib/table/renderer/number-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L14)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L12)
+[src/lib/table/renderer/number-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L13)
 
 ## Methods
 
@@ -94,4 +94,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L16)
+[src/lib/table/renderer/number-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-renderer.ts#L17)

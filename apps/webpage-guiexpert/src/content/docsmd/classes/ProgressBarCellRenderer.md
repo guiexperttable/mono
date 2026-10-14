@@ -22,6 +22,7 @@ Works with AreaModelObjectArray only
 
 ### Properties
 
+- [ariaLabel](ProgressBarCellRenderer.md#arialabel)
 - [labelVisible](ProgressBarCellRenderer.md#labelvisible)
 - [maxValue](ProgressBarCellRenderer.md#maxvalue)
 - [property](ProgressBarCellRenderer.md#property)
@@ -34,7 +35,7 @@ Works with AreaModelObjectArray only
 
 ### constructor
 
-• **new ProgressBarCellRenderer**\<`T`\>(`property`, `maxValue?`, `labelVisible?`): [`ProgressBarCellRenderer`](ProgressBarCellRenderer.md)\<`T`\>
+• **new ProgressBarCellRenderer**\<`T`\>(`property`, `maxValue?`, `labelVisible?`, `ariaLabel?`): [`ProgressBarCellRenderer`](ProgressBarCellRenderer.md)\<`T`\>
 
 #### Type parameters
 
@@ -44,11 +45,12 @@ Works with AreaModelObjectArray only
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `property` | `string` | `undefined` |
-| `maxValue` | `number` | `100` |
-| `labelVisible` | `boolean` | `false` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `property` | `string` | `undefined` | - |
+| `maxValue` | `number` | `100` | - |
+| `labelVisible` | `boolean` | `false` | - |
+| `ariaLabel` | (`percent`: `number`, `value`: `number`) => `string` | `undefined` | Text for screen readers (the bar is an image). Default: `"75 %"`. **`Since`** 1.1.91 |
 
 #### Returns
 
@@ -56,9 +58,40 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[src/lib/table/renderer/progress-bar-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L14)
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L15)
 
 ## Properties
+
+### ariaLabel
+
+• **ariaLabel**: (`percent`: `number`, `value`: `number`) => `string`
+
+#### Type declaration
+
+▸ (`percent`, `value`): `string`
+
+Text for screen readers (the bar is an image). Default: `"75 %"`.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `percent` | `number` |
+| `value` | `number` |
+
+##### Returns
+
+`string`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L20)
+
+___
 
 ### labelVisible
 
@@ -66,7 +99,7 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[src/lib/table/renderer/progress-bar-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L17)
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L18)
 
 ___
 
@@ -76,7 +109,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/renderer/progress-bar-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L16)
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L17)
 
 ___
 
@@ -86,7 +119,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/renderer/progress-bar-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L15)
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L16)
 
 ## Methods
 
@@ -120,4 +153,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/progress-bar-cell-renderer.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L21)
+[src/lib/table/renderer/progress-bar-cell-renderer.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/progress-bar-cell-renderer.ts#L24)

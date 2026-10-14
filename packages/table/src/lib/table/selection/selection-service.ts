@@ -1,4 +1,5 @@
 import { GeMouseEvent } from "../data/common/event/ge-mouse-event";
+import { AriaTextsIf } from "../aria/aria-texts.if";
 import { TableScope } from "../table-scope";
 import { GetT } from "../data/common/get-t";
 import { SelectionModelIf } from "./selection-model.if";
@@ -160,12 +161,17 @@ export class SelectionService implements OnActionTriggeredIf {
         if (actionId === "SELECT_ALL") {
           sm.selectAll();
           this.tableScope.repaint();
+          this.announce(texts => texts.allSelected());
           return true;
         }
         if (actionId === "DESELECT_ALL") {
           sm.clear();
           this.tableScope.repaint();
+          this.announce(texts => texts.selectionCleared());
           return true;
+        }
+        if (actionId === "TOGGLE_SELECTION" && this.tableScope.getHeaderFocus?.()) {
+          return false; // a header cell has the focus – not the body cell behind it
         }
         if (actionId === "TOGGLE_SELECTION") {
           const [row, col] = fm.getFocus();
@@ -178,6 +184,14 @@ export class SelectionService implements OnActionTriggeredIf {
     return false;
   }
 
+
+  /** Speaks a message for screen readers – only if the selection model can select anything. */
+  private announce(text: (texts: AriaTextsIf) => string): void {
+    const sm = this.getSelectionModel?.() as unknown as { selectionType?: string } | undefined;
+    if (sm?.selectionType !== "none" && this.tableScope.ariaTexts && typeof this.tableScope.announce === "function") {
+      this.tableScope.announce(text(this.tableScope.ariaTexts));
+    }
+  }
 
   /** Runs `fn` so that all selection changes in it reach the table's listener as ONE onSelectionChanged event. */
   private batch(fn: () => void): void {

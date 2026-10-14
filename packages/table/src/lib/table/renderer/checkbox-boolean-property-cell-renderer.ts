@@ -43,6 +43,7 @@ export class CheckboxBooleanPropertyCellRenderer<T> implements CellRendererIf {
           data-col-index="${columnIndex}"
           data-property-index="${this.property}"
           data-input-type="checkbox"
+          tabindex="-1"
           ${checked}
           ${readonly}
           class="ge-input-checkbox">`;

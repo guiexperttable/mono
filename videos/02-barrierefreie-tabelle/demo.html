@@ -1,0 +1,84 @@
+<!doctype html>
+<!--
+  Recording page for episode 02 "Barrierefreie Tabelle in 60 Sekunden".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/02-barrierefreie-tabelle/demo.html
+  Screen reader:      macOS VoiceOver (Cmd+F5) with Safari – or NVDA with Firefox/Chrome on Windows.
+  The box below the table shows what the screen reader hears (a copy of the live region) – for the subtitles.
+-->
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – barrierefrei</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #fff; font-size: 18px; }
+    header { display: flex; gap: 16px; align-items: baseline; padding: 10px 16px 0; }
+    h1 { font-size: 24px; margin: 0; }
+    .keys { padding: 6px 16px; font-size: 15px; color: #333; }
+    kbd { border: 1px solid #888; border-radius: 4px; padding: 0 5px; font-size: 14px; background: #f6f6f6; }
+    .bar { padding: 6px 16px; }
+    .bar input { font: inherit; padding: 4px 8px; }
+    .table-div { height: calc(100vh - 260px); margin: 0 16px; font-size: 17px; }
+    .heard { margin: 10px 16px; padding: 10px 14px; border: 2px solid #1e4fd8; border-radius: 8px; font-size: 20px; min-height: 1.4em; }
+    .heard::before { content: "🔊 "; }
+  </style>
+</head>
+<body>
+<header><h1 id="title">Bestellungen</h1></header>
+<p class="keys">
+  <kbd>Tab</kbd> in die Tabelle · <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> Zellen · <kbd>Pos1</kbd>/<kbd>Ende</kbd> ·
+  <kbd>Bild↓</kbd> · <kbd>↑</kbd> in Zeile 1 → Kopfzeile, <kbd>Enter</kbd> sortiert · <kbd>Strg</kbd>+<kbd>C</kbd>
+</p>
+<div class="bar"><label>Filter Kunde <input id="filter" type="search" placeholder="z. B. 42"></label></div>
+<div class="table-div"></div>
+<div class="heard" id="heard" aria-hidden="true"></div>
+
+<script type="module">
+  // Same code as snippet.ts (plain JS for the browser) + filter field + the visible copy of the live region
+  import { ColumnDef, EventAdapter, SelectionModel, SimpleDomService, TableFactory, TableOptions, TableScope, TrueFn } from "@guiexpert/table";
+
+  let filter = "";
+  const selectionModel = new SelectionModel("range", "multi");
+  const tableOptions = {
+    ...new TableOptions(),
+    ariaLabelledBy: "title",
+    ariaTexts: {
+      sorted: (spalte, state) => `Sortiert nach ${spalte}, ${state === "desc" ? "absteigend" : "aufsteigend"}`,
+      filtered: (zeilen) => zeilen === 1 ? "1 Zeile" : `${zeilen} Zeilen`,
+      copied: (zellen) => zellen === 1 ? "1 Zelle kopiert" : `${zellen} Zellen kopiert`,
+      allSelected: () => "Alle Zellen ausgewählt",
+    },
+    getSelectionModel: () => selectionModel,
+    externalFilterFunction: row => !filter || row.kunde.includes(filter),
+  };
+  const rows = Array.from({ length: 100_000 }, (_, i) => ({ id: i + 1, kunde: `Kunde ${i % 997}`, summe: i % 1000 }));
+  const columnDefs = ["id", "kunde", "summe"].map(p => ColumnDef.create({ property: p, headerLabel: p.toUpperCase(), sortable: TrueFn }));
+  const tableModel = TableFactory.createTableModel({ rows, columnDefs, tableOptions });
+  const host = document.querySelector(".table-div");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  scope.firstInit();
+  const api = scope.getApi();
+
+  document.querySelector("#filter").addEventListener("input", e => { filter = e.target.value; api.externalFilterChanged(); });
+
+  // what the screen reader hears: live region (announcements) + the active cell (aria-activedescendant)
+  const heard = document.querySelector("#heard");
+  api.announce("100.000 Bestellungen");
+  const region = scope.liveAnnouncer.getElement();
+  new MutationObserver(() => { if (region.textContent) heard.textContent = region.textContent; })
+    .observe(region, { childList: true, characterData: true, subtree: true });
+  new MutationObserver(() => {
+    const cell = document.getElementById(host.getAttribute("aria-activedescendant") ?? "");
+    if (!cell) return;
+    const row = cell.closest("[aria-rowindex]")?.getAttribute("aria-rowindex");
+    const col = cell.getAttribute("aria-colindex");
+    const header = document.querySelector(`.ge-table-header-center [role=columnheader][aria-colindex="${col}"]`)?.textContent?.trim();
+    heard.textContent = cell.getAttribute("role") === "columnheader"
+      ? `${cell.textContent.trim()}, Spaltenkopf${cell.getAttribute("aria-sort") !== "none" ? ", " + cell.getAttribute("aria-sort") : ""}`
+      : `${header}: ${cell.textContent.trim()} – Zeile ${Number(row).toLocaleString("de")} von ${Number(host.getAttribute("aria-rowcount")).toLocaleString("de")}`;
+  }).observe(host, { attributes: true, attributeFilter: ["aria-activedescendant"] });
+</script>
+</body>
+</html>

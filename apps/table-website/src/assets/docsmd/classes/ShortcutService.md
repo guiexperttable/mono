@@ -88,7 +88,7 @@ Retrieves the shortcut action mapping object.
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L178)
+[src/lib/table/action/shortcut.service.ts:179](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L179)
 
 ___
 

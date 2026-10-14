@@ -121,6 +121,26 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   }
 
   /**
+   * The displayed children of a row (in display order): all children, with an active filter only those that match
+   * (or have a matching descendant). They are on screen if the row is expanded.
+   * Used for the screen reader attributes `aria-setsize` / `aria-posinset` of tree rows.
+   *
+   * @example
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * const shown = treeModel.getDisplayedChildren(treeModel.rows[0]).length;
+   *
+   * @param {TreeRowIf<S>} row - a tree row of this model
+   * @returns {TreeRowIf<S>[]} the displayed children (empty for a leaf)
+   * @since 1.1.91
+   */
+  getDisplayedChildren(row: TreeRowIf<S>): TreeRowIf<S>[] {
+    if (!row.children?.length) {
+      return [];
+    }
+    return this.lastPredictFn ? row.children.filter(child => child.keep) : row.children;
+  }
+
+  /**
    * The displayed rows: all parents expanded and accepted by the active filter, in display order.
    *
    * @returns {TreeRowIf<S>[]} the displayed tree rows (do not modify the array)

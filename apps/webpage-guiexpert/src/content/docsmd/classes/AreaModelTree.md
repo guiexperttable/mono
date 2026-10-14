@@ -5,6 +5,34 @@
 Represents a  tree-based table model.
 Extends the AbstractAreaModel class.
 
+The displayed rows always come from one pipeline: all tree rows (in their current, possibly sorted order)
+→ rows whose parents are all expanded → active filter. Everything that changes one of these inputs
+([recalcVisibleTreeRows](AreaModelTree.md#recalcvisibletreerows) after an expand/collapse, [externalFilterChanged](AreaModelTree.md#externalfilterchanged), [doSort](AreaModelTree.md#dosort),
+[toggleExpandCollapseAll](AreaModelTree.md#toggleexpandcollapseall)) runs the whole pipeline, so a filter survives expanding, collapsing and sorting.
+
+Filter semantics: the filter function receives the [tree row](../interfaces/TreeRowIf.md) – your object is `row.data`.
+It is called for **every** row, also for rows below collapsed parents. A row is shown if it or one of its
+descendants matches (`row.keep`) and all its parents are expanded. So a match below a collapsed node keeps
+that node visible (still collapsed); expanding it reveals the path to the match. The children of a matching
+row are not kept automatically.
+
+**`Example`**
+
+```ts
+// a tree table with a live search over the labels
+const filter = { text: "" };
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  externalFilterFunction: (row: TreeRowIf<OrderNode>) => row.data.label.toLowerCase().includes(filter.text)
+};
+const rows = TreeFactory.buildTreeRows<OrderNode>(nodes, { expanded: false });
+const tableModel = TableFactory.createTableModel({ rows, columnDefs, tableOptions });
+searchInput.addEventListener("input", () => {
+  filter.text = searchInput.value.toLowerCase();
+  tableApi.externalFilterChanged(); // parents of matches stay visible; expanding and sorting keep the filter
+});
+```
+
 ## Type parameters
 
 | Name | Description |
@@ -47,6 +75,8 @@ Extends the AbstractAreaModel class.
 - [getConstantRowHeight](AreaModelTree.md#getconstantrowheight)
 - [getCustomClassesAt](AreaModelTree.md#getcustomclassesat)
 - [getCustomStyleAt](AreaModelTree.md#getcustomstyleat)
+- [getDisplayedChildren](AreaModelTree.md#getdisplayedchildren)
+- [getDisplayedRootRows](AreaModelTree.md#getdisplayedrootrows)
 - [getFilteredFlattenRows](AreaModelTree.md#getfilteredflattenrows)
 - [getMaxColspan](AreaModelTree.md#getmaxcolspan)
 - [getMaxRowspan](AreaModelTree.md#getmaxrowspan)
@@ -59,6 +89,7 @@ Extends the AbstractAreaModel class.
 - [getValueAt](AreaModelTree.md#getvalueat)
 - [getValueByT](AreaModelTree.md#getvaluebyt)
 - [getYPosByRowIndex](AreaModelTree.md#getyposbyrowindex)
+- [hasDisplayedChildren](AreaModelTree.md#hasdisplayedchildren)
 - [init](AreaModelTree.md#init)
 - [isEditable](AreaModelTree.md#iseditable)
 - [isFilterable](AreaModelTree.md#isfilterable)
@@ -104,7 +135,7 @@ Extends the AbstractAreaModel class.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L32)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L61)
 
 ## Properties
 
@@ -138,7 +169,7 @@ if (areaModel.areaIdent === "body") {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L33)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L62)
 
 ___
 
@@ -166,7 +197,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L36)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L65)
 
 ___
 
@@ -180,7 +211,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L35)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L64)
 
 ___
 
@@ -190,7 +221,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L23)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L48)
 
 ___
 
@@ -231,7 +262,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L34)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L63)
 
 ___
 
@@ -241,7 +272,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L21)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L46)
 
 ___
 
@@ -329,7 +360,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L44)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L72)
 
 ___
 
@@ -337,61 +368,27 @@ ___
 
 ▸ **doSort**(`sortItems`): `boolean`
 
-Sorts the rows in this area based on the provided sort items.
-This method is called when the user clicks on a sortable column header.
+Sorts the rows of every level (children stay below their parent) and keeps the active filter. The first sort
+item is the primary key, the following ones break ties. The `rows` array and the children arrays are reordered
+in place, so the order survives expanding, collapsing and filtering. Sort state `""` keeps the current order.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `sortItems` | [`SortItem`](SortItem.md)[] | An array of sort items, each containing a column index and sort direction |
+| `sortItems` | [`SortItem`](SortItem.md)[] | primary key first; an empty list does nothing |
 
 #### Returns
 
 `boolean`
 
-True if sorting was performed, false otherwise
+`true` if the rows were sorted, `false` for an empty list
 
 **`Example`**
 
 ```ts
-// Sort by the second column in ascending order
-bodyAreaModel.doSort([{ columnIndex: 1, sortState: 'asc' }]);
-
-// Sort by the first column in descending order, then by the second column in ascending order
-bodyAreaModel.doSort([
-  { columnIndex: 0, sortState: 'desc' },
-  { columnIndex: 1, sortState: 'asc' }
-]);
-```
-
-**`Example`**
-
-```ts
-// Implementation example: a body model that sorts its own rows
-class MyBodyModel extends AreaModelObjectArray<any> {
-  override doSort(sortItems: SortItem[]): boolean {
-    if (!sortItems.length) return false;
-    
-    // Apply sorting to the rows
-    for (const sortItem of sortItems) {
-      const { columnIndex, sortState } = sortItem;
-      const property = this.columnDefs[columnIndex].property;
-      const direction = sortState === 'asc' ? 1 : -1;
-      
-      this.rows.sort((a, b) => {
-        const valueA = a[property];
-        const valueB = b[property];
-        
-        if (valueA < valueB) return -1 * direction;
-        if (valueA > valueB) return 1 * direction;
-        return 0;
-      });
-    }
-    
-    return true;
-  }
-}
+tableModel.getBodyModel().doSort([new SortItem(1, "desc")]);
+tableApi.repaint();
 ```
 
 #### Overrides
@@ -400,7 +397,7 @@ class MyBodyModel extends AreaModelObjectArray<any> {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L123)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:244](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L244)
 
 ___
 
@@ -408,8 +405,15 @@ ___
 
 ▸ **externalFilterChanged**\<`S`\>(`predictFn`): `void`
 
-Applies a filter function to the rows in this area.
-This method is called when a filter is applied to the table.
+Filters the tree; the function is remembered and applied again on every expand/collapse
+([recalcVisibleTreeRows](AreaModelTree.md#recalcvisibletreerows)), [toggleExpandCollapseAll](AreaModelTree.md#toggleexpandcollapseall) and [doSort](AreaModelTree.md#dosort).
+
+The function is called once for **every** tree row in depth-first order – also for rows below collapsed
+parents – with the [tree row](../interfaces/TreeRowIf.md) (not your object: use `row.data`), the index of the row in
+this depth-first list and the list itself. Shown are the rows that match or have a matching descendant
+(`row.keep = true`) and whose parents are all expanded. A match below a collapsed node therefore keeps the
+collapsed node visible. Usually called by `tableApi.externalFilterChanged()` with
+`tableOptions.externalFilterFunction`.
 
 #### Type parameters
 
@@ -421,7 +425,7 @@ This method is called when a filter is applied to the table.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `predictFn` | [`FilterFunction`](../modules.md#filterfunction)\<`S`\> | A function that takes a row and returns true if the row should be visible |
+| `predictFn` | [`FilterFunction`](../modules.md#filterfunction)\<`S`\> | returns a truthy value for the rows to show |
 
 #### Returns
 
@@ -430,21 +434,12 @@ This method is called when a filter is applied to the table.
 **`Example`**
 
 ```ts
-// Filter rows where age > 30
-bodyAreaModel.externalFilterChanged(row => row.age > 30);
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+treeModel.externalFilterChanged((row: TreeRowIf<OrderNode>) => row.data.total > 1000);
+tableApi.repaintHard();
 
-// Clear all filters
-bodyAreaModel.externalFilterChanged(() => true);
-```
-
-**`Example`**
-
-```ts
-// Implementation example
-externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
-  // Apply the filter to the rows
-  this.filteredRows = this.rows.filter(predictFn);
-}
+// remove the filter
+treeModel.externalFilterChanged(() => true);
 ```
 
 #### Overrides
@@ -453,7 +448,7 @@ externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L118)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:227](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L227)
 
 ___
 
@@ -487,7 +482,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:170](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L170)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:317](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L317)
 
 ___
 
@@ -609,7 +604,7 @@ The constant row height or `undefined`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L93)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:181](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L181)
 
 ___
 
@@ -676,7 +671,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L98)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L186)
 
 ___
 
@@ -739,17 +734,77 @@ getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string
 
 ___
 
-### getFilteredFlattenRows
+### getDisplayedChildren
 
-▸ **getFilteredFlattenRows**(): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+▸ **getDisplayedChildren**(`row`): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+
+The displayed children of a row (in display order): all children, with an active filter only those that match
+(or have a matching descendant). They are on screen if the row is expanded.
+Used for the screen reader attributes `aria-setsize` / `aria-posinset` of tree rows.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\> | a tree row of this model |
 
 #### Returns
 
 [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
 
+the displayed children (empty for a leaf)
+
+**`Example`**
+
+```ts
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+const shown = treeModel.getDisplayedChildren(treeModel.rows[0]).length;
+```
+
+**`Since`**
+
+1.1.91
+
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L54)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L136)
+
+___
+
+### getDisplayedRootRows
+
+▸ **getDisplayedRootRows**(): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+
+The displayed top-level rows: all of [rows](AreaModelTree.md#rows), with an active filter only the matching ones (or with a
+matching descendant).
+
+#### Returns
+
+[`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+
+the top-level rows that are shown
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:105](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L105)
+
+___
+
+### getFilteredFlattenRows
+
+▸ **getFilteredFlattenRows**(): [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+
+The displayed rows: all parents expanded and accepted by the active filter, in display order.
+
+#### Returns
+
+[`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>[]
+
+the displayed tree rows (do not modify the array)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L148)
 
 ___
 
@@ -882,7 +937,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L103)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L191)
 
 ___
 
@@ -922,7 +977,7 @@ getRowCount(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L58)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L152)
 
 ___
 
@@ -985,7 +1040,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L83)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L171)
 
 ___
 
@@ -1205,7 +1260,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L68)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L156)
 
 ___
 
@@ -1226,7 +1281,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L107)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:195](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L195)
 
 ___
 
@@ -1290,6 +1345,31 @@ getYPosByRowIndex(rowIndex: number): number {
 #### Defined in
 
 [src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L95)
+
+___
+
+### hasDisplayedChildren
+
+▸ **hasDisplayedChildren**(`row`): `boolean`
+
+True if the row has children that are shown when it is expanded – with an active filter only children that
+match (or have a matching descendant) count. The arrow of a row without such children is hidden.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\> | a tree row of this model |
+
+#### Returns
+
+`boolean`
+
+true if the row has displayed children
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L116)
 
 ___
 
@@ -1549,7 +1629,8 @@ ___
 ▸ **isSelectable**(`_rowIndex`, `_columnIndex`): `boolean`
 
 Determines whether the cell at the specified row and column indices is selectable.
-If true, the user can select the cell.
+If true, the user can select the cell: the table draws the selection only on selectable body cells.
+All built-in models and [AreaModel](AreaModel.md) return `true` (except the hidden and cover-grid models).
 
 #### Parameters
 
@@ -1599,15 +1680,36 @@ ___
 
 ### recalcVisibleTreeRows
 
-▸ **recalcVisibleTreeRows**(): `void`
+▸ **recalcVisibleTreeRows**(`refilter?`): `void`
+
+Rebuilds the displayed rows after the `expanded` state of rows has changed and applies the active filter
+(see [externalFilterChanged](AreaModelTree.md#externalfilterchanged)) again. The table calls it on every expand/collapse click. Call it
+yourself after changing `row.expanded` from code, then repaint with `tableApi.repaintHard()`
+(the row count changes).
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `refilter?` | `boolean` | `true` | run the filter function again (needed after the rows changed). `false` after a pure expand/collapse: whether a row matches does not depend on it (the table does this on every click – before, the filter ran over all nodes for each click). |
 
 #### Returns
 
 `void`
 
+**`Example`**
+
+```ts
+// expand all first-level rows from code
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+for (const row of treeModel.rows) row.expanded = true;
+treeModel.recalcVisibleTreeRows();
+tableApi.repaintHard();
+```
+
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L50)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L95)
 
 ___
 
@@ -1627,7 +1729,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L143)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:290](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L290)
 
 ___
 
@@ -1756,22 +1858,22 @@ setValue(rowIndex: number, columnIndex: number, value: any): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:151](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L151)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:298](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L298)
 
 ___
 
 ### sort
 
-▸ **sort**(`_compareFn?`): `void`
+▸ **sort**(`compareFn`): `void`
 
-Sorts the rows in this area using a custom comparator function.
-This method provides more flexibility than doSort for complex sorting logic.
+Sorts the rows of every level with your own function (children stay below their parent) and keeps the active
+filter. Used by `tableApi.sort(fn)` – before, sorting a tree with a function did nothing.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `_compareFn?` | (`a`: `any`, `b`: `any`) => `number` | A function that compares two rows and returns a number: - Negative if a should come before b - Positive if a should come after b - Zero if they are equivalent for sorting purposes |
+| `compareFn` | (`a`: [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>, `b`: [`TreeRowIf`](../interfaces/TreeRowIf.md)\<`S`\>) => `number` | compares two sibling rows – like the filter function it gets the tree rows: your objects are `a.data` / `b.data` |
 
 #### Returns
 
@@ -1780,36 +1882,16 @@ This method provides more flexibility than doSort for complex sorting logic.
 **`Example`**
 
 ```ts
-// Sort rows by name length
-bodyAreaModel.sort((a, b) => a.name.length - b.name.length);
-
-// Sort rows by a computed value
-bodyAreaModel.sort((a, b) => {
-  const scoreA = a.wins * 3 + a.draws;
-  const scoreB = b.wins * 3 + b.draws;
-  return scoreB - scoreA; // Descending order
-});
+tableApi.sort((a, b) => a.data.total - b.data.total);   // sorts the siblings of every level by total
 ```
 
-**`Example`**
-
-```ts
-// Implementation example
-sort(compareFn?: (a: any, b: any) => number): void {
-  if (!compareFn) return;
-  
-  // Apply the custom sort function
-  this.rows.sort(compareFn);
-}
-```
-
-#### Inherited from
+#### Overrides
 
 [AbstractAreaModel](AbstractAreaModel.md).[sort](AbstractAreaModel.md#sort)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L122)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L275)
 
 ___
 
@@ -1817,11 +1899,13 @@ ___
 
 ▸ **toggleExpandCollapseAll**(`expanded`): `void`
 
+Expands or collapses every row on every level and applies the active filter again.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `expanded` | `boolean` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `expanded` | `boolean` | `true` expands, `false` collapses all rows |
 
 #### Returns
 
@@ -1829,4 +1913,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L136)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:285](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L285)

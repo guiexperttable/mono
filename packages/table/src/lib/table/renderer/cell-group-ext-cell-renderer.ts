@@ -8,6 +8,7 @@ import { HeaderGroupOptions } from '../data/options/header-group-options';
 import { HeaderGroupOptionsIf } from '../data/options/header-group-options.if';
 import { IconIf } from '../data/options/icon.if';
 import { escapeHtml } from '../../common/escape-html';
+import { AriaTexts } from '../aria/aria-texts';
 
 
 /** @category Header groups */
@@ -39,7 +40,13 @@ export class CellGroupExtCellRenderer implements CellRendererIf {
       const action = toggle ? CellGroupExtCellRenderer.toggleHeaderGroup : '';
       this.addText(cellDiv, areaIdent, rowIndex, columnIndex, label, action);
       if (toggle && visibility !== 'always') {
-        this.addArrowDiv(domService, cellDiv, !closed, rowIndex, columnIndex, areaIdent, action);
+        const arrow = this.addArrowDiv(domService, cellDiv, !closed, rowIndex, columnIndex, areaIdent, action);
+        // screen readers: a button "Collapse group Q1" (expanded) – own texts via tableOptions.ariaTexts
+        const texts = new AriaTexts();
+        domService.setAttribute(arrow, 'role', 'button');
+        domService.setAttribute(arrow, 'aria-expanded', `${!closed}`);
+        domService.setAttribute(arrow, 'data-ge-group-label', `${label}`);
+        domService.setAttribute(arrow, 'aria-label', closed ? texts.expandGroup(`${label}`) : texts.collapseGroup(`${label}`));
       }
     } else {
       this.addText(cellDiv, areaIdent, rowIndex, columnIndex, label, '');

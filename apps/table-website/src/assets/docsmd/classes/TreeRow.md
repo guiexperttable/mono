@@ -149,7 +149,7 @@ ___
 
 • **keep**: `boolean` = `false`
 
-Internal: kept by the filter because a descendant matches.
+Internal, set by the filter: the row or one of its descendants matches (also below collapsed rows).
 
 #### Implementation of
 

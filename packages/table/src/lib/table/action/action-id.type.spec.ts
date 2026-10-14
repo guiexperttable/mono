@@ -15,6 +15,13 @@ describe('actionIds', () => {
       'NAVIGATE_RIGHT',
       'NAVIGATE_UP',
       'NAVIGATE_DOWN',
+      'NAVIGATE_ROW_START',
+      'NAVIGATE_ROW_END',
+      'NAVIGATE_FIRST_CELL',
+      'NAVIGATE_LAST_CELL',
+      'NAVIGATE_PAGE_UP',
+      'NAVIGATE_PAGE_DOWN',
+      'ACTIVATE_CELL',
     ]);
   });
 

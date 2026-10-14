@@ -7,6 +7,7 @@
 ### Properties
 
 - [areaIdent](AddColumnDivPara.md#areaident)
+- [checkboxAriaLabel](AddColumnDivPara.md#checkboxarialabel)
 - [checkedType](AddColumnDivPara.md#checkedtype)
 - [columnIndex](AddColumnDivPara.md#columnindex)
 - [geo](AddColumnDivPara.md#geo)
@@ -27,6 +28,22 @@
 #### Defined in
 
 [src/lib/table/service/convenience-dom.service.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L24)
+
+___
+
+### checkboxAriaLabel
+
+• `Optional` **checkboxAriaLabel**: `string`
+
+Accessible name of the row checkbox (`showCheckboxWihoutExtraColumn`), e.g. "Select row 5".
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/service/convenience-dom.service.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L32)
 
 ___
 

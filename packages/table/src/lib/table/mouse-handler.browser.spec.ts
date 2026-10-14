@@ -562,6 +562,53 @@ describe('hover row and column (hoverRowVisible / hoverColumnVisible)', () => {
   });
 });
 
+// Regression: with a footer and fixed right columns the scroll bar range differs from the rendered content range
+// (the scroll viewport covers the footer, the east columns and the vertical scroll bar). The hover row/column used
+// scrollTop/scrollLeft instead of the rendered content offset → they drifted away from the rows/columns the further the
+// table was scrolled (seen in apps/table-demo: generateSimpleModel(1000, 100), 2 header + 2 footer rows, 2+2 fixed).
+describe('hover row and column on a large table with header, footer and fixed columns', () => {
+
+  function mountDemoLikeTable() {
+    const columnCount = 100;
+    const cell = (r: number | string, c: number) => `${r}/${c}`;
+    const tableModel = TableFactory.createTableModel({
+      headerData: [0, 1].map(r => Array.from({ length: columnCount }, (_, c) => cell(`H${r}`, c))),
+      bodyData: Array.from({ length: 1000 }, (_, r) => Array.from({ length: columnCount }, (_, c) => cell(r, c))),
+      footerData: [0, 1].map(r => Array.from({ length: columnCount }, (_, c) => cell(`F${r}`, c))),
+      overridingColumnWidth: 110,
+      fixedLeftColumnCount: 2,
+      fixedRightColumnCount: 2,
+    });
+    return mountTable(tableModel, { width: 1000, height: 600 });
+  }
+
+  const rect = (e: Element) => e.getBoundingClientRect();
+
+  for (const [label, ratioY, ratioX] of [['top left', 0, 0], ['middle', 0.5, 0.5], ['end', 1, 1]] as const) {
+    it(`the hover row and column sit exactly on the hovered cell (${label})`, async () => {
+      const { host, scope } = mountDemoLikeTable();
+      await nextFrame();
+      const vp = scope.scrollViewport;
+      vp.scrollTop = (vp.scrollHeight - vp.clientHeight) * ratioY;
+      vp.scrollLeft = (vp.scrollWidth - vp.clientWidth) * ratioX;
+      await nextFrame();
+      await nextFrame();
+      const rows = renderedRows(host);
+      const row = rows[Math.floor(rows.length / 2)];
+      const cells = Array.from(row.querySelectorAll<HTMLElement>(':scope > .ge-table-col-div'));
+      const cellEl = cells[Math.floor(cells.length / 2)];
+      await userEvent.hover(cellEl);
+      const hoverRowEl = host.querySelector<HTMLElement>('.ge-table-hover-row')!;
+      const hoverColEl = host.querySelector<HTMLElement>('.ge-table-hover-column')!;
+      await vi.waitFor(() => expect(hoverRowEl.style.display).toBe('block'));
+      expect(Math.abs(rect(hoverRowEl).top - rect(cellEl).top)).toBeLessThan(1);
+      expect(Math.abs(rect(hoverRowEl).height - rect(cellEl).height)).toBeLessThan(1);
+      expect(Math.abs(rect(hoverColEl).left - rect(cellEl).left)).toBeLessThan(1);
+      expect(Math.abs(rect(hoverColEl).width - rect(cellEl).width)).toBeLessThan(1);
+    });
+  }
+});
+
 describe('context menu (onContextmenu)', () => {
 
   it('a right click reports the cell as GeMouseEvent', async () => {

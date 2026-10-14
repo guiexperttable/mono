@@ -26,6 +26,13 @@ describe('WindowsShortcutActionIdMapping', () => {
       'arrowdown': 'NAVIGATE_DOWN',
       'arrowleft': 'NAVIGATE_LEFT',
       'arrowright': 'NAVIGATE_RIGHT',
+      'home': 'NAVIGATE_ROW_START',
+      'end': 'NAVIGATE_ROW_END',
+      'ctrl+home': 'NAVIGATE_FIRST_CELL',
+      'ctrl+end': 'NAVIGATE_LAST_CELL',
+      'pageup': 'NAVIGATE_PAGE_UP',
+      'pagedown': 'NAVIGATE_PAGE_DOWN',
+      'enter': 'ACTIVATE_CELL',
       'meta+c': 'COPY_2_CLIPBOARD',
       'ctrl+c': 'COPY_2_CLIPBOARD',
     });

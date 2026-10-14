@@ -14,6 +14,8 @@
 
 ### Properties
 
+- [anchorRanges](SelectionService.md#anchorranges)
+- [dragSnapshot](SelectionService.md#dragsnapshot)
 - [getFocusModel](SelectionService.md#getfocusmodel)
 - [getSelectionModel](SelectionService.md#getselectionmodel)
 - [ignoreNextClick](SelectionService.md#ignorenextclick)
@@ -45,9 +47,33 @@
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L21)
+[src/lib/table/selection/selection-service.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L27)
 
 ## Properties
+
+### anchorRanges
+
+• `Protected` **anchorRanges**: [`CellRange`](CellRange.md)[] = `[]`
+
+The ranges the anchor click (or the last shift-click) added – the next shift-click replaces them.
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L22)
+
+___
+
+### dragSnapshot
+
+• `Protected` `Optional` **dragSnapshot**: [`SelectionSnapshot`](../interfaces/SelectionSnapshot.md)
+
+The selection before a Ctrl/⌘-drag – each drag frame replaces only the dragged rectangle.
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L24)
+
+___
 
 ### getFocusModel
 
@@ -55,7 +81,7 @@
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L15)
+[src/lib/table/selection/selection-service.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L17)
 
 ___
 
@@ -65,7 +91,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L14)
+[src/lib/table/selection/selection-service.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L16)
 
 ___
 
@@ -77,7 +103,7 @@ A drag selection ends with a click on another cell – that click must not clear
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L18)
+[src/lib/table/selection/selection-service.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L20)
 
 ___
 
@@ -87,7 +113,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L16)
+[src/lib/table/selection/selection-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L18)
 
 ___
 
@@ -97,7 +123,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L22)
+[src/lib/table/selection/selection-service.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L28)
 
 ## Methods
 
@@ -111,7 +137,7 @@ Triggers an action based on the provided action ID.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` | The ID of the action to be triggered. |
+| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` | The ID of the action to be triggered. |
 
 #### Returns
 
@@ -125,7 +151,7 @@ Triggers an action based on the provided action ID.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L124)
+[src/lib/table/selection/selection-service.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L156)
 
 ___
 
@@ -133,20 +159,31 @@ ___
 
 ▸ **onMouseClicked**(`evt`, `_previousEvt`): `boolean`
 
+A click on a body cell: moves the focus and changes the selection.
+- plain click: new selection (the clicked cell, row or column – by selection type);
+- Shift: the rectangle from the previous click (the anchor) to this cell replaces what that click had selected –
+  repeated Shift-clicks change the rectangle, ranges added before the anchor stay;
+- Ctrl/⌘: toggles the cell (row, column); Ctrl/⌘+Alt: deselects it.
+
+Header/footer clicks and the second click of a double click (`clickCount` 2) do not change selection or focus.
+All changes of one click are reported as one `onSelectionChanged` event.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `evt` | [`GeMouseEvent`](GeMouseEvent.md) |
-| `_previousEvt` | `undefined` \| [`GeMouseEvent`](GeMouseEvent.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `evt` | [`GeMouseEvent`](GeMouseEvent.md) | the click |
+| `_previousEvt` | `undefined` \| [`GeMouseEvent`](GeMouseEvent.md) | not used (the service keeps its own anchor) |
 
 #### Returns
 
 `boolean`
 
+true if focus or selection changed (repaint needed)
+
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L64)
+[src/lib/table/selection/selection-service.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L95)
 
 ___
 
@@ -162,7 +199,7 @@ Called on mouse down: a new gesture starts.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L33)
+[src/lib/table/selection/selection-service.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L39)
 
 ___
 
@@ -172,6 +209,7 @@ ___
 
 Selects a range by dragging the mouse over body cells (selection type "range").
 The cell where the drag started stays the anchor, so a following shift-click extends from there.
+With Ctrl/⌘ held at the start the dragged range is added to the existing selection, otherwise it replaces it.
 
 #### Parameters
 
@@ -188,4 +226,4 @@ true if the selection changed (repaint needed)
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L45)
+[src/lib/table/selection/selection-service.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L53)

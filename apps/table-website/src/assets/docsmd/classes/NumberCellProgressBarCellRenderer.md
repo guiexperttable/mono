@@ -20,6 +20,7 @@
 
 ### Properties
 
+- [ariaLabel](NumberCellProgressBarCellRenderer.md#arialabel)
 - [labelVisible](NumberCellProgressBarCellRenderer.md#labelvisible)
 - [maxValue](NumberCellProgressBarCellRenderer.md#maxvalue)
 
@@ -31,7 +32,7 @@
 
 ### constructor
 
-• **new NumberCellProgressBarCellRenderer**\<`T`\>(`maxValue?`, `labelVisible?`): [`NumberCellProgressBarCellRenderer`](NumberCellProgressBarCellRenderer.md)\<`T`\>
+• **new NumberCellProgressBarCellRenderer**\<`T`\>(`maxValue?`, `labelVisible?`, `ariaLabel?`): [`NumberCellProgressBarCellRenderer`](NumberCellProgressBarCellRenderer.md)\<`T`\>
 
 #### Type parameters
 
@@ -41,10 +42,11 @@
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `maxValue` | `number` | `100` |
-| `labelVisible` | `boolean` | `false` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `maxValue` | `number` | `100` | - |
+| `labelVisible` | `boolean` | `false` | - |
+| `ariaLabel` | (`percent`: `number`, `value`: `number`) => `string` | `undefined` | Text for screen readers (the bar is an image). Default: `"75 %"`. **`Since`** 1.1.91 |
 
 #### Returns
 
@@ -52,9 +54,40 @@
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L11)
+[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L12)
 
 ## Properties
+
+### ariaLabel
+
+• **ariaLabel**: (`percent`: `number`, `value`: `number`) => `string`
+
+#### Type declaration
+
+▸ (`percent`, `value`): `string`
+
+Text for screen readers (the bar is an image). Default: `"75 %"`.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `percent` | `number` |
+| `value` | `number` |
+
+##### Returns
+
+`string`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L16)
+
+___
 
 ### labelVisible
 
@@ -62,7 +95,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L13)
+[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L14)
 
 ___
 
@@ -72,7 +105,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L12)
+[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L13)
 
 ## Methods
 
@@ -106,4 +139,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L17)
+[src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/number-cell-progress-bar-cell-renderer.ts#L20)

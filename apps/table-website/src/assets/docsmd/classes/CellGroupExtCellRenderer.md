@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L17)
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L19)
 
 ## Methods
 
@@ -57,7 +57,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L114)
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L122)
 
 ___
 
@@ -91,4 +91,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L23)
+[src/lib/table/renderer/cell-group-ext-cell-renderer.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/cell-group-ext-cell-renderer.ts#L25)

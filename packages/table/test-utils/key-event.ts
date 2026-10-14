@@ -29,6 +29,18 @@ export const KEY_EVENTS_BY_MAPPING_KEY: Record<string, KeyEventInit> = {
   'arrowdown': { key: 'ArrowDown', code: 'ArrowDown' },
   'arrowleft': { key: 'ArrowLeft', code: 'ArrowLeft' },
   'arrowright': { key: 'ArrowRight', code: 'ArrowRight' },
+  // since 1.1.91 (grid navigation, prompts/001-aria-screenreader.design.md § 2.8)
+  'home': { key: 'Home', code: 'Home' },
+  'end': { key: 'End', code: 'End' },
+  'ctrl+home': { key: 'Home', code: 'Home', ctrlKey: true },
+  'ctrl+end': { key: 'End', code: 'End', ctrlKey: true },
+  'meta+left': { key: 'ArrowLeft', code: 'ArrowLeft', metaKey: true },
+  'meta+right': { key: 'ArrowRight', code: 'ArrowRight', metaKey: true },
+  'meta+up': { key: 'ArrowUp', code: 'ArrowUp', metaKey: true },
+  'meta+down': { key: 'ArrowDown', code: 'ArrowDown', metaKey: true },
+  'pageup': { key: 'PageUp', code: 'PageUp' },
+  'pagedown': { key: 'PageDown', code: 'PageDown' },
+  'enter': { key: 'Enter', code: 'Enter' },
 };
 
 export function keyEvent(init: KeyEventInit): KeyboardEvent {

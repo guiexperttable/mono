@@ -19,6 +19,9 @@
 - [AreaModelObjectArrayWithColumndefs](classes/AreaModelObjectArrayWithColumndefs.md)
 - [AreaModelTree](classes/AreaModelTree.md)
 - [AreaObjectMap](classes/AreaObjectMap.md)
+- [AriaGridInfo](classes/AriaGridInfo.md)
+- [AriaIds](classes/AriaIds.md)
+- [AriaTexts](classes/AriaTexts.md)
 - [ArrayPropertyType](classes/ArrayPropertyType.md)
 - [AutoRestoreOptions](classes/AutoRestoreOptions.md)
 - [BooleanPropertyType](classes/BooleanPropertyType.md)
@@ -74,6 +77,7 @@
 - [InputHandler](classes/InputHandler.md)
 - [JsonService](classes/JsonService.md)
 - [LicenseManager](classes/LicenseManager.md)
+- [LiveAnnouncer](classes/LiveAnnouncer.md)
 - [MaleFemaleToIconCellRenderer](classes/MaleFemaleToIconCellRenderer.md)
 - [MouseHandler](classes/MouseHandler.md)
 - [MouseTargetData](classes/MouseTargetData.md)
@@ -116,6 +120,7 @@
 - [TableOptions](classes/TableOptions.md)
 - [TableScope](classes/TableScope.md)
 - [ThreeColorGradientArg](classes/ThreeColorGradientArg.md)
+- [TreeAriaInfo](classes/TreeAriaInfo.md)
 - [TreeCheckboxModel](classes/TreeCheckboxModel.md)
 - [TreeFactory](classes/TreeFactory.md)
 - [TreeOptions](classes/TreeOptions.md)
@@ -137,6 +142,7 @@
 - [AreaModelIf](interfaces/AreaModelIf.md)
 - [ArgsAdjustColumnsToRowParentParams](interfaces/ArgsAdjustColumnsToRowParentParams.md)
 - [ArgsRenderCellDiv](interfaces/ArgsRenderCellDiv.md)
+- [AriaTextsIf](interfaces/AriaTextsIf.md)
 - [AutoRestoreOptionsIf](interfaces/AutoRestoreOptionsIf.md)
 - [CellGroupIf](interfaces/CellGroupIf.md)
 - [CellRendererIf](interfaces/CellRendererIf.md)
@@ -163,6 +169,7 @@
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
+- [SelectionSnapshot](interfaces/SelectionSnapshot.md)
 - [SizeIf](interfaces/SizeIf.md)
 - [SortedOptionsIf](interfaces/SortedOptionsIf.md)
 - [TableCellUpdateEventIf](interfaces/TableCellUpdateEventIf.md)
@@ -170,6 +177,8 @@
 - [TableModelIf](interfaces/TableModelIf.md)
 - [TableOptionsIf](interfaces/TableOptionsIf.md)
 - [ThreeColorGradientArgIf](interfaces/ThreeColorGradientArgIf.md)
+- [TreeAriaModel](interfaces/TreeAriaModel.md)
+- [TreeAriaRowInfo](interfaces/TreeAriaRowInfo.md)
 - [TreeFactoryOptions](interfaces/TreeFactoryOptions.md)
 - [TreeOptionsIf](interfaces/TreeOptionsIf.md)
 - [TreeRowIf](interfaces/TreeRowIf.md)
@@ -268,11 +277,13 @@
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [debounce](modules.md#debounce)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
+- [escapeHtml](modules.md#escapehtml)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
 - [isAreaModelTree](modules.md#isareamodeltree)
+- [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isTreeRow](modules.md#istreerow)
 - [throttle](modules.md#throttle)
@@ -1372,7 +1383,7 @@ module:myModule.actionIds
 
 #### Defined in
 
-[src/lib/table/action/action-id.type.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L39)
+[src/lib/table/action/action-id.type.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L41)
 
 ___
 
@@ -1394,7 +1405,7 @@ ___
 
 ### actionIds
 
-• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``]
+• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``]
 
 An array of action identifiers.
 
@@ -1420,13 +1431,17 @@ ___
 
 #### Defined in
 
-[src/lib/table/action/shortcut-util.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L36)
+[src/lib/table/action/shortcut-util.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L58)
 
 ___
 
 ### harmonizeShortcut
 
 ▸ **harmonizeShortcut**(`shortcut`): `string`
+
+Normalizes a shortcut string (e.g. a key of a [ShortcutActionIdMapping](modules.md#shortcutactionidmapping)) so that it can be compared with
+[createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent): "+" becomes a space, symbols and synonyms are unified
+("⌘"/"meta"/"command" → "cmd", "arrowup" → "up" …), modifiers come first.
 
 #### Parameters
 
@@ -1438,9 +1453,16 @@ ___
 
 `string`
 
+**`Example`**
+
+```ts
+harmonizeShortcut('meta+c');    // "cmd c"
+harmonizeShortcut('arrowup');   // "up"
+```
+
 #### Defined in
 
-[src/lib/table/action/shortcut-util.ts:2](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L2)
+[src/lib/table/action/shortcut-util.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L23)
 
 ## DOM
 
@@ -1662,6 +1684,49 @@ ___
 
 ___
 
+### escapeHtml
+
+▸ **escapeHtml**(`value`): `string`
+
+Escapes a value for HTML text and for (double or single quoted) HTML attribute values:
+`&`, `<`, `>`, `"` and `'` become entities; `null` and `undefined` become an empty string.
+
+Use it whenever data (cell values, labels, ids from the server …) is written into `innerHTML` – otherwise a value
+like `<img src=x onerror=alert(1)>` is executed as markup (HTML injection / XSS), and a `"` cuts an attribute value.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `unknown` | any value; it is converted with `String(value)` |
+
+#### Returns
+
+`string`
+
+the escaped text
+
+**`Example`**
+
+```ts
+// in a cell renderer
+const cellDiv = document.createElement('div');
+const cellValue = 'Tom & Jerry <3';
+cellDiv.innerHTML = `<div class="my-label" title="${escapeHtml(cellValue)}">${escapeHtml(cellValue)}</div>`;
+```
+
+**`Example`**
+
+```ts
+escapeHtml('<b>"Tom" & Jerry</b>'); // "&lt;b&gt;&quot;Tom&quot; &amp; Jerry&lt;/b&gt;"
+```
+
+#### Defined in
+
+[src/lib/common/escape-html.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/escape-html.ts#L30)
+
+___
+
 ### firstLetterUppercase
 
 ▸ **firstLetterUppercase**(`text`): `string`
@@ -1734,27 +1799,55 @@ Determines if the given model is an AreaModelTree.
 
 ___
 
-### isCheckboxColumnDef
+### isCheckboxCellRenderer
 
-▸ **isCheckboxColumnDef**(`o`): `boolean`
+▸ **isCheckboxCellRenderer**(`o`): `boolean`
 
-Checks if the given object is a CheckboxColumnDef.
+True for a [CheckboxCellRenderer](classes/CheckboxCellRenderer.md) – also from another copy of the core (no `instanceof`).
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `o` | `any` | The object to be checked. |
+| Name | Type |
+| :------ | :------ |
+| `o` | `any` |
 
 #### Returns
 
 `boolean`
 
-- True if the object is a CheckboxColumnDef, false otherwise.
+**`Example`**
+
+```ts
+isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
+```
+
+**`Since`**
+
+1.1.91
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L43)
+[src/lib/table/instanceof-workaround.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L52)
+
+___
+
+### isCheckboxColumnDef
+
+▸ **isCheckboxColumnDef**(`o`): `boolean`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `o` | `any` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L56)
 
 ___
 

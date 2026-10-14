@@ -501,7 +501,7 @@ bodyAreaModel.changeColumnOrder(lastIndex, 0);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:615](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L615)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:624](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L624)
 
 ___
 
@@ -510,7 +510,8 @@ ___
 ▸ **doSort**(`sortItems`): `boolean`
 
 Sorts the filtered rows based on the provided sort items.
-This method supports sorting by multiple columns with different sort directions.
+This method supports sorting by multiple columns with different sort directions: the first item is the primary
+key, the following ones break ties.
 
 #### Parameters
 
@@ -554,7 +555,7 @@ bodyAreaModel.doSort([new SortItem(0, '')]);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:533](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L533)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:534](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L534)
 
 ___
 
@@ -811,7 +812,7 @@ const sortedRows = [...this.getFilteredRows()].sort(comparator);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:667](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L667)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:676](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L676)
 
 ___
 
@@ -1018,7 +1019,7 @@ cellElement.classList.add(...classes);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:639](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L639)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:648](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L648)
 
 ___
 
@@ -1589,7 +1590,7 @@ console.log(email); // 'john@example.com'
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:588](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L588)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:597](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L597)
 
 ___
 
@@ -1912,7 +1913,8 @@ ___
 ▸ **isSelectable**(`_rowIndex`, `_columnIndex`): `boolean`
 
 Determines whether the cell at the specified row and column indices is selectable.
-If true, the user can select the cell.
+If true, the user can select the cell: the table draws the selection only on selectable body cells.
+All built-in models and [AreaModel](AreaModel.md) return `true` (except the hidden and cover-grid models).
 
 #### Parameters
 
@@ -2202,4 +2204,4 @@ bodyAreaModel.sort((a, b) => {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:565](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L565)
+[src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts:574](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-object-array.ts#L574)

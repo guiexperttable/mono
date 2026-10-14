@@ -1,6 +1,6 @@
 # TODO-Prompt 001: Screenreader-Unterstützung (ARIA)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `aria` (Branch `feat/aria`, Design `prompts/001-aria-screenreader.design.md`)
+> Status: **umgesetzt** auf `feat/aria` (14.10.2026) – offen: manuelle Screenreader-Tests, Demo-Repo `ep-035` · angelegt 14.10.2026 · Slug `aria` (Branch `feat/aria`, Design `prompts/001-aria-screenreader.design.md`)
 > Abhängigkeiten: keine. **Alle späteren Prompts bauen darauf auf**: neue DOM-Elemente bekommen ab hier Rollen und
 > `aria-*`-Attribute nach den Regeln, die dieser Prompt festlegt.
 > ag-Grid: ARIA und Tastaturbedienung sind dort **Community** (kostenlos). Bei GuiExpert fehlt beides fürs Screenreading.
@@ -126,7 +126,9 @@ Tabellen, keine geänderten Klassen/Attribute, Escaping in Attributen.
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Entscheidungen zu Zeilenstruktur, Fokusmodell, ID-Schema, Optionen, Tastatur 🛑
-- [ ] A1–A14 umgesetzt und getestet; axe ohne Verstöße; Screenreader-Protokoll im Design-Dokument
-- [ ] Performance-Messung vorher/nachher dokumentiert, Budget eingehalten
-- [ ] Regel „neues DOM-Element → Rolle/ARIA“ in `CLAUDE.md` §5 und in `prompts/000-arbeitsweise.md` bestätigt
+- [x] Design-Dokument mit Entscheidungen zu Zeilenstruktur, Fokusmodell, ID-Schema, Optionen, Tastatur 🛑
+      (freigegeben durch den Auftrag „selbständig bearbeiten“)
+- [x] A1–A14 umgesetzt und getestet; axe ohne Verstöße (zwei begründete Viewport-Funde gefiltert, Design § 8)
+- [ ] Screenreader-Protokoll im Design-Dokument – Matrix angelegt, **manuelle Tests mit NVDA/JAWS/VoiceOver offen**
+- [x] Performance-Messung vorher/nachher dokumentiert, Budget eingehalten (+3,6 %)
+- [x] Regel „neues DOM-Element → Rolle/ARIA“ in `CLAUDE.md` §5 und in `prompts/000-arbeitsweise.md` bestätigt

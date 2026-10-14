@@ -79,8 +79,10 @@ html, html[data-theme="light"] {
   --ge-table-color-drop-zone: #fafafa;
   --ge-table-color-tree-arrow-collapsed-color: var(--ge-table-body-west-text);
 
-  --ge-table-color-star-rating: #fcb515;
-  --ge-table-color-progress-bar: #36BB6C;
+  /* light theme: ≥ 3 : 1 against white (WCAG 1.4.11, the stars and bars are images for screen readers);
+     before 1.1.91: #fcb515 (1.8 : 1) and #36BB6C (2.5 : 1) */
+  --ge-table-color-star-rating: #a86f00;
+  --ge-table-color-progress-bar: #1e874b;
 }
 
 

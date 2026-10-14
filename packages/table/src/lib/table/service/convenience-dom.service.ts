@@ -28,10 +28,15 @@ export interface AddColumnDivPara {
   tableOptions?: TableOptionsIf;
   checkedType?: CheckedType | undefined;
   sortState?: SortState;
+  /** Accessible name of the row checkbox (`showCheckboxWihoutExtraColumn`), e.g. "Select row 5". @since 1.1.91 */
+  checkboxAriaLabel?: string;
 }
 
 /** @category DOM */
 export class ConvenienceDomService {
+
+  /** Width of the focus frame of a cell in px (WCAG 2.4.7: visible focus, not only a color). @since 1.1.91 */
+  static focusBorderWidthInPx = 2;
 
   constructor(
     public readonly domService: DomServiceIf
@@ -158,6 +163,30 @@ export class ConvenienceDomService {
     return div;
   }
 
+  /**
+   * Removes an attribute (via {@link DomServiceIf.removeAttribute} if the DOM service has it).
+   *
+   * @since 1.1.91
+   */
+  removeAttribute(ele: HTMLElement, key: string): HTMLElement {
+    if (this.domService.removeAttribute) {
+      this.domService.removeAttribute(ele, key);
+    } else {
+      ele.removeAttribute(key);
+    }
+    return ele;
+  }
+
+  /**
+   * Hides a purely decorative element (border, hover, icon …) from screen readers: `aria-hidden="true"`.
+   *
+   * @since 1.1.91
+   */
+  setAriaHidden<T extends HTMLElement>(ele: T): T {
+    this.domService.setAttribute(ele, "aria-hidden", "true");
+    return ele;
+  }
+
 
   createAreaDivWithClass(clazz: string, parent: HTMLDivElement, areaIdent: AreaIdent, sideIdent: SideIdent): HTMLDivElement {
     const div = this.domService.createElement<HTMLDivElement>("div");
@@ -220,7 +249,7 @@ export class ConvenienceDomService {
     para: AddColumnDivPara
   ): HTMLDivElement {
 
-    const {parent, geo, rowIndex=-1, columnIndex=-1, areaIdent, sideIdent, text="", treeArrow, tableOptions, checkedType=undefined, sortState} = para;
+    const {parent, geo, rowIndex=-1, columnIndex=-1, areaIdent, sideIdent, text="", treeArrow, tableOptions, checkedType=undefined, sortState, checkboxAriaLabel} = para;
     const treeOptions = tableOptions?.treeOptions;
     const checkboxWithoutExtraColumn = tableOptions?.showCheckboxWihoutExtraColumn;
 
@@ -255,7 +284,7 @@ export class ConvenienceDomService {
     // }
 
     if (checkboxWithoutExtraColumn && columnIndex === 0 && checkedType) {
-      this.addCheckboxToDiv(div, checkedType, areaIdent, rowIndex);
+      this.addCheckboxToDiv(div, checkedType, areaIdent, rowIndex, checkboxAriaLabel);
 
     }
     if (text) {
@@ -277,18 +306,29 @@ export class ConvenienceDomService {
     parent: HTMLDivElement,
     checkedType: CheckedType,
     areaIdent: AreaIdent,
-    rowIndex: number): HTMLDivElement {
+    rowIndex: number,
+    ariaLabel?: string): HTMLDivElement {
 
     const div = this.domService.createElement<HTMLDivElement>("div");
-    const checked = (checkedType === "full") ? "checked" : "";
-    div.innerHTML = `
-            <input
-                type="checkbox"
-                data-area="${areaIdent}"
-                data-row-index="${rowIndex}"
-                data-input-type="checkbox"
-                ${checked}
-                class="ge-table-row-checkbox"> `;
+    // built with DOM methods (no HTML string): the accessible name may contain data (column labels, own texts)
+    const input = this.domService.createElement<HTMLInputElement>("input");
+    this.domService.setAttribute(input, "type", "checkbox");
+    this.domService.setAttribute(input, "data-area", `${areaIdent}`);
+    this.domService.setAttribute(input, "data-row-index", `${rowIndex}`);
+    this.domService.setAttribute(input, "data-input-type", "checkbox");
+    this.domService.setAttribute(input, "tabindex", "-1"); // the table is one tab stop (Enter toggles the focused row)
+    if (checkedType === "full") {
+      this.domService.setAttribute(input, "checked", "");
+      input.checked = true;
+    }
+    if (checkedType === "semi") {
+      input.indeterminate = true; // screen readers: "mixed" (aria-checked="mixed" of a native checkbox)
+    }
+    this.domService.addClass(input, "ge-table-row-checkbox");
+    if (ariaLabel) {
+      this.domService.setAttribute(input, "aria-label", ariaLabel);
+    }
+    this.domService.appendChild(div, input);
     this.domService.setStyle(div, "display", "inline");
     this.domService.setStyle(div, "width", "inherit");
     this.domService.setAttribute(div, "data-row-index", `${rowIndex}`);
@@ -346,6 +386,7 @@ export class ConvenienceDomService {
 
     const div = this.domService.createElement<HTMLDivElement>("div");
     this.domService.addClass(div, "ge-table-sorted-icon-div");
+    this.setAriaHidden(div); // the sort state is aria-sort of the header cell
     this.domService.setStyle(div, "position", "absolute");
     this.domService.setStyle(div, "top", "0");
     this.domService.setStyle(div, "right", "0");
@@ -393,6 +434,7 @@ export class ConvenienceDomService {
   ): HTMLDivElement {
     const div = this.domService.createElement<HTMLDivElement>("div");
     this.domService.addClass(div, "ge-table-tree-arrow-div");
+    this.setAriaHidden(div); // aria-expanded of the row; keyboard: Enter
     this.domService.setStyle(div, "display", "inline-block");
     this.domService.setStyle(div, "position", "");
     this.domService.setStyle(div, "width", "20px");
@@ -456,6 +498,7 @@ export class ConvenienceDomService {
     // Border south:
     const div = this.domService.createElement<HTMLDivElement>("div");
     this.domService.addClass(div, clazz);
+    this.setAriaHidden(div);
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
     this.domService.setStyle(div, "left", `${geo.left}px`);
@@ -466,62 +509,34 @@ export class ConvenienceDomService {
     return div;
   }
 
+  /**
+   * Draws the focus frame of a cell: four divs with the class `ge-table-focus-border` (2 px, color
+   * `--ge-table-focus-outline-color` resp. `--ge-table-focus-border`). Hidden from screen readers – they get the
+   * focus through `aria-activedescendant`.
+   */
   addFocusBorderDivs(parent: HTMLDivElement, geo: GeoData, style: HtmlStyle): HTMLDivElement {
     geo = {...geo, width: geo.width+1, height: geo.height+1}; // we want draw on the right and bottom border
-
-    // Border west:
-    let div = this.domService.createElement<HTMLDivElement>("div");
-    this.domService.addClass(div, "ge-table-focus-border");
-    this.domService.setStyle(div, "display", "clip");
-    this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
-    this.domService.setStyle(div, "top", `${geo.top}px`);
-    this.domService.setStyle(div, "width", `1px`);
-    this.domService.setStyle(div, "height", `${geo.height}px`);
-    this.domService.setStyle(div, "z-index", `9999`);
-    this.applyStyle(div, style);
-    this.domService.appendChild(parent, div);
-
-    // Border east:
-    div = this.domService.createElement<HTMLDivElement>("div");
-    this.domService.addClass(div, "ge-table-focus-border");
-    this.domService.setStyle(div, "display", "clip");
-    this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left + geo.width - 1}px`);
-    this.domService.setStyle(div, "top", `${geo.top}px`);
-    this.domService.setStyle(div, "width", `1px`);
-    this.domService.setStyle(div, "height", `${geo.height}px`);
-    this.domService.setStyle(div, "z-index", `9999`);
-    this.applyStyle(div, style);
-    this.domService.appendChild(parent, div);
-
-    // Border north:
-    div = this.domService.createElement<HTMLDivElement>("div");
-    this.domService.addClass(div, "ge-table-focus-border");
-    this.domService.setStyle(div, "display", "clip");
-    this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
-    this.domService.setStyle(div, "top", `${(geo.top)}px`);
-    this.domService.setStyle(div, "width", `${geo.width}px`);
-    this.domService.setStyle(div, "height", `1px`);
-    this.domService.setStyle(div, "z-index", `9999`);
-    this.applyStyle(div, style);
-    this.domService.appendChild(parent, div);
-
-
-    // Border south:
-    div = this.domService.createElement<HTMLDivElement>("div");
-    this.domService.addClass(div, "ge-table-focus-border");
-    this.domService.setStyle(div, "display", "clip");
-    this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
-    this.domService.setStyle(div, "top", `${(geo.top + geo.height - 1)}px`);
-    this.domService.setStyle(div, "width", `${geo.width}px`);
-    this.domService.setStyle(div, "height", `1px`);
-    this.domService.setStyle(div, "z-index", `9999`);
-    this.applyStyle(div, style);
-    this.domService.appendChild(parent, div);
-
+    const t = ConvenienceDomService.focusBorderWidthInPx;
+    const sides: [number, number, number, number][] = [
+      [geo.left, geo.top, t, geo.height],                         // west
+      [geo.left + geo.width - t, geo.top, t, geo.height],         // east
+      [geo.left, geo.top, geo.width, t],                          // north
+      [geo.left, geo.top + geo.height - t, geo.width, t],         // south
+    ];
+    for (const [left, top, width, height] of sides) {
+      const div = this.domService.createElement<HTMLDivElement>("div");
+      this.domService.addClass(div, "ge-table-focus-border");
+      this.setAriaHidden(div);
+      this.domService.setStyle(div, "display", "clip");
+      this.domService.setStyle(div, "position", "absolute");
+      this.domService.setStyle(div, "left", `${left}px`);
+      this.domService.setStyle(div, "top", `${top}px`);
+      this.domService.setStyle(div, "width", `${width}px`);
+      this.domService.setStyle(div, "height", `${height}px`);
+      this.domService.setStyle(div, "z-index", `9999`);
+      this.applyStyle(div, style);
+      this.domService.appendChild(parent, div);
+    }
     return parent;
   }
 
@@ -533,6 +548,7 @@ export class ConvenienceDomService {
     // Border east:
     const div = this.domService.createElement<HTMLDivElement>("div");
     this.domService.addClass(div, clazz);
+    this.setAriaHidden(div);
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
     this.domService.setStyle(div, "left", `${geo.left}px`);
@@ -548,6 +564,7 @@ export class ConvenienceDomService {
     if (clazz) {
       this.domService.addClass(div, clazz);
     }
+    this.setAriaHidden(div); // decorative or mouse-only (e.g. the "expand/collapse all" icon)
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
     this.domService.setStyle(div, "left", `${geo.left}px`);

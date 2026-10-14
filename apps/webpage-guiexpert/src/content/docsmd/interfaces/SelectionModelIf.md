@@ -10,9 +10,11 @@ Changes are reported to [EventListenerIf.onSelectionChanged](EventListenerIf.md#
 
 ```ts
 override onSelectionChanged(model: SelectionModelIf): void {
-  const ranges = model.getRanges().filter(r => !r.gammaRange);     // skip special ranges
-  const cells = ranges.reduce((n, r) => n + (r.r2 - r.r1 + 1) * (r.c2 - r.c1 + 1), 0);
-  console.log(`${cells} cells selected`);
+  // rows with at least one selected cell – also for "row"/"column" selections (their ranges are unbounded:
+  // r2/c2 = Number.MAX_SAFE_INTEGER, so (r2 - r1 + 1) * (c2 - c1 + 1) is no cell count)
+  const rowCount = tableModel.getBodyModel().getRowCount();
+  const rows = model.getMergedRowIndices(rowCount);
+  console.log(model.hasSelection() ? `${rows.length} rows with selected cells` : "nothing selected");
 }
 ```
 
@@ -65,7 +67,7 @@ Get notified on every change of the selection.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L25)
+[src/lib/table/selection/selection-model.if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L27)
 
 ___
 
@@ -74,6 +76,7 @@ ___
 ▸ **addSelection**(`range`): `void`
 
 Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9, columns 0–3).
+Cells removed before ([removeSelection](SelectionModelIf.md#removeselection)) are selected again – the last operation wins.
 
 #### Parameters
 
@@ -87,7 +90,7 @@ Adds a rectangle to the selection, e.g. `new CellRange(0, 0, 9, 3)` (rows 0–9,
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L69)
+[src/lib/table/selection/selection-model.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L85)
 
 ___
 
@@ -103,7 +106,7 @@ Removes the whole selection.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L60)
+[src/lib/table/selection/selection-model.if.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L73)
 
 ___
 
@@ -126,7 +129,7 @@ Called by the table on a click: starts a selection at this cell, depending on se
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L84)
+[src/lib/table/selection/selection-model.if.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L100)
 
 ___
 
@@ -142,23 +145,39 @@ The registered listeners (the table registers itself).
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L23)
+[src/lib/table/selection/selection-model.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L25)
 
 ___
 
 ### getMergedRowIndices
 
-▸ **getMergedRowIndices**(): `number`[]
+▸ **getMergedRowIndices**(`rowCount?`): `number`[]
 
-The indices of all rows that contain at least one selected cell, sorted.
+The indices of all rows that contain at least one selected cell, sorted ascending.
+
+Ranges that cover all rows (selection type `"column"`) and [selectAll](SelectionModelIf.md#selectall) need `rowCount` to be listed;
+without it they are skipped. Implementations written before `rowCount` existed may ignore it.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowCount?` | `number` | number of body rows (optional): limits the result to `0 … rowCount - 1` |
 
 #### Returns
 
 `number`[]
 
+**`Example`**
+
+```ts
+const sm = tableApi.getSelectionModel();
+const rowIndices = sm?.getMergedRowIndices(tableModel.getBodyModel().getRowCount()) ?? [];
+```
+
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L57)
+[src/lib/table/selection/selection-model.if.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L70)
 
 ___
 
@@ -176,7 +195,7 @@ Array of CellRange objects representing the ranges.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L54)
+[src/lib/table/selection/selection-model.if.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L56)
 
 ___
 
@@ -199,7 +218,7 @@ In how many selected ranges is this cell (0 = not selected)?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L75)
+[src/lib/table/selection/selection-model.if.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L91)
 
 ___
 
@@ -215,7 +234,7 @@ Is nothing selected?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L66)
+[src/lib/table/selection/selection-model.if.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L79)
 
 ___
 
@@ -231,7 +250,7 @@ Is anything selected?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L63)
+[src/lib/table/selection/selection-model.if.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L76)
 
 ___
 
@@ -247,7 +266,7 @@ Was everything selected with [selectAll](SelectionModelIf.md#selectall)?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L81)
+[src/lib/table/selection/selection-model.if.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L97)
 
 ___
 
@@ -272,7 +291,7 @@ Checks if a specific cell in a grid is selected.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L47)
+[src/lib/table/selection/selection-model.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L49)
 
 ___
 
@@ -294,7 +313,7 @@ Stop notifications.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L27)
+[src/lib/table/selection/selection-model.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L29)
 
 ___
 
@@ -302,7 +321,7 @@ ___
 
 ▸ **removeSelection**(`range`): `void`
 
-Removes a rectangle from the selection.
+Removes a rectangle from the selection (also from "all selected"); a later [addSelection](SelectionModelIf.md#addselection) selects it again.
 
 #### Parameters
 
@@ -316,7 +335,7 @@ Removes a rectangle from the selection.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L72)
+[src/lib/table/selection/selection-model.if.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L88)
 
 ___
 
@@ -324,7 +343,7 @@ ___
 
 ▸ **selectAll**(): `void`
 
-Selects all cells (⌘/Ctrl+A).
+Selects all cells (⌘/Ctrl+A) – also those removed from the selection before.
 
 #### Returns
 
@@ -332,7 +351,7 @@ Selects all cells (⌘/Ctrl+A).
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L78)
+[src/lib/table/selection/selection-model.if.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L94)
 
 ___
 
@@ -355,4 +374,4 @@ Toggles the selection state of a point at the specified row and column in a grid
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.if.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L38)
+[src/lib/table/selection/selection-model.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.if.ts#L40)

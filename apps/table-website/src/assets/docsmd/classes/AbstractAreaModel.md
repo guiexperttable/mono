@@ -1406,7 +1406,8 @@ ___
 ▸ **isSelectable**(`_rowIndex`, `_columnIndex`): `boolean`
 
 Determines whether the cell at the specified row and column indices is selectable.
-If true, the user can select the cell.
+If true, the user can select the cell: the table draws the selection only on selectable body cells.
+All built-in models and [AreaModel](AreaModel.md) return `true` (except the hidden and cover-grid models).
 
 #### Parameters
 

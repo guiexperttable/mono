@@ -390,11 +390,11 @@ behobenen Fehlern `it.fails('<richtiges Verhalten>')` + `// BUG:`, dazu ein Eint
 ## Phase 7 – Training-Kapitel (gui.expert/training)
 
 **Platzierung (in Phase 1 entscheiden):** Kapitelnummer `no` und `episode` hängen am Git-Tag `ep-NNN` des Demo-Repos.
-Es gibt 34 Kapitel, Kapitel 34 ist das Finale „Checklist“.
+Es gibt 35 Kapitel: Kapitel 34 ist das Finale „Checklist“, Kapitel 35 „Accessibility“ (Teil 8, angelegt von Prompt 001).
 
 - **Option A (Empfehlung):** hinten anhängen in **Teil 8** (`PartId` `"advanced"`, s. `000-arbeitsweise.md`; den Teil
   legt der erste Prompt an, der ein Kapitel braucht), Kapitel `row-grouping` mit der nächsten freien Nummer (Stand
-  Okt. 2026: 35, falls 001–005 kein Kapitel angelegt haben). Pivot folgt direkt danach. Keine Umnummerierung, alle
+  Okt. 2026: 36 – 001 hat Kapitel 35 angelegt; vorher nachsehen, ob 002–005 weitere angelegt haben). Pivot folgt direkt danach. Keine Umnummerierung, alle
   Tags und Links bleiben gültig.
 - **Option B:** in Teil 6 „Look & feel“ neben `tree-table` einsortieren. Dann müssen alle Kapitel und Folgen dahinter
   umnummeriert und die Tags im Demo-Repo verschoben werden, und bestehende Links brechen. Nur mit gutem Grund.

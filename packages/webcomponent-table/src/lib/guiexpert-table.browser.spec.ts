@@ -53,6 +53,20 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(rowTexts(el)[0]).toContain('Row 0');
   });
 
+  it('the table is a WAI-ARIA grid with a name from the options (screen readers, since 1.1.91)', async () => {
+    const { el } = createTableElement();
+    el.data = data(createModel(5), { ...new TableOptions(), ariaLabel: 'Orders' });
+    await nextFrame();
+
+    const grid = el.querySelector('[role="grid"]')!;
+    expect(grid).not.toBeNull();
+    expect(grid.getAttribute('aria-label')).toBe('Orders');
+    expect(grid.getAttribute('aria-rowcount')).toBe('6');
+    el.remove(); // destroy() (deferred): the grid attributes are removed with the table
+    await nextFrame();
+    expect(el.querySelector('[role="grid"]')).toBeNull();
+  });
+
   // Regression: the "scroll" CustomEvent bubbled – every table scroll reached window/document "scroll" listeners.
   it('"scroll" is dispatched on the element and does not bubble', async () => {
     const { host, el } = createTableElement();

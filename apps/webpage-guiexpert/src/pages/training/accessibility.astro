@@ -1,0 +1,85 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="accessibility">
+
+  <h2 id="why">Why it matters</h2>
+  <p>
+    A data grid is a wall of divs. Without help, a screen reader announces “group, group, 243.20” – no row, no column,
+    no header. Since <code>@guiexpert/table@1.1.91</code> the table is a <strong>WAI-ARIA grid</strong> (a tree: a
+    <em>treegrid</em>): rows and cells have roles, the screen reader knows the real size of the table – also with virtual
+    scrolling, where only 30 of 100,000 rows are in the DOM – and every key of the grid pattern works. For many public and
+    corporate customers that is a must (WCAG 2.1 AA, EN 301 549, in Germany the BFSG since June 2025).
+  </p>
+
+  <h2 id="name">Give the table a name</h2>
+  <p>
+    Everything else is automatic. Name the grid with <ApiLink name="TableOptionsIf.ariaLabelledBy" /> (the id of a visible
+    heading – preferred) or <ApiLink name="TableOptionsIf.ariaLabel" />. With <ApiLink name="TableOptionsIf.ariaTexts" /> you
+    replace the English announcements, e.g. with German ones (<ApiLink name="AriaTextsIf" />):
+  </p>
+  <Snippet file="demos/accessibility.ts" region="options" title="src/model/order-table-options.ts" />
+  <LiveDemo name="accessibility" title="Keyboard and screen reader" height={380}
+            caption="Click “focus table” (or Tab into it), use the arrow keys, ↑ in the first row moves into the header, Enter sorts. 🔊 shows what a screen reader hears." />
+
+  <h2 id="keys">The keys</h2>
+  <table>
+    <thead><tr><th>Key</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Tab</kbd></td><td>into the table (one tab stop) – the first visible cell gets the focus</td></tr>
+      <tr><td><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>move the focus cell; <kbd>↑</kbd> in the first row moves into the header, <kbd>↓</kbd> back</td></tr>
+      <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>first / last cell of the row (macOS also <kbd>⌘←</kbd> / <kbd>⌘→</kbd>)</td></tr>
+      <tr><td><kbd>Ctrl+Home</kbd> / <kbd>Ctrl+End</kbd></td><td>first cell of the table / last cell of the last row (macOS also <kbd>⌘↑</kbd> / <kbd>⌘↓</kbd>)</td></tr>
+      <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>one page</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>header: sort, open/close a header group · body: row checkbox, open/close a tree node</td></tr>
+      <tr><td><kbd>Space</kbd>, <kbd>Ctrl+A</kbd>, <kbd>Ctrl+C</kbd>, <kbd>F2</kbd></td><td>select, select all, copy, edit (<ChapterLink slug="selection-and-copy" />, <ChapterLink slug="inline-editing" />)</td></tr>
+    </tbody>
+  </table>
+  <p>The keys are <ApiLink name="ActionId" />s – change them with <code>shortcutActionIdMapping</code> (<ChapterLink slug="table-options" />).</p>
+
+  <h2 id="what">What the screen reader gets</h2>
+  <ul>
+    <li><strong>Size and position</strong>: <code>aria-rowcount</code> counts header + all body rows + footer, every rendered row
+      and cell carries <code>aria-rowindex</code> / <code>aria-colindex</code> – “row 5,001 of 100,001”.</li>
+    <li><strong>Focus</strong>: the table keeps the DOM focus, <code>aria-activedescendant</code> points to the focused cell.</li>
+    <li><strong>State</strong>: <code>aria-sort</code> on headers, <code>aria-selected</code>, tree level and expanded state,
+      checkboxes with names (“Select row 5”), partly checked = “mixed”.</li>
+    <li><strong>Announcements</strong> through a polite live region: sorting, the filter result, copied cells, select all.
+      Your own messages with <ApiLink name="TableApi.announce" />:</li>
+  </ul>
+  <Snippet file="demos/accessibility.ts" region="announce" title="after loading" />
+
+  <h2 id="renderers">Your own renderers</h2>
+  <p>
+    The cell is already a <code>gridcell</code> – do not change its role. Text is read; a purely visual statement needs a text
+    alternative. The built-in progress bar, star, true/false and gender renderers do it; in your own renderers
+    (<ChapterLink slug="cell-renderers" />, <ChapterLink slug="framework-components" />) use <code>role="img"</code> with an
+    <code>aria-label</code>, or hidden text:
+  </p>
+  <Code lang="ts" title="renderer/traffic-light.ts" code={`render(cellDiv: HTMLDivElement, _r: number, _c: number, _a: AreaIdent, _m: AreaModelIf, value: Order["status"], dom: DomServiceIf) {
+  const dot = dom.createElement<HTMLSpanElement>("span");
+  dom.addClass(dot, \`dot-\${value}\`);              // a coloured dot …
+  dom.setAttribute(dot, "role", "img");
+  dom.setAttribute(dot, "aria-label", value);       // … that screen readers read as "shipped"
+  dom.appendChild(cellDiv, dot);
+  return undefined;
+}`} />
+
+  <Callout type="pitfall" title="One tab stop">
+    <p>Buttons or links in cells need a name (<code>aria-label</code>) and <code>tabindex="-1"</code> – the table is one tab
+      stop and is operated with the arrow keys. A cell full of tab stops makes 100,000 rows unusable with a keyboard.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Needs <code>@guiexpert/table@1.1.91</code>. Checked automatically with axe-core (WCAG 2.1 A/AA) in Chromium. Test your
+      app with a real screen reader as well – NVDA with Firefox or Chrome, JAWS, VoiceOver with Safari.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview: <a href="/training/">all chapters</a> – or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

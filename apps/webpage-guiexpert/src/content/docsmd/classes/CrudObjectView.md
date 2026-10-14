@@ -2,6 +2,9 @@
 
 # Class: CrudObjectView\<T\>
 
+Read-only dialog (`<dialog>`) that lists all properties of an object (nested objects flattened). Labels and values
+are escaped – data is shown as text, never as markup.
+
 ## Type parameters
 
 | Name | Type |
@@ -44,7 +47,7 @@
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:6](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L6)
+[src/lib/table/crud/crud-object-view.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L13)
 
 ## Methods
 
@@ -65,7 +68,7 @@
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L32)
+[src/lib/table/crud/crud-object-view.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L38)
 
 ___
 
@@ -85,7 +88,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L36)
+[src/lib/table/crud/crud-object-view.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L42)
 
 ___
 
@@ -99,4 +102,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L10)
+[src/lib/table/crud/crud-object-view.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L17)

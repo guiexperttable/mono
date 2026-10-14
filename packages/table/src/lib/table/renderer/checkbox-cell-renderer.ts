@@ -8,6 +8,9 @@ import { RendererCleanupFnType } from "./renderer-cleanup-fn.type";
 /** @category Renderers & editing */
 export class CheckboxCellRenderer implements CellRendererIf {
 
+  /** Marker for {@link isCheckboxCellRenderer} (works across copies of the core). @since 1.1.91 */
+  readonly type = "CheckboxCellRenderer";
+
   render(
     cellDiv: HTMLDivElement,
     rowIndex: number,
@@ -20,18 +23,24 @@ export class CheckboxCellRenderer implements CellRendererIf {
     if (areaModel.isRowCheckable(rowIndex)) {
       domService.addClass(cellDiv, "ge-table-row-checkbox-div");
       const rowChecked = areaModel.isRowChecked(rowIndex);
-      const checked = (rowChecked === "full") ? "checked" : "";
-      const semi = (rowChecked === "semi") ? "<span style=\"opacity: 0.4;\">✓</span>" : "";
-      cellDiv.innerHTML = `
-        <input
-            type="checkbox"
-            data-area="${areaIdent}"
-            data-row-index="${rowIndex}"
-            data-col-index="${columnIndex}"
-            data-input-type="checkbox"
-            ${checked}
-            class="ge-table-row-checkbox">
-        ${semi}  `;
+      cellDiv.innerText = "";
+      const input = domService.createElement<HTMLInputElement>("input");
+      domService.setAttribute(input, "type", "checkbox");
+      domService.setAttribute(input, "data-area", `${areaIdent}`);
+      domService.setAttribute(input, "data-row-index", `${rowIndex}`);
+      domService.setAttribute(input, "data-col-index", `${columnIndex}`);
+      domService.setAttribute(input, "data-input-type", "checkbox");
+      domService.setAttribute(input, "tabindex", "-1"); // the table is one tab stop (Enter toggles the focused row)
+      domService.addClass(input, "ge-table-row-checkbox");
+      if (rowChecked === "full") {
+        domService.setAttribute(input, "checked", "");
+        input.checked = true;
+      }
+      // partly checked (a tree node with some checked children): the native "indeterminate" state –
+      // screen readers announce "mixed" (before 1.1.91: a pale ✓ next to an empty box)
+      input.indeterminate = rowChecked === "semi";
+      domService.appendChild(cellDiv, input);
+      // the accessible name ("Select row 5") is set by the table (tableOptions.ariaTexts)
     }
     return undefined;
   }

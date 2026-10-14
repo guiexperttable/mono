@@ -56,6 +56,18 @@ describe('GuiexpertTable (React)', () => {
     expect(rowTexts(host)[0]).toContain('Row 0');
   });
 
+  it('the table is a WAI-ARIA grid with a name from the options (screen readers, since 1.1.91)', async () => {
+    const tableOptions = { ...new TableOptions(), ariaLabel: 'Orders' };
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} tableOptions={tableOptions} />);
+    await nextFrame();
+
+    const grid = host.querySelector('[role="grid"]')!;
+    expect(grid).not.toBeNull();
+    expect(grid.getAttribute('aria-label')).toBe('Orders');
+    expect(grid.getAttribute('aria-rowcount')).toBe('6'); // header + 5 rows
+    expect(grid.querySelectorAll('[role="row"]').length).toBeGreaterThan(1);
+  });
+
   it('a click on a body cell calls mouseClicked with row and column index', async () => {
     const mouseClicked = vi.fn<(evt: GeMouseEvent) => void>();
     const host = mount(<GuiexpertTable tableModel={createModel(5)} mouseClicked={mouseClicked} />);

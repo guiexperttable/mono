@@ -279,7 +279,8 @@ describe('checkbox renderers', () => {
     expect(headerBox().querySelector<HTMLInputElement>('input')!.checked).toBe(false);
 
     await userEvent.click(bodyBox(2));
-    await vi.waitFor(() => expect(headerBox().textContent).toContain('✓')); // "semi": some rows checked
+    // "semi" (some rows checked) = indeterminate since 1.1.91 (before: a pale ✓)
+    await vi.waitFor(() => expect(headerBox().querySelector<HTMLInputElement>('input')!.indeterminate).toBe(true));
     expect(headerBox().querySelector<HTMLInputElement>('input')!.checked).toBe(false);
 
     await userEvent.click(headerBox().querySelector('input')!);

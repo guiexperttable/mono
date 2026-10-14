@@ -15,6 +15,7 @@
 ### Properties
 
 - [columnSeparatorChar](CopyService.md#columnseparatorchar)
+- [maxCopyCells](CopyService.md#maxcopycells)
 - [rowSeparatorChar](CopyService.md#rowseparatorchar)
 
 ### Methods
@@ -41,7 +42,26 @@
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L11)
+[src/lib/table/service/copy-service.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L20)
+
+___
+
+### maxCopyCells
+
+▪ `Static` **maxCopyCells**: `number` = `1_000_000`
+
+Upper limit for the number of cells [createContent](CopyService.md#createcontent) copies (e.g. after Ctrl+A on a table with millions
+of rows). Larger selections are rejected instead of building a huge string and blocking the browser.
+
+**`Example`**
+
+```ts
+CopyService.maxCopyCells = 5_000_000; // allow bigger copies
+```
+
+#### Defined in
+
+[src/lib/table/service/copy-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L18)
 
 ___
 
@@ -51,7 +71,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L12)
+[src/lib/table/service/copy-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L21)
 
 ## Methods
 
@@ -79,7 +99,7 @@ A promise that resolves when the content has been successfully copied to the cli
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L68)
+[src/lib/table/service/copy-service.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L88)
 
 ___
 
@@ -109,7 +129,7 @@ A promise that resolves with the copied text if successful, or rejects if an err
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L80)
+[src/lib/table/service/copy-service.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L100)
 
 ___
 
@@ -118,6 +138,11 @@ ___
 ▸ **createContent**(`tableModel`, `selectionModel`, `focusModel`): `Promise`\<`string`\>
 
 Returns the content to be copied based on the provided table model, selection model, and focus model.
+
+- Selection: the bounding box of all selected ranges, one line per row, cells separated by TAB; cells inside the
+  box that are not selected become empty strings, hidden columns are left out.
+- Everything selected ([SelectionModelIf.selectAll](../interfaces/SelectionModelIf.md#selectall), ⌘/Ctrl+A): all displayed body rows × all columns.
+- No selection: the text of the focused cell.
 
 #### Parameters
 
@@ -143,4 +168,4 @@ Throws an error if neither selection nor focus is defined.
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L23)
+[src/lib/table/service/copy-service.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L37)

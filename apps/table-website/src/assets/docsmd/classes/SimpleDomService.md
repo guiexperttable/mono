@@ -19,6 +19,7 @@
 - [appendText](SimpleDomService.md#appendtext)
 - [createElement](SimpleDomService.md#createelement)
 - [createText](SimpleDomService.md#createtext)
+- [removeAttribute](SimpleDomService.md#removeattribute)
 - [removeClass](SimpleDomService.md#removeclass)
 - [setAttribute](SimpleDomService.md#setattribute)
 - [setStyle](SimpleDomService.md#setstyle)
@@ -171,6 +172,38 @@ Creates a text node.
 #### Defined in
 
 [src/lib/table/service/simple-dom-service.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/simple-dom-service.ts#L47)
+
+___
+
+### removeAttribute
+
+▸ **removeAttribute**(`ele`, `key`): `void`
+
+Removes an attribute (used for ARIA attributes of reused row divs). Optional: without it the table calls
+`ele.removeAttribute(key)` itself.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ele` | `HTMLElement` |
+| `key` | `string` |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.91
+
+#### Implementation of
+
+[DomServiceIf](../interfaces/DomServiceIf.md).[removeAttribute](../interfaces/DomServiceIf.md#removeattribute)
+
+#### Defined in
+
+[src/lib/table/service/simple-dom-service.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/simple-dom-service.ts#L55)
 
 ___
 

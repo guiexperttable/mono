@@ -217,3 +217,11 @@ export * from './lib/table/crud/urls.if';
 
 export * from "./lib/table/data/tablemodel/areamodel/has-default-row-height-if";
 
+
+// Accessibility (since 1.1.91)
+export * from './lib/table/aria/aria-texts.if';
+export * from './lib/table/aria/aria-texts';
+export * from './lib/table/aria/aria-ids';
+export * from './lib/table/aria/aria-grid-info';
+export * from './lib/table/aria/tree-aria-info';
+export * from './lib/table/aria/live-announcer';

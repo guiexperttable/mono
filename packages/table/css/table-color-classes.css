@@ -70,7 +70,9 @@
 .ge-table-hover-column { background-color: var(--ge-table-hover-column-bg); }
 .ge-table-hover-row { background-color: var(--ge-table-hover-row-bg); }
 
-.ge-table-focus-border { background-color: var(--ge-table-focus-border); }
+/* Focus frame of the focused cell (2 px). --ge-table-focus-outline-color (not set by default) overrides the
+   color of the cell frame and of the host's keyboard focus ring at once. */
+.ge-table-focus-border { background-color: var(--ge-table-focus-outline-color, var(--ge-table-focus-border)); }
 .ge-table-color-col-resize-handle-hover { background-color: var(--ge-table-color-col-resize-handle-hover-bg); }
 .ge-table-color-dragged-col-div { background-color: var(--ge-table-color-dragged-col-div-bg); }
 .ge-table-color-drop-zone { background-color: var(--ge-table-color-drop-zone-bg); }

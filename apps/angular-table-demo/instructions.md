@@ -171,6 +171,14 @@ siehe `componentrenderer/`.
 Hinweis: Die Tabelle wird einmalig in `ngOnInit` aufgebaut. Ein später geändertes `tableModel` wird nicht
 übernommen – deshalb wird die Komponente in den Demos per `*ngIf` erst erzeugt, wenn die Daten da sind.
 
+## Barrierefreiheit (ab `@guiexpert/table` 1.1.91)
+
+Die Tabelle ist ein WAI-ARIA-Grid (Screenreader, Tastatur: Pfeile, Pos1/Ende, Bild↑/↓, Enter, ↑ in den Header) – ohne
+eigenen Code. Empfohlen ist ein Name über die Optionen, z. B. `ariaLabelledBy: "orders-title"` (ID einer Überschrift)
+oder `ariaLabel: "Bestellungen"`; deutsche Ansagen über `ariaTexts`. Diese Demo nutzt noch die npm-Pakete
+(`TODO.md`) – die Attribute erscheinen hier erst nach dem Release 1.1.91. Eine lauffähige Demo im Mono-Repo:
+`pnpm serve:table-demo` → `http://localhost:4200/aria.html`. Details: `instructions.md` 6.14 im Repo-Root.
+
 ## Lizenz
 
 **Aktuelle Releases: MIT-Lizenz** – kostenlos nutzbar, auch kommerziell. **Künftige Releases: mögliche

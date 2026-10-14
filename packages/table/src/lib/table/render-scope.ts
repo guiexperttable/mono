@@ -26,7 +26,11 @@ import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
 import { TableCellUpdateEventIf } from './data/common/event/input/table-cell-update-event.if';
-import { isAreaModelTree, isTreeRow } from './instanceof-workaround';
+import { isAreaModelTree, isCheckboxCellRenderer, isTreeRow } from './instanceof-workaround';
+import { AriaGridInfo } from './aria/aria-grid-info';
+import { TreeAriaInfo, TreeAriaModel } from './aria/tree-aria-info';
+import { AriaTexts } from './aria/aria-texts';
+import { AriaTextsIf } from './aria/aria-texts.if';
 
 
 /**
@@ -113,6 +117,23 @@ export class RenderScope extends EleScope {
   private editorRendererRow?: number;
   private removables: HTMLDivElement[] = [];
 
+  /** Texts for screen readers (English defaults + `tableOptions.ariaTexts`). @since 1.1.91 */
+  readonly ariaTexts: AriaTextsIf;
+  /** Row/column numbers of the current render pass (see {@link getAriaGridInfo}). */
+  private ariaGridInfo?: AriaGridInfo;
+  private readonly treeAriaInfo = new TreeAriaInfo();
+  /** The cell that has the keyboard focus in this render pass (→ `aria-activedescendant`). */
+  private ariaFocusedCell?: { element: HTMLDivElement, area: AreaIdent, rowIndex: number, columnIndex: number };
+  /** `aria-selected` on body cells ("cell") or rows ("row") – from the type of the selection model. */
+  private ariaSelectionKind: 'none' | 'cell' | 'row' = 'none';
+  /** Span cells rendered in their row this pass – drawBigCell() draws them again on top (screen readers: once). */
+  private renderedSpanCells = new Set<string>();
+  /**
+   * The header cell with the keyboard focus (row, column of the cell's origin) – set by the arrow-up key in the
+   * first body row, see `TableScope`. `undefined`: the focus is in the body ({@link FocusModelIf}).
+   */
+  protected headerFocus?: [number, number];
+
   constructor(
     hostElement: HTMLDivElement,
     tableModel: TableModelIf,
@@ -120,6 +141,7 @@ export class RenderScope extends EleScope {
     tableOptions: TableOptionsIf
   ) {
     super(hostElement, tableModel, dom, tableOptions);
+    this.ariaTexts = AriaTexts.create(tableOptions?.ariaTexts);
 
     // Selection model: table model → table options → an own model of THIS table.
     // (Before 1.1.90 the default was one module-wide SelectionModel/FocusModel shared by all tables.)
@@ -329,6 +351,10 @@ export class RenderScope extends EleScope {
       footer: this.areaFooterCenter.child.clientHeight,
       header: headerHeight
     };
+    this.ariaGridInfo = AriaGridInfo.create(this.tableModel);
+    this.ariaSelectionKind = this.getAriaSelectionKind();
+    this.ariaFocusedCell = undefined;
+    this.renderedSpanCells.clear();
     try {
       this.adjustBody();
       this.adjustArea('footer');
@@ -336,6 +362,7 @@ export class RenderScope extends EleScope {
     } finally {
       this.areaHeightsOfRenderPass = undefined;
     }
+    this.updateHostAria();
 
     if (this.tableOptions.tableTopBorderVisible) {
       this.removables.push(this.dom.addHorizontalBorder(
@@ -667,6 +694,7 @@ export class RenderScope extends EleScope {
     // otherwise the first row would overflow its 0 px area.
     if ((areaIdent === 'header' && !this.tableModel.isHeaderVisibe())
       || (areaIdent === 'footer' && !this.tableModel.isFooterVisibe())) {
+      this.updateRowGroupRoles(westArea, centerArea, eastArea);
       return;
     }
     let y = yStart;
@@ -714,6 +742,7 @@ export class RenderScope extends EleScope {
         // center -------------------------------------------
         let geo = { left, width, height, top, index };
         let rowDiv = this.dom.addRowDiv(centerArea, geo, index, areaIdent, 'center');
+        this.applyRowAria(rowDiv, areaIdent, areaModel, index);
         const rowDivs = [rowDiv];
         const centerStartCol = fixedLeftColumnCount;
 
@@ -734,6 +763,7 @@ export class RenderScope extends EleScope {
         if (padding.left > 0) {
           geo = { left, width: this.areaBodyWestGeo.width, height, top, index };
           rowDiv = this.dom.addRowDiv(westArea, geo, index, areaIdent, 'west');
+          this.applyRowAria(rowDiv, areaIdent, areaModel, index);
           rowDivs.push(rowDiv);
           this.adjustColumnsToRowParent({
             areaIdent,
@@ -753,6 +783,7 @@ export class RenderScope extends EleScope {
         if (padding.right > 0) {
           geo = { left, width: this.areaBodyEastGeo.width, height, top, index };
           rowDiv = this.dom.addRowDiv(eastArea, geo, index, areaIdent, 'east');
+          this.applyRowAria(rowDiv, areaIdent, areaModel, index);
           this.adjustColumnsToRowParent({
             areaIdent,
             sideIdent: 'east',
@@ -778,7 +809,7 @@ export class RenderScope extends EleScope {
           const div =
             this.dom.applyStyle(
               this.dom.setAttribute(
-                this.dom.addDiv(arrowHeaderCell.parentElement as HTMLDivElement, new GeoData(iconLeft, 20, 20, 8)),
+                this.dom.addDiv(arrowHeaderCell.parentElement as HTMLDivElement, new GeoData(iconLeft, 20, 20, 8)), // aria-hidden
                 'data-ge-action', 'toggleExpandCollapseAll'
               ),
               { 'cursor': 'pointer' }
@@ -858,6 +889,210 @@ export class RenderScope extends EleScope {
         }
       }
     }
+    this.updateRowGroupRoles(westArea, centerArea, eastArea);
+  }
+
+  /**
+   * Row and column numbers for screen readers of the current render pass (computed at its start).
+   *
+   * @returns {AriaGridInfo} the counts
+   * @since 1.1.91
+   */
+  getAriaGridInfo(): AriaGridInfo {
+    if (!this.ariaGridInfo) {
+      this.ariaGridInfo = AriaGridInfo.create(this.tableModel);
+    }
+    return this.ariaGridInfo;
+  }
+
+  /** `role="row"` and `aria-rowindex`; body rows of a tree: level, position, expanded; row selection: selected. */
+  protected applyRowAria(rowDiv: HTMLDivElement, areaIdent: AreaIdent, areaModel: AreaModelIf, rowIndex: number, rowState = true) {
+    const ds = this.dom.domService;
+    ds.setAttribute(rowDiv, 'role', 'row');
+    ds.setAttribute(rowDiv, 'aria-rowindex', `${this.getAriaGridInfo().rowIndex(areaIdent, rowIndex)}`);
+    if (areaIdent !== 'body' || !rowState) {
+      return;
+    }
+    if (this.tree && isAreaModelTree(areaModel)) {
+      const info = this.treeAriaInfo.get(areaModel as unknown as TreeAriaModel, rowIndex);
+      if (info) {
+        ds.setAttribute(rowDiv, 'aria-level', `${info.level}`);
+        ds.setAttribute(rowDiv, 'aria-setsize', `${info.setSize}`);
+        ds.setAttribute(rowDiv, 'aria-posinset', `${info.posInSet}`);
+        if (info.expanded === undefined) {
+          this.dom.removeAttribute(rowDiv, 'aria-expanded'); // the row div is reused for another row
+        } else {
+          ds.setAttribute(rowDiv, 'aria-expanded', `${info.expanded}`);
+        }
+      }
+    }
+    if (this.ariaSelectionKind === 'row') {
+      const sm = this.getSelectionModel?.();
+      ds.setAttribute(rowDiv, 'aria-selected', sm && sm.getSelectionCount(rowIndex, 0) > 0 ? 'true' : 'false');
+    } else if (rowDiv.hasAttribute('aria-selected')) {
+      this.dom.removeAttribute(rowDiv, 'aria-selected'); // the selection type was changed at runtime
+    }
+  }
+
+  /**
+   * `role`, `aria-colindex`, spans and `aria-sort` of a cell.
+   *
+   * @returns {[number, number]} rowspan and colspan of the cell (≥ 1)
+   */
+  protected applyCellAria(cell: HTMLDivElement, areaIdent: AreaIdent, areaModel: AreaModelIf, rowIndex: number, columnIndex: number): [number, number] {
+    const ds = this.dom.domService;
+    const info = this.getAriaGridInfo();
+    const header = areaIdent === 'header';
+    ds.setAttribute(cell, 'role', header ? 'columnheader' : 'gridcell');
+    const colIndex = info.colIndex(columnIndex);
+    if (colIndex > 0) {
+      ds.setAttribute(cell, 'aria-colindex', `${colIndex}`);
+    }
+    const rowspan = Math.max(1, areaModel.getRowspanAt(rowIndex, columnIndex) || 1);
+    const colspan = Math.max(1, areaModel.getColspanAt(rowIndex, columnIndex) || 1);
+    if (colspan > 1) {
+      ds.setAttribute(cell, 'aria-colspan', `${info.colSpan(columnIndex, colspan)}`);
+    }
+    if (rowspan > 1) {
+      ds.setAttribute(cell, 'aria-rowspan', `${rowspan}`);
+    }
+    if (rowspan > 1 || colspan > 1) {
+      this.renderedSpanCells.add(`${areaIdent}:${rowIndex}:${columnIndex}`);
+    }
+    // aria-sort: on the lowest header cell of a sortable column
+    if (header && rowIndex + rowspan >= info.headerRowCount && colspan === 1) {
+      const columnDef = this.tableModel.getColumnDef(columnIndex);
+      if (columnDef?.sortable?.()) {
+        const state = columnDef.sortState;
+        ds.setAttribute(cell, 'aria-sort', state === 'asc' ? 'ascending' : state === 'desc' ? 'descending' : 'none');
+      }
+    }
+    return [rowspan, colspan];
+  }
+
+  /** An empty row group has role "presentation" (a rowgroup needs rows) – changed only when it changes. */
+  private updateRowGroupRoles(...scopes: DivScope[]) {
+    for (const scope of scopes) {
+      const role = scope.child.firstElementChild ? 'rowgroup' : 'presentation';
+      if (scope.child.getAttribute('role') !== role) {
+        this.dom.domService.setAttribute(scope.child, 'role', role);
+      }
+    }
+  }
+
+  /** Writes an attribute of the host only if it changed (every write may notify screen readers). */
+  private setHostAttribute(key: string, value: string | undefined) {
+    this.setHostAriaAttribute(key, value);
+  }
+
+  /** Counts, multi selection and the active cell on the host – at the end of every render pass. */
+  private updateHostAria() {
+    const info = this.getAriaGridInfo();
+    this.setHostAttribute('aria-rowcount', `${info.rowCount}`);
+    this.setHostAttribute('aria-colcount', `${info.colCount}`);
+    const sm = this.getSelectionModel?.() as unknown as { selectionType?: string, selectionMode?: string } | undefined;
+    const multi = this.ariaSelectionKind !== 'none' && sm?.selectionMode === 'multi';
+    this.setHostAttribute('aria-multiselectable', multi ? 'true' : undefined);
+
+    const focused = this.ariaFocusedCell;
+    if (focused) {
+      const id = this.ariaIds.cell(focused.area, focused.rowIndex, focused.columnIndex);
+      this.dom.domService.setAttribute(focused.element, 'id', id);
+      this.setHostAttribute('aria-activedescendant', id);
+    } else {
+      this.setHostAttribute('aria-activedescendant', undefined); // never a reference to a missing element
+    }
+  }
+
+  /**
+   * Remembers the focused cell of this pass. A cell drawn twice (header groups: in its row and again by
+   * drawBigCell, that copy is aria-hidden) keeps the first, visible-to-screen-readers element.
+   */
+  private setAriaFocusedCell(element: HTMLDivElement, area: AreaIdent, rowIndex: number, columnIndex: number) {
+    const f = this.ariaFocusedCell;
+    if (f && f.area === area && f.rowIndex === rowIndex && f.columnIndex === columnIndex) {
+      return;
+    }
+    this.ariaFocusedCell = { element, area, rowIndex, columnIndex };
+  }
+
+  /** "row" for a row selection model, "none" for type "none" (or no model), otherwise "cell". */
+  private getAriaSelectionKind(): 'none' | 'cell' | 'row' {
+    const sm = this.getSelectionModel?.() as unknown as { selectionType?: string } | undefined;
+    if (!sm) {
+      return 'none';
+    }
+    const type = sm.selectionType;
+    if (type === 'none') {
+      return 'none';
+    }
+    return type === 'row' ? 'row' : 'cell';
+  }
+
+  /**
+   * The label of a column for screen readers: the header label of its column definition, otherwise the text of the
+   * lowest header row, otherwise the property.
+   *
+   * @param {number} columnIndex - model column index
+   * @returns {string} e.g. "Total"
+   * @since 1.1.91
+   */
+  getColumnAriaLabel(columnIndex: number): string {
+    const columnDef = this.tableModel.getColumnDef(columnIndex);
+    if (columnDef?.headerLabel) {
+      return `${columnDef.headerLabel}`;
+    }
+    const headerModel = this.tableModel.getAreaModel('header');
+    const headerRows = headerModel?.getRowCount() ?? 0;
+    if (headerRows > 0) {
+      const value: unknown = headerModel.getValueAt(headerRows - 1, columnIndex);
+      const text = value && typeof value === 'object' && 'data' in value ? (value as { data: unknown }).data : value; // CellGroupExt
+      if ((typeof text === 'string' && text.trim()) || typeof text === 'number') {
+        return `${text}`;
+      }
+    }
+    return columnDef?.property || `Column ${columnIndex + 1}`;
+  }
+
+  /** Name of a row checkbox: "Select row 5" (body) resp. "Select all rows" (header). */
+  protected getCheckboxAriaLabel(areaIdent: AreaIdent, rowIndex: number): string {
+    return areaIdent === 'header' ? this.ariaTexts.selectAllRows() : this.ariaTexts.selectRow(rowIndex + 1);
+  }
+
+  /** Gives a form control a name, unless the renderer gave it one. */
+  private labelControl(control: HTMLElement, label: string) {
+    if (label && !control.hasAttribute('aria-label') && !control.hasAttribute('aria-labelledby')) {
+      this.dom.domService.setAttribute(control, 'aria-label', label);
+    }
+  }
+
+  /**
+   * Names for controls of built-in renderers: row checkboxes ({@link CheckboxColumnDef}), boolean property
+   * checkboxes and – with own `ariaTexts` – header group toggles. Cheap class checks first: most cells have none.
+   */
+  private labelRendererControls(cell: HTMLDivElement, cellRenderer: CellRendererIf, areaIdent: AreaIdent, rowIndex: number, columnIndex: number) {
+    if (isCheckboxCellRenderer(cellRenderer) || cell.classList.contains('ge-table-row-checkbox-div')) {
+      const input = cell.querySelector<HTMLInputElement>('input.ge-table-row-checkbox');
+      if (input) {
+        this.labelControl(input, this.getCheckboxAriaLabel(areaIdent, rowIndex));
+        return;
+      }
+      const propertyCheckbox = cell.querySelector<HTMLInputElement>('input.ge-input-checkbox');
+      if (propertyCheckbox) {
+        this.labelControl(propertyCheckbox, this.getColumnAriaLabel(columnIndex));
+      }
+      return;
+    }
+    const ownTexts = this.tableOptions.ariaTexts;
+    if (areaIdent === 'header' && (ownTexts?.expandGroup || ownTexts?.collapseGroup)) {
+      const toggle = cell.querySelector<HTMLElement>('.ge-table-toggle-icon-div[role="button"]');
+      if (toggle) {
+        const label = toggle.getAttribute('data-ge-group-label') ?? '';
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        this.dom.domService.setAttribute(toggle, 'aria-label',
+          expanded ? this.ariaTexts.collapseGroup(label) : this.ariaTexts.expandGroup(label));
+      }
+    }
   }
 
   /** The cell div of a column among the children of the given row divs. */
@@ -919,6 +1154,20 @@ export class RenderScope extends EleScope {
       const count = selectionModel.getSelectionCount(range.r1, range.c1);
       cellSelected = count > 0;
     }
+    // Screen readers: a cell must be in a row – the big cell gets a row of its own (0 × 0 px, the cell is positioned
+    // relative to the area like before). Was the cell already rendered in its row (header groups), this one is a
+    // visual duplicate and hidden from screen readers.
+    const areaIdent = areaModel.areaIdent;
+    const spanRow = this.dom.applyStyle(
+      this.dom.createDivWithClass('ge-table-span-row', parentDiv),
+      { position: 'absolute', left: '0', top: '0', width: '0', height: '0', overflow: 'visible' });
+    if (this.renderedSpanCells.has(`${areaIdent}:${range.r1}:${range.c1}`)) {
+      this.dom.setAriaHidden(spanRow);
+    } else {
+      this.applyRowAria(spanRow, areaIdent, areaModel, range.r1, false);
+    }
+    parentDiv = spanRow;
+
     if (range.gammaRange) {
       // TODO render hierarchy cell
       // console.info('TODO here', range);
@@ -1191,6 +1440,9 @@ export class RenderScope extends EleScope {
     const val = areaModel.getValueAt(rowIndex, index);
     const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
     const checkedType = areaModel.isRowChecked(rowIndex);
+    const checkboxAriaLabel = (this.tableOptions.showCheckboxWihoutExtraColumn && index === 0 && checkedType)
+      ? this.getCheckboxAriaLabel(areaIdent, rowIndex)
+      : undefined;
     const cell = this.dom.addColumnDiv(
       {
         parent,
@@ -1203,8 +1455,10 @@ export class RenderScope extends EleScope {
         treeArrow,
         tableOptions: this.tableOptions,
         checkedType,
-        sortState
+        sortState,
+        checkboxAriaLabel
       });
+    const [rowspan, colspan] = this.applyCellAria(cell, areaIdent, areaModel, rowIndex, index);
 
     const tooltip = areaModel.getTooltipAt(rowIndex, index);
     if (tooltip) {
@@ -1223,7 +1477,12 @@ export class RenderScope extends EleScope {
         // the cell is rebuilt on every repaint (e.g. after the click events of the double click) –
         // give the new input/select the focus, otherwise typing goes nowhere
         const input = cell.querySelector('input, select') as HTMLInputElement | HTMLSelectElement | null;
-        if (input && !input.contains(document.activeElement)) input.focus();
+        if (input) {
+          this.labelControl(input, this.getColumnAriaLabel(index)); // screen readers: "Total, edit text"
+          if (!input.contains(document.activeElement)) input.focus();
+        }
+      } else {
+        this.labelRendererControls(cell, cellRenderer, areaIdent, rowIndex, index);
       }
     }
 
@@ -1236,11 +1495,21 @@ export class RenderScope extends EleScope {
     if (lastRowOfModel) {
       this.dom.addHorizontalBorder({ left, width, height, top: top + height }, parent);
     }
-    if (this.getFocusModel && areaIdent === 'body') {
+    if (this.getFocusModel && areaIdent === 'body' && !this.headerFocus) {
       const fm = this.getFocusModel();
       if (fm?.hasFocus(rowIndex, index)) {
         this.dom.addFocusBorderDivs(parent, geo, {});
+        this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
+      } else if (fm && (rowspan > 1 || colspan > 1)) {
+        const [fr, fc] = fm.getFocus();
+        if (fr >= rowIndex && fr < rowIndex + rowspan && fc >= index && fc < index + colspan) {
+          this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
+        }
       }
+    } else if (areaIdent === 'header' && this.headerFocus
+      && this.headerFocus[0] === rowIndex && this.headerFocus[1] === index) {
+      this.dom.addFocusBorderDivs(parent, geo, {});
+      this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
     }
     if (areaIdent === 'header') {
       this.dom.setAttribute(cell, 'data-ge-action', 'drag-column');
@@ -1319,8 +1588,9 @@ export class RenderScope extends EleScope {
     if (this.tableOptions.hoverRowVisible && mouseMoveEvent.rowIndex > -1 && mouseMoveEvent.areaIdent === 'body') {
       const width = this.hostElement.clientWidth;
       const rowHeight = this.tableModel.getAreaModel('body').getRowHeight(mouseMoveEvent.rowIndex);
-      // with a capped scroll height scrollTop is not a content position – use the rendered offset
-      const scrolledOut = this.isScrollHeightCapped() ? this.contentScrollTop : this.scrollTop;
+      // Always the rendered content offset, never scrollTop: the scroll bar range (viewport incl. footer, wrapper + 1 px,
+      // capped height) differs from the content range – with a footer the hover row drifted the further one scrolled.
+      const scrolledOut = this.contentScrollTop;
       const top = mouseMoveEvent.rowTop + this.areaHeaderCenter.parent.clientHeight - scrolledOut;
       this.dom.applyStyle(this.hoverRow, {
         'left': '0',
@@ -1391,7 +1661,18 @@ export class RenderScope extends EleScope {
       const firstEastColumnLeft = this.tableModel.getXPosByColumnIndex(columnCount - fixedRight);
       return this.areaBodyEastGeo.left + columnLeft - firstEastColumnLeft;
     }
-    return columnLeft - this.scrollLeft; // center: west columns + scrolled center = columnLeft - scrollLeft
+    // center: the rendered content offset, not scrollLeft – the scroll bar range differs from the content range
+    // (east columns, vertical scroll bar), so the hover column drifted with horizontal scrolling
+    return columnLeft - this.getContentScrollLeft();
+  }
+
+  /**
+   * Content pixels of the center columns scrolled out on the left – the offset that is actually rendered
+   * (see adjustColumnsToRowParent), the horizontal counterpart of `contentScrollTop`.
+   */
+  protected getContentScrollLeft(): number {
+    const virtualRowDivLeftF1 = this.areaBodyCenterGeo.width - this.tableModel.getContentWidthInPixel();
+    return -this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1);
   }
 
   /**
@@ -1601,7 +1882,7 @@ export class RenderScope extends EleScope {
    */
   private renderDragTargetDiv(parent: HTMLDivElement, left: number, top: number, width: number, height: number): HTMLDivElement {
     const div = this.dom.applyStylePosistionAbsolute(
-      this.dom.createDivWithClass('ge-table-drop-zone', parent)
+      this.dom.setAriaHidden(this.dom.createDivWithClass('ge-table-drop-zone', parent))
     );
     this.dom.setStyle(div, 'left', `${left}px`);
     this.dom.setStyle(div, 'top', `${top}px`);
@@ -1647,7 +1928,7 @@ export class RenderScope extends EleScope {
           for (let i = 0; i < count; i++) {
             const div = this.dom.applyStylePosistionAbsolute(
               // ge-table-body-west-selected-range
-              this.dom.createDivWithClass(`ge-table-${areaModel.areaIdent}-${sideIdent}-selected-range`, parent)
+              this.dom.setAriaHidden(this.dom.createDivWithClass(`ge-table-${areaModel.areaIdent}-${sideIdent}-selected-range`, parent))
             );
             this.dom.setStyle(div, 'left', `${left}px`);
             this.dom.setStyle(div, 'top', `${top}px`);
@@ -1711,6 +1992,9 @@ export class RenderScope extends EleScope {
     if (cellSelected) {
       this.dom.addClass(`ge-table-${areaIdent}-${sideIdent}-selected-range`, div);
     }
+    if (areaIdent === 'body' && this.ariaSelectionKind === 'cell') {
+      this.dom.domService.setAttribute(div, 'aria-selected', cellSelected ? 'true' : 'false');
+    }
     if (fn) {
       this.cleanupFunctions[areaIdent].push(fn);
     }
@@ -1745,6 +2029,7 @@ export class RenderScope extends EleScope {
     domService.setAttribute(div, 'data-ge-action', 'resize-column');
     // domService.setAttribute(div, 'data-ge-action', 'column-resize');
     domService.addClass(div, `ge-table-column-resize-handle`);
+    domService.setAttribute(div, 'aria-hidden', 'true'); // mouse only
     domService.setStyle(div, 'display', 'clip');
     domService.setStyle(div, 'position', 'absolute');
     domService.setStyle(div, 'cursor', 'col-resize');

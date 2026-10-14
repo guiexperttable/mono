@@ -22,6 +22,7 @@ Works with AreaModelObjectArray only
 
 ### Properties
 
+- [ariaLabel](StarRatingCellRenderer.md#arialabel)
 - [property](StarRatingCellRenderer.md#property)
 
 ### Methods
@@ -32,7 +33,7 @@ Works with AreaModelObjectArray only
 
 ### constructor
 
-• **new StarRatingCellRenderer**\<`T`\>(`property`): [`StarRatingCellRenderer`](StarRatingCellRenderer.md)\<`T`\>
+• **new StarRatingCellRenderer**\<`T`\>(`property`, `ariaLabel?`): [`StarRatingCellRenderer`](StarRatingCellRenderer.md)\<`T`\>
 
 #### Type parameters
 
@@ -42,9 +43,10 @@ Works with AreaModelObjectArray only
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `property` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `property` | `string` | - |
+| `ariaLabel` | (`stars`: `number`) => `string` | Text for screen readers (the stars are an image). Default: `"4 stars"`. **`Since`** 1.1.91 |
 
 #### Returns
 
@@ -52,9 +54,39 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[src/lib/table/renderer/star-rating-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L14)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L15)
 
 ## Properties
+
+### ariaLabel
+
+• **ariaLabel**: (`stars`: `number`) => `string`
+
+#### Type declaration
+
+▸ (`stars`): `string`
+
+Text for screen readers (the stars are an image). Default: `"4 stars"`.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `stars` | `number` |
+
+##### Returns
+
+`string`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/star-rating-cell-renderer.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L18)
+
+___
 
 ### property
 
@@ -62,7 +94,7 @@ Works with AreaModelObjectArray only
 
 #### Defined in
 
-[src/lib/table/renderer/star-rating-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L15)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L16)
 
 ## Methods
 
@@ -96,4 +128,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/star-rating-cell-renderer.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L21)
+[src/lib/table/renderer/star-rating-cell-renderer.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/star-rating-cell-renderer.ts#L24)

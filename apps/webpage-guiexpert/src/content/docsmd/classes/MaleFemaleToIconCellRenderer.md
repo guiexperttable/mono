@@ -12,6 +12,10 @@
 
 - [constructor](MaleFemaleToIconCellRenderer.md#constructor)
 
+### Properties
+
+- [ariaLabels](MaleFemaleToIconCellRenderer.md#arialabels)
+
 ### Methods
 
 - [render](MaleFemaleToIconCellRenderer.md#render)
@@ -20,17 +24,52 @@
 
 ### constructor
 
-• **new MaleFemaleToIconCellRenderer**(): [`MaleFemaleToIconCellRenderer`](MaleFemaleToIconCellRenderer.md)
+• **new MaleFemaleToIconCellRenderer**(`ariaLabels?`): [`MaleFemaleToIconCellRenderer`](MaleFemaleToIconCellRenderer.md)
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ariaLabels` | `Object` | texts for screen readers (the symbols ♂ / ♀ are images). Default: "male" / "female". |
+| `ariaLabels.female` | `string` | - |
+| `ariaLabels.male` | `string` | - |
 
 #### Returns
 
 [`MaleFemaleToIconCellRenderer`](MaleFemaleToIconCellRenderer.md)
 
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/male-female-to-icon-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/male-female-to-icon-cell-renderer.ts#L14)
+
+## Properties
+
+### ariaLabels
+
+• **ariaLabels**: `Object`
+
+texts for screen readers (the symbols ♂ / ♀ are images). Default: "male" / "female".
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `female` | `string` |
+| `male` | `string` |
+
+#### Defined in
+
+[src/lib/table/renderer/male-female-to-icon-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/male-female-to-icon-cell-renderer.ts#L15)
+
 ## Methods
 
 ### render
 
-▸ **render**(`cellDiv`, `_rowIndex`, `_columnIndex`, `_areaIdent`, `_areaModel`, `cellValue`, `_domService`): `undefined` \| `Function`
+▸ **render**(`cellDiv`, `_rowIndex`, `_columnIndex`, `_areaIdent`, `_areaModel`, `cellValue`, `domService`): `undefined` \| `Function`
 
 Fills the (empty) cell element.
 
@@ -44,7 +83,7 @@ Fills the (empty) cell element.
 | `_areaIdent` | [`AreaIdent`](../modules.md#areaident) | `"header"`, `"body"` or `"footer"` |
 | `_areaModel` | [`AreaModelIf`](../interfaces/AreaModelIf.md) | the model of this area (e.g. for `getRowByIndex(rowIndex)`) |
 | `cellValue` | `any` | the value of the cell (`areaModel.getValueAt(rowIndex, columnIndex)`) |
-| `_domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) | create and change elements through it (works with Angular's Renderer2, too) |
+| `domService` | [`DomServiceIf`](../interfaces/DomServiceIf.md) | create and change elements through it (works with Angular's Renderer2, too) |
 
 #### Returns
 
@@ -58,4 +97,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/male-female-to-icon-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/male-female-to-icon-cell-renderer.ts#L11)
+[src/lib/table/renderer/male-female-to-icon-cell-renderer.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/male-female-to-icon-cell-renderer.ts#L19)

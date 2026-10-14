@@ -2,6 +2,35 @@
 
 # Class: CrudOptions
 
+Settings and REST calls of a CRUD table ([CrudTableModelFactory](CrudTableModelFactory.md)).
+
+The default REST calls use `fetch`:
+- `{id}` in a URL is replaced by the URL-encoded id (`/api/items/{id}` → `/api/items/a%2Fb`);
+- requests with a body (`updateItem`, `createItem`) send JSON with `Content-Type: application/json`
+  (unless `getHeadersInit()` already sets a `Content-Type`);
+- the promise is rejected for an HTTP error status (4xx/5xx) and when no URL is configured;
+  an empty response body (e.g. `204 No Content`) resolves with `undefined`.
+
+Every call can be replaced, e.g. to use your own HTTP client.
+
+**`Example`**
+
+```ts
+const crudOptions: CrudOptions = {
+  ...new CrudOptions(),
+  urls: {
+    list: new UrlInfo('GET', '/api/customers'),
+    read: new UrlInfo('GET', '/api/customers/{id}'),
+    update: new UrlInfo('PUT', '/api/customers/{id}'),
+    create: new UrlInfo('POST', '/api/customers'),
+    delete: new UrlInfo('DELETE', '/api/customers/{id}'),
+  },
+  getHeadersInit: () => ({ Authorization: 'Bearer my-token' }),
+  getIdKey: () => 'customerId',
+  getEmptyItem: () => ({ name: '', vip: false, credit: 0 }),
+};
+```
+
 ## Implements
 
 - [`CrudOptionsIf`](../interfaces/CrudOptionsIf.md)
@@ -55,7 +84,7 @@
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L28)
+[src/lib/table/crud/crud-options.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L57)
 
 ___
 
@@ -83,7 +112,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L31)
+[src/lib/table/crud/crud-options.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L60)
 
 ___
 
@@ -93,7 +122,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L29)
+[src/lib/table/crud/crud-options.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L58)
 
 ___
 
@@ -115,7 +144,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L112)
+[src/lib/table/crud/crud-options.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L90)
 
 ___
 
@@ -137,7 +166,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L33)
+[src/lib/table/crud/crud-options.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L62)
 
 ___
 
@@ -149,6 +178,8 @@ ___
 
 ▸ (): `string`
 
+The property that holds the id of an item (default `'id'`).
+
 ##### Returns
 
 `string`
@@ -159,7 +190,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L37)
+[src/lib/table/crud/crud-options.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L67)
 
 ___
 
@@ -173,7 +204,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L17)
+[src/lib/table/crud/crud-options.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L46)
 
 ___
 
@@ -187,7 +218,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L24)
+[src/lib/table/crud/crud-options.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L53)
 
 ___
 
@@ -201,7 +232,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L11)
+[src/lib/table/crud/crud-options.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L40)
 
 ## Methods
 
@@ -222,7 +253,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L85)
+[src/lib/table/crud/crud-options.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L84)
 
 ___
 
@@ -247,7 +278,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L99)
+[src/lib/table/crud/crud-options.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L87)
 
 ___
 
@@ -278,7 +309,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L58)
+[src/lib/table/crud/crud-options.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L78)
 
 ___
 
@@ -308,13 +339,15 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L47)
+[src/lib/table/crud/crud-options.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L75)
 
 ___
 
 ### getIdByObject
 
 ▸ **getIdByObject**\<`T`\>(`o`): `any`
+
+The id of an item: the value of its `getIdKey()` property (`undefined` if it has none).
 
 #### Type parameters
 
@@ -338,7 +371,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L39)
+[src/lib/table/crud/crud-options.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L70)
 
 ___
 
@@ -364,4 +397,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-options.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L71)
+[src/lib/table/crud/crud-options.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-options.ts#L81)

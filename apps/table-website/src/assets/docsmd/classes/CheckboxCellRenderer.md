@@ -12,6 +12,10 @@
 
 - [constructor](CheckboxCellRenderer.md#constructor)
 
+### Properties
+
+- [type](CheckboxCellRenderer.md#type)
+
 ### Methods
 
 - [render](CheckboxCellRenderer.md#render)
@@ -25,6 +29,22 @@
 #### Returns
 
 [`CheckboxCellRenderer`](CheckboxCellRenderer.md)
+
+## Properties
+
+### type
+
+• `Readonly` **type**: ``"CheckboxCellRenderer"``
+
+Marker for [isCheckboxCellRenderer](../modules.md#ischeckboxcellrenderer) (works across copies of the core).
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/checkbox-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/checkbox-cell-renderer.ts#L12)
 
 ## Methods
 
@@ -58,4 +78,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/checkbox-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/checkbox-cell-renderer.ts#L11)
+[src/lib/table/renderer/checkbox-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/checkbox-cell-renderer.ts#L14)

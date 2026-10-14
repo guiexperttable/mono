@@ -58,6 +58,7 @@ export class ActionsCellRenderer implements CellRendererIf {
     return `
     <button
       type="button"
+      tabindex="-1"
       data-area="${areaIdent}"
       data-action="${action.action}"
       data-id="${escapeHtml(id)}"
@@ -81,6 +82,7 @@ export class ActionsCellRenderer implements CellRendererIf {
     return `
     <a
       href="javascript:void(0)"
+      tabindex="-1"
       data-area="${areaIdent}"
       data-action="${action.action}"
       data-id="${escapeHtml(id)}"

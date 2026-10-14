@@ -59,5 +59,9 @@ export class DomService implements DomServiceIf {
     this.renderer.setAttribute(ele, key, value);
   }
 
+  removeAttribute(ele: HTMLElement, key: string): void {
+    this.renderer.removeAttribute(ele, key);
+  }
+
 
 }

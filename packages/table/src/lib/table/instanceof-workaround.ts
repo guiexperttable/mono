@@ -40,6 +40,19 @@ export function isAreaModelTree(model: any): boolean {
  *
  * @category Utilities
  */
+/**
+ * True for a {@link CheckboxCellRenderer} – also from another copy of the core (no `instanceof`).
+ *
+ * @example
+ * isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
+ *
+ * @since 1.1.91
+ * @category Utilities
+ */
+export function isCheckboxCellRenderer(o: any): boolean {
+  return !!o && o['type'] === 'CheckboxCellRenderer';
+}
+
 export function isCheckboxColumnDef(o: any): boolean {
   return o && o['type'] === 'CheckboxColumnDef';
 }

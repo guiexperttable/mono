@@ -68,4 +68,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/tree-row.service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L23)
+[src/lib/table/service/tree-row.service.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/tree-row.service.ts#L34)

@@ -323,6 +323,24 @@ const tableOptions: TableOptionsIf = {
 `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
 `tableApi.getShortcutActionMapping()`, `tableApi.triggerAction("SELECT_ALL")`, `tableApi.copyToClipboard()`.
 
+**Screen readers (since 1.1.91):** the table is a WAI-ARIA grid – give it a name in the options; everything else
+(roles, row/column numbers, focus, announcements, keyboard: arrows, Home/End, Page Up/Down, Enter, header focus) works
+without code. Details and the rules for own cell components: `instructions.md` 6.14 in the repository root.
+
+```ts
+import { TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  ariaLabelledBy: "orders-title",                 // <h2 id="orders-title">Orders</h2> above the table
+  ariaTexts: { filtered: (rowCount: number) => `${rowCount} Zeilen` },
+};
+```
+
+An Angular cell component (`RenderWrapperFactory`) is rendered into a cell with `role="gridcell"`: icons need an
+`aria-label` (`role="img"`), buttons a name, and no `tabindex` of their own. The wrapper's `DomService` sets and
+removes attributes through `Renderer2`.
+
 ---
 
 ## 10. Mouse events

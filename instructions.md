@@ -670,7 +670,8 @@ const tableOptions: TableOptionsIf = {
 - Keyboard shortcuts (copy, select all, navigation, start editing) – see `tableApi.getShortcutActionMapping()`;
   override with `tableOptions.shortcutActionIdMapping` or disable with `shortcutActionsDisabled: true`.
   Action ids: `COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`, `DESELECT_ALL`,
-  `NAVIGATE_LEFT/RIGHT/UP/DOWN`; trigger them with `tableApi.triggerAction("SELECT_ALL")`.
+  `NAVIGATE_LEFT/RIGHT/UP/DOWN`, since 1.1.91 also `NAVIGATE_ROW_START/ROW_END/FIRST_CELL/LAST_CELL/PAGE_UP/PAGE_DOWN`
+  and `ACTIVATE_CELL` (keys: 6.14); trigger them with `tableApi.triggerAction("SELECT_ALL")`.
 
 ### 6.5 Events
 
@@ -859,6 +860,76 @@ start, `-1` keeps the horizontal position); `setColumnVisible(column, visible)` 
 showing it again restores the previous width), `isColumnVisible(column)`, `setHeaderVisible(visible)`,
 `setFooterVisible(visible)`, `isHeaderVisible()`, `isFooterVisible()`, `ensureColumnIsVisible(col)` (scrolls
 horizontally only if needed – the counterpart of `ensureRowIsVisible`; the arrow keys use both and skip hidden columns).
+
+### 6.14 Accessibility: screen readers and keyboard (since 1.1.91)
+
+The table follows the WAI-ARIA pattern **grid** (a tree body: **treegrid**) and is tested with axe-core
+(WCAG 2.1 A/AA). Nothing to switch on – give the table a name and, if you like, your own texts:
+
+```ts
+import { TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  ariaLabelledBy: "orders-title",                    // id of a visible heading – or ariaLabel: "Orders"
+  ariaDescribedBy: "orders-hint",                    // optional
+  ariaTexts: {                                       // optional, English defaults (AriaTexts)
+    filtered: (rowCount: number) => `${rowCount} Zeilen`,
+    copied: (cellCount: number) => `${cellCount} Zellen kopiert`,
+  },
+};
+```
+
+**What screen readers get**
+
+| | |
+|---|---|
+| Grid | `role="grid"`/`"treegrid"`, name, `aria-rowcount` (header + **all** body rows + footer – not only the rendered ones), `aria-colcount` (shown columns), `aria-multiselectable` for a `"multi"` selection model |
+| Rows / cells | `role="row"` + `aria-rowindex`; `columnheader`/`gridcell` + `aria-colindex`, `aria-colspan`/`aria-rowspan`; fixed columns: the row divs of west, center and east share the `aria-rowindex` |
+| Focus | the table is **one** tab stop; the focused cell is announced via `aria-activedescendant` (Tab into the table focuses the first visible cell) |
+| Sorting | `aria-sort` on sortable headers; announcement "Sorted by Total, descending" |
+| Selection | `aria-selected` on cells (cell/range/column selection) or rows (row selection) |
+| Tree | `aria-level`, `aria-setsize`, `aria-posinset`, `aria-expanded` (with a filter only the shown siblings count) |
+| Checkboxes | named "Select row 5" / "Select all rows"; partly checked = native `indeterminate` ("mixed") |
+| Header groups | the toggle is a button "Collapse group Q1" with `aria-expanded` |
+| Editor | the input is named after the column; Escape closes it and the focus returns to the table |
+| Announcements | a polite live region (in `document.body`, removed by `destroy()`): sorting, filter result ("42 rows"), copy ("12 cells copied"), select all; own messages with `tableApi.announce("Orders loaded")`. Inside a modal dialog (`aria-modal="true"`) screen readers ignore it – use a live region of your own there |
+| Decoration | borders, hover, focus frame, drag ghost, resize handles, icons: `aria-hidden="true"` |
+
+**Keyboard** (WAI-ARIA grid; change it with `shortcutActionIdMapping`)
+
+| Key | Action |
+|---|---|
+| ← → ↑ ↓ | move the focus cell (hidden columns are skipped); ↑ in the first row moves into the header, ↓ back |
+| Home / End (macOS also ⌘← / ⌘→) | first / last cell of the row |
+| Ctrl+Home / Ctrl+End (macOS also ⌘↑ / ⌘↓) | first cell of the first row / last cell of the last row |
+| Page Up / Page Down | one page up / down |
+| Enter | body: toggle the row checkbox, otherwise expand/collapse the tree row · header: open/close a group, otherwise sort |
+| Space | toggle the selection of the focus cell |
+| F2 / Escape | start / cancel editing |
+| Ctrl/⌘+A, Ctrl+Shift+A, Ctrl/⌘+C | select all, clear, copy |
+
+`tableApi.getHeaderFocus()` returns the header cell with the keyboard focus (the `FocusModel` holds the body focus only).
+
+**Your own cell renderers and framework components**
+
+- The cell div already has `role="gridcell"` – never change its role.
+- Text in the cell is read. A purely visual statement (icon, bar, color) needs a text: `role="img"` + `aria-label`, or
+  hidden text with the class `ge-table-sr-only`. The built-in progress bar, star, true/false and male/female renderers
+  do this (texts via an optional constructor parameter, e.g. `new StarRatingCellRenderer("rating", n => n + " von 5")`).
+- Controls (button, link, input) need a name (`aria-label`) and `tabindex="-1"` – the table is one tab stop (the
+  built-in checkboxes and action buttons do this; keys pressed on a focused button or link belong to it).
+- Never write data unescaped into `innerHTML` (`escapeHtml()`), also not into `aria-label="…"`.
+- Tooltips (`getTooltipAt`) stay `title` attributes: screen readers read them as the cell's description; sighted
+  keyboard users do not see them (known limitation).
+
+**Focus and contrast:** the focused cell has a 2 px frame; the keyboard focus ring of the table is a 2 px outline.
+Both use `--ge-table-focus-outline-color` (falls back to `--ge-table-focus-border`). The default light and dark themes
+pass the axe contrast check (since 1.1.91 the light star and progress bar colors are darker: ≥ 3 : 1).
+
+**Test protocol for your release** (screen readers cannot run in CI): NVDA + Firefox, NVDA + Chrome, JAWS + Chrome,
+VoiceOver + Safari – tab into the table, arrow through cells (row/column numbers and headers are announced), sort with
+Enter in the header, filter and copy (announcements), expand a tree node, open the editor with F2.
 
 ---
 

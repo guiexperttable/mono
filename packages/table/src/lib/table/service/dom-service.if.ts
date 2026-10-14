@@ -38,4 +38,12 @@ export interface DomServiceIf {
 
   /** Sets an attribute. */
   setAttribute(ele: HTMLElement, key: string, value: string): void;
+
+  /**
+   * Removes an attribute (used for ARIA attributes of reused row divs). Optional: without it the table calls
+   * `ele.removeAttribute(key)` itself.
+   *
+   * @since 1.1.91
+   */
+  removeAttribute?(ele: HTMLElement, key: string): void;
 }

@@ -52,5 +52,9 @@ export class SimpleDomService implements DomServiceIf {
     ele.setAttribute(key, value);
   }
 
+  removeAttribute(ele: HTMLElement, key: string): void {
+    ele.removeAttribute(key);
+  }
+
 
 }

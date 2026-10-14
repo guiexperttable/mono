@@ -655,6 +655,7 @@ export class TableApi {
    *
    * The copied data is formatted as tab-separated text that can be pasted into spreadsheet
    * applications like Excel or text editors while maintaining the tabular structure.
+   * Screen readers hear "12 cells copied" ({@link AriaTextsIf.copied}).
    *
    * @example
    * // Copy the currently selected data to clipboard
@@ -679,12 +680,53 @@ export class TableApi {
    * @returns {Promise<string>} A promise that resolves with the copied data as a string.
    *   The string contains the tab-separated representation of the selected table data.
    */
-  copyToClipboard() {
+  copyToClipboard(): Promise<string> {
     return this.tableScope.copyService.copyToClipboard(
       this.tableScope.tableModel,
       this.tableScope.selectionModel(),
       this.tableScope.focusModel()
-    );
+    ).then(text => {
+      this.tableScope.announceCopied(text);
+      return text;
+    });
+  }
+
+  /**
+   * Speaks a message to screen reader users through the live region of the table (`role="status"`,
+   * polite – it does not interrupt). The table itself announces sorting, filter results, copying and
+   * "select all"; use this for your own events, e.g. after loading or saving data.
+   *
+   * @example
+   * fetch("/api/orders").then(r => r.json()).then(orders => {
+   *   tableApi.setRows(orders);
+   *   tableApi.announce(`${orders.length} orders loaded`);
+   * });
+   *
+   * @param {string} text - plain text (not HTML)
+   * @since 1.1.91
+   * @see Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
+   */
+  announce(text: string): void {
+    this.tableScope.announce(text);
+  }
+
+  /**
+   * The header cell that has the keyboard focus. Arrow up in the first body row moves the focus into the header
+   * (Enter sorts or opens/closes a header group there); arrow down leaves it. The {@link FocusModelIf} holds
+   * the body focus only and is not changed by this.
+   *
+   * @example
+   * const headerFocus = tableApi.getHeaderFocus();
+   * if (headerFocus) {
+   *   const [headerRow, column] = headerFocus;
+   *   console.log(`header cell ${headerRow}/${column} has the focus`);
+   * }
+   *
+   * @returns {[number, number] | undefined} header row index and column index, `undefined` if the focus is in the body
+   * @since 1.1.91
+   */
+  getHeaderFocus(): [number, number] | undefined {
+    return this.tableScope.getHeaderFocus();
   }
 
   /**

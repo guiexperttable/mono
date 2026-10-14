@@ -14,12 +14,14 @@ Represents a model for handling colspan and rowspan in a table.
 
 - [areaModel](ColAndRowspanModel.md#areamodel)
 - [colAndRowspanRanges](ColAndRowspanModel.md#colandrowspanranges)
+- [rowCountAtInit](ColAndRowspanModel.md#rowcountatinit)
 - [tableModel](ColAndRowspanModel.md#tablemodel)
 
 ### Methods
 
 - [getRanges](ColAndRowspanModel.md#getranges)
 - [init](ColAndRowspanModel.md#init)
+- [initIfRowCountChanged](ColAndRowspanModel.md#initifrowcountchanged)
 - [isInRange](ColAndRowspanModel.md#isinrange)
 
 ## Constructors
@@ -65,6 +67,18 @@ ___
 
 ___
 
+### rowCountAtInit
+
+• `Protected` **rowCountAtInit**: `number` = `-1`
+
+Row count of the area model at the last [init](ColAndRowspanModel.md#init) (−1: not initialized yet).
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L21)
+
+___
+
 ### tableModel
 
 • `Protected` **tableModel**: [`TableModelIf`](../interfaces/TableModelIf.md)
@@ -85,7 +99,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L48)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L67)
 
 ___
 
@@ -99,7 +113,26 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L20)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L23)
+
+___
+
+### initIfRowCountChanged
+
+▸ **initIfRowCountChanged**(): `boolean`
+
+Builds the ranges again if the row count of the area model changed since the last [init](ColAndRowspanModel.md#init) – e.g. after
+`setRows()` or a filter (the old ranges could point to rows that no longer exist). Cheap otherwise.
+
+#### Returns
+
+`boolean`
+
+true if the ranges were rebuilt
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L59)
 
 ___
 
@@ -120,4 +153,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L55)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L74)

@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/date-to-int-date-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/date-to-int-date-cell-renderer.ts#L11)
+[src/lib/table/renderer/date-to-int-date-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/date-to-int-date-cell-renderer.ts#L12)
 
 ## Methods
 
@@ -72,4 +72,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/date-to-int-date-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/date-to-int-date-cell-renderer.ts#L17)
+[src/lib/table/renderer/date-to-int-date-cell-renderer.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/date-to-int-date-cell-renderer.ts#L18)

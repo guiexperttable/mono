@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/action/actions-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/actions-cell-renderer.ts#L15)
+[src/lib/table/renderer/action/actions-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/actions-cell-renderer.ts#L16)
 
 ## Methods
 
@@ -69,4 +69,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/action/actions-cell-renderer.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/actions-cell-renderer.ts#L21)
+[src/lib/table/renderer/action/actions-cell-renderer.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/action/actions-cell-renderer.ts#L22)

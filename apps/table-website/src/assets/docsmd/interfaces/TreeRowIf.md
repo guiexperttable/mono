@@ -7,8 +7,10 @@ A row of a tree table: your object (`data`) plus the tree state. Created by [Tre
 **`Example`**
 
 ```ts
-// expand all first-level rows, then repaint
-for (const row of rows) row.expanded = true;
+// expand all first-level rows: change `expanded`, rebuild the displayed rows, repaint
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+for (const row of treeModel.rows) row.expanded = true;
+treeModel.recalcVisibleTreeRows(); // without it the table keeps showing the old rows
 tableApi.repaintHard();
 ```
 
@@ -49,7 +51,7 @@ Checkbox state (with `showCheckboxWihoutExtraColumn` or a checkbox column).
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L31)
+[src/lib/table/data/common/tree-row-if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L33)
 
 ___
 
@@ -61,7 +63,7 @@ The child rows, undefined for leaves.
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L25)
+[src/lib/table/data/common/tree-row-if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L27)
 
 ___
 
@@ -73,7 +75,7 @@ Your object. Column values are read from it (`columnDef.property`).
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L21)
+[src/lib/table/data/common/tree-row-if.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L23)
 
 ___
 
@@ -85,7 +87,7 @@ Depth in the tree: 0 = top level.
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L29)
+[src/lib/table/data/common/tree-row-if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L31)
 
 ___
 
@@ -97,7 +99,7 @@ Are the children visible?
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L23)
+[src/lib/table/data/common/tree-row-if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L25)
 
 ___
 
@@ -105,11 +107,11 @@ ___
 
 • **keep**: `boolean`
 
-Internal: kept by the filter because a descendant matches.
+Internal, set by the filter: the row or one of its descendants matches (also below collapsed rows).
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L33)
+[src/lib/table/data/common/tree-row-if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L35)
 
 ___
 
@@ -121,7 +123,7 @@ The parent row, undefined on the top level.
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L27)
+[src/lib/table/data/common/tree-row-if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L29)
 
 ___
 
@@ -133,4 +135,4 @@ Marker to recognise tree rows across package boundaries (see `isTreeRow()`).
 
 #### Defined in
 
-[src/lib/table/data/common/tree-row-if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L19)
+[src/lib/table/data/common/tree-row-if.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/tree-row-if.ts#L21)

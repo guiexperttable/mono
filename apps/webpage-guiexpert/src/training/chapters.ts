@@ -2,13 +2,14 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-034`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-035`), so every chapter can link to the exact code state of its episode.
+ * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
  * a renamed class or method breaks the build instead of producing a dead link.
  */
 
-export type PartId = "foundations" | "start" | "frameworks" | "model" | "data" | "look" | "interaction";
+export type PartId = "foundations" | "start" | "frameworks" | "model" | "data" | "look" | "interaction" | "advanced";
 
 export interface Part {
   id: PartId;
@@ -59,7 +60,8 @@ export const PARTS: Part[] = [
   { id: "model", no: 4, title: "The table model", lead: "Header, body and footer models, columns, fixed columns, millions of rows." },
   { id: "data", no: 5, title: "Options & data", lead: "Options, sorting, filtering, selection, events and Excel export." },
   { id: "look", no: 6, title: "Look & feel", lead: "Renderers, components, heatmaps, themes, spans and trees." },
-  { id: "interaction", no: 7, title: "Interaction & state", lead: "Editing, live data and a table that remembers its state." }
+  { id: "interaction", no: 7, title: "Interaction & state", lead: "Editing, live data and a table that remembers its state." },
+  { id: "advanced", no: 8, title: "Beyond the basics", lead: "Features added after the course: accessibility and more." }
 ];
 
 export const CHAPTERS: Chapter[] = [
@@ -353,6 +355,17 @@ export const CHAPTERS: Chapter[] = [
     lead: "A checklist for your own table and an honest list of what is not built in.",
     learn: ["plan a table step by step", "know the strengths", "know when to pick something else"],
     api: ["TableApi", "TableOptions", "TableFactory", "ColumnDef"]
+  },
+  // ── Part 8 ──────────────────────────────────────────────────────────────────────────────
+  {
+    slug: "accessibility", no: 35, part: "advanced", episode: 35, minutes: 5,
+    title: "Accessible tables: keyboard and screen readers", nav: "Accessibility",
+    lead: "A screen reader hears “row 5 of 1,001, Total, 243.20” – and every key of the WAI-ARIA grid works.",
+    learn: ["name the table for screen readers", "know the keys of the grid", "announce sorting, filter and copy – also in German",
+      "write cell renderers that screen readers understand"],
+    api: ["TableOptionsIf.ariaLabelledBy", "TableOptionsIf.ariaLabel", "TableOptionsIf.ariaTexts", "AriaTextsIf", "AriaTexts",
+      "TableApi.announce", "TableApi.getHeaderFocus", "LiveAnnouncer", "ActionId"],
+    since: "1.1.91"
   }
 ];
 

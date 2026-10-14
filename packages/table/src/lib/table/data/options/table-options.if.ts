@@ -10,6 +10,7 @@ import { GetT } from "../common/get-t";
 import { FocusModelIf } from "../../focus/focus-model.if";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptionsIf } from './header-group-options.if';
+import { AriaTextsIf } from "../../aria/aria-texts.if";
 
 /**
  * Represents the options for configuring a table.
@@ -271,4 +272,57 @@ export interface TableOptionsIf {
 
   /** Switch off all keyboard shortcuts of the table (copy, select all, navigation, F2 …). */
   shortcutActionsDisabled: boolean;
+
+  /**
+   * The accessible name of the table for screen readers (`aria-label` of the grid), e.g. `"Orders"`.
+   * Prefer {@link ariaLabelledBy} if the page shows a title.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabel: "Orders" };
+   *
+   * @since 1.1.91
+   * @see Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
+   */
+  ariaLabel?: string;
+
+  /**
+   * The id of the element that names the table, e.g. a heading above it (`aria-labelledby` of the grid).
+   * Takes precedence over {@link ariaLabel}.
+   *
+   * @example
+   * // <h2 id="orders-title">Orders 2026</h2> <div class="table-div"></div>
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabelledBy: "orders-title" };
+   *
+   * @since 1.1.91
+   */
+  ariaLabelledBy?: string;
+
+  /**
+   * The id of an element that describes the table, e.g. a hint below it (`aria-describedby` of the grid).
+   *
+   * @example
+   * // <p id="orders-hint">Double click a header to sort.</p>
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaDescribedBy: "orders-hint" };
+   *
+   * @since 1.1.91
+   */
+  ariaDescribedBy?: string;
+
+  /**
+   * Own texts for screen readers – announcements (sorting, filter, copy, select all) and the names of the row
+   * checkboxes and header group toggles. Functions you leave out keep their English default ({@link AriaTexts}).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   ariaTexts: {
+   *     filtered: (rowCount: number) => `${rowCount} Zeilen`,
+   *     copied: (cellCount: number) => `${cellCount} Zellen kopiert`,
+   *     selectRow: (rowNumber: number) => `Zeile ${rowNumber} auswählen`,
+   *   },
+   * };
+   *
+   * @since 1.1.91
+   */
+  ariaTexts?: Partial<AriaTextsIf>;
 }

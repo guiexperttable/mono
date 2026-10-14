@@ -12,6 +12,10 @@
 
 - [constructor](TrueFalseCellRenderer.md#constructor)
 
+### Properties
+
+- [ariaLabels](TrueFalseCellRenderer.md#arialabels)
+
 ### Methods
 
 - [render](TrueFalseCellRenderer.md#render)
@@ -20,11 +24,46 @@
 
 ### constructor
 
-• **new TrueFalseCellRenderer**(): [`TrueFalseCellRenderer`](TrueFalseCellRenderer.md)
+• **new TrueFalseCellRenderer**(`ariaLabels?`): [`TrueFalseCellRenderer`](TrueFalseCellRenderer.md)
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ariaLabels` | `Object` | texts for screen readers (the icons ✅ / ❌ are images). Default: "Yes" / "No". |
+| `ariaLabels.false` | `string` | - |
+| `ariaLabels.true` | `string` | - |
 
 #### Returns
 
 [`TrueFalseCellRenderer`](TrueFalseCellRenderer.md)
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/renderer/true-false-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/true-false-cell-renderer.ts#L15)
+
+## Properties
+
+### ariaLabels
+
+• **ariaLabels**: `Object`
+
+texts for screen readers (the icons ✅ / ❌ are images). Default: "Yes" / "No".
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `false` | `string` |
+| `true` | `string` |
+
+#### Defined in
+
+[src/lib/table/renderer/true-false-cell-renderer.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/true-false-cell-renderer.ts#L16)
 
 ## Methods
 
@@ -58,4 +97,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/true-false-cell-renderer.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/true-false-cell-renderer.ts#L11)
+[src/lib/table/renderer/true-false-cell-renderer.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/true-false-cell-renderer.ts#L20)

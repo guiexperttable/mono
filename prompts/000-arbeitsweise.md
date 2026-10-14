@@ -65,8 +65,15 @@ Regeln aus CLAUDE.md §6:
 - Browser-Specs: Zeit über `nextFrame()` / `vi.waitFor`, keine festen `setTimeout`s, keine pixelgenauen Textbreiten.
 - **HTML-Injection-Test** für jeden Text, der aus Daten oder Optionen ins DOM kommt: `<img src="x" onerror=…>` → kein
   `img`-Element, Text sichtbar (Muster: `renderer/renderer.browser.spec.ts` „HTML injection“).
-- **Barrierefreiheit:** Sobald Prompt 001 umgesetzt ist, bekommt jedes neue DOM-Element passende Rollen und
-  `aria-*`-Attribute, mit Test (inkl. axe-Prüfung, falls 001 sie eingeführt hat).
+- **Barrierefreiheit** (Prompt 001 ist umgesetzt, Regeln: `CLAUDE.md` §5, Entscheidungen:
+  `prompts/001-aria-screenreader.design.md`): jedes neue DOM-Element bekommt eine passende Rolle bzw. `aria-*`-Attribute –
+  innerhalb der Tabelle sind Kinder eines `role="row"` nur Zellen (`gridcell`/`columnheader`) oder `aria-hidden`;
+  Bedienelemente haben einen Namen (Texte als neue Funktion in `AriaTextsIf` + englischer Default in `AriaTexts`, über
+  `tableOptions.ariaTexts` überschreibbar); Dekoratives `aria-hidden="true"` (`ConvenienceDomService.setAriaHidden`);
+  Zustandsänderungen, die man nicht sieht, über `tableScope.announce()`; keine eigenen Tab-Stopps (die Tabelle ist ein
+  Tab-Stopp, Tastatur über `ActionId` + Shortcut-Mappings). Test: Attribute im Browser-Spec und
+  `expect(await axeViolations(host)).toEqual([])` (`test-utils/axe.ts`). Neue Elemente außerhalb der Tabelle
+  (Overlays, Menüs, Dialoge) folgen dem passenden APG-Muster (z. B. `role="dialog"`, `role="menu"`).
 - Performance: keine Zeit-Assertions in `test:unit`. Messungen als `vitest bench`; Bench-Dateien nicht unter `src/`
   ablegen oder in `vitest.config.ts` → `coverage.exclude` aufnehmen (heute ausgeschlossen: `*.spec.ts`, `*.demo.ts`,
   `*.if.ts`, `index.ts`).
@@ -97,7 +104,7 @@ Regeln aus CLAUDE.md §6:
 
 ### Phase 4 – Doku
 
-- JSDoc + `pnpm --filter @guiexpert/table docs:check` (Okt. 2026: 283 Beispiele, 0 Fehler).
+- JSDoc + `pnpm --filter @guiexpert/table docs:check` (Okt. 2026: 297 Beispiele, 0 Fehler).
 - `pnpm --filter @guiexpert/table typedoc:website`: erneuert die API-Doku und `apps/webpage-guiexpert/src/training/api-index.json`
   (ohne ihn bauen die `<ApiLink>`s im Training nicht).
 - `instructions.md`: Abschnitt an passender Stelle; alle `ts`-Blöcke kompilieren (Snippets extrahieren → `tsc` strict mit
@@ -133,7 +140,8 @@ Regeln aus CLAUDE.md §6:
 - **Platzierung:** Kapitelnummer `no` und `episode` hängen am Git-Tag `ep-NNN` des Demo-Repos. Neue Kapitel werden
   **nicht** einsortiert (das würde alle späteren Nummern, Tags und Links verschieben), sondern hinten angehängt: in
   **Teil 8** (`PartId` `"advanced"`, Titel z. B. „Beyond the basics“). Den Teil legt der erste Prompt an, der ein
-  Kapitel braucht. Nummer = höchste vorhandene + 1 (in `src/training/chapters.ts` nachsehen; Stand Okt. 2026: 34).
+  Kapitel braucht – Prompt 001 hat ihn angelegt („Beyond the basics“, Kapitel 35 `accessibility`). Nummer = höchste
+  vorhandene + 1 (in `src/training/chapters.ts` nachsehen; Stand Okt. 2026: 35).
 - Kleine Features können stattdessen einen Abschnitt in einem bestehenden Kapitel bekommen (keine neue Nummer), mit
   `<Callout type="version">`. In Phase 1 entscheiden.
 - Umsetzung (Ablauf CLAUDE.md §11): Eintrag in `chapters.ts` (`slug`, `lead`, `learn`, `api`, `showcases`, `since`),
@@ -150,7 +158,8 @@ Regeln aus CLAUDE.md §6:
   `demoTagUrl()` in `chapters.ts`). Das Repo liegt nicht im Mono-Repo und muss erst verbunden bzw. geklont werden.
 - Empfehlung: neue Folge im bestehenden Repo (Commit + Tag `ep-NNN` = Kapitelnummer). Ein eigenes Repo nur mit Grund.
 - Nutzt das Demo-Repo die npm-Pakete, gibt es das Feature dort erst nach dem Release: bis dahin Branch, Tag danach.
-- Offener Punkt aus `TODO.md`: Tags `ep-001` … `ep-034` sind evtl. noch nicht gepusht. Fehlende zusammen pushen.
+- Offener Punkt aus `TODO.md`: Tags `ep-001` … `ep-034` sind evtl. noch nicht gepusht, `ep-035` (Prompt 001) ist noch
+  nicht angelegt. Fehlende zusammen pushen.
 - Anlegen, Pushen, Tags: **nur nach ausdrücklicher Freigabe**.
 - Im Training gezeigter Framework-Code → `apps/webpage-guiexpert/training-examples/` (README dort: Tag aktualisieren).
 

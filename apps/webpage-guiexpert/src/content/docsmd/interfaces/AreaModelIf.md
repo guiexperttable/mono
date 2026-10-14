@@ -358,7 +358,7 @@ class MyBodyModel extends AreaModelObjectArray<any> {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:894](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L894)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:895](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L895)
 
 ___
 
@@ -407,7 +407,7 @@ externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:849](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L849)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:850](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L850)
 
 ___
 
@@ -1263,7 +1263,7 @@ isFilterable(): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:826](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L826)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:827](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L827)
 
 ___
 
@@ -1312,7 +1312,7 @@ isRowCheckable(rowIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:750](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L750)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:751](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L751)
 
 ___
 
@@ -1361,7 +1361,7 @@ isRowChecked(rowIndex: number): CheckedType | undefined {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:777](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L777)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:778](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L778)
 
 ___
 
@@ -1370,7 +1370,8 @@ ___
 ▸ **isSelectable**(`rowIndex`, `columnIndex`): `boolean`
 
 Determines whether the cell at the specified row and column indices is selectable.
-If true, the user can select the cell.
+If true, the user can select the cell: the table draws the selection only on selectable body cells.
+All built-in models and [AreaModel](../classes/AreaModel.md) return `true` (except the hidden and cover-grid models).
 
 #### Parameters
 
@@ -1410,7 +1411,7 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:723](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L723)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:724](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L724)
 
 ___
 
@@ -1457,7 +1458,7 @@ setRowChecked(rowIndex: number, checked: boolean): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:804](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L804)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:805](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L805)
 
 ___
 
@@ -1554,4 +1555,4 @@ sort(compareFn?: (a: any, b: any) => number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:926](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L926)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:927](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L927)

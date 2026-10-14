@@ -30,7 +30,7 @@ This is a monorepo containing multiple packages:
 - Row and column spanning
 - Fixed columns (left and right)
 - Tree table (hierarchical view)
-- Accessibility support with keyboard shortcuts
+- Accessibility: WAI-ARIA grid/treegrid for screen readers (aria-rowcount/rowindex with virtual scrolling, aria-activedescendant focus, aria-sort, aria-selected, live-region announcements; options ariaLabel, ariaLabelledBy, ariaDescribedBy, ariaTexts; tableApi.announce()) and keyboard navigation (arrows, Home/End, Ctrl+Home/End, Page Up/Down, Enter, header focus) – since 1.1.91
 - Custom filtering
 - In-place cell editing
 - User-defined key and mouse events
@@ -52,7 +52,7 @@ Basic usage involves:
 
 ## Documentation
 - Demos: https://gui.expert/demos
-- Training (34 chapters, step by step): https://gui.expert/training/
+- Training (35 chapters, step by step): https://gui.expert/training/
 - Documentation: https://gui.expert/doc
 - API: https://gui.expert/api
 

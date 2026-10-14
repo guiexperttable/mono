@@ -43,10 +43,12 @@ const DEMOS = {
   "inline-editing": { slug: "inline-editing", dblclick: [2, 7] },
   "live-data": { slug: "live-data", wait: 1500 },
   "persist-state": { slug: "persist-state" },
-  "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] }
+  "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
+  "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
 
-const browser = await chromium.launch();
+// CHROMIUM_PATH: a preinstalled Chromium instead of Playwright's own download (e.g. in a container)
+const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 let failed = 0;
 for (const theme of ["light", "dark"]) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -96,6 +98,13 @@ for (const theme of ["light", "dark"]) {
         await demo.locator(".td-host .ge-table-tree-arrow-div").nth(i * 2).click().catch(() => {});
         await page.waitForTimeout(250);
       }
+    }
+    if (step.keys) {
+      for (const key of step.keys) {
+        await page.keyboard.press(key);
+        await page.waitForTimeout(40);
+      }
+      await page.waitForTimeout(300);
     }
     await page.mouse.move(5, 5);                         // no hover effects in the poster
     await demo.locator(".td-stage").screenshot({ path: `${out}/demo-${name}-${theme}.png` });

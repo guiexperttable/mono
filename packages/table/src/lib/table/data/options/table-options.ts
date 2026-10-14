@@ -11,6 +11,7 @@ import { GetT } from "../common/get-t";
 import { FocusModelIf } from "../../focus/focus-model.if";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptions } from './header-group-options';
+import { AriaTextsIf } from "../../aria/aria-texts.if";
 
 
 /**
@@ -89,4 +90,16 @@ export class TableOptions implements TableOptionsIf {
    * Focus model of the table. Not set (default): every table creates its own `new FocusModel("cell")`.
    */
   getFocusModel?: GetT<FocusModelIf> = undefined;
+
+  /** Accessible name of the table (`aria-label`). Default: none. @since 1.1.91 */
+  ariaLabel?: string = undefined;
+
+  /** Id of the element that names the table (`aria-labelledby`). Default: none. @since 1.1.91 */
+  ariaLabelledBy?: string = undefined;
+
+  /** Id of the element that describes the table (`aria-describedby`). Default: none. @since 1.1.91 */
+  ariaDescribedBy?: string = undefined;
+
+  /** Own screen reader texts; missing functions use the English defaults ({@link AriaTexts}). @since 1.1.91 */
+  ariaTexts?: Partial<AriaTextsIf> = undefined;
 }

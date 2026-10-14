@@ -159,6 +159,21 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
   Mapping-Schlüssel werden mit `harmonizeShortcut` normalisiert („ctrl+c“, „meta+c“ = „cmd c“, „arrowup“ = „up“).
   Editor öffnen: F2. Erst seit Okt. 2026 wirksam – vorher löste jede Taste `START_EDITING` aus (s. `TODO.md`).
+  Seit 1.1.91 zusätzlich (WAI-ARIA-Grid): Pos1/Ende (`NAVIGATE_ROW_START/END`, macOS auch ⌘←/⌘→), Strg+Pos1/Ende
+  (`NAVIGATE_FIRST/LAST_CELL`, macOS auch ⌘↑/⌘↓), Bild↑/↓ (`NAVIGATE_PAGE_UP/DOWN`), Enter (`ACTIVATE_CELL`: Body =
+  Zeilen-Checkbox bzw. Baumknoten, Header = Gruppe bzw. Sortieren). **Header-Fokus**: ↑ in Body-Zeile 0 → unterste
+  Header-Zeile, ↓ zurück; Zustand in `TableScope` (`getHeaderFocus()`), das `FocusModel` bleibt Body-only.
+- **Barrierefreiheit (seit 1.1.91, `aria/`, Design `prompts/001-aria-screenreader.design.md`)**: Host `role="grid"`/
+  `"treegrid"` mit `aria-rowcount` (Header + **alle** Body-Zeilen + Footer), `aria-colcount` (sichtbare Spalten),
+  `aria-owns` (9 Rowgroups in der Reihenfolge Header → Body → Footer, leere = `presentation`), `aria-activedescendant`
+  (nur die fokussierte Zelle hat eine ID: `AriaIds`, Präfix `ge-<host-id>` bzw. `ge-t<n>`). Jeder Row-Div `role="row"` +
+  `aria-rowindex` (West/Center/East mit gleichem Index – ag-Grid-Muster), Zellen `columnheader`/`gridcell` + `aria-colindex`
+  (`AriaGridInfo`, einmal je Render-Durchgang), Span-Zellen in eigener Zeile `.ge-table-span-row`. Baum: `TreeAriaInfo`
+  (Level, Setsize, Posinset, Expanded). Deko (Rahmen, Hover, Fokusrahmen, Icons, Resize-Handles) `aria-hidden`.
+  Ansagen über `LiveAnnouncer` (Live-Region in `document.body`, `destroy()` entfernt sie), Texte `AriaTexts`
+  (`tableOptions.ariaTexts`), eigene Ansagen `tableApi.announce()`. Scroll-Viewport `tabindex="-1"` (sonst zweiter
+  Tab-Stopp in Chrome) und gibt den Fokus an den Host weiter. Tab in die Tabelle setzt den Fokus auf die erste Zelle
+  (nur bei echtem Tab, nicht bei `host.focus()`).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -185,7 +200,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `fixedEastSeparatorBorderVisible`, `tableTopBorderVisible`, `tableBottomBorderVisible`, `overflowX/Y`,
 `treeOptions`, `headerGroupOptions`, `headerToggleExpandCollapseIcons`, `showCheckboxWihoutExtraColumn` (sic),
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
-`getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`.
+`getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
+seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -228,6 +244,12 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 - Jede neue öffentliche Datei in `packages/table/src/index.ts` exportieren (sonst fehlt sie im npm-Paket und in typedoc).
 - Umfangreiche JSDoc mit `@example` ist Standard (wird zu https://gui.expert/api).
 - Spaltenindex = Modell-Index über alle 3 Seiten (west + center + east).
+- **Barrierefreiheit (seit 1.1.91)**: Jedes neue DOM-Element bekommt eine passende Rolle bzw. `aria-*`-Attribute –
+  Bedienelemente einen Namen (Texte über `AriaTextsIf`, englische Defaults), rein Dekoratives `aria-hidden="true"`
+  (`ConvenienceDomService.setAriaHidden`), Kinder eines `role="row"` sind nur Zellen oder versteckt. Attribute immer über
+  `DomServiceIf.setAttribute`/`removeAttribute` (wiederverwendete Row-Divs: veraltete Attribute entfernen). Keine eigenen
+  Tab-Stopps (die Tabelle ist **ein** Tab-Stopp): Bedienelemente in Zellen `tabindex="-1"`. Test mit `axeViolations()` (`test-utils/axe.ts`, axe-core) + Eintrag in
+  `aria/aria.browser.spec.ts`. Regeln für eigene Renderer: `instructions.md` 6.14.
 - Bestehende Tippfehler in öffentlichen APIs (`isHeaderVisibe`, `showCheckboxWihoutExtraColumn`, `emmitDataKey`,
   `createCoverGrisDefaultOptions`) **nicht stillschweigend umbenennen** – Breaking Change. Nur mit Alias + `@deprecated`.
 
@@ -239,7 +261,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 283 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 297 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -250,13 +272,15 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.450 Tests) |
-  | `test:browser` | echtes Chromium, ~345 Tests in 17 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.500 Tests) |
+  | `test:browser` | echtes Chromium, ~420 Tests in 18 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
     `browser`, Helfer `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `destroyAllTables`).
-    Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`) – nie im npm-Paket.
+    Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`, `axe.ts` =
+    `axeViolations(host)` mit axe-core als devDependency; zwei bekannte, begründete Funde am Scroll-Viewport werden dort
+    eng gefiltert) – nie im npm-Paket.
   - Importe wie Anwender: `from '@guiexpert/table'` (Alias → `src/index.ts`).
   - Unit-Projekt läuft mit `isolate: false` (geteilter Modulzustand je Worker, sonst ~18 s statt ~2 s): keine
     Zustandsreste zwischen Tests, Singletons im `beforeEach` zurücksetzen; `test-utils/unit-setup.ts` stellt Timer,
@@ -285,7 +309,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 26 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 27 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -370,6 +394,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 20 | Inline-Editing | `getEditRenderer`, `InputCellRenderer`, Demo `todo` |
 | 21 | Maus-Events & Kontextmenü | Showcase `mouseevents`, Demo `mouseevent` |
 | 22 | Warum nicht ag-Grid? (Vergleich, sachlich) | Website `post/top-framework-agnostic-…` |
+| 23 | Barrierefreie Tabelle (Screenreader + Tastatur) | `videos/02-barrierefreie-tabelle/`, Training-Kapitel `accessibility`, `apps/table-demo/aria.html` |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
@@ -378,8 +403,10 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 34 Kapitel = 34 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 35 Kapitel = 35 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
+Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`;
+Tag `ep-035` im Demo-Repo erst nach dem Release 1.1.91).
 
 ```
 apps/webpage-guiexpert/src/

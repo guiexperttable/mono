@@ -348,7 +348,7 @@ Fehler, die dabei in bestehenden Klassen auftauchen: zuerst ein roter Test, bei 
 ## Phase 7 – Training-Kapitel (gui.expert/training)
 
 **Platzierung (in Phase 1 bestätigen):** Kapitelnummer `no` und `episode` hängen am Git-Tag `ep-NNN` des Demo-Repos.
-Bis Okt. 2026 gibt es 34 Kapitel, Kapitel 34 ist das Finale „Checklist“. Neue Kapitel kommen hinten in
+Stand Okt. 2026: 35 Kapitel (34 = Finale „Checklist“, 35 = „Accessibility“ in Teil 8, angelegt von Prompt 001). Neue Kapitel kommen hinten in
 Teil 8 (`PartId` `"advanced"`, s. `000-arbeitsweise.md`); 006 legt dort `row-grouping` an.
 
 - **Option A (Empfehlung):** Kapitel `pivot-tables` mit der nächsten freien Nummer in Teil 8, möglichst direkt nach

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+  Accessibility demo (screen readers + keyboard, since 1.1.91) – also the recording page of video 02.
+  Start: pnpm serve:table-demo → http://localhost:4200/aria.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – accessible table</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    header { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+    h1 { font-size: 20px; margin: 0; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button, .bar select { font: inherit; padding: 4px 8px; }
+    .table-div { height: 420px; width: 100%; }
+    .log { margin-top: 12px; font-size: 14px; border: 1px solid #888; border-radius: 6px; padding: 8px 12px; min-height: 3em; }
+    .log ol { margin: 4px 0 0; padding-left: 20px; }
+    .keys { font-size: 13px; color: inherit; opacity: .8; }
+    kbd { border: 1px solid #888; border-radius: 3px; padding: 0 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1 id="orders-title">Orders 2026</h1>
+  <p id="orders-hint" class="keys">
+    <kbd>Tab</kbd> into the table · <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> cells ·
+    <kbd>Home</kbd>/<kbd>End</kbd> row · <kbd>Ctrl</kbd>+<kbd>Home</kbd>/<kbd>End</kbd> table ·
+    <kbd>PgUp</kbd>/<kbd>PgDn</kbd> page · <kbd>↑</kbd> in the first row → header, <kbd>Enter</kbd> sorts ·
+    <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>
+  </p>
+</header>
+<div class="bar">
+  <label>Filter customer <input id="filter" type="search" placeholder="e.g. 7"></label>
+  <label>Language
+    <select id="language"><option value="en">English</option><option value="de">Deutsch</option></select>
+  </label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<section class="log" aria-hidden="true">
+  <strong>Screen reader hears (live region):</strong>
+  <ol id="log"></ol>
+</section>
+<script src="/src/aria/aria-demo.ts" type="module"></script>
+</body>
+</html>

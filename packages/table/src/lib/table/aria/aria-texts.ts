@@ -1,0 +1,77 @@
+import { AriaTextsIf } from "./aria-texts.if";
+import { SortState } from "../data/common/sort-state.type";
+
+/**
+ * The English default texts for screen readers (see {@link AriaTextsIf}).
+ *
+ * The table uses `AriaTexts.create(tableOptions.ariaTexts)`: your functions replace the defaults one by one.
+ *
+ * @example
+ * const texts = AriaTexts.create({ copied: (n: number) => `${n} Zellen kopiert` });
+ * texts.copied(3);       // "3 Zellen kopiert"
+ * texts.filtered(42);    // "42 rows" (default)
+ *
+ * @since 1.1.91
+ * @category Accessibility
+ */
+export class AriaTexts implements AriaTextsIf {
+
+  /**
+   * The default texts, overridden by the given functions.
+   *
+   * @param {Partial<AriaTextsIf>} [overrides] - functions that replace the English defaults (e.g. `tableOptions.ariaTexts`)
+   * @returns {AriaTextsIf} a complete set of texts
+   */
+  static create(overrides?: Partial<AriaTextsIf>): AriaTextsIf {
+    const texts = new AriaTexts();
+    if (overrides) {
+      for (const key of Object.keys(overrides) as (keyof AriaTextsIf)[]) {
+        const fn = overrides[key];
+        if (typeof fn === "function") {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (texts as any)[key] = fn;
+        }
+      }
+    }
+    return texts;
+  }
+
+  sorted(columnLabel: string, sortState: SortState): string {
+    if (sortState === "asc") return `Sorted by ${columnLabel}, ascending`;
+    if (sortState === "desc") return `Sorted by ${columnLabel}, descending`;
+    return `Sorting of ${columnLabel} removed`;
+  }
+
+  filtered(rowCount: number): string {
+    if (rowCount === 0) return "No rows";
+    return rowCount === 1 ? "1 row" : `${rowCount} rows`;
+  }
+
+  copied(cellCount: number): string {
+    return cellCount === 1 ? "1 cell copied" : `${cellCount} cells copied`;
+  }
+
+  allSelected(): string {
+    return "All cells selected";
+  }
+
+  selectionCleared(): string {
+    return "Selection cleared";
+  }
+
+  selectRow(rowNumber: number): string {
+    return `Select row ${rowNumber}`;
+  }
+
+  selectAllRows(): string {
+    return "Select all rows";
+  }
+
+  expandGroup(groupLabel: string): string {
+    return groupLabel ? `Expand group ${groupLabel}` : "Expand group";
+  }
+
+  collapseGroup(groupLabel: string): string {
+    return groupLabel ? `Collapse group ${groupLabel}` : "Collapse group";
+  }
+}

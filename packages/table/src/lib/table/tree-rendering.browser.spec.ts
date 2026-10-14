@@ -277,7 +277,8 @@ describe('tree checkboxes (CheckboxColumnDef → TreeCheckboxModel)', () => {
     expect(headerBox().checked).toBe(true);
     await click(box(host, 3)); // A2 off → header "semi"
     expect(headerBox().checked).toBe(false);
-    expect(getCellDiv(host, 'header', 'center', 0, 0).textContent).toContain('✓');
+    // "semi" = the native indeterminate state (since 1.1.91; before: a pale ✓ next to the box)
+    expect(getCellDiv(host, 'header', 'center', 0, 0).querySelector<HTMLInputElement>('input')!.indeterminate).toBe(true);
     await click(headerBox()); // semi → all checked
     expect(checked[checked.length - 1]).toHaveLength(7);
     await click(headerBox()); // all → none
@@ -303,8 +304,9 @@ describe('tree checkboxes (CheckboxColumnDef → TreeCheckboxModel)', () => {
     await userEvent.click(box(host, 3)); // A2 → A is partly checked
     const parentCell = getCellDiv(host, 'body', 'center', 0, 0);
     expect(box(host, 0).checked).toBe(false);
-    expect(parentCell.querySelector<HTMLElement>('span')!.style.opacity).toBe('0.4');
-    expect(parentCell.textContent).toContain('✓');
+    // since 1.1.91 the native indeterminate state (screen readers: "mixed"), before: a pale ✓ next to the box
+    expect(box(host, 0).indeterminate).toBe(true);
+    expect(parentCell.textContent).not.toContain('✓');
   });
 
   it('showCheckboxWihoutExtraColumn renders the checkbox inside the arrow column', async () => {

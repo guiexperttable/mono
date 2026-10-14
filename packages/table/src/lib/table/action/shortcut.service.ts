@@ -89,7 +89,8 @@ export class ShortcutService {
     // keys typed into a cell editor (or any other form field in a cell) belong to that field –
     // otherwise e.g. ctrl+a re-renders the table and the editor loses its text
     const target = evt.target as HTMLElement | null;
-    if (target && (target.isContentEditable || ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName))) {
+    // (also buttons and links of a cell renderer: Enter/Space belong to them)
+    if (target && (target.isContentEditable || ["INPUT", "SELECT", "TEXTAREA", "BUTTON", "A"].includes(target.tagName))) {
       return;
     }
     const actionId = this.findEntity(evt);

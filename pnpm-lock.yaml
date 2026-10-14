@@ -1427,6 +1427,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.4
         version: 5.0.4(@vitest/browser@5.0.4)(vitest@5.0.4)
+      axe-core:
+        specifier: 4.10.3
+        version: 4.10.3
       playwright:
         specifier: 1.64.0
         version: 1.64.0
@@ -7144,6 +7147,10 @@ packages:
 
   aws4@1.13.2:
     resolution: {integrity: sha512-lHe62zvbTB5eEABUVi/AwVh0ZKY9rMMDhmm+eeyuuUQbQ3+J+fONVQOZyj+DdrvD4BY33uYniyRJ4UJIaSKAfw==}
+
+  axe-core@4.10.3:
+    resolution: {integrity: sha512-Xm7bpRXnDSX2YE2YFfBk2FnF0ep6tmG7xPh8iHee8MIcrgq762Nkce856dYtJYLkuIoYZvGfTs/PbZhideTcEg==}
+    engines: {node: '>=4'}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -23760,6 +23767,8 @@ snapshots:
   aws-sign2@0.7.0: {}
 
   aws4@1.13.2: {}
+
+  axe-core@4.10.3: {}
 
   axobject-query@4.1.0: {}
 

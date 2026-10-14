@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng17",
-  "version": "17.1.90",
+  "version": "17.1.91",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 17 -> @guiexpert/angular-table@17.x",
   "license": "MIT",

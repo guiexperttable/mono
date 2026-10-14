@@ -1,3 +1,5 @@
+import { TableOverlayChange } from "./overlay/table-overlay";
+import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 
 import { TableModelIf } from './data/tablemodel/table-model.if';
@@ -101,6 +103,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.91
    */
   readonly liveAnnouncer: LiveAnnouncer;
+  /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** firstInit() has finished: announcements are made from now on (not for the initial filter). */
@@ -224,6 +228,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {boolean} - Returns true if the action was triggered successfully, false otherwise.
    */
   onActionTriggered(actionId: ActionId): boolean {
+    if (this.tableOverlay.isBlocking() && TableScope.actionsBlockedWhileLoading.includes(actionId)) {
+      return true; // a blocking "Loading…" overlay: no editing, no toggling (navigation and copying still work)
+    }
     if (this.headerFocus) {
       const consumed = this.onHeaderAction(actionId);
       if (consumed !== undefined) {
@@ -291,6 +298,63 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   announce(text: string, delayInMs?: number): void {
     if (text && !this.isDestroyed()) {
       this.liveAnnouncer.announce(text, delayInMs);
+    }
+  }
+
+  /**
+   * Shows the loading overlay over the body (see {@link TableApi.showLoadingOverlay}).
+   *
+   * @param {string} [text] - text for this overlay, default {@link OverlayOptionsIf.loadingText}
+   * @since 1.1.91
+   */
+  showLoadingOverlay(text?: string): void {
+    this.tableOverlay.showLoading(text);
+  }
+
+  /**
+   * Shows the "no rows" overlay (see {@link TableApi.showNoRowsOverlay}).
+   *
+   * @param {string} [text] - text for this overlay, default {@link OverlayOptionsIf.noRowsText}
+   * @since 1.1.91
+   */
+  showNoRowsOverlay(text?: string): void {
+    this.tableOverlay.showNoRows(text);
+  }
+
+  /**
+   * Ends an overlay shown by the API (see {@link TableApi.hideOverlay}).
+   *
+   * @since 1.1.91
+   */
+  hideOverlay(): void {
+    this.tableOverlay.hide();
+  }
+
+  /**
+   * The overlay shown now (see {@link TableApi.getOverlayState}).
+   *
+   * @since 1.1.91
+   */
+  getOverlayState(): GeOverlayKind {
+    return this.tableOverlay.getState();
+  }
+
+  /**
+   * Screen readers: `aria-busy` while loading, the loading text is spoken; "no rows" is spoken when it appears
+   * after the start (not for the initially empty table). "No matching rows" is not spoken: the filter
+   * announcement ({@link AriaTextsIf.filtered}) already says it.
+   */
+  protected override onOverlayChanged(change: TableOverlayChange): void {
+    if (this.isDestroyed()) {
+      return;
+    }
+    if (change.kind === "loading") {
+      this.setHostAriaAttribute("aria-busy", "true");
+    } else if (change.previous === "loading") {
+      this.setHostAriaAttribute("aria-busy", undefined);
+    }
+    if (change.kind === "loading" || (change.kind === "noRows" && this.initialized)) {
+      this.announce(change.text);
     }
   }
 
@@ -628,6 +692,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const fm = this.getFocusModel ? this.getFocusModel() : undefined;
     fm?.removeEventFocusChangedListener(this);
     this.disposeRendering();
+    this.tableOverlay.destroy();
     this.liveAnnouncer.destroy();
     this.removeHostAria();
     this.hostElement.innerText = "";

@@ -372,6 +372,57 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(nameCell(host, 0)).toBe('Pear');
   });
 
+  /** A promise the test resolves or rejects by hand: the request is "on the way" until then. */
+  function pending<T>() {
+    let resolve!: (v: T) => void;
+    let reject!: (e: unknown) => void;
+    const promise = new Promise<T>((res, rej) => { resolve = res; reject = rej; });
+    return { promise, resolve, reject };
+  }
+
+  it('DELETE: "Loading…" over the table while the request runs (since 1.1.91)', async () => {
+    const request = pending<unknown>();
+    const { host, api } = await createCrudTable(({ deleteItem }) => deleteItem.mockImplementation(() => request.promise));
+    await userEvent.click(actionLink(host, 0, 'DELETE'));
+    expect(api.getOverlayState()).toBe('loading');
+    request.resolve(undefined);
+    await vi.waitFor(() => expect(api.getOverlayState()).toBe('none'));
+    expect(renderedRows(host)).toHaveLength(1);
+  });
+
+  it('VIEW: "Loading…" while the item is fetched, gone when the dialog opens (since 1.1.91)', async () => {
+    const request = pending<unknown>();
+    const { host, api } = await createCrudTable(({ fetchItem }) => fetchItem.mockImplementation(() => request.promise as never));
+    await userEvent.click(actionLink(host, 1, 'VIEW'));
+    expect(api.getOverlayState()).toBe('loading');
+    request.resolve({ ...items[1] });
+    await vi.waitFor(() => expect(viewDialog()).not.toBeNull());
+    expect(api.getOverlayState()).toBe('none');
+  });
+
+  it('a failed request ends the loading overlay too (since 1.1.91)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { host, api } = await createCrudTable(({ deleteItem }) =>
+      deleteItem.mockImplementation(() => Promise.reject(new Error('403'))));
+    await userEvent.click(actionLink(host, 0, 'DELETE'));
+    await vi.waitFor(() => expect(console.error).toHaveBeenCalled());
+    expect(api.getOverlayState()).toBe('none');
+    expect(renderedRows(host)).toHaveLength(2);
+  });
+
+  it('CREATE without the item in the response: "Loading…" until the list is loaded again (since 1.1.91)', async () => {
+    const reload = pending<Item[]>();
+    const { api, factory, fetchList } = await createCrudTable();
+    fetchList.mockImplementation(() => reload.promise as never);
+    factory.openDialogForCreate();
+    await userEvent.fill(field(editDialog()!, 'name'), 'Plum');
+    await save();
+    await vi.waitFor(() => expect(fetchList).toHaveBeenCalledTimes(2));
+    expect(api.getOverlayState()).toBe('loading');
+    reload.resolve([...items, { id: 3, name: 'Plum', price: 0 }]);
+    await vi.waitFor(() => expect(api.getOverlayState()).toBe('none'));
+  });
+
   it('the listener of createTableModel gets every action event first', async () => {
     const spies = crudOptions();
     const listen = vi.fn();

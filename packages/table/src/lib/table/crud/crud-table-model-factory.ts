@@ -160,6 +160,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
    *   list is loaded again (`fetchList`);
    * - `DELETE`: `deleteItem(id)` → the row is removed.
    *
+   * While a request runs, the table shows its loading overlay ({@link TableApi.showLoadingOverlay}, since 1.1.91).
    * A failed request is logged with `console.error`; the table stays unchanged.
    */
   onActionEvent(actionEvent: ActionEventIf): void {
@@ -172,20 +173,20 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
     const id = actionEvent.id;
 
     if (action === 'VIEW') {
-      options.fetchItem<Record<string, any>>(options, id)
+      this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
         .then(item => new CrudObjectView(item).openDialog())
         .catch(error => this.logError(action, error));
 
     } else if (action === 'EDIT') {
-      options.fetchItem<Record<string, any>>(options, id)
+      this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
         .then(item => new CrudObjectEdit(idKey, item).openDialog(updatedObject =>
-          options.updateItem(options, id, updatedObject)
+          this.whileLoading(() => options.updateItem(options, id, updatedObject))
             .then(response => this.updateRow(id, this.isItemWithId(response) ? response : updatedObject))
             .catch(error => this.logError(action, error))))
         .catch(error => this.logError(action, error));
 
     } else if (action === 'CLONE') {
-      options.fetchItem<Record<string, any>>(options, id)
+      this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
         .then(item => new CrudObjectEdit(idKey, item, 'Clone Item')
           .openDialog(updatedObject => this.createItem(action, updatedObject)))
         .catch(error => this.logError(action, error));
@@ -195,7 +196,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
         .openDialog(updatedObject => this.createItem(action, updatedObject));
 
     } else if (action === 'DELETE') {
-      options.deleteItem(options, id)
+      this.whileLoading(() => options.deleteItem(options, id))
         .then(() => {
           this.bodyModel?.filterRowsByPredict(row => !this.hasId(row, id));
           this.tableModel?.getTableScope()?.clearSelection(true);
@@ -209,8 +210,8 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
   private createItem(action: string, item: Record<string, any>): void {
     const options = this.crudOptions;
     const { [this.getIdKey()]: _ignoredId, ...itemWithoutId } = item;
-    options.createItem(options, itemWithoutId)
-      .then(response => this.isItemWithId(response) ? this.addRow(response) : this.reloadRows())
+    this.whileLoading(() => options.createItem(options, itemWithoutId)
+      .then(response => this.isItemWithId(response) ? this.addRow(response) : this.reloadRows()))
       .catch(error => this.logError(action, error));
   }
 
@@ -246,6 +247,16 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
       tableScope?.externalFilterChanged(false); // re-applies an external filter (if there is one)
       tableScope?.repaintHard();
     });
+  }
+
+  /**
+   * Shows the loading overlay of the table while `request` runs (also when it fails). Before the table exists
+   * (first `fetchList` in {@link createTableModel}) there is nothing to show it on.
+   */
+  private whileLoading<R>(request: () => Promise<R>): Promise<R> {
+    const tableScope = this.tableModel?.getTableScope();
+    tableScope?.showLoadingOverlay();
+    return request().finally(() => tableScope?.hideOverlay());
   }
 
   private getIdKey(): string {

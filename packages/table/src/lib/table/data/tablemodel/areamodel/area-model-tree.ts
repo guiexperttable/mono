@@ -153,6 +153,18 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     return this.filteredFlattenRows.length; // only visible rows (all parents expanded) are in the list
   }
 
+  /**
+   * The number of rows the tree shows without the external filter: all nodes whose parents are expanded
+   * (collapsed children do not count). `0` only for a tree without rows.
+   *
+   * @returns {number} displayed rows before filtering
+   *
+   * @since 1.1.91
+   */
+  getUnfilteredRowCount(): number {
+    return this.flattenRows.length;
+  }
+
   getValueAt(rowIndex: number, columnIndex: number): any {
     const row = this.getRowByIndex(rowIndex);
     if (row) {

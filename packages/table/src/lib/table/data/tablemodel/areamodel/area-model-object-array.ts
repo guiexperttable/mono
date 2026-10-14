@@ -301,6 +301,22 @@ export class AreaModelObjectArray<T>
   }
 
   /**
+   * The number of all rows, without the external filter (the filter only shrinks {@link getRowCount}).
+   *
+   * @returns {number} `getAllRows().length`
+   *
+   * @example
+   * if (bodyAreaModel.getRowCount() === 0 && bodyAreaModel.getUnfilteredRowCount() > 0) {
+   *   console.log("The filter hides all rows");
+   * }
+   *
+   * @since 1.1.91
+   */
+  getUnfilteredRowCount(): number {
+    return this.rows?.length ?? 0;
+  }
+
+  /**
    * Gets the value at the specified row and column indices.
    * This method handles tree rows and nested properties.
    * 

@@ -7,6 +7,7 @@ import { AriaIds } from "./aria/aria-ids";
 import { AreaIdent } from "./data/tablemodel/area-ident.type";
 import { SideIdent } from "./data/side-ident.type";
 import { isAreaModelTree } from "./instanceof-workaround";
+import { TableOverlay } from "./overlay/table-overlay";
 
 
 /**
@@ -60,6 +61,9 @@ export class EleScope {
 
   /** The IDs this table uses for ARIA references (prefix from the host id). @since 1.1.91 */
   readonly ariaIds: AriaIds;
+
+  /** The overlay layer over the body ("Loading…", "No rows to show"). @since 1.1.91 */
+  readonly tableOverlay: TableOverlay;
 
 
   constructor(
@@ -185,6 +189,19 @@ export class EleScope {
       }
     }
     this.setHostAriaAttribute("aria-owns", owned.join(" "));
+
+    // above everything else of the body (z-index in CSS), positioned in adjustContainersAndRows()
+    this.tableOverlay = new TableOverlay(hostEle, dom, tableOptions?.overlayOptions, () => this.updateOverlay());
+  }
+
+  /**
+   * Shows the overlay that fits the current state (requested by the API, or "no rows" for an empty body).
+   * Overwritten in {@link RenderScope}.
+   *
+   * @since 1.1.91
+   */
+  protected updateOverlay(): void {
+    // must be overwritten
   }
 
   /** The values of the host attributes before the table changed them (restored by {@link removeHostAria}). */
@@ -395,6 +412,13 @@ export class EleScope {
     } else {
       this.dom.applyDisplayNoneStyle(this.borderFooterTop);
     }
+
+    // Overlay: the visible body (below the header, above the footer, without the vertical scroll bar)
+    this.tableOverlay.setBounds(
+      0,
+      padding.top,
+      Math.min(w, padding.left + this.scrollViewport.clientWidth),
+      h - padding.top - padding.bottom);
 
     this.adjustAfterScrolling();
   }

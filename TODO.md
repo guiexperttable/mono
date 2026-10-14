@@ -149,6 +149,12 @@
 - [ ] `AsyncBodyAreaModelObjectArray` – unfertige Source-Leiche (nicht exportiert, fehlerhafte Indizes).
       Entscheiden: fertigstellen (Server-Side-Row-Model) oder löschen. *(später)*
 
+- [ ] **Pivot-Tabellen** (`PivotFactory`): nach Zeilenfeldern gruppieren, Werte eines Spaltenfelds als Spalten,
+      aggregieren (Summe, Anzahl, Mittelwert …) mit Zwischen- und Gesamtsummen – bei ag-Grid ein Enterprise-Feature.
+      Vollständiger Arbeitsauftrag in Phasen (API-Entwurf → Vitest → Code → Doku → Demos → Website → Training →
+      Demo-Repo → Video): **`TODO_Prompt.md`**. Die Website sagt heute noch „kein Pivot“ (`home/why.astro`, Training
+      `build-buy-or-guiexpert` und `checklist`) – erst mit dem Feature ändern.
+
 ## Mono-Repo / Build
 
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm

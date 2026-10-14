@@ -10,6 +10,10 @@ import { createRows, destroyAllTables, mountTable, nextFrame } from '../../../..
 
 type Modifier = 'Alt' | 'Control' | 'Meta' | 'Shift';
 
+// Ctrl+click on macOS is a secondary click (contextmenu, no click event) – Mac users toggle with ⌘. The table
+// treats both the same (ctrlKey || metaKey), so the specs click with ⌘ on macOS and with Ctrl elsewhere (CI: Linux).
+const CTRL: Modifier = /Mac/i.test(navigator.platform) ? 'Meta' : 'Control';
+
 afterEach(destroyAllTables);
 
 /**
@@ -87,7 +91,7 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
   it('a plain click starts a new selection', async () => {
     const { host, sm } = await mountSelectionTable('row', 'multi');
     await clickCell(host, 1, 0);
-    await clickCell(host, 3, 0, 'Control');
+    await clickCell(host, 3, 0, CTRL);
     expect(sm.getMergedRowIndices()).toEqual([1, 3]);
     await clickCell(host, 5, 2);
     expect(sm.getMergedRowIndices()).toEqual([5]);
@@ -106,7 +110,7 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
     const { host, sm } = await mountSelectionTable('range');
     await clickCell(host, 1, 0);
     await clickCell(host, 2, 1, 'Shift');
-    await clickCell(host, 4, 2, 'Control');
+    await clickCell(host, 4, 2, CTRL);
     expect(selectedCells(sm)).toEqual(['1/0', '1/1', '2/0', '2/1', '4/2']);
   });
 
@@ -120,7 +124,7 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
   it('ctrl-click on a selected cell removes it from the selection', async () => {
     const { host, sm } = await mountSelectionTable('range');
     sm.addSelection(new CellRange(0, 0, 1, 2));
-    await clickCell(host, 1, 1, 'Control');
+    await clickCell(host, 1, 1, CTRL);
     expect(selectedCells(sm)).toEqual(['0/0', '0/1', '0/2', '1/0', '1/2']);
   });
 
@@ -128,7 +132,7 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
     const clear = vi.spyOn(console, 'clear');
     const { host, sm } = await mountSelectionTable('range');
     sm.addSelection(new CellRange(0, 0, 1, 2));
-    await clickCell(host, 0, 2, 'Control', 'Alt');
+    await clickCell(host, 0, 2, CTRL, 'Alt');
     expect(selectedCells(sm)).toEqual(['0/0', '0/1', '1/0', '1/1', '1/2']);
     expect(clear).not.toHaveBeenCalled(); // Regression: Ctrl+Alt ran debug code (console.clear + console.info)
   });
@@ -136,12 +140,12 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
   // Regression: a deselected cell stayed deselected forever (negative ranges were only removed by clear()).
   it('a cell removed with ctrl-click can be added again with ctrl-click', async () => {
     const { host, sm } = await mountSelectionTable('cell');
-    await clickCell(host, 2, 1, 'Control');
-    await clickCell(host, 3, 1, 'Control');
-    await clickCell(host, 2, 1, 'Control');
+    await clickCell(host, 2, 1, CTRL);
+    await clickCell(host, 3, 1, CTRL);
+    await clickCell(host, 2, 1, CTRL);
     expect(selectedCells(sm)).toEqual(['3/1']);
-    await clickCell(host, 3, 2, 'Control'); // another cell in between: no double-click on 2/1
-    await clickCell(host, 2, 1, 'Control');
+    await clickCell(host, 3, 2, CTRL); // another cell in between: no double-click on 2/1
+    await clickCell(host, 2, 1, CTRL);
     expect(selectedCells(sm)).toEqual(['2/1', '3/1', '3/2']);
   });
 
@@ -162,7 +166,7 @@ describe('selection with the mouse (real clicks in Chromium)', () => {
     const { host, onFocusChanged } = await mountSelectionTable('range');
     await clickCell(host, 1, 1);
     expect(onFocusChanged).toHaveBeenCalledTimes(1);
-    await clickCell(host, 3, 0, 'Control');
+    await clickCell(host, 3, 0, CTRL);
     expect(onFocusChanged).toHaveBeenCalledTimes(2);
     await clickCell(host, 5, 2, 'Shift');
     expect(onFocusChanged).toHaveBeenCalledTimes(3);
@@ -307,7 +311,7 @@ describe('selection – open points of the first selection work (Okt. 2026)', ()
   // toggled on/off/on.
   it('a Ctrl+double click toggles the cell once', async () => {
     const { host, sm } = await mountSelectionTable('cell', 'multi');
-    await userEvent.dblClick(cell(host, 2, 0), { modifiers: ['Control'] }); // column 0 is not editable
+    await userEvent.dblClick(cell(host, 2, 0), { modifiers: [CTRL] }); // column 0 is not editable
     await settle();
     expect(selectedCells(sm)).toEqual(['2/0']);
   });
@@ -317,10 +321,10 @@ describe('selection – open points of the first selection work (Okt. 2026)', ()
     const { host, sm } = await mountSelectionTable('cell', 'multi');
     await clickCell(host, 1, 1);
     expect(sm.hasSelection()).toBe(true);
-    await clickCell(host, 4, 2, 'Control');
-    await clickCell(host, 1, 1, 'Control');
+    await clickCell(host, 4, 2, CTRL);
+    await clickCell(host, 1, 1, CTRL);
     expect(selectedCells(sm)).toEqual(['4/2']);
-    await clickCell(host, 4, 2, 'Control');
+    await clickCell(host, 4, 2, CTRL);
     expect(selectedCells(sm)).toEqual([]);
     expect(sm.hasSelection()).toBe(false);
   });

@@ -14,7 +14,7 @@ console.log(overlayOptions.loadingText); // "Loading…"
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 ## Implements
 

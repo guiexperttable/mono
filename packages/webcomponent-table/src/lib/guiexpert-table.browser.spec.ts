@@ -238,7 +238,7 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(rowTexts(el)).toHaveLength(5);
   });
 
-  it('el.loading shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+  it('el.loading shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
     const { el, events } = createTableElement();
     el.loading = true; // before data: applied when the table is created
     el.data = data(createModel(5));
@@ -257,7 +257,7 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(overlayKind(el)).toBe('loading');
   });
 
-  it('the boolean attribute loading works like the property (since 1.1.91)', async () => {
+  it('the boolean attribute loading works like the property (since 1.1.92)', async () => {
     const { el } = createTableElement();
     el.data = data(createModel(5));
     el.setAttribute('loading', '');

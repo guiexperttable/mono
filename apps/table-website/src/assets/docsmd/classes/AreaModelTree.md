@@ -1216,7 +1216,7 @@ displayed rows before filtering
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

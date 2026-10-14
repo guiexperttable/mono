@@ -37,7 +37,7 @@ export interface GuiexpertTableProps {
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it
    * (`TableApi.showLoadingOverlay()` / `hideOverlay()`). Changing it does **not** re-create the table.
-   * Texts and behaviour: `tableOptions.overlayOptions`. @since 1.1.91
+   * Texts and behaviour: `tableOptions.overlayOptions`. @since 1.1.92
    */
   loading?: boolean,
 }
@@ -58,7 +58,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.tableReady] - The callback for when the table is ready.
  * @param {Function} [props.scroll] - The callback for scroll events.
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
- * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.91).
+ * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.92).
  *
  * A new `tableModel` or `tableOptions` object (new reference) re-creates the table; the previous
  * table is released with `TableApi.destroy()`. Keep both stable with `useMemo` / `useState`,

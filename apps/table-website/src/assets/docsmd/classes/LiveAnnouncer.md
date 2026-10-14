@@ -123,7 +123,7 @@ Used when the reason for the message is gone, e.g. "Loading…" after the data a
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

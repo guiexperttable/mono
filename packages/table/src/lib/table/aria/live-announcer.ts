@@ -67,7 +67,7 @@ export class LiveAnnouncer {
    * Used when the reason for the message is gone, e.g. "Loading…" after the data arrived.
    *
    * @param {string} [text] - only this message is dropped
-   * @since 1.1.91
+   * @since 1.1.92
    */
   cancel(text?: string): void {
     if (this.timeout && (text === undefined || text === this.pendingText)) {

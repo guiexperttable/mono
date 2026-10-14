@@ -9,7 +9,7 @@ MIT-lizenziert, kostenlos auch kommerziell.
 
 ## Voraussetzung
 
-`@guiexpert/table` **1.1.91** (Branch `feat/overlays`). Vor der Aufnahme: `pnpm build:core`.
+`@guiexpert/table` **1.1.92** (Branch `feat/overlays`). Vor der Aufnahme: `pnpm build:core`.
 Kein Vergleich „ohne Enterprise-Lizenz“: ag-Grid hat Lade-, Keine-Zeilen- und Keine-Treffer-Overlays auch in der
 Community-Version (geprüft auf ag-grid.com, Okt. 2026) – sachlich bleiben, der Punkt ist „nur CSS, null Abhängigkeiten“.
 

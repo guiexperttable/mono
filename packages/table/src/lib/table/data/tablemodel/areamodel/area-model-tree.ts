@@ -159,7 +159,7 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
    *
    * @returns {number} displayed rows before filtering
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getUnfilteredRowCount(): number {
     return this.flattenRows.length;

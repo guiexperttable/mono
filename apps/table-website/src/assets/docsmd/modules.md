@@ -1494,7 +1494,7 @@ if (tableApi.getOverlayState() === "noMatches") {
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -2001,7 +2001,7 @@ calcOverlayKind({ manual: "loading", rowCount: 0, autoNoRows: true });       // 
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

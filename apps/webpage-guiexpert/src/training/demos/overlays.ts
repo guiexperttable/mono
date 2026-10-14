@@ -1,5 +1,5 @@
 // Chapter 32 – loading and empty tables: "Loading…" with a CSS spinner while the data is on the way,
-// "No rows to show" for an empty answer and "No matching rows" for a filter without hits (since 1.1.91).
+// "No rows to show" for an empty answer and "No matching rows" for a filter without hits (since 1.1.92).
 import {
   EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, type TableApi, type TableOptionsIf
 } from "@guiexpert/table";

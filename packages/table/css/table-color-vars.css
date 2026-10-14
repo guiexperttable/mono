@@ -84,7 +84,7 @@ html, html[data-theme="light"] {
   --ge-table-color-star-rating: #a86f00;
   --ge-table-color-progress-bar: #1e874b;
 
-  /* Overlays "Loading…" / "No rows" (since 1.1.91) */
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
   --ge-table-overlay-color: #333;
@@ -166,7 +166,7 @@ html[data-theme="dark"] {
   --ge-table-color-star-rating: #fcb515;
   --ge-table-color-progress-bar: #36BB6C;
 
-  /* Overlays "Loading…" / "No rows" (since 1.1.91) */
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
   --ge-table-overlay-content-bg: #1f2937;
   --ge-table-overlay-color: #ddd;

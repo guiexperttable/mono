@@ -1,6 +1,6 @@
 # Design 002 – Overlays „Lädt…“ und „Keine Daten“
 
-> Prompt: `prompts/002-overlays-laden-keine-daten.md` · Branch `feat/overlays` · Zielversion **1.1.91** (`since`)
+> Prompt: `prompts/002-overlays-laden-keine-daten.md` · Branch `feat/overlays` · Zielversion **1.1.92** (`since`)
 > Stand 14.10.2026. Abhängigkeit 001 (ARIA) ist auf `main` gemergt (`LiveAnnouncer`, `tableApi.announce`, `AriaIds`).
 > **Freigegeben** 14.10.2026 (Antwort „go“): alle Empfehlungen aus § 8, Wrapper-Variante (a) Prop `loading`.
 
@@ -32,7 +32,7 @@
 ### 2.1 API (Frage 1) → vier Methoden, ein Zustand
 
 ```ts
-// TableApi, alle @since 1.1.91, @category Overlays
+// TableApi, alle @since 1.1.92, @category Overlays
 showLoadingOverlay(text?: string): void;   // text: nur für diese Anzeige, z. B. "Saving…"
 showNoRowsOverlay(text?: string): void;    // manuell, z. B. Server meldet "keine Berechtigung"
 hideOverlay(): void;                       // beendet die manuelle Anzeige

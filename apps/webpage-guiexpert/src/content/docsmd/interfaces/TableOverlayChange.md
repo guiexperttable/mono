@@ -6,7 +6,7 @@ A change of the shown overlay, reported by [TableOverlay.update](../classes/Tabl
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 ## Table of contents
 

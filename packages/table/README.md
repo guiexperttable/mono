@@ -28,7 +28,7 @@ This is the UI-agnostic table component for your next web app. 😊
 - Accessibility: screen readers (WAI-ARIA grid/treegrid, row/column counts with virtual scrolling, announcements of
   sorting, filter and copy) and full keyboard navigation (arrows, Home/End, Page Up/Down, header focus, Enter) – since 1.1.91
 - Overlays "Loading…" (CSS spinner, `tableApi.showLoadingOverlay()`, `loading` prop in the wrappers) and
-  "No rows to show" / "No matching rows" (automatic) – plain HTML/CSS, since 1.1.91
+  "No rows to show" / "No matching rows" (automatic) – plain HTML/CSS, since 1.1.92
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

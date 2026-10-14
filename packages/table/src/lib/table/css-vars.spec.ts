@@ -31,7 +31,7 @@ describe('CssVars', () => {
     expect(CssVars.vars.blackboard.startsWith('html[data-theme="dark"] {')).toBe(true);
   });
 
-  it('every theme colours the overlays "Loading…" / "No rows" (since 1.1.91)', () => {
+  it('every theme colours the overlays "Loading…" / "No rows" (since 1.1.92)', () => {
     for (const theme of CssVars.themes as ThemeName[]) {
       const vars = declarations(CssVars.vars[theme]);
       for (const name of ['--ge-table-overlay-bg', '--ge-table-overlay-content-bg', '--ge-table-overlay-color',

@@ -20,7 +20,7 @@ import { GeOverlayKind } from "../../overlay/ge-overlay-kind.type";
  *   },
  * };
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @see Training: [Live data](https://gui.expert/training/live-data/)
  * @category Overlays
  */

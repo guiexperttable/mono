@@ -119,7 +119,7 @@ describe('GuiexpertTable (Svelte 4)', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
     const onTableReady = vi.fn<(api: TableApi) => void>();
     const { host, component } = create({ tableModel: createModel(5), onTableReady, loading: true });
     await tick();

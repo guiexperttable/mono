@@ -135,7 +135,7 @@ describe('GuiexpertTable (Preact)', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
     const tableReady = vi.fn<(api: TableApi) => void>();
     const tableModel = createModel(5);
     const tableOptions = new TableOptions();

@@ -1088,7 +1088,7 @@ the length of the array
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

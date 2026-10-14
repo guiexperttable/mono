@@ -62,7 +62,7 @@ export class EleScope {
   /** The IDs this table uses for ARIA references (prefix from the host id). @since 1.1.91 */
   readonly ariaIds: AriaIds;
 
-  /** The overlay layer over the body ("Loading…", "No rows to show"). @since 1.1.91 */
+  /** The overlay layer over the body ("Loading…", "No rows to show"). @since 1.1.92 */
   readonly tableOverlay: TableOverlay;
 
 
@@ -198,7 +198,7 @@ export class EleScope {
    * Shows the overlay that fits the current state (requested by the API, or "no rows" for an empty body).
    * Overwritten in {@link RenderScope}.
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   protected updateOverlay(): void {
     // must be overwritten
@@ -231,7 +231,7 @@ export class EleScope {
    * Gives an ARIA attribute of the host back the value it had before the table changed it (e.g. `aria-busy` after
    * loading), or removes it if the host had none.
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   protected restoreHostAriaAttribute(key: string): void {
     const before = this.hostAttributesBefore.get(key) ?? null;

@@ -21,7 +21,7 @@
   export let licenseKey = undefined;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it –
-   * without re-creating the table (since 1.1.91).
+   * without re-creating the table (since 1.1.92).
    * @type {boolean}
    */
   export let loading = false;

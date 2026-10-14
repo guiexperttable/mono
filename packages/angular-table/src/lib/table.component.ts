@@ -88,7 +88,7 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
    * (`TableApi.showLoadingOverlay()` / `hideOverlay()`). Changing it does **not** re-create the table;
    * a re-created table (new model) keeps showing it. Texts: `tableOptions.overlayOptions`.
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   @Input()
   loading: boolean = false;

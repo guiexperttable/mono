@@ -44,7 +44,7 @@ The table fills its host element – give it a height:
 | Class | `TableComponent` |
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
-| Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.91: loading overlay, no re-creation) |
+| Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.92: loading overlay, no re-creation) |
 | Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`) |
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
@@ -134,7 +134,7 @@ export class PersonTableComponent implements OnInit {
 }
 ```
 
-**With a loading overlay (since 1.1.91):** create the (empty) model at once and let the `loading` input show the
+**With a loading overlay (since 1.1.92):** create the (empty) model at once and let the `loading` input show the
 spinner – the table is not re-created when `loading` changes; an empty answer shows "No rows to show" by itself.
 
 ```ts

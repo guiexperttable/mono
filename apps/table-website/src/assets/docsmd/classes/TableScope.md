@@ -1264,7 +1264,7 @@ The overlay layer over the body ("Loading…", "No rows to show").
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 
@@ -2657,7 +2657,7 @@ The overlay shown now (see [TableApi.getOverlayState](TableApi.md#getoverlaystat
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -2884,7 +2884,7 @@ Ends an overlay shown by the API (see [TableApi.hideOverlay](TableApi.md#hideove
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -3605,7 +3605,7 @@ loading), or removes it if the host had none.
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 
@@ -3895,7 +3895,7 @@ Shows the loading overlay over the body (see [TableApi.showLoadingOverlay](Table
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -3921,7 +3921,7 @@ Shows the "no rows" overlay (see [TableApi.showNoRowsOverlay](TableApi.md#showno
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -4160,7 +4160,7 @@ Shows the overlay that fits the body now (see [TableOverlay.update](TableOverlay
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 

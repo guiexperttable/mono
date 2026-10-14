@@ -175,7 +175,7 @@ then
   list is loaded again (`fetchList`);
 - `DELETE`: `deleteItem(id)` → the row is removed.
 
-While a request runs, the table shows its loading overlay ([TableApi.showLoadingOverlay](TableApi.md#showloadingoverlay), since 1.1.91).
+While a request runs, the table shows its loading overlay ([TableApi.showLoadingOverlay](TableApi.md#showloadingoverlay), since 1.1.92).
 A failed request is logged with `console.error`; the table stays unchanged.
 
 #### Parameters

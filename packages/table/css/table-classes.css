@@ -154,7 +154,7 @@
 }
 
 
-/* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.91).
+/* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.92).
    Position and size are set inline by the table (the visible body), display is switched inline (none / flex). */
 .ge-table-overlay {
   z-index: 10000; /* above .ge-table-body-east (999) and the focus frame (9999) */

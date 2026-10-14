@@ -40,7 +40,7 @@ export class GuiexpertTable extends HTMLElement {
    * (also as boolean attribute `loading` – any value counts, `loading="false"` is `true` too; remove the attribute). Changing it does **not** re-create the table; a new table
    * (new `data`) shows the overlay as long as `loading` is `true`. Texts: `tableOptions.overlayOptions`.
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   get loading(): boolean {
     return this._loading;

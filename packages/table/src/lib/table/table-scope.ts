@@ -307,7 +307,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * Shows the loading overlay over the body (see {@link TableApi.showLoadingOverlay}).
    *
    * @param {string} [text] - text for this overlay, default {@link OverlayOptionsIf.loadingText}
-   * @since 1.1.91
+   * @since 1.1.92
    */
   showLoadingOverlay(text?: string): void {
     this.tableOverlay.showLoading(text);
@@ -317,7 +317,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * Shows the "no rows" overlay (see {@link TableApi.showNoRowsOverlay}).
    *
    * @param {string} [text] - text for this overlay, default {@link OverlayOptionsIf.noRowsText}
-   * @since 1.1.91
+   * @since 1.1.92
    */
   showNoRowsOverlay(text?: string): void {
     this.tableOverlay.showNoRows(text);
@@ -326,7 +326,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   /**
    * Ends an overlay shown by the API (see {@link TableApi.hideOverlay}).
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   hideOverlay(): void {
     this.tableOverlay.hide();
@@ -335,7 +335,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   /**
    * The overlay shown now (see {@link TableApi.getOverlayState}).
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getOverlayState(): GeOverlayKind {
     return this.tableOverlay.getState();

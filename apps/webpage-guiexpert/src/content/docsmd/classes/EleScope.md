@@ -380,7 +380,7 @@ The overlay layer over the body ("Loading…", "No rows to show").
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -537,7 +537,7 @@ loading), or removes it if the host had none.
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -586,7 +586,7 @@ Overwritten in [RenderScope](RenderScope.md).
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

@@ -6,7 +6,7 @@ Input of [calcOverlayKind](../modules.md#calcoverlaykind).
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 ## Table of contents
 

@@ -539,7 +539,7 @@ Texts and behaviour of the "Loading…" / "No rows" overlays; missing fields use
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Implementation of
 

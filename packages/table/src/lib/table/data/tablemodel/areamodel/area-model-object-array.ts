@@ -310,7 +310,7 @@ export class AreaModelObjectArray<T>
    *   console.log("The filter hides all rows");
    * }
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getUnfilteredRowCount(): number {
     return this.rows?.length ?? 0;

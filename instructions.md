@@ -931,7 +931,7 @@ pass the axe contrast check (since 1.1.91 the light star and progress bar colors
 VoiceOver + Safari – tab into the table, arrow through cells (row/column numbers and headers are announced), sort with
 Enter in the header, filter and copy (announcements), expand a tree node, open the editor with F2.
 
-### 6.15 Loading and empty table: overlays (since 1.1.91)
+### 6.15 Loading and empty table: overlays (since 1.1.92)
 
 Three overlays lie over the **body** (header and footer stay readable). They are plain HTML and CSS – the spinner is a
 CSS animation, no image, no library:

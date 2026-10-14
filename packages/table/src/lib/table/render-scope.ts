@@ -398,7 +398,7 @@ export class RenderScope extends EleScope {
    * Shows the overlay that fits the body now (see {@link TableOverlay.update}) and reports a change to
    * {@link onOverlayChanged}.
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   protected override updateOverlay(): void {
     const overlay = this.tableOverlay;
@@ -418,7 +418,7 @@ export class RenderScope extends EleScope {
    * Called after the shown overlay changed (ARIA in {@link TableScope}).
    *
    * @param {TableOverlayChange} _change - previous and new overlay, its text
-   * @since 1.1.91
+   * @since 1.1.92
    */
   protected onOverlayChanged(_change: TableOverlayChange): void {
     // overwritten in TableScope

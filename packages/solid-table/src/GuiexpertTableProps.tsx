@@ -30,7 +30,7 @@ export interface GuiexpertTableProps {
   licenseKey?: string,
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
-   * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.91
+   * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
    */
   loading?: boolean,
 }

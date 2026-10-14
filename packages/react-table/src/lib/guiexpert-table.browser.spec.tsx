@@ -153,7 +153,7 @@ describe('GuiexpertTable (React)', () => {
     expect(rowTexts(host)).toHaveLength(5);
   });
 
-  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
     const tableReady = vi.fn<(api: TableApi) => void>();
     const tableModel = createModel(5);
     const tableOptions = new TableOptions();
@@ -174,13 +174,13 @@ describe('GuiexpertTable (React)', () => {
     expect(overlayKind(host)).toBe('loading');
   });
 
-  it('an empty model shows "No rows to show" by itself (since 1.1.91)', async () => {
+  it('an empty model shows "No rows to show" by itself (since 1.1.92)', async () => {
     const host = mount(<GuiexpertTable tableModel={createModel(0)} />);
     await nextFrame();
     expect(overlayKind(host)).toBe('noRows');
   });
 
-  it('an overlay the app shows in tableReady is not hidden by the loading prop (since 1.1.91)', async () => {
+  it('an overlay the app shows in tableReady is not hidden by the loading prop (since 1.1.92)', async () => {
     const host = mount(<GuiexpertTable tableModel={createModel(5)} tableReady={api => api.showLoadingOverlay()} />);
     await nextFrame();
     expect(overlayKind(host)).toBe('loading');

@@ -9,7 +9,7 @@ import { GeOverlayKind } from "../../overlay/ge-overlay-kind.type";
  * const overlayOptions = OverlayOptions.create({ noRowsText: "Keine Daten" });
  * console.log(overlayOptions.loadingText); // "Loading…"
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Overlays
  */
 export class OverlayOptions implements OverlayOptionsIf {

@@ -26,7 +26,7 @@ const tableOptions: TableOptionsIf = {
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 **`See`**
 

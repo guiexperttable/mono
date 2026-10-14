@@ -69,7 +69,7 @@ export function cellOf(evt: GeMouseEvent): { areaIdent: string | undefined; rowI
 }
 
 /**
- * The overlay a table in `container` shows: "none", "loading", "noRows" or "noMatches" (since 1.1.91).
+ * The overlay a table in `container` shows: "none", "loading", "noRows" or "noMatches" (since 1.1.92).
  * Reads the DOM (works without a TableApi, e.g. for the `loading` prop of the wrappers).
  */
 export function overlayKind(container: Element): string {

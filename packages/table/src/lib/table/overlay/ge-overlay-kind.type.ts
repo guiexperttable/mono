@@ -11,7 +11,7 @@
  *   console.log("Reset the filter to see rows again");
  * }
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Overlays
  */
 export type GeOverlayKind = "none" | "loading" | "noRows" | "noMatches";

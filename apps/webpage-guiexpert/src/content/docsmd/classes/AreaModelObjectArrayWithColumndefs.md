@@ -1524,7 +1524,7 @@ if (bodyAreaModel.getRowCount() === 0 && bodyAreaModel.getUnfilteredRowCount() >
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 

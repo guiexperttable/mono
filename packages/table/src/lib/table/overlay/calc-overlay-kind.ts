@@ -3,7 +3,7 @@ import { GeOverlayKind } from "./ge-overlay-kind.type";
 /**
  * Input of {@link calcOverlayKind}.
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Internals
  */
 export interface OverlayKindInput {
@@ -26,7 +26,7 @@ export interface OverlayKindInput {
  * calcOverlayKind({ rowCount: 0, unfilteredRowCount: 100, autoNoRows: true }); // "noMatches"
  * calcOverlayKind({ manual: "loading", rowCount: 0, autoNoRows: true });       // "loading"
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Internals
  */
 export function calcOverlayKind(input: OverlayKindInput): GeOverlayKind {

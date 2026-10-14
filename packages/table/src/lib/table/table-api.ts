@@ -731,7 +731,7 @@ export class TableApi {
    *   .finally(() => tableApi.hideOverlay()); // 0 rows? "No rows to show" appears by itself
    *
    * @param {string} [text] - text for this overlay only, e.g. `"Saving…"`; default {@link OverlayOptionsIf.loadingText}
-   * @since 1.1.91
+   * @since 1.1.92
    * @see Training: [Live data](https://gui.expert/training/live-data/)
    */
   showLoadingOverlay(text?: string): void {
@@ -747,7 +747,7 @@ export class TableApi {
    * tableApi.showNoRowsOverlay("You may not see these orders");
    *
    * @param {string} [text] - text for this overlay only; default {@link OverlayOptionsIf.noRowsText}
-   * @since 1.1.91
+   * @since 1.1.92
    */
   showNoRowsOverlay(text?: string): void {
     this.tableScope.showNoRowsOverlay(text);
@@ -762,7 +762,7 @@ export class TableApi {
    * tableApi.showLoadingOverlay("Saving…");
    * save(order).finally(() => tableApi.hideOverlay());
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   hideOverlay(): void {
     this.tableScope.hideOverlay();
@@ -779,7 +779,7 @@ export class TableApi {
    * }
    *
    * @returns {GeOverlayKind} the shown overlay
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getOverlayState(): GeOverlayKind {
     return this.tableScope.getOverlayState();

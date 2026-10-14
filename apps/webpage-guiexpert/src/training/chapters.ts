@@ -337,7 +337,7 @@ export const CHAPTERS: Chapter[] = [
     title: "Live data without rebuilding the table", nav: "Live data",
     lead: "1,500 cell updates per second – only the changed, visible cells are redrawn.",
     learn: ["update single cells with updateCells()", "flash a cell with CSS classes", "keep permanent colours in the model",
-      "show a loading spinner and empty states (since 1.1.91)"],
+      "show a loading spinner and empty states (since 1.1.92)"],
     api: ["TableApi.updateCells", "TableCellUpdateEvent", "TableApi.repaint", "TableApi.showLoadingOverlay",
       "TableApi.hideOverlay", "OverlayOptionsIf"],
     showcases: [{ name: "crypto", title: "Crypto ticker" }],

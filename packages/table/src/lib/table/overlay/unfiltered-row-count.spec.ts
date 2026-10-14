@@ -1,4 +1,4 @@
-// AreaModelIf.getUnfilteredRowCount (since 1.1.91): tells "no rows at all" from "nothing matches the filter".
+// AreaModelIf.getUnfilteredRowCount (since 1.1.92): tells "no rows at all" from "nothing matches the filter".
 import { describe, expect, it } from 'vitest';
 import { AreaModelArrayOfArrays, ColumnDef, CoverGridBodyModel, TableFactory, TreeFactory, px100 } from '@guiexpert/table';
 import type { AreaModelIf, CellRendererIf } from '@guiexpert/table';

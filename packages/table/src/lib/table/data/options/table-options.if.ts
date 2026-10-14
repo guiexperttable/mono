@@ -338,7 +338,7 @@ export interface TableOptionsIf {
    *   overlayOptions: { noRowsText: "No orders yet", blockInteractionWhileLoading: false },
    * };
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   overlayOptions?: Partial<OverlayOptionsIf>;
 }

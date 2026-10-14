@@ -285,7 +285,7 @@ export interface AreaModelIf {
    *   override getValueAt(rowIndex: number, columnIndex: number): any { return this.shown[rowIndex]?.[columnIndex]; }
    * }
    *
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getUnfilteredRowCount?(): number;
 

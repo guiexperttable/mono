@@ -38,7 +38,7 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
    * The number of all rows, without the external filter.
    *
    * @returns {number} the length of the array
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getUnfilteredRowCount(): number {
     return this.arr?.length ?? 0;

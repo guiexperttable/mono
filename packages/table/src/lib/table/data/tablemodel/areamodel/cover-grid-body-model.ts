@@ -44,7 +44,7 @@ export class CoverGridBodyModel<T> implements AreaModelIf {
    * The number of grid rows without the external filter (`0` without items).
    *
    * @returns {number} grid rows for all items
-   * @since 1.1.91
+   * @since 1.1.92
    */
   getUnfilteredRowCount(): number {
     if (!this.items?.length) return 0;

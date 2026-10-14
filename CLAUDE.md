@@ -174,7 +174,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (`tableOptions.ariaTexts`), eigene Ansagen `tableApi.announce()`. Scroll-Viewport `tabindex="-1"` (sonst zweiter
   Tab-Stopp in Chrome) und gibt den Fokus an den Host weiter. Tab in die Tabelle setzt den Fokus auf die erste Zelle
   (nur bei echtem Tab, nicht bei `host.focus()`).
-- **Overlays (seit 1.1.91, `overlay/`, Design `prompts/002-overlays-laden-keine-daten.design.md`)**: ein Div
+- **Overlays (seit 1.1.92, `overlay/`, Design `prompts/002-overlays-laden-keine-daten.design.md`)**: ein Div
   `.ge-table-overlay` je Tabelle (`TableOverlay`, in `EleScope` angelegt, Geometrie in `adjustContainersAndRows`, Zustand
   am Ende von `RenderScope.adjustAfterScrolling` → `calcOverlayKind`; DOM nur bei Änderung). `api.showLoadingOverlay(text?)`,
   `showNoRowsOverlay(text?)`, `hideOverlay()` (beendet nur Manuelles), `getOverlayState()` = `"none" | "loading" | "noRows"
@@ -211,7 +211,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `treeOptions`, `headerGroupOptions`, `headerToggleExpandCollapseIcons`, `showCheckboxWihoutExtraColumn` (sic),
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
-seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, `overlayOptions`.
+seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -228,7 +228,7 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 | webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` auf dem Element (`contextmenu` nicht bubbling); Entfernen = `destroy()`, Wieder-Einfügen = Neuaufbau |
 | angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
 
-Alle Wrapper haben seit 1.1.91 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
+Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
 ohne Neuaufbau der Tabelle.
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.

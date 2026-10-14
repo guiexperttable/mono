@@ -1044,7 +1044,7 @@ class OrdersBodyModel extends AreaModel {
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

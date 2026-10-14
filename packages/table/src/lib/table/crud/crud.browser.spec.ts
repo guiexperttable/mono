@@ -380,7 +380,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     return { promise, resolve, reject };
   }
 
-  it('DELETE: "Loading…" over the table while the request runs (since 1.1.91)', async () => {
+  it('DELETE: "Loading…" over the table while the request runs (since 1.1.92)', async () => {
     const request = pending<unknown>();
     const { host, api } = await createCrudTable(({ deleteItem }) => deleteItem.mockImplementation(() => request.promise));
     await userEvent.click(actionLink(host, 0, 'DELETE'));
@@ -390,7 +390,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(renderedRows(host)).toHaveLength(1);
   });
 
-  it('VIEW: "Loading…" while the item is fetched, gone when the dialog opens (since 1.1.91)', async () => {
+  it('VIEW: "Loading…" while the item is fetched, gone when the dialog opens (since 1.1.92)', async () => {
     const request = pending<unknown>();
     const { host, api } = await createCrudTable(({ fetchItem }) => fetchItem.mockImplementation(() => request.promise as never));
     await userEvent.click(actionLink(host, 1, 'VIEW'));
@@ -400,7 +400,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(api.getOverlayState()).toBe('none');
   });
 
-  it('a failed request ends the loading overlay too (since 1.1.91)', async () => {
+  it('a failed request ends the loading overlay too (since 1.1.92)', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { host, api } = await createCrudTable(({ deleteItem }) =>
       deleteItem.mockImplementation(() => Promise.reject(new Error('403'))));
@@ -410,7 +410,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(renderedRows(host)).toHaveLength(2);
   });
 
-  it('two requests at the same time: "Loading…" until both have answered (since 1.1.91)', async () => {
+  it('two requests at the same time: "Loading…" until both have answered (since 1.1.92)', async () => {
     const first = pending<unknown>();
     const second = pending<unknown>();
     const { api, factory } = await createCrudTable(({ deleteItem }) =>
@@ -425,7 +425,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     await vi.waitFor(() => expect(api.getOverlayState()).toBe('noRows')); // both rows deleted: empty table
   });
 
-  it('a request that throws at once does not leave the overlay on (since 1.1.91)', async () => {
+  it('a request that throws at once does not leave the overlay on (since 1.1.92)', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { host, api } = await createCrudTable(({ deleteItem }) => deleteItem.mockImplementation(() => { throw new Error('sync'); }));
     await userEvent.click(actionLink(host, 0, 'DELETE'));
@@ -433,7 +433,7 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(api.getOverlayState()).toBe('none');
   });
 
-  it('CREATE without the item in the response: "Loading…" until the list is loaded again (since 1.1.91)', async () => {
+  it('CREATE without the item in the response: "Loading…" until the list is loaded again (since 1.1.92)', async () => {
     const reload = pending<Item[]>();
     const { api, factory, fetchList } = await createCrudTable();
     fetchList.mockImplementation(() => reload.promise as never);

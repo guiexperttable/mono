@@ -7,7 +7,7 @@ import { calcOverlayKind } from "./calc-overlay-kind";
 /**
  * A change of the shown overlay, reported by {@link TableOverlay.update}.
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Internals
  */
 export interface TableOverlayChange {
@@ -43,7 +43,7 @@ const KIND_CLASSES: { [K in GeOverlayKind]: string } = {
  * console.log(overlay.getState()); // "loading"
  * overlay.destroy();
  *
- * @since 1.1.91
+ * @since 1.1.92
  * @category Internals
  */
 export class TableOverlay {

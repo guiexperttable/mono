@@ -886,7 +886,7 @@ The overlay layer over the body ("Loading…", "No rows to show").
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 
@@ -1924,7 +1924,7 @@ Called after the shown overlay changed (ARIA in [TableScope](TableScope.md)).
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -2176,7 +2176,7 @@ loading), or removes it if the host had none.
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Inherited from
 
@@ -2301,7 +2301,7 @@ Shows the overlay that fits the body now (see [TableOverlay.update](TableOverlay
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Overrides
 

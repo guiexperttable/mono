@@ -154,7 +154,7 @@
 }
 
 
-/* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.91).
+/* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.92).
    Position and size are set inline by the table (the visible body), display is switched inline (none / flex). */
 .ge-table-overlay {
   z-index: 10000; /* above .ge-table-body-east (999) and the focus frame (9999) */
@@ -400,7 +400,7 @@
   --ge-table-color-star-rating: #a86f00;
   --ge-table-color-progress-bar: #1e874b;
 
-  /* Overlays "Loading…" / "No rows" (since 1.1.91) */
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
   --ge-table-overlay-color: #333;
@@ -482,7 +482,7 @@ html[data-theme="dark"] {
   --ge-table-color-star-rating: #fcb515;
   --ge-table-color-progress-bar: #36BB6C;
 
-  /* Overlays "Loading…" / "No rows" (since 1.1.91) */
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
   --ge-table-overlay-content-bg: #1f2937;
   --ge-table-overlay-color: #ddd;

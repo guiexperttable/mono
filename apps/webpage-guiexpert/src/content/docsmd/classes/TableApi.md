@@ -1143,7 +1143,7 @@ if (tableApi.getOverlayState() === "noMatches") {
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -1330,7 +1330,7 @@ save(order).finally(() => tableApi.hideOverlay());
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 
@@ -2207,7 +2207,7 @@ fetch("/api/orders")
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 **`See`**
 
@@ -2245,7 +2245,7 @@ tableApi.showNoRowsOverlay("You may not see these orders");
 
 **`Since`**
 
-1.1.91
+1.1.92
 
 #### Defined in
 

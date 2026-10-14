@@ -162,7 +162,7 @@ describe('GuiexpertTable (Vue 3)', () => {
     expect(consoleWarn).not.toHaveBeenCalled();
   });
 
-  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
     const tableModel = createModel(5);
     const tableOptions = new TableOptions();
     const { host, props, tableReady } = mount({ tableModel, tableOptions, loading: true });

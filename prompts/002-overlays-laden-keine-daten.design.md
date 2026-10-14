@@ -275,5 +275,9 @@ Erwartet < 2 KB min. JS + ~1 KB CSS. Pro Frame ein `getRowCount()` und ein Vergl
 | Tests | Unit: `calc-overlay-kind`, `overlay-options`, `unfiltered-row-count`; Browser: `overlay/overlay.browser.spec.ts` (O1–O12 + Standalone), 4 CRUD-Fälle; Wrapper: React, Preact, Solid, Vue, Svelte 4/5, Web Component. Angular: nur Build 14–22 (kein Test-Setup, `TODO.md`) |
 | Abdeckung | `calc-overlay-kind` 100 %, `table-overlay` 98 % Zeilen / 93 % Zweige, `overlay-options` 100 % |
 | Größe | `dist/index.cjs` gzip 59,1 → 60,7 KB (+1,6 KB); CSS ~1 KB |
+| Website | **Abweichung:** kein Eingriff in den Crypto-Showcase – er hat statische Daten, ein künstliches „Loading…“ wäre vorgetäuscht. Stattdessen: Zeile in `why.astro` (ehrlich: ag-Grid Community hat es auch), Feature-Text in `features.astro`; `pnpm build:webpage-guiexpert` grün (436 Seiten) |
+| Training | Abschnitt „Loading and empty tables“ in Kapitel 32 `live-data` mit Live-Demo `demos/overlays.ts` (28. Live-Demo), Callout `version`, Poster `demo-overlays-light|dark.png`, Screenshot-Eintrag |
+| Demo/Video | `apps/table-demo/overlay.html`; `videos/03-lade-spinner/` (Snippet 14 Zeilen, kompiliert strict); beide im Browser geprüft (light/dark, keine Konsolenfehler) |
+| Demo-Repo | Phase 8 nicht nötig (kein neues Kapitel); der Abschnitt in Kapitel 32 verweist auf keinen neuen Tag |
 | Doku | `instructions.md` 6.15, Angular-Doku § 2/§ 4, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`, typedoc-Kategorie „Overlays“, `docs:check` 310 Beispiele / 0 Fehler |
 

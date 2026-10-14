@@ -42,6 +42,7 @@ const DEMOS = {
   "tree-table": { slug: "tree-table", expand: 3 },
   "inline-editing": { slug: "inline-editing", dblclick: [2, 7] },
   "live-data": { slug: "live-data", wait: 1500 },
+  "overlays": { slug: "live-data", wait: 1500, button: "refresh" },
   "persist-state": { slug: "persist-state" },
   "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }

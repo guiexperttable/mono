@@ -43,6 +43,30 @@ import Callout from "../../components/training/Callout.astro";
     interval, not once per message. The showcase <a href="/showcase/crypto/run/">Crypto</a> does that with real price data.
   </p>
 
+  <h2 id="overlays">Loading and empty tables</h2>
+  <p>
+    Before the first data arrive, the body is empty – and an empty table looks broken. The table has three overlays for
+    that, plain HTML and CSS (the spinner is a CSS animation, no image, no library):
+  </p>
+  <Snippet file="demos/overlays.ts" region="table" />
+  <Snippet file="demos/overlays.ts" region="load" />
+  <ul>
+    <li><ApiLink name="TableApi.showLoadingOverlay" /> shows <em>Loading…</em> over the body until
+      <ApiLink name="TableApi.hideOverlay" />. Rows already shown stay visible under a semi-transparent layer; mouse and
+      editing are blocked meanwhile (<code>blockInteractionWhileLoading</code>).</li>
+    <li><em>No rows to show</em> appears by itself when the body is empty, <em>No matching rows</em> when the filter hides
+      every row – <code>hideOverlay()</code> does not end them, they describe the body. <ApiLink name="TableApi.getOverlayState" />
+      tells which one is shown.</li>
+    <li>Texts, a delay against flashing (<code>loadingDelayInMs</code>) and own content: <ApiLink name="OverlayOptionsIf" />.
+      Screen readers hear the texts; the table is <code>aria-busy</code> while loading.</li>
+  </ul>
+  <LiveDemo name="overlays" title="Loading, empty answer, no matches" height={360}
+            caption="Click “refresh”: the spinner lies over the rows. “empty answer” and a search for “zzz” show the empty states." />
+  <Callout type="version">
+    <p>Since 1.1.91. The framework wrappers have a <code>loading</code> prop – <code>&lt;GuiexpertTable loading=&#123;isLoading&#125; … /&gt;</code> –
+      that shows the overlay without re-creating the table.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>A table that remembers sorting and scroll position: <ChapterLink slug="persist-state" />.</p>
 </TrainingLayout>

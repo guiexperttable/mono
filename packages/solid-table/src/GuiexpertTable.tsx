@@ -54,6 +54,15 @@ export default (props: GuiexpertTableProps) => {
     onMouseMoved: (evt: GeMouseEvent) => emit("mouseMoved", evt, merged.mouseMoved)
   };
 
+  let currentScope: TableScope | undefined;
+  const applyLoading = (loading: boolean) => {
+    if (loading) {
+      currentScope?.showLoadingOverlay();
+    } else {
+      currentScope?.hideOverlay();
+    }
+  };
+
   // Runs after the div is rendered and again whenever tableModel / tableOptions change (only these two are
   // tracked). onCleanup releases the table before the next run and when the component is disposed.
   createEffect(() => {
@@ -68,10 +77,21 @@ export default (props: GuiexpertTableProps) => {
         ele, tableModel, new SimpleDomService(), tableOptions ?? new TableOptions(), listener
       );
       scope.firstInit();
+      currentScope = scope;
+      applyLoading(!!merged.loading); // a re-created table keeps showing the overlay
       emit("tableReady", scope.getApi(), merged.tableReady);
       return scope;
     });
-    onCleanup(() => tableScope.destroy());
+    onCleanup(() => {
+      if (currentScope === tableScope) currentScope = undefined;
+      tableScope.destroy();
+    });
+  });
+
+  // the loading prop: shows/hides the overlay, no re-creation of the table
+  createEffect(() => {
+    const loading = !!merged.loading;
+    untrack(() => applyLoading(loading));
   });
 
   createEffect(() => {

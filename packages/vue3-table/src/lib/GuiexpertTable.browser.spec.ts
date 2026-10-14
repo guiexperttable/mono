@@ -8,7 +8,7 @@ import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, TableModelIf, TableOptionsIf } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable.vue';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 interface Mounted {
@@ -21,7 +21,7 @@ interface Mounted {
 
 const apps: App[] = [];
 
-function mount(props: { tableModel: TableModelIf; tableOptions?: TableOptionsIf; debounceMouseClickDelay?: number }): Mounted {
+function mount(props: { tableModel: TableModelIf; tableOptions?: TableOptionsIf; debounceMouseClickDelay?: number; loading?: boolean }): Mounted {
   const host = createHost();
   const tableReady = vi.fn<(api: TableApi) => void>();
   const mouseClicked = vi.fn<(evt: GeMouseEvent) => void>();
@@ -160,5 +160,26 @@ describe('GuiexpertTable (Vue 3)', () => {
     expect(tableCount(host)).toBe(0);
     expect(consoleError).not.toHaveBeenCalled();
     expect(consoleWarn).not.toHaveBeenCalled();
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+    const tableModel = createModel(5);
+    const tableOptions = new TableOptions();
+    const { host, props, tableReady } = mount({ tableModel, tableOptions, loading: true });
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+
+    props.value = { tableModel, tableOptions, loading: false };
+    await nextTick();
+    expect(overlayKind(host)).toBe('none');
+    props.value = { tableModel, tableOptions, loading: true };
+    await nextTick();
+    expect(overlayKind(host)).toBe('loading');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+
+    props.value = { tableModel: createModel(2), tableOptions, loading: true }; // re-created, overlay stays
+    await nextTick();
+    expect(tableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
   });
 });

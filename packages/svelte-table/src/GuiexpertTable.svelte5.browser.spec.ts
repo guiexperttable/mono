@@ -8,7 +8,7 @@ import { GeMouseEvent, TableApi, TableOptions, TableScope } from '@guiexpert/tab
 import GuiexpertTable from './GuiexpertTable.svelte';
 import RunesHost from '../test/RunesHost.svelte';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 const cleanups: (() => void)[] = [];
@@ -140,5 +140,32 @@ describe('GuiexpertTable (Svelte 5)', () => {
     expect(isDestroyed(onTableReady.mock.calls[0][0])).toBe(true);
     expect(tableCount(host)).toBe(0);
     expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+    const host = createHost();
+    const onTableReady = vi.fn<(api: TableApi) => void>();
+    const component = createClassComponent({
+      component: GuiexpertTable,
+      target: host,
+      props: { tableModel: createModel(5), onTableReady, loading: true },
+    });
+    cleanups.push(() => component.$destroy());
+    flushSync();
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+
+    component.$set({ loading: false });
+    flushSync();
+    expect(overlayKind(host)).toBe('none');
+    component.$set({ loading: true });
+    flushSync();
+    expect(overlayKind(host)).toBe('loading');
+    expect(onTableReady).toHaveBeenCalledTimes(1);
+
+    component.$set({ tableModel: createModel(2) });
+    flushSync();
+    expect(onTableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
   });
 });

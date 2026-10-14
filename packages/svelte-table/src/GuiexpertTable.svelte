@@ -4,6 +4,7 @@
   Shipped as Svelte source (not pre-compiled), so it is compiled by YOUR Svelte compiler and works with
   Svelte 4 and Svelte 5. Written in plain JS (types in GuiexpertTable.svelte.d.ts) – no preprocessor needed.
 
+  `loading` (boolean) shows the loading overlay without re-creating the table.
   Events: listen with `on:tableReady` / `on:mouseClicked` … (event payload in `e.detail`) or pass callback
   props `onTableReady` / `onMouseClicked` … (payload directly; use these in Svelte 5 runes mode).
   A new `tableModel` or `tableOptions` object re-creates the table (the previous one is destroyed).
@@ -18,6 +19,12 @@
   export let tableOptions = undefined;
   /** @type {string | undefined} */
   export let licenseKey = undefined;
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it –
+   * without re-creating the table (since 1.1.91).
+   * @type {boolean}
+   */
+  export let loading = false;
 
   /** @type {((api: import("@guiexpert/table").TableApi) => void) | undefined} */
   export let onTableReady = undefined;
@@ -76,9 +83,19 @@
     }
     tableScope = new TableScope(root, model, new SimpleDomService(), options ?? new TableOptions(), listener);
     tableScope.firstInit();
+    applyLoading(loading); // a re-created table keeps showing the overlay
     const api = tableScope.getApi();
     dispatch("tableReady", api);
     onTableReady?.(api);
+  }
+
+  /** @param {boolean} show */
+  function applyLoading(show) {
+    if (show) {
+      tableScope?.showLoadingOverlay();
+    } else {
+      tableScope?.hideOverlay();
+    }
   }
 
   onMount(() => {
@@ -92,6 +109,9 @@
 
   // runs after mount and whenever a new tableModel / tableOptions object arrives
   $: if (mounted) init(tableModel, tableOptions);
+
+  // the loading prop: only shows/hides the overlay (depends on `loading` only, no re-creation)
+  $: applyLoading(loading);
 
   $: if (licenseKey) LicenseManager.getInstance().setLicenseKey(licenseKey);
 </script>

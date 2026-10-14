@@ -67,3 +67,16 @@ export function isDestroyed(api: TableApi): boolean {
 export function cellOf(evt: GeMouseEvent): { areaIdent: string | undefined; rowIndex: number; columnIndex: number } {
   return { areaIdent: evt.areaIdent, rowIndex: evt.rowIndex, columnIndex: evt.columnIndex };
 }
+
+/**
+ * The overlay a table in `container` shows: "none", "loading", "noRows" or "noMatches" (since 1.1.91).
+ * Reads the DOM (works without a TableApi, e.g. for the `loading` prop of the wrappers).
+ */
+export function overlayKind(container: Element): string {
+  const overlay = container.querySelector<HTMLElement>('.ge-table-overlay');
+  if (!overlay || overlay.style.display === 'none') return 'none';
+  if (overlay.classList.contains('ge-table-overlay-loading')) return 'loading';
+  if (overlay.classList.contains('ge-table-overlay-no-matches')) return 'noMatches';
+  if (overlay.classList.contains('ge-table-overlay-no-rows')) return 'noRows';
+  return 'none';
+}

@@ -26,6 +26,34 @@ export class GuiexpertTable extends HTMLElement {
 
   private _data: TableModelAndOptionsIf | undefined;
   private tableScope: TableScope | undefined;
+  private _loading = false;
+
+  /** The boolean attribute `loading` (`<guiexpert-table loading>`) sets {@link loading}. */
+  static get observedAttributes(): string[] {
+    return ['loading'];
+  }
+
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it
+   * (also as boolean attribute `loading`). Changing it does **not** re-create the table; a new table
+   * (new `data`) shows the overlay as long as `loading` is `true`. Texts: `tableOptions.overlayOptions`.
+   *
+   * @since 1.1.91
+   */
+  get loading(): boolean {
+    return this._loading;
+  }
+
+  set loading(value: boolean) {
+    this._loading = !!value;
+    this.applyLoading();
+  }
+
+  attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
+    if (name === 'loading') {
+      this.loading = newValue !== null;
+    }
+  }
 
 
   get data(): TableModelAndOptionsIf | undefined {
@@ -65,6 +93,7 @@ export class GuiexpertTable extends HTMLElement {
     // properties set before customElements.define() shadow the setters – re-apply them
     this.upgradeProperty('data');
     this.upgradeProperty('licenseKey');
+    this.upgradeProperty('loading');
     if (!this.tableScope && this._data) {
       this.createTable(this._data);
     }
@@ -121,18 +150,27 @@ export class GuiexpertTable extends HTMLElement {
       domService.setStyle(ele, "height", "100%");
       domService.setStyle(ele, "width", "100%");
       tableScope.firstInit();
+      this.applyLoading();
 
       dispatch("tableReady", tableScope.getApi());
     }
   }
 
   /** Releases the table (listeners, resize observer, cell renderers). */
+  private applyLoading() {
+    if (this._loading) {
+      this.tableScope?.showLoadingOverlay();
+    } else {
+      this.tableScope?.hideOverlay();
+    }
+  }
+
   private destroyTable() {
     this.tableScope?.destroy();
     this.tableScope = undefined;
   }
 
-  private upgradeProperty(prop: 'data' | 'licenseKey') {
+  private upgradeProperty(prop: 'data' | 'licenseKey' | 'loading') {
     const self = this as unknown as Record<string, unknown>;
     if (Object.prototype.hasOwnProperty.call(self, prop)) {
       const value = self[prop];

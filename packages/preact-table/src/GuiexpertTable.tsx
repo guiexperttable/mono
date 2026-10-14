@@ -32,6 +32,11 @@ export interface GuiexpertTableProps {
   licenseKey?: string,
   selectionChanged?: GeSelectionChangeEventFn;
   focusChanged?: GeFocusChangeEventFn;
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
+   * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.91
+   */
+  loading?: boolean;
 }
 
 
@@ -66,6 +71,9 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
     if (myContainer
       && (previousProps.tableModel !== this.props.tableModel || previousProps.tableOptions !== this.props.tableOptions)) {
       this.initTable(myContainer, this.props);
+    }
+    if (!!previousProps.loading !== !!this.props.loading) {
+      this.applyLoading(); // no re-creation of the table
     }
     if (this.props.licenseKey && this.props.licenseKey !== previousProps.licenseKey) {
       LicenseManager.getInstance().setLicenseKey(this.props.licenseKey);
@@ -103,9 +111,19 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
     );
     this.tableScope = tableScope;
     tableScope.firstInit();
+    this.applyLoading();
     props.tableReady?.(tableScope.getApi());
     if (props.licenseKey) LicenseManager.getInstance().setLicenseKey(props.licenseKey);
   };
+
+  /** Shows or hides the loading overlay according to the `loading` prop. */
+  private applyLoading() {
+    if (this.props.loading) {
+      this.tableScope?.showLoadingOverlay();
+    } else {
+      this.tableScope?.hideOverlay();
+    }
+  }
 
   /** Releases the table (listeners, resize observer, cell renderers). */
   private destroyTable() {

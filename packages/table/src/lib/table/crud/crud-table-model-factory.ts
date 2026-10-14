@@ -256,7 +256,14 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
   private whileLoading<R>(request: () => Promise<R>): Promise<R> {
     const tableScope = this.tableModel?.getTableScope();
     tableScope?.showLoadingOverlay();
-    return request().finally(() => tableScope?.hideOverlay());
+    const hide = () => tableScope?.hideOverlay();
+    return request().then(result => {
+      hide();
+      return result;
+    }, error => {
+      hide();
+      throw error;
+    });
   }
 
   private getIdKey(): string {

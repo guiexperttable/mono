@@ -10,7 +10,7 @@ import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -151,5 +151,32 @@ describe('GuiexpertTable (React)', () => {
     expect(apis.filter(api => !isDestroyed(api))).toHaveLength(1);
     expect(tableCount(host)).toBe(1);
     expect(rowTexts(host)).toHaveLength(5);
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.91)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const tableModel = createModel(5);
+    const tableOptions = new TableOptions();
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+    expect(tableReady.mock.calls[0][0].getOverlayState()).toBe('loading');
+
+    rerender(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading={false} />);
+    expect(overlayKind(host)).toBe('none');
+    rerender(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    expect(overlayKind(host)).toBe('loading');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+
+    // a new model re-creates the table – it still shows the overlay
+    rerender(<GuiexpertTable tableModel={createModel(2)} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    expect(tableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
+  });
+
+  it('an empty model shows "No rows to show" by itself (since 1.1.91)', async () => {
+    const host = mount(<GuiexpertTable tableModel={createModel(0)} />);
+    await nextFrame();
+    expect(overlayKind(host)).toBe('noRows');
   });
 });

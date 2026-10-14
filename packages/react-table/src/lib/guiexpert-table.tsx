@@ -34,6 +34,12 @@ export interface GuiexpertTableProps {
   focusChanged?: GeFocusChangeEventFn;
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it
+   * (`TableApi.showLoadingOverlay()` / `hideOverlay()`). Changing it does **not** re-create the table.
+   * Texts and behaviour: `tableOptions.overlayOptions`. @since 1.1.91
+   */
+  loading?: boolean,
 }
 
 /**
@@ -52,6 +58,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.tableReady] - The callback for when the table is ready.
  * @param {Function} [props.scroll] - The callback for scroll events.
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
+ * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.91).
  *
  * A new `tableModel` or `tableOptions` object (new reference) re-creates the table; the previous
  * table is released with `TableApi.destroy()`. Keep both stable with `useMemo` / `useState`,
@@ -67,6 +74,7 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
   } = props;
 
   const myContainer = useRef<HTMLDivElement>(null);
+  const apiRef = useRef<TableApi | undefined>(undefined);
 
   // Always call the latest callback props without re-creating the table.
   const propsRef = useRef<GuiexpertTableProps>(props);
@@ -96,10 +104,28 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       ele, tableModel, new SimpleDomService(), tableOptions ?? new TableOptions(), listener
     );
     tableScope.firstInit();
-    propsRef.current.tableReady?.(tableScope.getApi());
+    const api = tableScope.getApi();
+    apiRef.current = api;
+    if (propsRef.current.loading) {
+      api.showLoadingOverlay(); // a re-created table keeps showing the overlay
+    }
+    propsRef.current.tableReady?.(api);
 
-    return () => tableScope.destroy();
+    return () => {
+      apiRef.current = undefined;
+      tableScope.destroy();
+    };
   }, [tableModel, tableOptions]);
+
+  const loading = !!props.loading;
+  useEffect(() => {
+    const api = apiRef.current;
+    if (loading) {
+      api?.showLoadingOverlay();
+    } else {
+      api?.hideOverlay();
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (licenseKey) LicenseManager.getInstance().setLicenseKey(licenseKey);

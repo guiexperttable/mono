@@ -260,7 +260,7 @@ html[data-theme="dark"] .home-status-cancelled { color: #fda4af; }
 .home-compare tbody th { font-weight: 600; white-space: nowrap; }
 .home-compare td { color: var(--color-text-offset); }
 .home-compare .ours { background: rgb(236 72 153 / 0.08); color: var(--color-text); font-weight: 600; }
-.home-compare thead .ours { color: var(--color-primary); }
+.home-compare thead .ours { color: var(--color-primary); align-content: center}
 .home-compare figcaption { padding: 0.9rem 1rem 1rem; font-size: 0.88rem; line-height: 1.55; }
 .home-compare figcaption a { color: var(--color-secondary); }
 .home-compare figcaption a:hover { text-decoration: underline; }

@@ -3,6 +3,7 @@
 **Become a master at creating web applications with large tables.**
 UI-agnostic, high-performance data table for the browser – one core, wrappers for every major framework.
 Accessible: WAI-ARIA grid/treegrid for screen readers, full keyboard navigation, tested with axe-core (since 1.1.91).
+Built-in overlays "Loading…" (CSS spinner) and "No rows to show" / "No matching rows" – plain HTML/CSS (since 1.1.91).
 
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 

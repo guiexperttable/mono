@@ -158,6 +158,11 @@ Eigenschaften (RTL-Vorbereitung, Prompt 012). Klassen: `.ge-table-overlay`, `-vi
 
 ### 2.9 `CrudTableModelFactory`
 
+> **Umgesetzt anders als hier vorgeschlagen:** Das Feld `tableApi?` ist unnötig – die Factory erreicht die Tabelle
+> schon über `tableModel.getTableScope()`. Alle Anfragen (fetchItem, updateItem, createItem, deleteItem, Reload) laufen
+> durch `whileLoading()`; auch ein Fehler beendet das Overlay. Das erste `fetchList` bleibt ohne Overlay (keine Tabelle).
+
+
 Die Liste wird geladen, **bevor** es Modell und Tabelle gibt – für das erste Laden kann die Factory kein Overlay zeigen
 (es gibt keine Tabelle). Vorschlag:
 - neues optionales Feld `tableApi?: TableApi` (Anwender setzt es in `tableReady`); `reloadRows()` und die Aktionen
@@ -182,6 +187,7 @@ const tableApi = tableScope.getApi();
 tableApi.showLoadingOverlay();                 // Spinner + "Loading…", aria-busy
 const orders: Order[] = await (await fetch("/api/orders")).json();
 tableApi.setRows(orders);
+tableApi.repaintHard();                        // setRows zeichnet nicht selbst neu (Zeilenzahl geändert)
 tableApi.hideOverlay();                        // 0 Zeilen? → "No rows to show" erscheint von selbst
 ```
 Erwartung: zuerst Spinner über dem leeren Body, Header lesbar; danach Zeilen; bei leerer Antwort „No rows to show“.
@@ -258,3 +264,16 @@ Erwartet < 2 KB min. JS + ~1 KB CSS. Pro Frame ein `getRowCount()` und ein Vergl
 5. Default `blockInteractionWhileLoading: true`, `loadingDelayInMs: 0`, `autoNoRows: true` (Verhaltensänderung!).
 6. CRUD: Feld `tableApi?` für Reload/Aktionen; erstes Laden nur dokumentiert (§ 2.9).
 7. Kein neuer Showcase, kein neues Trainingskapitel; Video `videos/03-lade-spinner/`.
+
+## 9. Umsetzung (15.10.2026)
+
+| Punkt | Ergebnis |
+|---|---|
+| Dateien | `overlay/ge-overlay-kind.type.ts`, `overlay/calc-overlay-kind.ts` (reine Funktion), `overlay/table-overlay.ts` (`TableOverlay`, `@category Internals`), `data/options/overlay-options(.if).ts` |
+| Einbindung | `EleScope` legt das Overlay an und setzt die Geometrie in `adjustContainersAndRows`; `RenderScope.updateOverlay()` am Ende von `adjustAfterScrolling`; `TableScope.onOverlayChanged` (ARIA), Tastatur-Blockade in `onActionTriggered` (`TableScope.actionsBlockedWhileLoading`) |
+| Abweichungen | § 2.9 (kein `tableApi`-Feld); `getOverlayState()` = **gezeigtes** Overlay (während `loadingDelayInMs`: `"none"`, auch kein „No rows“-Aufblitzen); Maus-Blockade per `stopPropagation` am Overlay für click/dblclick/mousedown/mousemove/contextmenu (mouseup bleibt frei, damit ein Ziehen enden kann) |
+| Tests | Unit: `calc-overlay-kind`, `overlay-options`, `unfiltered-row-count`; Browser: `overlay/overlay.browser.spec.ts` (O1–O12 + Standalone), 4 CRUD-Fälle; Wrapper: React, Preact, Solid, Vue, Svelte 4/5, Web Component. Angular: nur Build 14–22 (kein Test-Setup, `TODO.md`) |
+| Abdeckung | `calc-overlay-kind` 100 %, `table-overlay` 98 % Zeilen / 93 % Zweige, `overlay-options` 100 % |
+| Größe | `dist/index.cjs` gzip 59,1 → 60,7 KB (+1,6 KB); CSS ~1 KB |
+| Doku | `instructions.md` 6.15, Angular-Doku § 2/§ 4, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`, typedoc-Kategorie „Overlays“, `docs:check` 310 Beispiele / 0 Fehler |
+

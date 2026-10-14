@@ -175,6 +175,7 @@ then
   list is loaded again (`fetchList`);
 - `DELETE`: `deleteItem(id)` → the row is removed.
 
+While a request runs, the table shows its loading overlay ([TableApi.showLoadingOverlay](TableApi.md#showloadingoverlay), since 1.1.91).
 A failed request is logged with `console.error`; the table stays unchanged.
 
 #### Parameters
@@ -193,7 +194,7 @@ A failed request is logged with `console.error`; the table stays unchanged.
 
 #### Defined in
 
-[src/lib/table/crud/crud-table-model-factory.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L165)
+[src/lib/table/crud/crud-table-model-factory.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L166)
 
 ___
 

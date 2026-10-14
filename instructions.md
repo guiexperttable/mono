@@ -931,6 +931,95 @@ pass the axe contrast check (since 1.1.91 the light star and progress bar colors
 VoiceOver + Safari – tab into the table, arrow through cells (row/column numbers and headers are announced), sort with
 Enter in the header, filter and copy (announcements), expand a tree node, open the editor with F2.
 
+### 6.15 Loading and empty table: overlays (since 1.1.91)
+
+Three overlays lie over the **body** (header and footer stay readable). They are plain HTML and CSS – the spinner is a
+CSS animation, no image, no library:
+
+| Overlay | When | Default text |
+|---|---|---|
+| `"loading"` | `tableApi.showLoadingOverlay()` until `tableApi.hideOverlay()` | `Loading…` |
+| `"noRows"` | the body has no rows (automatic), or `tableApi.showNoRowsOverlay()` | `No rows to show` |
+| `"noMatches"` | the body has rows, but `externalFilterFunction` hides all of them (automatic) | `No matching rows` |
+
+Loading data with `fetch`:
+
+```ts
+import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+
+interface Order { id: number; customer: string; total: number }
+
+async function showOrders(host: HTMLDivElement) {
+  const tableModel = TableFactory.createTableModel({ rows: [] as Order[], properties: ["id", "customer", "total"] });
+  const tableScope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  tableApi.showLoadingOverlay();            // spinner + "Loading…", aria-busy on the table
+  try {
+    const orders: Order[] = await (await fetch("/api/orders")).json();
+    tableApi.setRows(orders);
+    tableApi.repaintHard();                 // the row count changed
+  } finally {
+    tableApi.hideOverlay();                 // 0 rows? "No rows to show" appears by itself
+  }
+}
+```
+
+- `tableApi.hideOverlay()` ends only what the API showed. "No rows to show" / "No matching rows" describe the body and
+  stay as long as it is empty – switch them off with `overlayOptions: { autoNoRows: false }`.
+- `tableApi.getOverlayState()` returns `"none"`, `"loading"`, `"noRows"` or `"noMatches"`.
+- While loading, mouse and editing on the body are blocked (keyboard navigation and copying still work);
+  `blockInteractionWhileLoading: false` keeps the table usable under a semi-transparent layer.
+- "No matching rows" needs the optional `AreaModelIf.getUnfilteredRowCount()` (object arrays and trees have it). Own
+  area models without it get "No rows to show".
+
+Texts, delay and own content:
+
+```ts
+import type { GeOverlayKind, TableOptionsIf } from "@guiexpert/table";
+import { TableOptions } from "@guiexpert/table";
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  overlayOptions: {
+    loadingText: "Lädt…",
+    noRowsText: "Keine Bestellungen",
+    noMatchesText: "Keine Treffer",
+    loadingDelayInMs: 200,                  // fast answers show no spinner at all
+    getOverlayElement: (kind: GeOverlayKind, text: string) => {
+      if (kind !== "noRows") return undefined; // built-in content for the others
+      const div = document.createElement("div");
+      div.textContent = `📭 ${text}`;
+      return div;
+    },
+  },
+};
+```
+
+Texts are always written as text (never as HTML). The overlay is `aria-hidden`; screen readers hear the texts through
+the live region of the table (6.14), and the table has `aria-busy="true"` while loading. Put no buttons or links into
+an own overlay element.
+
+**Framework wrappers** have a `loading` prop that shows/hides the loading overlay **without** re-creating the table:
+
+```tsx
+<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} loading={isLoading} />   {/* React, Preact, Solid */}
+```
+```html
+<GuiexpertTable :tableModel="tableModel" :loading="isLoading" />                      <!-- Vue 3 -->
+<GuiexpertTable {tableModel} loading={isLoading} />                                   <!-- Svelte -->
+<guiexpert-table [tableModel]="tableModel" [loading]="isLoading"></guiexpert-table>   <!-- Angular -->
+<guiexpert-table loading></guiexpert-table>   <!-- Web Component: attribute or el.loading = true -->
+```
+
+**Look:** CSS variables `--ge-table-overlay-bg`, `--ge-table-overlay-color`, `--ge-table-spinner-color`,
+`--ge-table-spinner-track-color`, `--ge-table-spinner-size` (light and dark theme); classes `.ge-table-overlay`,
+`.ge-table-overlay-loading`, `.ge-table-overlay-no-rows`, `.ge-table-overlay-no-matches`, `.ge-table-spinner`,
+`.ge-table-overlay-text`. With `prefers-reduced-motion: reduce` the spinner does not turn.
+
+`CrudTableModelFactory` shows the loading overlay while its requests run (view, edit, clone, create, delete).
+
 ---
 
 ## 7. Not available yet

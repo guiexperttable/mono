@@ -105,10 +105,12 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [getHeaderFocus](TableApi.md#getheaderfocus)
 - [getLastFullVisibleRowIndex](TableApi.md#getlastfullvisiblerowindex)
 - [getLastVisibleRowIndex](TableApi.md#getlastvisiblerowindex)
+- [getOverlayState](TableApi.md#getoverlaystate)
 - [getSelectionModel](TableApi.md#getselectionmodel)
 - [getShortcutActionMapping](TableApi.md#getshortcutactionmapping)
 - [getTableModel](TableApi.md#gettablemodel)
 - [getTableScope](TableApi.md#gettablescope)
+- [hideOverlay](TableApi.md#hideoverlay)
 - [isColumnVisible](TableApi.md#iscolumnvisible)
 - [isFooterVisible](TableApi.md#isfootervisible)
 - [isHeaderVisible](TableApi.md#isheadervisible)
@@ -129,6 +131,8 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [setRowExpanded](TableApi.md#setrowexpanded)
 - [setRows](TableApi.md#setrows)
 - [setSelectionModel](TableApi.md#setselectionmodel)
+- [showLoadingOverlay](TableApi.md#showloadingoverlay)
+- [showNoRowsOverlay](TableApi.md#shownorowsoverlay)
 - [sort](TableApi.md#sort)
 - [sortByColumn](TableApi.md#sortbycolumn)
 - [triggerAction](TableApi.md#triggeraction)
@@ -153,7 +157,7 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 
 #### Defined in
 
-[src/lib/table/table-api.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L80)
+[src/lib/table/table-api.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L81)
 
 ## Properties
 
@@ -163,7 +167,7 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 
 #### Defined in
 
-[src/lib/table/table-api.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L81)
+[src/lib/table/table-api.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L82)
 
 ## Methods
 
@@ -210,7 +214,7 @@ tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:961](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L961)
+[src/lib/table/table-api.ts:1035](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1035)
 
 ___
 
@@ -251,7 +255,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:990](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L990)
+[src/lib/table/table-api.ts:1064](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1064)
 
 ___
 
@@ -292,7 +296,7 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 
 #### Defined in
 
-[src/lib/table/table-api.ts:709](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L709)
+[src/lib/table/table-api.ts:710](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L710)
 
 ___
 
@@ -316,7 +320,7 @@ Automatically resizes all columns to fit their content.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:863](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L863)
+[src/lib/table/table-api.ts:937](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L937)
 
 ___
 
@@ -347,7 +351,7 @@ tableApi.clearSelection();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:562](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L562)
+[src/lib/table/table-api.ts:563](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L563)
 
 ___
 
@@ -369,7 +373,7 @@ tableApi.collapseAll();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1279](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1279)
+[src/lib/table/table-api.ts:1353](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1353)
 
 ___
 
@@ -419,7 +423,7 @@ function onCopyButtonClick() {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:683](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L683)
+[src/lib/table/table-api.ts:684](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L684)
 
 ___
 
@@ -446,7 +450,7 @@ scope.firstInit();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:482](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L482)
+[src/lib/table/table-api.ts:483](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L483)
 
 ___
 
@@ -501,7 +505,7 @@ tableApi.downloadExcel('quarterly-data.xlsx');
 
 #### Defined in
 
-[src/lib/table/table-api.ts:761](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L761)
+[src/lib/table/table-api.ts:835](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L835)
 
 ___
 
@@ -543,7 +547,7 @@ tableApi.ensureRowIsVisible(rowIndex);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1398](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1398)
+[src/lib/table/table-api.ts:1472](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1472)
 
 ___
 
@@ -590,7 +594,7 @@ Implicitly may throw if rowIndex is not a number or if required properties are u
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1375](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1375)
+[src/lib/table/table-api.ts:1449](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1449)
 
 ___
 
@@ -613,7 +617,7 @@ document.querySelector("#expand")!.addEventListener("click", () => tableApi.expa
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1269](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1269)
+[src/lib/table/table-api.ts:1343](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1343)
 
 ___
 
@@ -669,7 +673,7 @@ TableScope.externalFilterChanged
 
 #### Defined in
 
-[src/lib/table/table-api.ts:216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L216)
+[src/lib/table/table-api.ts:217](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L217)
 
 ___
 
@@ -738,7 +742,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1175)
+[src/lib/table/table-api.ts:1249](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1249)
 
 ___
 
@@ -807,7 +811,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1122)
+[src/lib/table/table-api.ts:1196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1196)
 
 ___
 
@@ -863,7 +867,7 @@ const matchingRows = tableApi.findRows<Order>([{ ...orders[0] }], (a, b) => a.id
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1064](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1064)
+[src/lib/table/table-api.ts:1138](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1138)
 
 ___
 
@@ -882,7 +886,7 @@ The area model interface that provides access to the table's body data,
 
 #### Defined in
 
-[src/lib/table/table-api.ts:908](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L908)
+[src/lib/table/table-api.ts:982](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L982)
 
 ___
 
@@ -905,7 +909,7 @@ applying any filtering, pagination, or other visibility constraints.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1411](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1411)
+[src/lib/table/table-api.ts:1485](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1485)
 
 ___
 
@@ -945,7 +949,7 @@ const isRowFullyVisible = (rowIndex: number) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1474)
+[src/lib/table/table-api.ts:1548](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1548)
 
 ___
 
@@ -989,7 +993,7 @@ if (firstVisibleIndex >= 0) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1446](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1446)
+[src/lib/table/table-api.ts:1520](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1520)
 
 ___
 
@@ -1023,7 +1027,7 @@ if (headerFocus) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:728](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L728)
+[src/lib/table/table-api.ts:802](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L802)
 
 ___
 
@@ -1065,7 +1069,7 @@ if (rowIndex > lastVisibleRowIndex) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1538](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1538)
+[src/lib/table/table-api.ts:1612](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1612)
 
 ___
 
@@ -1111,7 +1115,38 @@ console.log(`Visible rows: ${visibleRowsRange.first} to ${visibleRowsRange.last}
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1506](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1506)
+[src/lib/table/table-api.ts:1580](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1580)
+
+___
+
+### getOverlayState
+
+▸ **getOverlayState**(): [`GeOverlayKind`](../modules.md#geoverlaykind)
+
+The overlay shown now: `"none"`, `"loading"`, `"noRows"` or `"noMatches"`. During
+[OverlayOptionsIf.loadingDelayInMs](../interfaces/OverlayOptionsIf.md#loadingdelayinms) the loading overlay is requested but not shown yet (`"none"`).
+
+#### Returns
+
+[`GeOverlayKind`](../modules.md#geoverlaykind)
+
+the shown overlay
+
+**`Example`**
+
+```ts
+if (tableApi.getOverlayState() === "noMatches") {
+  resetFilterButton.hidden = false;
+}
+```
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/table-api.ts:783](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L783)
 
 ___
 
@@ -1165,7 +1200,7 @@ selectionModel?.addEventSelectionChangedListener({
 
 #### Defined in
 
-[src/lib/table/table-api.ts:849](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L849)
+[src/lib/table/table-api.ts:923](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L923)
 
 ___
 
@@ -1213,7 +1248,7 @@ Object.entries(shortcuts).forEach(([key, actionId]) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:643](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L643)
+[src/lib/table/table-api.ts:644](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L644)
 
 ___
 
@@ -1232,7 +1267,7 @@ The table model interface that provides access to the table's data structure,
 
 #### Defined in
 
-[src/lib/table/table-api.ts:898](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L898)
+[src/lib/table/table-api.ts:972](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L972)
 
 ___
 
@@ -1269,7 +1304,36 @@ tableScope.contextmenu(geMouseEvent);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:806](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L806)
+[src/lib/table/table-api.ts:880](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L880)
+
+___
+
+### hideOverlay
+
+▸ **hideOverlay**(): `void`
+
+Ends the overlay shown by [showLoadingOverlay](TableApi.md#showloadingoverlay) or [showNoRowsOverlay](TableApi.md#shownorowsoverlay).
+"No rows to show" / "No matching rows" are not ended: they show the state of the body and stay as long as it
+is empty (switch them off with `overlayOptions: { autoNoRows: false }`).
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+tableApi.showLoadingOverlay("Saving…");
+save(order).finally(() => tableApi.hideOverlay());
+```
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/table-api.ts:767](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L767)
 
 ___
 
@@ -1302,7 +1366,7 @@ if (!tableApi.isColumnVisible("category")) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:380](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L380)
+[src/lib/table/table-api.ts:381](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L381)
 
 ___
 
@@ -1326,7 +1390,7 @@ const footerShown = tableApi.isFooterVisible();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:431](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L431)
+[src/lib/table/table-api.ts:432](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L432)
 
 ___
 
@@ -1350,7 +1414,7 @@ const headerShown = tableApi.isHeaderVisible();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:401](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L401)
+[src/lib/table/table-api.ts:402](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L402)
 
 ___
 
@@ -1408,7 +1472,7 @@ if (!tableApi.isLoggingActive()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1631](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1631)
+[src/lib/table/table-api.ts:1705](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1705)
 
 ___
 
@@ -1440,7 +1504,7 @@ tableApi.reSort();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1258](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1258)
+[src/lib/table/table-api.ts:1332](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1332)
 
 ___
 
@@ -1462,7 +1526,7 @@ Recalculates the column widths of the table.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:539](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L539)
+[src/lib/table/table-api.ts:540](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L540)
 
 ___
 
@@ -1484,7 +1548,7 @@ It ensures that all wrapper elements are properly sized to match their content.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:876](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L876)
+[src/lib/table/table-api.ts:950](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L950)
 
 ___
 
@@ -1524,7 +1588,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1020](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1020)
+[src/lib/table/table-api.ts:1094](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1094)
 
 ___
 
@@ -1573,7 +1637,7 @@ tableApi.repaint();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:465](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L465)
+[src/lib/table/table-api.ts:466](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L466)
 
 ___
 
@@ -1636,7 +1700,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:527](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L527)
+[src/lib/table/table-api.ts:528](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L528)
 
 ___
 
@@ -1692,7 +1756,7 @@ tableApi.scrollToIndex(3, tableApi.getFirstVisibleRowIndex());
 
 #### Defined in
 
-[src/lib/table/table-api.ts:306](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L306)
+[src/lib/table/table-api.ts:307](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L307)
 
 ___
 
@@ -1772,7 +1836,7 @@ class TableScroller {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L270)
+[src/lib/table/table-api.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L271)
 
 ___
 
@@ -1826,7 +1890,7 @@ tableApi.getTableModel().getColumnDefs()?.forEach((columnDef, index) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:364](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L364)
+[src/lib/table/table-api.ts:365](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L365)
 
 ___
 
@@ -1851,7 +1915,7 @@ Sets the width of a specific column in the table.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:888](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L888)
+[src/lib/table/table-api.ts:962](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L962)
 
 ___
 
@@ -1884,7 +1948,7 @@ tableApi.setFooterVisible(!!tableOptions.externalFilterFunction);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:419](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L419)
+[src/lib/table/table-api.ts:420](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L420)
 
 ___
 
@@ -1925,7 +1989,7 @@ document.querySelector("#toggle-header")!.addEventListener("click", () =>
 
 #### Defined in
 
-[src/lib/table/table-api.ts:329](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L329)
+[src/lib/table/table-api.ts:330](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L330)
 
 ___
 
@@ -1989,7 +2053,7 @@ if (!tableApi.isLoggingActive()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1585](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1585)
+[src/lib/table/table-api.ts:1659](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1659)
 
 ___
 
@@ -2021,7 +2085,7 @@ tableApi.setRowExpanded(0, true);   // expand the first row
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1294](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1294)
+[src/lib/table/table-api.ts:1368](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1368)
 
 ___
 
@@ -2060,7 +2124,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:928](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L928)
+[src/lib/table/table-api.ts:1002](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1002)
 
 ___
 
@@ -2101,7 +2165,90 @@ tableApi.repaint(); // Now repaint once
 
 #### Defined in
 
-[src/lib/table/table-api.ts:594](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L594)
+[src/lib/table/table-api.ts:595](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L595)
+
+___
+
+### showLoadingOverlay
+
+▸ **showLoadingOverlay**(`text?`): `void`
+
+Shows "Loading…" with a CSS spinner over the body – e.g. while a server answers. The header and footer stay
+readable; rows already shown stay visible under a semi-transparent layer. By default mouse and editing on the
+body are blocked until [hideOverlay](TableApi.md#hideoverlay) ([OverlayOptionsIf.blockInteractionWhileLoading](../interfaces/OverlayOptionsIf.md#blockinteractionwhileloading)).
+Screen readers: the host gets `aria-busy="true"`, the text is announced.
+
+Texts, delay and own content: [TableOptionsIf.overlayOptions](../interfaces/TableOptionsIf.md#overlayoptions). Framework wrappers have a `loading` prop
+that calls this method (no re-creation of the table).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `text?` | `string` | text for this overlay only, e.g. `"Saving…"`; default [OverlayOptionsIf.loadingText](../interfaces/OverlayOptionsIf.md#loadingtext) |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+tableApi.showLoadingOverlay();
+fetch("/api/orders")
+  .then(response => response.json())
+  .then((orders: object[]) => {
+    tableApi.setRows(orders);
+    tableApi.repaintHard();
+  })
+  .finally(() => tableApi.hideOverlay()); // 0 rows? "No rows to show" appears by itself
+```
+
+**`Since`**
+
+1.1.91
+
+**`See`**
+
+Training: [Live data](https://gui.expert/training/live-data/)
+
+#### Defined in
+
+[src/lib/table/table-api.ts:737](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L737)
+
+___
+
+### showNoRowsOverlay
+
+▸ **showNoRowsOverlay**(`text?`): `void`
+
+Shows the "no rows" overlay, also over rows – e.g. when the server says "no permission". An empty body shows
+"No rows to show" anyway ([OverlayOptionsIf.autoNoRows](../interfaces/OverlayOptionsIf.md#autonorows)); this method is for other cases.
+Ends with [hideOverlay](TableApi.md#hideoverlay).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `text?` | `string` | text for this overlay only; default [OverlayOptionsIf.noRowsText](../interfaces/OverlayOptionsIf.md#norowstext) |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+tableApi.showNoRowsOverlay("You may not see these orders");
+```
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/table-api.ts:752](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L752)
 
 ___
 
@@ -2178,7 +2325,7 @@ tableApi.sort((a: TreeRowIf<OrderNode>, b: TreeRowIf<OrderNode>) => b.data.total
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1348](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1348)
+[src/lib/table/table-api.ts:1422](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1422)
 
 ___
 
@@ -2210,7 +2357,7 @@ document.querySelector("#by-total")!.addEventListener("click", () => tableApi.so
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1239)
+[src/lib/table/table-api.ts:1313](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1313)
 
 ___
 
@@ -2233,7 +2380,7 @@ This function can be invoked programmatically.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:606](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L606)
+[src/lib/table/table-api.ts:607](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L607)
 
 ___
 
@@ -2331,7 +2478,7 @@ animateCell();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L168)
+[src/lib/table/table-api.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L169)
 
 ___
 
@@ -2372,4 +2519,4 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1208)
+[src/lib/table/table-api.ts:1282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1282)

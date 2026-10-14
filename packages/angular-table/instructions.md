@@ -44,7 +44,7 @@ The table fills its host element – give it a height:
 | Class | `TableComponent` |
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
-| Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms) |
+| Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.91: loading overlay, no re-creation) |
 | Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`) |
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
@@ -133,6 +133,43 @@ export class PersonTableComponent implements OnInit {
   }
 }
 ```
+
+**With a loading overlay (since 1.1.91):** create the (empty) model at once and let the `loading` input show the
+spinner – the table is not re-created when `loading` changes; an empty answer shows "No rows to show" by itself.
+
+```ts
+import { Component, OnInit, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { TableComponent } from "@guiexpert/angular-table";
+import { TableApi, TableFactory, TableOptions } from "@guiexpert/table";
+
+interface PersonIf { id: number; firstName: string; lastName: string; }
+
+@Component({
+  selector: "app-person-loading-table",
+  standalone: true,
+  imports: [TableComponent],
+  template: `<guiexpert-table class="table-div" [tableModel]="tableModel" [tableOptions]="tableOptions"
+                [loading]="loading" (tableReady)="tableApi = $event" />`
+})
+export class PersonLoadingTableComponent implements OnInit {
+  private readonly http = inject(HttpClient);
+  readonly tableModel = TableFactory.createTableModel({ rows: [] as PersonIf[], properties: ["id", "firstName", "lastName"] });
+  readonly tableOptions = { ...new TableOptions(), overlayOptions: { noRowsText: "No persons" } };
+  loading = true;
+  tableApi?: TableApi;
+
+  ngOnInit(): void {
+    this.http.get<PersonIf[]>("/assets/persons.json").subscribe(rows => {
+      this.tableApi?.setRows(rows);
+      this.tableApi?.repaintHard();
+      this.loading = false;
+    });
+  }
+}
+```
+
+Texts, delay and own content: `tableOptions.overlayOptions` (see the developer guide, section 6.15).
 
 ---
 

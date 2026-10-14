@@ -31,6 +31,7 @@
 ## Notes
 - Designed for large tables and performance-first use cases.
 - Accessible: WAI-ARIA grid/treegrid for screen readers, full keyboard navigation, announcements via a live region, checked with axe-core (WCAG 2.1 AA) – since 1.1.91.
+- Overlays "Loading…" (CSS spinner, tableApi.showLoadingOverlay(), `loading` prop in every wrapper) and "No rows to show" / "No matching rows" – plain HTML/CSS, no library – since 1.1.91.
 - Components are framework‑agnostic; core stays consistent across ecosystems.
 - Repository is actively maintained as of mid‑2025.
 

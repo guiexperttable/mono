@@ -86,6 +86,7 @@ html, html[data-theme="light"] {
 
   /* Overlays "Loading…" / "No rows" (since 1.1.91) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
+  --ge-table-overlay-content-bg: #fff;
   --ge-table-overlay-color: #333;
   --ge-table-spinner-color: #1a73e8;
   --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
@@ -166,7 +167,8 @@ html[data-theme="dark"] {
   --ge-table-color-progress-bar: #36BB6C;
 
   /* Overlays "Loading…" / "No rows" (since 1.1.91) */
-  --ge-table-overlay-bg: rgba(30, 30, 30, 0.7);
+  --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
+  --ge-table-overlay-content-bg: #1f2937;
   --ge-table-overlay-color: #ddd;
   --ge-table-spinner-color: #8ab4f8;
   --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);

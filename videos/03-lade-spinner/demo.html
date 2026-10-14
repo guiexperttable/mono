@@ -1,0 +1,69 @@
+<!doctype html>
+<!--
+  Recording page for episode 03 "Lade-Spinner und leere Tabelle – ohne Library, nur CSS".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/03-lade-spinner/demo.html
+  Runs the code of snippet.ts (plain JS); fetch("/api/orders") is replaced by a 1.5 s timer – no server needed.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Lade-Spinner</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button, .bar input { font: inherit; padding: 4px 12px; }
+    .table-div { height: calc(100vh - 140px); margin: 0 16px; font-size: 17px; }
+  </style>
+</head>
+<body>
+<h1>Bestellungen</h1>
+<div class="bar">
+  <button id="load">Laden</button>
+  <button id="empty">Laden – leere Antwort</button>
+  <label>Kunde <input id="filter" type="search" placeholder="z. B. 42"></label>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+
+  let filterText = "";
+  const orders = Array.from({ length: 100_000 }, (_, i) => ({ id: i + 1, kunde: `Kunde ${i % 997}`, summe: i % 1000 }));
+  const fakeFetch = (rows) => new Promise(resolve => setTimeout(() => resolve(rows), 1500)); // fetch("/api/orders")
+
+  // --- code of snippet.ts ---
+  const tableModel = TableFactory.createTableModel({ rows: [], properties: ["id", "kunde", "summe"] });
+  const tableOptions = {
+    ...new TableOptions(),
+    overlayOptions: { loadingText: "Lädt…", noRowsText: "Noch keine Bestellungen", noMatchesText: "Keine Treffer" },
+    externalFilterFunction: row => !filterText || row.kunde.endsWith(" " + filterText),
+  };
+  const host = document.querySelector(".table-div");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  scope.firstInit();
+  const tableApi = scope.getApi();
+
+  async function load(answer) {
+    tableApi.showLoadingOverlay("Lädt…");
+    const rows = await fakeFetch(answer);
+    tableApi.setRows(rows);
+    tableApi.repaintHard();
+    tableApi.hideOverlay();
+  }
+  // ---
+
+  document.querySelector("#load").addEventListener("click", () => load(orders));
+  document.querySelector("#empty").addEventListener("click", () => load([]));
+  document.querySelector("#filter").addEventListener("input", e => {
+    filterText = e.target.value.trim();
+    tableApi.externalFilterChanged();
+  });
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

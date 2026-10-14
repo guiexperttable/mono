@@ -179,9 +179,11 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   am Ende von `RenderScope.adjustAfterScrolling` → `calcOverlayKind`; DOM nur bei Änderung). `api.showLoadingOverlay(text?)`,
   `showNoRowsOverlay(text?)`, `hideOverlay()` (beendet nur Manuelles), `getOverlayState()` = `"none" | "loading" | "noRows"
   | "noMatches"`. Leerer Body → automatisch „No rows to show“, Filter blendet alles aus → „No matching rows“ (über das
-  optionale `AreaModelIf.getUnfilteredRowCount()`). „Loading“ blockiert per Default Maus (stopPropagation am Overlay) und
-  `START_EDITING`/`TOGGLE_SELECTION`/`ACTIVATE_CELL`. ARIA: Overlay `aria-hidden`, Host `aria-busy`, Texte über die
-  Live-Region. Wrapper: Prop `loading` (kein Neuaufbau, nach Neuaufbau erneut angewendet).
+  optionale `AreaModelIf.getUnfilteredRowCount()`). „Loading“ blockiert per Default Maus (`MouseHandler` ignoriert Events auf dem
+  Overlay – `TableOverlay.isEventBlocked`, die Seite sieht sie weiter; z-index 10000 über dem Fokusrahmen) und im Body
+  `START_EDITING`/`TOGGLE_SELECTION`/`ACTIVATE_CELL` (Header bleibt bedienbar). ARIA: Overlay `aria-hidden`, Host `aria-busy`, Texte über die
+  Live-Region. Wrapper: Prop `loading` (kein Neuaufbau, nach Neuaufbau erneut angewendet; `false` blendet nur aus, was die Prop
+  eingeblendet hat – ein eigenes Overlay der App aus `tableReady` bleibt).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -283,8 +285,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.520 Tests) |
-  | `test:browser` | echtes Chromium, ~460 Tests in 19 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.535 Tests) |
+  | `test:browser` | echtes Chromium, ~475 Tests in 19 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt

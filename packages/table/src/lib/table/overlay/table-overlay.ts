@@ -25,9 +25,6 @@ const KIND_CLASSES: { [K in GeOverlayKind]: string } = {
   noMatches: "ge-table-overlay-no-matches",
 };
 
-/** Mouse events a blocking overlay keeps away from the table (mouseup is not blocked: a drag must be able to end). */
-const BLOCKED_MOUSE_EVENTS = ["click", "dblclick", "mousedown", "mousemove", "contextmenu"];
-
 /**
  * The overlay layer over the table body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows".
  * One element per table (`.ge-table-overlay`, a child of the host, `aria-hidden` – the table announces the texts
@@ -64,7 +61,6 @@ export class TableOverlay {
   private shownBlocking = false;
   private bounds = "";
   private destroyed = false;
-  private readonly abortController = new AbortController();
 
   /**
    * @param {HTMLDivElement} hostElement - the table host; the overlay is appended to it
@@ -84,15 +80,6 @@ export class TableOverlay {
     dom.setAriaHidden(this.element);
     dom.applyDisplayNoneStyle(this.element);
     this.contentElement = dom.createDivWithClass("ge-table-overlay-content", this.element);
-
-    const signal = this.abortController.signal;
-    for (const type of BLOCKED_MOUSE_EVENTS) {
-      this.element.addEventListener(type, evt => {
-        if (this.shownBlocking) {
-          evt.stopPropagation(); // the table's mouse handler (on the host) never sees it
-        }
-      }, { signal });
-    }
   }
 
   /**
@@ -151,6 +138,18 @@ export class TableOverlay {
   }
 
   /**
+   * `true` for a mouse event on a blocking loading overlay: the table ignores it (click, double click, mouse down,
+   * context menu, hover). The event is not stopped – page handlers (e.g. "click outside closes the menu") see it.
+   *
+   * @param {Event} evt - a mouse event that reached the host
+   * @returns {boolean} the table must not react to it
+   */
+  isEventBlocked(evt: Event): boolean {
+    const target = evt.target;
+    return this.shownBlocking && target instanceof Node && this.element.contains(target);
+  }
+
+  /**
    * Shows the overlay that fits the body: a requested one, else "no matching rows" / "no rows to show"
    * for an empty body. Changes the DOM only if the result differs from what is shown.
    *
@@ -162,9 +161,11 @@ export class TableOverlay {
     if (this.destroyed) {
       return undefined;
     }
+    const autoNoRows = this.options.autoNoRows;
     const kind: GeOverlayKind = this.delayTimeout
-      ? "none" // waiting for the delayed spinner: show nothing (no "no rows" flash)
-      : calcOverlayKind({ manual: this.manual?.kind, rowCount, unfilteredRowCount, autoNoRows: this.options.autoNoRows });
+      // waiting for the delayed spinner: keep the automatic overlay ("no rows" stays, no flicker if the answer is fast)
+      ? calcOverlayKind({ rowCount, unfilteredRowCount, autoNoRows })
+      : calcOverlayKind({ manual: this.manual?.kind, rowCount, unfilteredRowCount, autoNoRows });
     const text = this.getText(kind);
     const blocking = kind === "loading" && this.options.blockInteractionWhileLoading;
     if (kind === this.shownKind && text === this.shownText && blocking === this.shownBlocking) {
@@ -192,14 +193,13 @@ export class TableOverlay {
     });
   }
 
-  /** Removes the overlay element, its listeners and a waiting delay. Calling it twice is harmless. */
+  /** Removes the overlay element and a waiting delay. Calling it twice is harmless. */
   destroy(): void {
     if (this.destroyed) {
       return;
     }
     this.destroyed = true;
     this.clearDelay();
-    this.abortController.abort();
     this.contentElement.replaceChildren(); // own elements of getOverlayElement are detached
     this.element.remove();
     this.manual = undefined;
@@ -234,7 +234,7 @@ export class TableOverlay {
     } else {
       dom.addClass(`ge-table-overlay-visible ${KIND_CLASSES[kind]}`, ele);
       dom.setStyle(ele, "display", "flex");
-      const own = this.options.getOverlayElement?.(kind, text);
+      const own = this.getOwnElement(kind, text);
       if (own) {
         dom.domService.appendChild(this.contentElement, own);
       } else {
@@ -253,6 +253,16 @@ export class TableOverlay {
     this.shownKind = kind;
     this.shownText = text;
     this.shownBlocking = blocking;
+  }
+
+  /** The element of {@link OverlayOptionsIf.getOverlayElement}; an error falls back to the built-in content. */
+  private getOwnElement(kind: GeOverlayKind, text: string): HTMLElement | undefined {
+    try {
+      return this.options.getOverlayElement?.(kind, text);
+    } catch (error) {
+      console.error("TableOverlay: getOverlayElement failed, the built-in content is shown", error);
+      return undefined;
+    }
   }
 
   private clearDelay(): void {

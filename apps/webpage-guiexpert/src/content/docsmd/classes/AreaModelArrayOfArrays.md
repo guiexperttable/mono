@@ -52,6 +52,7 @@ Represents a model for an area containing a two-dimensional array of data.
 - [getRowspanAt](AreaModelArrayOfArrays.md#getrowspanat)
 - [getTextValueAt](AreaModelArrayOfArrays.md#gettextvalueat)
 - [getTooltipAt](AreaModelArrayOfArrays.md#gettooltipat)
+- [getUnfilteredRowCount](AreaModelArrayOfArrays.md#getunfilteredrowcount)
 - [getValueAt](AreaModelArrayOfArrays.md#getvalueat)
 - [getYPosByRowIndex](AreaModelArrayOfArrays.md#getyposbyrowindex)
 - [init](AreaModelArrayOfArrays.md#init)
@@ -311,7 +312,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L69)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L79)
 
 ___
 
@@ -551,7 +552,7 @@ The constant row height or `undefined`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L64)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L74)
 
 ___
 
@@ -810,7 +811,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L50)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L60)
 
 ___
 
@@ -913,7 +914,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L54)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L64)
 
 ___
 
@@ -1073,6 +1074,28 @@ getTooltipAt(rowIndex: number, columnIndex: number): any {
 
 ___
 
+### getUnfilteredRowCount
+
+▸ **getUnfilteredRowCount**(): `number`
+
+The number of all rows, without the external filter.
+
+#### Returns
+
+`number`
+
+the length of the array
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L43)
+
+___
+
 ### getValueAt
 
 ▸ **getValueAt**(`rowIndex`, `columnIndex`): `any`
@@ -1133,7 +1156,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L37)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L47)
 
 ___
 
@@ -1630,7 +1653,7 @@ setValue(rowIndex: number, columnIndex: number, value: any): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L41)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L51)
 
 ___
 

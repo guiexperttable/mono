@@ -228,6 +228,23 @@ export class EleScope {
   }
 
   /**
+   * Gives an ARIA attribute of the host back the value it had before the table changed it (e.g. `aria-busy` after
+   * loading), or removes it if the host had none.
+   *
+   * @since 1.1.91
+   */
+  protected restoreHostAriaAttribute(key: string): void {
+    const before = this.hostAttributesBefore.get(key) ?? null;
+    if (before === null) {
+      if (this.hostElement.hasAttribute(key)) {
+        this.dom.removeAttribute(this.hostElement, key);
+      }
+    } else if (this.hostElement.getAttribute(key) !== before) {
+      this.dom.setAttribute(this.hostElement, key, before);
+    }
+  }
+
+  /**
    * Removes the ARIA attributes the table has set on the host element (see {@link initHostAria}).
    *
    * @since 1.1.91

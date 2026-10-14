@@ -190,4 +190,13 @@ describe('GuiexpertTable (Solid)', () => {
     expect(tableReady).toHaveBeenCalledTimes(2);
     expect(overlayKind(host)).toBe('loading');
   });
+
+  it('an overlay the app shows in tableReady is not hidden by the loading prop (since 1.1.91)', async () => {
+    const host = createHost();
+    disposers.push(render(() => (
+      <GuiexpertTable tableModel={createModel(5)} tableReady={api => api.showLoadingOverlay()} />
+    ), host));
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+  });
 });

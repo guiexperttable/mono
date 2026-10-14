@@ -73,8 +73,9 @@ ___
 
 • **blockInteractionWhileLoading**: `boolean` = `true`
 
-`true` (default): while "Loading…" is shown, mouse events on the body (click, double click, hover, context
-menu) are blocked and the keyboard cannot start editing or toggle rows; navigation and copying still work.
+`true` (default): while "Loading…" is shown, the table ignores mouse events on the body (click, double click,
+hover, context menu – the page still sees them) and the keyboard cannot start editing or toggle rows in the body;
+navigation, copying and the header still work.
 `false`: the loading overlay is only a picture, the table stays usable.
 "No rows" / "No matching rows" never block.
 
@@ -122,7 +123,7 @@ ___
 • **loadingDelayInMs**: `number` = `0`
 
 Waits this long (ms) before the loading overlay appears. Answers that come faster show no spinner at all
-(no flashing). Default: `0` (right away).
+(no flashing); meanwhile an automatic "No rows to show" stays as it is. Default: `0` (right away).
 
 #### Implementation of
 

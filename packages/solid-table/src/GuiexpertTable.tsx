@@ -55,11 +55,14 @@ export default (props: GuiexpertTableProps) => {
   };
 
   let currentScope: TableScope | undefined;
+  let shownByProp = false; // loading={false} hides only an overlay the prop showed (not one of the app)
   const applyLoading = (loading: boolean) => {
     if (loading) {
       currentScope?.showLoadingOverlay();
-    } else {
+      shownByProp = true;
+    } else if (shownByProp) {
       currentScope?.hideOverlay();
+      shownByProp = false;
     }
   };
 
@@ -78,6 +81,7 @@ export default (props: GuiexpertTableProps) => {
       );
       scope.firstInit();
       currentScope = scope;
+      shownByProp = false;
       applyLoading(!!merged.loading); // a re-created table keeps showing the overlay
       emit("tableReady", scope.getApi(), merged.tableReady);
       return scope;

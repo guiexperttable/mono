@@ -57,6 +57,7 @@ Represents a store for HTML elements.
 - [initHostAria](EleScope.md#inithostaria)
 - [removeHostAria](EleScope.md#removehostaria)
 - [resetSizeOfWrapperDiv](EleScope.md#resetsizeofwrapperdiv)
+- [restoreHostAriaAttribute](EleScope.md#restorehostariaattribute)
 - [setHostAriaAttribute](EleScope.md#sethostariaattribute)
 - [updateOverlay](EleScope.md#updateoverlay)
 
@@ -415,7 +416,7 @@ This method must be overwritten in child classes.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:432](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L432)
+[src/lib/table/ele-scope.ts:449](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L449)
 
 ___
 
@@ -431,7 +432,7 @@ Adjusts the containers and rows of the table based on the current state.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L282)
+[src/lib/table/ele-scope.ts:299](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L299)
 
 ___
 
@@ -454,7 +455,7 @@ The element that holds the rows of an area (`DivScope.child`).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:267](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L267)
+[src/lib/table/ele-scope.ts:284](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L284)
 
 ___
 
@@ -475,7 +476,7 @@ and description from the table options. Counts and the active cell follow with e
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:252](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L252)
+[src/lib/table/ele-scope.ts:269](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L269)
 
 ___
 
@@ -495,7 +496,7 @@ Removes the ARIA attributes the table has set on the host element (see [initHost
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L235)
+[src/lib/table/ele-scope.ts:252](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L252)
 
 ___
 
@@ -513,7 +514,34 @@ Returns nothing.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L443)
+[src/lib/table/ele-scope.ts:460](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L460)
+
+___
+
+### restoreHostAriaAttribute
+
+▸ **restoreHostAriaAttribute**(`key`): `void`
+
+Gives an ARIA attribute of the host back the value it had before the table changed it (e.g. `aria-busy` after
+loading), or removes it if the host had none.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `key` | `string` |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L236)
 
 ___
 

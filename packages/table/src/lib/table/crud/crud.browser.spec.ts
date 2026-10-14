@@ -410,6 +410,29 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(renderedRows(host)).toHaveLength(2);
   });
 
+  it('two requests at the same time: "Loading…" until both have answered (since 1.1.91)', async () => {
+    const first = pending<unknown>();
+    const second = pending<unknown>();
+    const { api, factory } = await createCrudTable(({ deleteItem }) =>
+      deleteItem.mockImplementationOnce(() => first.promise).mockImplementationOnce(() => second.promise));
+    // by code (a second click would hit the blocking overlay)
+    factory.onActionEvent(new ActionEvent('DELETE', 'body', factory.bodyModel!, 0, 3, '1'));
+    factory.onActionEvent(new ActionEvent('DELETE', 'body', factory.bodyModel!, 1, 3, '2'));
+    first.resolve(undefined);
+    await new Promise(r => setTimeout(r, 20));
+    expect(api.getOverlayState()).toBe('loading');
+    second.resolve(undefined);
+    await vi.waitFor(() => expect(api.getOverlayState()).toBe('noRows')); // both rows deleted: empty table
+  });
+
+  it('a request that throws at once does not leave the overlay on (since 1.1.91)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { host, api } = await createCrudTable(({ deleteItem }) => deleteItem.mockImplementation(() => { throw new Error('sync'); }));
+    await userEvent.click(actionLink(host, 0, 'DELETE'));
+    await vi.waitFor(() => expect(console.error).toHaveBeenCalled());
+    expect(api.getOverlayState()).toBe('none');
+  });
+
   it('CREATE without the item in the response: "Loading…" until the list is loaded again (since 1.1.91)', async () => {
     const reload = pending<Item[]>();
     const { api, factory, fetchList } = await createCrudTable();

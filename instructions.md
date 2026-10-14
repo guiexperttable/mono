@@ -969,7 +969,8 @@ async function showOrders(host: HTMLDivElement) {
 - `tableApi.hideOverlay()` ends only what the API showed. "No rows to show" / "No matching rows" describe the body and
   stay as long as it is empty – switch them off with `overlayOptions: { autoNoRows: false }`.
 - `tableApi.getOverlayState()` returns `"none"`, `"loading"`, `"noRows"` or `"noMatches"`.
-- While loading, mouse and editing on the body are blocked (keyboard navigation and copying still work);
+- While loading, the table ignores mouse events and editing on the body (keyboard navigation, copying and the header
+  still work; the page still gets the clicks, e.g. for "click outside closes the menu");
   `blockInteractionWhileLoading: false` keeps the table usable under a semi-transparent layer.
 - "No matching rows" needs the optional `AreaModelIf.getUnfilteredRowCount()` (object arrays and trees have it). Own
   area models without it get "No rows to show".
@@ -1001,7 +1002,9 @@ Texts are always written as text (never as HTML). The overlay is `aria-hidden`; 
 the live region of the table (6.14), and the table has `aria-busy="true"` while loading. Put no buttons or links into
 an own overlay element.
 
-**Framework wrappers** have a `loading` prop that shows/hides the loading overlay **without** re-creating the table:
+**Framework wrappers** have a `loading` prop that shows/hides the loading overlay **without** re-creating the table.
+`loading={false}` only ends an overlay the prop showed – one your code shows with `tableApi.showLoadingOverlay()` (e.g. in
+`tableReady`) stays until your `hideOverlay()`:
 
 ```tsx
 <GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} loading={isLoading} />   {/* React, Preact, Solid */}

@@ -196,16 +196,22 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
         this.elementRef.nativeElement, this.tableModel, this.domService, this.tableOptions, this
       );
       this.tableScope.firstInit();
+      this.shownByInput = false;
       this.applyLoading();
       this.tableReady.next(this.tableScope.getApi());
     }
   }
 
+  /** the overlay was shown by the `loading` input: `false` hides only that one (not one the app showed itself) */
+  private shownByInput = false;
+
   private applyLoading() {
     if (this.loading) {
       this.tableScope?.showLoadingOverlay();
-    } else {
+      this.shownByInput = true;
+    } else if (this.shownByInput) {
       this.tableScope?.hideOverlay();
+      this.shownByInput = false;
     }
   }
 

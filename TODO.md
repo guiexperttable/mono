@@ -506,7 +506,7 @@ Objekt-Tabelle hat `ge-focused-row`.
 
 - **Overlays (002)**: Eine Tabelle mit leerem Body zeigt jetzt „No rows to show“ (bzw. „No matching rows“, wenn der
   Filter alle Zeilen ausblendet) – abschaltbar mit `overlayOptions: { autoNoRows: false }`. Neues Div
-  `.ge-table-overlay` im Host (`aria-hidden`, z-index 1000); Host bekommt beim Laden `aria-busy="true"`.
+  `.ge-table-overlay` im Host (`aria-hidden`, z-index 10000); Host bekommt beim Laden `aria-busy="true"`.
   `CrudTableModelFactory` zeigt während Anfragen „Loading…“ und blockiert dabei Maus und Editieren.
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)

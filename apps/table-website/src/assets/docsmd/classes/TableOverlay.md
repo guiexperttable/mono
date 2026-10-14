@@ -44,6 +44,7 @@ overlay.destroy();
 - [getState](TableOverlay.md#getstate)
 - [hide](TableOverlay.md#hide)
 - [isBlocking](TableOverlay.md#isblocking)
+- [isEventBlocked](TableOverlay.md#iseventblocked)
 - [setBounds](TableOverlay.md#setbounds)
 - [showLoading](TableOverlay.md#showloading)
 - [showNoRows](TableOverlay.md#shownorows)
@@ -70,7 +71,7 @@ overlay.destroy();
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L76)
+[src/lib/table/overlay/table-overlay.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L72)
 
 ## Properties
 
@@ -82,7 +83,7 @@ The content box, centered in the overlay (`.ge-table-overlay-content`).
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L57)
+[src/lib/table/overlay/table-overlay.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L54)
 
 ___
 
@@ -94,7 +95,7 @@ The overlay element (`.ge-table-overlay`).
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L55)
+[src/lib/table/overlay/table-overlay.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L52)
 
 ___
 
@@ -104,7 +105,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L58)
+[src/lib/table/overlay/table-overlay.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L55)
 
 ## Methods
 
@@ -112,7 +113,7 @@ ___
 
 ▸ **destroy**(): `void`
 
-Removes the overlay element, its listeners and a waiting delay. Calling it twice is harmless.
+Removes the overlay element and a waiting delay. Calling it twice is harmless.
 
 #### Returns
 
@@ -120,7 +121,7 @@ Removes the overlay element, its listeners and a waiting delay. Calling it twice
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L196)
+[src/lib/table/overlay/table-overlay.ts:197](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L197)
 
 ___
 
@@ -136,7 +137,7 @@ The overlay that is shown now.
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L144)
+[src/lib/table/overlay/table-overlay.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L131)
 
 ___
 
@@ -152,7 +153,7 @@ Ends a requested overlay; the automatic "no rows" / "no matching rows" stays as 
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L134)
+[src/lib/table/overlay/table-overlay.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L121)
 
 ___
 
@@ -168,7 +169,32 @@ ___
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L149)
+[src/lib/table/overlay/table-overlay.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L136)
+
+___
+
+### isEventBlocked
+
+▸ **isEventBlocked**(`evt`): `boolean`
+
+`true` for a mouse event on a blocking loading overlay: the table ignores it (click, double click, mouse down,
+context menu, hover). The event is not stopped – page handlers (e.g. "click outside closes the menu") see it.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `evt` | `Event` | a mouse event that reached the host |
+
+#### Returns
+
+`boolean`
+
+the table must not react to it
+
+#### Defined in
+
+[src/lib/table/overlay/table-overlay.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L147)
 
 ___
 
@@ -193,7 +219,7 @@ Places the overlay over the body (px, relative to the host). Unchanged values do
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:181](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L181)
+[src/lib/table/overlay/table-overlay.ts:182](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L182)
 
 ___
 
@@ -215,7 +241,7 @@ Requests the loading overlay (after [OverlayOptionsIf.loadingDelayInMs](../inter
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L103)
+[src/lib/table/overlay/table-overlay.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L90)
 
 ___
 
@@ -237,7 +263,7 @@ Requests the "no rows" overlay, also over rows and with [OverlayOptionsIf.autoNo
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L124)
+[src/lib/table/overlay/table-overlay.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L111)
 
 ___
 
@@ -263,4 +289,4 @@ the change, `undefined` if nothing changed
 
 #### Defined in
 
-[src/lib/table/overlay/table-overlay.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L161)
+[src/lib/table/overlay/table-overlay.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/table-overlay.ts#L160)

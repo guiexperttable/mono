@@ -255,16 +255,26 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
    */
   private whileLoading<R>(request: () => Promise<R>): Promise<R> {
     const tableScope = this.tableModel?.getTableScope();
+    this.pendingRequests++;
     tableScope?.showLoadingOverlay();
-    const hide = () => tableScope?.hideOverlay();
-    return request().then(result => {
-      hide();
+    const done = () => {
+      this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+      if (this.pendingRequests === 0) {
+        tableScope?.hideOverlay(); // parallel requests: the last answer ends the overlay
+      }
+    };
+    // Promise.resolve().then(): a request that throws synchronously becomes a rejected promise
+    return Promise.resolve().then(request).then(result => {
+      done();
       return result;
     }, error => {
-      hide();
+      done();
       throw error;
     });
   }
+
+  /** Requests on the way ({@link whileLoading}). */
+  private pendingRequests = 0;
 
   private getIdKey(): string {
     return this.crudOptions.getIdKey?.() ?? 'id';

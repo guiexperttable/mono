@@ -770,7 +770,8 @@ export class TableApi {
 
   /**
    * The overlay shown now: `"none"`, `"loading"`, `"noRows"` or `"noMatches"`. During
-   * {@link OverlayOptionsIf.loadingDelayInMs} the loading overlay is requested but not shown yet (`"none"`).
+   * {@link OverlayOptionsIf.loadingDelayInMs} the loading overlay is requested but not shown yet – the automatic
+   * overlay stays meanwhile (e.g. `"noRows"` of an empty table), so a fast answer causes no flicker.
    *
    * @example
    * if (tableApi.getOverlayState() === "noMatches") {

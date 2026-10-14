@@ -67,14 +67,15 @@ ___
 
 • **blockInteractionWhileLoading**: `boolean`
 
-`true` (default): while "Loading…" is shown, mouse events on the body (click, double click, hover, context
-menu) are blocked and the keyboard cannot start editing or toggle rows; navigation and copying still work.
+`true` (default): while "Loading…" is shown, the table ignores mouse events on the body (click, double click,
+hover, context menu – the page still sees them) and the keyboard cannot start editing or toggle rows in the body;
+navigation, copying and the header still work.
 `false`: the loading overlay is only a picture, the table stays usable.
 "No rows" / "No matching rows" never block.
 
 #### Defined in
 
-[src/lib/table/data/options/overlay-options.if.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L50)
+[src/lib/table/data/options/overlay-options.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L51)
 
 ___
 
@@ -125,7 +126,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/overlay-options.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L84)
+[src/lib/table/data/options/overlay-options.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L85)
 
 ___
 
@@ -134,11 +135,11 @@ ___
 • **loadingDelayInMs**: `number`
 
 Waits this long (ms) before the loading overlay appears. Answers that come faster show no spinner at all
-(no flashing). Default: `0` (right away).
+(no flashing); meanwhile an automatic "No rows to show" stays as it is. Default: `0` (right away).
 
 #### Defined in
 
-[src/lib/table/data/options/overlay-options.if.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L56)
+[src/lib/table/data/options/overlay-options.if.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/overlay-options.if.ts#L57)
 
 ___
 

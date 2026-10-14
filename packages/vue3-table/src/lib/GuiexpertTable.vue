@@ -81,6 +81,7 @@ export default defineComponent({
     const root = ref(null);
     let clickTimer: ReturnType<typeof setTimeout> | undefined;
     let tableScope: TableScope | undefined;
+    let shownByProp = false; // :loading="false" hides only an overlay the prop showed (not one of the app)
 
     const emitMouseClicked = (evt: GeMouseEvent) => {
       const delay = props.debounceMouseClickDelay;
@@ -156,6 +157,7 @@ export default defineComponent({
       );
       tableScope = scope;
       scope.firstInit();
+      shownByProp = false;
       applyLoading(); // a re-created table keeps showing the overlay
       emit("tableReady", scope.getApi());
     };
@@ -163,8 +165,10 @@ export default defineComponent({
     const applyLoading = () => {
       if (props.loading) {
         tableScope?.showLoadingOverlay();
-      } else {
+        shownByProp = true;
+      } else if (shownByProp) {
         tableScope?.hideOverlay();
+        shownByProp = false;
       }
     };
 

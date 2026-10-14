@@ -83,18 +83,24 @@
     }
     tableScope = new TableScope(root, model, new SimpleDomService(), options ?? new TableOptions(), listener);
     tableScope.firstInit();
+    shownByProp = false;
     applyLoading(loading); // a re-created table keeps showing the overlay
     const api = tableScope.getApi();
     dispatch("tableReady", api);
     onTableReady?.(api);
   }
 
+  // loading={false} hides only an overlay the prop showed (not one the app showed itself)
+  let shownByProp = false;
+
   /** @param {boolean} show */
   function applyLoading(show) {
     if (show) {
       tableScope?.showLoadingOverlay();
-    } else {
+      shownByProp = true;
+    } else if (shownByProp) {
       tableScope?.hideOverlay();
+      shownByProp = false;
     }
   }
 

@@ -1,7 +1,7 @@
 // Overlays "Loading…" / "No rows to show" / "No matching rows" in a real browser – the reference cases O1–O12 of
 // prompts/002-overlays-laden-keine-daten.md (design: prompts/002-overlays-laden-keine-daten.design.md).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ConvenienceDomService, EventAdapter, FocusModel, LiveAnnouncer, SimpleDomService, TableFactory, TableOverlay } from '@guiexpert/table';
+import { ConvenienceDomService, EventAdapter, FocusModel, LiveAnnouncer, SimpleDomService, TableFactory, TableOptions, TableOverlay, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, GeOverlayKind, OverlayOptionsIf, TableOptionsIf } from '@guiexpert/table';
 import {
   areaRows, createRows, destroyAllTables, getCellDiv, mountTable, nextFrame, renderedRows,
@@ -106,6 +106,23 @@ describe('O1/O2 – loading overlay', () => {
     expect(clicked[0].rowIndex).toBe(2);
   });
 
+  it('an aria-busy the app set on the host comes back after loading', async () => {
+    const host = document.createElement('div');
+    host.style.cssText = 'position:relative; width:800px; height:500px;';
+    host.setAttribute('aria-busy', 'false');
+    document.body.appendChild(host);
+    const tableModel = TableFactory.createTableModel({ rows: createRows(5), properties: ['id', 'name'] });
+    const scope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+    scope.firstInit();
+    const api = scope.getApi();
+    api.showLoadingOverlay();
+    expect(host.getAttribute('aria-busy')).toBe('true');
+    api.hideOverlay();
+    expect(host.getAttribute('aria-busy')).toBe('false');
+    api.destroy();
+    host.remove();
+  });
+
   it('hideOverlay without an overlay changes nothing', async () => {
     const { host, api } = await mount(10);
     api.hideOverlay();
@@ -139,10 +156,25 @@ describe('O1/O2 – loading overlay', () => {
     expect(isShown(host)).toBe(false);
   });
 
-  it('loadingDelayInMs with an empty body: no "no rows" flash while the delay runs', async () => {
-    const { api } = await mount(0, { loadingDelayInMs: 80 });
+  it('loadingDelayInMs with an empty body: "no rows" stays during the delay, a fast answer changes nothing', async () => {
+    const { host, api } = await mount(0, { loadingDelayInMs: 80 });
+    await nextFrame();
+    expect(api.getOverlayState()).toBe('noRows');
+    const mutations: MutationRecord[] = [];
+    const observer = new MutationObserver(m => mutations.push(...m));
+    observer.observe(overlayOf(host), { attributes: true, childList: true, subtree: true });
+    const announce = vi.spyOn(api.getTableScope(), 'announce');
+
     api.showLoadingOverlay();
-    expect(api.getOverlayState()).toBe('none');
+    expect(api.getOverlayState()).toBe('noRows'); // no flicker: the shown overlay stays until the spinner is due
+    api.hideOverlay();                             // fast answer (still empty)
+    await new Promise(r => setTimeout(r, 120));
+    observer.disconnect();
+    expect(api.getOverlayState()).toBe('noRows');
+    expect(mutations).toEqual([]);
+    expect(announce).not.toHaveBeenCalled();       // no second "No rows to show"
+
+    api.showLoadingOverlay();
     await vi.waitFor(() => expect(api.getOverlayState()).toBe('loading'), { timeout: 2000 });
   });
 });
@@ -231,9 +263,36 @@ describe('O6 – loading over existing rows (refresh)', () => {
     const bg = getComputedStyle(overlay).backgroundColor;
     expect(bg).toMatch(/rgba\(.*, 0\.\d+\)/); // semi-transparent
 
+    const pageClicks = vi.fn();
+    document.addEventListener('click', pageClicks);
     const target = clickAtCell(host, 2, 1);
+    document.removeEventListener('click', pageClicks);
     expect(overlay.contains(target)).toBe(true);
     expect(clicked).toHaveLength(0);
+    expect(pageClicks).toHaveBeenCalledTimes(1); // page handlers ("click outside closes the menu") still see it
+  });
+
+  it('the hover row disappears when the blocking overlay appears', async () => {
+    const { host, api } = await mount(20);
+    const cell = getCellDiv(host, 'body', 'center', 3, 1);
+    const r = rect(cell);
+    cell.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: r.left + 5, clientY: r.top + 5 }));
+    const hoverRow = host.querySelector<HTMLElement>('.ge-table-hover-row')!;
+    await vi.waitFor(() => expect(hoverRow.style.display).not.toBe('none'));
+    api.showLoadingOverlay();
+    expect(hoverRow.style.display).toBe('none');
+  });
+
+  it('a header column drag over the loading overlay keeps following the mouse (mousemove not blocked while pressed)', async () => {
+    const { host, api, scope } = await mount(20);
+    api.showLoadingOverlay();
+    const moved = vi.spyOn(scope, 'setDragging');
+    const header = areaRows(host, 'header')[0].querySelector<HTMLElement>('[data-col-index="1"]')!;
+    const h = rect(header);
+    header.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: h.left + 20, clientY: h.top + 5 }));
+    overlayOf(host).dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: h.left + 60, clientY: h.top + 80 }));
+    host.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: h.left + 60, clientY: h.top + 80 }));
+    expect(moved).toHaveBeenCalledWith(true);
   });
 
   async function mountEditable(overlayOptions?: Partial<OverlayOptionsIf>) {
@@ -255,6 +314,18 @@ describe('O6 – loading over existing rows (refresh)', () => {
 
     scope.onActionTriggered('NAVIGATE_DOWN');
     expect(focusModel.getFocus()).toEqual([3, 1]);
+  });
+
+  it('blocking does not stop Enter on a header cell (the header is not covered)', async () => {
+    const { api, scope, focusModel } = await mountEditable();
+    focusModel.setFocus(0, 1);
+    scope.onActionTriggered('NAVIGATE_UP'); // into the header
+    expect(scope.getHeaderFocus()).toBeDefined();
+    // private method: spied through an index type
+    const activate = vi.spyOn(scope as unknown as { activateHeaderCell(): boolean }, 'activateHeaderCell').mockReturnValue(true);
+    api.showLoadingOverlay();
+    scope.onActionTriggered('ACTIVATE_CELL');
+    expect(activate).toHaveBeenCalledTimes(1);
   });
 
   it('without blocking (or after hideOverlay) F2 starts editing as usual', async () => {
@@ -322,9 +393,17 @@ describe('O7 – position', () => {
     expect(Math.round(rect(overlayOf(host)).top)).toBe(Math.round(rect(host).top));
   });
 
-  it('is above the fixed east columns (z-index)', async () => {
-    const { host } = await mount(0);
-    expect(Number(getComputedStyle(overlayOf(host)).zIndex)).toBeGreaterThan(999);
+  it('is above the fixed east columns and the focus frame (z-index)', async () => {
+    const focusModel = new FocusModel();
+    const { host, api } = await mount(10, undefined, { getFocusModel: () => focusModel });
+    focusModel.setFocus(2, 1);
+    api.repaint();
+    api.showLoadingOverlay();
+    const focusFrame = host.querySelector<HTMLElement>('.ge-table-focus-border');
+    expect(focusFrame).not.toBeNull();
+    const overlayZ = Number(getComputedStyle(overlayOf(host)).zIndex);
+    expect(overlayZ).toBeGreaterThan(999);
+    expect(overlayZ).toBeGreaterThan(Number(getComputedStyle(focusFrame!).zIndex) || 0);
   });
 });
 
@@ -402,6 +481,28 @@ describe('O10/O11 – content', () => {
   });
 });
 
+describe('robustness', () => {
+
+  it('a throwing getOverlayElement falls back to the built-in content and is not called every frame', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const getOverlayElement = vi.fn((): HTMLElement => { throw new Error('boom'); });
+    const { host, api } = await mount(0, { getOverlayElement });
+    expect(overlayText(host)).toBe('No rows to show');
+    api.repaint();
+    api.repaint();
+    await nextFrame();
+    expect(getOverlayElement).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+
+  it('a body of arrays (bodyData) with a filter that hides everything → "No matching rows"', async () => {
+    const tableModel = TableFactory.createTableModel({ bodyData: [[1, 'a'], [2, 'b']] });
+    const table = mountTable(tableModel, { tableOptions: { externalFilterFunction: () => false } });
+    await nextFrame();
+    expect(table.api.getOverlayState()).toBe('noMatches');
+  });
+});
+
 describe('O12 – accessibility', () => {
 
   it('loading: aria-busy + the live region speaks the loading text', async () => {
@@ -409,6 +510,15 @@ describe('O12 – accessibility', () => {
     api.showLoadingOverlay('Loading orders…');
     expect(host.getAttribute('aria-busy')).toBe('true');
     await vi.waitFor(() => expect(liveText()).toBe('Loading orders…'));
+  });
+
+  it('a loading announcement still waiting is dropped when loading ends at once', async () => {
+    LiveAnnouncer.defaultDelayInMs = 60;
+    const { api } = await mount(10);
+    api.showLoadingOverlay('Loading orders…');
+    api.hideOverlay();
+    await new Promise(r => setTimeout(r, 120));
+    expect(liveText()).not.toBe('Loading orders…');
   });
 
   it('"no rows" is announced when it appears after the start, not for the initial empty table', async () => {
@@ -495,18 +605,21 @@ describe('TableOverlay (standalone)', () => {
     host.remove();
   });
 
-  it('a non-blocking overlay lets mouse events bubble to the host', () => {
+  it('isEventBlocked: only events on a blocking overlay', () => {
     const { host, overlay } = create();
+    const onOverlay = new MouseEvent('click', { bubbles: true });
     overlay.update(0, 0); // noRows, never blocking
-    const seen = vi.fn();
-    host.addEventListener('click', seen);
-    overlay.element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(seen).toHaveBeenCalledTimes(1);
+    overlay.element.dispatchEvent(onOverlay);
+    expect(overlay.isEventBlocked(onOverlay)).toBe(false);
 
     overlay.showLoading();
     overlay.update(0, 0); // loading, blocking
-    overlay.element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(seen).toHaveBeenCalledTimes(1);
+    const blocked = new MouseEvent('click', { bubbles: true });
+    overlay.element.dispatchEvent(blocked);
+    expect(overlay.isEventBlocked(blocked)).toBe(true);
+    const elsewhere = new MouseEvent('click', { bubbles: true });
+    host.dispatchEvent(elsewhere);
+    expect(overlay.isEventBlocked(elsewhere)).toBe(false);
     overlay.destroy();
     host.remove();
   });

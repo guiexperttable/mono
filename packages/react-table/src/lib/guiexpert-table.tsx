@@ -75,6 +75,9 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
 
   const myContainer = useRef<HTMLDivElement>(null);
   const apiRef = useRef<TableApi | undefined>(undefined);
+  // true while the overlay was shown by the loading prop: loading={false} hides only that one
+  // (an overlay the app shows itself, e.g. in tableReady, stays)
+  const shownByPropRef = useRef(false);
 
   // Always call the latest callback props without re-creating the table.
   const propsRef = useRef<GuiexpertTableProps>(props);
@@ -106,7 +109,8 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
     tableScope.firstInit();
     const api = tableScope.getApi();
     apiRef.current = api;
-    if (propsRef.current.loading) {
+    shownByPropRef.current = !!propsRef.current.loading;
+    if (shownByPropRef.current) {
       api.showLoadingOverlay(); // a re-created table keeps showing the overlay
     }
     propsRef.current.tableReady?.(api);
@@ -122,8 +126,10 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
     const api = apiRef.current;
     if (loading) {
       api?.showLoadingOverlay();
-    } else {
+      shownByPropRef.current = true;
+    } else if (shownByPropRef.current) {
       api?.hideOverlay();
+      shownByPropRef.current = false;
     }
   }, [loading]);
 

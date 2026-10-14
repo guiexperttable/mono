@@ -54,6 +54,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
   ref = createRef<HTMLDivElement>();
 
   private tableScope?: TableScope;
+  /** the overlay was shown by the loading prop: loading={false} hides only that one */
+  private shownByProp = false;
 
   constructor(props: GuiexpertTableProps) {
     super(props);
@@ -111,6 +113,7 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
     );
     this.tableScope = tableScope;
     tableScope.firstInit();
+    this.shownByProp = false;
     this.applyLoading();
     props.tableReady?.(tableScope.getApi());
     if (props.licenseKey) LicenseManager.getInstance().setLicenseKey(props.licenseKey);
@@ -120,8 +123,10 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
   private applyLoading() {
     if (this.props.loading) {
       this.tableScope?.showLoadingOverlay();
-    } else {
-      this.tableScope?.hideOverlay();
+      this.shownByProp = true;
+    } else if (this.shownByProp) {
+      this.tableScope?.hideOverlay(); // an overlay the app showed itself stays
+      this.shownByProp = false;
     }
   }
 

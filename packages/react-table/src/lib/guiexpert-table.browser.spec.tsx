@@ -179,4 +179,10 @@ describe('GuiexpertTable (React)', () => {
     await nextFrame();
     expect(overlayKind(host)).toBe('noRows');
   });
+
+  it('an overlay the app shows in tableReady is not hidden by the loading prop (since 1.1.91)', async () => {
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} tableReady={api => api.showLoadingOverlay()} />);
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+  });
 });

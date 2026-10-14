@@ -107,6 +107,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
+  /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
+  private lastLoadingAnnouncement?: string;
   /** firstInit() has finished: announcements are made from now on (not for the initial filter). */
   private initialized = false;
 
@@ -228,8 +230,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {boolean} - Returns true if the action was triggered successfully, false otherwise.
    */
   onActionTriggered(actionId: ActionId): boolean {
-    if (this.tableOverlay.isBlocking() && TableScope.actionsBlockedWhileLoading.includes(actionId)) {
-      return true; // a blocking "Loading…" overlay: no editing, no toggling (navigation and copying still work)
+    if (!this.headerFocus && this.tableOverlay.isBlocking() && TableScope.actionsBlockedWhileLoading.includes(actionId)) {
+      return true; // a blocking "Loading…" over the body: no editing, no toggling (navigation, copying, header still work)
     }
     if (this.headerFocus) {
       const consumed = this.onHeaderAction(actionId);
@@ -350,8 +352,16 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     if (change.kind === "loading") {
       this.setHostAriaAttribute("aria-busy", "true");
+      if (this.tableOverlay.isBlocking()) {
+        this.hideHoverRow(); // no hover under the layer (mouse moves on it are ignored)
+        this.hideHoverColumn();
+      }
     } else if (change.previous === "loading") {
-      this.setHostAriaAttribute("aria-busy", undefined);
+      this.restoreHostAriaAttribute("aria-busy");
+      this.liveAnnouncer.cancel(this.lastLoadingAnnouncement); // loading ended before "Loading…" was spoken
+    }
+    if (change.kind === "loading") {
+      this.lastLoadingAnnouncement = change.text;
     }
     if (change.kind === "loading" || (change.kind === "noRows" && this.initialized)) {
       this.announce(change.text);

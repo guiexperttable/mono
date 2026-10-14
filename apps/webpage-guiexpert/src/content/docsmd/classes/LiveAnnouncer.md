@@ -41,6 +41,7 @@ announcer.destroy();
 ### Methods
 
 - [announce](LiveAnnouncer.md#announce)
+- [cancel](LiveAnnouncer.md#cancel)
 - [destroy](LiveAnnouncer.md#destroy)
 - [getElement](LiveAnnouncer.md#getelement)
 
@@ -64,7 +65,7 @@ announcer.destroy();
 
 #### Defined in
 
-[src/lib/table/aria/live-announcer.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L34)
+[src/lib/table/aria/live-announcer.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L35)
 
 ## Properties
 
@@ -99,7 +100,34 @@ Speaks a message (replaces a message that is still waiting).
 
 #### Defined in
 
-[src/lib/table/aria/live-announcer.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L47)
+[src/lib/table/aria/live-announcer.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L48)
+
+___
+
+### cancel
+
+▸ **cancel**(`text?`): `void`
+
+Drops a message that is still waiting (not spoken yet) – only if it is `text` (or any message without `text`).
+Used when the reason for the message is gone, e.g. "Loading…" after the data arrived.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `text?` | `string` | only this message is dropped |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.91
+
+#### Defined in
+
+[src/lib/table/aria/live-announcer.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L72)
 
 ___
 
@@ -115,7 +143,7 @@ Cancels a waiting message and removes the live region from the document.
 
 #### Defined in
 
-[src/lib/table/aria/live-announcer.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L74)
+[src/lib/table/aria/live-announcer.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L92)
 
 ___
 
@@ -133,4 +161,4 @@ undefined without a document body (e.g. server side rendering)
 
 #### Defined in
 
-[src/lib/table/aria/live-announcer.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L67)
+[src/lib/table/aria/live-announcer.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/live-announcer.ts#L85)

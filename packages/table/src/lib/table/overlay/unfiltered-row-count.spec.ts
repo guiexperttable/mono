@@ -1,7 +1,9 @@
 // AreaModelIf.getUnfilteredRowCount (since 1.1.91): tells "no rows at all" from "nothing matches the filter".
 import { describe, expect, it } from 'vitest';
-import { ColumnDef, TableFactory, TreeFactory, px100 } from '@guiexpert/table';
-import type { AreaModelIf } from '@guiexpert/table';
+import { AreaModelArrayOfArrays, ColumnDef, CoverGridBodyModel, TableFactory, TreeFactory, px100 } from '@guiexpert/table';
+import type { AreaModelIf, CellRendererIf } from '@guiexpert/table';
+
+const renderer: CellRendererIf = { render: () => undefined };
 
 interface Node { id: number; name: string; children?: Node[] }
 
@@ -39,5 +41,20 @@ describe('getUnfilteredRowCount', () => {
     model.externalFilterChanged(() => false);
     expect(body.getRowCount()).toBe(0);
     expect(body.getUnfilteredRowCount?.()).toBe(3);
+  });
+
+  it('AreaModelArrayOfArrays: all rows, independent of the external filter', () => {
+    const body = new AreaModelArrayOfArrays('body', [[1, 'a'], [2, 'b']], 30);
+    body.externalFilterChanged(() => false);
+    expect(body.getRowCount()).toBe(0);
+    expect(body.getUnfilteredRowCount()).toBe(2);
+  });
+
+  it('CoverGridBodyModel: > 0 with items, 0 without', () => {
+    const grid = new CoverGridBodyModel<{ id: number }>([{ id: 1 }, { id: 2 }, { id: 3 }], renderer);
+    grid.externalFilterChanged(() => false);
+    expect(grid.getRowCount()).toBe(0);
+    expect(grid.getUnfilteredRowCount()).toBeGreaterThan(0);
+    expect(new CoverGridBodyModel<{ id: number }>([], renderer).getUnfilteredRowCount()).toBe(0);
   });
 });

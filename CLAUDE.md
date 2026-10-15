@@ -74,6 +74,11 @@ mono/
   (`postcss.config.cjs`, `.eslintrc.cjs`).
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
+- Root-`pnpm.packageExtensions`: `@angular/animations` bekommt die Peer-Dependency `@angular/common`. Angular 17
+  importiert `@angular/common` in `animations.mjs`, deklariert es aber nicht; pnpm löst es dann über das versteckte
+  Hoisting (`node_modules/.pnpm/node_modules`) auf – dort liegt Angular **14** aus `angular-builds/ng14`. Folge in
+  `serve:angular-table-demo`: zwei Angular-Versionen im Vite-Vorab-Bundle, leere Seite,
+  „Cannot read properties of undefined (reading 'None')“. Nach Änderungen: `apps/angular-table-demo/.angular` löschen.
 - Website (Astro 7): Tailwind 3 läuft über `postcss.config.cjs` + `src/styles/tailwind.css` – `@astrojs/tailwind` unterstützt
   nur Astro ≤ 5. `compressHTML: false` ist Absicht (sonst fehlen Leerzeichen vor Links). Vite 8 minifiziert CSS mit
   lightningcss: kein `//` in `<style>`, kein `;;`. Keine Datei in `public/` mit demselben Pfad wie eine Seite.

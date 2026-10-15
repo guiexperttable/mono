@@ -257,7 +257,14 @@ html[data-theme="dark"] .home-status-cancelled { color: #fda4af; }
   border-bottom: 1px solid var(--color-border);
 }
 .home-compare thead th { font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
-.home-compare tbody th { font-weight: 600; white-space: nowrap; }
+.home-compare tbody th { font-weight: 600; }
+/* feature column: wraps instead of growing to the longest label, so the comparison columns keep their room */
+.home-compare tr > :first-child {
+  width: 12rem;
+  min-width: 9rem;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
 .home-compare td { color: var(--color-text-offset); }
 .home-compare .ours { background: rgb(236 72 153 / 0.08); color: var(--color-text); font-weight: 600; }
 .home-compare thead .ours { color: var(--color-primary); align-content: center}
@@ -319,7 +326,7 @@ html[data-theme="dark"] .home-status-cancelled { color: #fda4af; }
 }
 @media (max-width: 640px) {
   .home-hero-inner { padding: 2.25rem 1rem 2.5rem; }
-  .home-compare tbody th { white-space: normal; min-width: 7.5rem; }
+  .home-compare tr > :first-child { width: 8.5rem; min-width: 7rem; }
   .home-compare th, .home-compare td { padding: 0.5rem 0.6rem; }
   .home-lead { font-size: 1.02rem; }
   .home-install { display: flex; width: 100%; justify-content: space-between; }

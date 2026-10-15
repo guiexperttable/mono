@@ -77,6 +77,13 @@
   "pnpm": {
     "overrides": {
       "@jridgewell/sourcemap-codec": "^1.6.0"
+    },
+    "packageExtensions": {
+      "@angular/animations": {
+        "peerDependencies": {
+          "@angular/common": "*"
+        }
+      }
     }
   }
 }

@@ -61,6 +61,12 @@ mono/
 | Versionen | `pnpm version:check`, `pnpm version:patch` (Core 1.1.84 → 1.1.85, Wrapper behalten Framework-Major) |
 | Release / Publish | **nie ohne ausdrückliche Anweisung.** Ablauf in `RELEASING.md`: `pnpm version:patch` → Commit → GitHub-Release → Workflow `npm-publish.yml` (Trusted Publishing, kein Token). Lokal: `pnpm pub:all:dry` / `pnpm pub:all` (`scripts/publish.mjs`, überspringt bereits veröffentlichte Versionen). Angular-Dist-Tags: `latest` = neueste Major, sonst `a14` … `a21` |
 
+**Nach jedem fertigen Feature** nennt Claude die Release-Befehle für den nächsten Patch als kopierfertigen Konsolen-Block
+(**ohne `#`-Kommentare**, ohne Platzhalter, mit der konkreten Version) – ausführen tut sie Marc. Muster und Regel:
+`prompts/000-arbeitsweise.md` Phase 10. Kurzform: `git checkout main`, `git pull`, `pnpm version:patch`,
+`pnpm version:check`, `pnpm build:all`, `git commit -am "chore: release X.Y.Z"`, `git push`,
+`gh release create vX.Y.Z --target main --title "vX.Y.Z" --generate-notes`.
+
 **Abhängigkeits-Fallen (beim Aufsetzen gelöst, nicht zurückdrehen):**
 - `pnpm-lock.yaml` basiert auf der Lockdatei von `ge-table`. Ohne sie zieht pnpm neuere Transitive (z. B. Babel 8),
   die `vite-plugin-babel` brechen.

@@ -192,6 +192,21 @@ Danach: Showcase und Training-Demo im Browser ansehen (light und dark); `instruc
 Referenzfälle gegen eine unabhängige Rechnung bzw. Beobachtung prüfen. Abschluss-Review durch einen separaten
 Agenten, der den Code nicht geschrieben hat (Schwerpunkte stehen im Feature-Prompt).
 
+**Release-Befehle:** Nach jedem **fertigen Feature** (im Abschlussbericht, nach dem Merge) die Befehle für einen Patch-Release nennen –
+als einen Block, den Marc direkt in die Konsole kopieren kann: **ohne `#`-Kommentare**, ohne Platzhalter, mit der
+konkreten nächsten Version (`packages/table/package.json` + 1). Claude führt sie nicht selbst aus (Release = npm-Publish).
+Muster für 1.1.91 → 1.1.92:
+```bash
+git checkout main
+git pull
+pnpm version:patch
+pnpm version:check
+pnpm build:all
+git commit -am "chore: release 1.1.92"
+git push
+gh release create v1.1.92 --target main --title "v1.1.92" --generate-notes
+```
+
 ## 3. Definition of Done (gilt zusätzlich zu der des Feature-Prompts)
 
 - [ ] Design-Dokument freigegeben 🛑
@@ -200,3 +215,4 @@ Agenten, der den Code nicht geschrieben hat (Schwerpunkte stehen im Feature-Prom
 - [ ] JSDoc + `docs:check`, API-Doku neu erzeugt, `instructions.md`, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
 - [ ] Demos, Website, Training, Video wie in Phase 1 entschieden; `pnpm build:webpage-guiexpert` grün
 - [ ] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung
+- [ ] Im Abschlussbericht: die Release-Befehle für den nächsten Patch (Phase 10), kopierfertig ohne `#`-Kommentare

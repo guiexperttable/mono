@@ -6,7 +6,7 @@ GuiExpert Table API / [Exports](modules.md)
 millions of rows, zero runtime dependencies, MIT-licensed. The framework packages (Angular, React, Vue,
 Svelte, Solid, Preact, Web Component) are thin wrappers around exactly this API.
 
-**New here?** The [training](https://gui.expert/training/) explains everything step by step – 34 short
+**New here?** The [training](https://gui.expert/training/) explains everything step by step – 36 short
 chapters with live demos. Every chapter links back to the classes on this site.
 
 ```ts
@@ -35,12 +35,14 @@ const tableApi = tableScope.getApi();
 | export to Excel | [TableApi.downloadExcel](classes/TableApi.html#downloadExcel), [ExcelService](classes/ExcelService.html) | [Excel export](https://gui.expert/training/excel-export/) |
 | style cells | [CellRendererIf](interfaces/CellRendererIf.html), [GeCssColorUtil](classes/GeCssColorUtil.html) | [Renderers](https://gui.expert/training/cell-renderers/), [Heatmap](https://gui.expert/training/heatmap/) |
 | show a tree | [TreeFactory](classes/TreeFactory.html), [TreeRow](classes/TreeRow.html) | [Tree table](https://gui.expert/training/tree-table/) |
+| group flat rows with totals | [RowGroupFactory](classes/RowGroupFactory.html), [AreaModelRowGroups](classes/AreaModelRowGroups.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | [Row grouping](https://gui.expert/training/row-grouping/) |
 | update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |
 | remember sorting and scroll position | [AutoRestoreOptions](classes/AutoRestoreOptions.html) | [Persist state](https://gui.expert/training/persist-state/) |
 
 The index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,
 **Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,
-**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **DOM**, **CRUD**, **Utilities** –
+**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Aggregation**, **Row grouping**, **DOM**,
+**CRUD**, **Utilities** –
 and **Internals** for the classes the table uses itself.
 
 ## Packages

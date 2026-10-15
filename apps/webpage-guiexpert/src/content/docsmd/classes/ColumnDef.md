@@ -33,6 +33,12 @@ ColumnDef.create({
 Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/),
   [Sorting](https://gui.expert/training/sorting/), [Cell renderers](https://gui.expert/training/cell-renderers/)
 
+## Hierarchy
+
+- **`ColumnDef`**
+
+  ↳ [`RowGroupColumnDef`](RowGroupColumnDef.md)
+
 ## Implements
 
 - [`ColumnDefIf`](../interfaces/ColumnDefIf.md)

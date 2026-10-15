@@ -131,7 +131,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `getColspanAt`/`getRowspanAt`, `getCustomClassesAt`/`getCustomStyleAt`, `getTooltipAt`, `getCellRenderer`,
   `isEditable`/`isSelectable`, `isRowCheckable`/`setRowChecked`, `doSort`/`sort`, `setValue`, `changeColumnOrder`.
 - Implementierungen: `AreaModel` (Basis zum Ableiten, z. B. `LargeBodyModel`), `AbstractAreaModel`,
-  `AreaModelArrayOfArrays`, `AreaModelObjectArray` (+ `…WithColumndefs`), `AreaModelTree`, `AreaModelCellGroups`
+  `AreaModelArrayOfArrays`, `AreaModelObjectArray` (+ `…WithColumndefs`), `AreaModelTree`, `AreaModelRowGroups` (1.1.94,
+  Unterklasse von `AreaModelTree`), `AreaModelCellGroups`
   (Header-Gruppen), `AreaModelHidden`, `CoverGridBodyModel`. (`AsyncBodyAreaModelObjectArray` = unfertige
   Source-Leiche, nicht exportiert – nicht verwenden, wird später entschieden.)
 - Fabriken (`factory/`):
@@ -140,7 +141,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `footerAggregates`
     (1.1.94), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
-  - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`.
+  - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`,
+    `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
   getEditRenderer, editInputPipe })`. Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
@@ -247,6 +249,23 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `onModelChanged`), `updateCells` (ohne `repaintAll` werden die Footer-Zellen nachgezeichnet), CRUD-Änderungen und **öffentlichem**
   `api.repaint()`/`repaintHard()` – nie beim Scrollen/internen Repaint. Auswahl: `api.getSelectionAggregates()`
   (`SelectionAggregator`, Kappung `maxCells` wie `CopyService.maxCopyCells`). Eigenes Footer-Modell: instructions.md 5.4.
+- **Row Grouping (seit 1.1.94, `rowgroup/`, Design `prompts/006-row-grouping.design.md`)**: DOM-freie Engine
+  `groupRows(rows, groupBy)` (ein Durchlauf, verschachtelte `Map`s, `null`/`undefined`/`''` = eine Gruppe „(empty)“ am Ende,
+  Dates nach Zeit, `1` ≠ `'1'`) + `aggregateRowGroups(groups, specs, accept?)` (Blattgruppe = `aggregateStates` über ihre
+  Zeilen, darüber `merge` der Kind-Zustände → `avg` korrekt) – Grundlage für Pivot (007). `RowGroup` (= `data` der
+  Gruppenzeile: `key`, `label`, `path`, stabile `id` aus Ebenennamen + typisierten Schlüsseln, `count`, `results`,
+  `getRows()`). Body `AreaModelRowGroups extends AreaModelTree` – **`type` bleibt `"AreaModelTree"`** (Pfeil, Klick,
+  ARIA, Zustand, Footer laufen unverändert), Erkennung über `kind` (`isAreaModelRowGroups`, `isGroupRow`, `isRowGroup`).
+  Detailzeilen = `RowGroupDetailRow` (intern, mit `sourceIndex`). Filter: Prädikat bekommt die **Objekte** (wie flach),
+  Ergebnis als `Uint8Array` je Quellindex; Aggregate lazy (`ensureAggregates`) über gefilterte Zeilen. Sortierung: eigenes
+  `doSort` (Aggregat- bzw. Schlüsselvergleich für Gruppen), `sort(fn)` sortiert Detailzeilen; letzte Sortierung wird nach
+  Neuaufbau wieder angewendet. Editieren: `setValue` → nur Pfad neu (`invalidateDerivedValues(change?:
+  DerivedValuesChangeIf)` – Edit und `updateCells` geben `{ area, rowIndices }` mit), geändertes Gruppierfeld → Neuaufbau;
+  `TableScope`/`RenderScope` zeichnen bei geänderter Zeilenzahl hart neu, `updateCells` zeichnet sichtbare Gruppenzeilen
+  nach. Fabrik: `RowGroupColumnDef` (Property `"RowGroupColumn"`, hinter Zeilennummer/Checkbox, fixiert), gruppierte
+  Spalten ausgeblendet (`rowgroup/row-group-layout.ts`, merkt sich, was es selbst ausgeblendet hat), Footer aus 005.
+  Umgruppieren: `api.setRowGroupBy(levels)` (kein neues Modell, Zustand bleibt), `getRowGroupBy()`. Persistenz: Gruppen-Id
+  unabhängig von `getRowId` (`TableStateService.idOfRow`). CSS `ge-table-row-group*`, `--ge-table-row-group-*`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -329,7 +348,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 373 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 418 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -340,10 +359,11 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.715 Tests) |
-  | `test:browser` | echtes Chromium, ~610 Tests in 22 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~1.780 Tests) |
+  | `test:browser` | echtes Chromium, ~625 Tests in 23 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
+  | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
     `browser`, Helfer `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `destroyAllTables`).
     Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`, `axe.ts` =
@@ -359,11 +379,11 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `// NOTE:`. **Jeder Bugfix bekommt zuerst einen roten Test.**
   - `src/index.spec.ts` hält alle Exportnamen als Snapshot fest: neuer Export → `pnpm exec vitest run -u src/index.spec.ts`
     und den Diff prüfen; ein **verschwundener** Export ist ein Breaking Change.
-  - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~89 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
+  - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~91 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers`, `aggregation` …).
+    `row-numbers`, `aggregation`, `rowgroup/row-group` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -378,7 +398,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 29 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 31 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -467,6 +487,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 24 | Lade-Spinner und leere Tabelle – ohne Library, nur CSS | `videos/03-lade-spinner/`, Training-Kapitel `live-data`, `apps/table-demo/overlay.html` |
 | 25 | Zeilennummern wie in Excel – eine Zeile Code (ohne Enterprise-Lizenz) | `videos/05-zeilennummern/`, Training-Kapitel `fixed-columns`, `apps/table-demo/row-numbers.html`, Showcase `large` |
 | 26 | Summenzeile in einer Zeile Code – plus Statusleiste für die Auswahl (ohne Enterprise-Lizenz) | `videos/06-summenzeile/`, Training-Kapitel `footer-totals`, `apps/table-demo/aggregation.html` |
+| 27 | Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz | `videos/07-row-grouping/`, Showcase `rowgrouping`, Training-Kapitel `row-grouping`, `apps/table-demo/row-grouping.html`; Bezug zu Folge 12 „Baumtabelle & Checkboxen“ |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
@@ -475,10 +496,10 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 35 Kapitel = 35 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 36 Kapitel = 36 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
-Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`;
-Tag `ep-035` im Demo-Repo erst nach dem Release 1.1.91).
+Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`,
+Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94).
 
 ```
 apps/webpage-guiexpert/src/

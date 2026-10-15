@@ -7,7 +7,7 @@
 // Imports only `@guiexpert/table` (alias) and relative files – no `vitest` here: the wrapper's own Vitest must be
 // used (CI installs only the wrapper packages, packages/table/node_modules is missing there).
 // Lives outside src/ on purpose: it must not end up in any npm package.
-import { TableFactory } from '@guiexpert/table';
+import { RowGroupFactory, TableFactory } from '@guiexpert/table';
 import type { GeMouseEvent, TableApi, TableModelIf } from '@guiexpert/table';
 import { nextFrame, renderedRows } from './mount-table'; // also loads css/main.css
 
@@ -19,6 +19,28 @@ export function createModel(rowCount: number, label = 'Row'): TableModelIf {
     rows: Array.from({ length: rowCount }, (_, i) => ({ id: i, name: `${label} ${i}` })),
     properties: ['id', 'name'],
   });
+}
+
+/**
+ * A row grouping (since 1.1.94): 6 sales grouped by `region` (Nord, Süd), sum of `umsatz`, total row in the footer.
+ * Group column first: the first row reads "Nord (3)".
+ */
+export function createGroupedModel(): TableModelIf {
+  return RowGroupFactory.createTableModel({
+    rows: [
+      { region: 'Nord', produkt: 'A', umsatz: 100 }, { region: 'Nord', produkt: 'B', umsatz: 50 },
+      { region: 'Süd', produkt: 'A', umsatz: 80 }, { region: 'Nord', produkt: 'A', umsatz: 120 },
+      { region: 'Süd', produkt: 'B', umsatz: 70 }, { region: 'Süd', produkt: 'A', umsatz: 30 },
+    ],
+    groupBy: ['region'],
+    aggregations: { umsatz: 'sum' },
+  });
+}
+
+/** The label texts of the rendered group column (fixed on the left, column 0). */
+export function groupLabels(container: Element): string[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('.ge-table-body-west [data-col-index="0"] .ge-table-label-div'),
+    e => e.textContent ?? '');
 }
 
 const hosts: HTMLElement[] = [];

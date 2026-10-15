@@ -12,7 +12,8 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
-import { isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelRowGroups, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import type { RowGroupField } from './rowgroup/row-group-field.type';
 import { TreeRowIf } from './data/common/tree-row-if';
 import { SelectionAggregator } from './selection/selection-aggregator';
 import type { SelectionAggregatesIf } from './aggregation/selection-aggregates.if';
@@ -1547,6 +1548,43 @@ export class TableApi {
   setRowExpanded(rowIndex: number, expanded: boolean): boolean {
     const row = this.tableScope.tableModel.getBodyModel().getRowByIndex(rowIndex);
     return isTreeRow(row) ? this.tableScope.setTreeRowExpanded(row as TreeRowIf<any>, expanded) : false;
+  }
+
+  /**
+   * Row grouping ({@link RowGroupFactory}): groups the rows by other levels – without a new table model (a new model
+   * would rebuild the table in every framework wrapper). Groups whose path stays keep their expanded state; filter,
+   * sorting and checked rows stay; the columns of the grouped properties are hidden (the previously grouped ones come
+   * back) and the header of the group column follows. An empty list shows the rows without groups.
+   *
+   * @param {RowGroupField[]} groupBy - the new levels, top first: property paths, functions or {@link RowGroupFieldIf}
+   * @returns {boolean} false if the body is no row grouping
+   *
+   * @example
+   * // a select with "region", "produkt", "region,produkt"
+   * select.addEventListener("change", () => tableApi.setRowGroupBy(select.value.split(",")));
+   *
+   * @example
+   * tableApi.setRowGroupBy([]);   // flat again (with the total row)
+   *
+   * @since 1.1.94
+   */
+  setRowGroupBy(groupBy: RowGroupField[]): boolean {
+    return this.tableScope.setRowGroupBy(groupBy);
+  }
+
+  /**
+   * Row grouping: the current levels.
+   *
+   * @returns {RowGroupField[] | undefined} the levels, undefined if the body is no row grouping
+   *
+   * @example
+   * const levels = tableApi.getRowGroupBy();   // ["region", "produkt"]
+   *
+   * @since 1.1.94
+   */
+  getRowGroupBy(): RowGroupField[] | undefined {
+    const body = this.tableScope.tableModel.getBodyModel();
+    return isAreaModelRowGroups(body) ? body.getGroupBy() : undefined;
   }
 
   /**

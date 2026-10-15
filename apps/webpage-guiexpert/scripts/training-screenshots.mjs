@@ -47,6 +47,7 @@ const DEMOS = {
   "overlays": { slug: "live-data", wait: 1500, button: "refresh" },
   "persist-state": { slug: "persist-state" },
   "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
+  "row-grouping": { slug: "row-grouping", search: "laptop" },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
 

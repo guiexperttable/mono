@@ -435,6 +435,43 @@ export const treeModel = TableFactory.createTableModel({
   (checkboxChanged)="onCheckboxChanged($event)" />
 ```
 
+### Row grouping (since 1.1.94)
+
+Flat rows grouped by properties, with aggregates per group and a total row (details: `instructions.md` 5.6). Regroup with
+the `TableApi` from `(tableReady)` – the table keeps its state, no new model:
+
+```ts
+import { Component } from "@angular/core";
+import { TableComponent } from "@guiexpert/angular-table";
+import { ColumnDef, RowGroupFactory, TableApi, px120 } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+
+@Component({
+  selector: "app-row-grouping",
+  standalone: true,
+  imports: [TableComponent],
+  template: `
+    <select (change)="regroup($any($event.target).value)">
+      <option value="region">Region</option><option value="region,produkt">Region › Produkt</option>
+    </select>
+    <guiexpert-table class="table-div" [tableModel]="tableModel" (tableReady)="api = $event" />`
+})
+export class RowGroupingComponent {
+  api?: TableApi;
+  readonly tableModel = RowGroupFactory.createTableModel<Sale>({
+    rows: [{ region: "Nord", produkt: "A", monat: "Jan", umsatz: 100 }, { region: "Süd", produkt: "B", monat: "Feb", umsatz: 70 }],
+    columnDefs: ["region", "produkt", "monat", "umsatz"].map(p => new ColumnDef(p, p, px120)),
+    groupBy: ["region"],
+    aggregations: { umsatz: "sum" }
+  });
+
+  regroup(value: string) {
+    this.api?.setRowGroupBy(value.split(","));
+  }
+}
+```
+
 ---
 
 ## 12. Inline editing
@@ -509,6 +546,7 @@ html {
 ## 14. Not available yet
 
 - No built-in filter UI, context menu, pagination or row drag & drop.
+- No pivot tables and no drag & drop group panel (row grouping itself: section 11).
 
 ## License
 

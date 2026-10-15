@@ -7,6 +7,7 @@ Built-in overlays "Loading…" (CSS spinner) and "No rows to show" / "No matchin
 Remembers column layout, sorting, selection and tree state – in `localStorage` or on your server via a JSON state API (since 1.1.92).
 Row numbers like in a spreadsheet – one flag, `rowNumbersVisible: true` (since 1.1.93).
 Total rows (sum, average, count, min, max …) that follow filter and sorting – `footerAggregates: { total: "sum" }` – and the sum of the selected cells for a status bar (since 1.1.94).
+Row grouping with aggregates per group – `RowGroupFactory.createTableModel({ rows, groupBy: ["country", "city"], aggregations: { total: "sum" } })`, regroup at runtime with `tableApi.setRowGroupBy()` (since 1.1.94).
 
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 

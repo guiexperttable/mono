@@ -354,3 +354,57 @@ html[data-theme= "dark"] {
 
 
 
+
+/* Totals in the footer (AreaModelAggregateFooter, since 1.1.94) – as in packages/table/css/table-classes.css */
+.ge-table-footer-aggregate {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ge-table-footer-label {
+  font-weight: 600;
+  text-align: start;
+}
+
+.ge-table-footer-label-overflow {
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.ge-table-footer-label-overflow .ge-table-label-div {
+  overflow: visible;
+}
+
+/* Row grouping (since 1.1.94) – as in packages/table/css/table-row-group.css */
+html[data-theme= "light"] {
+  --ge-table-row-group-bg: rgba(0, 0, 0, 0.045);
+  --ge-table-row-group-text: inherit;
+  --ge-table-row-group-label-font-weight: 600;
+}
+
+html[data-theme= "dark"] {
+  --ge-table-row-group-bg: rgba(255, 255, 255, 0.06);
+  --ge-table-row-group-text: inherit;
+  --ge-table-row-group-label-font-weight: 600;
+}
+
+.ge-table-col-div.ge-table-row-group {
+  background-color: var(--ge-table-row-group-bg);
+  color: var(--ge-table-row-group-text);
+}
+
+.ge-table-row-group-label {
+  font-weight: var(--ge-table-row-group-label-font-weight);
+}
+
+.ge-table-row-group-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ge-table-row-group-aggregate {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ge-table-row-group-label-font-weight);
+}

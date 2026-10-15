@@ -1,0 +1,66 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="rowgrouping-bar">
+  <label>Group by
+    <select class={id + '-select'} aria-label="Group by">
+      <option value="country,city" selected>Country › City</option>
+      <option value="country">Country</option>
+      <option value="category,product">Category › Product</option>
+      <option value="product,country">Product › Country</option>
+      <option value="">– nothing –</option>
+    </select>
+  </label>
+  <button type="button" class={id + '-expand'}>Expand all</button>
+  <button type="button" class={id + '-collapse'}>Collapse all</button>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'rowgrouping-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createRowGroupModelAndOptions } from "/scripts/demo-table-models/index.js";
+
+  // 50,000 orders grouped by country › city: sum of quantity and total, average price, total row
+  const {tableModel, tableOptions} = createRowGroupModelAndOptions(50_000);
+  const ele = document.querySelector('.' + id);
+
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  // regroup at runtime – no new table model, expanded groups and sorting stay
+  document.querySelector('.' + id + '-select').addEventListener('change', e => {
+    const value = e.target.value;
+    tableApi.setRowGroupBy(value ? value.split(',') : []);
+  });
+  document.querySelector('.' + id + '-expand').addEventListener('click', () => tableApi.expandAll());
+  document.querySelector('.' + id + '-collapse').addEventListener('click', () => tableApi.collapseAll());
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .rowgrouping-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+    }
+    .rowgrouping-bar select, .rowgrouping-bar button {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+</style>

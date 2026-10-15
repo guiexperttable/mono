@@ -43,3 +43,34 @@ export function seededRandom(seed: number): () => number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+// ---- Row grouping (prompt 006): expected results of the reference cases R1–R5 (computed by hand) ----
+
+/** R1: groupBy region, sum umsatz – groups in order, rows of each group in source order. */
+export const R1 = {
+  groups: [
+    { label: 'Nord (3)', umsatz: 270, rows: [100, 50, 120] },
+    { label: 'Süd (3)', umsatz: 180, rows: [80, 70, 30] },
+  ],
+  total: 450,
+};
+
+/** R2: groupBy region › produkt, sum umsatz. */
+export const R2 = {
+  Nord: { sum: 270, A: 220, B: 50 },
+  Süd: { sum: 180, A: 110, B: 70 },
+  total: 450,
+};
+
+/** R3: like R2 with avg – the mean of the rows, never the mean of the sub-group means. */
+export const R3 = {
+  Nord: { avg: 90, A: 110, B: 50 },     // not 80
+  Süd: { avg: 60, A: 55, B: 70 },       // not 62.5
+  total: 75,
+};
+
+/** R4: R1 with filter monat === 'Jan'. */
+export const R4 = { Nord: 150, Süd: 80, total: 230, rows: [100, 50, 80] };
+
+/** R5: R1 sorted by umsatz descending. */
+export const R5 = { groups: ['Nord', 'Süd'], nordRows: [120, 100, 50] };

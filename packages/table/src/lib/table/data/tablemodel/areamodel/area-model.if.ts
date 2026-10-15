@@ -1,3 +1,4 @@
+import type { DerivedValuesChangeIf } from "./derived-values-change.if";
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { CheckedType } from "../../common/checked-type";
 import { CheckboxModelIf } from "../../../checkbox/checkbox-model.if";
@@ -294,6 +295,10 @@ export interface AreaModelIf {
    * it for all three areas when data may have changed: filter, sorting, editing, `updateCells()` and the public
    * `tableApi.repaint()` / `repaintHard()` – not on scrolling or internal repaints.
    *
+   * After an edit and `updateCells()` the table passes `change` (since 1.1.94): the area and the displayed rows that
+   * changed – a model may recompute only what depends on them ({@link AreaModelRowGroups} recomputes the groups of
+   * these rows). Without `change` anything may have changed.
+   *
    * @example
    * class CachedTotalsFooter extends AreaModel {
    *   private total?: number;
@@ -310,7 +315,7 @@ export interface AreaModelIf {
    *
    * @since 1.1.94
    */
-  invalidateDerivedValues?(): void;
+  invalidateDerivedValues?(change?: DerivedValuesChangeIf): void;
 
   /**
    * Returns the value of the cell at the specified row and column indices.

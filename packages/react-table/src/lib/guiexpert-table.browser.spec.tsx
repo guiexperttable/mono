@@ -10,7 +10,7 @@ import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createGroupedModel, createHost, createModel, groupLabels, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -195,5 +195,23 @@ describe('GuiexpertTable (React)', () => {
     const host = mount(<GuiexpertTable tableModel={createModel(5)} tableReady={api => api.showLoadingOverlay()} />);
     await nextFrame();
     expect(overlayKind(host)).toBe('loading');
+  });
+
+  it('a row grouping: group rows render, setRowGroupBy regroups without a rebuild (since 1.1.94)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const destroy = vi.spyOn(TableScope.prototype, 'destroy');
+    const host = mount(<GuiexpertTable tableModel={createGroupedModel()} tableReady={tableReady} />);
+    await nextFrame();
+    expect(groupLabels(host)).toEqual(['Nord (3)', 'Süd (3)']);
+    const api = tableReady.mock.calls[0][0];
+    act(() => { api.setRowGroupBy(['produkt']); });
+    await nextFrame();
+    expect(groupLabels(host)[0]).toBe('A (4)');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+    expect(destroy).not.toHaveBeenCalled();
+    rerender(<GuiexpertTable tableModel={createModel(3)} tableReady={tableReady} />);
+    await nextFrame();
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(tableReady).toHaveBeenCalledTimes(2);
   });
 });

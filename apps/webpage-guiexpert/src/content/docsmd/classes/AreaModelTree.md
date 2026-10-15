@@ -45,6 +45,8 @@ searchInput.addEventListener("input", () => {
 
   ↳ **`AreaModelTree`**
 
+  ↳↳ [`AreaModelRowGroups`](AreaModelRowGroups.md)
+
 ## Table of contents
 
 ### Constructors

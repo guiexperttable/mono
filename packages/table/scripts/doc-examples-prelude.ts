@@ -9,7 +9,11 @@ import {
   AggregatorIf, AggregatorName, AggregatorRef, ValueAccessor, AggregateSpecIf, AggregateSpec, AggregateSpecMap, Aggregators,
   getAggregator, createValueGetter, aggregate, aggregateColumns, formatAggregateValue, SelectionAggregatesIf,
   SelectionAggregator, AggregateFooterRowIf, AggregateFooterOptionsIf, AggregateFooterConfig, AreaModelAggregateFooter,
-  AggregateCellRenderer, isAreaModelAggregateFooter
+  AggregateCellRenderer, isAreaModelAggregateFooter,
+  DerivedValuesChangeIf, RowGroupOrder, RowGroupFieldIf, RowGroupField, RowGroupIf, RowGroup, GroupRowsOptionsIf, groupRows,
+  aggregateRowGroups, RowGroupColumnOptionsIf, RowGroupColumnDef, RowGroupExpanded, RowGroupModelOptionsIf,
+  AreaModelRowGroups, RowGroupTableModelParaIf, RowGroupFactory, isRowGroup, isGroupRow, isAreaModelRowGroups,
+  isRowGroupColumnDef
 } from "__CORE__";
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
@@ -64,3 +68,11 @@ declare function fetchDataFromServer(): any[];
 declare const focusModel: FocusModelIf;
 declare class MyFocusChangeListener implements EventFocusChangedListenerIf { onFocusChanged(m: FocusModelIf): void }
 declare const dom: DomServiceIf; declare const cellValue: any;
+// row grouping (since 1.1.94): the sales of the reference cases R1–R5
+interface Sale { region: string; produkt: string; monat: string; umsatz: number }
+declare const sales: Sale[];
+declare const body: AreaModelRowGroups<Sale>;
+declare const model: AreaModelRowGroups<Sale>;
+declare const select: HTMLSelectElement;
+declare const MONTHS: string[];
+declare function loadSales(): Promise<Sale[]>;

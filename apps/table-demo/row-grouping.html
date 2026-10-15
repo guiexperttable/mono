@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!--
+  Row grouping with totals (since 1.1.94) – also the recording page of video 07.
+  Start: pnpm serve:table-demo → http://localhost:4200/row-grouping.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – row grouping</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .table-div { height: 480px; width: 100%; }
+  </style>
+</head>
+<body>
+<h1>50,000 orders</h1>
+<div class="bar">
+  <label>Group by
+    <select id="groupBy">
+      <option value="">– nothing –</option>
+      <option value="country" >Country</option>
+      <option value="country,city" selected>Country › City</option>
+      <option value="category,product">Category › Product</option>
+      <option value="year">Year (a function)</option>
+    </select>
+  </label>
+  <button id="expand" type="button">Expand all</button>
+  <button id="collapse" type="button">Collapse all</button>
+  <label>Filter <input id="filter" type="search" placeholder="e.g. laptop"></label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<script src="/src/row-grouping/row-grouping-demo.ts" type="module"></script>
+</body>
+</html>

@@ -10,7 +10,7 @@ import { isApiColumnVisible } from "../data/tablemodel/column/column-visibility"
 import { isDefaultGetRowId } from "../data/options/default-row-id";
 import { AutoRestoreOptionsIf, GetRowIdFn } from "../data/options/auto-restore-options.if";
 import { GeStateChangeEvent } from "../data/common/event/ge-state-change-event";
-import { isAreaModelTree, isTreeRow } from "../instanceof-workaround";
+import { isAreaModelTree, isRowGroup, isTreeRow } from "../instanceof-workaround";
 import { SelectionModelIf } from "../selection/selection-model.if";
 import { SelectionSnapshot } from "../selection/selection-model";
 import { ALL_TABLE_STATE_PARTS } from "./table-state-part";
@@ -947,6 +947,9 @@ export class TableStateService {
       return undefined;
     }
     const data = isTreeRow(row) ? (row as TreeRowIf<unknown>).data : row;
+    if (isRowGroup(data)) {
+      return data.id; // a group of a row grouping: its stable path id, independent of getRowId
+    }
     if (own) {
       return own(data, index);
     }

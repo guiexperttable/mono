@@ -11,10 +11,14 @@
  *   and "npm publish <tarball>" with dist-tag "latest". The core is published first.
  * - Angular (angular-builds/ngNN/dist): "npm publish <dir>" with dist-tag aNN, "latest" for the newest major.
  * - Versions that already exist on npm are skipped, so a failed run can simply be restarted.
+ * - A failed "npm publish" is retried (up to 3 attempts, with a pause) – e.g. TLOG_CREATE_ENTRY_ERROR (409) of the
+ *   Sigstore transparency log, which npm reports when its own retry finds the first, already written entry. Each
+ *   attempt signs anew, so the retry does not collide. Before a retry the registry is asked whether the version
+ *   arrived after all. A package that still fails does not stop the others; the script exits with 1 at the end.
  * - In GitHub Actions the npm CLI (>= 11.5.1) authenticates via OIDC (trusted publishing) and adds provenance.
  *   Locally it uses your npm login (~/.npmrc).
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -106,17 +110,38 @@ try {
 
 const tmp = mkdtempSync(join(tmpdir(), "ge-publish-"));
 const results = [];
+const MAX_ATTEMPTS = 3;
+const RETRY_PAUSE_MS = 15_000;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-function publish(id, name, version, target, tag, checked = false) {
+async function publish(id, name, version, target, tag, checked = false) {
   if (!checked && isPublished(name, version)) {
     results.push([id, `${name}@${version}`, "already on npm – skipped"]);
     return;
   }
   const npmArgs = ["publish", target, "--access", "public", "--tag", tag];
   if (dryRun) npmArgs.push("--dry-run");
-  console.log(`\n▶ ${name}@${version} (tag ${tag})${dryRun ? " [dry-run]" : ""}`);
-  execFileSync("npm", npmArgs, { cwd: root, stdio: "inherit" });
-  results.push([id, `${name}@${version}`, dryRun ? `dry-run ok (tag ${tag})` : `published (tag ${tag})`]);
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    console.log(`\n▶ ${name}@${version} (tag ${tag})${dryRun ? " [dry-run]" : ""}${attempt > 1 ? ` – attempt ${attempt}/${MAX_ATTEMPTS}` : ""}`);
+    const { status } = spawnSync("npm", npmArgs, { cwd: root, stdio: "inherit" });
+    if (status === 0) {
+      results.push([id, `${name}@${version}`, dryRun ? `dry-run ok (tag ${tag})` : `published (tag ${tag})${attempt > 1 ? `, attempt ${attempt}` : ""}`]);
+      return;
+    }
+    if (!dryRun) {
+      await sleep(attempt * 5_000); // the registry needs a moment until a new version is visible
+      if (isPublished(name, version)) {
+        console.log(`  ${name}@${version} is on npm although "npm publish" failed – counted as published.`);
+        results.push([id, `${name}@${version}`, `published (tag ${tag}), npm reported an error`]);
+        return;
+      }
+    }
+    if (attempt < MAX_ATTEMPTS) {
+      console.log(`  "npm publish" failed (exit ${status}) – retrying in ${RETRY_PAUSE_MS / 1000} s …`);
+      await sleep(RETRY_PAUSE_MS);
+    }
+  }
+  results.push([id, `${name}@${version}`, `FAILED after ${MAX_ATTEMPTS} attempts`]);
 }
 
 for (const id of LIBS.filter(selected)) {
@@ -129,15 +154,21 @@ for (const id of LIBS.filter(selected)) {
   run("pnpm", ["pack", "--pack-destination", tmp], dir);
   const tgz = readdirSync(tmp).find(f => f.endsWith(".tgz") && !before.has(f));
   if (!tgz) throw new Error(`${id}: pnpm pack produced no tarball`);
-  publish(id, pkg.name, pkg.version, join(tmp, tgz), "latest", true);
+  await publish(id, pkg.name, pkg.version, join(tmp, tgz), "latest", true);
 }
 
 for (const id of NG.filter(selected)) {
   const dist = join(root, "angular-builds", id, "dist");
   if (!existsSync(join(dist, "package.json"))) throw new Error(`${id}: ${dist}/package.json missing – build first (pnpm build:angular).`);
   const pkg = readJson(join(dist, "package.json"));
-  publish(id, pkg.name, pkg.version, dist, id === newestNg ? "latest" : `a${id.slice(2)}`);
+  await publish(id, pkg.name, pkg.version, dist, id === newestNg ? "latest" : `a${id.slice(2)}`);
 }
 
-console.log(`\n${dryRun ? "DRY RUN – nothing was published." : "Done."}`);
+const failed = results.filter(([, , status]) => status.startsWith("FAILED"));
+console.log(`\n${dryRun ? "DRY RUN – nothing was published." : failed.length ? "Done – with errors." : "Done."}`);
 console.table(results.map(([id, pkg, status]) => ({ id, package: pkg, status })));
+if (failed.length) {
+  console.error(`\n✖ Not published: ${failed.map(([, pkg]) => pkg).join(", ")}. Run the workflow again (manually, ` +
+    `dry_run off, on the release tag) – packages already on npm are skipped.`);
+  process.exit(1);
+}

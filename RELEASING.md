@@ -84,3 +84,4 @@ pnpm pub:all                  # veröffentlicht (ohne Provenance); --only geht a
 | `E422 … repository.url` | `repository.url` im Manifest passt nicht zu `github.com/guiexperttable/mono` |
 | `npm ERR! code EOTP` | lokal: 2FA-Code fehlt (`npm publish --otp …`) – in CI tritt das mit Trusted Publishing nicht auf |
 | `Versions must be consistent` schlägt fehl | `pnpm version:sync` bzw. `version:patch` vergessen |
+| `TLOG_CREATE_ENTRY_ERROR … (409) an equivalent entry already exists in the transparency log` | vorübergehender Fehler beim Eintragen der Provenance-Signatur ins Sigstore-Log (npm wiederholt intern und trifft auf den eigenen ersten Eintrag). Das Paket ist **nicht** veröffentlicht. `publish.mjs` versucht es seit 1.1.93 dreimal und macht mit den übrigen Paketen weiter. Bleibt ein Paket übrig: Workflow manuell auf dem Release-Tag starten (`gh workflow run npm-publish.yml --ref vX.Y.Z -f dry_run=false`) – schon veröffentlichte Pakete werden übersprungen. |

@@ -56,6 +56,12 @@ class TotalsFooter extends AreaModel {
   [Own AreaModel: two million rows](https://gui.expert/training/custom-area-model/),
   [Footer totals](https://gui.expert/training/footer-totals/)
 
+## Hierarchy
+
+- **`AreaModel`**
+
+  ↳ [`AreaModelAggregateFooter`](AreaModelAggregateFooter.md)
+
 ## Implements
 
 - [`AreaModelIf`](../interfaces/AreaModelIf.md)

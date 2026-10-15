@@ -290,6 +290,29 @@ export interface AreaModelIf {
   getUnfilteredRowCount?(): number;
 
   /**
+   * Optional: drops cached, derived values (e.g. the totals of an {@link AreaModelAggregateFooter}). The table calls
+   * it for all three areas when data may have changed: filter, sorting, editing, `updateCells()` and the public
+   * `tableApi.repaint()` / `repaintHard()` – not on scrolling or internal repaints.
+   *
+   * @example
+   * class CachedTotalsFooter extends AreaModel {
+   *   private total?: number;
+   *   constructor(private readonly body: AreaModelObjectArray<Order>) {
+   *     super();
+   *     this.areaIdent = "footer";
+   *   }
+   *   invalidateDerivedValues(): void { this.total = undefined; }
+   *   override getRowCount(): number { return 1; }
+   *   override getValueAt(_row: number, _col: number): any {
+   *     return this.total ??= this.body.getFilteredRows().reduce((sum, o) => sum + o.total, 0);
+   *   }
+   * }
+   *
+   * @since 1.1.94
+   */
+  invalidateDerivedValues?(): void;
+
+  /**
    * Returns the value of the cell at the specified row and column indices.
    * This is one of the most important methods in the area model, as it provides
    * the actual data to be displayed in each cell.

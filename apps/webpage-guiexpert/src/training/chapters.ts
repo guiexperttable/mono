@@ -191,9 +191,11 @@ export const CHAPTERS: Chapter[] = [
     slug: "footer-totals", no: 16, part: "model", episode: 16, minutes: 5,
     title: "Footer models: totals and key figures", nav: "Footer totals",
     lead: "A footer that sums up exactly the rows you see – and follows filter and sorting.",
-    learn: ["write a footer area model", "sum the filtered rows only once", "find columns by property"],
+    learn: ["write a footer area model", "sum the filtered rows only once", "find columns by property",
+      "since 1.1.94: totals in one option, sums of the selection"],
     api: ["AreaModel", "AreaModelObjectArray.getFilteredRows", "CreateTableModelPara.footerAreaModel",
-      "TableModelIf.getBodyModel"]
+      "TableModelIf.getBodyModel", "CreateTableModelPara.footerAggregates", "AreaModelAggregateFooter",
+      "aggregateColumns", "TableApi.getSelectionAggregates"]
   },
   {
     slug: "custom-area-model", no: 17, part: "model", episode: 17, minutes: 6,

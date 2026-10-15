@@ -141,6 +141,25 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   }
 
   /**
+   * The leaves (rows without children) of the whole tree, depth-first in the current order – independent of the
+   * expanded state. Used for totals: collapsing a node does not change them, and parent rows are not counted twice.
+   *
+   * @param {boolean} [filtered=true] - only the leaves the active filter keeps (`externalFilterChanged`); `false`: all
+   * @returns {TreeRowIf<S>[]} a new array
+   *
+   * @example
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * const total = aggregate(treeModel.getLeafRows(), row => row.data.total, "sum");
+   *
+   * @since 1.1.94
+   */
+  getLeafRows(filtered: boolean = true): TreeRowIf<S>[] {
+    const keepAll = !filtered || !this.lastPredictFn;
+    return this.collectAllRows(this.rows ?? [], [])
+      .filter(row => !row.children?.length && (keepAll || row.keep));
+  }
+
+  /**
    * The displayed rows: all parents expanded and accepted by the active filter, in display order.
    *
    * @returns {TreeRowIf<S>[]} the displayed tree rows (do not modify the array)

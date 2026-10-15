@@ -1,6 +1,6 @@
 # TODO-Prompt 005: Aggregation und Gesamtzeile (Helfer, Footer-Modell, Auswahl-Summen)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `aggregation` (Branch `feat/aggregation`, Design `prompts/005-aggregation-gesamtzeile.design.md`)
+> Status: **umgesetzt** (15.10.2026, Branch `feat/aggregation`, selbständig – Entscheidungen im Design-Dokument) · angelegt 14.10.2026 · Slug `aggregation` (Branch `feat/aggregation`, Design `prompts/005-aggregation-gesamtzeile.design.md`)
 > Abhängigkeiten: 001 (ARIA) für die Footer-Zellen (`rowheader`/Beschriftung), sonst keine.
 > **Grundlage für 006 (Row Grouping), 007 (Pivot) und 008 (Show values as):** Dieser Prompt baut die gemeinsamen
 > Aggregatoren. Die späteren Prompts bauen sie nicht neu, sondern nutzen sie.
@@ -115,7 +115,7 @@ Rechenkorrektheit (vor allem `merge`/`avg`), Cache und Invalidierung, Eignung de
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Aggregator-Interface, Footer-Modell, Invalidierung, Komfort-API 🛑
-- [ ] G1–G12 umgesetzt und getestet; Fixture `test-utils/grouping-fixtures.ts` angelegt
-- [ ] `instructions.md` §5.4 und Kapitel `footer-totals` aktualisiert; `TODO.md`-Eintrag abgehakt
-- [ ] Hinweis in `prompts/006-row-grouping.md` und `prompts/007-pivot.md` geprüft: dort „Aggregatoren aus 005“
+- [x] Design-Dokument mit Aggregator-Interface, Footer-Modell, Invalidierung, Komfort-API 🛑
+- [x] G1–G12 umgesetzt und getestet; Fixture `test-utils/grouping-fixtures.ts` angelegt
+- [x] `instructions.md` §5.4 und Kapitel `footer-totals` aktualisiert; `TODO.md`-Eintrag abgehakt
+- [x] Hinweis in `prompts/006-row-grouping.md` und `prompts/007-pivot.md` geprüft: dort „Aggregatoren aus 005“

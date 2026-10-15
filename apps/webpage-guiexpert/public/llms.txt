@@ -33,6 +33,7 @@
 - Accessible: WAI-ARIA grid/treegrid for screen readers, full keyboard navigation, announcements via a live region, checked with axe-core (WCAG 2.1 AA) – since 1.1.91.
 - Overlays "Loading…" (CSS spinner, tableApi.showLoadingOverlay(), `loading` prop in every wrapper) and "No rows to show" / "No matching rows" – plain HTML/CSS, no library – since 1.1.92.
 - Row numbers like in a spreadsheet: `rowNumbersVisible: true` in TableFactory.createTableModel (or RowNumberColumnDef) – fixed left, width fits the largest number, click selects the row – since 1.1.93.
+- Total rows that follow filter and sorting: `footerAggregates: { total: "sum" }` in TableFactory.createTableModel (sum, count, avg, min, max, countDistinct, first, last or your own aggregator; several rows with labels), helpers aggregate() / aggregateColumns(), and count/sum/average of the selected cells for a status bar (tableApi.getSelectionAggregates()) – since 1.1.94.
 - State persistence: column layout, sorting, scroll position, tree, checked and selected rows – in localStorage (autoRestoreOptions) or on your server (tableApi.getState() / applyState(), initialState, onStateChanged) – since 1.1.92.
 - Components are framework‑agnostic; core stays consistent across ecosystems.
 - Repository is actively maintained as of mid‑2025.

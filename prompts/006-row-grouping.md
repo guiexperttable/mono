@@ -8,6 +8,11 @@
 > (`src/lib/table/aggregation/`), die Gesamtzeile und die Fixture `test-utils/grouping-fixtures.ts`. Dieser Prompt
 > baut darauf die Gruppier-Engine. Ist 005 nicht umgesetzt: anhalten und fragen.
 >
+> **005 ist umgesetzt (1.1.94)**, API im Design `prompts/005-aggregation-gesamtzeile.design.md`: `AggregatorIf`
+> (`init`/`add`/`merge`/`result`), `Aggregators`, `getAggregator`, `aggregateColumns`, `createValueGetter`,
+> `formatAggregateValue`, `AreaModelAggregateFooter` (Option `getRows` für eine eigene Quelle; `AreaModelIf.invalidateDerivedValues?()`
+> ruft die Tabelle nach Filter/Sortierung/Editieren), Fixture `createSales()` in `test-utils/grouping-fixtures.ts`.
+>
 > **Reihenfolge: nach 005, vor 007 (Pivot).** Row Grouping baut die Gruppier-Engine, auf der Pivot später aufsetzt.
 > Bei ag-Grid ist das genauso: Pivot gibt es dort nur zusammen mit Row Grouping.
 >

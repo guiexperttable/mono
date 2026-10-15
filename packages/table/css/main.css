@@ -46,6 +46,27 @@
   padding-right: 10px;
 }
 
+/* Total rows of AreaModelAggregateFooter (1.1.94) – before the align classes, so a column's footer class wins */
+.ge-table-footer-aggregate {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ge-table-footer-label {
+  font-weight: 600;
+  text-align: start;
+}
+
+/* the next footer cell is empty: the label may run into it instead of being cut off */
+.ge-table-footer-label-overflow {
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.ge-table-footer-label-overflow .ge-table-label-div {
+  overflow: visible;
+}
+
 .ge-table-text-align-left {
   text-align: left;
 }

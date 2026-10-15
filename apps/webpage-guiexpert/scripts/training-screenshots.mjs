@@ -27,6 +27,7 @@ const DEMOS = {
   "array-of-arrays": { slug: "array-of-arrays", wait: 800 },
   "header-groups": { slug: "header-groups" },
   "footer-totals": { slug: "footer-totals", search: "berlin" },
+  "footer-aggregates": { slug: "footer-totals", search: "berlin", drag: [[1, 3], [4, 5]] },
   "custom-area-model": { slug: "custom-area-model", button: "row 1,000,000" },
   "fixed-columns": { slug: "fixed-columns", button: "→ scroll right" },
   "row-numbers": { slug: "fixed-columns", button: "sort by total ↓", numbers: [[2], [6]] },

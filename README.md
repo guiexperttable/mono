@@ -6,6 +6,7 @@ Accessible: WAI-ARIA grid/treegrid for screen readers, full keyboard navigation,
 Built-in overlays "Loading…" (CSS spinner) and "No rows to show" / "No matching rows" – plain HTML/CSS (since 1.1.92).
 Remembers column layout, sorting, selection and tree state – in `localStorage` or on your server via a JSON state API (since 1.1.92).
 Row numbers like in a spreadsheet – one flag, `rowNumbersVisible: true` (since 1.1.93).
+Total rows (sum, average, count, min, max …) that follow filter and sorting – `footerAggregates: { total: "sum" }` – and the sum of the selected cells for a status bar (since 1.1.94).
 
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 

@@ -5,7 +5,11 @@ import {
   TableSelectionStateIf, TableStateRangeIf, TableHeaderGroupStateIf, StateStorageIf, ALL_TABLE_STATE_PARTS, TableStateService,
   GeStateChangeEvent, readLegacyState, removeLegacyState,
   RowNumberCellRenderer, RowNumberColumnDef, RowNumberMode, RowNumberOptions, RowNumberOptionsIf,
-  getLeadingRowNumberColumnCount, isRowNumberColumnDef
+  getLeadingRowNumberColumnCount, isRowNumberColumnDef,
+  AggregatorIf, AggregatorName, AggregatorRef, ValueAccessor, AggregateSpecIf, AggregateSpec, AggregateSpecMap, Aggregators,
+  getAggregator, createValueGetter, aggregate, aggregateColumns, formatAggregateValue, SelectionAggregatesIf,
+  SelectionAggregator, AggregateFooterRowIf, AggregateFooterOptionsIf, AggregateFooterConfig, AreaModelAggregateFooter,
+  AggregateCellRenderer, isAreaModelAggregateFooter
 } from "__CORE__";
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;

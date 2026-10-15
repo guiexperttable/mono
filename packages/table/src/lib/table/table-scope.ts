@@ -621,7 +621,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const ok: boolean = bodyAreaModel.setValue(rowIndex, columnIndex, value);
       if (ok) {
         this.resetEditorRenderer();
+        this.invalidateAggregates();
         this.repaint();
+        // values the app derives in onModelChanged (and repaints) are counted by the next repaint
+        this.invalidateAggregates();
         this.eventListener.onModelChanged?.(GeModelChangeEvent.createSingle(rowIndex, columnIndex));
         this.hostElement.focus();
       }
@@ -1071,6 +1074,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       }
       this.tableModel.externalFilterChanged(predictFn);
       this.reapplySorting(); // filtering starts from the unsorted rows
+      this.invalidateAggregates();
       this.scrollViewport.scrollTo(0, 0);
       this.tableModel.recalcHeightAndPadding();
       this.resetSizeOfWrapperDiv();
@@ -1124,6 +1128,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const sortItem = new SortItem(colIdx, newState);
     const done = this.tableModel.doSort([sortItem]);
     if (done) {
+      this.invalidateAggregates(); // sorted in place: first/last
       this.lastSortCompareFn = undefined;
       this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = '');
       colDef.sortState = newState;
@@ -1576,11 +1581,13 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // the current sort order: the last sort(fn), otherwise the columns with a sortState (header icons) – before only
     // the items stored by autoRestoreOptions were used, so reSort() did nothing without them
     this.reapplySorting();
+    this.invalidateAggregates();
     this.repaint();
   }
 
   sort(compareFn: (a: any, b: any) => number) {
     this.tableModel.sort(compareFn);
+    this.invalidateAggregates();
     this.lastSortCompareFn = compareFn;
     this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = ''); // the header icons no longer apply
     this.repaint(); // without it the new order only appeared after the next scroll
@@ -1604,6 +1611,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (sortItems.length) {
       this.lastSortCompareFn = undefined;
       this.tableModel.doSort(sortItems);
+      this.invalidateAggregates();
     }
   }
 

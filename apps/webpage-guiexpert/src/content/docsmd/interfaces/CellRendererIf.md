@@ -32,6 +32,7 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/),
 ## Implemented by
 
 - [`ActionsCellRenderer`](../classes/ActionsCellRenderer.md)
+- [`AggregateCellRenderer`](../classes/AggregateCellRenderer.md)
 - [`CellGroupExtCellRenderer`](../classes/CellGroupExtCellRenderer.md)
 - [`CheckboxBooleanPropertyCellRenderer`](../classes/CheckboxBooleanPropertyCellRenderer.md)
 - [`CheckboxCellRenderer`](../classes/CheckboxCellRenderer.md)

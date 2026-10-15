@@ -44,6 +44,36 @@ import Pipeline from "../../components/training/diagrams/Pipeline.astro";
       object – call <code>invalidate()</code> and <ApiLink name="TableApi.repaint" />.</p>
   </Callout>
 
+  <h2 id="built-in">Built in: totals in one option</h2>
+  <p>
+    The footer model above is how it works inside – since 1.1.94 the table has it built in.
+    <ApiLink name="CreateTableModelPara.footerAggregates" /> builds an <ApiLink name="AreaModelAggregateFooter" />: the keys
+    are column properties, the values aggregators – <code>"sum"</code>, <code>"count"</code>, <code>"avg"</code>,
+    <code>"min"</code>, <code>"max"</code>, <code>"countDistinct"</code>, <code>"first"</code>, <code>"last"</code> or your own.
+  </p>
+  <Snippet file="demos/footer-aggregates.ts" region="model" />
+  <ul>
+    <li><strong>Follows filter and sorting</strong> like the model above, and computes once per change – never while scrolling.
+      Filter, sorting, editing, <ApiLink name="TableApi.updateCells" /> and <ApiLink name="TableApi.repaint" /> recompute it;
+      no <code>invalidate()</code> of your own.</li>
+    <li><strong>Labels</strong>: <code>"100,000 rows"</code> by default in the first column without a total, or your own per row.
+      A short form for one row: <code>footerAggregates: &#123; quantity: "sum", total: "sum" &#125;</code>.</li>
+    <li><strong>Numbers stay numbers</strong>: the footer shows <code>"27,481,033.5"</code>, Excel gets the number
+      (<ChapterLink slug="excel-export" />); a footer renderer of the column gets it, too.</li>
+    <li>The same aggregators without a table: <ApiLink name="aggregateColumns" />.</li>
+  </ul>
+  <p>
+    A status bar for the selection – count, sum and average of the selected cells, like in a spreadsheet – is
+    <ApiLink name="TableApi.getSelectionAggregates" /> in <code>onSelectionChanged</code>:
+  </p>
+  <Snippet file="demos/footer-aggregates.ts" region="status" />
+  <LiveDemo name="footer-aggregates" title="Totals in one option, sums of the selection" height={400}
+            caption="Type “berlin”, then drag over Qty … Total – the toolbar shows the sum of the selected cells." />
+  <Callout type="version">
+    <p>Since 1.1.94. The tag <code>ep-016</code> of the demo repository shows the own footer model of this episode; the
+      built-in footer needs 1.1.94 or later.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>A model without any array behind it – two million rows computed on demand: <ChapterLink slug="custom-area-model" />.</p>
 </TrainingLayout>

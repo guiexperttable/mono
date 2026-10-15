@@ -22,6 +22,8 @@ import { isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
 import { RowNumberColumnDef } from "../data/common/row-number-column-def";
 import { RowNumberOptionsIf } from "../data/common/row-number-options.if";
 import { getLeadingRowNumberColumnCount } from "../data/common/row-number-columns";
+import { AreaModelAggregateFooter } from "../data/tablemodel/areamodel/area-model-aggregate-footer";
+import type { AggregateFooterConfig } from "../data/tablemodel/areamodel/aggregate-footer-options.if";
 
 
 /**
@@ -54,8 +56,24 @@ export interface CreateTableModelPara {
   headerAreaModel: AreaModelIf;
   /** Model of the body. Default: built from `rows` (objects or tree rows) or `bodyData`. See {@link AreaModel} for own models. */
   bodyAreaModel: AreaModelIf;
-  /** Model of the footer. Default: `footerData`, otherwise no footer. Totals that follow the filter: an own {@link AreaModel}. */
+  /** Model of the footer. Default: `footerAggregates`, `footerData`, otherwise no footer. */
   footerAreaModel: AreaModelIf;
+  /**
+   * A footer with totals that follow filter and sorting ({@link AreaModelAggregateFooter}): `{ total: "sum" }` (one
+   * row – the key is the property of the column), `[{ label, aggregates }, …]` (several rows) or full
+   * {@link AggregateFooterOptionsIf}. Row height: `defaultRowHeights.footer`. Ignored with an own `footerAreaModel`
+   * (warning); `footerData` is ignored with it (warning).
+   *
+   * @example
+   * const tableModel = TableFactory.createTableModel({
+   *   rows: orders,
+   *   columnDefs,
+   *   footerAggregates: { quantity: "sum", total: "sum" }       // footer: "100,000 rows" | … | 549,812 | 27,481,033.5
+   * });
+   *
+   * @since 1.1.94
+   */
+  footerAggregates: AggregateFooterConfig;
   /** Number of columns fixed on the left (side "west"). Default 0. */
   fixedLeftColumnCount: number;
   /** Number of columns fixed on the right (side "east"). Default 0. */
@@ -228,7 +246,8 @@ export class TableFactory {
         p.headerAreaModel = new AreaModelHidden("header");
       }
     }
-    if (!p.footerAreaModel) {
+    const footerAggregates = TableFactory.checkFooterAggregates(p);
+    if (!p.footerAreaModel && !footerAggregates) {
       if (p.footerData?.length) {
         p.footerAreaModel = new AreaModelArrayOfArrays<string>(
           "footer",
@@ -273,6 +292,12 @@ export class TableFactory {
       }
     }
 
+    if (footerAggregates) {
+      const options = AreaModelAggregateFooter.toOptions(footerAggregates);
+      p.footerAreaModel = new AreaModelAggregateFooter(p.bodyAreaModel!, p.columnDefs ?? [], // the body is built above
+        { ...options, rowHeight: options.rowHeight ?? p.defaultRowHeights.footer });
+    }
+
     if (p.fixedLeftColumnCount === undefined) {
       p.fixedLeftColumnCount = 0;
     }
@@ -294,7 +319,7 @@ export class TableFactory {
     return new TableModel(
       p.headerAreaModel,
       p.bodyAreaModel,
-      p.footerAreaModel,
+      p.footerAreaModel ?? new AreaModelHidden("footer"),
       p.fixedLeftColumnCount,
       p.fixedRightColumnCount,
       p.rowCheckboxVisible,
@@ -308,6 +333,24 @@ export class TableFactory {
     );
   }
 
+
+  /**
+   * `footerAggregates`: returns the configuration if the factory builds an aggregate footer (after the body model),
+   * `undefined` if there is none or an own `footerAreaModel` wins.
+   */
+  private static checkFooterAggregates(p: Partial<CreateTableModelPara>): AggregateFooterConfig | undefined {
+    if (!p.footerAggregates) {
+      return undefined;
+    }
+    if (p.footerAreaModel) {
+      console.warn("TableFactory.createTableModel: footerAggregates is ignored – an own footerAreaModel is given.");
+      return undefined;
+    }
+    if (p.footerData?.length) {
+      console.warn("TableFactory.createTableModel: footerData is ignored – footerAggregates builds the footer.");
+    }
+    return p.footerAggregates;
+  }
 
   /**
    * `rowNumbersVisible`: puts a RowNumberColumnDef in front of the column definitions (and an empty cell in front of

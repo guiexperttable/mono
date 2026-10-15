@@ -13,3 +13,4 @@ Regeln und Episoden-Backlog: siehe `CLAUDE.md` § 10.
 | 04 | [Spalten anpassen, neu laden – alles noch da](04-zustand-merken/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.92 (Branch `feat/table-state`) |
 | 05 | [Zeilennummern wie in Excel – eine Zeile Code](05-zeilennummern/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.93 (Branch `feat/row-numbers`) |
 | 06 | [Summenzeile in einer Zeile Code](06-summenzeile/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.94 (Branch `feat/aggregation`) |
+| 07 | [Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz](07-row-grouping/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.94 (Branch `feat/row-grouping`) |

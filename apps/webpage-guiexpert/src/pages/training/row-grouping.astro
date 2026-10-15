@@ -1,0 +1,136 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="row-grouping">
+
+  <h2 id="idea">Tree, grouping, pivot</h2>
+  <p>
+    Your orders come as a flat list. The question is “how much per country – and per city?”. Three tools look alike:
+  </p>
+  <table>
+    <thead><tr><th></th><th>Tree table</th><th>Row grouping</th><th>Pivot table</th></tr></thead>
+    <tbody>
+      <tr><th>Input</th><td>nested data (<code>children</code>)</td><td>flat rows</td><td>flat rows</td></tr>
+      <tr><th>Hierarchy</th><td>in the data</td><td>from the grouped columns</td><td>from the row fields</td></tr>
+      <tr><th>Original rows</th><td>yes</td><td>yes, below their group</td><td>no</td></tr>
+      <tr><th>Columns</th><td>yours</td><td>yours (+ a group column)</td><td>made from data values</td></tr>
+      <tr><th>Totals</th><td>you compute them</td><td>per group and column</td><td>in every cell</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The tree table (<ChapterLink slug="tree-table" />) needs data that is already nested. Row grouping builds that tree
+    for you – since <code>@guiexpert/table@1.1.94</code> with one factory call. Pivot tables are not built in yet.
+  </p>
+
+  <h2 id="factory">One factory call</h2>
+  <p>
+    <ApiLink name="RowGroupFactory.createTableModel" /> takes the rows, the columns, the levels and the aggregates. The keys
+    of <code>aggregations</code> are column properties, the values the aggregators of
+    <ChapterLink slug="footer-totals" /> – <code>"sum"</code>, <code>"avg"</code>, <code>"count"</code>, <code>"min"</code>,
+    <code>"max"</code> … or your own:
+  </p>
+  <Snippet file="demos/row-grouping.ts" region="model" title="src/model/order-groups.ts" />
+  <LiveDemo name="row-grouping" title="100,000 orders grouped" height={440}
+            caption="Switch the grouping with the buttons, type “laptop” – groups, counts and totals follow." />
+  <p>What the factory builds:</p>
+  <ul>
+    <li>a <strong>group column</strong> with arrows and labels – the key and the number of its orders, e.g.
+      <code>"Berlin (804)"</code> – fixed on the left, header
+      <code>"Country › City"</code>;</li>
+    <li>the grouped columns <strong>hidden</strong> – their values are in the labels (<code>hideGroupedColumns: false</code>
+      keeps them);</li>
+    <li>a body model <ApiLink name="AreaModelRowGroups" /> – a tree, so <ApiLink name="TableApi.expandAll" />,
+      <ApiLink name="TableApi.collapseAll" />, the keyboard and screen readers work as in <ChapterLink slug="tree-table" />;</li>
+    <li>a <strong>total row</strong> with the same aggregates (<code>footerAggregates: false</code> removes it).</li>
+  </ul>
+  <p><code>expanded</code> sets what is open at the start: <code>true</code>, <code>false</code>, a number of open levels
+    (<code>1</code> = countries open, cities closed) or a function per group.</p>
+
+  <h2 id="levels">Levels: columns or computed keys</h2>
+  <p>
+    A level is a property path (<code>"country"</code>, <code>"address.city"</code>), a function or the full form
+    <ApiLink name="RowGroupFieldIf" /> with a name, a label for the header, a format for the key and an order:
+  </p>
+  <Snippet file="demos/row-grouping.ts" region="levels" />
+  <ul>
+    <li>Groups are sorted ascending by key – <code>order: "desc"</code>, <code>"insertion"</code> or your own comparison.</li>
+    <li><code>null</code>, <code>undefined</code> and <code>""</code> form one group <code>"(empty)"</code>, always last.</li>
+    <li>Keys are compared as values: <code>1</code> and <code>"1"</code> are two groups, two dates of the same day one.</li>
+    <li>Give functions a <code>name</code>: it is part of the group id that remembers which groups were open.</li>
+  </ul>
+
+  <h2 id="average">The average trap</h2>
+  <p>Six sales, grouped by region and product, <code>aggregations: &#123; umsatz: "avg" &#125;</code>:</p>
+  <table>
+    <thead><tr><th>Group</th><th>Sales</th><th>Average</th></tr></thead>
+    <tbody>
+      <tr><th>Nord › A</th><td>100, 120</td><td>110</td></tr>
+      <tr><th>Nord › B</th><td>50</td><td>50</td></tr>
+      <tr><th>Nord</th><td>100, 50, 120</td><td><strong>90</strong> – not (110 + 50) / 2 = 80</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The average of a group is the average of its rows, never the average of its sub-groups. The aggregators keep a
+    <em>state</em> (sum and count), and a group merges the states of its sub-groups – so every level is right and the
+    table still visits every row only once. The same holds for your own aggregator if its <code>merge</code> is right
+    (<ChapterLink slug="footer-totals" hash="#built-in" />).
+  </p>
+
+  <h2 id="filter-sort">Filter and sort</h2>
+  <p>
+    The filter function gets <strong>your objects</strong> – the same function as in a flat table
+    (<ChapterLink slug="filtering" />). Groups without a match disappear, the counts in the labels and all totals follow:
+  </p>
+  <Snippet file="demos/row-grouping.ts" region="filter" />
+  <p>
+    Sorting (<ChapterLink slug="sorting" />): a double click on <em>Total</em> sorts the groups by their sum and the orders
+    inside each group by their total; on the group column the groups by key. <ApiLink name="TableApi.sort" /> with your own
+    comparison sorts the orders inside their groups.
+  </p>
+
+  <h2 id="regroup">Regroup at runtime</h2>
+  <p>
+    A new table model would rebuild the table in every framework wrapper. <ApiLink name="TableApi.setRowGroupBy" /> changes
+    the levels of the existing model – open groups, the filter, the sorting and checked rows stay; the hidden columns and
+    the header of the group column follow:
+  </p>
+  <Snippet file="demos/row-grouping.ts" region="regroup" />
+  <p>A group panel where users drag columns is not built in – it is a few lines of UI around this call.</p>
+
+  <h2 id="edit">Editing and live data</h2>
+  <ul>
+    <li>Group rows are not editable. An edited value (<ChapterLink slug="inline-editing" />) recomputes only the groups of its
+      row – not all 100,000 rows.</li>
+    <li>An edited <em>grouped</em> value (the city of an order) moves the row into its new group.</li>
+    <li><ApiLink name="TableApi.updateCells" /> (<ChapterLink slug="live-data" />) updates the visible group rows, too.
+      Changed objects yourself? <code>tableApi.repaint()</code> – changed grouped values: <code>body.regroup()</code> and
+      <code>tableApi.repaintHard()</code>.</li>
+    <li>Excel and the clipboard (<ChapterLink slug="excel-export" />) get the group rows with their labels and numbers.</li>
+    <li>Open groups are remembered by a stable id (country and city, not the position) – with
+      <ChapterLink slug="persist-state" /> they survive a reload.</li>
+  </ul>
+
+  <h2 id="read">Read the groups</h2>
+  <p>For a chart or a summary: <ApiLink name="AreaModelRowGroups.getGroups" /> gives the groups with
+    <code>label</code>, <code>count</code>, <code>results</code> and their rows (<ApiLink name="RowGroupIf" />). Without a table,
+    <ApiLink name="groupRows" /> and <ApiLink name="aggregateRowGroups" /> do the same for any array.</p>
+  <Code lang="ts" code={`const body = tableModel.getBodyModel() as AreaModelRowGroups<Order>;
+const perCountry = body.getGroups().map(g => ({ country: g.label, total: g.results["total"], orders: g.count }));`} />
+
+  <Callout type="note" title="Not included">
+    <p>No group panel by drag and drop, no Excel outline levels, no pivot tables (data values as columns) – yet.
+      In ag-Grid, row grouping is an Enterprise feature; here it is MIT-licensed, also for commercial use.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.94. The tag <code>ep-036</code> of the demo repository follows after the release.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview of all chapters, or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

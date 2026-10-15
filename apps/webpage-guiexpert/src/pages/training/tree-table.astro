@@ -9,6 +9,10 @@ import Callout from "../../components/training/Callout.astro";
 <TrainingLayout slug="tree-table">
 
   <h2 id="data">Hierarchical data</h2>
+  <Callout type="version" title="Flat data? Row grouping (since 1.1.94)">
+    <p>This chapter starts from data that is already nested. If your rows are flat and you only want them grouped by
+      columns with totals per group, let the table build the tree: <ChapterLink slug="row-grouping" />.</p>
+  </Callout>
   <p>5,000 orders, grouped by country → customer → order. Every node has its own totals and a unique id:</p>
   <Snippet file="demos/tree-table.ts" region="data" title="src/model/order-tree.ts" />
 

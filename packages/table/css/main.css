@@ -434,6 +434,11 @@
   --ge-table-color-star-rating: #a86f00;
   --ge-table-color-progress-bar: #1e874b;
 
+  /* Row grouping: group rows (since 1.1.94) */
+  --ge-table-row-group-bg: rgba(0, 0, 0, 0.045);
+  --ge-table-row-group-text: inherit;
+  --ge-table-row-group-label-font-weight: 600;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
@@ -520,6 +525,11 @@ html[data-theme="dark"] {
   --ge-table-color-star-rating: #fcb515;
   --ge-table-color-progress-bar: #36BB6C;
 
+  /* Row grouping: group rows (since 1.1.94) */
+  --ge-table-row-group-bg: rgba(255, 255, 255, 0.06);
+  --ge-table-row-group-text: inherit;
+  --ge-table-row-group-label-font-weight: 600;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
   --ge-table-overlay-content-bg: #1f2937;
@@ -531,6 +541,31 @@ html[data-theme="dark"] {
   /* Row numbers (since 1.1.93) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #aaa;
+}
+/* Row grouping (RowGroupFactory / AreaModelRowGroups, since 1.1.94) */
+
+/* every cell of a group row */
+.ge-table-col-div.ge-table-row-group {
+  background-color: var(--ge-table-row-group-bg);
+  color: var(--ge-table-row-group-text);
+}
+
+/* the label in the group column: "Nord (3)" */
+.ge-table-row-group-label {
+  font-weight: var(--ge-table-row-group-label-font-weight);
+}
+
+.ge-table-row-group-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the aggregates of a group row */
+.ge-table-row-group-aggregate {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ge-table-row-group-label-font-weight);
 }
 /* Tree table */
 

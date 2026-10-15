@@ -19,6 +19,7 @@
 - [AreaModelHidden](classes/AreaModelHidden.md)
 - [AreaModelObjectArray](classes/AreaModelObjectArray.md)
 - [AreaModelObjectArrayWithColumndefs](classes/AreaModelObjectArrayWithColumndefs.md)
+- [AreaModelRowGroups](classes/AreaModelRowGroups.md)
 - [AreaModelTree](classes/AreaModelTree.md)
 - [AreaObjectMap](classes/AreaObjectMap.md)
 - [AriaGridInfo](classes/AriaGridInfo.md)
@@ -101,6 +102,9 @@
 - [Renderer](classes/Renderer.md)
 - [RequestChunk](classes/RequestChunk.md)
 - [ResizeHandler](classes/ResizeHandler.md)
+- [RowGroup](classes/RowGroup.md)
+- [RowGroupColumnDef](classes/RowGroupColumnDef.md)
+- [RowGroupFactory](classes/RowGroupFactory.md)
 - [RowNumberCellRenderer](classes/RowNumberCellRenderer.md)
 - [RowNumberColumnDef](classes/RowNumberColumnDef.md)
 - [RowNumberOptions](classes/RowNumberOptions.md)
@@ -169,12 +173,14 @@
 - [CreateTableModelPara](interfaces/CreateTableModelPara.md)
 - [CrudOptionsIf](interfaces/CrudOptionsIf.md)
 - [DefaultRowHeightsIf](interfaces/DefaultRowHeightsIf.md)
+- [DerivedValuesChangeIf](interfaces/DerivedValuesChangeIf.md)
 - [DomServiceIf](interfaces/DomServiceIf.md)
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
 - [EventListenerIf](interfaces/EventListenerIf.md)
 - [EventSelectionChangedListenerIf](interfaces/EventSelectionChangedListenerIf.md)
 - [ExcelServiceIf](interfaces/ExcelServiceIf.md)
 - [FocusModelIf](interfaces/FocusModelIf.md)
+- [GroupRowsOptionsIf](interfaces/GroupRowsOptionsIf.md)
 - [HasDefaultRowHeightIf](interfaces/HasDefaultRowHeightIf.md)
 - [HeaderGroupOptionsIf](interfaces/HeaderGroupOptionsIf.md)
 - [IconIf](interfaces/IconIf.md)
@@ -184,6 +190,11 @@
 - [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
+- [RowGroupColumnOptionsIf](interfaces/RowGroupColumnOptionsIf.md)
+- [RowGroupFieldIf](interfaces/RowGroupFieldIf.md)
+- [RowGroupIf](interfaces/RowGroupIf.md)
+- [RowGroupModelOptionsIf](interfaces/RowGroupModelOptionsIf.md)
+- [RowGroupTableModelParaIf](interfaces/RowGroupTableModelParaIf.md)
 - [RowNumberOptionsIf](interfaces/RowNumberOptionsIf.md)
 - [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
@@ -240,6 +251,9 @@
 - [HtmlStyle](modules.md#htmlstyle)
 - [IsSameFn](modules.md#issamefn)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
+- [RowGroupExpanded](modules.md#rowgroupexpanded)
+- [RowGroupField](modules.md#rowgroupfield)
+- [RowGroupOrder](modules.md#rowgrouporder)
 - [RowNumberMode](modules.md#rownumbermode)
 - [SelectionMode](modules.md#selectionmode)
 - [SelectionType](modules.md#selectiontype)
@@ -316,6 +330,7 @@
 - [TrueFn](modules.md#truefn)
 - [aggregate](modules.md#aggregate)
 - [aggregateColumns](modules.md#aggregatecolumns)
+- [aggregateRowGroups](modules.md#aggregaterowgroups)
 - [calcOverlayKind](modules.md#calcoverlaykind)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [createValueGetter](modules.md#createvaluegetter)
@@ -328,11 +343,16 @@
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
+- [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
 - [isAreaModelAggregateFooter](modules.md#isareamodelaggregatefooter)
+- [isAreaModelRowGroups](modules.md#isareamodelrowgroups)
 - [isAreaModelTree](modules.md#isareamodeltree)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
+- [isGroupRow](modules.md#isgrouprow)
+- [isRowGroup](modules.md#isrowgroup)
+- [isRowGroupColumnDef](modules.md#isrowgroupcolumndef)
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isTreeRow](modules.md#istreerow)
 - [readLegacyState](modules.md#readlegacystate)
@@ -1706,7 +1726,7 @@ const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L74)
+[src/lib/table/instanceof-workaround.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L78)
 
 ## Aggregation
 
@@ -2183,7 +2203,329 @@ const totals = isAreaModelAggregateFooter(footer) ? footer.getResults() : {};
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L91)
+[src/lib/table/instanceof-workaround.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L95)
+
+## Row grouping
+
+### RowGroupExpanded
+
+Ƭ **RowGroupExpanded**\<`T`\>: `boolean` \| `number` \| (`group`: [`RowGroupIf`](interfaces/RowGroupIf.md)\<`T`\>) => `boolean`
+
+Which groups are expanded: all (`true`), none (`false`), the levels above a number (`1` = the top level is open, its
+sub-groups are closed; `0` = all closed), or a function per group.
+
+**`Example`**
+
+```ts
+const onlyNorth: RowGroupExpanded<Sale> = group => group.path[0] === "Nord";
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Defined in
+
+[src/lib/table/rowgroup/row-group-model-options.if.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rowgroup/row-group-model-options.if.ts#L16)
+
+___
+
+### RowGroupField
+
+Ƭ **RowGroupField**\<`T`\>: [`ValueAccessor`](modules.md#valueaccessor)\<`T`\> \| [`RowGroupFieldIf`](interfaces/RowGroupFieldIf.md)\<`T`\>
+
+One level of a row grouping: a property path (`"region"`), a function (`o => o.date.getFullYear()`) or the full form
+[RowGroupFieldIf](interfaces/RowGroupFieldIf.md).
+
+**`Example`**
+
+```ts
+const groupBy: RowGroupField<Sale>[] = ["region", s => s.produkt.toUpperCase()];
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `any` | the row type |
+
+#### Defined in
+
+[src/lib/table/rowgroup/row-group-field.type.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rowgroup/row-group-field.type.ts#L58)
+
+___
+
+### RowGroupOrder
+
+Ƭ **RowGroupOrder**: ``"asc"`` \| ``"desc"`` \| ``"insertion"`` \| (`a`: `unknown`, `b`: `unknown`) => `number`
+
+The order of the groups of one level: ascending (`"asc"`, the default), descending, in the order the keys first
+appear in the rows (`"insertion"`), or an own comparison of two keys. Empty keys (`null`, `undefined`, `""`) are
+always last.
+
+**`Example`**
+
+```ts
+const months: RowGroupOrder = (a, b) => MONTHS.indexOf(a as string) - MONTHS.indexOf(b as string);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/rowgroup/row-group-field.type.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rowgroup/row-group-field.type.ts#L14)
+
+___
+
+### aggregateRowGroups
+
+▸ **aggregateRowGroups**\<`T`\>(`groups`, `aggregations`, `accept?`): `Record`\<`string`, `unknown`\>
+
+Computes the aggregates of all groups ([RowGroupIf.results](interfaces/RowGroupIf.md#results)) and their row counts ([RowGroupIf.count](interfaces/RowGroupIf.md#count)).
+A group of the last level aggregates its rows; every group above **merges** the states of its sub-groups – an
+average stays the average of all rows (sum and count are merged), never the average of averages.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `groups` | [`RowGroup`](classes/RowGroup.md)\<`T`\>[] | the top-level groups of [groupRows](modules.md#grouprows) |
+| `aggregations` | [`AggregateSpecMap`](modules.md#aggregatespecmap)\<`T`\> | key → aggregator (`{ umsatz: "sum" }`, see [AggregateSpecMap](modules.md#aggregatespecmap)) |
+| `accept?` | (`sourceIndex`: `number`) => `boolean` | a filter: only rows it accepts count (index into the source rows) |
+
+#### Returns
+
+`Record`\<`string`, `unknown`\>
+
+the totals over all groups
+
+**`Example`**
+
+```ts
+const groups = groupRows(sales, ["region", "produkt"]);
+const totals = aggregateRowGroups(groups, { umsatz: "avg" });
+groups[0].results.umsatz;   // 90 – Nord: (100 + 50 + 120) / 3, not the mean of A (110) and B (50)
+totals.umsatz;              // 75
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/rowgroup/group-rows.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rowgroup/group-rows.ts#L56)
+
+___
+
+### groupRows
+
+▸ **groupRows**\<`T`\>(`rows`, `groupBy`, `options?`): [`RowGroup`](classes/RowGroup.md)\<`T`\>[]
+
+Groups rows by one or more levels – the engine behind [AreaModelRowGroups](classes/AreaModelRowGroups.md) (and pivot tables). One pass over
+the rows with nested `Map`s: keys are compared as values (`1` and `"1"` are different groups, two dates of the same
+time one group); `null`, `undefined` and `""` form one group (label `"(empty)"`), which is always last. Groups are
+ordered by the `order` of their level (default ascending); the rows of a group stay in source order. The rows are
+not changed.
+
+Aggregates are filled by [aggregateRowGroups](modules.md#aggregaterowgroups).
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | `ArrayLike`\<`T`\> | the rows |
+| `groupBy` | [`RowGroupField`](modules.md#rowgroupfield)\<`T`\>[] | the levels, top first: property paths, functions or [RowGroupFieldIf](interfaces/RowGroupFieldIf.md) |
+| `options?` | [`GroupRowsOptionsIf`](interfaces/GroupRowsOptionsIf.md) | e.g. the label of empty keys |
+
+#### Returns
+
+[`RowGroup`](classes/RowGroup.md)\<`T`\>[]
+
+the groups of the top level (empty for no levels or no rows)
+
+**`Example`**
+
+```ts
+const groups = groupRows(sales, ["region", "produkt"]);
+groups[0].label;                  // "Nord"
+groups[0].children[0].getRows();  // the rows of Nord › A
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/rowgroup/group-rows.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rowgroup/group-rows.ts#L33)
+
+___
+
+### isAreaModelRowGroups
+
+▸ **isAreaModelRowGroups**(`o`): o is AreaModelRowGroups\<any\>
+
+True for the body model of a row grouping ([AreaModelRowGroups](classes/AreaModelRowGroups.md)). It is a tree as well
+(`isAreaModelTree` is true). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableModel.getBodyModel()` |
+
+#### Returns
+
+o is AreaModelRowGroups\<any\>
+
+true for a row grouping
+
+**`Example`**
+
+```ts
+const body = tableModel.getBodyModel();
+const groups = isAreaModelRowGroups(body) ? body.getGroups() : [];
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L150)
+
+___
+
+### isGroupRow
+
+▸ **isGroupRow**(`row`): row is TreeRowIf\<RowGroupIf\<any\>\>
+
+True for a group row of a row grouping: a tree row whose `data` is a [RowGroupIf](interfaces/RowGroupIf.md) (detail rows hold your objects).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | `any` | a body row, e.g. `tableModel.getBodyModel().getRowByIndex(rowIndex)` or `mouseEvent.row` |
+
+#### Returns
+
+row is TreeRowIf\<RowGroupIf\<any\>\>
+
+true for a group row
+
+**`Example`**
+
+```ts
+const eventListener = new EventAdapter();
+eventListener.onMouseClicked = (evt: GeMouseEvent) => {
+  const row = tableModel.getBodyModel().getRowByIndex(evt.rowIndex);
+  if (isGroupRow(row)) console.log("group", row.data.path);
+};
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L132)
+
+___
+
+### isRowGroup
+
+▸ **isRowGroup**(`o`): o is RowGroupIf\<any\>
+
+True for a group of a row grouping ([RowGroupIf](interfaces/RowGroupIf.md)) – the `data` of a group row. Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `treeRow.data` |
+
+#### Returns
+
+o is RowGroupIf\<any\>
+
+true for a group
+
+**`Example`**
+
+```ts
+const row = tableModel.getBodyModel().getRowByIndex(rowIndex);
+if (isTreeRow(row) && isRowGroup(row.data)) console.log(row.data.label, row.data.count);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L112)
+
+___
+
+### isRowGroupColumnDef
+
+▸ **isRowGroupColumnDef**(`o`): o is RowGroupColumnDef
+
+True for the group column of a row grouping ([RowGroupColumnDef](classes/RowGroupColumnDef.md)). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. a column definition |
+
+#### Returns
+
+o is RowGroupColumnDef
+
+true for the group column
+
+**`Example`**
+
+```ts
+const groupColumnIndex = (tableModel.getColumnDefs() ?? []).findIndex(isRowGroupColumnDef);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L166)
 
 ## DOM
 
@@ -2516,7 +2858,7 @@ Determines if the given model is an AreaModelTree.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L32)
+[src/lib/table/instanceof-workaround.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L36)
 
 ___
 
@@ -2548,7 +2890,7 @@ isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L46)
+[src/lib/table/instanceof-workaround.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L50)
 
 ___
 
@@ -2572,7 +2914,7 @@ Checks if the given object is a CheckboxColumnDef.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L58)
+[src/lib/table/instanceof-workaround.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L62)
 
 ___
 
@@ -2596,7 +2938,7 @@ Checks if the given row is a tree row.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L18)
+[src/lib/table/instanceof-workaround.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L22)
 
 ___
 

@@ -35,6 +35,9 @@ This is the UI-agnostic table component for your next web app. 😊
   `AreaModelAggregateFooter`), helpers `aggregate()` / `aggregateColumns()` with mergeable aggregators (sum, count, avg,
   min, max, countDistinct, first, last or your own), and count/sum/average of the selected cells for a status bar
   (`tableApi.getSelectionAggregates()`) – since 1.1.94
+- Row grouping with aggregation: flat rows grouped by one or more properties or functions, group rows with arrow,
+  label (`"Berlin (12)"`) and sum/average/… per column, total row, filter and sorting by aggregate, regroup at runtime
+  (`RowGroupFactory.createTableModel({ rows, groupBy, aggregations })`, `tableApi.setRowGroupBy()`) – since 1.1.94
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

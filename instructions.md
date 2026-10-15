@@ -559,8 +559,8 @@ const tableModel = TableFactory.createTableModel({
 ```
 
 - **Data**: the rows the body shows (after `externalFilterFunction`); in a tree all leaves the filter keeps, expanded
-  or not; with `bodyData` or an own body model every row via `getValueAt` of the column. `source: "all"` ignores the
-  filter, `getRows` sets an own source.
+  or not (in a row grouping, 5.6, its rows – the factory adds this footer for you); with `bodyData` or an own body
+  model every row via `getValueAt` of the column. `source: "all"` ignores the filter, `getRows` sets an own source.
 - **Label**: `"2 rows"` in the first data column without an aggregate (screen readers announce it as row header);
   `labelProperty` picks the column, `label` per row sets the text (string or `(rowCount, results) => string`).
 - **Cells**: the value is the raw result – Excel gets numbers (`downloadExcel()` exports the footer, 6.10), a footer
@@ -674,6 +674,79 @@ Tips for very large models:
   end of the table drops from ~29 ms to ~15 ms). The built-in models do this automatically.
 - `scrollToIndex()` uses `getYPosByRowIndex()`. Since 1.1.85 the `AreaModel` default derives it from the row heights
   (O(1) with `getConstantRowHeight()`, otherwise O(n)); override it for huge models with variable row heights.
+
+### 5.6 Row grouping with aggregation (since 1.1.94)
+
+Flat rows grouped by one or more properties: every group is a row with an arrow, a label (`"Nord (3)"`) and the
+aggregates of its rows per column; below it the sub-groups or the original rows; a total row in the footer. The columns
+stay the columns of your data (unlike a pivot table). Built on the tree table, so expanding, `expandAll()`/`collapseAll()`,
+keyboard, screen readers and `autoRestoreOptions` work as there.
+
+```ts
+import { ColumnDef, RowGroupFactory, px120 } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+
+const sales: Sale[] = [
+  { region: "Nord", produkt: "A", monat: "Jan", umsatz: 100 }, { region: "Nord", produkt: "B", monat: "Jan", umsatz: 50 },
+  { region: "Süd", produkt: "A", monat: "Jan", umsatz: 80 }, { region: "Nord", produkt: "A", monat: "Feb", umsatz: 120 },
+  { region: "Süd", produkt: "B", monat: "Feb", umsatz: 70 }, { region: "Süd", produkt: "A", monat: "Feb", umsatz: 30 }
+];
+const tableModel = RowGroupFactory.createTableModel<Sale>({
+  rows: sales,
+  columnDefs: ["region", "produkt", "monat", "umsatz"].map(p => new ColumnDef(p, p, px120)),
+  groupBy: ["region", "produkt"],          // levels, top first
+  aggregations: { umsatz: "sum" }          // key = property of the column
+});
+// ▾ Nord (3)  … 270   ▾ A (2) … 220   Jan 100 · Feb 120   ▾ B (1) … 50 …   footer: "6 rows" … 450
+```
+
+What the factory does: a group column (arrows and labels, fixed on the left, behind row numbers and checkbox column)
+with the header `"region › produkt"`, the grouped columns hidden (`hideGroupedColumns: false` keeps them), the body an
+`AreaModelRowGroups`, a total row from the `aggregations` (`footerAggregates: false` removes it, or pass an own
+configuration as in 5.4).
+
+- **Levels**: property paths (`"address.city"`), functions (`o => new Date(o.date).getFullYear()`) or
+  `{ value, name, label, format, order }`. Groups are ordered ascending (`order: "desc" | "insertion" | (a, b) => …`);
+  `null`, `undefined` and `""` form one group `"(empty)"` (`emptyLabel`), always last; `1` and `"1"` are different groups.
+- **Aggregates**: the aggregators of 5.4. Every group above the last level merges the states of its sub-groups – an
+  average is the average of all rows (Nord: 270 / 3 = 90), never the average of averages. Formatted with `format` of the
+  spec or two decimals; the cell value stays the number (Excel).
+- **Expanded**: `expanded: true` (default), `false`, a number of open levels (`0` = all closed) or `(group) => boolean`.
+- **Filter**: `externalFilterFunction` gets **your objects** – the same function as in the flat table. Groups without a
+  match disappear; counts, aggregates and the total row follow the filter.
+- **Sorting**: a click on an aggregated column sorts the groups by their aggregate and the rows by their value; on the
+  group column the groups by key. `tableApi.sort((a, b) => …)` sorts the rows inside their groups (your objects).
+- **Editing**: group rows are not editable. A changed value recomputes only the groups of that row; a changed grouped
+  value moves the row into its new group. After changing data yourself: `tableApi.repaint()`; after changing grouped
+  values: `body.regroup()` + `tableApi.repaintHard()`.
+- **Export**: copy and Excel contain the group rows (label, raw aggregates) and the rows – hidden columns are left out.
+
+Regroup at runtime – no new model, so no framework wrapper rebuilds the table; expanded groups, filter, sorting and
+checked rows stay:
+
+```ts
+import { TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;                 // from tableReady
+const select = document.createElement("select");  // options "region", "produkt", "region,produkt", ""
+select.addEventListener("change", () => tableApi.setRowGroupBy(select.value ? select.value.split(",") : []));
+```
+
+Read the groups (e.g. for a chart) – `getGroups()`, `findGroup(path)`, `getRowGroup(rowIndex)`, `getTotals()`:
+
+```ts
+import { AreaModelRowGroups, TableModelIf } from "@guiexpert/table";
+
+declare const tableModel: TableModelIf;
+const body = tableModel.getBodyModel() as AreaModelRowGroups<{ region: string; umsatz: number }>;
+const perRegion = body.getGroups().map(g => ({ region: g.label, umsatz: g.results["umsatz"], rows: g.count }));
+```
+
+Without a table, the engine groups and aggregates any array: `groupRows(rows, ["region"])` +
+`aggregateRowGroups(groups, { umsatz: "avg" })`.
+
+Not included: a group panel to drag columns into (build it with `setRowGroupBy`), Excel outline levels, pivot tables.
 
 ---
 
@@ -1243,6 +1316,8 @@ To avoid surprises – these are **not** implemented in the current releases:
 
 - No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
   (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
+- No pivot tables and no drag & drop group panel – row grouping itself is built in (5.6), regroup with
+  `tableApi.setRowGroupBy()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 
 ---

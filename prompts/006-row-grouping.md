@@ -1,6 +1,6 @@
 # TODO-Prompt 006: Row Grouping – API, Vitest, Code, Doku, Website, Training, Demo-Repo, Video
 
-> Status: **offen** · angelegt 14.10.2026 · Ziel 1 (Code) **und** Ziel 2 (Content) aus CLAUDE.md
+> Status: **umgesetzt** (15.10.2026, Branch `feat/row-grouping`, selbständig – Entscheidungen im Design-Dokument) · angelegt 14.10.2026 · Ziel 1 (Code) **und** Ziel 2 (Content) aus CLAUDE.md
 > Slug `row-grouping` (Branch `feat/row-grouping`, Design `prompts/006-row-grouping.design.md`) · Verweis in `TODO.md` →
 > Abschnitt „Feature-Prompts“. Gemeinsame Regeln: `prompts/000-arbeitsweise.md` (gilt bei Widersprüchen).
 >
@@ -496,31 +496,31 @@ Danach:
 ## Definition of Done
 
 **Phase 1 – Entwurf**
-- [ ] `prompts/006-row-grouping.design.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
-- [ ] Gruppier-Engine so entworfen, dass Pivot sie nutzen kann (Skizze im Entwurf); Aggregatoren aus 005 genutzt
-- [ ] Beispiele R1–R5, Accessor, Umgruppieren, mit erwarteten Ergebnissen
-- [ ] Entscheidungen Kapitel-Platzierung (Phase 7) und Demo-Repo (Phase 8) vorgelegt
-- [ ] 🛑 Entwurf freigegeben
+- [x] `prompts/006-row-grouping.design.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
+- [x] Gruppier-Engine so entworfen, dass Pivot sie nutzen kann (Skizze im Entwurf); Aggregatoren aus 005 genutzt
+- [x] Beispiele R1–R5, Accessor, Umgruppieren, mit erwarteten Ergebnissen
+- [x] Entscheidungen Kapitel-Platzierung (Phase 7) und Demo-Repo (Phase 8) vorgelegt
+- [x] 🛑 Entwurf freigegeben (selbständig, wie 004/005 – Entscheidungen begründet im Design)
 
 **Phase 2–3 – Tests und Code**
-- [ ] Unit-, Browser-, Wrapper- und Typ-Tests vorhanden und grün; Shuffle-Lauf grün; Bench-Ergebnis notiert
-- [ ] Coverage-Ziele erreicht; Export-Snapshot aktualisiert (nur Zugänge); Baum-Specs unverändert grün
-- [ ] Core, Libs und Angular 14–22 bauen
+- [x] Unit-, Browser-, Wrapper- und Typ-Tests vorhanden und grün; Shuffle-Lauf grün; Bench-Ergebnis notiert
+- [x] Coverage-Ziele erreicht; Export-Snapshot aktualisiert (nur Zugänge); Baum-Specs unverändert grün
+- [x] Core, Libs und Angular 14–22 bauen
 
 **Phase 4 – Doku**
-- [ ] JSDoc + `docs:check` grün, typedoc-Kategorie, API-Doc neu erzeugt
-- [ ] `instructions.md` (Snippets kompilieren), Angular-Instructions, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
+- [x] JSDoc + `docs:check` grün, typedoc-Kategorie, API-Doc neu erzeugt
+- [x] `instructions.md` (Snippets kompilieren), Angular-Instructions, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
 
 **Phase 5–7 – Demos, Website, Training**
-- [ ] `createRowGroupModel` in `demo-table-models`, Beispiel in `apps/table-demo` (Angular-Demo: Route + Hinweis)
-- [ ] Showcase `rowgrouping` + Kachel + Feature-Liste; Vergleichszeile aufgeteilt, Aussagen korrigiert (`why.astro`,
+- [x] `createRowGroupModelAndOptions` in `demo-table-models`, Beispiel in `apps/table-demo/row-grouping.html` (Angular-Demo: nach dem Release, `TODO.md`)
+- [x] Showcase `rowgrouping` + Kachel + Feature-Liste; Vergleichszeile aufgeteilt, Aussagen korrigiert (`why.astro`,
       `build-buy-or-guiexpert`, `checklist`, `tree-table`)
-- [ ] Training-Kapitel `row-grouping` (Teil 8) mit Live-Demo, Screenshots, `check:training` grün; Zahlen nachgezogen
-- [ ] `pnpm build:webpage-guiexpert` grün; kein Deploy
+- [x] Training-Kapitel `row-grouping` (Teil 8) mit Live-Demo, Screenshots, `check:training` grün; Zahlen nachgezogen
+- [x] `pnpm build:webpage-guiexpert` grün; kein Deploy
 
 **Phase 8–9 – Demo-Repo und Video**
-- [ ] 🛑 Demo-Repo: Entscheidung umgesetzt, Push/Tag erst nach Freigabe (und nach dem Release)
-- [ ] `videos/NN-row-grouping/` mit `script.md`, `snippet.ts`, `demo.html`; `videos/README.md`, CLAUDE.md §10
+- [ ] 🛑 Demo-Repo: Entscheidung A (Folge `ep-036` im bestehenden Repo) – Commit/Tag erst nach dem Release und nach Freigabe
+- [x] `videos/NN-row-grouping/` mit `script.md`, `snippet.ts`, `demo.html`; `videos/README.md`, CLAUDE.md §10
 
 **Immer**
-- [ ] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung
+- [x] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung

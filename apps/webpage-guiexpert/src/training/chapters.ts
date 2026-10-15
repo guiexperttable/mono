@@ -2,7 +2,7 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-035`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-036`), so every chapter can link to the exact code state of its episode.
  * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
@@ -374,6 +374,19 @@ export const CHAPTERS: Chapter[] = [
     api: ["TableOptionsIf.ariaLabelledBy", "TableOptionsIf.ariaLabel", "TableOptionsIf.ariaTexts", "AriaTextsIf", "AriaTexts",
       "TableApi.announce", "TableApi.getHeaderFocus", "LiveAnnouncer", "ActionId"],
     since: "1.1.91"
+  },
+  {
+    slug: "row-grouping", no: 36, part: "advanced", episode: 36, minutes: 6,
+    title: "Row grouping: totals per country, city or month", nav: "Row grouping",
+    lead: "100,000 flat orders, one factory call – grouped by country and city, with sums per group and a total row.",
+    learn: ["group flat rows by one or more columns or computed keys", "show sums, averages and counts per group",
+      "know why an average of groups is not the average of averages", "regroup at runtime without a new model",
+      "filter, sort and edit grouped rows"],
+    api: ["RowGroupFactory", "RowGroupFactory.createTableModel", "RowGroupTableModelParaIf", "RowGroupFieldIf",
+      "AreaModelRowGroups", "AreaModelRowGroups.getGroups", "RowGroupIf", "TableApi.setRowGroupBy", "TableApi.expandAll",
+      "TableApi.collapseAll", "groupRows", "aggregateRowGroups", "isGroupRow"],
+    showcases: [{ name: "rowgrouping", title: "Row grouping" }],
+    since: "1.1.94"
   }
 ];
 

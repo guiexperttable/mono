@@ -5,7 +5,7 @@ import { GeMouseEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, Table
 import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createGroupedModel, createHost, createModel, groupLabels, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -278,5 +278,21 @@ describe('GuiexpertTable (Web Component)', () => {
     el.removeAttribute('loading');
     expect(el.loading).toBe(false);
     expect(overlayKind(el)).toBe('none');
+  });
+
+  it('a row grouping: group rows render, setRowGroupBy regroups without a rebuild (since 1.1.94)', async () => {
+    const { el, events } = createTableElement();
+    const destroy = vi.spyOn(TableScope.prototype, 'destroy');
+    el.data = data(createGroupedModel());
+    await nextFrame();
+    expect(groupLabels(el)).toEqual(['Nord (3)', 'Süd (3)']);
+    events.tableReady[0].setRowGroupBy(['produkt']);
+    await nextFrame();
+    expect(groupLabels(el)[0]).toBe('A (4)');
+    expect(events.tableReady).toHaveLength(1);
+    el.data = data(createModel(3));
+    await nextFrame();
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(events.tableReady).toHaveLength(2);
   });
 });

@@ -1,5 +1,9 @@
 import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 import type { AreaModelAggregateFooter } from './data/tablemodel/areamodel/area-model-aggregate-footer';
+import type { AreaModelRowGroups } from './data/tablemodel/areamodel/area-model-row-groups';
+import type { RowGroupIf } from './rowgroup/row-group.if';
+import type { RowGroupColumnDef } from './rowgroup/row-group-column-def';
+import type { TreeRowIf } from './data/common/tree-row-if';
 
 
 /*
@@ -90,4 +94,75 @@ export function isRowNumberColumnDef(o: any): o is RowNumberColumnDef {
  */
 export function isAreaModelAggregateFooter(o: any): o is AreaModelAggregateFooter {
   return !!o && o['type'] === 'AreaModelAggregateFooter';
+}
+
+/**
+ * True for a group of a row grouping ({@link RowGroupIf}) – the `data` of a group row. Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. `treeRow.data`
+ * @returns {boolean} true for a group
+ *
+ * @example
+ * const row = tableModel.getBodyModel().getRowByIndex(rowIndex);
+ * if (isTreeRow(row) && isRowGroup(row.data)) console.log(row.data.label, row.data.count);
+ *
+ * @since 1.1.94
+ * @category Row grouping
+ */
+export function isRowGroup(o: any): o is RowGroupIf {
+  return !!o && o['type'] === 'RowGroup';
+}
+
+/**
+ * True for a group row of a row grouping: a tree row whose `data` is a {@link RowGroupIf} (detail rows hold your objects).
+ *
+ * @param {any} row - a body row, e.g. `tableModel.getBodyModel().getRowByIndex(rowIndex)` or `mouseEvent.row`
+ * @returns {boolean} true for a group row
+ *
+ * @example
+ * const eventListener = new EventAdapter();
+ * eventListener.onMouseClicked = (evt: GeMouseEvent) => {
+ *   const row = tableModel.getBodyModel().getRowByIndex(evt.rowIndex);
+ *   if (isGroupRow(row)) console.log("group", row.data.path);
+ * };
+ *
+ * @since 1.1.94
+ * @category Row grouping
+ */
+export function isGroupRow(row: any): row is TreeRowIf<RowGroupIf> {
+  return isTreeRow(row) && isRowGroup(row['data']);
+}
+
+/**
+ * True for the body model of a row grouping ({@link AreaModelRowGroups}). It is a tree as well
+ * (`isAreaModelTree` is true). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. `tableModel.getBodyModel()`
+ * @returns {boolean} true for a row grouping
+ *
+ * @example
+ * const body = tableModel.getBodyModel();
+ * const groups = isAreaModelRowGroups(body) ? body.getGroups() : [];
+ *
+ * @since 1.1.94
+ * @category Row grouping
+ */
+export function isAreaModelRowGroups(o: any): o is AreaModelRowGroups {
+  return !!o && o['kind'] === 'AreaModelRowGroups';
+}
+
+/**
+ * True for the group column of a row grouping ({@link RowGroupColumnDef}). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. a column definition
+ * @returns {boolean} true for the group column
+ *
+ * @example
+ * const groupColumnIndex = (tableModel.getColumnDefs() ?? []).findIndex(isRowGroupColumnDef);
+ *
+ * @since 1.1.94
+ * @category Row grouping
+ */
+export function isRowGroupColumnDef(o: any): o is RowGroupColumnDef {
+  return !!o && o['type'] === 'RowGroupColumnDef';
 }

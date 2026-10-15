@@ -33,7 +33,8 @@
     "test:watch": "vitest --project unit",
     "test:coverage": "vitest run --coverage",
     "test:types": "tsc -p tsconfig.spec.json --noEmit",
-    "npm-pub": "pnpm publish --no-git-checks --access public"
+    "npm-pub": "pnpm publish --no-git-checks --access public",
+    "bench": "vitest run --config bench/vitest.bench.config.ts"
   },
   "publishConfig": {
     "directory": "dist",

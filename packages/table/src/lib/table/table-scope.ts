@@ -31,7 +31,10 @@ import { EventAdapter } from './event-adapter';
 import { SimpleDomService } from './service/simple-dom-service';
 import { TableOptions } from './data/options/table-options';
 import { TreeRowIf } from './data/common/tree-row-if';
-import { isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import type { DerivedValuesChangeIf } from './data/tablemodel/areamodel/derived-values-change.if';
+import type { RowGroupField } from './rowgroup/row-group-field.type';
+import { updateRowGroupLayout } from './rowgroup/row-group-layout';
 import { LicenseManager } from './license-manager';
 import { SelectionModel } from './selection/selection-model';
 import { CopyService } from './service/copy-service';
@@ -618,13 +621,22 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   updateModelValueAfterEdit(areaIdent: AreaIdent, rowIndex: number, columnIndex: number, value: string) {
     if (areaIdent === 'body') {
       const bodyAreaModel = this.tableModel.getAreaModel(areaIdent);
+      const rowCountBefore = bodyAreaModel.getRowCount();
+      const buildsBefore = isAreaModelRowGroups(bodyAreaModel) ? bodyAreaModel.getBuildCount() : 0;
       const ok: boolean = bodyAreaModel.setValue(rowIndex, columnIndex, value);
       if (ok) {
         this.resetEditorRenderer();
-        this.invalidateAggregates();
-        this.repaint();
+        // one row changed: models may recompute less (a row grouping only the groups of this row)
+        const change: DerivedValuesChangeIf = { area: 'body', rowIndices: [rowIndex] };
+        this.invalidateAggregates(change);
+        const moved = isAreaModelRowGroups(bodyAreaModel) && bodyAreaModel.getBuildCount() !== buildsBefore;
+        if (moved || bodyAreaModel.getRowCount() !== rowCountBefore) {
+          this.repaintHard(); // e.g. a grouped value changed: the row moved to another group
+        } else {
+          this.repaint();
+        }
         // values the app derives in onModelChanged (and repaints) are counted by the next repaint
-        this.invalidateAggregates();
+        this.invalidateAggregates(change);
         this.eventListener.onModelChanged?.(GeModelChangeEvent.createSingle(rowIndex, columnIndex));
         this.hostElement.focus();
       }
@@ -936,6 +948,27 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     (bodyAreaModel as AreaModelTree<any>).recalcVisibleTreeRows(false); // the filter result does not change
     this.repaintHard(); // the row count changed
     this.stateService.markDirty('tree');
+    return true;
+  }
+
+  /**
+   * Groups the rows of a row grouping by other levels (see {@link TableApi.setRowGroupBy}).
+   *
+   * @param {RowGroupField[]} groupBy - the new levels, top first
+   * @returns {boolean} false if the body is no row grouping
+   */
+  setRowGroupBy(groupBy: RowGroupField[]): boolean {
+    const body = this.tableModel.getBodyModel();
+    if (!isAreaModelRowGroups(body)) {
+      return false;
+    }
+    body.setGroupBy(groupBy);   // keeps expanded groups, filter, sorting and checked rows
+    updateRowGroupLayout(this.tableModel);
+    this.invalidateAggregates();
+    this.tableModel.recalcPadding();
+    this.repaintHard();
+    this.stateService.markDirty('tree');
+    this.stateService.markDirty('columns');
     return true;
   }
 

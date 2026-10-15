@@ -9,6 +9,7 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { SideIdent } from './data/side-ident.type';
 import { DivScope } from './data/div-scope.type';
 import type { AreaModelTree } from './data/tablemodel/areamodel/area-model-tree';
+import type { DerivedValuesChangeIf } from './data/tablemodel/areamodel/derived-values-change.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { ArgsAdjustColumnsToRowParentParams } from './data/common/args-adjust-columns-to-row-parent-params';
 import { ArgsRenderCellDiv } from './data/common/args-render-cell-div';
@@ -27,7 +28,7 @@ import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
 import { TableCellUpdateEventIf } from './data/common/event/input/table-cell-update-event.if';
-import { isAreaModelAggregateFooter, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelAggregateFooter, isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { getLeadingRowNumberColumnCount } from './data/common/row-number-columns';
 import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 import { AriaGridInfo } from './aria/aria-grid-info';
@@ -260,11 +261,12 @@ export class RenderScope extends EleScope {
    * {@link AreaModelAggregateFooter}) – called where data may have changed (filter, sorting, editing, `updateCells`,
    * the public `tableApi.repaint()` / `repaintHard()`), not on scrolling.
    *
+   * @param {DerivedValuesChangeIf} [change] - the changed rows of an edit or `updateCells()` (models may recompute less)
    * @since 1.1.94
    */
-  invalidateAggregates(): void {
+  invalidateAggregates(change?: DerivedValuesChangeIf): void {
     for (const areaIdent of ['header', 'body', 'footer'] as const) {
-      this.tableModel.getAreaModel(areaIdent)?.invalidateDerivedValues?.();
+      this.tableModel.getAreaModel(areaIdent)?.invalidateDerivedValues?.(change);
     }
   }
 
@@ -500,7 +502,9 @@ export class RenderScope extends EleScope {
     events: TableCellUpdateEventIf[],
     repaintAll: boolean = false) {
 
-    events.forEach(evt => {
+    const bodyModel = this.tableModel.getBodyModel();
+    const rowCountBefore = bodyModel.getRowCount();
+    const apply = () => events.forEach(evt => {
         this.tableModel
           .getAreaModel(evt.area)
           .setValue(evt.rowIndex, evt.columnIndex, evt.value);
@@ -509,14 +513,49 @@ export class RenderScope extends EleScope {
         }
       }
     );
-    if (events.length) {
+    // a row grouping moves rows with a changed grouped value only after the last event (the indices stay valid)
+    const regrouped = isAreaModelRowGroups(bodyModel) ? bodyModel.batch(apply) : (apply(), false);
+    if (regrouped) {
       this.invalidateAggregates();
+      this.repaintHard();             // rows moved to other groups: labels, counts and positions changed
+      return;
     }
-    if (repaintAll) {
+    if (events.length) {
+      // only rows of one area changed: models may recompute less (a row grouping only the groups of these rows)
+      const area = events[0].area;
+      this.invalidateAggregates(events.every(evt => evt.area === area)
+        ? { area, rowIndices: events.map(evt => evt.rowIndex) }
+        : undefined);
+    }
+    if (events.length && bodyModel.getRowCount() !== rowCountBefore) {
+      this.repaintHard(); // e.g. a grouped value changed: the row moved to another group
+    } else if (repaintAll) {
       this.repaint();
     } else if (events.length) {
       this.rerenderDerivedFooterCells(events);
+      this.rerenderGroupRowCells();
     }
+  }
+
+  /**
+   * After `updateCells()` without a repaint: draws the rendered aggregate cells of the group rows of a row grouping
+   * again (they follow the changed rows; labels and counts don't change – a moved row repaints the whole table).
+   */
+  protected rerenderGroupRowCells(): void {
+    const bodyModel = this.tableModel.getBodyModel();
+    if (!isAreaModelRowGroups(bodyModel)) {
+      return;
+    }
+    const cells = this.hostElement.querySelectorAll<HTMLDivElement>('div.ge-table-col-div[data-area="body"][data-row-index][data-col-index]');
+    cells.forEach(cell => {
+      const rowIndex = Number(cell.getAttribute('data-row-index'));
+      const columnIndex = Number(cell.getAttribute('data-col-index'));
+      // only the aggregates (the label cell keeps its arrow; counts change only if rows move → repaintHard above)
+      if (!bodyModel.isGroupRowIndex(rowIndex) || !bodyModel.getCellRenderer(rowIndex, columnIndex)) return;
+      this.rerenderCellContent({
+        area: 'body', rowIndex, columnIndex, value: bodyModel.getValueAt(rowIndex, columnIndex)
+      } as TableCellUpdateEventIf);
+    });
   }
 
   /**
@@ -1054,7 +1093,9 @@ export class RenderScope extends EleScope {
     // the numbers of a RowNumberColumnDef name their rows (screen readers announce them with the row)
     const rowHeader = (areaIdent === 'body' && isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex)))
       // the label of a total row ("6 rows") names its row
-      || (areaIdent === 'footer' && isAreaModelAggregateFooter(areaModel) && areaModel.isLabelCell(rowIndex, columnIndex));
+      || (areaIdent === 'footer' && isAreaModelAggregateFooter(areaModel) && areaModel.isLabelCell(rowIndex, columnIndex))
+      // the label of a group row ("Nord (3)") names its row
+      || (areaIdent === 'body' && isAreaModelRowGroups(areaModel) && areaModel.isGroupLabelCell(rowIndex, columnIndex));
     ds.setAttribute(cell, 'role', header ? 'columnheader' : rowHeader ? 'rowheader' : 'gridcell');
     const colIndex = info.colIndex(columnIndex);
     if (colIndex > 0) {

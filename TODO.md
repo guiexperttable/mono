@@ -213,9 +213,24 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `ColumnDef.valueGetter` im Footer zuerst auflösen (Design § 2.2) · Review-Nits (Design § 5): Auswahl-Aggregate im Baum
       zählen sichtbare Zeilen, der Footer Blätter · `footerAggregates` + `bodyData` ohne `columnDefs` warnt nicht · eigener
       Aggregator mit Feld `aggregator` wird als Spec gelesen.
-- [ ] **006 Row Grouping** (`prompts/006-row-grouping.md`). Die Website sagt heute noch „Row grouping … – tree tables
-      instead“ (`home/why.astro`, Training `build-buy-or-guiexpert` und `checklist`) – erst mit dem Feature ändern.
-- [ ] **007 Pivot-Tabellen** (`prompts/007-pivot.md`), nach 005 und 006; gleiche Stellen auf der Website.
+- [x] **006 Row Grouping** – Branch `feat/row-grouping`, Design `prompts/006-row-grouping.design.md`: DOM-freie Engine
+      `groupRows()` / `aggregateRowGroups()` (`rowgroup/`, Grundlage für 007), `RowGroup`, `AreaModelRowGroups` (Unterklasse
+      von `AreaModelTree`), `RowGroupFactory.createTableModel()`, `RowGroupColumnDef`, `api.setRowGroupBy()` /
+      `getRowGroupBy()`, `AreaModelIf.invalidateDerivedValues?(change?)` mit `DerivedValuesChangeIf`, `isRowGroup`,
+      `isGroupRow`, `isAreaModelRowGroups`, `isRowGroupColumnDef`; CSS `ge-table-row-group*`. Showcase `rowgrouping`,
+      Training-Kapitel 36, `videos/07-row-grouping/`. Selbständig umgesetzt.
+      Offen: Demo-Repo `ep-036` (nach dem Release, Freigabe), Angular-Demo-Route `rowgroup` erst nach dem Release (die App
+      nutzt npm-Pakete), Bench auf dem Mac nachmessen.
+- [ ] Folgepunkte 006: Gruppenleiste per Drag & Drop (baut auf `api.setRowGroupBy`) · Excel-Gliederung (Outline-Level)
+      für Gruppenzeilen · Zeilennummern zählen Gruppenzeilen mit (004-Folgepunkt: evtl. nur Detailzeilen nummerieren) ·
+      eine selbst ausgeblendete gruppierte Spalte erscheint nach dem Umgruppieren wieder (`row-group-layout.ts` merkt nur
+      eigene Ausblendungen) · `setValue` mit geändertem Gruppierfeld außerhalb von `batch()` baut je Aufruf neu auf ·
+      Gesamtzeile oben/Zwischensummen unten (ag-Grid `groupTotalRow`) · `AreaModelRowGroups` mit 1 Mio. Zeilen ~1,2 s im
+      Container (eine `TreeRow` je Zeile; Engine 0,64 s) · Website-Showcases laden eine eigene CSS-Kopie
+      (`src/styles/ge-table.css`) statt `@guiexpert/table/css/main.css` – neue Klassen dort jedes Mal nachtragen.
+- [ ] **007 Pivot-Tabellen** (`prompts/007-pivot.md`), nach 005 und 006; die Engine aus 006 steht bereit (`groupRows`,
+      `RowGroup.sourceIndices`, `computeLeaf`/`mergeChildren` in `rowgroup/group-rows-internals.ts`); auf der Website sind
+      „Row grouping“ und „Pivot tables“ schon getrennte Zeilen (Pivot weiter „–“).
 - [ ] **008 Berechnete Spalten, „Show values as“, Formeln** (`prompts/008-formeln-berechnete-spalten-show-values-as.md`).
 - [ ] **009 Zeilen ziehen (Row Drag)** (`prompts/009-row-drag.md`).
 - [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
@@ -555,6 +570,11 @@ Objekt-Tabelle hat `ge-focused-row`.
   Nummernspalte keine Verhaltensänderung. Mit Nummernspalte an Index 0 sitzen `CheckboxColumnDef`, Baumpfeil und
   `showCheckboxWihoutExtraColumn` an Index 1 (vorher fest an 0). `TableFactory.buildByTypedRows(rows, [])` wirft nicht
   mehr. `RenderScope.getTreeArrowColumnIndex()` liefert `number` statt `0 | 1` (protected).
+- **Row Grouping (006, ab 1.1.94)**: neu `RowGroupFactory`, `AreaModelRowGroups`, `groupRows()`/`aggregateRowGroups()`,
+  `api.setRowGroupBy()`/`getRowGroupBy()`. Ohne Gruppierung keine Verhaltensänderung, außer: `AreaModelIf.invalidateDerivedValues?()`
+  bekommt nach Edit und `updateCells()` ein optionales Argument `{ area, rowIndices }` (eigene Modelle dürfen es ignorieren);
+  ändert ein Edit die Zeilenzahl des Bodys, zeichnet die Tabelle hart neu (vorher nur `repaint()` – falsche Scrollhöhe).
+  Neues Script `pnpm --filter @guiexpert/table bench` (Messungen außerhalb von `src/`).
 - **Aggregation (005, ab 1.1.94)**: neu `footerAggregates`, `AreaModelAggregateFooter`, `aggregate()`/`aggregateColumns()`,
   `api.getSelectionAggregates()`. Ohne Aggregat-Footer keine Verhaltensänderung. `api.repaint()`/`repaintHard()` rufen
   zusätzlich `invalidateDerivedValues?()` der drei Area-Modelle (neues optionales Member von `AreaModelIf`); `updateCells()` ohne

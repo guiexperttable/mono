@@ -1,0 +1,25 @@
+/* Row grouping (RowGroupFactory / AreaModelRowGroups, since 1.1.94) */
+
+/* every cell of a group row */
+.ge-table-col-div.ge-table-row-group {
+  background-color: var(--ge-table-row-group-bg);
+  color: var(--ge-table-row-group-text);
+}
+
+/* the label in the group column: "Nord (3)" */
+.ge-table-row-group-label {
+  font-weight: var(--ge-table-row-group-label-font-weight);
+}
+
+.ge-table-row-group-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the aggregates of a group row */
+.ge-table-row-group-aggregate {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ge-table-row-group-label-font-weight);
+}

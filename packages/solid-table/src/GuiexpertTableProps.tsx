@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeModelChangeEvent, GeMouseEvent, GeScrollEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeModelChangeEvent, GeMouseEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -11,6 +11,7 @@ export type GeModelChangeEventFn = (evt: GeModelChangeEvent) => void;
 export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
 export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
+export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -26,6 +27,12 @@ export interface GuiexpertTableProps {
   modelChanged?: GeModelChangeEventFn,
   selectionChanged?: GeSelectionChangeEventFn;
   focusChanged?: GeFocusChangeEventFn;
+  /**
+   * The state changed (column layout, sorting, scroll position, tree, checked/selected rows …) – once after the
+   * changes settled. Save `evt.state` (e.g. on your server) and pass it back as `tableOptions.initialState`.
+   * @since 1.1.92
+   */
+  stateChanged?: GeStateChangeEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

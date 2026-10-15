@@ -4,6 +4,7 @@ import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
 import { EventListenerIf } from "./event-listener.if";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
+import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
 
 /**
  * Empty implementation of {@link EventListenerIf} – extend it and override only the events you need.
@@ -49,6 +50,10 @@ export class EventAdapter implements EventListenerIf {
   }
 
   onFocusChanged(_model: FocusModelIf): void {
+  }
+
+  /** @since 1.1.92 */
+  onStateChanged(_evt: GeStateChangeEvent): void {
   }
 
 }

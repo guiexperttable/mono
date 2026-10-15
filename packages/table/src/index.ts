@@ -230,3 +230,11 @@ export * from './lib/table/overlay/calc-overlay-kind';
 export * from './lib/table/overlay/table-overlay';
 export * from './lib/table/data/options/overlay-options.if';
 export * from './lib/table/data/options/overlay-options';
+
+// state (1.1.92)
+export * from './lib/table/state/table-state.if';
+export * from './lib/table/state/state-storage.if';
+export * from './lib/table/state/table-state-part';
+export * from './lib/table/state/table-state.service';
+export * from './lib/table/state/table-state-migration';
+export * from './lib/table/data/common/event/ge-state-change-event';

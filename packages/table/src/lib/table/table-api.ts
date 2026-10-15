@@ -1,4 +1,5 @@
 import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
+import { TableStateIf, TableStatePart } from "./state/table-state.if";
 import { SortState } from "./data/common/sort-state.type";
 import {TableScope} from "./table-scope";
 import {ColumnDefIf} from "./data/tablemodel/column/column-def.if";
@@ -42,6 +43,7 @@ import { TreeRowIf } from './data/common/tree-row-if';
  * | redraw | {@link repaint} (same row count), {@link repaintHard} (row count or heights changed) |
  * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths} |
  * | tree | {@link expandAll}, {@link collapseAll}, {@link setRowExpanded} |
+ * | state | {@link getState}, {@link applyState}, {@link resetState} (with {@link TableOptionsIf.autoRestoreOptions}) |
  * | lifecycle | {@link destroy} |
  *
  * @example
@@ -783,6 +785,110 @@ export class TableApi {
    */
   getOverlayState(): GeOverlayKind {
     return this.tableScope.getOverlayState();
+  }
+
+  /**
+   * The state of the table as plain JSON: column layout (order, widths, visibility), sorting, scroll position,
+   * expanded tree nodes, checked and selected rows, header groups and your own data ({@link setCustomState}).
+   * Columns are identified by property and rows by id ({@link AutoRestoreOptionsIf.getRowId}), never by index.
+   * Parts that do not apply to this table are left out (e.g. `tree` for a flat table).
+   *
+   * Store it wherever you like and give it back with {@link applyState} or {@link TableOptionsIf.initialState};
+   * {@link TableOptionsIf.autoRestoreOptions} does this for you in `localStorage`.
+   *
+   * @param {TableStatePart[]} [parts] - only these parts, default: all
+   * @returns {TableStateIf} the state
+   *
+   * @example
+   * const state = tableApi.getState();                       // { version: 1, columns: [...], sort: [...], ... }
+   * await fetch("/api/prefs/orders", { method: "PUT", body: JSON.stringify(state) });
+   *
+   * @example
+   * const layout = tableApi.getState(["columns", "sort"]);   // only the layout, no scroll position or selection
+   *
+   * @see Training: [Remember the state](https://gui.expert/training/persist-state/)
+   * @since 1.1.92
+   */
+  getState(parts?: TableStatePart[]): TableStateIf {
+    return this.tableScope.stateService.getState(parts);
+  }
+
+  /**
+   * Applies a state from {@link getState} (or one written by hand) and repaints. Only the parts contained in the
+   * state are applied (optionally only the given ones); the others stay as they are – pass a part empty to reset it,
+   * e.g. `sort: []` (clears the sort icons; the rows keep their current order). Unknown columns and rows are ignored. The change is stored ({@link TableOptionsIf.autoRestoreOptions})
+   * and reported ({@link EventListenerIf.onStateChanged}).
+   *
+   * @param {Partial<TableStateIf>} state - the state
+   * @param {TableStatePart[]} [parts] - only these parts, default: all parts of the state
+   *
+   * @example
+   * // two saved views of the same table
+   * const views: Record<string, TableStateIf> = {};
+   * views["compact"] = tableApi.getState(["columns"]);
+   * tableApi.applyState(views["compact"]);
+   *
+   * @example
+   * tableApi.applyState({ sort: [{ property: "total", sortState: "desc" }] });
+   *
+   * @since 1.1.92
+   */
+  applyState(state: Partial<TableStateIf>, parts?: TableStatePart[]): void {
+    this.tableScope.stateService.applyState(state, parts);
+  }
+
+  /**
+   * Back to the state of the code: column layout, sort icons and header groups as they were right after the table was
+   * built (before a stored state was applied) – tree, checked and selected rows too when they are remembered
+   * ({@link TableOptionsIf.autoRestoreOptions}) or given as {@link TableOptionsIf.initialState} –, scrolled to the top,
+   * custom data removed. Deletes the stored state. The rows keep their current order (a table has no "unsorted" order
+   * to go back to); only the sort icons of the code come back.
+   *
+   * @example
+   * document.querySelector("#reset-layout")!.addEventListener("click", () => tableApi.resetState());
+   *
+   * @since 1.1.92
+   */
+  resetState(): void {
+    this.tableScope.stateService.resetState();
+  }
+
+  /**
+   * Stores data of your application with the table state (part `custom`), e.g. the text of a filter field. It is
+   * reported with {@link EventListenerIf.onStateChanged}, stored with `autoRestoreCustomState` and returned by
+   * {@link getState} – also after a reload, so you can restore your filter in `tableReady`. Must be JSON.
+   *
+   * @param {unknown} custom - your data (JSON)
+   *
+   * @example
+   * filterInput.addEventListener("input", () => {
+   *   tableApi.setCustomState({ filter: filterInput.value });
+   *   tableApi.externalFilterChanged();
+   * });
+   * // after a reload (tableReady):
+   * const custom = tableApi.getState(["custom"]).custom as { filter?: string } | undefined;
+   * filterInput.value = custom?.filter ?? "";
+   *
+   * @since 1.1.92
+   */
+  setCustomState(custom: unknown): void {
+    this.tableScope.stateService.setCustomState(custom);
+  }
+
+  /**
+   * Collapses or expands a header group ({@link CellGroupIf} with `toggle: true`) – like a click on its toggle.
+   *
+   * @param {string} id - {@link CellGroupIf.id}, otherwise the path of the labels, e.g. `"Customer"` or `"2026/Q1"`
+   * @param {boolean} collapsed - true = collapse
+   * @returns {boolean} false if the header has no such group
+   *
+   * @example
+   * tableApi.setHeaderGroupCollapsed("Customer", true);
+   *
+   * @since 1.1.92
+   */
+  setHeaderGroupCollapsed(id: string, collapsed: boolean = true): boolean {
+    return this.tableScope.setHeaderGroupCollapsed(id, collapsed);
   }
 
   /**

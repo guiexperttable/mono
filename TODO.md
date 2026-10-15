@@ -175,11 +175,19 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `getOverlayState`, `tableOptions.overlayOptions`, automatisch „No rows to show“ / „No matching rows“
       (`AreaModelIf.getUnfilteredRowCount?`), CSS-Spinner, `loading`-Prop in allen Wrappern, CRUD zeigt beim Laden das
       Overlay. Offen: Angular-Smoke-Test (es gibt noch kein Angular-Test-Setup), Demo-Repo (nach dem Release).
-- [ ] **003 Zustand speichern vervollständigen + State-API** (`prompts/003-zustand-speichern.md`). Befund 14.10.2026:
-      `autoRestoreCheckedState` und `autoRestoreSelectedState` sind nur deklariert (stilles No-op), `isSame` ungenutzt;
-      Sortierung wird nach Spaltenindex gespeichert (vermutlich falsch nach Spalten-Drag, Test fehlt); Spaltenbreite,
-      -reihenfolge, -sichtbarkeit und Header-Gruppen werden nicht gespeichert; JSDoc behauptet einen Standard-Schlüssel,
-      ohne `getStorageKeyFn` wird aber nichts gespeichert.
+- [x] **003 Zustand speichern vervollständigen + State-API** – Branch `feat/table-state`, Design
+      `prompts/003-zustand-speichern.design.md`: `TableStateIf` (JSON, Spalten nach Property, Zeilen nach `getRowId`),
+      `api.getState/applyState/resetState/setCustomState/setHeaderGroupCollapsed`, `tableOptions.initialState`,
+      `onStateChanged` (`GeStateChangeEvent`, entprellt, `stateChanged` in allen Wrappern), Speicher-Adapter
+      (`autoRestoreOptions.storage`), neue Flags `autoRestoreColumnLayout/HeaderGroupState/CustomState`,
+      `autoRestoreCheckedState`/`autoRestoreSelectedState` wirken, ein Schlüssel `<key>tableState` (Migration der drei
+      alten Schlüssel), Warnung ohne `getStorageKeyFn`. Fehler S5 (Sortierung nach Index) behoben.
+      Offen: Demo-Repo (Kap. 33 hat schon einen Tag – kein neuer), Angular-Demo `columndef` erst nach dem Release.
+- [ ] Folgepunkte 003: alte Schlüssel (`<key>sortingState`, `scrollState`, `collapsedExpandedState`) bis 1.2 lesen, dann
+      `readLegacyState` und die `@deprecated` `StoreState*Service`-Klassen entfernen · Fokuszelle im Zustand (ag-Grid
+      hat sie) · Mehrspalten-Sortierung per Shift-Klick im Header (Speicher und `applyState` können sie schon) ·
+      Programmatische Änderungen an Haken über das Modell werden erst mit der nächsten Änderung oder `destroy()`
+      gespeichert · Verschieben über die Grenze fixierter Spalten (Drag und Restore) prüfen.
 - [ ] **004 Zeilennummern** (`prompts/004-zeilennummern.md`).
 - [ ] **005 Aggregation und Gesamtzeile** (Helfer, fertiges Footer-Modell, Auswahl-Summen) – Grundlage für 006–008
       (`prompts/005-aggregation-gesamtzeile.md`).
@@ -346,6 +354,9 @@ Verhalten steht als `// NOTE:` in den Specs.
 Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`packages/table/src/**/*.browser.spec.ts`).
 
 **Spaltenbreiten, Scrollen, fixierte Spalten**
+- [x] **Gespeicherte Sortierung traf nach einem Spalten-Drag die falsche Spalte** (`autoRestoreSortingState`, Fall S5 aus
+      Prompt 003): gespeichert wurde der Spaltenindex. Behoben in 1.1.92 (Sortierung nach Property); Regressionstest in
+      `lifecycle.browser.spec.ts` und `state/table-state.browser.spec.ts`.
 - [x] Behoben (Branch `fix/columns-scrolling`): %-Spaltenbreiten wurden bis zum ersten ResizeObserver-Callback (~500 ms)
       für 400 px berechnet – `firstInit()` nimmt jetzt die Host-Breite · `recalcColumnWidths(clientWidth)` las den noch
       alten Scroll-Viewport (nach Host-Resize eine Runde hinterher) – jetzt Host-Breite minus West-Spalten und
@@ -508,6 +519,16 @@ Objekt-Tabelle hat `ge-focused-row`.
   Filter alle Zeilen ausblendet) – abschaltbar mit `overlayOptions: { autoNoRows: false }`. Neues Div
   `.ge-table-overlay` im Host (`aria-hidden`, z-index 10000); Host bekommt beim Laden `aria-busy="true"`.
   `CrudTableModelFactory` zeigt während Anfragen „Loading…“ und blockiert dabei Maus und Editieren.
+- **Zustand speichern (003, ab 1.1.92)**: `autoRestoreOptions` speichern in **einem** Schlüssel `<key>tableState` (JSON wie
+  `api.getState()`); die drei alten Schlüssel werden einmal gelesen und beim nächsten Speichern entfernt (ein Downgrade
+  verliert den Zustand). Sortierung wird nach **Property** gespeichert – vorher nach Index, nach einem Spalten-Drag wurde
+  die falsche Spalte sortiert. `autoRestoreCheckedState` und `autoRestoreSelectedState` wirken jetzt (vorher ohne
+  Wirkung). Neue Flags `autoRestoreColumnLayout`, `autoRestoreHeaderGroupState`, `autoRestoreCustomState`. Gespeichert wird
+  300 ms nach der letzten Änderung (`stateChangedDebounceDelay`), auch der Scroll-Zustand (vorher 500 ms). Ein
+  `autoRestore…`-Flag ohne `getStorageKeyFn` erzeugt eine `console.warn`. Neu: `onStateChanged` im `EventListenerIf`
+  bzw. `stateChanged` in allen Wrappern. `isSame` ist `@deprecated` (wurde nie benutzt). Zeilen ohne `id`/`uuid` und
+  ohne eigene `getRowId` werden nicht mehr gespeichert (vorher diente das JSON der ganzen Zeile als Id – auch für
+  aufgeklappte Baumknoten; deren gespeicherter Zustand geht dann einmal verloren).
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

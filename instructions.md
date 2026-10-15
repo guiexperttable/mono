@@ -806,27 +806,85 @@ function exportAllRows(tableApi: TableApi) {          // all rows, ignoring filt
 - Numbers stay numbers in Excel; dates are written as ISO text. Since 1.1.86 the files carry valid CRC-32 checksums,
   row numbers and sheet dimensions (older versions wrote CRC 0 and a fixed range `A1:B3`, which strict readers reject).
 
-### 6.11 Persisting state
+### 6.11 Persisting state: column layout, sorting, selection (since 1.1.92 complete)
+
+**In `localStorage`** – switch on what the table should remember; one key per table:
 
 ```ts
 import { AutoRestoreOptions, TableOptions } from "@guiexpert/table";
+import type { TableOptionsIf } from "@guiexpert/table";
 
-const tableOptions = {
+interface Order { id: number; customer: string; total: number }
+
+const tableOptions: TableOptionsIf = {
   ...new TableOptions(),
   autoRestoreOptions: {
-    ...new AutoRestoreOptions<any>(),
-    getStorageKeyFn: () => "my-person-table",        // key in localStorage
-    autoRestoreScrollPosition: true,
+    ...new AutoRestoreOptions<Order>(),
+    getStorageKeyFn: () => "orders",                 // stored as "orderstableState"
+    getRowId: (order: Order) => order.id,            // rows (tree nodes) are stored by id
+    autoRestoreColumnLayout: true,                   // widths, order, visibility (1.1.92)
+    autoRestoreHeaderGroupState: true,               // collapsed header groups (1.1.92)
     autoRestoreSortingState: true,
+    autoRestoreScrollPosition: true,
     autoRestoreCollapsedExpandedState: true,         // tree tables
-    getRowId: (row: any) => row.id                   // tree tables: a unique id per node
+    autoRestoreCheckedState: true,                   // checked rows (1.1.92)
+    autoRestoreSelectedState: true                   // selection (1.1.92)
   }
 };
 ```
 
-Since 1.1.89: the header sort icon follows the restored order, nested tree rows are restored too, a table that
-starts collapsed stays collapsed until the user opens a node, and a blocked `localStorage` (private mode) no
-longer breaks the table.
+| Flag | Remembers |
+|---|---|
+| `autoRestoreColumnLayout` | width (only of resized columns), order and visibility (`setColumnVisible`) – by property |
+| `autoRestoreHeaderGroupState` | collapsed / expanded header groups (`CellGroupIf.id` or the label path, e.g. `"Customer"`) |
+| `autoRestoreSortingState` | sorted columns – by property (before 1.1.92 by index: a moved column sorted the wrong column) |
+| `autoRestoreScrollPosition` | scroll position plus the id of the first visible row (new rows above it are no problem) |
+| `autoRestoreCollapsedExpandedState` | expanded tree nodes – by `getRowId` |
+| `autoRestoreCheckedState` | checked rows – by `getRowId`, also when the data arrives in another order |
+| `autoRestoreSelectedState` | selection: rows by id, columns by property; restored in the current row order |
+| `autoRestoreCustomState` | your data from `tableApi.setCustomState(…)`, e.g. a filter text |
+
+- Nothing is stored without `getStorageKeyFn` (the table warns once when a flag is set without it).
+- `storage: sessionStorage` (or an own `StateStorageIf` with `getItem/setItem/removeItem`) instead of `localStorage`.
+- The state is written once, 300 ms after the last change (`tableOptions.stateChangedDebounceDelay`), never per
+  scroll frame. A blocked storage (private mode) does not break the table.
+- Tables before 1.1.92 stored three keys (`<key>sortingState`, `<key>scrollState`, `<key>collapsedExpandedState`).
+  They are read once (sort index → property of the default column order) and removed with the next save.
+- Models without row objects (e.g. an own `AreaModel` for millions of rows): use
+  `getRowId: (_row, rowIndex) => rowIndex`, otherwise checked and selected rows are not stored.
+- **Privacy:** the state holds no cell values – only properties, widths, sort states and row ids. Ids can be personal
+  data (an e-mail address as id). Rows without `id`/`uuid` and without an own `getRowId` are not stored (the table
+  warns once) – before 1.1.92 the JSON of the whole row was used as id.
+- `resetState()` and `sort: []` clear the sort icons, the rows keep their current order.
+
+**State API – e.g. on your server per user.** `getState()` returns the same state as JSON, `applyState()` applies it,
+`initialState` starts with it, `onStateChanged` reports every change (debounced, not while the table is built):
+
+```ts
+import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+import type { GeStateChangeEvent, TableOptionsIf, TableStateIf } from "@guiexpert/table";
+
+async function createOrderTable(host: HTMLDivElement, orders: object[]) {
+  const saved = (await (await fetch("/api/prefs/orders")).json()) as TableStateIf | null;
+  const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: saved ?? undefined };
+
+  const listener = new EventAdapter();
+  listener.onStateChanged = (evt: GeStateChangeEvent) => {
+    void fetch("/api/prefs/orders", { method: "PUT", body: JSON.stringify(evt.state) });
+  };
+  const tableModel = TableFactory.createTableModel({ rows: orders, tableOptions });
+  const api = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+
+  api.getState(["columns", "sort"]);                                   // only some parts
+  api.applyState({ sort: [{ property: "total", sortState: "desc" }] }); // missing parts stay as they are
+  api.setHeaderGroupCollapsed("Customer", true);
+  return api;                                                           // api.resetState(): back to the code
+}
+```
+
+Framework wrappers report it as `stateChanged` (React/Preact/Solid callback prop, Vue `@stateChanged`, Svelte
+`on:stateChanged` / `onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent "stateChanged"`). A stored
+state (`autoRestoreOptions`) wins over `initialState`, part by part.
 
 ### 6.12 Look & feel
 

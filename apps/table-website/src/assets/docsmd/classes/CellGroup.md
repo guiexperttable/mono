@@ -23,6 +23,7 @@
 - [children](CellGroup.md#children)
 - [closed](CellGroup.md#closed)
 - [data](CellGroup.md#data)
+- [id](CellGroup.md#id)
 - [impl](CellGroup.md#impl)
 - [property](CellGroup.md#property)
 - [toggle](CellGroup.md#toggle)
@@ -51,7 +52,7 @@
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L8)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L11)
 
 ## Properties
 
@@ -67,7 +68,7 @@ Sub-groups or columns.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L14)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L17)
 
 ___
 
@@ -83,7 +84,7 @@ Current state: collapsed.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L12)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L15)
 
 ___
 
@@ -96,6 +97,26 @@ The label of the group or column.
 #### Implementation of
 
 [CellGroupIf](../interfaces/CellGroupIf.md).[data](../interfaces/CellGroupIf.md#data)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L12)
+
+___
+
+### id
+
+• `Optional` **id**: `string`
+
+See [CellGroupIf.id](../interfaces/CellGroupIf.md#id).
+
+**`Since`**
+
+1.1.92
+
+#### Implementation of
+
+[CellGroupIf](../interfaces/CellGroupIf.md).[id](../interfaces/CellGroupIf.md#id)
 
 #### Defined in
 
@@ -131,7 +152,7 @@ Set on leaves only: the property shown in this column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L10)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L13)
 
 ___
 
@@ -147,7 +168,7 @@ Show a ❯ toggle so that the user can collapse / expand the group.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L11)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L14)
 
 ___
 
@@ -164,4 +185,4 @@ When is this child visible? `"always"` – also when the group is collapsed; `"i
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L13)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L16)

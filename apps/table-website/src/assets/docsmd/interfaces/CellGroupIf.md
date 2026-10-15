@@ -33,6 +33,7 @@ Training: [Header models: multi-row and grouped](https://gui.expert/training/hea
 - [children](CellGroupIf.md#children)
 - [closed](CellGroupIf.md#closed)
 - [data](CellGroupIf.md#data)
+- [id](CellGroupIf.md#id)
 - [impl](CellGroupIf.md#impl)
 - [property](CellGroupIf.md#property)
 - [toggle](CellGroupIf.md#toggle)
@@ -48,7 +49,7 @@ Sub-groups or columns.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L35)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L42)
 
 ___
 
@@ -60,7 +61,7 @@ Current state: collapsed.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L28)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L35)
 
 ___
 
@@ -72,7 +73,24 @@ The label of the group or column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L22)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L29)
+
+___
+
+### id
+
+• `Optional` **id**: `string`
+
+A stable id of the group, used to remember whether it is collapsed ([TableHeaderGroupStateIf](TableHeaderGroupStateIf.md),
+[TableApi.setHeaderGroupCollapsed](../classes/TableApi.md#setheadergroupcollapsed)). Default: the path of the labels, e.g. `"Customer"` or `"2026/Q1"`.
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L26)
 
 ___
 
@@ -84,7 +102,7 @@ Internal: the implementation type of the node.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L38)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L45)
 
 ___
 
@@ -96,7 +114,7 @@ Set on leaves only: the property shown in this column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L24)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L31)
 
 ___
 
@@ -108,7 +126,7 @@ Show a ❯ toggle so that the user can collapse / expand the group.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L26)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L33)
 
 ___
 
@@ -121,4 +139,4 @@ When is this child visible? `"always"` – also when the group is collapsed; `"i
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L33)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.if.ts#L40)

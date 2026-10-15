@@ -1,6 +1,7 @@
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
+import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 import { EventFocusChangedListenerIf } from './focus/event-focus-changed-listener.if';
@@ -65,4 +66,12 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
 
   /** The focused cell changed – read it from {@link FocusModelIf.getFocus}. */
   onFocusChanged(model: FocusModelIf): void;
+
+  /**
+   * The state of the table changed (column layout, sorting, scroll position, tree, checked or selected rows,
+   * header groups, custom data) – reported once after the changes settled, see {@link GeStateChangeEvent}.
+   * Save `evt.state` e.g. on your server and pass it back as {@link TableOptionsIf.initialState}.
+   * @since 1.1.92
+   */
+  onStateChanged?(evt: GeStateChangeEvent): void;
 }

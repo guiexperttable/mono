@@ -24,11 +24,13 @@ describe('AutoRestoreOptions', () => {
       expect(options.autoRestoreScrollPosition).toBe(false);
       expect(options.autoRestoreCheckedState).toBe(false);
       expect(options.autoRestoreSelectedState).toBe(false);
+      expect(options.autoRestoreColumnLayout).toBe(false);
+      expect(options.autoRestoreHeaderGroupState).toBe(false);
+      expect(options.autoRestoreCustomState).toBe(false);
     });
 
     it('has no storage key function', () => {
-      // NOTE: AutoRestoreOptionsIf documents a constant fallback key 'autorestoreoptionsif', but without
-      // getStorageKeyFn the store-state services persist nothing.
+      // without getStorageKeyFn nothing is stored (and the table warns once if a flag is set – table-state.browser.spec)
       expect(options.getStorageKeyFn).toBeUndefined();
     });
 
@@ -112,5 +114,13 @@ describe('AutoRestoreOptions', () => {
       expect(opts.getStorageKeyFn?.()).toBe('orders-table');
       expect(opts.getRowId?.({ id: 7 })).toBe(7);
     });
+  });
+});
+
+describe('GetRowIdFn (since 1.1.92 with an optional rowIndex)', () => {
+  it('a function with two parameters is a valid getRowId', () => {
+    const opts: AutoRestoreOptionsIf<Order> = { autoRestoreSortingState: false, getRowId: (_row: Order, rowIndex?: number) => rowIndex ?? -1 };
+    expect(opts.getRowId!({ id: 1 }, 5)).toBe(5);
+    expect(opts.getRowId!.length).toBe(2);
   });
 });

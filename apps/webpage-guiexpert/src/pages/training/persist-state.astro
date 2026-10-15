@@ -15,19 +15,28 @@ import { Code } from "astro-expressive-code/components";
     the next start. Start from <ApiLink name="AutoRestoreOptions" /> and switch on what you need:
   </p>
   <Snippet file="demos/persist-state.ts" region="options" title="src/model/order-table-options.ts" />
-  <LiveDemo name="persist-state" title="Sort, scroll, reload" height={380}
-            caption="Double-click “Total”, scroll down, then “reload page”. The table comes back sorted and at the same row." />
+  <LiveDemo name="persist-state" title="Sort, resize, reload" height={380}
+            caption="Double-click “Total”, drag a column edge or a header, scroll down, then “reload page”. The table comes back exactly as you left it." />
 
   <h2 id="what">What can be remembered</h2>
   <table>
     <thead><tr><th>Option</th><th>Remembers</th></tr></thead>
     <tbody>
-      <tr><td><code>autoRestoreSortingState</code></td><td>sorted column and direction (incl. the header icon)</td></tr>
-      <tr><td><code>autoRestoreScrollPosition</code></td><td>scroll position</td></tr>
-      <tr><td><code>autoRestoreCollapsedExpandedState</code></td><td>expanded / collapsed nodes of a tree – needs <code>getRowId</code></td></tr>
+      <tr><td><code>autoRestoreSortingState</code></td><td>sorted columns and direction (incl. the header icon) – by property</td></tr>
+      <tr><td><code>autoRestoreScrollPosition</code></td><td>scroll position (and the first visible row)</td></tr>
+      <tr><td><code>autoRestoreCollapsedExpandedState</code></td><td>expanded / collapsed nodes of a tree – by <code>getRowId</code></td></tr>
+      <tr><td><code>autoRestoreColumnLayout</code></td><td>width of resized columns, column order, hidden columns (1.1.92)</td></tr>
+      <tr><td><code>autoRestoreHeaderGroupState</code></td><td>collapsed header groups (1.1.92)</td></tr>
+      <tr><td><code>autoRestoreCheckedState</code></td><td>checked rows – by <code>getRowId</code> (1.1.92)</td></tr>
+      <tr><td><code>autoRestoreSelectedState</code></td><td>selected rows, columns or ranges (1.1.92)</td></tr>
+      <tr><td><code>autoRestoreCustomState</code></td><td>your own data, e.g. a filter text: <ApiLink name="TableApi.setCustomState" /> (1.1.92)</td></tr>
     </tbody>
   </table>
-  <p>For trees (<ChapterLink slug="tree-table" />) the table needs a stable id per node to recognise it after a reload:</p>
+  <p>
+    Columns are stored by their property and rows by their id – never by position. A column the user moved is still
+    the right column after a reload, and checked rows stay checked when the server sends them in another order.
+  </p>
+  <p>For trees (<ChapterLink slug="tree-table" />) and checked or selected rows the table needs a stable id per row:</p>
   <Code lang="ts" title="tree/tree.ts" code={`autoRestoreOptions: {
   ...new AutoRestoreOptions<OrderNode>(),
   getStorageKeyFn: () => "ge-demo-order-tree",
@@ -36,13 +45,34 @@ import { Code } from "astro-expressive-code/components";
   autoRestoreScrollPosition: true
 }`} />
 
+  <h2 id="api">Your own storage – or your server</h2>
+  <p>
+    The same state is available as plain JSON: <ApiLink name="TableApi.getState" /> reads it,
+    <ApiLink name="TableApi.applyState" /> applies it, <ApiLink name="TableOptionsIf.initialState" /> starts with it and
+    <ApiLink name="EventListenerIf.onStateChanged" /> reports every change – once, after the user stopped dragging or
+    scrolling. That is all you need to keep the layout per user on your server:
+  </p>
+  <Snippet file="demos/persist-state.ts" region="event" title="src/table/order-table.ts" />
+  <Code lang="ts" title="start with the saved state" code={`const saved = await (await fetch("/api/prefs/orders")).json();   // TableStateIf | null
+const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: saved ?? undefined };`} />
+  <p>A “reset layout” button is one line – it also deletes the stored state:</p>
+  <Snippet file="demos/persist-state.ts" region="reset" />
+  <p>
+    <code>sessionStorage</code> instead of <code>localStorage</code>? Set <code>storage: sessionStorage</code> in the
+    auto-restore options (or any object with <code>getItem</code>, <code>setItem</code>, <code>removeItem</code>).
+    The state holds no cell values – but row ids can be personal data (an e-mail address as id); prefer technical ids.
+  </p>
+
   <Callout type="pitfall" title="One key per table">
     <p><code>getStorageKeyFn</code> must be unique per table – two tables with the same key overwrite each other's state. Include the
-      user id if several people share a browser.</p>
+      user id if several people share a browser. Without <code>getStorageKeyFn</code> nothing is stored (the table warns once).</p>
   </Callout>
   <Callout type="version">
     <p>Needs <code>@guiexpert/table@1.1.89</code>: the sort icon shows the restored sorting, the scroll position is saved reliably,
       nested tree nodes are restored, and blocked storage (private mode) no longer breaks the start.</p>
+    <p>Since <code>1.1.92</code>: column layout, header groups, checked and selected rows, the state API and one storage key
+      <code>&lt;key&gt;tableState</code> (the keys of older versions are read once and removed). Sorting is stored by
+      property – before, a moved column could restore the sorting of the wrong column.</p>
   </Callout>
 
   <h2 id="next">Next</h2>

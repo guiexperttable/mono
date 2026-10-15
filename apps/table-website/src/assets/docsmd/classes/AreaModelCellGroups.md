@@ -41,6 +41,7 @@
 - [getRowHeight](AreaModelCellGroups.md#getrowheight)
 - [getRowspanAt](AreaModelCellGroups.md#getrowspanat)
 - [getTextValueAt](AreaModelCellGroups.md#gettextvalueat)
+- [getToggleGroupStates](AreaModelCellGroups.md#gettogglegroupstates)
 - [getTooltipAt](AreaModelCellGroups.md#gettooltipat)
 - [getValueAt](AreaModelCellGroups.md#getvalueat)
 - [getYPosByRowIndex](AreaModelCellGroups.md#getyposbyrowindex)
@@ -50,6 +51,7 @@
 - [isRowCheckable](AreaModelCellGroups.md#isrowcheckable)
 - [isRowChecked](AreaModelCellGroups.md#isrowchecked)
 - [isSelectable](AreaModelCellGroups.md#isselectable)
+- [setGroupClosed](AreaModelCellGroups.md#setgroupclosed)
 - [setRowChecked](AreaModelCellGroups.md#setrowchecked)
 - [setValue](AreaModelCellGroups.md#setvalue)
 - [sort](AreaModelCellGroups.md#sort)
@@ -77,7 +79,7 @@
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L30)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L31)
 
 ## Properties
 
@@ -111,7 +113,7 @@ if (areaModel.areaIdent === "body") {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L31)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L32)
 
 ___
 
@@ -121,7 +123,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L25)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L26)
 
 ___
 
@@ -131,7 +133,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L33)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L34)
 
 ___
 
@@ -141,7 +143,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L34)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L35)
 
 ___
 
@@ -151,7 +153,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L22)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L23)
 
 ___
 
@@ -161,7 +163,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L32)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L33)
 
 ___
 
@@ -192,7 +194,7 @@ const isSelected = bodyModel.isRowChecked(5);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L24)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L25)
 
 ## Methods
 
@@ -206,7 +208,7 @@ const isSelected = bodyModel.isRowChecked(5);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L69)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L70)
 
 ___
 
@@ -254,7 +256,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L95)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L96)
 
 ___
 
@@ -325,7 +327,7 @@ class MyBodyModel extends AreaModelObjectArray<any> {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L99)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L100)
 
 ___
 
@@ -378,7 +380,7 @@ externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L103)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L104)
 
 ___
 
@@ -392,7 +394,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L56)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L57)
 
 ___
 
@@ -441,7 +443,7 @@ getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefin
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L107)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L108)
 
 ___
 
@@ -495,7 +497,7 @@ getColspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L111)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L112)
 
 ___
 
@@ -562,7 +564,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L129)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L130)
 
 ___
 
@@ -621,7 +623,7 @@ getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L133)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L134)
 
 ___
 
@@ -664,7 +666,7 @@ getMaxColspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L137)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:138](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L138)
 
 ___
 
@@ -678,7 +680,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L61)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L62)
 
 ___
 
@@ -721,7 +723,7 @@ getMaxRowspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L141)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:142](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L142)
 
 ___
 
@@ -768,7 +770,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L145)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L146)
 
 ___
 
@@ -808,7 +810,7 @@ getRowCount(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L149)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L150)
 
 ___
 
@@ -871,7 +873,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L186)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L187)
 
 ___
 
@@ -925,7 +927,7 @@ getRowspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L157)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L158)
 
 ___
 
@@ -976,7 +978,38 @@ getTextValueAt(rowIndex: number, columnIndex: number): string {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L176)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:177](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L177)
+
+___
+
+### getToggleGroupStates
+
+▸ **getToggleGroupStates**(): [`TableHeaderGroupStateIf`](../interfaces/TableHeaderGroupStateIf.md)[]
+
+The header groups the user can collapse (`toggle: true`, not `visibility: "always"`) with their id
+([CellGroupIf.id](../interfaces/CellGroupIf.md#id), otherwise the path of the labels, e.g. `"Customer"` or `"2026/Q1"`; a second group with
+the same path gets `#2`) and their state.
+
+#### Returns
+
+[`TableHeaderGroupStateIf`](../interfaces/TableHeaderGroupStateIf.md)[]
+
+id and `closed` per group, in header order
+
+**`Example`**
+
+```ts
+const header = tableApi.getTableModel().getAreaModel("header") as AreaModelCellGroups;
+console.log(header.getToggleGroupStates());   // [{ id: "Customer", closed: false }]
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L239)
 
 ___
 
@@ -1027,7 +1060,7 @@ getTooltipAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L167)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L168)
 
 ___
 
@@ -1091,7 +1124,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L172)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:173](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L173)
 
 ___
 
@@ -1154,7 +1187,7 @@ getYPosByRowIndex(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L180)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:181](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L181)
 
 ___
 
@@ -1189,7 +1222,7 @@ init(): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L46)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L47)
 
 ___
 
@@ -1256,7 +1289,7 @@ isEditable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L190)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L191)
 
 ___
 
@@ -1299,7 +1332,7 @@ isFilterable(): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L194)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:195](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L195)
 
 ___
 
@@ -1352,7 +1385,7 @@ isRowCheckable(rowIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:198](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L198)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:199](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L199)
 
 ___
 
@@ -1405,7 +1438,7 @@ isRowChecked(rowIndex: number): CheckedType | undefined {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:202](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L202)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L203)
 
 ___
 
@@ -1459,7 +1492,38 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:206](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L206)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:207](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L207)
+
+___
+
+### setGroupClosed
+
+▸ **setGroupClosed**(`id`, `closed`): `undefined` \| [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[]
+
+Collapses or expands a header group by its id (see [getToggleGroupStates](AreaModelCellGroups.md#gettogglegroupstates)) and returns the column
+definitions to use from now on – like a click on its toggle. [TableApi.setHeaderGroupCollapsed](TableApi.md#setheadergroupcollapsed) does this
+and repaints.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `id` | `string` | the id of the group |
+| `closed` | `boolean` | true = collapse |
+
+#### Returns
+
+`undefined` \| [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[]
+
+the merged column definitions, `undefined` if there is no such group
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L253)
 
 ___
 
@@ -1510,7 +1574,7 @@ setRowChecked(rowIndex: number, checked: boolean): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L210)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:211](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L211)
 
 ___
 
@@ -1562,7 +1626,7 @@ setValue(rowIndex: number, columnIndex: number, value: any): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:214](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L214)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:215](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L215)
 
 ___
 
@@ -1621,7 +1685,7 @@ sort(compareFn?: (a: any, b: any) => number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L42)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L43)
 
 ___
 
@@ -1641,4 +1705,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:218](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L218)
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L219)

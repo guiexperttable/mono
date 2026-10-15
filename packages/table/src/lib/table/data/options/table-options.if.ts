@@ -11,6 +11,7 @@ import { FocusModelIf } from "../../focus/focus-model.if";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptionsIf } from './header-group-options.if';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
+import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 
 /**
@@ -341,4 +342,25 @@ export interface TableOptionsIf {
    * @since 1.1.92
    */
   overlayOptions?: Partial<OverlayOptionsIf>;
+
+  /**
+   * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from
+   * your server ({@link TableApi.getState}, {@link EventListenerIf.onStateChanged}). A state stored by
+   * {@link autoRestoreOptions} wins over it, part by part.
+   *
+   * @example
+   * const saved = (await (await fetch("/api/prefs/orders")).json()) as TableStateIf | null;
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: saved ?? undefined };
+   *
+   * @since 1.1.92
+   */
+  initialState?: Partial<TableStateIf>;
+
+  /**
+   * Delay in ms between the last change of the state (resize, sort, scroll …) and
+   * {@link EventListenerIf.onStateChanged} / the save of {@link autoRestoreOptions}. Default 300.
+   *
+   * @since 1.1.92
+   */
+  stateChangedDebounceDelay?: number;
 }

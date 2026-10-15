@@ -20,6 +20,7 @@
 - [children](CellGroupExt.md#children)
 - [closed](CellGroupExt.md#closed)
 - [data](CellGroupExt.md#data)
+- [id](CellGroupExt.md#id)
 - [impl](CellGroupExt.md#impl)
 - [leftNeighbour](CellGroupExt.md#leftneighbour)
 - [parent](CellGroupExt.md#parent)
@@ -108,7 +109,7 @@ Current state: collapsed.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L12)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L15)
 
 ___
 
@@ -121,6 +122,26 @@ The label of the group or column.
 #### Inherited from
 
 [CellGroup](CellGroup.md).[data](CellGroup.md#data)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L12)
+
+___
+
+### id
+
+• `Optional` **id**: `string`
+
+See [CellGroupIf.id](../interfaces/CellGroupIf.md#id).
+
+**`Since`**
+
+1.1.92
+
+#### Inherited from
+
+[CellGroup](CellGroup.md).[id](CellGroup.md#id)
 
 #### Defined in
 
@@ -176,7 +197,7 @@ Set on leaves only: the property shown in this column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L10)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L13)
 
 ___
 
@@ -212,7 +233,7 @@ Show a ❯ toggle so that the user can collapse / expand the group.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L11)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L14)
 
 ___
 
@@ -229,7 +250,7 @@ When is this child visible? `"always"` – also when the group is collapsed; `"i
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L13)
+[src/lib/table/data/tablemodel/cellgroup/cell-group.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group.ts#L16)
 
 ## Methods
 
@@ -243,7 +264,7 @@ When is this child visible? `"always"` – also when the group is collapsed; `"i
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L99)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L100)
 
 ___
 
@@ -264,7 +285,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L104)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:105](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L105)
 
 ___
 
@@ -278,7 +299,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L38)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L39)
 
 ___
 
@@ -299,7 +320,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L130)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L131)
 
 ___
 
@@ -320,7 +341,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L119)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L120)
 
 ___
 
@@ -334,7 +355,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L82)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L83)
 
 ___
 
@@ -354,7 +375,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L141)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:142](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L142)
 
 ___
 
@@ -368,7 +389,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L29)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L30)
 
 ___
 
@@ -382,4 +403,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L33)
+[src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cellgroup/cell-group-ext.ts#L34)

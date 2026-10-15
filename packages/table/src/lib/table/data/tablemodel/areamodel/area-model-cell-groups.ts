@@ -14,6 +14,7 @@ import { MouseTargetData } from '../../event/mouse-target-data';
 import { HeaderGroupOptionsIf } from '../../options/header-group-options.if';
 import { HeaderGroupOptions } from '../../options/header-group-options';
 import { setGroupColumnVisibility } from '../column/column-visibility';
+import { TableHeaderGroupStateIf } from '../../../state/table-state.if';
 
 // TODO next steps:   fix this model
 /** @category Header groups */
@@ -219,19 +220,75 @@ Gold A     Gold B    Gold C   Gold D    Gold Sum    HOH Loc    HOH A    HOH B   
     const cellGroup: (CellGroupExt | null | undefined) = this.arr[mouseTargetData.rowIdx][mouseTargetData.colIdx];
     if (cellGroup?.toggle && cellGroup.visibility !== 'always') {
       cellGroup.closed = !cellGroup.closed;
-
       this.init();
-      //this.groupExts = CellgroupFactory.buildGroupExts(this.groups);
-
-      // this.columnDefs = CellgroupFactory.buildColumnDefs(this.groups);
-      // this.arr = this.buildArray();
-      
-      // console.info('columnDefs', this.columnDefs);
-      // console.info('toggled', cellGroup);
-      // console.info('columnDefs 2', CellgroupFactory.buildColumnDefs(this.groups));
     }
-    // Keep the existing ColumnDef objects (width, classes, renderers, sorting …) – only their visibility
-    // comes from the rebuilt groups. Fresh defs would reset every width to the default (100 px).
+    return this.mergeColumnDefs();
+  }
+
+  /**
+   * The header groups the user can collapse (`toggle: true`, not `visibility: "always"`) with their id
+   * ({@link CellGroupIf.id}, otherwise the path of the labels, e.g. `"Customer"` or `"2026/Q1"`; a second group with
+   * the same path gets `#2`) and their state.
+   *
+   * @returns {TableHeaderGroupStateIf[]} id and `closed` per group, in header order
+   * @example
+   * const header = tableApi.getTableModel().getAreaModel("header") as AreaModelCellGroups;
+   * console.log(header.getToggleGroupStates());   // [{ id: "Customer", closed: false }]
+   * @since 1.1.92
+   */
+  getToggleGroupStates(): TableHeaderGroupStateIf[] {
+    return Array.from(this.getToggleGroups(), ([id, group]) => ({ id, closed: !!group.closed }));
+  }
+
+  /**
+   * Collapses or expands a header group by its id (see {@link getToggleGroupStates}) and returns the column
+   * definitions to use from now on – like a click on its toggle. {@link TableApi.setHeaderGroupCollapsed} does this
+   * and repaints.
+   *
+   * @param {string} id - the id of the group
+   * @param {boolean} closed - true = collapse
+   * @returns {ColumnDefIf[] | undefined} the merged column definitions, `undefined` if there is no such group
+   * @since 1.1.92
+   */
+  setGroupClosed(id: string, closed: boolean): ColumnDefIf[] | undefined {
+    const group = this.getToggleGroups().get(id);
+    if (!group) {
+      return undefined;
+    }
+    if (!!group.closed !== closed) {
+      group.closed = closed;
+      this.init();
+    }
+    return this.mergeColumnDefs();
+  }
+
+  /** The toggleable groups by id (header order). */
+  private getToggleGroups(): Map<string, CellGroupExt> {
+    const ret = new Map<string, CellGroupExt>();
+    const walk = (groups: CellGroupExt[] | undefined, path: string) => {
+      for (const group of groups ?? []) {
+        const own = path ? path + '/' + String(group.data) : String(group.data);
+        if (group.children?.length) {
+          if (group.toggle && group.visibility !== 'always') {
+            let id = group.id ?? own;
+            for (let n = 2; ret.has(id); n++) {
+              id = (group.id ?? own) + '#' + n;
+            }
+            ret.set(id, group);
+          }
+          walk(group.children, own);
+        }
+      }
+    };
+    walk(this.groupExts, '');
+    return ret;
+  }
+
+  /**
+   * Keep the existing ColumnDef objects (width, classes, renderers, sorting …) – only their visibility
+   * comes from the rebuilt groups. Fresh defs would reset every width to the default (100 px).
+   */
+  private mergeColumnDefs(): ColumnDefIf[] {
     const fresh = CellgroupFactory.buildColumnDefs(this.groupExts);
     const previous = new Map(this.columnDefs.map(def => [def.property, def]));
     const merged = fresh.map(def => {

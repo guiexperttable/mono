@@ -4,6 +4,7 @@ import type {
   GeModelChangeEvent,
   GeMouseEvent,
   GeScrollEvent,
+  GeStateChangeEvent,
   SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -28,6 +29,8 @@ export interface GuiexpertTableProps {
   onSelectionChanged?: (model: SelectionModelIf) => void;
   onFocusChanged?: (model: FocusModelIf) => void;
   onScroll?: (evt: GeScrollEvent) => void;
+  /** The state changed (column layout, sorting, scroll position …). @since 1.1.92 */
+  onStateChanged?: (evt: GeStateChangeEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -42,6 +45,8 @@ export interface GuiexpertTableEvents {
   selectionChanged: CustomEvent<SelectionModelIf>;
   focusChanged: CustomEvent<FocusModelIf>;
   scroll: CustomEvent<GeScrollEvent>;
+  /** @since 1.1.92 */
+  stateChanged: CustomEvent<GeStateChangeEvent>;
 }
 
 /**

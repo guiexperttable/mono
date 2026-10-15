@@ -13,11 +13,12 @@ import { EventListenerIf } from './event-listener.if';
 import { TableApi } from './table-api';
 import { SortState } from './data/common/sort-state.type';
 import { AreaModelTree } from './data/tablemodel/areamodel/area-model-tree';
-import { StoreStateScrollPosService } from './service/store-state-scroll-pos.service';
 import { StoreStateCollapsedExpandService } from './service/store-state-collapsed-expand.service';
 import { StoreStateSortingService } from './service/store-state-sorting.service';
 import { RenderScope } from './render-scope';
 import { SortItem } from './data/common/sort-item';
+import { TableStateService } from './state/table-state.service';
+import { GeStateChangeEvent } from './data/common/event/ge-state-change-event';
 import { InputHandler } from './input-handler';
 import { GeModelChangeEvent } from './data/common/event/ge-model-change-event';
 import { GeScrollEvent } from './data/common/event/ge-scroll-event';
@@ -90,8 +91,16 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   public resizeHandler: ResizeHandler;
   public shortcutService: ShortcutService;
 
+  /** @deprecated since 1.1.92 – always `undefined`; the state is kept by {@link stateService}. */
   public storeStateCollapsedExpandService?: StoreStateCollapsedExpandService;
+  /** @deprecated since 1.1.92 – always `undefined`; the state is kept by {@link stateService}. */
   public storeSortingService?: StoreStateSortingService;
+  /**
+   * Collects, applies, stores and reports the state of this table (column layout, sorting, scroll, tree, checked
+   * and selected rows …). Use {@link TableApi.getState} / {@link TableApi.applyState}.
+   * @since 1.1.92
+   */
+  public readonly stateService: TableStateService;
 
   protected selectionService: SelectionService = new SelectionService(this);
   protected keyEvent?: GeKeyEvent;
@@ -140,21 +149,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (!eventListener) {
       this.eventListener = new EventAdapter();
     }
-    if (this.tableOptions?.autoRestoreOptions) {
-      const autoRestoreOptions = this.tableOptions.autoRestoreOptions;
-      const keyFn = autoRestoreOptions.getStorageKeyFn;
-      if (keyFn) {
-        if (autoRestoreOptions.autoRestoreScrollPosition) {
-          this.storeScrollPosStateService = new StoreStateScrollPosService(keyFn);
-        }
-        if (autoRestoreOptions.autoRestoreCollapsedExpandedState) {
-          this.storeStateCollapsedExpandService = new StoreStateCollapsedExpandService(keyFn);
-        }
-        if (autoRestoreOptions.autoRestoreSortingState) {
-          this.storeSortingService = new StoreStateSortingService(keyFn);
-        }
-      }
-    }
+    this.stateService = new TableStateService(this);
     this.mouseHandler = new MouseHandler(this);
     this.inputHandler = new InputHandler(this);
     this.resizeHandler = new ResizeHandler(this, tableOptions.resizeEventDebounceDelay);
@@ -658,15 +653,17 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (availableWidth > 0) {
       this.tableModel.setParentWidth(availableWidth);
     }
+    // the restore of the state (autoRestoreOptions, initialState) runs in the first firstInit() only
+    this.stateService.initBeforeModel();
     this.tableModel.init();
+    this.stateService.initAfterModel();
     if (this.tableOptions?.externalFilterFunction) {
       this.externalFilterChanged(false);
     }
-    this.autoRestoreCollapsedExpandedState();
-    this.autoRestoreSortingState();
+    this.stateService.initAfterFilter();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
-    this.autoRestoreScrollPosition();
+    this.stateService.initAfterLayout();
     // the live region must exist before its first message – screen readers often miss a region inserted with text
     this.liveAnnouncer.getElement();
     this.initialized = true;
@@ -693,6 +690,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   destroy(): void {
     if (this.destroyed) {
       return;
+    }
+    try {
+      this.stateService.destroy(); // stores and reports a pending change
+    } catch (e) {
+      console.error(e);            // an own onStateChanged / getRowId threw – release the table anyway
     }
     this.destroyed = true;
     this.listenerAbortController.abort();
@@ -843,10 +845,13 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     if (this.mouseStartAction === 'resize-column') {
       this.resizeColumn(mouseEvent);
+      this.stateService.markDirty('columns');
 
     } else if (this.mouseStartAction === 'drag-column') {
       this.hideDraggingColumn();
       this.repaint();
+      this.stateService.markDirty('columns');
+      this.stateService.markDirty('selection'); // column indices of the selection moved
     }
     this.mouseStartWidth = -1;
     this.mouseStartColumnIndex = -1;
@@ -903,7 +908,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       amt.toggleExpandCollapseAll(expand);
       this.allExpanded = expand;
       this.repaintHard(); // the row count changed → recalc the scroll height, not only the visible rows
-      this.storeStateCollapsedExpandService?.collapsedStateAll(expand);
+      this.stateService.markDirty('tree');
     }
   }
 
@@ -925,27 +930,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     row.expanded = expanded;
     (bodyAreaModel as AreaModelTree<any>).recalcVisibleTreeRows(false); // the filter result does not change
     this.repaintHard(); // the row count changed
-    this.storeTreeRowState(row);
+    this.stateService.markDirty('tree');
     return true;
-  }
-
-  /** Remembers the expanded/collapsed state of a row (autoRestoreOptions.getRowId). */
-  private storeTreeRowState(tr: TreeRowIf<any>) {
-    const getRowId = this.tableOptions?.autoRestoreOptions?.getRowId;
-    const service = this.storeStateCollapsedExpandService;
-    if (getRowId && service) {
-      // first toggle: a row that is now expanded means "the table started collapsed" → store expanded ids
-      service.initModeIfEmpty(tr.expanded ? "expanded" : "collapsed");
-      const mode = service.collapsedExpandedStateGet().mode;
-      const push = (mode === "collapsed" && !tr.expanded) || (mode === "expanded" && tr.expanded);
-      const remove = (mode === "collapsed" && tr.expanded) || (mode === "expanded" && !tr.expanded);
-      const rowId = getRowId(tr.data);
-      if (push) {
-        service.collapsedStateIdsPush(rowId);
-      } else if (remove) {
-        service.collapsedStateIdsRemove(rowId);
-      }
-    }
   }
 
   /**
@@ -966,6 +952,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const selectedRows = areaModel.rowSelectionModel?.getCheckedRows();
     // a copy: the model changes its array with the next click (a listener that keeps it would see the change)
     this.eventListener.onCheckboxChanged?.(selectedRows ? selectedRows.slice() : []);
+    this.stateService.markDirty('checked');
   }
 
   /**
@@ -1022,7 +1009,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.eventListener.onFocusChanged?.(sm);
   }
 
+  /**
+   * Reports a changed state to the event listener (called by {@link TableStateService}).
+   * @since 1.1.92
+   */
+  stateChanged(evt: GeStateChangeEvent): void {
+    this.eventListener.onStateChanged?.(evt);
+  }
+
+  protected override afterRenderPass(): void {
+    this.stateService?.rendered(); // undefined while the constructor of the super class renders
+  }
+
   onSelectionChanged(sm: SelectionModelIf) {
+    this.stateService?.markDirty('selection');
     if (this.selectionEventsHeld > 0) {
       this.heldSelectionModel = sm; // reported once at the end of holdSelectionEvents()
       return;
@@ -1127,7 +1127,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       colDef.sortState = newState;
     }
     this.repaint();
-    this.storeSortingService?.setSortItems([sortItem]);
+    if (done) {
+      this.stateService.sortedByColumn(newState ? colDef.property : undefined);
+    }
     if (done) {
       this.announce(this.ariaTexts.sorted(this.getColumnAriaLabel(colIdx), newState));
     }
@@ -1252,8 +1254,39 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if ('columnDefs' in this.tableModel) {
       this.tableModel.columnDefs = headerAreaModel.toggleHeaderGroup(mouseTargetData);
     }
-    // this.repaint();
+    this.headerGroupsChanged();
+  }
+
+  /**
+   * Collapses or expands a header group by its id ({@link TableApi.setHeaderGroupCollapsed}).
+   *
+   * @param {string} id - {@link CellGroupIf.id} or the path of the labels, e.g. `"Customer"`
+   * @param {boolean} collapsed - true = collapse
+   * @returns {boolean} false if the header has no such group
+   * @since 1.1.92
+   */
+  setHeaderGroupCollapsed(id: string, collapsed: boolean): boolean {
+    const header = this.tableModel.getAreaModel('header') as Partial<AreaModelCellGroups>;
+    const columnDefs = header.setGroupClosed?.(id, collapsed);
+    if (!columnDefs) {
+      return false;
+    }
+    if ('columnDefs' in this.tableModel) {
+      this.tableModel.columnDefs = columnDefs;
+    }
+    this.headerGroupsChanged();
+    return true;
+  }
+
+  /**
+   * Rebuilds the layout after a header group was collapsed or expanded (other columns are shown) and marks the
+   * state as changed.
+   * @since 1.1.92
+   */
+  headerGroupsChanged(): void {
     this.firstInit();
+    this.stateService.markDirty('headerGroups');
+    this.stateService.markDirty('columns');
 
     // this.tableModel.recalcPadding();
     // this.resetSizeOfWrapperDiv();
@@ -1404,93 +1437,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /**
-   * Restores the scroll position of the table if auto restore options are enabled.
-   *
-   *
-   * @returns {void}
-   */
-  private autoRestoreScrollPosition() {
-    if (this.tableOptions?.autoRestoreOptions && this.storeScrollPosStateService) {
-      const autoRestoreOptions = this.tableOptions.autoRestoreOptions;
-      if (autoRestoreOptions.autoRestoreScrollPosition) {
-        const scrollOffset = this.storeScrollPosStateService.getScrollOffset();
-        if (scrollOffset) {
-          this.scrollViewport.scrollTo(...scrollOffset);
-        }
-      }
-    }
-  }
-
-  /**
-   * Automatically restores the sorting state of the table.
-   *
-   * @private
-   * @function autoRestoreSortingState
-   * @memberof ClassName
-   *
-   * @description
-   * This method checks if the autoRestoreSortingState option is enabled in the tableOptions.
-   * If enabled, it uses the storeSortingService to retrieve the sort items array.
-   * If there are sort items present, it applies them to the table's body model using the doSort method.
-   *
-   * @returns {void}
-   */
-  private autoRestoreSortingState() {
-    if (this.tableOptions?.autoRestoreOptions?.autoRestoreSortingState && this.storeSortingService) {
-      const sortItems = this.storeSortingService.getSortItems();
-      if (sortItems?.length) {
-        const areaModel = this.tableModel.getBodyModel();
-        areaModel.doSort(sortItems);
-        // the header icons must show the restored order (not the sortState of the column definitions)
-        const columnDefs = this.tableModel.getColumnDefs();
-        if (columnDefs) {
-          columnDefs.forEach(cd => cd.sortState = '');
-          sortItems.forEach(item => {
-            const cd = columnDefs[item.columnIndex];
-            if (cd) cd.sortState = item.sortState;
-          });
-        }
-      }
-    }
-  }
-
-  /**
-   * Restores the collapsed/expanded state of the rows in the table based on the autoRestoreOptions
-   * specified in the tableOptions. This method is private and should not be called directly.
-   *
-   * @private
-   */
-  private autoRestoreCollapsedExpandedState() {
-    const service = this.storeStateCollapsedExpandService;
-    const autoRestoreOptions = this.tableOptions?.autoRestoreOptions;
-    const getRowId = autoRestoreOptions?.getRowId;
-    if (!service || !getRowId || !autoRestoreOptions?.autoRestoreCollapsedExpandedState) return;
-    if (!service.hasStoredState()) return; // nothing stored yet → keep the initial state of the rows
-
-    const areaModel = this.tableModel.getAreaModel('body');
-    if (isAreaModelTree(areaModel)) {
-      const amtr: AreaModelTree<any> = areaModel as AreaModelTree<any>;
-      const state = service.collapsedExpandedStateGet();
-      // walk ALL rows (not only the visible ones) – otherwise nested rows of collapsed parents are never restored
-      const restore = (rows: TreeRowIf<any>[] | undefined) => rows?.forEach(row => {
-        if (state.allExpanded) {
-          row.expanded = true;
-        } else if (state.allCollapsed) {
-          row.expanded = false;
-        } else {
-          const included = service.collapsedExpandedStateIncludes(getRowId(row.data));
-          row.expanded = state.mode === 'expanded' ? included : !included;
-        }
-        restore(row.children);
-      });
-      restore(amtr.rows);
-      amtr.recalcVisibleTreeRows(false);
-    }
-  }
-
-
-
-  /**
    * Calculates a width per column that fits the widest text of header, body and footer.
    *
    * The text is measured with the font and padding of a rendered cell label (canvas `measureText`),
@@ -1555,6 +1501,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   setColumnWidth(columnIndex: number, width: number): void{
     this.tableModel.setColumnWidth(columnIndex, width);
+    this.stateService.markDirty('columns');
   }
 
   /**
@@ -1569,6 +1516,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return false;
     }
     this.recalcWrappers(); // content width, wrapper div, fixed areas, repaint
+    this.stateService.markDirty('columns');
     return true;
   }
 
@@ -1612,6 +1560,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       this.tableModel.setColumnWidth(i, columnWidth);
     }
     if (recalcWrappers) this.recalcWrappers();
+    this.stateService.markDirty('columns');
   }
 
   recalcWrappers(){
@@ -1632,6 +1581,27 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.lastSortCompareFn = compareFn;
     this.tableModel.getColumnDefs()?.forEach(cd => cd.sortState = ''); // the header icons no longer apply
     this.repaint(); // without it the new order only appeared after the next scroll
+    this.stateService.sortedByColumn(undefined); // an own comparator can't be stored
+  }
+
+  /**
+   * Sorts the body by the given items (first = primary key) and sets the header icons – used to apply a stored
+   * state. Does not repaint.
+   *
+   * @param {SortItem[]} sortItems - column index and sort state per sorted column; `[]` only clears the icons
+   * @since 1.1.92
+   */
+  applySortItems(sortItems: SortItem[]): void {
+    const columnDefs = this.tableModel.getColumnDefs();
+    columnDefs?.forEach(cd => cd.sortState = '');
+    sortItems.forEach(item => {
+      const cd = columnDefs?.[item.columnIndex];
+      if (cd) cd.sortState = item.sortState;
+    });
+    if (sortItems.length) {
+      this.lastSortCompareFn = undefined;
+      this.tableModel.doSort(sortItems);
+    }
   }
 
   /**

@@ -1,9 +1,10 @@
 import { AutoRestoreOptionsIf } from "./auto-restore-options.if";
+import { markDefaultGetRowId } from "./default-row-id";
 
 
 /**
  * Defaults for {@link TableOptionsIf.autoRestoreOptions}: everything off. Spread it and switch on what the table
- * should remember in `localStorage` (one key per table).
+ * should remember in `localStorage` (one key per table) – see {@link AutoRestoreOptionsIf} for all flags.
  *
  * @example
  * const tableOptions: TableOptionsIf = {
@@ -12,7 +13,8 @@ import { AutoRestoreOptionsIf } from "./auto-restore-options.if";
  *     ...new AutoRestoreOptions<Order>(),
  *     getStorageKeyFn: () => "orders-table",          // unique per table
  *     autoRestoreSortingState: true,
- *     autoRestoreScrollPosition: true
+ *     autoRestoreScrollPosition: true,
+ *     autoRestoreColumnLayout: true                     // widths, order, visibility (since 1.1.92)
  *   }
  * };
  *
@@ -41,10 +43,18 @@ export class AutoRestoreOptions<T> implements AutoRestoreOptionsIf<T> {
   public autoRestoreCheckedState = false;
   public autoRestoreSelectedState = false;
 
+  /** @since 1.1.92 */
+  public autoRestoreColumnLayout = false;
+  /** @since 1.1.92 */
+  public autoRestoreHeaderGroupState = false;
+  /** @since 1.1.92 */
+  public autoRestoreCustomState = false;
+
 
   public getStorageKeyFn = undefined;
 
 
+  /** @deprecated since 1.1.92 – never used by the table. */
   public isSame = (r1: T, r2: T, options: AutoRestoreOptionsIf<T>) => {
     if (r1 && r2) {
       if (options.getRowId) {
@@ -56,7 +66,11 @@ export class AutoRestoreOptions<T> implements AutoRestoreOptionsIf<T> {
     return false;
   };
 
-  public getRowId = (row: T): string | number => {
+  /**
+   * Default: the property `id`, then `uuid`, then the JSON of the row. The table itself uses only `id` / `uuid` of
+   * this default (since 1.1.92): rows without them are not stored – the JSON would write whole rows into the storage.
+   */
+  public getRowId = markDefaultGetRowId((row: T): string | number => {
     if (row) {
       // First try:
       for (const key of ["id", "uuid"]) {
@@ -74,8 +88,8 @@ export class AutoRestoreOptions<T> implements AutoRestoreOptionsIf<T> {
         console.error(e);
       }
     }
-    console.warn("One of following options set to true without a valid \"getRowId()\": autoRestoreExpandedState, autoRestoreCheckedState.");
+    console.warn("autoRestoreOptions: getRowId() got no row – set an own getRowId (row, rowIndex) for models without row objects.");
     return -1;
-  };
+  });
 
 }

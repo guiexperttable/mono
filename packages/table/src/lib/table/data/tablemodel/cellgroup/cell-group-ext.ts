@@ -24,6 +24,7 @@ export class CellGroupExt extends CellGroup {
       cellGroup.visibility,
       cellGroup.children
     );
+    this.id = cellGroup.id;
   }
 
   ownColumn(): boolean {

@@ -18,6 +18,7 @@ import { AggregateCellRenderer } from "../../../renderer/aggregate-cell-renderer
 import { isPivotColumnDef } from "../../../instanceof-workaround";
 import { pivotSubtotalProperty, pivotTotalProperty, pivotValueProperty } from "../../../pivot/pivot-layout";
 import { DEFAULT_TOTAL_LABEL } from "../../../pivot/pivot-internals";
+import { formatShowValuesAs } from "../../../calc/show-values-as";
 
 const COUNT_FORMAT = new Intl.NumberFormat("en-US");
 
@@ -293,7 +294,50 @@ export class AreaModelPivot<T = any> extends AreaModelTree<any> {
     if (group && group.children.length > 0 && this.config.subtotals === false) {
       return undefined; // a group row without subtotals
     }
-    return this.getResult().getValue(group, info.column, info.valueIndex);
+    return this.getShownValue(group, info);
+  }
+
+  /**
+   * The value of a pivot cell as shown: the aggregate, or with „Show values as“ ({@link PivotValueIf.showValuesAs})
+   * its share of the row total, column total, grand total or parent row.
+   *
+   * @param {RowGroupIf<T> | undefined} group - the row group; `undefined` = all rows (the total row)
+   * @param {PivotColumnInfoIf} info - the column ({@link getColumnInfo})
+   * @returns {unknown} the shown value, `undefined` for an empty cell
+   *
+   * @example
+   * const body = (tableModel as PivotTableModel).getPivotBody();
+   * body.getShownValue(body.getRowGroup(0), body.getColumnInfo(2)!);   // 0.4 – 40 % of the row
+   *
+   * @since 1.1.95
+   */
+  getShownValue(group: RowGroupIf<T> | undefined, info: PivotColumnInfoIf): unknown {
+    const result = this.getResult();
+    const value = result.getValue(group, info.column, info.valueIndex);
+    const showValuesAs = info.value.showValuesAs;
+    if (!showValuesAs || typeof value !== "number") {
+      return value;
+    }
+    let total: unknown;
+    switch (showValuesAs.mode) {
+      case "percentOfRowTotal":
+        total = result.getValue(group, undefined, info.valueIndex);
+        break;
+      case "percentOfColumnTotal":
+        total = result.getValue(undefined, info.column, info.valueIndex);
+        break;
+      case "percentOfGrandTotal":
+        total = result.getValue(undefined, undefined, info.valueIndex);
+        break;
+      case "percentOfParentTotal": {
+        const parent = (group as RowGroup<T> | undefined)?.parent;
+        total = result.getValue(group ? parent ?? undefined : undefined, info.column, info.valueIndex);
+        break;
+      }
+      default:
+        return value; // running totals, differences and ranks don't apply to a pivot
+    }
+    return typeof total === "number" && total !== 0 ? value / total : undefined;
   }
 
   override getTextValueAt(rowIndex: number, columnIndex: number): string {
@@ -305,6 +349,9 @@ export class AreaModelPivot<T = any> extends AreaModelTree<any> {
     }
     if (value === undefined) {
       return this.isSubtotalSuppressed(rowIndex) ? "" : this.config.emptyText ?? "";
+    }
+    if (info.value.showValuesAs) {
+      return formatShowValuesAs(value, info.value.showValuesAs);
     }
     return info.value.format ? info.value.format(value) : formatAggregateValue(value);
   }
@@ -433,7 +480,8 @@ export class AreaModelPivot<T = any> extends AreaModelTree<any> {
    * sales[0].umsatz = 999;   // changed outside the table
    * tableApi.repaint();      // calls invalidateDerivedValues() – all cells are computed again
    */
-  invalidateDerivedValues(): void {
+  override invalidateDerivedValues(): void {
+    super.invalidateDerivedValues();
     this.dirty = true;
   }
 
@@ -492,9 +540,10 @@ export class AreaModelPivot<T = any> extends AreaModelTree<any> {
       return () => 0;
     }
     const columnDef = this.columnDefs.find(def => def.property === property);
+    // by the shown value: a share of the row total orders differently than the aggregate (since 1.1.95)
     return (a, b) => {
-      const va = this.result.getValue(a.data, info.column, info.valueIndex);
-      const vb = this.result.getValue(b.data, info.column, info.valueIndex);
+      const va = this.getShownValue(a.data, info);
+      const vb = this.getShownValue(b.data, info);
       // empty cells last – in both directions
       if (va === undefined || vb === undefined) {
         return va === vb ? 0 : va === undefined ? 1 : -1;

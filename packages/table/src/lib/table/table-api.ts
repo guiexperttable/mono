@@ -12,12 +12,18 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
-import { isAreaModelRowGroups, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelRowGroups, isPivotColumnDef, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import type { PivotConfigIf } from './pivot/pivot-config.if';
 import type { RowGroupField } from './rowgroup/row-group-field.type';
 import { TreeRowIf } from './data/common/tree-row-if';
 import { SelectionAggregator } from './selection/selection-aggregator';
 import type { SelectionAggregatesIf } from './aggregation/selection-aggregates.if';
+import type { ShowValuesAsConfig } from './calc/show-values-as.type';
+import { resolveShowValuesAs } from './calc/show-values-as';
+import { excelFormatOfShowValuesAs } from './calc/show-values-as-internals';
+import { compileFormula, createFormulaValueGetter } from './formula/compile-formula';
+import type { FormulaOptionsIf } from './formula/formula-options.if';
+import { FormulaError } from './formula/formula-error';
 
 
 /**
@@ -985,7 +991,16 @@ export class TableApi {
         ? columnDef.getRowNumber(rowIndex, areaModel)
         : columnDef.getRowNumberText(rowIndex, areaModel);
     }
-    return areaModel.getValueAt(rowIndex, columnIndex);
+    const value = areaModel.getValueAt(rowIndex, columnIndex);
+    if (area !== "header" && typeof value === "number" && this.tableScope.excelService.supportsNumberFormats) {
+      // a share of „Show values as“: the number with a percent format (what the table shows), since 1.1.95.
+      // A pivot shows shares in body and total row; other tables in the body only (their footer has raw totals).
+      const config = isPivotColumnDef(columnDef) ? columnDef.pivot.value.showValuesAs
+        : area === "body" ? columnDef?.showValuesAs : undefined;
+      const numberFormat = excelFormatOfShowValuesAs(config);
+      if (numberFormat) return { value, numberFormat };
+    }
+    return value;
   }
 
   /**
@@ -1627,6 +1642,109 @@ export class TableApi {
   getPivotConfig(): PivotConfigIf | undefined {
     const model = this.tableScope.tableModel;
     return isPivotTableModel(model) ? model.getPivotConfig() : undefined;
+  }
+
+  /**
+   * The value of a column for a row object – computed for a calculated column (`valueGetter`, `formula`), otherwise
+   * the property (path). Use it in the external filter to filter by calculated values; a `TreeRow` is unwrapped.
+   *
+   * @param {any} row - a row object (or the `TreeRow` a tree filter gets)
+   * @param {string} property - the property of the column
+   * @returns {unknown} the value (a {@link FormulaError} for a formula error)
+   *
+   * @example
+   * tableOptions.externalFilterFunction = (row: Item) => Number(tableApi.getRowValue(row, "total")) > 500;
+   * tableApi.externalFilterChanged();
+   *
+   * @since 1.1.95
+   */
+  getRowValue(row: any, property: string): unknown {
+    const body = this.tableScope.tableModel.getBodyModel() as AreaModelIf & { getRowValue?: (row: any, p: string) => unknown };
+    if (typeof body.getRowValue === "function") {
+      return body.getRowValue(row, property);
+    }
+    const data = isTreeRow(row) ? (row as TreeRowIf<any>).data : row;
+    if (data === null || data === undefined) return undefined;
+    let o: any = data;
+    for (const key of property.split(".")) {
+      if (o === null || o === undefined) return undefined;
+      o = o[key];
+    }
+    return o;
+  }
+
+  /**
+   * „Show values as“: shows the numbers of a column differently – share of the column total, running total, rank …
+   * (see {@link ShowValuesAs}) – or normal again (`undefined`). No new model: the table repaints.
+   *
+   * @param {string} property - the property of the column
+   * @param {ShowValuesAsConfig | undefined} showValuesAs - the mode (with options) or `undefined` for the values
+   * @returns {boolean} false if there is no such column or the mode is unknown
+   *
+   * @example
+   * select.addEventListener("change", () =>
+   *   tableApi.setShowValuesAs("total", select.value ? select.value as ShowValuesAs : undefined));
+   *
+   * @since 1.1.95
+   */
+  setShowValuesAs(property: string, showValuesAs: ShowValuesAsConfig | undefined): boolean {
+    const defs = (this.tableScope.tableModel.getColumnDefs() ?? []).filter(def => def.property === property);
+    if (!defs.length || (showValuesAs !== undefined && !resolveShowValuesAs(showValuesAs))) {
+      return false;
+    }
+    defs.forEach(def => def.showValuesAs = showValuesAs);
+    this.repaint();
+    return true;
+  }
+
+  /**
+   * „Show values as“ of a column.
+   *
+   * @param {string} property - the property of the column
+   * @returns {ShowValuesAsConfig | undefined} the configuration, `undefined` for none
+   *
+   * @example
+   * const mode = tableApi.getShowValuesAs("total");   // "percentOfColumnTotal"
+   *
+   * @since 1.1.95
+   */
+  getShowValuesAs(property: string): ShowValuesAsConfig | undefined {
+    return this.tableScope.tableModel.getColumnDefs()?.find(def => def.property === property)?.showValuesAs;
+  }
+
+  /**
+   * Sets (or replaces) the formula of a column – e.g. from an input field of your app. The formula is compiled
+   * once; an invalid formula is set anyway (the cells show `#ERROR!` / `#NAME?`) and its error is returned, so you can
+   * show the message next to the input. No code is ever executed (no `eval`). The table repaints; totals, sorting
+   * and filter see the new values after `repaint`, `reSort()` resp. `externalFilterChanged()`.
+   *
+   * @param {string} property - the property of the column (it becomes a calculated column)
+   * @param {string} formula - the formula, e.g. `"[price] * [quantity] * 1.19"`
+   * @param {FormulaOptionsIf} [options] - own functions
+   * @returns {FormulaError | undefined} the error of the formula itself, `undefined` if it is valid
+   *   (`#NAME?` also if there is no such column)
+   *
+   * @example
+   * input.addEventListener("change", () => {
+   *   const error = tableApi.setColumnFormula("custom", input.value);
+   *   hint.textContent = error ? `${error.code} ${error.message}` : "";
+   * });
+   *
+   * @since 1.1.95
+   */
+  setColumnFormula(property: string, formula: string, options?: FormulaOptionsIf): FormulaError | undefined {
+    const defs = (this.tableScope.tableModel.getColumnDefs() ?? []).filter(def => def.property === property);
+    if (!defs.length) {
+      return new FormulaError("#NAME?", `No column "${property}"`);
+    }
+    const compiled = compileFormula(formula, options);
+    const getter = createFormulaValueGetter(compiled);
+    defs.forEach(def => {
+      def.formula = compiled.source;
+      def.valueGetter = getter;
+    });
+    this.repaint();
+    return compiled.error;
   }
 
   /**

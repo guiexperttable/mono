@@ -534,7 +534,33 @@ export class RenderScope extends EleScope {
     } else if (events.length) {
       this.rerenderDerivedFooterCells(events);
       this.rerenderGroupRowCells();
+      this.rerenderCalculatedCells();
     }
+  }
+
+  /**
+   * After `updateCells()` without a repaint: draws the rendered cells of calculated and „Show values as“ columns of
+   * the body again (they depend on the changed cells, e.g. `total = price * quantity` or a share of the total).
+   */
+  protected rerenderCalculatedCells(): void {
+    const bodyModel = this.tableModel.getBodyModel() as AreaModelIf & { hasDerivedColumns?: () => boolean; isDerivedProperty?: (p: string) => boolean };
+    if (!bodyModel.hasDerivedColumns?.()) {
+      return;
+    }
+    const derived = new Map<number, boolean>();
+    const cells = this.hostElement.querySelectorAll<HTMLDivElement>('div.ge-table-col-div[data-area="body"][data-row-index][data-col-index]');
+    cells.forEach(cell => {
+      const rowIndex = Number(cell.getAttribute('data-row-index'));
+      const columnIndex = Number(cell.getAttribute('data-col-index'));
+      if (!derived.has(columnIndex)) {
+        const property = this.tableModel.getColumnDef(columnIndex)?.property;
+        derived.set(columnIndex, property !== undefined && !!bodyModel.isDerivedProperty?.(property));
+      }
+      if (!derived.get(columnIndex)) return;
+      this.rerenderCellContent({
+        area: 'body', rowIndex, columnIndex, value: bodyModel.getValueAt(rowIndex, columnIndex) ?? ''
+      } as TableCellUpdateEventIf);
+    });
   }
 
   /**

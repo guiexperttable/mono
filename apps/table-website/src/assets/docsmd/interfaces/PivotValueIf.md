@@ -34,6 +34,7 @@ const avgPrice: PivotValueIf<Order> = {
 - [format](PivotValueIf.md#format)
 - [label](PivotValueIf.md#label)
 - [name](PivotValueIf.md#name)
+- [showValuesAs](PivotValueIf.md#showvaluesas)
 - [value](PivotValueIf.md#value)
 
 ## Properties
@@ -46,7 +47,7 @@ A built-in aggregator by name (`"sum"`, `"avg"`, `"count"` …) or an own [Aggre
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L25)
+[src/lib/table/pivot/pivot-value.type.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L26)
 
 ___
 
@@ -72,7 +73,7 @@ The text of a result in a cell. Default: numbers with at most two decimals (`"1,
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L34)
+[src/lib/table/pivot/pivot-value.type.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L35)
 
 ___
 
@@ -84,7 +85,7 @@ The header of its columns (with several values). Default: the name. Text only �
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L32)
+[src/lib/table/pivot/pivot-value.type.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L33)
 
 ___
 
@@ -97,7 +98,28 @@ Default: `"<aggregator>(<path>)"`, e.g. `"sum(umsatz)"`; for a function `"<aggre
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L30)
+[src/lib/table/pivot/pivot-value.type.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L31)
+
+___
+
+### showValuesAs
+
+• `Optional` **showValuesAs**: [`ShowValuesAsConfig`](../modules.md#showvaluesasconfig)
+
+„Show values as“ (since 1.1.95): `"percentOfRowTotal"` (each pivot row = 100 %), `"percentOfColumnTotal"`,
+`"percentOfGrandTotal"` or `"percentOfParentTotal"` (share of the parent row group). The cells then hold the
+fraction (Excel: number with percent format), the text is a percentage; `format` is not used. Other modes of
+[ShowValuesAs](../modules.md#showvaluesas) don't apply to a pivot (the value is shown).
+
+**`Example`**
+
+```ts
+values: [{ value: "umsatz", showValuesAs: "percentOfRowTotal" }]
+```
+
+#### Defined in
+
+[src/lib/table/pivot/pivot-value.type.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L45)
 
 ___
 
@@ -109,4 +131,4 @@ The value of a row: a property path (`"umsatz"`, `"order.total"`) or a function.
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L23)
+[src/lib/table/pivot/pivot-value.type.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L24)

@@ -110,9 +110,9 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
     this.sourceRows = rows ?? [];
     this.options = { ...options, groupBy: [...(options.groupBy ?? [])] };
     const aggregations = options.aggregations ?? {};
-    this.specs = Object.keys(aggregations).map(key => resolveAggregateSpec<T>(key, aggregations[key]));
+    this.specs = Object.keys(aggregations).map(key => this.withCalculatedValue(resolveAggregateSpec<T>(key, aggregations[key])));
     this.specByKey = new Map(this.specs.map(spec => [spec.key, spec]));
-    this.fields = resolveRowGroupFields(this.options.groupBy);
+    this.fields = this.withCalculatedKeys(resolveRowGroupFields(this.options.groupBy));
     this.build(false);
   }
 
@@ -171,7 +171,7 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
   setGroupBy(groupBy: RowGroupField<T>[]): void {
     const fields = resolveRowGroupFields(groupBy ?? []); // throws for an invalid level – before anything changes
     this.options.groupBy = [...(groupBy ?? [])];
-    this.fields = fields;
+    this.fields = this.withCalculatedKeys(fields);
     this.build(true);
   }
 
@@ -357,26 +357,25 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
 
   // ---------------------------------------------------------------- cells
 
-  override getValueAt(rowIndex: number, columnIndex: number): any {
-    const row = this.getRowByIndex(rowIndex);
-    if (!row) {
-      return "";
-    }
-    const property = this.properties[columnIndex];
+  /** Group rows: the label resp. the aggregate of the column; detail rows: the value of the row (calculated or path). */
+  protected override getRawValueOfRow(row: TreeRowIf<any>, property: string): any {
     if (isRowGroup(row.data)) {
       this.ensureAggregates();
       const group = row.data as RowGroup<T>;
       if (property === RowGroupColumnDef.PROPERTY) {
         return this.getGroupLabel(group);
       }
-      return property !== undefined && this.specByKey.has(property) ? group.results[property] : "";
+      return this.specByKey.has(property) ? group.results[property] : "";
     }
-    return property === RowGroupColumnDef.PROPERTY ? "" : super.getValueAt(rowIndex, columnIndex);
+    return property === RowGroupColumnDef.PROPERTY ? "" : super.getRawValueOfRow(row, property);
   }
 
   override getTextValueAt(rowIndex: number, columnIndex: number): string {
     const row = this.getRowByIndex(rowIndex);
     const property = this.properties[columnIndex];
+    if (row && property !== undefined && property !== RowGroupColumnDef.PROPERTY && this.getColumnValues().getShowValuesAs(property)) {
+      return this.getCalculatedText(property, this.getValueAt(rowIndex, columnIndex)) ?? "";
+    }
     if (row && isRowGroup(row.data) && property !== RowGroupColumnDef.PROPERTY) {
       const spec = property !== undefined ? this.specByKey.get(property) : undefined;
       if (!spec) return "";
@@ -544,7 +543,8 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
    * sales[0].umsatz = 999;        // changed outside the table
    * tableApi.repaint();           // calls invalidateDerivedValues() – all groups are computed again
    */
-  invalidateDerivedValues(change?: DerivedValuesChangeIf): void {
+  override invalidateDerivedValues(change?: DerivedValuesChangeIf): void {
+    super.invalidateDerivedValues(change); // formula aggregates, „Show values as“
     if (change?.area === "body" && Array.isArray(change.rowIndices)) {
       for (const rowIndex of change.rowIndices) {
         const row = this.getRowByIndex(rowIndex);
@@ -562,6 +562,29 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
   // ---------------------------------------------------------------- internals
 
   /** After sorting the tree rows: the groups (`getGroups()`, `children`) in display order. */
+  /** An aggregate over a calculated column (key or value = its property) uses the computed value. */
+  private withCalculatedValue(spec: ResolvedAggregateSpec<T>): ResolvedAggregateSpec<T> {
+    const property = spec.value;
+    const path = spec.getValue;
+    if (!path || typeof property !== "string") {
+      return spec;
+    }
+    // decided per call: a formula may be set later (tableApi.setColumnFormula)
+    return { ...spec, getValue: (row: T) => this.isCalculatedProperty(property) ? this.getValueByT(row, property) : path(row) };
+  }
+
+  /** A grouping level on a calculated column groups by the computed value. */
+  private withCalculatedKeys(fields: ResolvedRowGroupField<T>[]): ResolvedRowGroupField<T>[] {
+    return fields.map(field => {
+      const path = field.path;
+      const getKey = field.getKey;
+      if (path === undefined) {
+        return field;
+      }
+      return { ...field, getKey: (row: T) => this.isCalculatedProperty(path) ? this.getValueByT(row, path) : getKey(row) };
+    });
+  }
+
   private syncGroupOrder(): void {
     const groupsOf = (rows: TreeRowIf<any>[] | undefined): RowGroup<T>[] =>
       (rows ?? []).filter(row => isRowGroup(row.data)).map(row => {

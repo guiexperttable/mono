@@ -450,7 +450,51 @@ Width constants `px0 … px500` (and `new Size(n, "px")`), alignment helpers `bo
 `allLeft`, `allCenter`, `allRight`, boolean helpers `TrueFn` / `FalseFn`.
 `ColumnDef.create(...)` accepts: `property`, `headerLabel`, `width`, `minWidth`, `maxWidth`, `headerRenderer`,
 `bodyRenderer`, `footerRenderer`, `headerClasses`, `bodyClasses`, `footerClasses`, `sortable`, `sortIconVisible`,
-`sortComparator`, `sortState`, `sortStatesOrder`, `editable`, `isVisible`, `getEditRenderer`, `editInputPipe`.
+`sortComparator`, `sortState`, `sortStatesOrder`, `editable`, `isVisible`, `getEditRenderer`, `editInputPipe` and
+since 1.1.95 `valueGetter`, `valueSetter`, `showValuesAs`, `formula`, `formulaOptions` (next section, 5.8, 5.9).
+
+#### Calculated columns: `valueGetter` (since 1.1.95)
+
+A column can compute its value from the row instead of reading a property – the data stays unchanged:
+
+```ts
+import { ColumnDef, TableFactory, TrueFn } from "@guiexpert/table";
+
+interface Item { product: string; price: number; quantity: number; }
+
+const items: Item[] = [
+  { product: "Laptop", price: 1299, quantity: 2 },
+  { product: "Monitor", price: 349, quantity: 3 },
+  { product: "Mouse", price: 25, quantity: 10 }
+];
+const tableModel = TableFactory.createTableModel({
+  rows: items,
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product" }),
+    ColumnDef.create({ property: "price", headerLabel: "Price", editable: TrueFn }),
+    ColumnDef.create({ property: "quantity", headerLabel: "Qty" }),
+    ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
+                       valueGetter: (o: Item) => o.price * o.quantity })      // 2598, 1047, 250
+  ],
+  footerAggregates: { total: "sum" }                                         // 3895
+});
+```
+
+- **One place:** the value is read where every other feature reads cell values – sorting (header double click,
+  `sortByColumn`), copy, Excel, the footer (`footerAggregates: { total: "sum" }` sums the computed values), row
+  grouping (`aggregations`, `groupBy` on a calculated column) all use it. `property` stays the id of the column.
+- **Filter:** the external filter still gets the row; read calculated values with `tableApi.getRowValue(row, property)`:
+  `tableOptions.externalFilterFunction = (row: Item) => Number(tableApi.getRowValue(row, "total")) > 500`.
+- **Editing:** a calculated column is never editable – also not with `editable: TrueFn` – unless it has a `valueSetter`
+  (`(row, value) => { … }`, return `false` to reject). Editing a source column (`price`) updates the calculated cells
+  and the footer.
+- **Performance:** values are not cached; the getter runs for the visible cells on each render and once per row for a
+  sort pass or a total. Keep it fast and free of side effects. Exceptions in a getter become a `#VALUE!` cell.
+- **Context:** the second parameter (`ValueGetterContextIf`) reads other columns – also calculated ones –
+  (`ctx.getValue(row, "total")`) and column aggregates over the filtered rows (`ctx.aggregate("total", "sum")`, cached).
+  Circular references give `#CIRC!` instead of a stack overflow.
+- Supported by the models of `TableFactory.createTableModel({ rows })`, trees and row groups – in the body only. Not by
+  array-of-arrays models (`bodyData`); an own `AreaModel` calls `columnDef.valueGetter` itself.
 
 #### Row numbers (since 1.1.93)
 
@@ -871,6 +915,131 @@ Not included: a field list to drag fields into (build it with `setPivotConfig`),
 filter on finished pivot rows ("only regions > 200") and Excel outline levels.
 
 ---
+
+### 5.8 Show values as: shares, running totals, ranks (since 1.1.95)
+
+`showValuesAs` shows the numbers of a column differently – without changing the data:
+
+```ts
+import { ColumnDef, TableFactory } from "@guiexpert/table";
+
+interface Item { product: string; price: number; quantity: number; }
+declare const items: Item[];
+
+const tableModel = TableFactory.createTableModel({
+  rows: items,
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product" }),
+    ColumnDef.create({ property: "total", headerLabel: "Total", valueGetter: (o: Item) => o.price * o.quantity }),
+    ColumnDef.create({ property: "share", headerLabel: "Share", valueGetter: (o: Item) => o.price * o.quantity,
+                       showValuesAs: "percentOfColumnTotal" })               // 66.7%, 26.9%, 6.4%
+  ]
+});
+```
+
+| Mode | Shows | Flat table | Tree / row groups | Pivot |
+|---|---|---|---|---|
+| `percentOfColumnTotal` | value / sum of the column | ✓ | sum of the (filtered) leaf rows | cell / column total |
+| `percentOfGrandTotal` | value / grand total | = column total | = column total | cell / grand total |
+| `percentOfParentTotal` | value / total of the parent | = column total | value / sum of the siblings – each group = 100 % | cell / parent row |
+| `percentOfRowTotal` | value / row total | – | – | cell / row total |
+| `differenceFromPrevious` | value − row above (first row empty) | ✓ | among siblings | – |
+| `runningTotal` | sum up to the row (display order) | ✓ | among siblings | – |
+| `rank` | 1 = largest, ties share a rank (1, 2, 2, 4) | ✓ | among siblings | – |
+
+- **Reference:** the **filtered** rows (like the total row): with a filter the visible shares add up to 100 %.
+  Not applicable (–): the value is shown. Values that are no numbers and a total of 0 give an empty cell.
+- **Text:** percentages with one decimal (`"66.7%"`); `{ mode, fractionDigits: 2 }` or `{ mode, format: v => … }`
+  (text only, never HTML). Each cell is rounded for itself – the shown shares may add up to 99.9 % or 100.1 %; the
+  values themselves add up to exactly 1.
+- **Sorting** uses the raw value: for all shares that is the same order; running totals, differences and ranks
+  follow the new order (sorting *by* them would be circular). A pivot sorts a `percentOfRowTotal` column by the share.
+- **Export:** the shown value – copy as text (`66.7%`), Excel as number with the format `0.0%` (the default
+  `ExcelService`; an own `ExcelServiceIf` gets plain numbers unless it sets `supportsNumberFormats`).
+- **At runtime:** `tableApi.setShowValuesAs("total", "runningTotal")`, `undefined` = values again;
+  `tableApi.getShowValuesAs("total")`.
+- **Pivot:** per value – `values: [{ value: "umsatz", showValuesAs: "percentOfRowTotal" }]` (each pivot row = 100 %;
+  the total row and the total column follow).
+- For own models: `calculateShowValuesAs(values, mode)` and `formatShowValuesAs(value, mode)` are DOM-free helpers.
+
+### 5.9 Formulas (since 1.1.95)
+
+A formula column is a calculated column whose getter is compiled from a text – e.g. typed by your users:
+
+```ts
+import { ColumnDef, TableFactory, compileFormula, isFormulaError } from "@guiexpert/table";
+
+interface Item { product: string; price: number; quantity: number; }
+declare const items: Item[];
+
+const tableModel = TableFactory.createTableModel({
+  rows: items,
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product" }),
+    ColumnDef.create({ property: "net", headerLabel: "Net", formula: "[price] * [quantity]" }),
+    ColumnDef.create({ property: "gross", headerLabel: "Gross", formula: "ROUND([net] * 1.19, 2)" }),   // 3091.62
+    ColumnDef.create({ property: "share", headerLabel: "Share %", formula: "ROUND([net] / SUM([net]) * 100, 1)" })
+  ],
+  footerAggregates: { net: "sum", gross: "sum" }
+});
+
+const result = compileFormula("[price] / [quantity]").evaluate({ price: 10, quantity: 0 });
+if (isFormulaError(result)) console.log(result.code, result.message);   // "#DIV/0!" "Division by zero"
+```
+
+**Grammar**
+
+| Element | Examples |
+|---|---|
+| Field (own property of the row or another calculated column) | `[price]`, `[address.city]`, `[Unit price]`, `[a\]b]` |
+| Numbers, texts, booleans | `12`, `1.5`, `.5`, `1e3`, `"text"`, `'text'` (escapes `\" \' \\ \n \t`), `TRUE`, `FALSE` |
+| Operators (weak → strong) | `= == <> != < <= > >=` · `&` (text) · `+ -` · `* /` · unary `-` · `^` (power, right-associative) |
+| Functions (case-insensitive) | `ROUND(x, digits)`, `ABS`, `FLOOR`, `CEILING`, `MOD`, `SQRT`, `POWER`, `IF(c, a, b)`, `IFERROR(x, y)`, `AND`, `OR`, `NOT`, `CONCAT`, `LEN`, `UPPER`, `LOWER`, `TRIM`, `ISBLANK` |
+| Aggregates | `SUM([x])`, `AVG([x])` / `AVERAGE`, `MIN`, `MAX`, `COUNT` – with exactly one field: over the filtered rows of the column (cached); otherwise over the arguments (`MAX([a], [b])`) |
+
+A leading `=` is ignored. **Unlike Excel** `-2^2` is `-4` (math convention). Blank values count as `0` resp. `""`, numeric
+texts (`"3"`) as numbers, booleans as 1/0, dates as milliseconds. `ROUND` rounds half away from zero
+(`ROUND(1.005, 2) = 1.01`). Own functions: `formulaOptions: { functions: { VAT: net => Number(net) * 0.19 } }`
+(also for `compileFormula`); `FORMULA_FUNCTION_NAMES` lists the built-in ones.
+
+**Error values instead of exceptions** – the cell shows the code, gets the class `ge-table-cell-error`
+(`--ge-table-cell-error-color`) and the message as tooltip:
+
+| Code | When |
+|---|---|
+| `#ERROR!` | syntax error (`[price] *`, missing `)`, more than 10,000 characters or 64 levels) – every cell of the column |
+| `#NAME?` | unknown field or function |
+| `#VALUE!` | wrong type (`"abc" * 2`), an own function threw |
+| `#DIV/0!` | division by zero, `AVG` of nothing |
+| `#NUM!` | no finite result (`SQRT(-1)`, `10 ^ 400`) |
+| `#CIRC!` | circular reference between calculated columns (`[a]` uses `[b]` uses `[a]`, or `SUM` of the own column) |
+
+Errors propagate (`[a] / 0 + 1` → `#DIV/0!`), `IFERROR(x, fallback)` catches them, sorting puts them last, copy and
+Excel get the code as text. Unlike a spreadsheet, totals (`SUM([x])`, `footerAggregates`) **skip** error cells, and
+`AND`/`OR`/`IF` stop at the first deciding argument (`AND(FALSE, 1/0)` is `FALSE`). At most 1,000 operators per formula.
+
+**Security:** formulas are parsed into a syntax tree and evaluated by an interpreter – **no `eval`, no `new Function`**
+(works with a strict Content-Security-Policy). User input can't run code: only the listed functions exist, fields read
+own properties only (`[constructor]`, `[__proto__]` are `#NAME?`), and Excel gets values, never formulas.
+
+**At runtime** (e.g. an input field of your app – there is no built-in formula editor, the UI belongs to the app):
+
+```ts
+import type { TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+declare const input: HTMLInputElement;
+declare const hint: HTMLElement;
+
+input.addEventListener("change", () => {
+  const error = tableApi.setColumnFormula("custom", input.value);   // compiles, repaints
+  hint.textContent = error ? `${error.code} ${error.message}` : "";
+});
+```
+
+No cell references like `=B2*C2`: positions change with sorting, filter and virtual scrolling – a formula refers to
+fields of the same row and to column aggregates. 1,000,000 rows with a formula column: compiled once, ~0.5 µs per row
+and evaluated only for the visible cells (`bench/formula.bench.ts`).
 
 ## 6. Features
 
@@ -1441,6 +1610,8 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No drag & drop group panel or pivot field list – row grouping (5.6) and pivot tables (5.7) themselves are built in;
   change them with `tableApi.setRowGroupBy()` / `tableApi.setPivotConfig()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
+- No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
+  to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
 
 ---
 

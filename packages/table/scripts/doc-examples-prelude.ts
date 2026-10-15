@@ -16,8 +16,18 @@ import {
   isRowGroupColumnDef,
   PivotValueIf, PivotValue, PivotValueInfoIf, PivotConfigIf, PivotColumnInfoIf, PivotColumnDef, PivotResult, pivotRows,
   PivotTableModel, AreaModelPivot, AreaModelPivotFooter, PivotTableModelParaIf, PivotFactory, isPivotTableModel,
-  isAreaModelPivot, isPivotColumnDef
+  isAreaModelPivot, isPivotColumnDef,
+  ValueGetter, ValueSetter, ValueGetterContextIf, ShowValuesAs, ShowValuesAsIf, ShowValuesAsConfig, SHOW_VALUES_AS_MODES,
+  resolveShowValuesAs, isPercentShowValuesAs, formatShowValuesAs, sumOfNumbers, calculateShowValuesAs, FormulaErrorCode,
+  FormulaError, isFormulaError, FormulaNode, FormulaBinaryOperator, FormulaValue, FormulaFunction, FormulaOptionsIf,
+  FORMULA_FUNCTION_NAMES, CompiledFormula, compileFormula, createFormulaValueGetter, ExcelFormattedValueIf,
+  isExcelFormattedValue
 } from "__CORE__";
+
+interface Item { product: string; price: number; quantity: number }
+declare const input: HTMLInputElement;
+declare const hint: HTMLElement;
+declare const select: HTMLSelectElement;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
   category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled"; }
@@ -76,7 +86,6 @@ interface Sale { region: string; produkt: string; monat: string; umsatz: number 
 declare const sales: Sale[];
 declare const body: AreaModelRowGroups<Sale>;
 declare const model: AreaModelRowGroups<Sale>;
-declare const select: HTMLSelectElement;
 declare const MONTHS: string[];
 declare function loadSales(): Promise<Sale[]>;
 // pivot tables (since 1.1.94): the reference cases of prompt 007

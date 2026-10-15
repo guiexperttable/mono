@@ -34,6 +34,9 @@ import Callout from "../../components/training/Callout.astro";
       <tr><th>Accessibility (WAI-ARIA, keyboard)</th><td>yourself – the hard part with virtual scrolling</td><td>✔</td><td>✔</td><td>✔ since 1.1.91 (<ChapterLink slug="accessibility" label="ch. 35" />)</td></tr>
       <tr><th>Row numbers</th><td>yourself (a renderer)</td><td>–</td><td>✔</td><td>✔ one flag, since 1.1.93 (<ChapterLink slug="fixed-columns" label="ch. 18" />)</td></tr>
       <tr><th>Total rows (sum, average …)</th><td>yourself (a footer model)</td><td>–</td><td>✔</td><td>✔ one option, since 1.1.94 (<ChapterLink slug="footer-totals" label="ch. 16" />)</td></tr>
+      <tr><th>Calculated columns &amp; formulas</th><td>yourself (and a parser)</td><td>–</td><td>✔</td><td>✔ <code>valueGetter</code> or <code>formula</code>, no <code>eval</code>, since 1.1.95 (<a href="/showcase/formulas/run">showcase</a>)</td></tr>
+      <tr><th>Show values as (% of total, running total, rank)</th><td>yourself</td><td>–</td><td>✔</td><td>✔ one option, since 1.1.95</td></tr>
+      <tr><th>Spreadsheet cell references (A1) &amp; formula editor</th><td>yourself</td><td>–</td><td>✔</td><td>– formulas use fields of the row; the input field is yours</td></tr>
       <tr><th>Filter UI</th><td>yourself</td><td>✔</td><td>✔</td><td>– filter function, the UI is yours (<ChapterLink slug="filtering" label="ch. 21" />)</td></tr>
       <tr><th>Frameworks</th><td>–</td><td>React, Angular, Vue, JS</td><td>React, Angular, Vue, JS</td><td>Angular 14–22, React, Vue, Svelte 4/5, Solid, Preact, Web Component, JS</td></tr>
       <tr><th>Runtime dependencies</th><td>–</td><td>–</td><td>–</td><td>none</td></tr>
@@ -43,9 +46,10 @@ import Callout from "../../components/training/Callout.astro";
   <h2 id="rule">Rule of thumb</h2>
   <Callout type="note" title="Which one?">
     <p>
-      If you need <strong>a drag &amp; drop group panel or pivot field list, or a server-side row model off the shelf</strong>,
-      ag-Grid Enterprise is further today. Row grouping with totals and pivot tables are built in since 1.1.94
-      (<ChapterLink slug="row-grouping" />, <ChapterLink slug="pivot-tables" />).
+      If you need <strong>a drag &amp; drop group panel or pivot field list, spreadsheet-style cell formulas with an in-cell
+      formula editor, or a server-side row model off the shelf</strong>, ag-Grid Enterprise is further today. Row grouping
+      with totals and pivot tables are built in since 1.1.94 (<ChapterLink slug="row-grouping" />,
+      <ChapterLink slug="pivot-tables" />), calculated columns, „Show values as“ and formulas since 1.1.95.
     </p>
     <p>
       If you need <strong>large data sets, export, selection and full control over HTML and CSS</strong> – without licence

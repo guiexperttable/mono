@@ -96,6 +96,9 @@ html, html[data-theme="light"] {
   --ge-table-pivot-total-font-weight: 600;
   --ge-table-pivot-empty-text: #6b7280;
 
+  /* Formulas: error values #DIV/0!, #NAME? … (since 1.1.95) */
+  --ge-table-cell-error-color: #b91c1c;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
@@ -193,6 +196,9 @@ html[data-theme="dark"] {
   --ge-table-pivot-total-bg: rgba(255, 255, 255, 0.1);
   --ge-table-pivot-total-font-weight: 600;
   --ge-table-pivot-empty-text: #9ca3af;
+
+  /* Formulas: error values #DIV/0!, #NAME? … (since 1.1.95) */
+  --ge-table-cell-error-color: #f87171;
 
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */

@@ -45,6 +45,9 @@ const ROWS: [string, string, string, string][] = [
   ["Save & restore state (layout, sorting, selection)", "✔", "✔", "✔ localStorage or your server, since 1.1.92"],
   ["Row numbers", "–", "✔", "✔ one flag, since 1.1.93"],
   ["Total rows & aggregation (sum, average …)", "–", "✔", "✔ one option, since 1.1.94"],
+  ["Calculated columns & formulas", "–", "✔", "✔ valueGetter or formula, no eval, since 1.1.95"],
+  ["Show values as (% of total, running total, rank)", "–", "✔", "✔ one option, since 1.1.95"],
+  ["Spreadsheet cell references (A1) & formula editor", "–", "✔", "– fields of the row, your input field"],
   ["Frameworks", "React, Angular, Vue, JS", "React, Angular, Vue, JS", "Angular 14 – 22, React, Vue, Svelte, Solid, Preact, Web Component, JS"],
   ["Runtime dependencies", "–", "–", "none"]
 ];
@@ -85,7 +88,8 @@ const ROWS: [string, string, string, string][] = [
       </div>
       <figcaption>
         <p>
-          <strong>Rule of thumb:</strong> need a drag &amp; drop group panel or pivot field list, or a server-side row model off the shelf?
+          <strong>Rule of thumb:</strong> need a drag &amp; drop group panel or pivot field list, spreadsheet-style cell formulas
+          with an in-cell formula editor, or a server-side row model off the shelf?
           ag-Grid Enterprise is further today. Need large data, export, selection and full control over HTML and CSS –
           in any framework, without licence costs? That is what GuiExpert Table is for.
         </p>

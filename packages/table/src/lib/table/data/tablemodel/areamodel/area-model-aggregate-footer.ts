@@ -330,6 +330,24 @@ export class AreaModelAggregateFooter<T = any> extends AreaModel implements HasD
     return (rowIndex: number) => getValue(body.getRowByIndex(rowIndex));
   }
 
+  /**
+   * A spec whose value is the property of a calculated column of the body (`footerAggregates: { total: "sum" }` with
+   * `total` = `price * quantity`) sums the computed values, not the (missing) property of the row (since 1.1.95).
+   */
+  private withCalculatedValues(specs: ResolvedAggregateSpec<T>[]): ResolvedAggregateSpec<T>[] {
+    const body = this.getBody() as Partial<{ isCalculatedProperty(p: string): boolean; getRowValue(row: unknown, p: string): unknown }>;
+    if (typeof body.isCalculatedProperty !== "function" || typeof body.getRowValue !== "function") {
+      return specs;
+    }
+    return specs.map(spec => {
+      const property = spec.value;
+      if (!spec.getValue || typeof property !== "string" || !body.isCalculatedProperty!(property)) {
+        return spec;
+      }
+      return { ...spec, getValue: (row: T) => body.getRowValue!(row, property) };
+    });
+  }
+
   private compute(): FooterCache {
     const source = this.getSource();
     const cache = this.cache;
@@ -337,7 +355,7 @@ export class AreaModelAggregateFooter<T = any> extends AreaModel implements HasD
       return cache;
     }
     const rows = source.getRows();
-    const allSpecs = this.footerRows.flatMap(footerRow => footerRow.specs);
+    const allSpecs = this.withCalculatedValues(this.footerRows.flatMap(footerRow => footerRow.specs));
     let states: unknown[];
     if (typeof rows === "number") {
       const body = this.getBody();

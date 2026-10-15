@@ -8,6 +8,10 @@ import { BooleanFunction, FalseFn, TrueFn } from "../../common/boolean-function"
 import { SortState } from "../../common/sort-state.type";
 import { GetEditRenderer } from "../../../renderer/edit/edit-cell-renderer.type";
 import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
+import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
+import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
+import type { FormulaOptionsIf } from "../../../formula/formula-options.if";
+import { createFormulaValueGetter } from "../../../formula/compile-formula";
 
 
 /**
@@ -40,6 +44,15 @@ export class ColumnDef implements ColumnDefIf {
 
 
   public visible = true;
+
+  /** A calculated column, see {@link ColumnDefIf.valueGetter}. */
+  public valueGetter?: ValueGetter;
+  /** Writes an edited calculated value back, see {@link ColumnDefIf.valueSetter}. */
+  public valueSetter?: ValueSetter;
+  /** „Show values as“, see {@link ColumnDefIf.showValuesAs}. */
+  public showValuesAs?: ShowValuesAsConfig;
+  /** The formula of a formula column, see {@link ColumnDefIf.formula}. */
+  public formula?: string;
 
   constructor(
     public property: string,
@@ -128,6 +141,19 @@ export class ColumnDef implements ColumnDefIf {
     getEditRenderer?: GetEditRenderer,
     /** Converts the editor text before it is stored, e.g. `editInputPipeForNumber`. */
     editInputPipe?: editInputPipe,
+    /** A calculated column: `(row, context) => value` (since 1.1.95). */
+    valueGetter?: ValueGetter,
+    /** Makes a calculated column editable (since 1.1.95). */
+    valueSetter?: ValueSetter,
+    /** „Show values as“: `"percentOfColumnTotal"`, `"rank"` … (since 1.1.95). */
+    showValuesAs?: ShowValuesAsConfig,
+    /**
+     * A formula column, e.g. `"[price] * [quantity] * 1.19"` – compiled once into the `valueGetter` (since 1.1.95,
+     * see {@link compileFormula}). Takes precedence over `valueGetter`.
+     */
+    formula?: string,
+    /** Own functions of the formula (since 1.1.95). */
+    formulaOptions?: FormulaOptionsIf,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -147,7 +173,7 @@ export class ColumnDef implements ColumnDefIf {
     const editable = param.editable ?? param.editable ?? FalseFn;
     const isVisible = param.isVisible ?? param.isVisible ?? TrueFn;
 
-    return new ColumnDef(
+    const def = new ColumnDef(
       param.property ?? "",
       param.headerLabel ?? "",
       param.width ?? new Size(100, "px"),
@@ -165,6 +191,15 @@ export class ColumnDef implements ColumnDefIf {
       param.editInputPipe,
       isVisible,
     );
+    if (param.formula !== undefined && param.formula !== null) {
+      def.formula = param.formula;
+      def.valueGetter = createFormulaValueGetter(param.formula, param.formulaOptions);
+    } else if (param.valueGetter) {
+      def.valueGetter = param.valueGetter;
+    }
+    if (param.valueSetter) def.valueSetter = param.valueSetter;
+    if (param.showValuesAs) def.showValuesAs = param.showValuesAs;
+    return def;
   }
 
 }

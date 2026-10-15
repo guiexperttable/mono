@@ -7,6 +7,11 @@ import { FilterFunction } from "../../common/filter-function";
 import { SorterService } from "../../../service/sorter.service";
 import { SortItem } from "../../common/sort-item";
 import {TreeRowIf} from "../../common/tree-row-if";
+import type { CellRendererIf } from "../../../renderer/cell-render.if";
+import type { DerivedValuesChangeIf } from "./derived-values-change.if";
+import type { ShowValuesAsIf } from "../../../calc/show-values-as.type";
+import { calculateShowValuesAs, sumOfNumbers } from "../../../calc/show-values-as";
+import { isFormulaError } from "../../../formula/formula-error";
 
 /**
  * Represents a  tree-based table model.
@@ -57,6 +62,8 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   private lastPredictFn?: FilterFunction<any>;
   /** `row.keep` was set for the current filter (it depends on the filter and the data, not on expand/collapse). */
   private keepMarked = false;
+  /** „Show values as“: shown value per row and property (cleared on filter, sorting and invalidation). */
+  private showValuesCache = new Map<string, { total?: number; byRow: Map<TreeRowIf<any>, number | undefined> }>();
 
   constructor(
     public override areaIdent: AreaIdent,
@@ -189,14 +196,119 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     if (row) {
       const prop = this.properties[columnIndex];
       if (prop) {
-        if (prop.includes(".")) {
-          return this.getPropertyValue(row.data, prop.split("."));
-        }
-        // @ts-ignore
-        return row.data[prop];
+        const value = this.getRawValueOfRow(row, prop);
+        const showValuesAs = this.getColumnValues().getShowValuesAs(prop);
+        return showValuesAs ? this.applyShowValuesAs(row, prop, value, showValuesAs) : value;
       }
     }
     return "";
+  }
+
+  /**
+   * The value of a tree row for a property – before „Show values as“: the computed value of a calculated column,
+   * otherwise the property (path) of `row.data`. Subclasses (row groups) return their aggregates for group rows.
+   *
+   * @param {TreeRowIf<S>} row - the tree row
+   * @param {string} prop - the property of the column
+   * @returns {any} the raw value
+   * @since 1.1.95
+   */
+  protected getRawValueOfRow(row: TreeRowIf<S>, prop: string): any {
+    if (this.getColumnValues().getter(prop)) {
+      return this.getColumnValues().get(row.data, prop);
+    }
+    if (prop.includes(".")) {
+      return this.getPropertyValue(row.data, prop.split("."));
+    }
+    // @ts-ignore
+    return row.data[prop];
+  }
+
+  /**
+   * The text of a cell: for a „Show values as“ column the formatted value (`"66.7%"`), for a formula error its code;
+   * otherwise like before (`'' + value`).
+   *
+   * @param {number} rowIndex - the row
+   * @param {number} columnIndex - the column
+   * @returns {string} the text
+   */
+  override getTextValueAt(rowIndex: number, columnIndex: number): string {
+    const value = this.getValueAt(rowIndex, columnIndex);
+    return this.getCalculatedText(this.properties[columnIndex], value) ?? "" + value;
+  }
+
+  /** A „Show values as“ column without an own body renderer shows the formatted text. */
+  override getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefined {
+    return super.getCellRenderer(rowIndex, columnIndex) ?? this.getCalculatedRenderer(this.properties[columnIndex]);
+  }
+
+  /** The message of a formula error as tooltip. */
+  override getTooltipAt(rowIndex: number, columnIndex: number): any {
+    const property = this.properties[columnIndex];
+    if (property !== undefined && this.getColumnValues().isCalculated(property)) {
+      const value = this.getValueAt(rowIndex, columnIndex);
+      if (isFormulaError(value)) return value.message;
+    }
+    return super.getTooltipAt(rowIndex, columnIndex);
+  }
+
+  /**
+   * Drops derived values: cached aggregates of formulas and „Show values as“ (called by the table on filter,
+   * sorting, editing, `updateCells` and `api.repaint()`).
+   *
+   * @param {DerivedValuesChangeIf} [_change] - the changed rows (not used here)
+   * @since 1.1.95
+   */
+  invalidateDerivedValues(_change?: DerivedValuesChangeIf): void {
+    this.invalidateColumnValues();
+    this.showValuesCache.clear();
+  }
+
+  /**
+   * „Show values as“ of one tree row: percentages of the column total relate to the (filtered) leaf rows,
+   * `percentOfParentTotal`, `runningTotal`, `differenceFromPrevious` and `rank` to the displayed siblings.
+   */
+  protected applyShowValuesAs(row: TreeRowIf<S>, property: string, value: unknown, options: ShowValuesAsIf): unknown {
+    if (isFormulaError(value)) return value;
+    let cache = this.showValuesCache.get(property);
+    if (!cache) {
+      cache = { byRow: new Map() };
+      this.showValuesCache.set(property, cache);
+    }
+    switch (options.mode) {
+      case "percentOfColumnTotal":
+      case "percentOfGrandTotal": {
+        if (cache.total === undefined) {
+          cache.total = sumOfNumbers(this.getLeafRows(true).map(leaf => this.getRawValueOfRow(leaf, property)));
+        }
+        return typeof value === "number" && !Number.isNaN(value) && cache.total !== 0 ? value / cache.total : undefined;
+      }
+      case "percentOfRowTotal":
+        return value; // only a pivot has row totals
+      default: {
+        if (!cache.byRow.has(row)) {
+          const siblings = row.parent ? this.getDisplayedChildren(row.parent) : this.getDisplayedRootRows();
+          const shown = calculateShowValuesAs(siblings.map(sibling => this.getRawValueOfRow(sibling, property)), options.mode);
+          siblings.forEach((sibling, i) => cache!.byRow.set(sibling, shown[i]));
+        }
+        return cache.byRow.get(row);
+      }
+    }
+  }
+
+  protected override readPropertyPath(t: any, property: string): unknown {
+    if (property.includes(".")) {
+      return this.getPropertyValue(t, property.split("."));
+    }
+    return t[property];
+  }
+
+  protected override getAggregationSourceForValues(): { signal: unknown; length: number; rows: () => ArrayLike<unknown> } {
+    return {
+      signal: this.rows,
+      length: this.rows.length,   // expanding/collapsing doesn't change the leaves; filter and edits invalidate
+      rows: () => this.getLeafRows(true).map(row => row.data),
+    };
   }
 
   getRowHeight(_rowIndex: number): number {
@@ -216,7 +328,8 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
 
   override getCustomClassesAt(rowIndex: number, _columnIndex: number): string[] {
     const row = this.filteredFlattenRows[rowIndex];
-    return ["ge-table-tree-cell", "ge-table-tree-deep-" + row.deep];
+    return this.addCalculatedClasses(["ge-table-tree-cell", "ge-table-tree-deep-" + row.deep],
+      this.properties[_columnIndex], () => this.getValueAt(rowIndex, _columnIndex));
   }
 
   override getRowByIndex(idx: number): TreeRowIf<S> | undefined {
@@ -226,6 +339,11 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   getValueByT(t: S, property: string):any {
     if (!t) return undefined;
     if (!property) return undefined;
+
+    const values = this.getColumnValues();
+    if (values.getter(property)) {
+      return values.get(t, property); // a calculated column (since 1.1.95)
+    }
 
     if (property.includes(".")) {
       return this.getPropertyValue(t, property.split("."));
@@ -257,6 +375,8 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
    */
   externalFilterChanged<S>(predictFn: FilterFunction<S>): void {
     this.lastPredictFn = predictFn;
+    this.showValuesCache.clear();
+    this.invalidateColumnValues();
     this.refreshDisplayedRows(true);
   }
 
@@ -280,6 +400,7 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
       const f = sortState === "asc" ? 1 : sortState === "desc" ? -1 : 0;
       return this.genericTreeTableSortComparator(this.properties[columnIndex], f);
     });
+    this.showValuesCache.clear();
     // primary key first (before: only the last item was used)
     this.treeSortWith(this.rows, (a, b) => {
       for (const comparator of comparators) {
@@ -304,6 +425,7 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
    * tableApi.sort((a, b) => a.data.total - b.data.total);   // sorts the siblings of every level by total
    */
   override sort(compareFn: (a: TreeRowIf<S>, b: TreeRowIf<S>) => number): void {
+    this.showValuesCache.clear();
     this.treeSortWith(this.rows, compareFn);
     this.refreshDisplayedRows(false);
   }
@@ -334,6 +456,10 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
     const treeRow: TreeRowIf<S> | undefined = this.getRowByIndex(rowIndex);
     if (treeRow) {
       const row: S = treeRow.data;
+      const columnDef = this.columnDefs[columnIndex];
+      if (this.areaIdent === "body" && columnDef?.valueGetter) {
+        return this.setCalculatedValue(row, columnDef, value); // a calculated column: only with a valueSetter
+      }
       const property = this.columnDefs[columnIndex].property;
       if (property.includes(".")) {
         return this.setPropertyValue(row, property.split("."), value);
@@ -348,10 +474,23 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
   protected genericTreeTableSortComparator(property: string, f: number) {
     // Find the column definition for the property
     const columnDef = this.columnDefs.find(def => def.property === property);
+    const calculated = this.getColumnValues().isCalculated(property);
+    const memo = calculated ? new Map<unknown, unknown>() : undefined;
+    const read = (data: S): unknown => {
+      if (!memo) return this.getValueByT(data, property);
+      if (memo.has(data)) return memo.get(data);
+      const v = this.getValueByT(data, property);
+      const value = isFormulaError(v) ? undefined : v;
+      memo.set(data, value);
+      return value;
+    };
 
     return (a: TreeRowIf<S>, b: TreeRowIf<S>) => {
-      const va = this.getValueByT(a.data, property);
-      const vb = this.getValueByT(b.data, property);
+      const va = read(a.data);
+      const vb = read(b.data);
+      if (calculated && (va === undefined || vb === undefined)) {
+        return va === vb ? 0 : va === undefined ? 1 : -1; // empty values and formula errors last
+      }
 
       // If the column has a custom sortComparator, use it
       if (columnDef?.sortComparator) {

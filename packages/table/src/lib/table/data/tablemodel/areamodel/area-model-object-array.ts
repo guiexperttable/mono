@@ -7,6 +7,11 @@ import { SorterService } from '../../../service/sorter.service';
 import { SortItem } from '../../common/sort-item';
 import { isTreeRow } from '../../../instanceof-workaround';
 import { ObjectArrayHolderIf } from './object-array-holder.if';
+import type { CellRendererIf } from '../../../renderer/cell-render.if';
+import type { DerivedValuesChangeIf } from './derived-values-change.if';
+import { calculateShowValuesAs, sumOfNumbers } from '../../../calc/show-values-as';
+import type { ShowValuesAsIf } from '../../../calc/show-values-as.type';
+import { isFormulaError } from '../../../formula/formula-error';
 
 /**
  * @class AreaModelObjectArray
@@ -174,6 +179,9 @@ export class AreaModelObjectArray<T>
    */
   protected sorterService: SorterService = new SorterService();
 
+  /** Cached „Show values as“ values per property (cleared on filter, sorting and invalidation). */
+  private showValuesCache = new Map<string, { total?: number; values?: (number | undefined)[] }>();
+
   /**
    * Creates an instance of AreaModelObjectArray.
    * 
@@ -269,6 +277,7 @@ export class AreaModelObjectArray<T>
   setRows(rows: T[]) {
     this.rows = rows;
     this.filteredRows = [...rows];
+    this.showValuesCache.clear();
   }
 
   /**
@@ -346,9 +355,95 @@ export class AreaModelObjectArray<T>
       t = t.data;
     }
     if (t) {
-      return this.getValueByT(t, property);
+      const value = this.getValueByT(t, property);
+      const showValuesAs = this.getColumnValues().getShowValuesAs(property);
+      return showValuesAs ? this.applyShowValuesAs(rowIndex, property, value, showValuesAs) : value;
     }
     return '';
+  }
+
+  /**
+   * The text of a cell: for a „Show values as“ column the formatted value (`"66.7%"`), for a formula error its code;
+   * otherwise like before (`'' + value`).
+   *
+   * @param {number} rowIndex - the row
+   * @param {number} columnIndex - the column
+   * @returns {string} the text
+   */
+  override getTextValueAt(rowIndex: number, columnIndex: number): string {
+    const value = this.getValueAt(rowIndex, columnIndex);
+    return this.getCalculatedText(this.properties[columnIndex], value) ?? '' + value;
+  }
+
+  /** A „Show values as“ column without an own body renderer shows the formatted text. */
+  override getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefined {
+    return super.getCellRenderer(rowIndex, columnIndex) ?? this.getCalculatedRenderer(this.properties[columnIndex]);
+  }
+
+  /** The message of a formula error as tooltip. */
+  override getTooltipAt(rowIndex: number, columnIndex: number): any {
+    const property = this.properties[columnIndex];
+    if (property !== undefined && this.getColumnValues().isCalculated(property)) {
+      const value = this.getValueAt(rowIndex, columnIndex);
+      if (isFormulaError(value)) return value.message;
+    }
+    return super.getTooltipAt(rowIndex, columnIndex);
+  }
+
+  /**
+   * Drops derived values: cached aggregates of formulas and „Show values as“ (called by the table on filter,
+   * sorting, editing, `updateCells` and `api.repaint()`).
+   *
+   * @param {DerivedValuesChangeIf} [_change] - the changed rows (not used)
+   * @since 1.1.95
+   */
+  invalidateDerivedValues(_change?: DerivedValuesChangeIf): void {
+    this.invalidateColumnValues();
+    this.showValuesCache.clear();
+  }
+
+  /** „Show values as“ of one cell; the reference are the filtered rows in display order. */
+  protected applyShowValuesAs(rowIndex: number, property: string, value: unknown, options: ShowValuesAsIf): unknown {
+    if (isFormulaError(value)) return value;
+    let cache = this.showValuesCache.get(property);
+    if (!cache) {
+      cache = {};
+      this.showValuesCache.set(property, cache);
+    }
+    switch (options.mode) {
+      case 'percentOfColumnTotal':
+      case 'percentOfGrandTotal':
+      case 'percentOfParentTotal': {
+        if (cache.total === undefined) {
+          cache.total = sumOfNumbers(this.filteredRows.map(row => this.getValueByT(isTreeRow(row) ? (row as any).data : row, property)));
+        }
+        return typeof value === 'number' && !Number.isNaN(value) && cache.total !== 0 ? value / cache.total : undefined;
+      }
+      case 'percentOfRowTotal':
+        return value; // a flat table has no row total
+      default:
+        if (!cache.values || cache.values.length !== this.filteredRows.length) {
+          cache.values = calculateShowValuesAs(
+            this.filteredRows.map(row => this.getValueByT(isTreeRow(row) ? (row as any).data : row, property)), options.mode);
+        }
+        return cache.values[rowIndex];
+    }
+  }
+
+  protected override readPropertyPath(t: any, property: string): unknown {
+    if (property.includes('.')) {
+      return this.getPropertyValue(t, property.split('.'));
+    }
+    return t[property];
+  }
+
+  protected override getAggregationSourceForValues(): { signal: unknown; length: number; rows: () => ArrayLike<unknown> } {
+    const rows = this.filteredRows;
+    return {
+      signal: rows,
+      length: rows.length,
+      rows: () => rows.some(row => isTreeRow(row)) ? rows.map(row => isTreeRow(row) ? (row as any).data : row) : rows
+    };
   }
 
   /**
@@ -522,6 +617,7 @@ export class AreaModelObjectArray<T>
    */
   externalFilterChanged(predictFn: FilterFunction<any>): void {
     this.filteredRows = (this.rows ? this.rows.filter(predictFn) : []);
+    this.showValuesCache.clear();
   }
 
   /**
@@ -552,6 +648,7 @@ export class AreaModelObjectArray<T>
       const f = sortState === 'asc' ? 1 : sortState === 'desc' ? -1 : 0;
       return this.genericFlatTableSortComparator(this.properties[columnIndex], f);
     });
+    this.showValuesCache.clear(); // running totals, ranks and differences follow the display order
     if (comparators.length) {
       // the first item is the primary key, the following ones break ties (before: one stable sort per item, so the
       // LAST item became the primary key)
@@ -589,6 +686,7 @@ export class AreaModelObjectArray<T>
    */
   override sort(compareFn: (a: T, b: T) => number): void {
     this.filteredRows = this.filteredRows.sort(compareFn);
+    this.showValuesCache.clear();
   }
 
   /**
@@ -613,6 +711,11 @@ export class AreaModelObjectArray<T>
   getValueByT(t: T, property: string): any {
     if (!t) return undefined;
     if (!property) return undefined;
+
+    const values = this.getColumnValues();
+    if (values.getter(property)) {
+      return values.get(t, property); // a calculated column (since 1.1.95)
+    }
 
     if (property.includes('.')) {
       return this.getPropertyValue(t, property.split('.'));
@@ -662,7 +765,8 @@ export class AreaModelObjectArray<T>
    * cellElement.classList.add(...classes);
    */
   override getCustomClassesAt(rowIndex: number, _columnIndex: number): string[] {
-    const ret: string[] = super.getCustomClassesAt(rowIndex, _columnIndex);
+    let ret: string[] = super.getCustomClassesAt(rowIndex, _columnIndex);
+    ret = this.addCalculatedClasses(ret, this.properties[_columnIndex], () => this.getValueAt(rowIndex, _columnIndex));
 
     const row = this.getRowByIndex(rowIndex);
     if (row.selected) {
@@ -692,10 +796,15 @@ export class AreaModelObjectArray<T>
   protected genericFlatTableSortComparator(property: string, f: number): (a: T, b: T) => number {
     // Find the column definition for the property
     const columnDef = this.columnDefs.find(def => def.property === property);
+    const read = this.createSortValueReader(property);
+    const calculated = this.getColumnValues().isCalculated(property);
 
     return (a: T, b: T) => {
-      const va = this.getValueByT(a, property);
-      const vb = this.getValueByT(b, property);
+      const va = read(a);
+      const vb = read(b);
+      if (calculated && (va === undefined || vb === undefined)) {
+        return va === vb ? 0 : va === undefined ? 1 : -1; // empty values and formula errors last, in both directions
+      }
 
       // If the column has a custom sortComparator, use it
       if (columnDef?.sortComparator) {
@@ -704,6 +813,24 @@ export class AreaModelObjectArray<T>
 
       // Otherwise, use the default generic comparator
       return this.sorterService.genericSortComparator(va, vb, f);
+    };
+  }
+
+  /**
+   * The value of a row for a sort pass: a calculated column is computed once per row (memo for this pass, not
+   * 2·n·log n times); formula errors sort last (as `undefined`).
+   */
+  protected createSortValueReader(property: string): (row: T) => unknown {
+    if (!this.getColumnValues().getter(property)) {
+      return (row: T) => this.getValueByT(row, property);
+    }
+    const memo = new Map<T, unknown>();
+    return (row: T) => {
+      if (memo.has(row)) return memo.get(row);
+      const v = this.getValueByT(row, property);
+      const value = isFormulaError(v) ? undefined : v;
+      memo.set(row, value);
+      return value;
     };
   }
 

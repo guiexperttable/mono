@@ -107,7 +107,7 @@ footer.getValueAt(0, pivotModel.getPivotBody().getColumnIndex([]));   // 450 –
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L34)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L35)
 
 ## Properties
 
@@ -149,7 +149,7 @@ row height in px
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L34)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L35)
 
 ___
 
@@ -189,7 +189,7 @@ Marker (works across copies of the core).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L26)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L27)
 
 ## Methods
 
@@ -369,7 +369,7 @@ getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefin
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L79)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L83)
 
 ___
 
@@ -438,7 +438,7 @@ of very large tables independent of the scroll position.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L49)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L50)
 
 ___
 
@@ -494,7 +494,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L83)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L87)
 
 ___
 
@@ -678,7 +678,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L40)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L41)
 
 ___
 
@@ -731,7 +731,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L45)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L46)
 
 ___
 
@@ -822,7 +822,7 @@ getTextValueAt(rowIndex: number, columnIndex: number): string {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L67)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L68)
 
 ___
 
@@ -926,7 +926,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L53)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L54)
 
 ___
 
@@ -1220,7 +1220,7 @@ true for the group column of the total row
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L103)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot-footer.ts#L107)
 
 ___
 

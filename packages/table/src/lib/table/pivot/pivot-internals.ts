@@ -2,6 +2,7 @@ import type { PivotValue, PivotValueIf, PivotValueInfoIf } from "./pivot-value.t
 import type { AggregatorIf } from "../aggregation/aggregator.if";
 import { Aggregators, getAggregator } from "../aggregation/aggregators";
 import { createValueGetter } from "../aggregation/create-value-getter";
+import { resolveShowValuesAs } from "../calc/show-values-as";
 
 // Not exported from index.ts: shared by PivotResult, AreaModelPivot and the pivot layout.
 
@@ -43,6 +44,7 @@ export function resolvePivotValues<T>(values: PivotValue<T>[] | undefined): Reso
       label: full.label ?? name,
       aggregator,
       format: full.format,
+      showValuesAs: resolveShowValuesAs(full.showValuesAs),
       getValue: aggregator === Aggregators.count ? undefined : createValueGetter<T>(full.value),
     };
   });

@@ -24,6 +24,7 @@ pivotBody.getResult().values.map(v => v.name);   // ["sum(umsatz)"]
 - [format](PivotValueInfoIf.md#format)
 - [label](PivotValueInfoIf.md#label)
 - [name](PivotValueInfoIf.md#name)
+- [showValuesAs](PivotValueInfoIf.md#showvaluesas)
 
 ## Properties
 
@@ -35,7 +36,7 @@ The aggregator.
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L66)
+[src/lib/table/pivot/pivot-value.type.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L77)
 
 ___
 
@@ -61,7 +62,7 @@ The format of a result, if one was given.
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L68)
+[src/lib/table/pivot/pivot-value.type.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L79)
 
 ___
 
@@ -73,7 +74,7 @@ The header label.
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L64)
+[src/lib/table/pivot/pivot-value.type.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L75)
 
 ___
 
@@ -85,4 +86,16 @@ The id ([PivotValueIf.name](PivotValueIf.md#name)).
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L62)
+[src/lib/table/pivot/pivot-value.type.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L73)
+
+___
+
+### showValuesAs
+
+• `Optional` `Readonly` **showValuesAs**: [`ShowValuesAsIf`](ShowValuesAsIf.md)
+
+„Show values as“, if one was given (since 1.1.95).
+
+#### Defined in
+
+[src/lib/table/pivot/pivot-value.type.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L81)

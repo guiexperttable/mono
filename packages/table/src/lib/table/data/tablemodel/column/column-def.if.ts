@@ -5,6 +5,8 @@ import { BooleanFunction } from "../../common/boolean-function";
 import { SortState } from "../../common/sort-state.type";
 import { GetEditRenderer } from "../../../renderer/edit/edit-cell-renderer.type";
 import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
+import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
+import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
 
 /**
  * Represents a function that compares two values for sorting purposes.
@@ -117,5 +119,49 @@ export interface ColumnDefIf {
    */
   getEditRenderer?: GetEditRenderer,
   /** Converts the text of the editor before it is written into the model, e.g. {@link editInputPipeForNumber}. */
-  editInputPipe?: editInputPipe
+  editInputPipe?: editInputPipe,
+
+  /**
+   * A calculated column: computes the value from the row instead of reading `property` (the data stays unchanged).
+   * Sorting, filter ({@link TableApi.getRowValue}), copy, Excel, totals (`footerAggregates`) and row groups use the
+   * computed value. `property` stays the id of the column (state, `footerAggregates`, other formulas).
+   * Without a {@link ColumnDefIf.valueSetter} the column cannot be edited.
+   *
+   * Supported by the models of `TableFactory.createTableModel({ rows })`, trees, row groups (not by array-of-arrays
+   * models; an own `AreaModel` calls it itself).
+   *
+   * @example
+   * ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
+   *                    valueGetter: (o: Item) => o.price * o.quantity })
+   *
+   * @see Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)
+   * @since 1.1.95
+   */
+  valueGetter?: ValueGetter,
+  /**
+   * Makes a calculated column editable: writes the edited value back into the row (return `false` to reject).
+   *
+   * @example
+   * valueSetter: (o: Item, v: unknown) => { o.price = Number(v) / o.quantity; }
+   *
+   * @since 1.1.95
+   */
+  valueSetter?: ValueSetter,
+  /**
+   * Shows the numbers of the column differently without changing the data: share of the column total, running
+   * total, rank … (see {@link ShowValuesAs}). Change it at runtime with {@link TableApi.setShowValuesAs}.
+   *
+   * @example
+   * ColumnDef.create({ property: "total", headerLabel: "Share", showValuesAs: "percentOfColumnTotal" })
+   *
+   * @since 1.1.95
+   */
+  showValuesAs?: ShowValuesAsConfig,
+  /**
+   * The formula of a formula column (`ColumnDef.create({ formula })` compiles it into the `valueGetter`), e.g.
+   * `"[price] * [quantity] * 1.19"`. Informational – change it with {@link TableApi.setColumnFormula}.
+   *
+   * @since 1.1.95
+   */
+  formula?: string
 }

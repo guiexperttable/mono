@@ -279,3 +279,13 @@ export * from './lib/table/data/tablemodel/areamodel/area-model-pivot';
 export * from './lib/table/data/tablemodel/areamodel/area-model-pivot-footer';
 export * from './lib/table/factory/pivot-table-model-para.if';
 export * from './lib/table/factory/pivot-factory';
+
+// calculated columns, show values as, formulas (1.1.95, prompt 008)
+export * from './lib/table/calc/value-getter.type';
+export * from './lib/table/calc/value-getter-context.if';
+export * from './lib/table/calc/show-values-as.type';
+export * from './lib/table/calc/show-values-as';
+export * from './lib/table/formula/formula-error';
+export * from './lib/table/formula/formula-ast.if';
+export * from './lib/table/formula/formula-options.if';
+export * from './lib/table/formula/compile-formula';

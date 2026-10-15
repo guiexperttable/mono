@@ -9,6 +9,7 @@ Row numbers like in a spreadsheet – one flag, `rowNumbersVisible: true` (since
 Total rows (sum, average, count, min, max …) that follow filter and sorting – `footerAggregates: { total: "sum" }` – and the sum of the selected cells for a status bar (since 1.1.94).
 Row grouping with aggregates per group – `RowGroupFactory.createTableModel({ rows, groupBy: ["country", "city"], aggregations: { total: "sum" } })`, regroup at runtime with `tableApi.setRowGroupBy()` (since 1.1.94).
 Pivot tables – row fields × column fields with subtotals, totals and multi-row headers – `PivotFactory.createTableModel({ rows, rowFields: ["country"], columnFields: ["year"], values: ["total"] })`, pivot again at runtime with `tableApi.setPivotConfig()` (since 1.1.94).
+Calculated columns, „Show values as“ and formulas – `ColumnDef.create({ property: "total", valueGetter: o => o.price * o.quantity })` (sorting, filter, copy, Excel and totals use the computed value), `showValuesAs: "percentOfColumnTotal"` (also `runningTotal`, `rank`, `percentOfRowTotal` in pivots …), `formula: "ROUND([price] * [quantity] * 1.19, 2)"` (own parser, no `eval`, error values like `#DIV/0!`) (since 1.1.95).
 
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 

@@ -177,6 +177,7 @@ class CustomAreaModel extends AreaModel {
 - [getRowByIndex](AreaModelIf.md#getrowbyindex)
 - [getRowCount](AreaModelIf.md#getrowcount)
 - [getRowHeight](AreaModelIf.md#getrowheight)
+- [getRowValue](AreaModelIf.md#getrowvalue)
 - [getRowspanAt](AreaModelIf.md#getrowspanat)
 - [getTextValueAt](AreaModelIf.md#gettextvalueat)
 - [getTooltipAt](AreaModelIf.md#gettooltipat)
@@ -185,6 +186,7 @@ class CustomAreaModel extends AreaModel {
 - [getYPosByRowIndex](AreaModelIf.md#getyposbyrowindex)
 - [init](AreaModelIf.md#init)
 - [invalidateDerivedValues](AreaModelIf.md#invalidatederivedvalues)
+- [isCalculatedProperty](AreaModelIf.md#iscalculatedproperty)
 - [isEditable](AreaModelIf.md#iseditable)
 - [isFilterable](AreaModelIf.md#isfilterable)
 - [isRowCheckable](AreaModelIf.md#isrowcheckable)
@@ -361,7 +363,7 @@ class MyBodyModel extends AreaModelObjectArray<any> {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:956](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L956)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:978](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L978)
 
 ___
 
@@ -410,7 +412,7 @@ externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:911](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L911)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:933](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L933)
 
 ___
 
@@ -455,7 +457,7 @@ getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefin
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:613](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L613)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:635](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L635)
 
 ___
 
@@ -505,7 +507,7 @@ getColspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:419](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L419)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:441](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L441)
 
 ___
 
@@ -536,7 +538,7 @@ getConstantRowHeight(): number | undefined { return 34; }
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:664](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L664)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:686](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L686)
 
 ___
 
@@ -599,7 +601,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:532](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L532)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:554](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L554)
 
 ___
 
@@ -654,7 +656,7 @@ getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:565](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L565)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:587](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L587)
 
 ___
 
@@ -693,7 +695,7 @@ getMaxColspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:441](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L441)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:463](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L463)
 
 ___
 
@@ -732,7 +734,7 @@ getMaxRowspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:491](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L491)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:513](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L513)
 
 ___
 
@@ -775,7 +777,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:685](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L685)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:707](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L707)
 
 ___
 
@@ -870,7 +872,41 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:647](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L647)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:669](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L669)
+
+___
+
+### getRowValue
+
+▸ **getRowValue**(`row`, `property`): `unknown`
+
+Optional: the value of a column for a row object – computed for a calculated column, otherwise the property
+path ([TableApi.getRowValue](../classes/TableApi.md#getrowvalue)). Implemented by the object-array, tree, row-group and pivot models.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `any` |
+| `property` | `string` |
+
+#### Returns
+
+`unknown`
+
+**`Example`**
+
+```ts
+tableModel.getBodyModel().getRowValue?.({ price: 25, quantity: 10 }, "total");   // 250
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:353](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L353)
 
 ___
 
@@ -920,7 +956,7 @@ getRowspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:469](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L469)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:491](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L491)
 
 ___
 
@@ -967,7 +1003,7 @@ getTextValueAt(rowIndex: number, columnIndex: number): string {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:391](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L391)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:413](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L413)
 
 ___
 
@@ -1014,7 +1050,7 @@ getTooltipAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:590](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L590)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:612](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L612)
 
 ___
 
@@ -1110,7 +1146,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:366](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L366)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:388](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L388)
 
 ___
 
@@ -1169,7 +1205,7 @@ getYPosByRowIndex(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:719](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L719)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:741](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L741)
 
 ___
 
@@ -1253,6 +1289,39 @@ class CachedTotalsFooter extends AreaModel {
 
 ___
 
+### isCalculatedProperty
+
+▸ **isCalculatedProperty**(`property`): `boolean`
+
+Optional: true if the column with this property is calculated (`ColumnDefIf.valueGetter` / `formula`).
+Implemented by the object-array, tree, row-group and pivot models.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `property` | `string` |
+
+#### Returns
+
+`boolean`
+
+**`Example`**
+
+```ts
+tableModel.getBodyModel().isCalculatedProperty?.("total");   // true
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:342](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L342)
+
+___
+
 ### isEditable
 
 ▸ **isEditable**(`rowIndex`, `columnIndex`): `boolean`
@@ -1312,7 +1381,7 @@ isEditable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:757](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L757)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:779](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L779)
 
 ___
 
@@ -1351,7 +1420,7 @@ isFilterable(): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:888](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L888)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:910](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L910)
 
 ___
 
@@ -1400,7 +1469,7 @@ isRowCheckable(rowIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:812](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L812)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:834](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L834)
 
 ___
 
@@ -1449,7 +1518,7 @@ isRowChecked(rowIndex: number): CheckedType | undefined {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:839](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L839)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:861](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L861)
 
 ___
 
@@ -1535,7 +1604,7 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:785](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L785)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:807](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L807)
 
 ___
 
@@ -1582,7 +1651,7 @@ setRowChecked(rowIndex: number, checked: boolean): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:866](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L866)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:888](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L888)
 
 ___
 
@@ -1679,4 +1748,4 @@ sort(compareFn?: (a: any, b: any) => number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:988](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L988)
+[src/lib/table/data/tablemodel/areamodel/area-model.if.ts:1010](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model.if.ts#L1010)

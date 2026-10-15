@@ -114,9 +114,8 @@
 - [x] `api.sort(fn)` / `api.reSort()` zeichneten nicht neu (neue Reihenfolge erst nach dem nächsten Scrollen).
 - [x] Excel-Export: ZIP ohne CRC-32 (immer 0 → strenge Leser wie Python `zipfile` lehnen ab), Zeilennummern als
       Literal `${r + 1}`, Blattgröße fest `A1:B3`. Behoben und mit openpyxl geprüft.
-- [ ] Footer-Summen über gefilterte Zeilen: geht heute mit eigenem Footer-AreaModel + `getFilteredRows()`
-      (instructions.md 5.4). Optional später eine fertige Klasse (z. B. `AreaModelAggregateFooter`).
-      → Prompt 005 (`prompts/005-aggregation-gesamtzeile.md`).
+- [x] Footer-Summen über gefilterte Zeilen: fertige Klasse `AreaModelAggregateFooter` + Fabrik-Option `footerAggregates`
+      (Prompt 005 `prompts/005-aggregation-gesamtzeile.md`, ab 1.1.94; instructions.md 5.4).
 
 - [x] `TableApi.setColumnVisible()`, `isColumnVisible()`, `setHeaderVisible()`, `isHeaderVisible()`,
       `setFooterVisible()`, `isFooterVisible()` implementiert (Branch `fix/core-api`): Spalte über `ColumnDef.isVisible`
@@ -199,8 +198,21 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       (009) kann die Nummernspalte als Griff nutzen · `MouseHandler.getArrowColumnIndex` ignoriert
       `showCheckboxWihoutExtraColumn` (anders als `RenderScope.getTreeArrowColumnIndex`, schon vor 004) · Speicher der
       Positions-`Map` im Modus `original` (evtl. Index am Modell statt Map).
-- [ ] **005 Aggregation und Gesamtzeile** (Helfer, fertiges Footer-Modell, Auswahl-Summen) – Grundlage für 006–008
-      (`prompts/005-aggregation-gesamtzeile.md`).
+- [x] **005 Aggregation und Gesamtzeile** – Branch `feat/aggregation`, Design `prompts/005-aggregation-gesamtzeile.design.md`:
+      `AggregatorIf` (`init`/`add`/`merge`/`result`, Zustand statt Zahl → Mittelwert über Gruppen korrekt), `Aggregators`
+      (sum, count, avg, min, max, countDistinct, first, last; Summen mit Neumaier-Kompensation), `aggregate()`,
+      `aggregateColumns()`, `createValueGetter()`, `formatAggregateValue()`; `AreaModelAggregateFooter` + Fabrik-Option
+      `footerAggregates` (eine oder mehrere Gesamtzeilen, Spalten nach Property, Beschriftung `rowheader`, Cache);
+      optional `AreaModelIf.invalidateDerivedValues?()` – die Tabelle ruft es bei Filter, Sortierung, Editieren, `updateCells()` und
+      `api.repaint()`/`repaintHard()`; `AreaModelTree.getLeafRows()`; `api.getSelectionAggregates()` /
+      `SelectionAggregator` (Statusleiste). Grundlage für 006–008. Selbständig umgesetzt.
+      Offen: Demo-Repo entfällt (kein neues Kapitel), Angular-Demo erst nach dem Release.
+- [ ] Folgepunkte 005: Excel-Formeln für die Gesamtzeile (`=SUBTOTAL(109, …)`; der XLSX-Writer kennt keine `<f>`-Zellen) ·
+      Gesamtzeile oben (ag-Grid `grandTotalRow: "top"`) · Beschriftung über leere Nachbarspalten (Colspan) · Live-Daten mit
+      Millionen Zeilen: je `updateCells()` ein voller Durchlauf (inkrementelle Summen nur ohne Filter möglich) · 008:
+      `ColumnDef.valueGetter` im Footer zuerst auflösen (Design § 2.2) · Review-Nits (Design § 5): Auswahl-Aggregate im Baum
+      zählen sichtbare Zeilen, der Footer Blätter · `footerAggregates` + `bodyData` ohne `columnDefs` warnt nicht · eigener
+      Aggregator mit Feld `aggregator` wird als Spec gelesen.
 - [ ] **006 Row Grouping** (`prompts/006-row-grouping.md`). Die Website sagt heute noch „Row grouping … – tree tables
       instead“ (`home/why.astro`, Training `build-buy-or-guiexpert` und `checklist`) – erst mit dem Feature ändern.
 - [ ] **007 Pivot-Tabellen** (`prompts/007-pivot.md`), nach 005 und 006; gleiche Stellen auf der Website.
@@ -543,6 +555,10 @@ Objekt-Tabelle hat `ge-focused-row`.
   Nummernspalte keine Verhaltensänderung. Mit Nummernspalte an Index 0 sitzen `CheckboxColumnDef`, Baumpfeil und
   `showCheckboxWihoutExtraColumn` an Index 1 (vorher fest an 0). `TableFactory.buildByTypedRows(rows, [])` wirft nicht
   mehr. `RenderScope.getTreeArrowColumnIndex()` liefert `number` statt `0 | 1` (protected).
+- **Aggregation (005, ab 1.1.94)**: neu `footerAggregates`, `AreaModelAggregateFooter`, `aggregate()`/`aggregateColumns()`,
+  `api.getSelectionAggregates()`. Ohne Aggregat-Footer keine Verhaltensänderung. `api.repaint()`/`repaintHard()` rufen
+  zusätzlich `invalidateDerivedValues?()` der drei Area-Modelle (neues optionales Member von `AreaModelIf`); `updateCells()` ohne
+  `repaintAll` zeichnet dann auch die Footer-Zellen neu. Mit `footerAggregates` wird `footerData` ignoriert (Warnung).
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

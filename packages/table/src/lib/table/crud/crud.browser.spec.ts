@@ -288,6 +288,16 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     await vi.waitFor(() => expect(nameCell(host, 0)).toBe('Green apple'));
   });
 
+  it('EDIT drops derived values (footer totals) of the area models', async () => {
+    const { host, scope } = await createCrudTable();
+    const invalidate = vi.spyOn(scope, 'invalidateAggregates');
+    await userEvent.click(actionLink(host, 0, 'EDIT'));
+    await vi.waitFor(() => expect(editDialog()).not.toBeNull());
+    await userEvent.fill(field(editDialog()!, 'price'), '9');
+    await save();
+    await vi.waitFor(() => expect(invalidate).toHaveBeenCalled());
+  });
+
   it('EDIT: an item in the response of updateItem is shown (e.g. values changed by the server)', async () => {
     const { host } = await createCrudTable(({ updateItem }) =>
       updateItem.mockImplementation(() => Promise.resolve({ id: 1, name: 'APPLE (saved)', price: 3 })));

@@ -31,6 +31,10 @@ This is the UI-agnostic table component for your next web app. 😊
   "No rows to show" / "No matching rows" (automatic) – plain HTML/CSS, since 1.1.92
 - Row numbers like in a spreadsheet (`rowNumbersVisible: true` or `RowNumberColumnDef`): fixed on the left, width
   fits the largest number, click selects the row, view or original order – since 1.1.93
+- Aggregation: total rows in the footer that follow filter and sorting (`footerAggregates: { quantity: "sum", total: "avg" }`,
+  `AreaModelAggregateFooter`), helpers `aggregate()` / `aggregateColumns()` with mergeable aggregators (sum, count, avg,
+  min, max, countDistinct, first, last or your own), and count/sum/average of the selected cells for a status bar
+  (`tableApi.getSelectionAggregates()`) – since 1.1.94
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

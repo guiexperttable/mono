@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!--
+  Total rows and selection sums (since 1.1.94) – also the recording page of video 06.
+  Start: pnpm serve:table-demo → http://localhost:4200/aggregation.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – totals</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .table-div { height: 420px; width: 100%; }
+    .status { font-size: 14px; margin-top: 8px; min-height: 1.4em; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+<h1>Orders</h1>
+<div class="bar">
+  <label>Rows
+    <select id="rows">
+      <option value="1000">1,000</option>
+      <option value="100000" selected>100,000</option>
+      <option value="1000000">1,000,000</option>
+    </select>
+  </label>
+  <label>Footer
+    <select id="footer">
+      <option value="sum">one row: sum</option>
+      <option value="two">two rows: sum and average</option>
+      <option value="none">none</option>
+    </select>
+  </label>
+  <label>Filter city/customer <input id="filter" type="search" placeholder="e.g. berlin"></label>
+  <label><input id="live" type="checkbox"> live prices</label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<p class="status" id="status" aria-live="polite">Select cells (drag, Shift/Ctrl-click, Ctrl+A) – count, sum and average appear here.</p>
+<script src="/src/aggregation/aggregation-demo.ts" type="module"></script>
+</body>
+</html>

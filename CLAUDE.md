@@ -137,7 +137,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Fabriken (`factory/`):
   - `TableFactory.createTableModel(Partial<CreateTableModelPara>)` – Universal-Einstieg
     (`rows`+`properties` | `bodyData`/`headerData`/`footerData` | `bodyAreaModel` …, `columnDefs`, `fixedLeftColumnCount`,
-    `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `tableOptions`).
+    `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `footerAggregates`
+    (1.1.94), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`.
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
@@ -230,8 +231,22 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
   Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via
   `getAllRows()`) über `new ExcelService().downloadExcel(matrix, …)`.
-- Footer mit Summen der gefilterten Zeilen: eigenes Footer-`AreaModel`, das `getFilteredRows()` des Body-Modells liest
-  (`instructions.md` 5.4); `footerData` ist statisch.
+- **Aggregation (seit 1.1.94, `aggregation/`, Design `prompts/005-aggregation-gesamtzeile.design.md`)**: DOM-freier Kern
+  für 005–008: `AggregatorIf<S, R>` (`init`/`add`/`merge`/`result` – **Zustand** statt Zahl, `avg` = `{ sum, count }`, damit
+  `merge` über Gruppen stimmt; `add(s)`/`merge(a, b)` dürfen `s`/`a` ändern, `b` **nie** – ein Kind-Zustand darf in
+  mehrere Eltern gemergt werden), `Aggregators` (sum, count, avg, min, max,
+  countDistinct, first, last; Summen mit Neumaier-Kompensation; nur `number` ohne `NaN`, Text wird nie umgewandelt,
+  `count` zählt Zeilen), `getAggregator`, `aggregate(rows, value, agg)`, `aggregateColumns(rows, specs)` (ein Durchlauf),
+  `createValueGetter` (Pfad oder Funktion), `formatAggregateValue`. Interna (`aggregate-internals.ts`) nicht exportiert.
+  **Gesamtzeile**: `AreaModelAggregateFooter` (`data/tablemodel/areamodel/`) bzw. `footerAggregates` der Fabrik – Spalten
+  über die **Property**, Quelle `getFilteredRows()` / Baum `getLeafRows()` (gefilterte Blätter, unabhängig vom
+  Aufklappen) / sonst `getValueAt` je Zeile; Wert roh (Excel), Text über `getTextValueAt` + `AggregateCellRenderer`
+  (oder Footer-Renderer der Spalte); Beschriftung `role="rowheader"` (`RenderScope.applyCellAria`). **Cache** je
+  Quell-Array + Länge (Baum: Wurzel-Array; Zeilen bzw. Baum-Durchlauf erst beim Fehlschlag); die Tabelle ruft das optionale `AreaModelIf.invalidateDerivedValues?()` aller Areas
+  (`RenderScope.invalidateAggregates()`) bei Filter, Sortieren (in place!), Editieren (vor dem Repaint und vor
+  `onModelChanged`), `updateCells` (ohne `repaintAll` werden die Footer-Zellen nachgezeichnet), CRUD-Änderungen und **öffentlichem**
+  `api.repaint()`/`repaintHard()` – nie beim Scrollen/internen Repaint. Auswahl: `api.getSelectionAggregates()`
+  (`SelectionAggregator`, Kappung `maxCells` wie `CopyService.maxCopyCells`). Eigenes Footer-Modell: instructions.md 5.4.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -314,7 +329,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 342 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 373 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -325,8 +340,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.590 Tests) |
-  | `test:browser` | echtes Chromium, ~580 Tests in 21 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.715 Tests) |
+  | `test:browser` | echtes Chromium, ~610 Tests in 22 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -348,7 +363,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers` …).
+    `row-numbers`, `aggregation` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -451,6 +466,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 23 | Barrierefreie Tabelle (Screenreader + Tastatur) | `videos/02-barrierefreie-tabelle/`, Training-Kapitel `accessibility`, `apps/table-demo/aria.html` |
 | 24 | Lade-Spinner und leere Tabelle – ohne Library, nur CSS | `videos/03-lade-spinner/`, Training-Kapitel `live-data`, `apps/table-demo/overlay.html` |
 | 25 | Zeilennummern wie in Excel – eine Zeile Code (ohne Enterprise-Lizenz) | `videos/05-zeilennummern/`, Training-Kapitel `fixed-columns`, `apps/table-demo/row-numbers.html`, Showcase `large` |
+| 26 | Summenzeile in einer Zeile Code – plus Statusleiste für die Auswahl (ohne Enterprise-Lizenz) | `videos/06-summenzeile/`, Training-Kapitel `footer-totals`, `apps/table-demo/aggregation.html` |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

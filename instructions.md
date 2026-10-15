@@ -535,44 +535,109 @@ const tableModel = TableFactory.createTableModel({
 });
 ```
 
-### 5.4 Footer with totals of the displayed rows
+### 5.4 Footer with totals of the displayed rows (built in since 1.1.94)
 
-`footerData` (5.3) is static text. A footer that follows filter and sorting is a small area model that computes its
-cells from the rows the body currently shows (`getFilteredRows()` = after `externalFilterFunction`, in display order).
-The footer is repainted with every `externalFilterChanged()`, `sort()` and `repaint()`:
+`footerData` (5.3) is static text. A footer that follows filter and sorting is one option of the factory – the keys
+are the properties of the columns, the values the aggregators (`"sum"`, `"count"`, `"avg"`, `"min"`, `"max"`,
+`"countDistinct"`, `"first"`, `"last"` or your own `AggregatorIf`):
 
 ```ts
-import { AreaModel, AreaModelObjectArray, ColumnDef, TableFactory, TableOptions, TableOptionsIf, px120 } from "@guiexpert/table";
+import { ColumnDef, TableFactory, TableOptions, TableOptionsIf, px120 } from "@guiexpert/table";
+
+interface OrderIf { id: number; city: string; quantity: number; total: number; }
+
+let city = "";
+const orders: OrderIf[] = [{ id: 1, city: "Berlin", quantity: 2, total: 20 }, { id: 2, city: "Hamburg", quantity: 1, total: 10 }];
+const tableOptions: TableOptionsIf = { ...new TableOptions(), externalFilterFunction: (o: OrderIf) => !city || o.city === city };
+const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  columnDefs: [new ColumnDef("id", "ID", px120), new ColumnDef("city", "City", px120),
+    new ColumnDef("quantity", "Qty", px120), new ColumnDef("total", "Total", px120)],
+  tableOptions,
+  footerAggregates: { quantity: "sum", total: "sum" }      // footer: "2 rows" | | 3 | 30
+});
+```
+
+- **Data**: the rows the body shows (after `externalFilterFunction`); in a tree all leaves the filter keeps, expanded
+  or not; with `bodyData` or an own body model every row via `getValueAt` of the column. `source: "all"` ignores the
+  filter, `getRows` sets an own source.
+- **Label**: `"2 rows"` in the first data column without an aggregate (screen readers announce it as row header);
+  `labelProperty` picks the column, `label` per row sets the text (string or `(rowCount, results) => string`).
+- **Cells**: the value is the raw result – Excel gets numbers (`downloadExcel()` exports the footer, 6.10), a footer
+  renderer of the column (`rendererMap.footer`) gets the number. Without one the text is formatted: at most two
+  decimals with thousands separators (`"1,234.5"`), or `format` of the spec.
+- **Recomputing**: once per change, never while scrolling. The table recomputes after filter, sorting, editing,
+  `updateCells()` and `tableApi.repaint()` / `repaintHard()` – after changing row objects yourself call
+  `tableApi.repaint()`, as for the cells.
+- Invalid values: `sum`/`avg`/`min`/`max` use numbers only (`null`, `""`, `"abc"`, `NaN` are ignored; text is not
+  converted – use `value: o => Number(o.amount)`), `count` counts rows, an empty set gives `sum` 0 and `avg`
+  `undefined` (empty cell).
+
+Several total rows, own labels and formats, computed values:
+
+```ts
+import { AggregateFooterConfig, formatAggregateValue } from "@guiexpert/table";
+
+interface Order { customer: string; quantity: number; price: number; total: number; }
+
+const footerAggregates: AggregateFooterConfig<Order> = {
+  labelProperty: "customer",
+  rows: [
+    { label: "Sum", aggregates: { quantity: "sum", total: "sum" } },
+    { label: (rowCount: number) => `Ø of ${rowCount}`, aggregates: {
+        quantity: "avg",
+        total: { aggregator: "avg", format: v => `${formatAggregateValue(v)} €` } } },
+    { label: "Largest order", aggregates: { total: { aggregator: "max", value: o => o.quantity * o.price } } }
+  ]
+};
+```
+
+The same aggregators work without a table – one pass over the rows, results by key:
+
+```ts
+import { Aggregators, aggregate, aggregateColumns } from "@guiexpert/table";
+
+const sales = [{ region: "North", amount: 100 }, { region: "South", amount: 80 }, { region: "North", amount: 120 }];
+aggregate(sales, "amount", "sum");                                         // 300
+aggregateColumns(sales, { amount: "avg", region: "countDistinct" });       // { amount: 100, region: 2 }
+const avg = Aggregators.avg;                                               // partial results merge correctly:
+const north = [100, 120].reduce((s, v) => avg.add(s, v), avg.init());
+const south = [80].reduce((s, v) => avg.add(s, v), avg.init());
+avg.result(avg.merge(north, south));                                       // 100 – not the mean of 110 and 80
+```
+
+Read the results of the footer (e.g. for a title): `(tableModel.getAreaModel("footer") as AreaModelAggregateFooter).getResults()`.
+
+**Your own footer model** – for layouts the built-in one doesn't cover (e.g. text that spans several columns): extend
+`AreaModel` and compute the cells from the rows the body currently shows (`getFilteredRows()` = after
+`externalFilterFunction`, in display order). Cache the sums yourself and drop the cache in `invalidateDerivedValues()` – the table
+calls it after filter, sorting, editing and `tableApi.repaint()`:
+
+```ts
+import { AreaModel, AreaModelObjectArray, aggregateColumns } from "@guiexpert/table";
 
 interface OrderIf { id: number; city: string; total: number; }
 
 class OrderTotalsFooterModel extends AreaModel {
+  private totals?: Record<string, unknown>;
   constructor(private readonly getBody: () => AreaModelObjectArray<OrderIf>) {
     super();
     this.areaIdent = "footer";
   }
+  invalidateDerivedValues(): void { this.totals = undefined; }   // called by the table (since 1.1.94)
   override getRowCount(): number { return 1; }
   override getRowHeight(_rowIndex: number): number { return 34; }
   override getValueAt(_rowIndex: number, columnIndex: number): any {
     const rows = this.getBody().getFilteredRows();          // only the rows that pass the filter
+    this.totals ??= aggregateColumns(rows, { total: "sum" });
     if (columnIndex === 1) return rows.length + " orders";
-    if (columnIndex === 2) return rows.reduce((sum, o) => sum + o.total, 0);
+    if (columnIndex === 2) return this.totals["total"];
     return "Σ";
   }
 }
-
-let city = "";
-const orders: OrderIf[] = [{ id: 1, city: "Berlin", total: 20 }, { id: 2, city: "Hamburg", total: 10 }];
-const tableOptions: TableOptionsIf = { ...new TableOptions(), externalFilterFunction: (o: OrderIf) => !city || o.city === city };
-const tableModel = TableFactory.createTableModel({
-  rows: orders,
-  columnDefs: [new ColumnDef("id", "ID", px120), new ColumnDef("city", "City", px120), new ColumnDef("total", "Total", px120)],
-  tableOptions,
-  footerAreaModel: new OrderTotalsFooterModel(() => tableModel.getBodyModel() as AreaModelObjectArray<OrderIf>)
-});
 ```
 
-`tableApi.downloadExcel()` exports this footer row as well (6.10).
+Pass it as `footerAreaModel: new OrderTotalsFooterModel(() => tableModel.getBodyModel() as AreaModelObjectArray<OrderIf>)`.
 
 ### 5.5 Millions of rows: your own area model
 
@@ -734,6 +799,26 @@ const tableOptions: TableOptionsIf = {
 - Events: `selectionChanged` (payload `SelectionModelIf`) and `focusChanged` (payload `FocusModelIf`).
 - API: `tableApi.clearSelection()`, `tableApi.setSelectionModel(new SelectionModel("cell", "single"))`,
   `tableApi.getSelectionModel()`.
+- Since 1.1.94: `tableApi.getSelectionAggregates()` returns `{ count, numericCount, sum, avg, min, max, capped }` of the
+  selected body cells (visible data columns; numbers only for sum/avg/min/max). Above
+  `SelectionAggregator.maxCells` (default 1,000,000) nothing is computed (`capped: true`). A status bar like in a
+  spreadsheet:
+
+```ts
+import { EventAdapter, SelectionModel, TableApi, formatAggregateValue } from "@guiexpert/table";
+
+declare const tableApi: TableApi;                       // from tableReady / scope.getApi()
+const statusBar = document.querySelector<HTMLDivElement>("#status")!;
+const selectionModel = new SelectionModel("range", "multi");
+const listener = new EventAdapter();                    // the eventListener of the table
+listener.onSelectionChanged = () => {
+  const a = tableApi.getSelectionAggregates();
+  statusBar.textContent = a.capped ? "Selection too large"
+    : a.numericCount ? `Count ${a.count} · Sum ${formatAggregateValue(a.sum)} · Average ${formatAggregateValue(a.avg)}`
+    : a.count ? `Count ${a.count}` : "";
+};
+```
+
 - Keyboard shortcuts (copy, select all, navigation, start editing) – see `tableApi.getShortcutActionMapping()`;
   override with `tableOptions.shortcutActionIdMapping` or disable with `shortcutActionsDisabled: true`.
   Action ids: `COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`, `DESELECT_ALL`,
@@ -843,6 +928,8 @@ function onPriceTick(tableApi: TableApi, row: number, col: number, price: number
 ```
 
 `tableApi.updateCells([], true)` repaints everything. Showcases: *Render speed* (fps), *Time table*, *Crypto*.
+A footer from `footerAggregates` (5.4) is recomputed after `updateCells()`; after changing row objects yourself call
+`tableApi.repaint()`.
 
 ### 6.10 Export: clipboard and Excel
 

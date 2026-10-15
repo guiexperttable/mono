@@ -4,6 +4,11 @@
 > Slug `pivot` (Branch `feat/pivot`, Design `prompts/007-pivot.design.md`) · Verweis in `TODO.md` → Abschnitt
 > „Feature-Prompts“. Gemeinsame Regeln: `prompts/000-arbeitsweise.md` (gilt bei Widersprüchen).
 >
+> **005 ist umgesetzt (1.1.94)**, API im Design `prompts/005-aggregation-gesamtzeile.design.md`: `AggregatorIf`
+> (`init`/`add`/`merge`/`result`), `Aggregators`, `getAggregator`, `aggregateColumns`, `createValueGetter`,
+> `formatAggregateValue`, `AreaModelAggregateFooter` (Option `getRows` für eine eigene Quelle; `AreaModelIf.invalidateDerivedValues?()`
+> ruft die Tabelle nach Filter/Sortierung/Editieren), Fixture `createSales()` in `test-utils/grouping-fixtures.ts`.
+>
 > **Voraussetzung: 005 (Aggregation) und 006 (Row Grouping)** (`prompts/005-aggregation-gesamtzeile.md`,
 > `prompts/006-row-grouping.md`). 005 liefert Aggregatoren, Gesamtzeile und Testfixture, 006 die Gruppierung und die
 > Gruppenzeilen. Pivot ergänzt nur die Spaltenschlüssel-Dimension.

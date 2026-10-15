@@ -9,9 +9,11 @@
 - [AbstractAreaModel](classes/AbstractAreaModel.md)
 - [ActionEvent](classes/ActionEvent.md)
 - [ActionsCellRenderer](classes/ActionsCellRenderer.md)
+- [AggregateCellRenderer](classes/AggregateCellRenderer.md)
 - [AnyPropertyType](classes/AnyPropertyType.md)
 - [AreaMapFactory](classes/AreaMapFactory.md)
 - [AreaModel](classes/AreaModel.md)
+- [AreaModelAggregateFooter](classes/AreaModelAggregateFooter.md)
 - [AreaModelArrayOfArrays](classes/AreaModelArrayOfArrays.md)
 - [AreaModelCellGroups](classes/AreaModelCellGroups.md)
 - [AreaModelHidden](classes/AreaModelHidden.md)
@@ -104,6 +106,7 @@
 - [RowNumberOptions](classes/RowNumberOptions.md)
 - [SchemeGenerator](classes/SchemeGenerator.md)
 - [SelectCellRenderer](classes/SelectCellRenderer.md)
+- [SelectionAggregator](classes/SelectionAggregator.md)
 - [SelectionModel](classes/SelectionModel.md)
 - [SelectionService](classes/SelectionService.md)
 - [ShortcutService](classes/ShortcutService.md)
@@ -146,6 +149,10 @@
 - [ActionEventIf](interfaces/ActionEventIf.md)
 - [ActionEventListenerIf](interfaces/ActionEventListenerIf.md)
 - [AddColumnDivPara](interfaces/AddColumnDivPara.md)
+- [AggregateFooterOptionsIf](interfaces/AggregateFooterOptionsIf.md)
+- [AggregateFooterRowIf](interfaces/AggregateFooterRowIf.md)
+- [AggregateSpecIf](interfaces/AggregateSpecIf.md)
+- [AggregatorIf](interfaces/AggregatorIf.md)
 - [AreaModelIf](interfaces/AreaModelIf.md)
 - [ArgsAdjustColumnsToRowParentParams](interfaces/ArgsAdjustColumnsToRowParentParams.md)
 - [ArgsRenderCellDiv](interfaces/ArgsRenderCellDiv.md)
@@ -178,6 +185,7 @@
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
 - [RowNumberOptionsIf](interfaces/RowNumberOptionsIf.md)
+- [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
 - [SizeIf](interfaces/SizeIf.md)
@@ -211,6 +219,11 @@
 ### Type Aliases
 
 - [ActionId](modules.md#actionid)
+- [AggregateFooterConfig](modules.md#aggregatefooterconfig)
+- [AggregateSpec](modules.md#aggregatespec)
+- [AggregateSpecMap](modules.md#aggregatespecmap)
+- [AggregatorName](modules.md#aggregatorname)
+- [AggregatorRef](modules.md#aggregatorref)
 - [AreaIdent](modules.md#areaident)
 - [AreaObjectMapType](modules.md#areaobjectmaptype)
 - [BooleanFunction](modules.md#booleanfunction)
@@ -238,11 +251,13 @@
 - [TableStateRowId](modules.md#tablestaterowid)
 - [TreeArrowType](modules.md#treearrowtype)
 - [TreeRowExpandedFn](modules.md#treerowexpandedfn)
+- [ValueAccessor](modules.md#valueaccessor)
 - [ValueRowSortComparator](modules.md#valuerowsortcomparator)
 
 ### Variables
 
 - [ALL\_TABLE\_STATE\_PARTS](modules.md#all_table_state_parts)
+- [Aggregators](modules.md#aggregators)
 - [PROPERTY\_TYPE\_KEY\_ANY](modules.md#property_type_key_any)
 - [PROPERTY\_TYPE\_KEY\_ARRAY](modules.md#property_type_key_array)
 - [PROPERTY\_TYPE\_KEY\_BOOLEAN](modules.md#property_type_key_boolean)
@@ -299,16 +314,22 @@
 - [AvoidDoubleExecution](modules.md#avoiddoubleexecution)
 - [FalseFn](modules.md#falsefn)
 - [TrueFn](modules.md#truefn)
+- [aggregate](modules.md#aggregate)
+- [aggregateColumns](modules.md#aggregatecolumns)
 - [calcOverlayKind](modules.md#calcoverlaykind)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
+- [createValueGetter](modules.md#createvaluegetter)
 - [debounce](modules.md#debounce)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
 - [escapeHtml](modules.md#escapehtml)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
+- [formatAggregateValue](modules.md#formataggregatevalue)
+- [getAggregator](modules.md#getaggregator)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
+- [isAreaModelAggregateFooter](modules.md#isareamodelaggregatefooter)
 - [isAreaModelTree](modules.md#isareamodeltree)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
@@ -1685,7 +1706,484 @@ const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L73)
+[src/lib/table/instanceof-workaround.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L74)
+
+## Aggregation
+
+### AggregateFooterConfig
+
+Ƭ **AggregateFooterConfig**\<`T`\>: [`AggregateSpecMap`](modules.md#aggregatespecmap)\<`T`\> \| [`AggregateFooterRowIf`](interfaces/AggregateFooterRowIf.md)\<`T`\>[] \| [`AggregateFooterOptionsIf`](interfaces/AggregateFooterOptionsIf.md)\<`T`\>
+
+The short and the full forms of a footer configuration:
+- `{ total: "sum" }` – one row ([AggregateSpecMap](modules.md#aggregatespecmap)),
+- `[{ label: "Sum", aggregates: … }, …]` – several rows ([AggregateFooterRowIf](interfaces/AggregateFooterRowIf.md)),
+- `{ rows: […], labelProperty, rowHeight, source, getRows }` – everything ([AggregateFooterOptionsIf](interfaces/AggregateFooterOptionsIf.md)).
+
+**`Example`**
+
+```ts
+const oneRow: AggregateFooterConfig<Order> = { quantity: "sum", total: "sum" };
+const twoRows: AggregateFooterConfig<Order> = [
+  { label: "Sum", aggregates: { total: "sum" } },
+  { label: "Max", aggregates: { total: "max" } }
+];
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/aggregate-footer-options.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/aggregate-footer-options.if.ts#L75)
+
+___
+
+### AggregateSpec
+
+Ƭ **AggregateSpec**\<`T`\>: [`AggregatorRef`](modules.md#aggregatorref) \| [`AggregateSpecIf`](interfaces/AggregateSpecIf.md)\<`T`\>
+
+An aggregate in short form (`"sum"`, an own aggregator) or in full form ([AggregateSpecIf](interfaces/AggregateSpecIf.md)).
+
+**`Example`**
+
+```ts
+const short: AggregateSpec<Order> = "sum";
+const full: AggregateSpec<Order> = { aggregator: "sum", value: o => o.quantity * o.price };
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregate-spec.if.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregate-spec.if.ts#L36)
+
+___
+
+### AggregateSpecMap
+
+Ƭ **AggregateSpecMap**\<`T`\>: `Record`\<`string`, [`AggregateSpec`](modules.md#aggregatespec)\<`T`\>\>
+
+Several aggregates by key. In [aggregateColumns](modules.md#aggregatecolumns) the key names the result (and is the default property path);
+in a footer ([AreaModelAggregateFooter](classes/AreaModelAggregateFooter.md)) the key is the property of the column that shows the result.
+
+**`Example`**
+
+```ts
+const specs: AggregateSpecMap<Order> = {
+  quantity: "sum",
+  total: "sum",
+  customer: "countDistinct",
+  avgTotal: { aggregator: "avg", value: "total" }   // a key without a column: only in the results
+};
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregate-spec.if.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregate-spec.if.ts#L53)
+
+___
+
+### AggregatorName
+
+Ƭ **AggregatorName**: ``"sum"`` \| ``"count"`` \| ``"avg"`` \| ``"min"`` \| ``"max"`` \| ``"countDistinct"`` \| ``"first"`` \| ``"last"``
+
+The names of the built-in aggregators ([Aggregators](modules.md#aggregators)).
+
+| name | result | uses |
+|---|---|---|
+| `sum` | sum, `0` for no numbers | numbers (`NaN` ignored) |
+| `count` | number of rows | every row – the value does not matter |
+| `avg` | sum / count of the numbers, `undefined` for none | numbers |
+| `min`, `max` | smallest / largest value, `undefined` for none | numbers and valid `Date`s |
+| `countDistinct` | number of different values | everything except `null`/`undefined`; dates by time |
+| `first`, `last` | value of the first / last row | every row, the value as it is |
+
+Text is never converted to a number (like Excel's SUM over a range): `"12"` does not count. Use an accessor such as
+`row => Number(row.amount)` for numbers stored as text.
+
+**`Example`**
+
+```ts
+const name: AggregatorName = "avg";
+aggregate(orders, "total", name);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregator-name.type.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregator-name.type.ts#L25)
+
+___
+
+### AggregatorRef
+
+Ƭ **AggregatorRef**: [`AggregatorName`](modules.md#aggregatorname) \| [`AggregatorIf`](interfaces/AggregatorIf.md)
+
+A built-in aggregator by name or an own [AggregatorIf](interfaces/AggregatorIf.md).
+
+**`Example`**
+
+```ts
+const byName: AggregatorRef = "sum";
+const own: AggregatorRef = { name: "range", init: () => [Infinity, -Infinity],
+  add: ([lo, hi]: number[], v: unknown) => typeof v === "number" ? [Math.min(lo, v), Math.max(hi, v)] : [lo, hi],
+  merge: (a: number[], b: number[]) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])],
+  result: ([lo, hi]: number[]) => hi - lo };
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregator-name.type.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregator-name.type.ts#L40)
+
+___
+
+### ValueAccessor
+
+Ƭ **ValueAccessor**\<`T`\>: `string` \| (`row`: `T`) => `unknown`
+
+Where an aggregation gets its value from a row: a property path (`"total"`, `"address.city"`) or a function
+(computed values, numbers stored as text, …).
+
+**`Example`**
+
+```ts
+const byPath: ValueAccessor<Order> = "total";
+const computed: ValueAccessor<Order> = order => order.quantity * order.price;
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `any` | the row type |
+
+#### Defined in
+
+[src/lib/table/aggregation/value-accessor.type.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/value-accessor.type.ts#L13)
+
+___
+
+### Aggregators
+
+• `Const` **Aggregators**: `Readonly`\<`Record`\<[`AggregatorName`](modules.md#aggregatorname), [`AggregatorIf`](interfaces/AggregatorIf.md)\>\>
+
+The built-in aggregators by name ([AggregatorName](modules.md#aggregatorname)) – each one is an [AggregatorIf](interfaces/AggregatorIf.md), so `merge` combines
+partial results correctly (the average of groups is the average of all rows).
+
+- `sum` and `avg` sum with compensation (Neumaier): `0.1 + 0.2 + 0.3` is `0.6`, and splitting the data into groups
+  does not change the result.
+- Numeric aggregators use numbers only (`NaN`, text, `null` … are ignored); `min`/`max` also valid `Date`s;
+  `count` counts rows; `countDistinct` ignores `null`/`undefined`; `first`/`last` take the value as it is.
+
+**`Example`**
+
+```ts
+const { sum } = Aggregators;
+let state = sum.init();
+for (const order of orders) state = sum.add(state, order.total);
+sum.result(state);                         // the same as aggregate(orders, "total", "sum")
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregators.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregators.ts#L185)
+
+___
+
+### aggregate
+
+▸ **aggregate**\<`T`\>(`rows`, `value`, `aggregator`): `unknown`
+
+Aggregates one value of all rows.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | `ArrayLike`\<`T`\> | the rows (an array, also filtered or sorted ones) |
+| `value` | [`ValueAccessor`](modules.md#valueaccessor)\<`T`\> | property path (`"total"`, `"address.zip"`) or function |
+| `aggregator` | [`AggregatorRef`](modules.md#aggregatorref) | `"sum"`, `"count"`, `"avg"`, `"min"`, `"max"`, `"countDistinct"`, `"first"`, `"last"` or an own [AggregatorIf](interfaces/AggregatorIf.md) |
+
+#### Returns
+
+`unknown`
+
+the result (`sum` of no numbers is `0`, `avg`/`min`/`max` of no numbers `undefined`)
+
+**`Example`**
+
+```ts
+aggregate(orders, "total", "sum");                      // all orders
+aggregate(orders.filter(o => o.city === "Berlin"), "total", "avg");
+aggregate(orders, o => o.quantity * o.price, "max");    // a computed value
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregate.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregate.ts#L23)
+
+___
+
+### aggregateColumns
+
+▸ **aggregateColumns**\<`T`\>(`rows`, `specs`): `Record`\<`string`, `unknown`\>
+
+Aggregates several values in **one** pass over the rows. The keys of `specs` name the results; a key is also the
+default property path.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | `ArrayLike`\<`T`\> | the rows |
+| `specs` | [`AggregateSpecMap`](modules.md#aggregatespecmap)\<`T`\> | key → aggregator name, own aggregator or [AggregateSpecIf](interfaces/AggregateSpecIf.md) |
+
+#### Returns
+
+`Record`\<`string`, `unknown`\>
+
+key → result, in the order of `specs`
+
+**`Example`**
+
+```ts
+const totals = aggregateColumns(orders, {
+  quantity: "sum",
+  total: "sum",
+  customer: "countDistinct",
+  avgTotal: { aggregator: "avg", value: "total" }
+});
+// { quantity: 549812, total: 27481033.5, customer: 412, avgTotal: 274.81 }
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregate.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregate.ts#L49)
+
+___
+
+### createValueGetter
+
+▸ **createValueGetter**\<`T`\>(`value`): (`row`: `T`) => `unknown`
+
+A function that reads a value from a row: a property path (`"address.city"`, missing parents → `undefined`) or the
+given function itself.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | [`ValueAccessor`](modules.md#valueaccessor)\<`T`\> | property path or function |
+
+#### Returns
+
+`fn`
+
+the getter
+
+▸ (`row`): `unknown`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `T` |
+
+##### Returns
+
+`unknown`
+
+**`Example`**
+
+```ts
+const city = createValueGetter<{ address?: { city: string } }>("address.city");
+city({ address: { city: "Kiel" } }); // "Kiel"
+city({});                            // undefined
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/create-value-getter.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/create-value-getter.ts#L18)
+
+___
+
+### formatAggregateValue
+
+▸ **formatAggregateValue**(`value`): `string`
+
+The default text of an aggregate (e.g. in a footer cell or a status bar): numbers with at most two decimals and
+thousands separators, dates as date (en-US), `null`/`undefined` empty, everything else as text.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `unknown` | an aggregation result |
+
+#### Returns
+
+`string`
+
+the text
+
+**`Example`**
+
+```ts
+formatAggregateValue(1234.5678);   // "1,234.57"
+formatAggregateValue(undefined);   // ""
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregate.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregate.ts#L73)
+
+___
+
+### getAggregator
+
+▸ **getAggregator**(`aggregator`): [`AggregatorIf`](interfaces/AggregatorIf.md)
+
+The aggregator for a name, or the given aggregator itself.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `aggregator` | [`AggregatorRef`](modules.md#aggregatorref) | a name like `"sum"` or an own [AggregatorIf](interfaces/AggregatorIf.md) |
+
+#### Returns
+
+[`AggregatorIf`](interfaces/AggregatorIf.md)
+
+the aggregator
+
+**`Throws`**
+
+for an unknown name (the message lists the built-in names)
+
+**`Example`**
+
+```ts
+getAggregator("avg").name;            // "avg"
+getAggregator(Aggregators.max);       // the same object
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/aggregation/aggregators.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aggregation/aggregators.ts#L210)
+
+___
+
+### isAreaModelAggregateFooter
+
+▸ **isAreaModelAggregateFooter**(`o`): o is AreaModelAggregateFooter\<any\>
+
+True for an [AreaModelAggregateFooter](classes/AreaModelAggregateFooter.md) – also from another copy of the core (no `instanceof`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableModel.getAreaModel("footer")` |
+
+#### Returns
+
+o is AreaModelAggregateFooter\<any\>
+
+true for a footer with totals
+
+**`Example`**
+
+```ts
+const footer = tableModel.getAreaModel("footer");
+const totals = isAreaModelAggregateFooter(footer) ? footer.getResults() : {};
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L91)
 
 ## DOM
 
@@ -2018,7 +2516,7 @@ Determines if the given model is an AreaModelTree.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L31)
+[src/lib/table/instanceof-workaround.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L32)
 
 ___
 
@@ -2050,7 +2548,7 @@ isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L45)
+[src/lib/table/instanceof-workaround.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L46)
 
 ___
 
@@ -2074,7 +2572,7 @@ Checks if the given object is a CheckboxColumnDef.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L57)
+[src/lib/table/instanceof-workaround.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L58)
 
 ___
 
@@ -2098,7 +2596,7 @@ Checks if the given row is a tree row.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L17)
+[src/lib/table/instanceof-workaround.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L18)
 
 ___
 

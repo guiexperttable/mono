@@ -1,4 +1,5 @@
 import type { RowNumberColumnDef } from './data/common/row-number-column-def';
+import type { AreaModelAggregateFooter } from './data/tablemodel/areamodel/area-model-aggregate-footer';
 
 
 /*
@@ -74,4 +75,19 @@ export function isRowNumberColumnDef(o: any): o is RowNumberColumnDef {
   return !!o && o['type'] === 'RowNumberColumnDef';
 }
 
-
+/**
+ * True for an {@link AreaModelAggregateFooter} – also from another copy of the core (no `instanceof`).
+ *
+ * @param {any} o - the object to check, e.g. `tableModel.getAreaModel("footer")`
+ * @returns {boolean} true for a footer with totals
+ *
+ * @example
+ * const footer = tableModel.getAreaModel("footer");
+ * const totals = isAreaModelAggregateFooter(footer) ? footer.getResults() : {};
+ *
+ * @since 1.1.94
+ * @category Aggregation
+ */
+export function isAreaModelAggregateFooter(o: any): o is AreaModelAggregateFooter {
+  return !!o && o['type'] === 'AreaModelAggregateFooter';
+}

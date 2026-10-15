@@ -200,6 +200,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
         .then(() => {
           this.bodyModel?.filterRowsByPredict(row => !this.hasId(row, id));
           this.tableModel?.getTableScope()?.clearSelection(true);
+          this.tableModel?.getTableScope()?.invalidateAggregates();
           this.tableModel?.getTableScope()?.repaintHard();
         })
         .catch(error => this.logError(action, error));
@@ -220,6 +221,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
     const row = this.bodyModel?.getAllRows().find(r => this.hasId(r, id));
     if (row) {
       Object.assign(row, item);
+      this.tableModel?.getTableScope()?.invalidateAggregates(); // footer totals: the row changed in place
       this.tableModel?.getTableScope()?.repaint();
     }
   }
@@ -234,6 +236,7 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
       if (filteredRows !== allRows) {
         filteredRows.push(item);
       }
+      this.tableModel?.getTableScope()?.invalidateAggregates();
       this.tableModel?.getTableScope()?.repaintHard();
     }
   }

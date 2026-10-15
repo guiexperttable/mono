@@ -27,7 +27,7 @@ import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
 import { TableCellUpdateEventIf } from './data/common/event/input/table-cell-update-event.if';
-import { isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelAggregateFooter, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { getLeadingRowNumberColumnCount } from './data/common/row-number-columns';
 import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 import { AriaGridInfo } from './aria/aria-grid-info';
@@ -253,6 +253,19 @@ export class RenderScope extends EleScope {
    */
   repaint() {
     this.adjustAfterScrolling();
+  }
+
+  /**
+   * Drops cached, derived values of the area models ({@link AreaModelIf.invalidateDerivedValues}, e.g. the totals of an
+   * {@link AreaModelAggregateFooter}) – called where data may have changed (filter, sorting, editing, `updateCells`,
+   * the public `tableApi.repaint()` / `repaintHard()`), not on scrolling.
+   *
+   * @since 1.1.94
+   */
+  invalidateAggregates(): void {
+    for (const areaIdent of ['header', 'body', 'footer'] as const) {
+      this.tableModel.getAreaModel(areaIdent)?.invalidateDerivedValues?.();
+    }
   }
 
 
@@ -496,9 +509,33 @@ export class RenderScope extends EleScope {
         }
       }
     );
+    if (events.length) {
+      this.invalidateAggregates();
+    }
     if (repaintAll) {
       this.repaint();
+    } else if (events.length) {
+      this.rerenderDerivedFooterCells(events);
     }
+  }
+
+  /**
+   * After `updateCells()` without a repaint: draws the rendered cells of a footer with cached totals again (only if the
+   * footer implements {@link AreaModelIf.invalidateDerivedValues}, and not if the events changed the footer itself).
+   */
+  protected rerenderDerivedFooterCells(events: TableCellUpdateEventIf[]): void {
+    const footerModel = this.tableModel.getAreaModel('footer');
+    if (!footerModel?.invalidateDerivedValues || events.every(evt => evt.area === 'footer')) {
+      return;
+    }
+    const cells = this.hostElement.querySelectorAll<HTMLDivElement>('div.ge-table-col-div[data-area="footer"][data-row-index][data-col-index]');
+    cells.forEach(cell => {
+      const rowIndex = Number(cell.getAttribute('data-row-index'));
+      const columnIndex = Number(cell.getAttribute('data-col-index'));
+      this.rerenderCellContent({
+        area: 'footer', rowIndex, columnIndex, value: footerModel.getValueAt(rowIndex, columnIndex)
+      } as TableCellUpdateEventIf);
+    });
   }
 
   /**
@@ -1015,7 +1052,9 @@ export class RenderScope extends EleScope {
     const info = this.getAriaGridInfo();
     const header = areaIdent === 'header';
     // the numbers of a RowNumberColumnDef name their rows (screen readers announce them with the row)
-    const rowHeader = areaIdent === 'body' && isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex));
+    const rowHeader = (areaIdent === 'body' && isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex)))
+      // the label of a total row ("6 rows") names its row
+      || (areaIdent === 'footer' && isAreaModelAggregateFooter(areaModel) && areaModel.isLabelCell(rowIndex, columnIndex));
     ds.setAttribute(cell, 'role', header ? 'columnheader' : rowHeader ? 'rowheader' : 'gridcell');
     const colIndex = info.colIndex(columnIndex);
     if (colIndex > 0) {

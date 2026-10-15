@@ -14,6 +14,8 @@ import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
 import { isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { TreeRowIf } from './data/common/tree-row-if';
+import { SelectionAggregator } from './selection/selection-aggregator';
+import type { SelectionAggregatesIf } from './aggregation/selection-aggregates.if';
 
 
 /**
@@ -447,6 +449,9 @@ export class TableApi {
    * Repainting the table ensures that all visible cells, rows, and styling reflect the
    * current state of the underlying data model and configuration settings.
    *
+   * Since 1.1.94 it also drops cached totals ({@link AreaModelIf.invalidateDerivedValues}, e.g. of a footer from
+   * `footerAggregates`), so they are computed again from the changed rows. Scrolling never does that.
+   *
    * @example
    * // Update data and repaint the table
    * const tableApi = new TableApi(tableScope);
@@ -466,6 +471,7 @@ export class TableApi {
    * @returns {void}
    */
   repaint() {
+    this.tableScope.invalidateAggregates(); // values may have changed (e.g. live data): totals are computed again
     this.tableScope.repaint();
   }
 
@@ -528,6 +534,7 @@ export class TableApi {
    * @returns {void} This method doesn't return a value
    */
   repaintHard() {
+    this.tableScope.invalidateAggregates();
     this.tableScope.repaintHard();
   }
 
@@ -1069,6 +1076,31 @@ export class TableApi {
    */
   getSelectionModel(): SelectionModelIf | undefined {
     return this.tableScope.selectionModel();
+  }
+
+  /**
+   * Count, sum, average, minimum and maximum of the selected body cells – for a status bar like in a spreadsheet.
+   * Counted are the selected cells of the visible data columns; the numbers are the cell values of type `number`.
+   * Above {@link SelectionAggregator.maxCells} cells (default 1,000,000) nothing is computed (`capped: true`).
+   * Without a selection all values are 0 / `undefined`.
+   *
+   * @returns {SelectionAggregatesIf} `{ count, numericCount, sum, avg, min, max, capped }`
+   *
+   * @example
+   * // a status bar in plain HTML under the table
+   * const statusBar = document.querySelector<HTMLDivElement>("#status")!;
+   * const listener = new EventAdapter();
+   * listener.onSelectionChanged = () => {
+   *   const a = tableApi.getSelectionAggregates();
+   *   statusBar.textContent = a.capped ? "Selection too large"
+   *     : a.numericCount ? `Count ${a.count} · Sum ${formatAggregateValue(a.sum)} · Average ${formatAggregateValue(a.avg)}`
+   *     : "";
+   * };
+   *
+   * @since 1.1.94
+   */
+  getSelectionAggregates(): SelectionAggregatesIf {
+    return new SelectionAggregator().aggregate(this.tableScope.tableModel, this.getSelectionModel());
   }
 
 

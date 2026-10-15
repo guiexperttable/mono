@@ -5,6 +5,7 @@
 ## Implemented by
 
 - [`AbstractAreaModel`](../classes/AbstractAreaModel.md)
+- [`AreaModelAggregateFooter`](../classes/AreaModelAggregateFooter.md)
 
 ## Table of contents
 

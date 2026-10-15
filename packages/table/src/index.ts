@@ -243,3 +243,17 @@ export * from './lib/table/state/table-state-part';
 export * from './lib/table/state/table-state.service';
 export * from './lib/table/state/table-state-migration';
 export * from './lib/table/data/common/event/ge-state-change-event';
+
+// aggregation (1.1.94, prompt 005)
+export * from './lib/table/aggregation/aggregator.if';
+export * from './lib/table/aggregation/aggregator-name.type';
+export * from './lib/table/aggregation/value-accessor.type';
+export * from './lib/table/aggregation/aggregate-spec.if';
+export * from './lib/table/aggregation/aggregators';
+export * from './lib/table/aggregation/create-value-getter';
+export * from './lib/table/aggregation/aggregate';
+export * from './lib/table/aggregation/selection-aggregates.if';
+export * from './lib/table/selection/selection-aggregator';
+export * from './lib/table/data/tablemodel/areamodel/aggregate-footer-options.if';
+export * from './lib/table/data/tablemodel/areamodel/area-model-aggregate-footer';
+export * from './lib/table/renderer/aggregate-cell-renderer';

@@ -47,7 +47,7 @@
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L27)
+[src/lib/table/selection/selection-service.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L28)
 
 ## Properties
 
@@ -59,7 +59,7 @@ The ranges the anchor click (or the last shift-click) added – the next shift-c
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L22)
+[src/lib/table/selection/selection-service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L23)
 
 ___
 
@@ -71,7 +71,7 @@ The selection before a Ctrl/⌘-drag – each drag frame replaces only the dragg
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L24)
+[src/lib/table/selection/selection-service.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L25)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L17)
+[src/lib/table/selection/selection-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L18)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L16)
+[src/lib/table/selection/selection-service.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L17)
 
 ___
 
@@ -103,7 +103,7 @@ A drag selection ends with a click on another cell – that click must not clear
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L20)
+[src/lib/table/selection/selection-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L21)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L18)
+[src/lib/table/selection/selection-service.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L19)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L28)
+[src/lib/table/selection/selection-service.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L29)
 
 ## Methods
 
@@ -151,7 +151,7 @@ Triggers an action based on the provided action ID.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L156)
+[src/lib/table/selection/selection-service.ts:170](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L170)
 
 ___
 
@@ -183,7 +183,7 @@ true if focus or selection changed (repaint needed)
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L95)
+[src/lib/table/selection/selection-service.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L96)
 
 ___
 
@@ -199,7 +199,7 @@ Called on mouse down: a new gesture starts.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L39)
+[src/lib/table/selection/selection-service.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L40)
 
 ___
 
@@ -226,4 +226,4 @@ true if the selection changed (repaint needed)
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L53)
+[src/lib/table/selection/selection-service.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L54)

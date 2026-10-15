@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+  Row numbers like in a spreadsheet (since 1.1.93) – also the recording page of video 05.
+  Start: pnpm serve:table-demo → http://localhost:4200/row-numbers.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – row numbers</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .table-div { height: 420px; width: 100%; }
+    .state { font-size: 14px; margin-top: 8px; opacity: .8; }
+  </style>
+</head>
+<body>
+<h1>Orders</h1>
+<div class="bar">
+  <label>Rows
+    <select id="rows">
+      <option value="1000">1,000</option>
+      <option value="100000">100,000</option>
+      <option value="2000000">2,000,000</option>
+    </select>
+  </label>
+  <label>Numbers
+    <select id="mode">
+      <option value="display">display (1, 2, 3 …)</option>
+      <option value="original">original (stay with the row)</option>
+    </select>
+  </label>
+  <label><input id="separators" type="checkbox"> 1,000 separators</label>
+  <label><input id="checkbox" type="checkbox"> checkbox column</label>
+  <button id="sort">Sort by total ↓</button>
+  <label>Filter customer <input id="filter" type="search" placeholder="e.g. 7"></label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<p class="state">Click a number to select the row (Shift extends, Ctrl/⌘ toggles), “#” selects all.
+  Selected rows: <strong id="selected">0</strong></p>
+<script src="/src/row-numbers/row-numbers-demo.ts" type="module"></script>
+</body>
+</html>

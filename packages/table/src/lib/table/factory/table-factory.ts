@@ -18,7 +18,10 @@ import {
   AreaModelObjectArrayWithColumndefs
 } from "../data/tablemodel/areamodel/area-model-object-array-with-columndefs";
 import { TableOptions } from "../data/options/table-options";
-import {isTreeRow} from "../instanceof-workaround";
+import { isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
+import { RowNumberColumnDef } from "../data/common/row-number-column-def";
+import { RowNumberOptionsIf } from "../data/common/row-number-options.if";
+import { getLeadingRowNumberColumnCount } from "../data/common/row-number-columns";
 
 
 /**
@@ -59,6 +62,21 @@ export interface CreateTableModelPara {
   fixedRightColumnCount: number;
   /** Show a checkbox column for every row. Default false. */
   rowCheckboxVisible: boolean;
+  /**
+   * Row numbers (1, 2, 3 …) in a column in front of all others, fixed on the left: `true` or options
+   * ({@link RowNumberOptionsIf}). Puts a {@link RowNumberColumnDef} in front of `columnDefs` and adds 1 to
+   * `fixedLeftColumnCount`; `headerData`/`footerData` get an empty cell in front. Default false.
+   *
+   * The column is a real column: the indices of all other columns are one higher – use properties where you can
+   * ({@link TableApi.getColumnIndex}). With `bodyData` or own area models the flag is ignored (with a warning), because
+   * their columns would shift – put a `RowNumberColumnDef` into the column definitions of your models yourself.
+   *
+   * @example
+   * const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs, rowNumbersVisible: true });
+   *
+   * @since 1.1.93
+   */
+  rowNumbersVisible: boolean | Partial<RowNumberOptionsIf>;
   /** Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34. */
   defaultRowHeights: DefaultRowHeightsIf;
   /** The columns: property, header label, width, classes, renderers, sorting, editing. See {@link ColumnDef}. */
@@ -176,6 +194,8 @@ export class TableFactory {
       }
     }
 
+    TableFactory.addRowNumberColumn(p);
+
     if (p.columnCount === undefined) {
       if (p.columnDefs?.length) {
         p.columnCount = p.columnDefs.length;
@@ -232,7 +252,9 @@ export class TableFactory {
             p.defaultRowHeights.body,
             p.columnDefs
           );
-          const checkboxExtraColumnVisible = p.columnDefs[0].property === "CheckboxColumn";
+          // the checkbox column is the first one – behind a RowNumberColumnDef the second one
+          const checkboxExtraColumnVisible =
+            p.columnDefs[getLeadingRowNumberColumnCount(p.columnDefs)]?.property === "CheckboxColumn";
           if (checkboxExtraColumnVisible || p.tableOptions?.showCheckboxWihoutExtraColumn) {
             p.bodyAreaModel.rowSelectionModel = new TreeCheckboxModel(treeRows);
           }
@@ -286,6 +308,40 @@ export class TableFactory {
     );
   }
 
+
+  /**
+   * `rowNumbersVisible`: puts a RowNumberColumnDef in front of the column definitions (and an empty cell in front of
+   * `headerData`/`footerData`) and fixes it on the left. Only where the factory builds the models from the column
+   * definitions – with `bodyData` or own area models every column would shift by one.
+   */
+  private static addRowNumberColumn(p: Partial<CreateTableModelPara>): void {
+    if (!p.rowNumbersVisible) {
+      return;
+    }
+    if (p.bodyData || p.headerAreaModel || p.bodyAreaModel || p.footerAreaModel) {
+      console.warn("TableFactory.createTableModel: rowNumbersVisible is ignored with bodyData or own area models " +
+        "(their columns would shift) – put a RowNumberColumnDef into the column definitions yourself.");
+      return;
+    }
+    const columnDefs = p.columnDefs ?? [];
+    if (isRowNumberColumnDef(columnDefs[0])) {
+      return; // already there
+    }
+    const options = p.rowNumbersVisible === true ? {} : p.rowNumbersVisible;
+    const rowNumberColumnDef = new RowNumberColumnDef(options);
+    p.columnDefs = [rowNumberColumnDef, ...columnDefs]; // a new array: the caller's array stays as it is
+    p.fixedLeftColumnCount = (p.fixedLeftColumnCount ?? 0) + 1;
+    if (p.columnCount !== undefined) {
+      p.columnCount++;
+    }
+    if (p.headerData?.length) {
+      const last = p.headerData.length - 1;
+      p.headerData = p.headerData.map((row, i) => [i === last ? rowNumberColumnDef.headerLabel : "", ...row]);
+    }
+    if (p.footerData?.length) {
+      p.footerData = p.footerData.map(row => ["", ...row]);
+    }
+  }
 
 
   /**
@@ -368,7 +424,8 @@ export class TableFactory {
   ): TableModelIf {
 
     const defaultRowHeights = tableOptions.defaultRowHeights;
-    const checkboxExtraColumnVisible = columnDefs[0].property === "CheckboxColumn";
+    const checkboxExtraColumnVisible =
+      columnDefs[getLeadingRowNumberColumnCount(columnDefs)]?.property === "CheckboxColumn";
 
     if (rows?.length && isTreeRow(rows[0])) {
       // Tree:

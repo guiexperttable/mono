@@ -15,6 +15,15 @@
   text-align: left;
 }
 
+/* Row numbers (RowNumberColumnDef) in a tree: no tree look – right aligned like in a flat table (since 1.1.93) */
+.ge-table-col-div.ge-table-row-number.ge-table-tree-cell {
+  text-align: right;
+}
+.ge-table-row-number.ge-table-tree-cell .ge-table-label-div {
+  display: block;
+  padding: 0;
+}
+
 .ge-padding-property-checkbox {
   padding-left: 0;
 }

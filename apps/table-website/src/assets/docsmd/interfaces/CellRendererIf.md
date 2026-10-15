@@ -45,6 +45,7 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/),
 - [`NumberCellRenderer`](../classes/NumberCellRenderer.md)
 - [`PositiveAndNegativeNumberRenderer`](../classes/PositiveAndNegativeNumberRenderer.md)
 - [`ProgressBarCellRenderer`](../classes/ProgressBarCellRenderer.md)
+- [`RowNumberCellRenderer`](../classes/RowNumberCellRenderer.md)
 - [`SelectCellRenderer`](../classes/SelectCellRenderer.md)
 - [`SimpleArrayCellRenderer`](../classes/SimpleArrayCellRenderer.md)
 - [`StarRatingCellRenderer`](../classes/StarRatingCellRenderer.md)

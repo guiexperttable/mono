@@ -30,6 +30,11 @@ export interface AddColumnDivPara {
   sortState?: SortState;
   /** Accessible name of the row checkbox (`showCheckboxWihoutExtraColumn`), e.g. "Select row 5". @since 1.1.91 */
   checkboxAriaLabel?: string;
+  /**
+   * Index of the first data column – the column of the checkbox of `showCheckboxWihoutExtraColumn` and of the tree
+   * label. 0, behind a {@link RowNumberColumnDef} 1. Default 0. @since 1.1.93
+   */
+  firstDataColumnIndex?: number;
 }
 
 /** @category DOM */
@@ -249,7 +254,7 @@ export class ConvenienceDomService {
     para: AddColumnDivPara
   ): HTMLDivElement {
 
-    const {parent, geo, rowIndex=-1, columnIndex=-1, areaIdent, sideIdent, text="", treeArrow, tableOptions, checkedType=undefined, sortState, checkboxAriaLabel} = para;
+    const {parent, geo, rowIndex=-1, columnIndex=-1, areaIdent, sideIdent, text="", treeArrow, tableOptions, checkedType=undefined, sortState, checkboxAriaLabel, firstDataColumnIndex=0} = para;
     const treeOptions = tableOptions?.treeOptions;
     const checkboxWithoutExtraColumn = tableOptions?.showCheckboxWihoutExtraColumn;
 
@@ -283,12 +288,12 @@ export class ConvenienceDomService {
     //   this.addToggleDiv(div, toggleIcon, treeOptions, rowIndex, columnIndex, areaIdent);
     // }
 
-    if (checkboxWithoutExtraColumn && columnIndex === 0 && checkedType) {
+    if (checkboxWithoutExtraColumn && columnIndex === firstDataColumnIndex && checkedType) {
       this.addCheckboxToDiv(div, checkedType, areaIdent, rowIndex, checkboxAriaLabel);
 
     }
     if (text) {
-      const firstTreeColumn = (treeArrow !== "none" && columnIndex === 0);
+      const firstTreeColumn = (treeArrow !== "none" && columnIndex === firstDataColumnIndex);
       this.addLabelDiv(div, text, firstTreeColumn, rowIndex, columnIndex, areaIdent);
     }
 

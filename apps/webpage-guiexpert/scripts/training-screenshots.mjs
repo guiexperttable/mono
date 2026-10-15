@@ -29,6 +29,7 @@ const DEMOS = {
   "footer-totals": { slug: "footer-totals", search: "berlin" },
   "custom-area-model": { slug: "custom-area-model", button: "row 1,000,000" },
   "fixed-columns": { slug: "fixed-columns", button: "→ scroll right" },
+  "row-numbers": { slug: "fixed-columns", button: "sort by total ↓", numbers: [[2], [6]] },
   "table-options": { slug: "table-options" },
   "sorting": { slug: "sorting", button: "sort by status" },
   "filtering": { slug: "filtering", search: "berlin" },
@@ -72,6 +73,13 @@ for (const theme of ["light", "dark"]) {
     await page.waitForTimeout(step.wait ?? 500);
     if (step.search) { await demo.locator(".td-toolbar input[type=search]").fill(step.search); await page.waitForTimeout(300); }
     if (step.button) { await demo.getByRole("button", { name: step.button }).click(); await page.waitForTimeout(400); }
+    if (step.numbers) {                                   // click the first row number, Shift-click the others
+      for (const [i, [row]] of step.numbers.entries()) {
+        await demo.locator(`.td-host .ge-table-body-west [data-row-index="${row}"][data-col-index="0"]`).first()
+          .click({ modifiers: i ? ["Shift"] : [] });
+        await page.waitForTimeout(250);
+      }
+    }
     if (step.drag) {
       const [[r1, c1], [r2, c2]] = step.drag;
       const a = await demo.locator(cell(r1, c1)).first().boundingBox();

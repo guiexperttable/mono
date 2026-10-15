@@ -13,6 +13,7 @@ import { GetT } from "../common/get-t";
 import { CheckboxModel } from "../../checkbox/checkbox-model";
 import { AllRowsCheckboxModel } from "../../checkbox/all-rows-checkbox-model";
 import {isCheckboxColumnDef} from "../../instanceof-workaround";
+import { getLeadingRowNumberColumnCount } from "../common/row-number-columns";
 import { FalseFn, TrueFn } from "../common/boolean-function";
 import { SizeIf } from '../common/size.if';
 import { Size } from '../common/size';
@@ -81,14 +82,14 @@ export class TableModel implements TableModelIf {
         this.columnCount = this.columnSizes?.length;
       }
     }
-    if (this.columnDefs?.length
-      && isCheckboxColumnDef(this.columnDefs[0])
+    // the CheckboxColumnDef is the first column – behind a RowNumberColumnDef (since 1.1.93) the second one
+    const checkboxColumnDef = this.columnDefs?.[getLeadingRowNumberColumnCount(this.columnDefs)];
+    if (isCheckboxColumnDef(checkboxColumnDef)
       && !bodyAreaModel.rowSelectionModel) {
       bodyAreaModel.rowSelectionModel = new CheckboxModel();
     }
     // the header checkbox of a CheckboxColumnDef checks / unchecks all body rows and shows their state
-    if (this.columnDefs?.length
-      && isCheckboxColumnDef(this.columnDefs[0])
+    if (isCheckboxColumnDef(checkboxColumnDef)
       && !headerAreaModel.rowSelectionModel) {
       headerAreaModel.rowSelectionModel = new AllRowsCheckboxModel(bodyAreaModel);
     }

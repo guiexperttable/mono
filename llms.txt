@@ -32,6 +32,7 @@ This is a monorepo containing multiple packages:
 - Tree table (hierarchical view)
 - Accessibility: WAI-ARIA grid/treegrid for screen readers (aria-rowcount/rowindex with virtual scrolling, aria-activedescendant focus, aria-sort, aria-selected, live-region announcements; options ariaLabel, ariaLabelledBy, ariaDescribedBy, ariaTexts; tableApi.announce()) and keyboard navigation (arrows, Home/End, Ctrl+Home/End, Page Up/Down, Enter, header focus) – since 1.1.91
 - Overlays: "Loading…" with a CSS spinner (tableApi.showLoadingOverlay(text?), hideOverlay(), getOverlayState(); `loading` prop in all framework wrappers, no table re-creation) and automatic "No rows to show" / "No matching rows" (tableOptions.overlayOptions: texts, autoNoRows, blockInteractionWhileLoading, loadingDelayInMs, getOverlayElement; CSS variables --ge-table-overlay-*, --ge-table-spinner-*) – since 1.1.92
+- Row numbers: TableFactory.createTableModel({ rows, rowNumbersVisible: true | { mode: "display" | "original", format, headerLabel, exported, minWidthInPx } }) or new RowNumberColumnDef() as first column; fixed left, width follows the largest number, role="rowheader", click selects the row, "#" selects all, not in copy/Excel unless exported; column indices shift by one – tableApi.getColumnIndex(property) – since 1.1.93
 - Custom filtering
 - In-place cell editing
 - User-defined key and mouse events

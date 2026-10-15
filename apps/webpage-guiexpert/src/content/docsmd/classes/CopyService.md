@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L20)
+[src/lib/table/service/copy-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L21)
 
 ___
 
@@ -61,7 +61,7 @@ CopyService.maxCopyCells = 5_000_000; // allow bigger copies
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L18)
+[src/lib/table/service/copy-service.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L19)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L21)
+[src/lib/table/service/copy-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L22)
 
 ## Methods
 
@@ -99,7 +99,7 @@ A promise that resolves when the content has been successfully copied to the cli
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L88)
+[src/lib/table/service/copy-service.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L100)
 
 ___
 
@@ -129,7 +129,7 @@ A promise that resolves with the copied text if successful, or rejects if an err
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L100)
+[src/lib/table/service/copy-service.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L112)
 
 ___
 
@@ -168,4 +168,4 @@ Throws an error if neither selection nor focus is defined.
 
 #### Defined in
 
-[src/lib/table/service/copy-service.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L37)
+[src/lib/table/service/copy-service.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/copy-service.ts#L38)

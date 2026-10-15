@@ -66,7 +66,7 @@
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L41)
+[src/lib/table/service/convenience-dom.service.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L46)
 
 ## Properties
 
@@ -76,7 +76,7 @@
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L42)
+[src/lib/table/service/convenience-dom.service.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L47)
 
 ___
 
@@ -92,7 +92,7 @@ Width of the focus frame of a cell in px (WCAG 2.4.7: visible focus, not only a 
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L39)
+[src/lib/table/service/convenience-dom.service.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L44)
 
 ## Methods
 
@@ -117,7 +117,7 @@ Width of the focus frame of a cell in px (WCAG 2.4.7: visible focus, not only a 
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:427](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L427)
+[src/lib/table/service/convenience-dom.service.ts:432](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L432)
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:305](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L305)
+[src/lib/table/service/convenience-dom.service.ts:310](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L310)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L132)
+[src/lib/table/service/convenience-dom.service.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L137)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L150)
+[src/lib/table/service/convenience-dom.service.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L155)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L474)
+[src/lib/table/service/convenience-dom.service.ts:479](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L479)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:248](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L248)
+[src/lib/table/service/convenience-dom.service.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L253)
 
 ___
 
@@ -249,7 +249,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:562](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L562)
+[src/lib/table/service/convenience-dom.service.ts:567](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L567)
 
 ___
 
@@ -275,7 +275,7 @@ focus through `aria-activedescendant`.
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:517](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L517)
+[src/lib/table/service/convenience-dom.service.ts:522](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L522)
 
 ___
 
@@ -297,7 +297,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:494](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L494)
+[src/lib/table/service/convenience-dom.service.ts:499](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L499)
 
 ___
 
@@ -322,7 +322,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:340](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L340)
+[src/lib/table/service/convenience-dom.service.ts:345](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L345)
 
 ___
 
@@ -347,7 +347,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L208)
+[src/lib/table/service/convenience-dom.service.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L213)
 
 ___
 
@@ -370,7 +370,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:380](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L380)
+[src/lib/table/service/convenience-dom.service.ts:385](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L385)
 
 ___
 
@@ -392,7 +392,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:543](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L543)
+[src/lib/table/service/convenience-dom.service.ts:548](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L548)
 
 ___
 
@@ -412,7 +412,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L110)
+[src/lib/table/service/convenience-dom.service.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L115)
 
 ___
 
@@ -433,7 +433,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L125)
+[src/lib/table/service/convenience-dom.service.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L130)
 
 ___
 
@@ -453,7 +453,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L65)
+[src/lib/table/service/convenience-dom.service.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L70)
 
 ___
 
@@ -473,7 +473,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L60)
+[src/lib/table/service/convenience-dom.service.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L65)
 
 ___
 
@@ -494,7 +494,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L53)
+[src/lib/table/service/convenience-dom.service.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L58)
 
 ___
 
@@ -514,7 +514,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L87)
+[src/lib/table/service/convenience-dom.service.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L92)
 
 ___
 
@@ -535,7 +535,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L70)
+[src/lib/table/service/convenience-dom.service.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L75)
 
 ___
 
@@ -555,7 +555,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L103)
+[src/lib/table/service/convenience-dom.service.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L108)
 
 ___
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L93)
+[src/lib/table/service/convenience-dom.service.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L98)
 
 ___
 
@@ -597,7 +597,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L82)
+[src/lib/table/service/convenience-dom.service.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L87)
 
 ___
 
@@ -617,7 +617,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L76)
+[src/lib/table/service/convenience-dom.service.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L81)
 
 ___
 
@@ -638,7 +638,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:578](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L578)
+[src/lib/table/service/convenience-dom.service.ts:583](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L583)
 
 ___
 
@@ -661,7 +661,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L191)
+[src/lib/table/service/convenience-dom.service.ts:196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L196)
 
 ___
 
@@ -682,7 +682,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:200](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L200)
+[src/lib/table/service/convenience-dom.service.ts:205](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L205)
 
 ___
 
@@ -709,7 +709,7 @@ Removes an attribute (via [DomServiceIf.removeAttribute](../interfaces/DomServic
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L171)
+[src/lib/table/service/convenience-dom.service.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L176)
 
 ___
 
@@ -730,7 +730,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L141)
+[src/lib/table/service/convenience-dom.service.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L146)
 
 ___
 
@@ -762,7 +762,7 @@ Hides a purely decorative element (border, hover, icon …) from screen readers:
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L185)
+[src/lib/table/service/convenience-dom.service.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L190)
 
 ___
 
@@ -784,7 +784,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L159)
+[src/lib/table/service/convenience-dom.service.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L164)
 
 ___
 
@@ -806,4 +806,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L47)
+[src/lib/table/service/convenience-dom.service.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L52)

@@ -8,6 +8,7 @@ import { CellRange } from "../data/common/cell-range";
 import { OnActionTriggeredIf } from "../action/on-action-triggered.if";
 import { ActionId } from "../action/action-id.type";
 import type { SelectionModel, SelectionSnapshot } from "./selection-model";
+import { isRowNumberColumnDef } from "../instanceof-workaround";
 
 
 /** @category Internals */
@@ -97,6 +98,10 @@ export class SelectionService implements OnActionTriggeredIf {
       this.ignoreNextClick = false;
       return false;
     }
+    if (evt.areaIdent === 'header' && evt.clickCount === 1 && this.isRowNumberColumn(evt.columnIndex)
+      && evt.rowIndex === this.tableScope.tableModel.getAreaModel('header').getRowCount() - 1) {
+      return this.selectAllByRowNumberHeader(); // the "#" corner, like in a spreadsheet
+    }
     if (evt.areaIdent !== 'body' || evt.rowIndex < 0 || evt.columnIndex < 0 || evt.clickCount > 1) {
       return false; // header/footer (before: cleared the selection, focused a body cell), double click
     }
@@ -117,6 +122,9 @@ export class SelectionService implements OnActionTriggeredIf {
           const ctrlKey = !!(evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey);
           const altKey = !!evt.originalEvent?.altKey;
 
+          // a click on a row number with selection type "range": whole rows (since 1.1.93)
+          const wholeRows = this.isRowNumberColumn(evt.columnIndex) && SelectionService.isRangeSelection(sm);
+
           if (shiftKey && this.previousEvt) {
             if (this.anchorRanges.length && SelectionService.hasSnapshots(sm)) {
               // what the anchor click (or the previous shift-click) selected is replaced by the new rectangle
@@ -124,6 +132,10 @@ export class SelectionService implements OnActionTriggeredIf {
               sm.restoreSnapshot({ ...current, ranges: current.ranges.filter(r => !this.anchorRanges.includes(r)) });
             }
             const range = this.createRangeByEvents(evt, this.previousEvt);
+            if (wholeRows) {
+              range.c1 = 0;
+              range.c2 = Number.MAX_SAFE_INTEGER;
+            }
             sm.addSelection(range);
             this.anchorRanges = [range];
             this.tableScope.onSelectionChanged(sm);
@@ -132,7 +144,9 @@ export class SelectionService implements OnActionTriggeredIf {
 
           // this click is the new anchor
           const before = sm.getRanges().slice();
-          if (ctrlKey && altKey) {
+          if (wholeRows) {
+            this.clickRowNumber(sm, evt.rowIndex, evt.columnIndex, shiftKey, ctrlKey, altKey);
+          } else if (ctrlKey && altKey) {
             sm.removeSelection(CellRange.singleCell(evt.rowIndex, evt.columnIndex));
           } else if (ctrlKey) {
             sm.togglePoint(evt.rowIndex, evt.columnIndex);
@@ -175,6 +189,12 @@ export class SelectionService implements OnActionTriggeredIf {
         }
         if (actionId === "TOGGLE_SELECTION") {
           const [row, col] = fm.getFocus();
+          if (this.isRowNumberColumn(col) && SelectionService.isRangeSelection(sm)) {
+            this.clickRowNumber(sm, row, col, false, true, false); // like Ctrl/⌘-click on the number: the whole row
+            this.tableScope.onSelectionChanged(sm);
+            this.tableScope.repaint();
+            return true;
+          }
           sm.togglePoint(row, col);
           this.tableScope.repaint();
           return true;
@@ -184,6 +204,49 @@ export class SelectionService implements OnActionTriggeredIf {
     return false;
   }
 
+
+  /** True if the column is a row number column ({@link RowNumberColumnDef}). */
+  private isRowNumberColumn(columnIndex: number): boolean {
+    return columnIndex > -1 && isRowNumberColumnDef(this.tableScope.tableModel?.getColumnDef(columnIndex));
+  }
+
+  /** A click on the header cell of the row numbers: everything (selection types "row" and "range"). */
+  private selectAllByRowNumberHeader(): boolean {
+    const sm = this.getSelectionModel?.();
+    const type = (sm as unknown as { selectionType?: string } | undefined)?.selectionType;
+    if (!sm || (type !== 'row' && type !== 'range')) {
+      return false;
+    }
+    this.batch(() => {
+      sm.selectAll();
+      this.tableScope.onSelectionChanged(sm);
+    });
+    this.announce(texts => texts.allSelected());
+    return true;
+  }
+
+  /** Selection type "range", click on a row number: the whole row – new, toggled (Ctrl/⌘) or removed (Ctrl/⌘+Alt). */
+  private clickRowNumber(sm: SelectionModelIf, rowIndex: number, numberColumn: number, shiftKey: boolean, ctrlKey: boolean, altKey: boolean): void {
+    const row = new CellRange(rowIndex, 0, rowIndex, Number.MAX_SAFE_INTEGER);
+    if (ctrlKey && altKey) {
+      sm.removeSelection(row);
+    } else if (ctrlKey) {
+      if (sm.isSelected(rowIndex, numberColumn)) { // a selected row includes its number cell
+        sm.removeSelection(row);
+      } else {
+        sm.addSelection(row);
+      }
+    } else {
+      if (!shiftKey && sm.hasSelection()) {
+        sm.clear();
+      }
+      sm.addSelection(row);
+    }
+  }
+
+  private static isRangeSelection(sm: SelectionModelIf): boolean {
+    return (sm as unknown as { selectionType?: string }).selectionType === 'range';
+  }
 
   /** Speaks a message for screen readers – only if the selection model can select anything. */
   private announce(text: (texts: AriaTextsIf) => string): void {

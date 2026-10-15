@@ -512,8 +512,8 @@ describe('TableFactory', () => {
       expect(tm.getColumnCount()).toBe(3);
     });
 
-    // BUG: buildByTypedRows reads columnDefs[0].property without a guard and crashes for an empty column list.
-    it.fails('does not throw for an empty list of column definitions', () => {
+    // Fixed in 1.1.93 (row numbers): buildByTypedRows read columnDefs[0].property without a guard.
+    it('does not throw for an empty list of column definitions', () => {
       expect(() => TableFactory.buildByTypedRows<Order>(orders(), [])).not.toThrow();
     });
 

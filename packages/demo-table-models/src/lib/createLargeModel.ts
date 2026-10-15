@@ -5,6 +5,7 @@ import {
   FalseFn, NumberCellProgressBarCellRenderer,
   px120,
   px200,
+  RowNumberColumnDef,
   SelectionModel,
   TableFactory,
   TableModelAndOptions,
@@ -48,12 +49,23 @@ function createLargeTableOptions(): TableOptions {
   };
 }
 
-export function createLargeModelAndOptions(rowcount: number = 1000000): TableModelAndOptionsIf {
+/**
+ * Two million rows (or `rowcount`) without row objects: an own body model computes the cells.
+ *
+ * @param rowcount - number of rows
+ * @param rowNumbersVisible - since 1.1.93: a fixed row number column in front ("#", 1 … 2,000,000)
+ */
+export function createLargeModelAndOptions(rowcount: number = 1000000, rowNumbersVisible = false): TableModelAndOptionsIf {
   const tableOptions = createLargeTableOptions();
-  const columnDefs: ColumnDefIf[] = createLargeColumnDefs();
-  const bodyAreaModel = new LargeBodyModel(rowcount);
+  // an own body model: the factory flag rowNumbersVisible does not apply – the column definition goes in front,
+  // the body model shifts its column indices by one
+  const columnDefs: ColumnDefIf[] = rowNumbersVisible
+    ? [new RowNumberColumnDef({ format: n => n.toLocaleString('en-US') }), ...createLargeColumnDefs()]
+    : createLargeColumnDefs();
+  const offset = rowNumbersVisible ? 1 : 0;
+  const bodyAreaModel = new LargeBodyModel(rowcount, offset);
   return new TableModelAndOptions(TableFactory.createTableModel({
-    bodyAreaModel, columnDefs, tableOptions, fixedLeftColumnCount: 0
+    bodyAreaModel, columnDefs, tableOptions, fixedLeftColumnCount: offset
   }), tableOptions);
 }
 
@@ -63,7 +75,11 @@ export class LargeBodyModel extends AreaModel {
 
   private barRenderer:CellRendererIf;
 
-  constructor(private rowcount: number = 1000000) {
+  /**
+   * @param rowcount - number of rows
+   * @param columnOffset - columns in front of the data columns (1 for a RowNumberColumnDef)
+   */
+  constructor(private rowcount: number = 1000000, private readonly columnOffset = 0) {
     super();
     this.barRenderer = new NumberCellProgressBarCellRenderer(rowcount, false);
   }
@@ -80,14 +96,16 @@ export class LargeBodyModel extends AreaModel {
     return 34; // all rows have the same height -> fast rendering at any scroll position
   }
 
-  override getValueAt(rowIndex: number, columnIndex: number): number | string {
+  override getValueAt(rowIndex: number, col: number): number | string {
+    const columnIndex = col - this.columnOffset;
+    if (columnIndex < 0) return '';
     if (columnIndex === 0) return 'id' + rowIndex;
     if (columnIndex === 1) return this.nf.format(rowIndex);
     return rowIndex;
   }
 
   override getCellRenderer(_rowIndex: number, columnIndex: number): CellRendererIf | undefined {
-    if (columnIndex==2) return this.barRenderer;
+    if (columnIndex - this.columnOffset === 2) return this.barRenderer;
     return undefined;
   }
 

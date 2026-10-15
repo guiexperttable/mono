@@ -188,7 +188,17 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       hat sie) · Mehrspalten-Sortierung per Shift-Klick im Header (Speicher und `applyState` können sie schon) ·
       Programmatische Änderungen an Haken über das Modell werden erst mit der nächsten Änderung oder `destroy()`
       gespeichert · Verschieben über die Grenze fixierter Spalten (Drag und Restore) prüfen.
-- [ ] **004 Zeilennummern** (`prompts/004-zeilennummern.md`).
+- [x] **004 Zeilennummern** – Branch `feat/row-numbers`, Design `prompts/004-zeilennummern.design.md`:
+      `RowNumberColumnDef` (+ `isRowNumberColumnDef`, `RowNumberCellRenderer`, `RowNumberOptions`), Flag
+      `rowNumbersVisible` in `TableFactory.createTableModel` (Spalte vorne, fixiert), Zählweise `display`/`original`,
+      `format`, Breite folgt der größten Nummer, `role="rowheader"`, Klick wählt die Zeile (`range`), „#“ wählt alles,
+      kein Export ohne `exported: true`, nicht zieh-/sortier-/resizebar, Checkbox/Baumpfeil rücken hinter die Nummer;
+      neu `api.getColumnIndex(property)`. Selbständig umgesetzt (Entscheidungen im Design ohne Freigabe-Runde).
+      Offen: Demo-Repo entfällt (kein neues Kapitel), Angular-Demo erst nach dem Release.
+- [ ] Folgepunkte 004: Gruppenzeilen (006) nicht nummerieren (`isGroupRow?` am Body-Modell, s. Design § 2.7) · Row Drag
+      (009) kann die Nummernspalte als Griff nutzen · `MouseHandler.getArrowColumnIndex` ignoriert
+      `showCheckboxWihoutExtraColumn` (anders als `RenderScope.getTreeArrowColumnIndex`, schon vor 004) · Speicher der
+      Positions-`Map` im Modus `original` (evtl. Index am Modell statt Map).
 - [ ] **005 Aggregation und Gesamtzeile** (Helfer, fertiges Footer-Modell, Auswahl-Summen) – Grundlage für 006–008
       (`prompts/005-aggregation-gesamtzeile.md`).
 - [ ] **006 Row Grouping** (`prompts/006-row-grouping.md`). Die Website sagt heute noch „Row grouping … – tree tables
@@ -338,8 +348,8 @@ Verhalten steht als `// NOTE:` in den Specs.
       (`abstract-area-model.ts:157`).
 - [x] `setColumnWidth` aktualisierte die x-Positionen nicht → `GeMouseEvent.columnLeft` veraltet (Branch
       `fix/columns-scrolling`).
-- [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`); `buildByTypedRows(rows, [])` wirft
-      (`table-factory.ts:371`).
+- [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`). (`buildByTypedRows(rows, [])` wirft
+      nicht mehr – nebenbei behoben mit 004, 1.1.93.)
 - [x] `TreeFactory`: `deepMaxLimit` off-by-one behoben (Zeilen bis Tiefe n, vorher n + 1); `TreeCheckboxModel.checkAll()`
       endlose Rekursion behoben (Argument optional, Default: ganzer Baum; entfernt weiterhin die Häkchen).
 - [ ] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei).
@@ -529,6 +539,10 @@ Objekt-Tabelle hat `ge-focused-row`.
   bzw. `stateChanged` in allen Wrappern. `isSame` ist `@deprecated` (wurde nie benutzt). Zeilen ohne `id`/`uuid` und
   ohne eigene `getRowId` werden nicht mehr gespeichert (vorher diente das JSON der ganzen Zeile als Id – auch für
   aufgeklappte Baumknoten; deren gespeicherter Zustand geht dann einmal verloren).
+- **Zeilennummern (004, ab 1.1.93)**: neu `rowNumbersVisible` / `RowNumberColumnDef`, `api.getColumnIndex()`. Ohne
+  Nummernspalte keine Verhaltensänderung. Mit Nummernspalte an Index 0 sitzen `CheckboxColumnDef`, Baumpfeil und
+  `showCheckboxWihoutExtraColumn` an Index 1 (vorher fest an 0). `TableFactory.buildByTypedRows(rows, [])` wirft nicht
+  mehr. `RenderScope.getTreeArrowColumnIndex()` liefert `number` statt `0 | 1` (protected).
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

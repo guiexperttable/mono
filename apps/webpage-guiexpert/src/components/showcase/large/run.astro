@@ -4,7 +4,7 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
 <div class="px-8">
   <div
-      style="height: calc(100vh - 140px); width: 540px;"
+      style="height: calc(100vh - 140px); width: 640px;"
       class:list={[id, 'large-demo']}></div>
 </div>
 
@@ -23,7 +23,8 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
   const tableEle = document.querySelector('.' + id);
   const maxRowCount = 2*1000*1000;
-  const {tableModel, tableOptions}  = createLargeModelAndOptions(maxRowCount);
+  // second argument: row numbers "#" in front (since 1.1.93)
+  const {tableModel, tableOptions}  = createLargeModelAndOptions(maxRowCount, true);
 
   const tableScope = new TableScope(
     tableEle,

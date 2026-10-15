@@ -27,7 +27,9 @@ import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
 import { TableCellUpdateEventIf } from './data/common/event/input/table-cell-update-event.if';
-import { isAreaModelTree, isCheckboxCellRenderer, isTreeRow } from './instanceof-workaround';
+import { isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { getLeadingRowNumberColumnCount } from './data/common/row-number-columns';
+import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 import { AriaGridInfo } from './aria/aria-grid-info';
 import { TreeAriaInfo, TreeAriaModel } from './aria/tree-aria-info';
 import { AriaTexts } from './aria/aria-texts';
@@ -308,6 +310,28 @@ export class RenderScope extends EleScope {
    * to the table's appearance and behavior after a scroll event occurs.
    */
   override adjustAfterScrolling() {
+    if (!this.adjustingRowNumberWidth && this.adjustRowNumberColumnWidth()) {
+      // the fixed west area got wider or narrower: new geometry first (it renders the table again – once: the flag
+      // stops a second width change in the nested pass)
+      this.adjustingRowNumberWidth = true;
+      try {
+        if (this.tableModel.getColumnDefs?.()?.some(def => def.width?.unit === 'weight' || def.width?.unit === '%')) {
+          // % and weight columns share the width left of the fixed columns – it changed
+          this.tableModel.recalcPadding();
+          const available = this.getAvailableColumnWidth();
+          if (available > 0) {
+            this.tableModel.setParentWidth(available);
+            this.tableModel.init();
+          }
+        }
+        this.tableModel.recalcPadding();
+        this.resetSizeOfWrapperDiv();
+        this.adjustContainersAndRows();
+      } finally {
+        this.adjustingRowNumberWidth = false;
+      }
+      return;
+    }
     for (const cleaning of this.removables) {
       cleaning.remove();
     }
@@ -389,6 +413,13 @@ export class RenderScope extends EleScope {
         'ge-table-body-west-vertical-border'));
     }
     this.updateOverlay(); // "no rows" after setRows / filter / tree toggle; one comparison when nothing changed
+    if (this.rowNumberWidth?.approximate && !this.rowNumberRemeasureScheduled && this.findRowNumberLabel()) {
+      // the row number width was measured before a number cell existed: measure again with its font, once
+      this.rowNumberRemeasureScheduled = true;
+      requestAnimationFrame(() => {
+        if (this.hostElement.isConnected) this.repaint();
+      });
+    }
     this.afterRenderPass();
   }
 
@@ -983,7 +1014,9 @@ export class RenderScope extends EleScope {
     const ds = this.dom.domService;
     const info = this.getAriaGridInfo();
     const header = areaIdent === 'header';
-    ds.setAttribute(cell, 'role', header ? 'columnheader' : 'gridcell');
+    // the numbers of a RowNumberColumnDef name their rows (screen readers announce them with the row)
+    const rowHeader = areaIdent === 'body' && isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex));
+    ds.setAttribute(cell, 'role', header ? 'columnheader' : rowHeader ? 'rowheader' : 'gridcell');
     const colIndex = info.colIndex(columnIndex);
     if (colIndex > 0) {
       ds.setAttribute(cell, 'aria-colindex', `${colIndex}`);
@@ -1246,7 +1279,7 @@ export class RenderScope extends EleScope {
       });
     }
 
-    if (areaModel.areaIdent === 'header' && this.tableOptions.columnsResizable) {
+    if (areaModel.areaIdent === 'header' && this.tableOptions.columnsResizable && this.isColumnResizable(range.c1)) {
       this.renderHeaderCellResizeHandle({
         rowIndex: range.r1,
         columnIndex: range.c1,
@@ -1382,7 +1415,7 @@ export class RenderScope extends EleScope {
               gammaRange: true
             });
           }
-          if (areaIdent === 'header' && this.tableOptions.columnsResizable) {
+          if (areaIdent === 'header' && this.tableOptions.columnsResizable && this.isColumnResizable(index)) {
             this.renderHeaderCellResizeHandle({
               rowIndex: rowIndex,
               columnIndex: index,
@@ -1413,18 +1446,109 @@ export class RenderScope extends EleScope {
    *
    * @protected
    *
-   * @returns {0 | 1} The column index of the tree arrow column.
-   *                Returns 0 if the checkbox is not visible,
-   *                otherwise returns 1.
+   * @returns {number} The column index of the tree arrow column: the first data column (0, behind a row number
+   *                column 1), one more with a visible row checkbox column.
    */
-  protected getTreeArrowColumnIndex(): 0 | 1 {
+  protected getTreeArrowColumnIndex(): number {
+    // behind a RowNumberColumnDef (since 1.1.93) everything moves one column to the right
+    const offset = this.getFirstDataColumnIndex();
     if (this.tableOptions.showCheckboxWihoutExtraColumn) {
-      return 0;
+      return offset;
     }
     if (this.tableModel.isRowCheckboxVisible()) {
-      return 1;
+      return offset + 1;
     }
-    return 0;
+    return offset;
+  }
+
+  /**
+   * Index of the first column that is not a row number column: 1 behind a {@link RowNumberColumnDef}, otherwise 0.
+   * The checkbox of `showCheckboxWihoutExtraColumn` and the tree arrow are bound to it.
+   *
+   * @returns {number} 0 or 1
+   * @since 1.1.93
+   */
+  getFirstDataColumnIndex(): number {
+    return getLeadingRowNumberColumnCount(this.tableModel.getColumnDefs?.());
+  }
+
+  /** false for a row number column: it has no resize handle (its width follows the numbers). */
+  protected isColumnResizable(columnIndex: number): boolean {
+    return !isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex));
+  }
+
+  /**
+   * The last measured text of the row number column and its width (measured again only when the text changes).
+   * `approximate`: measured with the font of the host before a number cell existed – measured again with the font of
+   * a rendered number cell in the next render pass.
+   */
+  private rowNumberWidth?: { text: string; width: number; approximate: boolean };
+  /** true while the containers are adjusted to a new row number width (no second change in that nested pass). */
+  private adjustingRowNumberWidth = false;
+  /** the approximate first width is measured again once (see adjustAfterScrolling). */
+  private rowNumberRemeasureScheduled = false;
+
+  /**
+   * Fits the width of a leading row number column ({@link RowNumberColumnDef}) to its largest number. Cheap on every
+   * render pass: only the text of the largest number is compared; it is measured (canvas) only when it changed.
+   *
+   * @returns {boolean} true if the width changed (the containers must be adjusted)
+   * @since 1.1.93
+   */
+  protected adjustRowNumberColumnWidth(): boolean {
+    if (!this.getFirstDataColumnIndex()) {
+      return false;
+    }
+    if ((this.tableModel as { overridingColumnWidth?: number }).overridingColumnWidth! > -1) {
+      return false; // one width for all columns (overridingColumnWidth) – the row numbers get it, too
+    }
+    const columnDef = this.tableModel.getColumnDef(0) as RowNumberColumnDef;
+    const text = columnDef.getWidestText(this.tableModel.getBodyModel());
+    const cached = this.rowNumberWidth;
+    let width = cached?.text === text ? cached.width : -1;
+    if (width < 0 || (cached?.approximate && this.findRowNumberLabel())) {
+      const [measured, approximate] = this.measureRowNumberText(text);
+      width = Math.max(columnDef.options.minWidthInPx, measured);
+      this.rowNumberWidth = { text, width, approximate };
+    }
+    if (this.tableModel.getColumnWidth(0) === width || this.tableModel.isColumnVisible?.(0) === false) {
+      return false;
+    }
+    this.tableModel.setColumnWidth(0, width);
+    return this.tableModel.getColumnWidth(0) === width; // false if the model did not take it (no endless re-render)
+  }
+
+  /** A rendered label of a number cell – its font and padding are what the numbers need. */
+  private findRowNumberLabel(): HTMLElement | null {
+    return this.hostElement.querySelector<HTMLElement>('.ge-table-row-number .ge-table-label');
+  }
+
+  /**
+   * Width in px of a row number text: with the font and padding of a rendered number cell label; before the first
+   * number cell exists with the font of the host and 6 px padding on each side (then `approximate` is true).
+   * Digits are measured as "0" (tabular figures: all digits are as wide as the widest).
+   *
+   * @returns {[number, boolean]} the width and whether it is approximate
+   */
+  protected measureRowNumberText(text: string): [number, boolean] {
+    const label = this.findRowNumberLabel();
+    const style = getComputedStyle(label ?? this.hostElement);
+    const padding = label
+      ? (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0)
+      : 2 * 6;                                       // .ge-table-row-number .ge-table-label { padding-inline: 6px }
+    const extra = padding + 4;                       // cell borders and rounding
+    const widestDigits = text.replace(/[0-9]/g, '0');
+    let ctx: CanvasRenderingContext2D | null = null;
+    try {
+      ctx = document.createElement('canvas').getContext('2d');
+    } catch (_e) {
+      ctx = null;
+    }
+    if (!ctx) {
+      return [Math.ceil(text.length * 8 + extra), !label];
+    }
+    ctx.font = style.font || `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    return [Math.ceil(ctx.measureText(widestDigits).width + extra), !label];
   }
 
 
@@ -1445,7 +1569,13 @@ export class RenderScope extends EleScope {
 
     // the editor belongs to the body only (header row 0 has the same row index as body row 0)
     const editor = areaIdent === 'body' && this.editorRenderer && this.editorRendererRow === rowIndex && this.editorRendererColumn === index;
-    const cellRenderer = (editor) ? this.editorRenderer : areaModel.getCellRenderer(rowIndex, index);
+    const columnDef = this.tableModel.getColumnDef(index);
+    // row numbers come from the column definition – also for own area models without renderers
+    const rowNumberColumn = isRowNumberColumnDef(columnDef);
+    const cellRenderer = (editor)
+      ? this.editorRenderer
+      : (rowNumberColumn && areaIdent === 'body' ? columnDef.rendererMap.body : undefined)
+        ?? areaModel.getCellRenderer(rowIndex, index);
     const geo = { left, width, height, top, index };
     const rowObject = areaModel.getRowByIndex(rowIndex);
     let treeArrow: TreeArrowType = 'none';
@@ -1471,16 +1601,17 @@ export class RenderScope extends EleScope {
 
     let sortState = undefined;
     if (areaIdent === 'header') {
-      const columnDef = this.tableModel.getColumnDef(index);
       if (!columnDef?.sortIconVisible || columnDef?.sortIconVisible()) {
         sortState = columnDef?.sortState;
       }
     }
 
     const val = areaModel.getValueAt(rowIndex, index);
-    const text = cellRenderer ? '' : `${val ?? ''}`; // undefined/null → empty cell (e.g. parent rows of a tree)
+    // undefined/null → empty cell (e.g. parent rows of a tree); the footer of a row number column stays empty
+    const text = cellRenderer || (rowNumberColumn && areaIdent === 'footer') ? '' : `${val ?? ''}`;
     const checkedType = areaModel.isRowChecked(rowIndex);
-    const checkboxAriaLabel = (this.tableOptions.showCheckboxWihoutExtraColumn && index === 0 && checkedType)
+    const firstDataColumnIndex = this.getFirstDataColumnIndex();
+    const checkboxAriaLabel = (this.tableOptions.showCheckboxWihoutExtraColumn && index === firstDataColumnIndex && checkedType)
       ? this.getCheckboxAriaLabel(areaIdent, rowIndex)
       : undefined;
     const cell = this.dom.addColumnDiv(
@@ -1496,7 +1627,8 @@ export class RenderScope extends EleScope {
         tableOptions: this.tableOptions,
         checkedType,
         sortState,
-        checkboxAriaLabel
+        checkboxAriaLabel,
+        firstDataColumnIndex
       });
     const [rowspan, colspan] = this.applyCellAria(cell, areaIdent, areaModel, rowIndex, index);
 
@@ -1505,7 +1637,6 @@ export class RenderScope extends EleScope {
       this.dom.setAttribute(cell, 'title', tooltip);
     }
 
-    const columnDef = this.tableModel.getColumnDef(index);
     if (columnDef && columnDef.classes[areaIdent]) {
       this.dom.addClasses(columnDef.classes[areaIdent], cell);
     }
@@ -1551,8 +1682,8 @@ export class RenderScope extends EleScope {
       this.dom.addFocusBorderDivs(parent, geo, {});
       this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
     }
-    if (areaIdent === 'header') {
-      this.dom.setAttribute(cell, 'data-ge-action', 'drag-column');
+    if (areaIdent === 'header' && !rowNumberColumn) {
+      this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // the row numbers stay in front
     }
 
     const styles = areaModel.getCustomStyleAt(rowIndex, index);

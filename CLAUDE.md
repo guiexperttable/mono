@@ -137,12 +137,16 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Fabriken (`factory/`):
   - `TableFactory.createTableModel(Partial<CreateTableModelPara>)` – Universal-Einstieg
     (`rows`+`properties` | `bodyData`/`headerData`/`footerData` | `bodyAreaModel` …, `columnDefs`, `fixedLeftColumnCount`,
-    `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `tableOptions`).
+    `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`.
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
   getEditRenderer, editInputPipe })`. Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+- Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
+  `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
+  Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
+  `getLeadingRowNumberColumnCount(columnDefs)` bzw. `RenderScope.getFirstDataColumnIndex()` – nie hart `0`.
 
 ### 3.5 Rendering & Anpassung
 - `CellRendererIf.render(cellDiv, rowIndex, columnIndex, areaIdent, areaModel, cellValue, domService)` →
@@ -195,6 +199,17 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `START_EDITING`/`TOGGLE_SELECTION`/`ACTIVATE_CELL` (Header bleibt bedienbar). ARIA: Overlay `aria-hidden`, Host `aria-busy`, Texte über die
   Live-Region. Wrapper: Prop `loading` (kein Neuaufbau, nach Neuaufbau erneut angewendet; `false` blendet nur aus, was die Prop
   eingeblendet hat – ein eigenes Overlay der App aus `tableReady` bleibt).
+- **Zeilennummern (seit 1.1.93, Design `prompts/004-zeilennummern.design.md`)**: `TableFactory.createTableModel({ …,
+  rowNumbersVisible: true | Partial<RowNumberOptionsIf> })` stellt eine `RowNumberColumnDef` vor die Spalten und erhöht
+  `fixedLeftColumnCount` (nicht bei `bodyData`/eigenen Area-Modellen: Warnung). Echte Spalte → alle Indizes +1
+  (`api.getColumnIndex(property)`). Zählweise `display` (Sicht) / `original` (`getAllRows()`, Map-Cache), Text über
+  `format`. Gerendert vom `RowNumberCellRenderer` der Spaltendefinition – auch bei eigenen `AreaModel`s (`RenderScope`
+  nimmt ihn aus dem ColumnDef). Breite: am Anfang von `adjustAfterScrolling()` `adjustRowNumberColumnWidth()` (Text der
+  größten Nummer vergleichen, nur bei Änderung messen → `adjustContainersAndRows()`). Body-Zellen `role="rowheader"`;
+  kein Resize-Griff, kein `drag-column`, Drag-Ziel ≥ Versatz, `autoResizeColumns` lässt sie aus; Copy/Excel nur mit
+  `exported: true` (Excel mit Default-`format` als Zahl). Selektion `range`: Klick/Leertaste auf die Nummer = ganze Zeile;
+  Klick auf „#“ (unterste Header-Zeile) = `selectAll`. Baum: CSS `.ge-table-row-number.ge-table-tree-cell` hebt das
+  Baum-Layout der Nummernzellen auf. Breitenänderung mit Re-Entry-Schutz, %-/Gewichtsspalten werden neu verteilt.
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -299,7 +314,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 329 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 342 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -310,8 +325,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.556 Tests) |
-  | `test:browser` | echtes Chromium, ~540 Tests in 20 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.590 Tests) |
+  | `test:browser` | echtes Chromium, ~580 Tests in 21 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -332,7 +347,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~89 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
-    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state` …).
+    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
+    `row-numbers` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -347,7 +363,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 28 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 29 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -434,6 +450,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 22 | Warum nicht ag-Grid? (Vergleich, sachlich) | Website `post/top-framework-agnostic-…` |
 | 23 | Barrierefreie Tabelle (Screenreader + Tastatur) | `videos/02-barrierefreie-tabelle/`, Training-Kapitel `accessibility`, `apps/table-demo/aria.html` |
 | 24 | Lade-Spinner und leere Tabelle – ohne Library, nur CSS | `videos/03-lade-spinner/`, Training-Kapitel `live-data`, `apps/table-demo/overlay.html` |
+| 25 | Zeilennummern wie in Excel – eine Zeile Code (ohne Enterprise-Lizenz) | `videos/05-zeilennummern/`, Training-Kapitel `fixed-columns`, `apps/table-demo/row-numbers.html`, Showcase `large` |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

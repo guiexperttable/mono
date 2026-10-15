@@ -30,6 +30,7 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 
 - [`CheckboxColumnDef`](../classes/CheckboxColumnDef.md)
 - [`ColumnDef`](../classes/ColumnDef.md)
+- [`RowNumberColumnDef`](../classes/RowNumberColumnDef.md)
 
 ## Table of contents
 

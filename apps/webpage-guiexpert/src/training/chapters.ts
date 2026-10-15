@@ -211,7 +211,9 @@ export const CHAPTERS: Chapter[] = [
     lead: "ID stays on the left, Total on the right – 40 columns scroll in between.",
     learn: ["fix columns in the model", "know west, center and east", "see horizontal virtual scrolling at work"],
     api: ["CreateTableModelPara.fixedLeftColumnCount", "CreateTableModelPara.fixedRightColumnCount",
-      "TableModelIf.getFixedLeftColumnCount", "TableModelIf.getFixedRightColumnCount"]
+      "TableModelIf.getFixedLeftColumnCount", "TableModelIf.getFixedRightColumnCount",
+      "CreateTableModelPara.rowNumbersVisible", "RowNumberColumnDef", "TableApi.getColumnIndex"],
+    showcases: [{ name: "large", title: "Large dataset" }]
   },
   // ── Part 5 ──────────────────────────────────────────────────────────────────────────────
   {

@@ -37,6 +37,36 @@ import NineAreas from "../../components/training/diagrams/NineAreas.astro";
       “Total” moved from position 10 to position 40.</p>
   </Callout>
 
+  <h2 id="row-numbers">Row numbers – a fixed column for free</h2>
+  <p>
+    The most common fixed column is the row number of a spreadsheet. One flag in
+    <ApiLink name="TableFactory.createTableModel" /> puts a <ApiLink name="RowNumberColumnDef" /> in front of your columns and
+    fixes it on the left – <code>fixedLeftColumnCount</code> counts it automatically:
+  </p>
+  <Snippet file="demos/row-numbers.ts" region="model" />
+  <ul>
+    <li>The width follows the largest number – <code>9</code>, <code>100,000</code> or <code>2,000,000</code>; filter to a few
+      rows and the column gets narrower again.</li>
+    <li><code>mode: "display"</code> (default) numbers the view 1, 2, 3 … – also after sorting and filtering.
+      <code>mode: "original"</code> keeps the number with its row. <ApiLink name="RowNumberOptionsIf" /> has the rest:
+      <code>format</code>, <code>headerLabel</code>, <code>exported</code>, <code>minWidthInPx</code>.</li>
+    <li>With selection type <code>"range"</code> a click on a number selects the whole row, Shift-click a block of rows,
+      Ctrl/⌘-click toggles one; a click on <code>#</code> selects all.</li>
+  </ul>
+  <Snippet file="demos/row-numbers.ts" region="selection" />
+  <LiveDemo name="row-numbers" title="100,000 orders with row numbers" height={360}
+            caption="Click a number, Shift-click another. Sort by total, then switch to original numbers – they stay with their rows." />
+  <Callout type="pitfall" title="Every other column index is one higher">
+    <p>The row numbers are a real column (like a <ApiLink name="CheckboxColumnDef" />): with the flag, “Total” is column 11,
+      not 10 – in events, <code>getValueAt</code> and <code>scrollToIndex</code>. Ask by property:
+      <ApiLink name="TableApi.getColumnIndex" />. With your own area models put the column definition in yourself – first,
+      counted in <code>fixedLeftColumnCount</code>; a checkbox column comes after it.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.93. Not in copy and Excel export unless <code>exported: true</code>; screen readers hear the numbers as row
+      headers.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>Part 5 starts with the options: <ChapterLink slug="table-options" />.</p>
 </TrainingLayout>

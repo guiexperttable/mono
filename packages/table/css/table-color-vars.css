@@ -91,6 +91,10 @@ html, html[data-theme="light"] {
   --ge-table-spinner-color: #1a73e8;
   --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
   --ge-table-spinner-size: 28px;
+
+  /* Row numbers (since 1.1.93): like the header, muted digits (#555 on the header gray ≈ 6.9 : 1) */
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #555;
 }
 
 
@@ -173,4 +177,8 @@ html[data-theme="dark"] {
   --ge-table-spinner-color: #8ab4f8;
   --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);
   --ge-table-spinner-size: 28px;
+
+  /* Row numbers (since 1.1.93) */
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #aaa;
 }

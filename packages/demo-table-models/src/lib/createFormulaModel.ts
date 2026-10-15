@@ -13,7 +13,6 @@ import {
   TableOptionsIf,
   TrueFn,
   editInputPipeForNumber,
-  px100,
   px110,
   px120,
   px130,

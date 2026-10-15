@@ -31,7 +31,7 @@ import { EventAdapter } from './event-adapter';
 import { SimpleDomService } from './service/simple-dom-service';
 import { TableOptions } from './data/options/table-options';
 import { TreeRowIf } from './data/common/tree-row-if';
-import { isAreaModelTree, isCheckboxCellRenderer, isTreeRow } from './instanceof-workaround';
+import { isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { LicenseManager } from './license-manager';
 import { SelectionModel } from './selection/selection-model';
 import { CopyService } from './service/copy-service';
@@ -476,7 +476,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private activateBodyCell(rowIndex: number, columnIndex: number): boolean {
     const bodyModel = this.tableModel.getBodyModel();
     const checkboxCell = bodyModel.isRowCheckable(rowIndex) && (
-      (this.tableOptions.showCheckboxWihoutExtraColumn && columnIndex === 0)
+      (this.tableOptions.showCheckboxWihoutExtraColumn && columnIndex === this.getFirstDataColumnIndex())
       || isCheckboxCellRenderer(bodyModel.getCellRenderer(rowIndex, columnIndex)));
     if (checkboxCell) {
       this.toggleRowCheckbox(rowIndex, columnIndex, 'body');
@@ -778,7 +778,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   onMouseDown(mouseEvent: GeMouseEvent) {
     this.selectionService.onMouseDown();
-    if (mouseEvent.columnIndex > -1 && mouseEvent.action && ['resize-column', 'drag-column'].includes(mouseEvent.action)) {
+    if (mouseEvent.columnIndex > -1 && mouseEvent.action && ['resize-column', 'drag-column'].includes(mouseEvent.action)
+      && !isRowNumberColumnDef(this.tableModel.getColumnDef(mouseEvent.columnIndex))) { // the row numbers stay
 
       this.mouseStartWidth = this.tableModel.getColumnWidth(mouseEvent.columnIndex);
       this.mouseStartAction = mouseEvent.action;
@@ -809,7 +810,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable) {
 
-      this.draggingTargetColumnIndex = mouseEvent.columnIndex;
+      // no column in front of the row numbers (RowNumberColumnDef, since 1.1.93)
+      this.draggingTargetColumnIndex = Math.max(mouseEvent.columnIndex, this.getFirstDataColumnIndex());
       this.dragTo = this.draggingTargetColumnIndex;
 
       if (this.dragFrom > -1 && this.dragTo > -1 && this.dragFrom !== this.dragTo) {
@@ -1556,6 +1558,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // Resize columns
     const columnWidthes = this.calcAutoColumnWidths();
     for (let i = 0; i < columnWidthes.length; i++) {
+      if (isRowNumberColumnDef(this.tableModel.getColumnDef(i))) continue; // its width follows the numbers
       const columnWidth = columnWidthes[i];
       this.tableModel.setColumnWidth(i, columnWidth);
     }

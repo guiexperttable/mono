@@ -2,6 +2,7 @@ import { TableModelIf } from '../data/tablemodel/table-model.if';
 import { SelectionModelIf } from '../selection/selection-model.if';
 import { FocusModelIf } from '../focus/focus-model.if';
 import { CopyServiceIf } from './copy-service.if';
+import { isRowNumberColumnDef } from "../instanceof-workaround";
 import { CellRange } from '../data/common/cell-range';
 
 
@@ -59,8 +60,15 @@ export class CopyService implements CopyServiceIf {
           for (let rowIndex = range.r1; rowIndex <= range.r2; rowIndex++) {
             const rowData: string[] = [];
             for (let columnIndex = range.c1; columnIndex <= range.c2; columnIndex++) {
-              if (tableModel.getColumnDef(columnIndex)?.isVisible?.() === false) continue; // hidden column
-              const cellValue = selectionModel.isSelected(rowIndex, columnIndex) ? tableModel.getBodyModel().getTextValueAt(rowIndex, columnIndex) : '';
+              const columnDef = tableModel.getColumnDef(columnIndex);
+              if (columnDef?.isVisible?.() === false) continue; // hidden column
+              const rowNumbers = isRowNumberColumnDef(columnDef) ? columnDef : undefined;
+              if (rowNumbers && !rowNumbers.options.exported) continue; // row numbers only with exported: true
+              const selected = selectionModel.isSelected(rowIndex, columnIndex);
+              const bodyModel = tableModel.getBodyModel();
+              const cellValue = !selected ? ''
+                : rowNumbers ? rowNumbers.getRowNumberText(rowIndex, bodyModel)
+                  : bodyModel.getTextValueAt(rowIndex, columnIndex);
               rowData.push(cellValue);
             }
             content.push(rowData.join(CopyService.columnSeparatorChar));
@@ -71,7 +79,11 @@ export class CopyService implements CopyServiceIf {
 
       if (focusModel) {
         const [r, c] = focusModel.getFocus();
-        const content = tableModel.getBodyModel().getTextValueAt(r, c);
+        const columnDef = tableModel.getColumnDef(c);
+        // the focused number of a RowNumberColumnDef: its number (the row has no value for this column)
+        const content = isRowNumberColumnDef(columnDef)
+          ? columnDef.getRowNumberText(r, tableModel.getBodyModel())
+          : tableModel.getBodyModel().getTextValueAt(r, c);
         return resolve(content);
       }
 

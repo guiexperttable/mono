@@ -1,3 +1,4 @@
+import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 
 
 /*
@@ -33,14 +34,6 @@ export function isAreaModelTree(model: any): boolean {
 
 
 /**
- * Checks if the given object is a CheckboxColumnDef.
- *
- * @param {any} o - The object to be checked.
- * @returns {boolean} - True if the object is a CheckboxColumnDef, false otherwise.
- *
- * @category Utilities
- */
-/**
  * True for a {@link CheckboxCellRenderer} – also from another copy of the core (no `instanceof`).
  *
  * @example
@@ -53,8 +46,32 @@ export function isCheckboxCellRenderer(o: any): boolean {
   return !!o && o['type'] === 'CheckboxCellRenderer';
 }
 
+/**
+ * Checks if the given object is a CheckboxColumnDef.
+ *
+ * @param {any} o - The object to be checked.
+ * @returns {boolean} - True if the object is a CheckboxColumnDef, false otherwise.
+ *
+ * @category Utilities
+ */
 export function isCheckboxColumnDef(o: any): boolean {
   return o && o['type'] === 'CheckboxColumnDef';
+}
+
+/**
+ * True for a {@link RowNumberColumnDef} – also from another copy of the core (no `instanceof`).
+ *
+ * @param {any} o - the object to check, e.g. `tableModel.getColumnDef(0)`
+ * @returns {boolean} true for a row number column
+ *
+ * @example
+ * const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
+ *
+ * @since 1.1.93
+ * @category Row numbers
+ */
+export function isRowNumberColumnDef(o: any): o is RowNumberColumnDef {
+  return !!o && o['type'] === 'RowNumberColumnDef';
 }
 
 

@@ -68,6 +68,8 @@ export class CssVars {
   --ge-table-spinner-color: #1a73e8;
   --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
   --ge-table-spinner-size: 28px;
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #555;
 }`,
 
     combat:`html[data-theme="combat"] {
@@ -133,6 +135,8 @@ export class CssVars {
   --ge-table-spinner-color: #00e0ff;
   --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);
   --ge-table-spinner-size: 28px;
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #a0a0a0;
 }`,
 
     paper: `html[data-theme="paper"] {
@@ -198,6 +202,8 @@ export class CssVars {
   --ge-table-spinner-color: #6b4f2a;
   --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
   --ge-table-spinner-size: 28px;
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #5a4a35;
 }`,
     blackboard:`html[data-theme="dark"] {
   --ge-table-bg: #0c1021;
@@ -262,6 +268,8 @@ export class CssVars {
   --ge-table-spinner-color: #e0df85;
   --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);
   --ge-table-spinner-size: 28px;
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #c9c86f;
 }`
   };
 

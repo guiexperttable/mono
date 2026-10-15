@@ -154,6 +154,19 @@
 }
 
 
+/* Row numbers (RowNumberColumnDef, since 1.1.93): right aligned, digits of equal width. Before the color classes
+   in main.css, so that the selection colors (.ge-table-body-west-selected-range …) still win. */
+.ge-table-row-number {
+  background-color: var(--ge-table-row-number-bg);
+  color: var(--ge-table-row-number-color);
+}
+.ge-table-row-number .ge-table-label,
+.ge-table-row-number-header .ge-table-label {
+  padding-inline: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+
 /* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.92).
    Position and size are set inline by the table (the visible body), display is switched inline (none / flex). */
 .ge-table-overlay {
@@ -407,6 +420,10 @@
   --ge-table-spinner-color: #1a73e8;
   --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
   --ge-table-spinner-size: 28px;
+
+  /* Row numbers (since 1.1.93): like the header, muted digits (#555 on the header gray ≈ 6.9 : 1) */
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #555;
 }
 
 
@@ -489,6 +506,10 @@ html[data-theme="dark"] {
   --ge-table-spinner-color: #8ab4f8;
   --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);
   --ge-table-spinner-size: 28px;
+
+  /* Row numbers (since 1.1.93) */
+  --ge-table-row-number-bg: var(--ge-table-header-west-bg);
+  --ge-table-row-number-color: #aaa;
 }
 /* Tree table */
 
@@ -505,6 +526,15 @@ html[data-theme="dark"] {
 
 .ge-table-col-tree {
   text-align: left;
+}
+
+/* Row numbers (RowNumberColumnDef) in a tree: no tree look – right aligned like in a flat table (since 1.1.93) */
+.ge-table-col-div.ge-table-row-number.ge-table-tree-cell {
+  text-align: right;
+}
+.ge-table-row-number.ge-table-tree-cell .ge-table-label-div {
+  display: block;
+  padding: 0;
 }
 
 .ge-padding-property-checkbox {

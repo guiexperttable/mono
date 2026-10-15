@@ -10,6 +10,7 @@
 - [checkboxAriaLabel](AddColumnDivPara.md#checkboxarialabel)
 - [checkedType](AddColumnDivPara.md#checkedtype)
 - [columnIndex](AddColumnDivPara.md#columnindex)
+- [firstDataColumnIndex](AddColumnDivPara.md#firstdatacolumnindex)
 - [geo](AddColumnDivPara.md#geo)
 - [parent](AddColumnDivPara.md#parent)
 - [rowIndex](AddColumnDivPara.md#rowindex)
@@ -64,6 +65,23 @@ ___
 #### Defined in
 
 [src/lib/table/service/convenience-dom.service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L23)
+
+___
+
+### firstDataColumnIndex
+
+• `Optional` **firstDataColumnIndex**: `number`
+
+Index of the first data column – the column of the checkbox of `showCheckboxWihoutExtraColumn` and of the tree
+label. 0, behind a [RowNumberColumnDef](../classes/RowNumberColumnDef.md) 1. Default 0.
+
+**`Since`**
+
+1.1.93
+
+#### Defined in
+
+[src/lib/table/service/convenience-dom.service.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L37)
 
 ___
 

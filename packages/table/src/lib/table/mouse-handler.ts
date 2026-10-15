@@ -272,7 +272,8 @@ export class MouseHandler {
 
   private getArrowColumnIndex(): number {
     const rowCheckboxVisible = this.tableScope.tableModel.isRowCheckboxVisible();
-    return rowCheckboxVisible ? 1 : 0;
+    // behind a RowNumberColumnDef (since 1.1.93) the arrow sits one column further right
+    return this.tableScope.getFirstDataColumnIndex() + (rowCheckboxVisible ? 1 : 0);
   }
 
 

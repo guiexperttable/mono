@@ -99,6 +99,9 @@
 - [Renderer](classes/Renderer.md)
 - [RequestChunk](classes/RequestChunk.md)
 - [ResizeHandler](classes/ResizeHandler.md)
+- [RowNumberCellRenderer](classes/RowNumberCellRenderer.md)
+- [RowNumberColumnDef](classes/RowNumberColumnDef.md)
+- [RowNumberOptions](classes/RowNumberOptions.md)
 - [SchemeGenerator](classes/SchemeGenerator.md)
 - [SelectCellRenderer](classes/SelectCellRenderer.md)
 - [SelectionModel](classes/SelectionModel.md)
@@ -174,6 +177,7 @@
 - [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
+- [RowNumberOptionsIf](interfaces/RowNumberOptionsIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
 - [SizeIf](interfaces/SizeIf.md)
@@ -223,6 +227,7 @@
 - [HtmlStyle](modules.md#htmlstyle)
 - [IsSameFn](modules.md#issamefn)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
+- [RowNumberMode](modules.md#rownumbermode)
 - [SelectionMode](modules.md#selectionmode)
 - [SelectionType](modules.md#selectiontype)
 - [ShortcutActionIdMapping](modules.md#shortcutactionidmapping)
@@ -302,10 +307,12 @@
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
+- [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
 - [isAreaModelTree](modules.md#isareamodeltree)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
+- [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isTreeRow](modules.md#istreerow)
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
@@ -1590,6 +1597,96 @@ const state = tableApi.getState(withoutScroll);
 
 [src/lib/table/state/table-state-part.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state-part.ts#L13)
 
+## Row numbers
+
+### RowNumberMode
+
+Ƭ **RowNumberMode**: ``"display"`` \| ``"original"``
+
+How a [RowNumberColumnDef](classes/RowNumberColumnDef.md) counts:
+- `"display"` (default): the position in the current view – 1, 2, 3 … also after sorting and filtering
+  (like the row headers of a spreadsheet).
+- `"original"`: the position in the unsorted, unfiltered rows (`getAllRows()` of the body model) – the number stays
+  with its row. Body models without `getAllRows()` (tree, own area models) count like `"display"`.
+
+**`Since`**
+
+1.1.93
+
+#### Defined in
+
+[src/lib/table/data/common/row-number-options.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-options.if.ts#L11)
+
+___
+
+### getLeadingRowNumberColumnCount
+
+▸ **getLeadingRowNumberColumnCount**(`columnDefs`): ``0`` \| ``1``
+
+1 if the first column is a [RowNumberColumnDef](classes/RowNumberColumnDef.md), otherwise 0 – the offset of the built-in columns that are
+bound to "the first column": the [CheckboxColumnDef](classes/CheckboxColumnDef.md), the tree arrow and the checkbox of
+`showCheckboxWihoutExtraColumn` sit at this index (behind the row numbers).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnDefs` | `undefined` \| [`ColumnDefIf`](interfaces/ColumnDefIf.md)[] | the column definitions of the table model |
+
+#### Returns
+
+``0`` \| ``1``
+
+the number of leading row number columns
+
+**`Example`**
+
+```ts
+const firstDataColumn = getLeadingRowNumberColumnCount(tableModel.getColumnDefs());
+```
+
+**`Since`**
+
+1.1.93
+
+#### Defined in
+
+[src/lib/table/data/common/row-number-columns.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-columns.ts#L18)
+
+___
+
+### isRowNumberColumnDef
+
+▸ **isRowNumberColumnDef**(`o`): o is RowNumberColumnDef
+
+True for a [RowNumberColumnDef](classes/RowNumberColumnDef.md) – also from another copy of the core (no `instanceof`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableModel.getColumnDef(0)` |
+
+#### Returns
+
+o is RowNumberColumnDef
+
+true for a row number column
+
+**`Example`**
+
+```ts
+const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
+```
+
+**`Since`**
+
+1.1.93
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L73)
+
 ## DOM
 
 ### HtmlStyle
@@ -1921,7 +2018,7 @@ Determines if the given model is an AreaModelTree.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L30)
+[src/lib/table/instanceof-workaround.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L31)
 
 ___
 
@@ -1953,7 +2050,7 @@ isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L52)
+[src/lib/table/instanceof-workaround.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L45)
 
 ___
 
@@ -1961,19 +2058,23 @@ ___
 
 ▸ **isCheckboxColumnDef**(`o`): `boolean`
 
+Checks if the given object is a CheckboxColumnDef.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `o` | `any` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | The object to be checked. |
 
 #### Returns
 
 `boolean`
 
+- True if the object is a CheckboxColumnDef, false otherwise.
+
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L56)
+[src/lib/table/instanceof-workaround.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L57)
 
 ___
 
@@ -1997,7 +2098,7 @@ Checks if the given row is a tree row.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L16)
+[src/lib/table/instanceof-workaround.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L17)
 
 ___
 

@@ -12,7 +12,7 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
-import { isTreeRow } from './instanceof-workaround';
+import { isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { TreeRowIf } from './data/common/tree-row-if';
 
 
@@ -41,7 +41,7 @@ import { TreeRowIf } from './data/common/tree-row-if';
  * | export | {@link copyToClipboard}, {@link downloadExcel} |
  * | change data | {@link updateCells}, {@link setRows}, {@link addRows}, {@link updateRows}, {@link removeRows} |
  * | redraw | {@link repaint} (same row count), {@link repaintHard} (row count or heights changed) |
- * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths} |
+ * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths}, {@link getColumnIndex} |
  * | tree | {@link expandAll}, {@link collapseAll}, {@link setRowExpanded} |
  * | state | {@link getState}, {@link applyState}, {@link resetState} (with {@link TableOptionsIf.autoRestoreOptions}) |
  * | lifecycle | {@link destroy} |
@@ -947,7 +947,10 @@ export class TableApi {
     const tableModel = this.tableScope.tableModel;
     const columns: number[] = []; // visible columns only – what the table shows
     for (let c = 0; c < tableModel.getColumnCount(); c++) {
-      if (tableModel.getColumnDef(c)?.isVisible?.() !== false) columns.push(c);
+      const columnDef = tableModel.getColumnDef(c);
+      if (columnDef?.isVisible?.() === false) continue;
+      if (isRowNumberColumnDef(columnDef) && !columnDef.options.exported) continue; // row numbers: only if exported
+      columns.push(c);
     }
 
     const areas: AreaIdent[] = ["header" , "body" , "footer"];
@@ -955,13 +958,50 @@ export class TableApi {
       const areaModel = tableModel.getAreaModel(area);
       const rowCount = areaModel?.getRowCount() ?? 0;
       for (let r = 0; r < rowCount; r++) {
-        matrix.push(columns.map(c => areaModel.getValueAt(r, c)));
+        matrix.push(columns.map(c => this.getExportValue(tableModel, area, areaModel, r, c)));
       }
     }
     // a custom ExcelServiceIf may return void – the API always returns a Promise
     return Promise.resolve(this.tableScope.excelService.downloadExcel(matrix, fileName, author));
   }
 
+
+  /** The value of a cell for the Excel export – the shown number in a row number column (body; footer empty). */
+  private getExportValue(tableModel: TableModelIf, area: AreaIdent, areaModel: AreaModelIf, rowIndex: number, columnIndex: number): any {
+    const columnDef = tableModel.getColumnDef(columnIndex);
+    if (isRowNumberColumnDef(columnDef) && area !== "header") {
+      if (area !== "body") return "";
+      // default format: a number (Excel can calculate with it); an own format: its text
+      return columnDef.hasDefaultFormat()
+        ? columnDef.getRowNumber(rowIndex, areaModel)
+        : columnDef.getRowNumberText(rowIndex, areaModel);
+    }
+    return areaModel.getValueAt(rowIndex, columnIndex);
+  }
+
+  /**
+   * The index of the column that shows a property – `-1` if there is none.
+   *
+   * Column indices count all columns, also a {@link RowNumberColumnDef} or {@link CheckboxColumnDef} in front:
+   * with row numbers (`rowNumbersVisible: true`) every data column has an index one higher. Get the index by the
+   * property instead of writing numbers into your code.
+   *
+   * @param {string} property - the property of the column definition, e.g. `"total"`
+   * @returns {number} the column index (fixed columns included) or -1
+   *
+   * @example
+   * const totalColumn = tableApi.getColumnIndex("total");
+   * tableApi.scrollToIndex(totalColumn, 0);
+   *
+   * @since 1.1.93
+   */
+  getColumnIndex(property: string): number {
+    const columnDefs = this.tableScope.tableModel.getColumnDefs?.() ?? [];
+    for (let i = 0; i < columnDefs.length; i++) {
+      if (columnDefs[i]?.property === property) return i;
+    }
+    return -1;
+  }
 
   /**
    * Returns the TableScope instance associated with this TableApi.

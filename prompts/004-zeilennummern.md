@@ -1,6 +1,6 @@
 # TODO-Prompt 004: Zeilennummern
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `row-numbers` (Branch `feat/row-numbers`, Design `prompts/004-zeilennummern.design.md`)
+> Status: **umgesetzt** 15.10.2026 (selbständig, Design ohne Freigabe-Runde) · angelegt 14.10.2026 · Slug `row-numbers` (Branch `feat/row-numbers`, Design `prompts/004-zeilennummern.design.md`)
 > Abhängigkeiten: **001 (ARIA)** – Zeilennummern sind `rowheader`-Zellen. 003 (Zustand) hilft, ist aber nicht nötig.
 > Danach nutzt 009 (Row Drag) die Spalte evtl. als Griff.
 > ag-Grid: „Row Numbers“ ist dort **Enterprise** (`RowNumbersModule`).
@@ -84,5 +84,5 @@ Index-Versatz in allen öffentlichen APIs, Zusammenspiel mit Checkbox- und fixie
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Einschalt-Mechanik, Zählweise, Index-Versatz 🛑
-- [ ] N1–N11 umgesetzt und getestet; Checkbox-Specs unverändert grün
+- [x] Design-Dokument mit Einschalt-Mechanik, Zählweise, Index-Versatz (selbständig entschieden, s. Design § 2)
+- [x] N1–N11 umgesetzt und getestet; Checkbox-Specs unverändert grün

@@ -452,6 +452,73 @@ Width constants `px0 … px500` (and `new Size(n, "px")`), alignment helpers `bo
 `bodyRenderer`, `footerRenderer`, `headerClasses`, `bodyClasses`, `footerClasses`, `sortable`, `sortIconVisible`,
 `sortComparator`, `sortState`, `sortStatesOrder`, `editable`, `isVisible`, `getEditRenderer`, `editInputPipe`.
 
+#### Row numbers (since 1.1.93)
+
+Running row numbers (1, 2, 3 …) like the row headers of a spreadsheet – one flag:
+
+```ts
+import { TableFactory, ColumnDef, ColumnDefIf, px120 } from "@guiexpert/table";
+
+interface OrderIf { id: number; customer: string; total: number; }
+declare const orders: OrderIf[];
+
+const orderColumns: ColumnDefIf[] = [new ColumnDef("customer", "Customer", px120), new ColumnDef("total", "Total", px120)];
+
+const tableModel = TableFactory.createTableModel({
+  rows: orders,
+  columnDefs: orderColumns,
+  rowNumbersVisible: true          // or options: { mode: "original", format: n => n.toLocaleString("en-US") }
+});
+```
+
+The flag puts a `RowNumberColumnDef` in front of the columns and fixes it on the left (`fixedLeftColumnCount` + 1).
+What you get:
+
+- header `#`, numbers right aligned with digits of equal width; the width follows the largest number (also after
+  `setRows` + `repaintHard()`, filtering, expanding tree rows) – `"2000000"` fits;
+- `mode: "display"` (default): 1, 2, 3 … of the current view, also after sorting and filtering;
+  `mode: "original"`: the position in the unsorted, unfiltered rows – the number stays with its row;
+- `format: n => …` for the text (default without thousands separators), `headerLabel` (default `"#"`),
+  `minWidthInPx` (default 36);
+- a click on a number selects the row (selection type `"row"` and `"range"`; Shift extends, Ctrl/⌘ toggles), a click
+  on `#` selects all;
+- not sortable, not editable, no resize handle, can't be dragged; `autoResizeColumns()` leaves it alone;
+- not in `copyToClipboard()` / `downloadExcel()` – unless `exported: true` (Excel gets numbers with the default
+  `format`, texts with your own); Ctrl+C on a focused number without selection copies that number;
+- screen readers: the number cells are row headers (`role="rowheader"`);
+- tree tables: the visible rows are numbered; the tree arrow stays in the first data column;
+- `mode: "original"` keeps a `Map` row → position (for 2 million rows some ten MB); `overridingColumnWidth` gives the
+  number column the same width as all others.
+
+**Column indices shift by one.** The row numbers are a real column (like a `CheckboxColumnDef`): with
+`rowNumbersVisible: true` the column `"total"` has the index 2, not 1 – in events (`GeMouseEvent.columnIndex`),
+`getValueAt`, `scrollToIndex`, the selection. Use properties where you can:
+
+```ts
+import type { TableApi } from "@guiexpert/table";
+declare const tableApi: TableApi;
+
+const totalColumn = tableApi.getColumnIndex("total");     // 2 with row numbers, 1 without
+tableApi.setColumnVisible("customer", false);              // by property – no index needed
+```
+
+With a checkbox column, or with your own area models, put the column definition in yourself – **as the first column**,
+counted in `fixedLeftColumnCount` (the flag is ignored with `bodyData` or own area models, because their columns would
+shift). The order is always: row numbers, checkbox, data columns.
+
+```ts
+import { CheckboxColumnDef, ColumnDef, ColumnDefIf, RowNumberColumnDef, TableFactory } from "@guiexpert/table";
+
+interface TaskIf { title: string; }
+declare const tasks: TaskIf[];
+
+const columnDefs: ColumnDefIf[] = [new RowNumberColumnDef(), new CheckboxColumnDef(), new ColumnDef("title", "Title")];
+const tableModel = TableFactory.createTableModel({ rows: tasks, columnDefs, fixedLeftColumnCount: 2 });
+```
+
+Look: CSS classes `ge-table-row-number` (body), `ge-table-row-number-header`, `ge-table-row-number-footer`, variables
+`--ge-table-row-number-bg` and `--ge-table-row-number-color` (light and dark).
+
 ### 5.3 Array of arrays
 
 ```ts

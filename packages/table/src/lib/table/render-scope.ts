@@ -1,3 +1,4 @@
+import { TableOverlayChange } from "./overlay/table-overlay";
 import { EleScope } from './ele-scope';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AddColumnDivPara, ConvenienceDomService } from './service/convenience-dom.service';
@@ -390,7 +391,39 @@ export class RenderScope extends EleScope {
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
+    this.updateOverlay(); // "no rows" after setRows / filter / tree toggle; one comparison when nothing changed
   }
+
+  /**
+   * Shows the overlay that fits the body now (see {@link TableOverlay.update}) and reports a change to
+   * {@link onOverlayChanged}.
+   *
+   * @since 1.1.92
+   */
+  protected override updateOverlay(): void {
+    const overlay = this.tableOverlay;
+    if (!overlay) {
+      return; // called while the EleScope constructor runs
+    }
+    const body = this.tableModel.getBodyModel();
+    const rowCount = body.getRowCount();
+    const unfilteredRowCount = rowCount === 0 ? body.getUnfilteredRowCount?.() : undefined;
+    const change = overlay.update(rowCount, unfilteredRowCount);
+    if (change) {
+      this.onOverlayChanged(change);
+    }
+  }
+
+  /**
+   * Called after the shown overlay changed (ARIA in {@link TableScope}).
+   *
+   * @param {TableOverlayChange} _change - previous and new overlay, its text
+   * @since 1.1.92
+   */
+  protected onOverlayChanged(_change: TableOverlayChange): void {
+    // overwritten in TableScope
+  }
+
 
   /**
    * Checks if the scroll position should be saved and saves it.

@@ -5,7 +5,7 @@ import { GeMouseEvent, TableApi, TableModelAndOptions, TableOptions, TableScope 
 import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -236,5 +236,35 @@ describe('GuiexpertTable (Web Component)', () => {
 
     expect(tableCount(el)).toBe(1);
     expect(rowTexts(el)).toHaveLength(5);
+  });
+
+  it('el.loading shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
+    const { el, events } = createTableElement();
+    el.loading = true; // before data: applied when the table is created
+    el.data = data(createModel(5));
+    await nextFrame();
+    expect(overlayKind(el)).toBe('loading');
+    expect(events.tableReady[0].getOverlayState()).toBe('loading');
+
+    el.loading = false;
+    expect(overlayKind(el)).toBe('none');
+    el.loading = true;
+    expect(overlayKind(el)).toBe('loading');
+    expect(events.tableReady).toHaveLength(1);
+
+    el.data = data(createModel(2)); // new table keeps the overlay
+    expect(events.tableReady).toHaveLength(2);
+    expect(overlayKind(el)).toBe('loading');
+  });
+
+  it('the boolean attribute loading works like the property (since 1.1.92)', async () => {
+    const { el } = createTableElement();
+    el.data = data(createModel(5));
+    el.setAttribute('loading', '');
+    expect(el.loading).toBe(true);
+    expect(overlayKind(el)).toBe('loading');
+    el.removeAttribute('loading');
+    expect(el.loading).toBe(false);
+    expect(overlayKind(el)).toBe('none');
   });
 });

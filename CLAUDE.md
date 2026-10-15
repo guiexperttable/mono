@@ -174,6 +174,16 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (`tableOptions.ariaTexts`), eigene Ansagen `tableApi.announce()`. Scroll-Viewport `tabindex="-1"` (sonst zweiter
   Tab-Stopp in Chrome) und gibt den Fokus an den Host weiter. Tab in die Tabelle setzt den Fokus auf die erste Zelle
   (nur bei echtem Tab, nicht bei `host.focus()`).
+- **Overlays (seit 1.1.92, `overlay/`, Design `prompts/002-overlays-laden-keine-daten.design.md`)**: ein Div
+  `.ge-table-overlay` je Tabelle (`TableOverlay`, in `EleScope` angelegt, Geometrie in `adjustContainersAndRows`, Zustand
+  am Ende von `RenderScope.adjustAfterScrolling` → `calcOverlayKind`; DOM nur bei Änderung). `api.showLoadingOverlay(text?)`,
+  `showNoRowsOverlay(text?)`, `hideOverlay()` (beendet nur Manuelles), `getOverlayState()` = `"none" | "loading" | "noRows"
+  | "noMatches"`. Leerer Body → automatisch „No rows to show“, Filter blendet alles aus → „No matching rows“ (über das
+  optionale `AreaModelIf.getUnfilteredRowCount()`). „Loading“ blockiert per Default Maus (`MouseHandler` ignoriert Events auf dem
+  Overlay – `TableOverlay.isEventBlocked`, die Seite sieht sie weiter; z-index 10000 über dem Fokusrahmen) und im Body
+  `START_EDITING`/`TOGGLE_SELECTION`/`ACTIVATE_CELL` (Header bleibt bedienbar). ARIA: Overlay `aria-hidden`, Host `aria-busy`, Texte über die
+  Live-Region. Wrapper: Prop `loading` (kein Neuaufbau, nach Neuaufbau erneut angewendet; `false` blendet nur aus, was die Prop
+  eingeblendet hat – ein eigenes Overlay der App aus `tableReady` bleibt).
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -201,7 +211,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `treeOptions`, `headerGroupOptions`, `headerToggleExpandCollapseIcons`, `showCheckboxWihoutExtraColumn` (sic),
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
-seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`.
+seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -217,6 +227,9 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 | solid-table | `GuiexpertTable` | Callback-Props (zusätzlich DOM-`CustomEvent`s, bubbling) | `createEffect` auf Modell/Options → Neuaufbau; `contextmenu`-CustomEvent kommt nicht an (s. `TODO.md`) |
 | webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` auf dem Element (`contextmenu` nicht bubbling); Entfernen = `destroy()`, Wieder-Einfügen = Neuaufbau |
 | angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
+
+Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
+ohne Neuaufbau der Tabelle.
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -261,7 +274,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 297 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 310 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -272,8 +285,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.500 Tests) |
-  | `test:browser` | echtes Chromium, ~420 Tests in 18 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.535 Tests) |
+  | `test:browser` | echtes Chromium, ~475 Tests in 19 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -309,7 +322,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 27 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 28 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -395,6 +408,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 21 | Maus-Events & Kontextmenü | Showcase `mouseevents`, Demo `mouseevent` |
 | 22 | Warum nicht ag-Grid? (Vergleich, sachlich) | Website `post/top-framework-agnostic-…` |
 | 23 | Barrierefreie Tabelle (Screenreader + Tastatur) | `videos/02-barrierefreie-tabelle/`, Training-Kapitel `accessibility`, `apps/table-demo/aria.html` |
+| 24 | Lade-Spinner und leere Tabelle – ohne Library, nur CSS | `videos/03-lade-spinner/`, Training-Kapitel `live-data`, `apps/table-demo/overlay.html` |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

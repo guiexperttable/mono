@@ -31,6 +31,16 @@ describe('CssVars', () => {
     expect(CssVars.vars.blackboard.startsWith('html[data-theme="dark"] {')).toBe(true);
   });
 
+  it('every theme colours the overlays "Loading…" / "No rows" (since 1.1.92)', () => {
+    for (const theme of CssVars.themes as ThemeName[]) {
+      const vars = declarations(CssVars.vars[theme]);
+      for (const name of ['--ge-table-overlay-bg', '--ge-table-overlay-content-bg', '--ge-table-overlay-color',
+        '--ge-table-spinner-color', '--ge-table-spinner-track-color', '--ge-table-spinner-size']) {
+        expect(vars.has(name), `${theme} ${name}`).toBe(true);
+      }
+    }
+  });
+
   it('all themes declare the same set of --ge-table-* variables', () => {
     const names = (theme: ThemeName) => [...declarations(CssVars.vars[theme]).keys()].sort();
     const light = names('light');

@@ -7,7 +7,7 @@ import { tick } from 'svelte';
 import { GeMouseEvent, TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable.svelte';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 // Svelte 4 component API (the class the Svelte 4 compiler generates)
@@ -117,5 +117,26 @@ describe('GuiexpertTable (Svelte 4)', () => {
     expect(isDestroyed(onTableReady.mock.calls[0][0])).toBe(true);
     expect(tableCount(host)).toBe(0);
     expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
+    const onTableReady = vi.fn<(api: TableApi) => void>();
+    const { host, component } = create({ tableModel: createModel(5), onTableReady, loading: true });
+    await tick();
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+
+    component.$set({ loading: false });
+    await tick();
+    expect(overlayKind(host)).toBe('none');
+    component.$set({ loading: true });
+    await tick();
+    expect(overlayKind(host)).toBe('loading');
+    expect(onTableReady).toHaveBeenCalledTimes(1);
+
+    component.$set({ tableModel: createModel(2) }); // re-created, overlay stays
+    await tick();
+    expect(onTableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
   });
 });

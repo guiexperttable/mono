@@ -26,6 +26,36 @@ export class GuiexpertTable extends HTMLElement {
 
   private _data: TableModelAndOptionsIf | undefined;
   private tableScope: TableScope | undefined;
+  private _loading = false;
+  /** the overlay was shown by `loading`: `false` hides only that one (not one the app showed itself) */
+  private shownByLoading = false;
+
+  /** The boolean attribute `loading` (`<guiexpert-table loading>`) sets {@link loading}. */
+  static get observedAttributes(): string[] {
+    return ['loading'];
+  }
+
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it
+   * (also as boolean attribute `loading` – any value counts, `loading="false"` is `true` too; remove the attribute). Changing it does **not** re-create the table; a new table
+   * (new `data`) shows the overlay as long as `loading` is `true`. Texts: `tableOptions.overlayOptions`.
+   *
+   * @since 1.1.92
+   */
+  get loading(): boolean {
+    return this._loading;
+  }
+
+  set loading(value: boolean) {
+    this._loading = !!value;
+    this.applyLoading();
+  }
+
+  attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
+    if (name === 'loading') {
+      this.loading = newValue !== null;
+    }
+  }
 
 
   get data(): TableModelAndOptionsIf | undefined {
@@ -65,6 +95,7 @@ export class GuiexpertTable extends HTMLElement {
     // properties set before customElements.define() shadow the setters – re-apply them
     this.upgradeProperty('data');
     this.upgradeProperty('licenseKey');
+    this.upgradeProperty('loading');
     if (!this.tableScope && this._data) {
       this.createTable(this._data);
     }
@@ -121,8 +152,21 @@ export class GuiexpertTable extends HTMLElement {
       domService.setStyle(ele, "height", "100%");
       domService.setStyle(ele, "width", "100%");
       tableScope.firstInit();
+      this.shownByLoading = false;
+      this.applyLoading();
 
       dispatch("tableReady", tableScope.getApi());
+    }
+  }
+
+  /** Shows or hides the loading overlay according to {@link loading}. */
+  private applyLoading() {
+    if (this._loading) {
+      this.tableScope?.showLoadingOverlay();
+      this.shownByLoading = true;
+    } else if (this.shownByLoading) {
+      this.tableScope?.hideOverlay();
+      this.shownByLoading = false;
     }
   }
 
@@ -132,7 +176,7 @@ export class GuiexpertTable extends HTMLElement {
     this.tableScope = undefined;
   }
 
-  private upgradeProperty(prop: 'data' | 'licenseKey') {
+  private upgradeProperty(prop: 'data' | 'licenseKey' | 'loading') {
     const self = this as unknown as Record<string, unknown>;
     if (Object.prototype.hasOwnProperty.call(self, prop)) {
       const value = self[prop];

@@ -12,6 +12,7 @@ import { FocusModelIf } from "../../focus/focus-model.if";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptions } from './header-group-options';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
+import { OverlayOptionsIf } from "./overlay-options.if";
 
 
 /**
@@ -102,4 +103,7 @@ export class TableOptions implements TableOptionsIf {
 
   /** Own screen reader texts; missing functions use the English defaults ({@link AriaTexts}). @since 1.1.91 */
   ariaTexts?: Partial<AriaTextsIf> = undefined;
+
+  /** Texts and behaviour of the "Loading…" / "No rows" overlays; missing fields use {@link OverlayOptions}. @since 1.1.92 */
+  overlayOptions?: Partial<OverlayOptionsIf> = undefined;
 }

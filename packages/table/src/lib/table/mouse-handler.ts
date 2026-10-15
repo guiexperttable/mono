@@ -68,6 +68,9 @@ export class MouseHandler {
    * @return {void}
    */
   private onContextmenu(evt: MouseEvent) {
+    if (this.isBlocked(evt)) {
+      return;
+    }
     if (!(evt instanceof MouseEvent)) {
       // a "contextmenu" CustomEvent of a wrapper (Solid dispatches its events on the host div) – no right click;
       // before, it was taken for a second right click within 50 ms and stopped (it never reached the listeners)
@@ -87,6 +90,9 @@ export class MouseHandler {
    * @return {void}
    */
   private onHostElementClicked(event: MouseEvent) {
+    if (this.isBlocked(event)) {
+      return;
+    }
     const now = Date.now();
     const eventTarget = this.tableScope.getMouseEventTarget(event); // a footer cell below the scroll viewport
     const cellKey = this.getCellKey(eventTarget);
@@ -171,6 +177,9 @@ export class MouseHandler {
    * @param {MouseEvent} event - The double click event.
    */
   private onHostElementDblClicked(event: MouseEvent) {
+    if (this.isBlocked(event)) {
+      return;
+    }
     this.lastClicked = Date.now();
     const eventTarget = this.tableScope.getMouseEventTarget(event);
     // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
@@ -268,6 +277,9 @@ export class MouseHandler {
 
 
   private onMouseDown(evt: MouseEvent) {
+    if (this.isBlocked(evt)) {
+      return;
+    }
     // A click repaint must not happen between mousedown and mouseup/click/dblclick: it would replace the pressed cell
     // element, and the browser would not see a click (or double click) on it. Hold it back until mouseup.
     if (this.tableScope.cancelPendingRepaint()) {
@@ -284,6 +296,9 @@ export class MouseHandler {
 
 
   private onMouseMove(evt: MouseEvent) {
+    if (!this.mouseDown && this.isBlocked(evt)) {
+      return; // no hover under a loading overlay; a running drag (started in the header) keeps following the mouse
+    }
     this.mouseEvent = evt;
     if (this.mouseDown) {
       if (!this.dragging) {
@@ -344,4 +359,9 @@ export class MouseHandler {
   }
 
 
+
+  /** A mouse event on a blocking loading overlay ({@link TableOverlay.isEventBlocked}): the table ignores it. */
+  private isBlocked(evt: Event): boolean {
+    return this.tableScope.tableOverlay?.isEventBlocked(evt) ?? false;
+  }
 }

@@ -30,6 +30,7 @@ export class LiveAnnouncer {
 
   private element?: HTMLElement;
   private timeout?: ReturnType<typeof setTimeout>;
+  private pendingText?: string;
 
   constructor(
     private readonly document: Document | undefined,
@@ -53,10 +54,27 @@ export class LiveAnnouncer {
       clearTimeout(this.timeout);
     }
     element.textContent = "";
+    this.pendingText = text;
     this.timeout = setTimeout(() => {
       this.timeout = undefined;
+      this.pendingText = undefined;
       element.textContent = text;
     }, Math.max(0, delayInMs));
+  }
+
+  /**
+   * Drops a message that is still waiting (not spoken yet) – only if it is `text` (or any message without `text`).
+   * Used when the reason for the message is gone, e.g. "Loading…" after the data arrived.
+   *
+   * @param {string} [text] - only this message is dropped
+   * @since 1.1.92
+   */
+  cancel(text?: string): void {
+    if (this.timeout && (text === undefined || text === this.pendingText)) {
+      clearTimeout(this.timeout);
+      this.timeout = undefined;
+      this.pendingText = undefined;
+    }
   }
 
   /**

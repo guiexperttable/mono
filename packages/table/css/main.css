@@ -154,6 +154,69 @@
 }
 
 
+/* Overlays over the body: "Loading…" with a CSS spinner, "No rows to show", "No matching rows" (since 1.1.92).
+   Position and size are set inline by the table (the visible body), display is switched inline (none / flex). */
+.ge-table-overlay {
+  z-index: 10000; /* above .ge-table-body-east (999) and the focus frame (9999) */
+  box-sizing: border-box;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* "no rows" never blocks */
+  color: var(--ge-table-overlay-color);
+}
+.ge-table-overlay-loading {
+  background-color: var(--ge-table-overlay-bg);
+}
+.ge-table-overlay-blocking {
+  pointer-events: auto; /* catches clicks, hover and the context menu while loading */
+  cursor: progress;
+}
+.ge-table-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding-inline: 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.ge-table-overlay-loading .ge-table-overlay-content {
+  /* a small card: the text stays readable over the rows of a refresh */
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: var(--ge-table-overlay-content-bg);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+}
+.ge-table-overlay-text {
+  color: var(--ge-table-overlay-color);
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.ge-table-spinner {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--ge-table-spinner-size);
+  height: var(--ge-table-spinner-size);
+  border: 3px solid var(--ge-table-spinner-track-color);
+  border-top-color: var(--ge-table-spinner-color);
+  border-radius: 50%;
+  animation: ge-table-spin 0.8s linear infinite;
+}
+@keyframes ge-table-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-table-spinner {
+    animation: none; /* a still ring segment and the text */
+  }
+}
+
+
 .ge-table { background-color: var(--ge-table-bg); }
 
 .ge-table-header-west { background-color: var(--ge-table-header-west-bg); }
@@ -336,6 +399,14 @@
      before 1.1.91: #fcb515 (1.8 : 1) and #36BB6C (2.5 : 1) */
   --ge-table-color-star-rating: #a86f00;
   --ge-table-color-progress-bar: #1e874b;
+
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
+  --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
+  --ge-table-overlay-content-bg: #fff;
+  --ge-table-overlay-color: #333;
+  --ge-table-spinner-color: #1a73e8;
+  --ge-table-spinner-track-color: rgba(0, 0, 0, 0.12);
+  --ge-table-spinner-size: 28px;
 }
 
 
@@ -410,6 +481,14 @@ html[data-theme="dark"] {
 
   --ge-table-color-star-rating: #fcb515;
   --ge-table-color-progress-bar: #36BB6C;
+
+  /* Overlays "Loading…" / "No rows" (since 1.1.92) */
+  --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
+  --ge-table-overlay-content-bg: #1f2937;
+  --ge-table-overlay-color: #ddd;
+  --ge-table-spinner-color: #8ab4f8;
+  --ge-table-spinner-track-color: rgba(255, 255, 255, 0.18);
+  --ge-table-spinner-size: 28px;
 }
 /* Tree table */
 

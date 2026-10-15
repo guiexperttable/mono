@@ -225,3 +225,8 @@ export * from './lib/table/aria/aria-ids';
 export * from './lib/table/aria/aria-grid-info';
 export * from './lib/table/aria/tree-aria-info';
 export * from './lib/table/aria/live-announcer';
+export * from './lib/table/overlay/ge-overlay-kind.type';
+export * from './lib/table/overlay/calc-overlay-kind';
+export * from './lib/table/overlay/table-overlay';
+export * from './lib/table/data/options/overlay-options.if';
+export * from './lib/table/data/options/overlay-options';

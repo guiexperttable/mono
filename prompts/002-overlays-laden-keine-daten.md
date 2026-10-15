@@ -1,6 +1,6 @@
 # TODO-Prompt 002: Overlays „Lädt…“ und „Keine Daten“ (plain HTML/CSS)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `overlays` (Branch `feat/overlays`, Design `prompts/002-overlays-laden-keine-daten.design.md`)
+> Status: **umgesetzt** 15.10.2026 auf `feat/overlays` (Design § 9) · angelegt 14.10.2026 · Slug `overlays` (Branch `feat/overlays`, Design `prompts/002-overlays-laden-keine-daten.design.md`)
 > Abhängigkeiten: **001 (ARIA)** für `aria-busy` und die Live-Region (ohne 001: Ansagen weglassen und nachrüsten).
 > ag-Grid: Overlays „Loading“ / „No Rows“ sind Community; seit v35 zusätzlich Filter- und Export-Overlays.
 >
@@ -95,6 +95,6 @@ Kein Flackern beim schnellen Ein-/Ausblenden, Escaping, Aufräumen, keine Neuauf
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit API, Optionen, Wrapper-Entscheidung 🛑
-- [ ] O1–O12 umgesetzt und getestet; Spinner ohne JS-Animation; light/dark geprüft
-- [ ] `CrudTableModelFactory` zeigt beim Laden das Overlay (oder begründet, warum nicht)
+- [x] Design-Dokument mit API, Optionen, Wrapper-Entscheidung 🛑 (freigegeben 14.10.2026)
+- [x] O1–O12 umgesetzt und getestet; Spinner ohne JS-Animation; light/dark geprüft
+- [x] `CrudTableModelFactory` zeigt beim Laden das Overlay (nicht beim allerersten `fetchList`: da gibt es noch keine Tabelle)

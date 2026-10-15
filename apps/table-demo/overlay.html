@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+  Overlays "Loading…" / "No rows to show" / "No matching rows" (since 1.1.92) – also the recording page of video 03.
+  Start: pnpm serve:table-demo → http://localhost:4200/overlay.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – loading and empty overlays</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button { font: inherit; padding: 4px 10px; }
+    .table-div { height: 420px; width: 100%; }
+    .state { font-size: 14px; margin-top: 8px; opacity: .8; }
+  </style>
+</head>
+<body>
+<h1>Orders</h1>
+<div class="bar">
+  <button id="load">Load orders (1 s)</button>
+  <button id="load-empty">Load – empty answer</button>
+  <button id="refresh">Refresh (rows stay visible)</button>
+  <label>Filter customer <input id="filter" type="search" placeholder="e.g. 7"></label>
+  <label><input id="block" type="checkbox" checked> block while loading</label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<p class="state">Overlay: <strong id="state">–</strong></p>
+<script src="/src/overlay/overlay-demo.ts" type="module"></script>
+</body>
+</html>

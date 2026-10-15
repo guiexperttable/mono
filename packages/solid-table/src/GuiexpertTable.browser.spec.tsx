@@ -8,7 +8,7 @@ import type { TableModelIf } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable';
 import type { GeMouseEventFn } from './GuiexpertTableProps';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 const disposers: (() => void)[] = [];
@@ -167,5 +167,36 @@ describe('GuiexpertTable (Solid)', () => {
     expect(isDestroyed(tableReady.mock.calls[0][0])).toBe(true);
     expect(tableCount(host)).toBe(0);
     expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
+    const host = createHost();
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const [model, setModel] = createSignal(createModel(5));
+    const [loading, setLoading] = createSignal(true);
+    disposers.push(render(() => (
+      <GuiexpertTable tableModel={model()} tableReady={tableReady} loading={loading()} />
+    ), host));
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+
+    setLoading(false);
+    expect(overlayKind(host)).toBe('none');
+    setLoading(true);
+    expect(overlayKind(host)).toBe('loading');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+
+    setModel(createModel(2)); // re-created table keeps the overlay
+    expect(tableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
+  });
+
+  it('an overlay the app shows in tableReady is not hidden by the loading prop (since 1.1.92)', async () => {
+    const host = createHost();
+    disposers.push(render(() => (
+      <GuiexpertTable tableModel={createModel(5)} tableReady={api => api.showLoadingOverlay()} />
+    ), host));
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
   });
 });

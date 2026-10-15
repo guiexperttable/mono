@@ -46,6 +46,7 @@ Represents a store for HTML elements.
 - [scrollViewport](EleScope.md#scrollviewport)
 - [tableModel](EleScope.md#tablemodel)
 - [tableOptions](EleScope.md#tableoptions)
+- [tableOverlay](EleScope.md#tableoverlay)
 - [maxScrollHeightInPx](EleScope.md#maxscrollheightinpx)
 
 ### Methods
@@ -56,7 +57,9 @@ Represents a store for HTML elements.
 - [initHostAria](EleScope.md#inithostaria)
 - [removeHostAria](EleScope.md#removehostaria)
 - [resetSizeOfWrapperDiv](EleScope.md#resetsizeofwrapperdiv)
+- [restoreHostAriaAttribute](EleScope.md#restorehostariaattribute)
 - [setHostAriaAttribute](EleScope.md#sethostariaattribute)
+- [updateOverlay](EleScope.md#updateoverlay)
 
 ## Constructors
 
@@ -79,7 +82,7 @@ Represents a store for HTML elements.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L65)
+[src/lib/table/ele-scope.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L69)
 
 ## Properties
 
@@ -89,7 +92,7 @@ Represents a store for HTML elements.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L37)
+[src/lib/table/ele-scope.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L38)
 
 ___
 
@@ -99,7 +102,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L58)
+[src/lib/table/ele-scope.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L59)
 
 ___
 
@@ -109,7 +112,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L39)
+[src/lib/table/ele-scope.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L40)
 
 ___
 
@@ -119,7 +122,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L59)
+[src/lib/table/ele-scope.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L60)
 
 ___
 
@@ -129,7 +132,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L38)
+[src/lib/table/ele-scope.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L39)
 
 ___
 
@@ -139,7 +142,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L57)
+[src/lib/table/ele-scope.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L58)
 
 ___
 
@@ -149,7 +152,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L42)
+[src/lib/table/ele-scope.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L43)
 
 ___
 
@@ -159,7 +162,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L44)
+[src/lib/table/ele-scope.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L45)
 
 ___
 
@@ -169,7 +172,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L43)
+[src/lib/table/ele-scope.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L44)
 
 ___
 
@@ -179,7 +182,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L33)
+[src/lib/table/ele-scope.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L34)
 
 ___
 
@@ -189,7 +192,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L35)
+[src/lib/table/ele-scope.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L36)
 
 ___
 
@@ -199,7 +202,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L34)
+[src/lib/table/ele-scope.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L35)
 
 ___
 
@@ -215,7 +218,7 @@ The IDs this table uses for ARIA references (prefix from the host id).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L62)
+[src/lib/table/ele-scope.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L63)
 
 ___
 
@@ -225,7 +228,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L49)
+[src/lib/table/ele-scope.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L50)
 
 ___
 
@@ -235,7 +238,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L48)
+[src/lib/table/ele-scope.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L49)
 
 ___
 
@@ -245,7 +248,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L47)
+[src/lib/table/ele-scope.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L48)
 
 ___
 
@@ -255,7 +258,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L46)
+[src/lib/table/ele-scope.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L47)
 
 ___
 
@@ -265,7 +268,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L31)
+[src/lib/table/ele-scope.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L32)
 
 ___
 
@@ -275,7 +278,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L30)
+[src/lib/table/ele-scope.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L31)
 
 ___
 
@@ -285,7 +288,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L68)
+[src/lib/table/ele-scope.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L72)
 
 ___
 
@@ -295,7 +298,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L53)
+[src/lib/table/ele-scope.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L54)
 
 ___
 
@@ -305,7 +308,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L66)
+[src/lib/table/ele-scope.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L70)
 
 ___
 
@@ -315,7 +318,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L52)
+[src/lib/table/ele-scope.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L53)
 
 ___
 
@@ -325,7 +328,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L51)
+[src/lib/table/ele-scope.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L52)
 
 ___
 
@@ -335,7 +338,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L55)
+[src/lib/table/ele-scope.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L56)
 
 ___
 
@@ -345,7 +348,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L28)
+[src/lib/table/ele-scope.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L29)
 
 ___
 
@@ -355,7 +358,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L67)
+[src/lib/table/ele-scope.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L71)
 
 ___
 
@@ -365,7 +368,23 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L69)
+[src/lib/table/ele-scope.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L73)
+
+___
+
+### tableOverlay
+
+• `Readonly` **tableOverlay**: [`TableOverlay`](TableOverlay.md)
+
+The overlay layer over the body ("Loading…", "No rows to show").
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L66)
 
 ___
 
@@ -380,7 +399,7 @@ and GPU rasterization loses precision long before (1px borders disappear and tex
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L26)
+[src/lib/table/ele-scope.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L27)
 
 ## Methods
 
@@ -397,7 +416,7 @@ This method must be overwritten in child classes.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:408](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L408)
+[src/lib/table/ele-scope.ts:449](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L449)
 
 ___
 
@@ -413,7 +432,7 @@ Adjusts the containers and rows of the table based on the current state.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:265](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L265)
+[src/lib/table/ele-scope.ts:299](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L299)
 
 ___
 
@@ -436,7 +455,7 @@ The element that holds the rows of an area (`DivScope.child`).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:250](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L250)
+[src/lib/table/ele-scope.ts:284](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L284)
 
 ___
 
@@ -457,7 +476,7 @@ and description from the table options. Counts and the active cell follow with e
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L235)
+[src/lib/table/ele-scope.ts:269](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L269)
 
 ___
 
@@ -477,7 +496,7 @@ Removes the ARIA attributes the table has set on the host element (see [initHost
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:218](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L218)
+[src/lib/table/ele-scope.ts:252](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L252)
 
 ___
 
@@ -495,7 +514,34 @@ Returns nothing.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:419](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L419)
+[src/lib/table/ele-scope.ts:460](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L460)
+
+___
+
+### restoreHostAriaAttribute
+
+▸ **restoreHostAriaAttribute**(`key`): `void`
+
+Gives an ARIA attribute of the host back the value it had before the table changed it (e.g. `aria-busy` after
+loading), or removes it if the host had none.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `key` | `string` |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L236)
 
 ___
 
@@ -523,4 +569,25 @@ time, so that [removeHostAria](TableScope.md#removehostaria) can restore it (e.g
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:199](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L199)
+[src/lib/table/ele-scope.ts:216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L216)
+
+___
+
+### updateOverlay
+
+▸ **updateOverlay**(): `void`
+
+Shows the overlay that fits the current state (requested by the API, or "no rows" for an empty body).
+Overwritten in [RenderScope](RenderScope.md).
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L203)

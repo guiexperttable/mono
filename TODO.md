@@ -170,7 +170,11 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
 - [ ] ARIA-Folgepunkte: Tooltip bei Tastaturfokus sichtbar machen (`title` erreicht nur Screenreader) · Spaltenbreite
       und -reihenfolge per Tastatur · „alle auf-/zuklappen“-Icon im Baum-Header per Tastatur (heute `aria-hidden`,
       Enter je Knoten) · Demo-Repo-Folge `ep-035` (nach dem Release).
-- [ ] **002 Overlays „Lädt…“ / „Keine Daten“** in plain HTML/CSS (`prompts/002-overlays-laden-keine-daten.md`).
+- [x] **002 Overlays „Lädt…“ / „Keine Daten“** – Branch `feat/overlays`, Design
+      `prompts/002-overlays-laden-keine-daten.design.md`: `showLoadingOverlay`/`showNoRowsOverlay`/`hideOverlay`/
+      `getOverlayState`, `tableOptions.overlayOptions`, automatisch „No rows to show“ / „No matching rows“
+      (`AreaModelIf.getUnfilteredRowCount?`), CSS-Spinner, `loading`-Prop in allen Wrappern, CRUD zeigt beim Laden das
+      Overlay. Offen: Angular-Smoke-Test (es gibt noch kein Angular-Test-Setup), Demo-Repo (nach dem Release).
 - [ ] **003 Zustand speichern vervollständigen + State-API** (`prompts/003-zustand-speichern.md`). Befund 14.10.2026:
       `autoRestoreCheckedState` und `autoRestoreSelectedState` sind nur deklariert (stilles No-op), `isSame` ungenutzt;
       Sortierung wird nach Spaltenindex gespeichert (vermutlich falsch nach Spalten-Drag, Test fehlt); Spaltenbreite,
@@ -191,6 +195,10 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
 - [ ] **012 Rechts-nach-links-Sprachen (RTL)** (`prompts/012-rtl.md`), bewusst zuletzt.
 
 ## Mono-Repo / Build
+
+- [ ] `pnpm --filter @guiexpert/preact-table build` meldet beim Typ-Build des Core-Quelltexts (lib < ES2019) zwei
+      Fehler in `selection/selection-model.ts:387` (`flatMap`, implizites `any`) – nicht fatal (Build-Exit 0), aber
+      Rauschen; `lib` der Preact-tsconfig anheben oder die Stelle ohne `flatMap` schreiben (gefunden bei 002).
 
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
       (`@guiexpert/angular-table@^17.1.83`, `@guiexpert/table@^1.1.84`). Ziel: `workspace:`-Core +
@@ -495,6 +503,11 @@ Objekt-Tabelle hat `ge-focused-row`.
   bedient per Maus bzw. Enter auf der Fokuszelle), Tasten auf einem fokussierten Button/Link gehören ihm;
   `MaleFemaleToIconCellRenderer` legt das Symbol in ein `span[role=img]`; `ConvenienceDomService.addDiv()` setzt
   `aria-hidden`; `destroy()` stellt vorherige ARIA-Attribute des Hosts wieder her.
+
+- **Overlays (002, ab 1.1.92)**: Eine Tabelle mit leerem Body zeigt jetzt „No rows to show“ (bzw. „No matching rows“, wenn der
+  Filter alle Zeilen ausblendet) – abschaltbar mit `overlayOptions: { autoNoRows: false }`. Neues Div
+  `.ge-table-overlay` im Host (`aria-hidden`, z-index 10000); Host bekommt beim Laden `aria-busy="true"`.
+  `CrudTableModelFactory` zeigt während Anfragen „Loading…“ und blockiert dabei Maus und Editieren.
 
 ## Gefunden beim Aufbau der Schulung und der API-Doc (Okt. 2026)
 

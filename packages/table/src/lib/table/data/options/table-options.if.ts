@@ -11,6 +11,7 @@ import { FocusModelIf } from "../../focus/focus-model.if";
 import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.type";
 import { HeaderGroupOptionsIf } from './header-group-options.if';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
+import { OverlayOptionsIf } from "./overlay-options.if";
 
 /**
  * Represents the options for configuring a table.
@@ -325,4 +326,19 @@ export interface TableOptionsIf {
    * @since 1.1.91
    */
   ariaTexts?: Partial<AriaTextsIf>;
+
+  /**
+   * Texts and behaviour of the overlays over the body: "Loading…" ({@link TableApi.showLoadingOverlay}),
+   * "No rows to show" (empty body, automatic) and "No matching rows" (the filter hides all rows).
+   * Fields you leave out keep their default ({@link OverlayOptions}).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   overlayOptions: { noRowsText: "No orders yet", blockInteractionWhileLoading: false },
+   * };
+   *
+   * @since 1.1.92
+   */
+  overlayOptions?: Partial<OverlayOptionsIf>;
 }

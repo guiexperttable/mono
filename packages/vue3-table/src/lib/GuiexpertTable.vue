@@ -52,6 +52,15 @@ export default defineComponent({
     licenseKey: {
       default: '',
       required: false
+    },
+    /**
+     * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
+     * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
+     */
+    loading: {
+      required: false,
+      type: Boolean,
+      default: false
     }
   },
   emits: [
@@ -72,6 +81,7 @@ export default defineComponent({
     const root = ref(null);
     let clickTimer: ReturnType<typeof setTimeout> | undefined;
     let tableScope: TableScope | undefined;
+    let shownByProp = false; // :loading="false" hides only an overlay the prop showed (not one of the app)
 
     const emitMouseClicked = (evt: GeMouseEvent) => {
       const delay = props.debounceMouseClickDelay;
@@ -147,7 +157,19 @@ export default defineComponent({
       );
       tableScope = scope;
       scope.firstInit();
+      shownByProp = false;
+      applyLoading(); // a re-created table keeps showing the overlay
       emit("tableReady", scope.getApi());
+    };
+
+    const applyLoading = () => {
+      if (props.loading) {
+        tableScope?.showLoadingOverlay();
+        shownByProp = true;
+      } else if (shownByProp) {
+        tableScope?.hideOverlay();
+        shownByProp = false;
+      }
     };
 
 
@@ -163,6 +185,9 @@ export default defineComponent({
         initTable(root.value as HTMLDivElement);
       }
     });
+
+    // the loading prop: no re-creation of the table
+    watch(() => props.loading, applyLoading, { flush: 'sync' });
 
     watch(() => props.licenseKey, (licenseKey) => {
       if (licenseKey) LicenseManager.getInstance().setLicenseKey(licenseKey);

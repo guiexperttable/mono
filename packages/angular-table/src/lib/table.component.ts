@@ -83,6 +83,16 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Input()
   debounceMouseClickDelay: number = 150;
 
+  /**
+   * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it
+   * (`TableApi.showLoadingOverlay()` / `hideOverlay()`). Changing it does **not** re-create the table;
+   * a re-created table (new model) keeps showing it. Texts: `tableOptions.overlayOptions`.
+   *
+   * @since 1.1.92
+   */
+  @Input()
+  loading: boolean = false;
+
   private debounceMouseClick: Subject<GeMouseEvent> = new Subject<GeMouseEvent>();
 
   private tableScope?: TableScope;
@@ -137,7 +147,9 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
    */
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized && (changes["tableModel"] || changes["tableOptions"])) {
-      this.initModel();
+      this.initModel(); // applies `loading` to the new table
+    } else if (this.initialized && changes["loading"]) {
+      this.zone.runOutsideAngular(() => this.applyLoading());
     }
   }
 
@@ -184,7 +196,22 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
         this.elementRef.nativeElement, this.tableModel, this.domService, this.tableOptions, this
       );
       this.tableScope.firstInit();
+      this.shownByInput = false;
+      this.applyLoading();
       this.tableReady.next(this.tableScope.getApi());
+    }
+  }
+
+  /** the overlay was shown by the `loading` input: `false` hides only that one (not one the app showed itself) */
+  private shownByInput = false;
+
+  private applyLoading() {
+    if (this.loading) {
+      this.tableScope?.showLoadingOverlay();
+      this.shownByInput = true;
+    } else if (this.shownByInput) {
+      this.tableScope?.hideOverlay();
+      this.shownByInput = false;
     }
   }
 

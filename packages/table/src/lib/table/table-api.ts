@@ -1,3 +1,4 @@
+import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 import { SortState } from "./data/common/sort-state.type";
 import {TableScope} from "./table-scope";
 import {ColumnDefIf} from "./data/tablemodel/column/column-def.if";
@@ -708,6 +709,80 @@ export class TableApi {
    */
   announce(text: string): void {
     this.tableScope.announce(text);
+  }
+
+  /**
+   * Shows "Loading…" with a CSS spinner over the body – e.g. while a server answers. The header and footer stay
+   * readable; rows already shown stay visible under a semi-transparent layer. By default mouse and editing on the
+   * body are blocked until {@link hideOverlay} ({@link OverlayOptionsIf.blockInteractionWhileLoading}).
+   * Screen readers: the host gets `aria-busy="true"`, the text is announced.
+   *
+   * Texts, delay and own content: {@link TableOptionsIf.overlayOptions}. Framework wrappers have a `loading` prop
+   * that calls this method (no re-creation of the table).
+   *
+   * @example
+   * tableApi.showLoadingOverlay();
+   * fetch("/api/orders")
+   *   .then(response => response.json())
+   *   .then((orders: object[]) => {
+   *     tableApi.setRows(orders);
+   *     tableApi.repaintHard();
+   *   })
+   *   .finally(() => tableApi.hideOverlay()); // 0 rows? "No rows to show" appears by itself
+   *
+   * @param {string} [text] - text for this overlay only, e.g. `"Saving…"`; default {@link OverlayOptionsIf.loadingText}
+   * @since 1.1.92
+   * @see Training: [Live data](https://gui.expert/training/live-data/)
+   */
+  showLoadingOverlay(text?: string): void {
+    this.tableScope.showLoadingOverlay(text);
+  }
+
+  /**
+   * Shows the "no rows" overlay, also over rows – e.g. when the server says "no permission". An empty body shows
+   * "No rows to show" anyway ({@link OverlayOptionsIf.autoNoRows}); this method is for other cases.
+   * Ends with {@link hideOverlay}.
+   *
+   * @example
+   * tableApi.showNoRowsOverlay("You may not see these orders");
+   *
+   * @param {string} [text] - text for this overlay only; default {@link OverlayOptionsIf.noRowsText}
+   * @since 1.1.92
+   */
+  showNoRowsOverlay(text?: string): void {
+    this.tableScope.showNoRowsOverlay(text);
+  }
+
+  /**
+   * Ends the overlay shown by {@link showLoadingOverlay} or {@link showNoRowsOverlay}.
+   * "No rows to show" / "No matching rows" are not ended: they show the state of the body and stay as long as it
+   * is empty (switch them off with `overlayOptions: { autoNoRows: false }`).
+   *
+   * @example
+   * tableApi.showLoadingOverlay("Saving…");
+   * save(order).finally(() => tableApi.hideOverlay());
+   *
+   * @since 1.1.92
+   */
+  hideOverlay(): void {
+    this.tableScope.hideOverlay();
+  }
+
+  /**
+   * The overlay shown now: `"none"`, `"loading"`, `"noRows"` or `"noMatches"`. During
+   * {@link OverlayOptionsIf.loadingDelayInMs} the loading overlay is requested but not shown yet – the automatic
+   * overlay stays meanwhile (e.g. `"noRows"` of an empty table), so a fast answer causes no flicker.
+   *
+   * @example
+   * if (tableApi.getOverlayState() === "noMatches") {
+   *   resetFilterButton.hidden = false;
+   * }
+   *
+   * @returns {GeOverlayKind} the shown overlay
+   * @since 1.1.92
+   */
+  getOverlayState(): GeOverlayKind {
+    return this.tableScope.getOverlayState();
   }
 
   /**

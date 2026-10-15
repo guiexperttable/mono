@@ -7,7 +7,7 @@ import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './GuiexpertTable';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 let host: HTMLDivElement | undefined;
@@ -133,5 +133,24 @@ describe('GuiexpertTable (Preact)', () => {
     expect(isDestroyed(tableReady.mock.calls[0][0])).toBe(true);
     expect(tableCount(host)).toBe(0);
     expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('the loading prop shows and hides the overlay without re-creating the table (since 1.1.92)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const tableModel = createModel(5);
+    const tableOptions = new TableOptions();
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    await nextFrame();
+    expect(overlayKind(host)).toBe('loading');
+
+    rerender(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading={false} />);
+    expect(overlayKind(host)).toBe('none');
+    rerender(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    expect(overlayKind(host)).toBe('loading');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+
+    rerender(<GuiexpertTable tableModel={createModel(2)} tableOptions={tableOptions} tableReady={tableReady} loading />);
+    expect(tableReady).toHaveBeenCalledTimes(2);
+    expect(overlayKind(host)).toBe('loading');
   });
 });

@@ -270,6 +270,26 @@ export interface AreaModelIf {
   getRowCount(): number;
 
   /**
+   * The number of rows the area would show **without** the external filter. Optional: the table uses it to tell
+   * "No rows to show" (no rows at all) from "No matching rows" (the filter hides all rows) – see
+   * {@link OverlayOptionsIf}. Models without it always get "No rows to show".
+   *
+   * @returns {number} e.g. all rows of an object array; for a tree the displayed rows before filtering
+   *
+   * @example
+   * class OrdersBodyModel extends AreaModel {
+   *   private all: string[][] = [];
+   *   private shown: string[][] = [];
+   *   override getRowCount(): number { return this.shown.length; }
+   *   getUnfilteredRowCount(): number { return this.all.length; }
+   *   override getValueAt(rowIndex: number, columnIndex: number): any { return this.shown[rowIndex]?.[columnIndex]; }
+   * }
+   *
+   * @since 1.1.92
+   */
+  getUnfilteredRowCount?(): number;
+
+  /**
    * Returns the value of the cell at the specified row and column indices.
    * This is one of the most important methods in the area model, as it provides
    * the actual data to be displayed in each cell.

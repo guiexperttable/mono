@@ -88,6 +88,7 @@
 - [NumberPropertyType](classes/NumberPropertyType.md)
 - [ObjectPropertyType](classes/ObjectPropertyType.md)
 - [OsxShortcutActionIdMapping](classes/OsxShortcutActionIdMapping.md)
+- [OverlayOptions](classes/OverlayOptions.md)
 - [Padding](classes/Padding.md)
 - [PositiveAndNegativeNumberRenderer](classes/PositiveAndNegativeNumberRenderer.md)
 - [ProgressBarCellRenderer](classes/ProgressBarCellRenderer.md)
@@ -118,6 +119,7 @@
 - [TableModel](classes/TableModel.md)
 - [TableModelAndOptions](classes/TableModelAndOptions.md)
 - [TableOptions](classes/TableOptions.md)
+- [TableOverlay](classes/TableOverlay.md)
 - [TableScope](classes/TableScope.md)
 - [ThreeColorGradientArg](classes/ThreeColorGradientArg.md)
 - [TreeAriaInfo](classes/TreeAriaInfo.md)
@@ -166,6 +168,8 @@
 - [IconIf](interfaces/IconIf.md)
 - [ObjectArrayHolderIf](interfaces/ObjectArrayHolderIf.md)
 - [OnActionTriggeredIf](interfaces/OnActionTriggeredIf.md)
+- [OverlayKindInput](interfaces/OverlayKindInput.md)
+- [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
@@ -176,6 +180,7 @@
 - [TableModelAndOptionsIf](interfaces/TableModelAndOptionsIf.md)
 - [TableModelIf](interfaces/TableModelIf.md)
 - [TableOptionsIf](interfaces/TableOptionsIf.md)
+- [TableOverlayChange](interfaces/TableOverlayChange.md)
 - [ThreeColorGradientArgIf](interfaces/ThreeColorGradientArgIf.md)
 - [TreeAriaModel](interfaces/TreeAriaModel.md)
 - [TreeAriaRowInfo](interfaces/TreeAriaRowInfo.md)
@@ -199,6 +204,7 @@
 - [ExtendedSelectionType](modules.md#extendedselectiontype)
 - [FilterFunction](modules.md#filterfunction)
 - [FocusType](modules.md#focustype)
+- [GeOverlayKind](modules.md#geoverlaykind)
 - [GetEditRenderer](modules.md#geteditrenderer)
 - [GetRowIdFn](modules.md#getrowidfn)
 - [GetStorageKeyFn](modules.md#getstoragekeyfn)
@@ -274,6 +280,7 @@
 - [AvoidDoubleExecution](modules.md#avoiddoubleexecution)
 - [FalseFn](modules.md#falsefn)
 - [TrueFn](modules.md#truefn)
+- [calcOverlayKind](modules.md#calcoverlaykind)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [debounce](modules.md#debounce)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
@@ -1464,6 +1471,35 @@ harmonizeShortcut('arrowup');   // "up"
 
 [src/lib/table/action/shortcut-util.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L23)
 
+## Overlays
+
+### GeOverlayKind
+
+Ƭ **GeOverlayKind**: ``"none"`` \| ``"loading"`` \| ``"noRows"`` \| ``"noMatches"``
+
+The overlay the table shows over its body:
+- `"none"` – no overlay;
+- `"loading"` – spinner + "Loading…" ([TableApi.showLoadingOverlay](classes/TableApi.md#showloadingoverlay));
+- `"noRows"` – "No rows to show": the body is empty ([OverlayOptionsIf.autoNoRows](interfaces/OverlayOptionsIf.md#autonorows)) or
+  [TableApi.showNoRowsOverlay](classes/TableApi.md#shownorowsoverlay) was called;
+- `"noMatches"` – "No matching rows": the body has rows, but the external filter hides all of them.
+
+**`Example`**
+
+```ts
+if (tableApi.getOverlayState() === "noMatches") {
+  console.log("Reset the filter to see rows again");
+}
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/overlay/ge-overlay-kind.type.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/ge-overlay-kind.type.ts#L17)
+
 ## DOM
 
 ### HtmlStyle
@@ -1935,3 +1971,38 @@ The modified string with the suffix removed, or the original string if no suffix
 #### Defined in
 
 [src/lib/common/generator/string-util.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/string-util.ts#L31)
+
+## Internals
+
+### calcOverlayKind
+
+▸ **calcOverlayKind**(`input`): [`GeOverlayKind`](modules.md#geoverlaykind)
+
+Decides which overlay the table shows. Order: a manual overlay > "no matching rows" > "no rows to show".
+A model that cannot tell its unfiltered row count gets "no rows" (never a wrong "no matching rows"),
+an unknown row count (< 0) no overlay.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `input` | [`OverlayKindInput`](interfaces/OverlayKindInput.md) |
+
+#### Returns
+
+[`GeOverlayKind`](modules.md#geoverlaykind)
+
+**`Example`**
+
+```ts
+calcOverlayKind({ rowCount: 0, unfilteredRowCount: 100, autoNoRows: true }); // "noMatches"
+calcOverlayKind({ manual: "loading", rowCount: 0, autoNoRows: true });       // "loading"
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/overlay/calc-overlay-kind.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/calc-overlay-kind.ts#L32)

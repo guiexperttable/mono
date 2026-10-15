@@ -14,6 +14,8 @@ export interface GuiexpertTableProps {
   tableModel: TableModelIf;
   tableOptions?: TableOptionsIf;
   licenseKey?: string;
+  /** `true` shows the loading overlay ("Loading…"), `false` hides it – no re-creation of the table. @since 1.1.92 */
+  loading?: boolean;
   /** Callback props – alternative to `on:…` (required in Svelte 5 runes mode). */
   onTableReady?: (api: TableApi) => void;
   onMouseClicked?: (evt: GeMouseEvent) => void;

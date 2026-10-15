@@ -185,7 +185,7 @@ describe('CrudTableModelFactory', () => {
 
       expect(listener).toHaveBeenCalledWith(evt);
       expect(deleteItem).toHaveBeenCalledWith(options, 1);
-      expect(factory.bodyModel!.getAllRows().map((r: Person) => r.id)).toEqual([22]);
+      await vi.waitFor(() => expect(factory.bodyModel!.getAllRows().map((r: Person) => r.id)).toEqual([22]));
       expect(factory.bodyModel!.getRowCount()).toBe(1);
     });
 

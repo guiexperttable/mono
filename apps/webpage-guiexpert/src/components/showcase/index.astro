@@ -11,6 +11,7 @@ import strategyImage from "../../assets/screens/thumbs/strategy.png";
 import treetableImage from "../../assets/screens/thumbs/treetable.png";
 import rowgroupingImage from "../../assets/screens/thumbs/rowgrouping.png";
 import pivotImage from "../../assets/screens/thumbs/pivot.png";
+import aggregationImage from "../../assets/screens/thumbs/aggregation.png";
 import idFilterImage from "../../assets/screens/thumbs/idfilter.png";
 import blackoutImage from "../../assets/screens/thumbs/blackout.png";
 import lafImage from "../../assets/screens/thumbs/laf.png";
@@ -145,6 +146,16 @@ import ShowcaseCard from "./common/ShowcaseCard.astro";
             url="/showcase/treetable/run">
           <p>
             Tree table, fixed columns, editable, multi selection area </p>
+        </ShowcaseCard>
+      </div>
+
+      <div>
+        <ShowcaseCard
+            title="Totals & aggregation"
+            img={aggregationImage}
+            url="/showcase/aggregation/run">
+          <p>
+            50,000 orders with sum, average and maximum in the footer, a status bar for the selected cells, totals follow the filter </p>
         </ShowcaseCard>
       </div>
 

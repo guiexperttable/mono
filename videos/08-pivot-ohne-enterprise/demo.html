@@ -1,0 +1,96 @@
+<!doctype html>
+<!--
+  Recording page for episode 08 "Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/08-pivot-ohne-enterprise/demo.html
+  Runs the code of snippet.ts (plain JS) with 50,000 generated orders.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Pivot-Tabelle</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button, .bar input, .bar select { font: inherit; padding: 4px 12px; }
+    .table-div { height: calc(100vh - 130px); margin: 0 16px; font-size: 17px; }
+  </style>
+</head>
+<body>
+<h1>50.000 Bestellungen</h1>
+<div class="bar">
+  <label>Spalten
+    <select id="auswahl">
+      <option value="jahr" selected>Jahr</option>
+      <option value="quartal">Jahr › Quartal</option>
+      <option value="produkt">Produkt</option>
+    </select>
+  </label>
+  <label>Wert
+    <select id="wert">
+      <option value="sum" selected>Summe</option>
+      <option value="avg">Mittelwert</option>
+    </select>
+  </label>
+  <button id="auf">Alle auf</button>
+  <button id="zu">Alle zu</button>
+  <label>Filter <input id="filter" type="search" placeholder="z. B. Laptop"></label>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import { EventAdapter, PivotFactory, SimpleDomService, TableOptions, TableScope } from "@guiexpert/table";
+
+  const ORTE = [["Deutschland", "Hamburg"], ["Deutschland", "Berlin"], ["Deutschland", "München"], ["Österreich", "Wien"],
+    ["Österreich", "Graz"], ["Schweiz", "Zürich"], ["Frankreich", "Paris"], ["Italien", "Mailand"], ["Spanien", "Madrid"]];
+  const PRODUKTE = [["Laptop", 1299], ["Monitor", 349], ["Tastatur", 89], ["Maus", 39], ["Headset", 149]];
+  let seed = 42;
+  const zufall = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const start = Date.UTC(2024, 0, 1);
+  const bestellungen = Array.from({ length: 50_000 }, () => {
+    const [land, stadt] = ORTE[Math.floor(zufall() * ORTE.length)];
+    const [produkt, preis] = PRODUKTE[Math.floor(zufall() * PRODUKTE.length)];
+    const menge = 1 + Math.floor(zufall() * 20);
+    const datum = new Date(start + Math.floor(zufall() * 1096) * 86_400_000).toISOString().slice(0, 10);
+    return { land, stadt, produkt, datum, menge, summe: Math.round(menge * preis * (0.85 + zufall() * 0.3)) };
+  });
+  let filterText = "";
+  const auswahl = document.querySelector("#auswahl");
+  const JAHR = { name: "jahr", value: b => b.datum.slice(0, 4) };
+  const QUARTAL = { name: "quartal", value: b => Math.ceil(Number(b.datum.slice(5, 7)) / 3), format: q => `Q${q}` };
+  const SPALTEN = { jahr: [JAHR], quartal: [JAHR, QUARTAL], produkt: ["produkt"] };
+  const WERTE = { sum: ["summe"], avg: [{ value: "summe", aggregator: "avg", label: "Ø summe", format: v => v === undefined ? "" : Math.round(v).toLocaleString("de-DE") }] };
+
+  // --- code of snippet.ts ---
+  const tableModel = PivotFactory.createTableModel({
+    rows: bestellungen,
+    rowFields: ["land", "stadt"],
+    columnFields: [JAHR],
+    values: ["summe"],
+    expanded: 0
+  });
+  const tableOptions = {
+    ...new TableOptions(),
+    externalFilterFunction: b => !filterText || b.produkt.toLowerCase().includes(filterText)
+  };
+  const host = document.querySelector(".table-div");
+  const api = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter())
+    .firstInit().getApi();
+  auswahl.onchange = () => api.setPivotConfig({ columnFields: SPALTEN[auswahl.value] });
+  // ---
+
+  document.querySelector("#wert").addEventListener("change", e => api.setPivotConfig({ values: WERTE[e.target.value] }));
+  document.querySelector("#auf").addEventListener("click", () => api.expandAll());
+  document.querySelector("#zu").addEventListener("click", () => api.collapseAll());
+  document.querySelector("#filter").addEventListener("input", e => {
+    filterText = e.target.value.trim().toLowerCase();
+    api.externalFilterChanged();
+  });
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

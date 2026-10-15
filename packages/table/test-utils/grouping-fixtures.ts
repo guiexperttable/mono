@@ -74,3 +74,26 @@ export const R4 = { Nord: 150, Süd: 80, total: 230, rows: [100, 50, 80] };
 
 /** R5: R1 sorted by umsatz descending. */
 export const R5 = { groups: ['Nord', 'Süd'], nordRows: [120, 100, 50] };
+
+// ---- Pivot (prompt 007): expected results of the reference cases (computed by hand, see prompts/007-pivot.md) ----
+
+/** Case 1: rows region, columns monat (Jan, Feb in data order), sum umsatz. */
+export const P1 = {
+  Nord: { Jan: 150, Feb: 120, total: 270 },
+  Süd: { Jan: 80, Feb: 100, total: 180 },
+  total: { Jan: 230, Feb: 220, total: 450 },
+};
+
+/** Case 2: rows region › produkt, columns monat, sum umsatz – `undefined` = no row has this combination. */
+export const P2 = {
+  Nord: { Jan: 150, Feb: 120, total: 270, A: { Jan: 100, Feb: 120, total: 220 }, B: { Jan: 50, Feb: undefined, total: 50 } },
+  Süd: { Jan: 80, Feb: 100, total: 180, A: { Jan: 80, Feb: 30, total: 110 }, B: { Jan: undefined, Feb: 70, total: 70 } },
+  total: { Jan: 230, Feb: 220, total: 450 },
+};
+
+/** Case 3: like case 1 with avg – totals are the mean of the rows (Jan 230 / 3), never the mean of the means (77.5). */
+export const P3 = {
+  Nord: { Jan: 75, Feb: 120, total: 90 },
+  Süd: { Jan: 80, Feb: 50, total: 60 },
+  total: { Jan: 230 / 3, Feb: 220 / 3, total: 75 },
+};

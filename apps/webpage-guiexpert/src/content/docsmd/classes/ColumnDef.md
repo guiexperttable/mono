@@ -39,6 +39,8 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 
   ↳ [`RowGroupColumnDef`](RowGroupColumnDef.md)
 
+  ↳ [`PivotColumnDef`](PivotColumnDef.md)
+
 ## Implements
 
 - [`ColumnDefIf`](../interfaces/ColumnDefIf.md)

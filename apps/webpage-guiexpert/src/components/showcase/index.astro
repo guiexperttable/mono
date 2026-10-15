@@ -10,6 +10,7 @@ import fpsImage from "../../assets/screens/thumbs/fps.png";
 import strategyImage from "../../assets/screens/thumbs/strategy.png";
 import treetableImage from "../../assets/screens/thumbs/treetable.png";
 import rowgroupingImage from "../../assets/screens/thumbs/rowgrouping.png";
+import pivotImage from "../../assets/screens/thumbs/pivot.png";
 import idFilterImage from "../../assets/screens/thumbs/idfilter.png";
 import blackoutImage from "../../assets/screens/thumbs/blackout.png";
 import lafImage from "../../assets/screens/thumbs/laf.png";
@@ -154,6 +155,16 @@ import ShowcaseCard from "./common/ShowcaseCard.astro";
             url="/showcase/rowgrouping/run">
           <p>
             50,000 orders grouped by country and city: sums, average and a total row, regroup at runtime </p>
+        </ShowcaseCard>
+      </div>
+
+      <div>
+        <ShowcaseCard
+            title="Pivot table"
+            img={pivotImage}
+            url="/showcase/pivot/run">
+          <p>
+            50,000 orders as countries × years and quarters: revenue, subtotals, collapsible years, pivot again at runtime </p>
         </ShowcaseCard>
       </div>
 

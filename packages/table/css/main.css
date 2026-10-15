@@ -439,6 +439,13 @@
   --ge-table-row-group-text: inherit;
   --ge-table-row-group-label-font-weight: 600;
 
+  /* Pivot tables: subtotals, totals, empty cells (since 1.1.94) */
+  --ge-table-pivot-subtotal-bg: rgba(0, 0, 0, 0.035);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(0, 0, 0, 0.07);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #6b7280;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
@@ -530,6 +537,13 @@ html[data-theme="dark"] {
   --ge-table-row-group-text: inherit;
   --ge-table-row-group-label-font-weight: 600;
 
+  /* Pivot tables: subtotals, totals, empty cells (since 1.1.94) */
+  --ge-table-pivot-subtotal-bg: rgba(255, 255, 255, 0.05);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(255, 255, 255, 0.1);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #9ca3af;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */
   --ge-table-overlay-content-bg: #1f2937;
@@ -541,6 +555,48 @@ html[data-theme="dark"] {
   /* Row numbers (since 1.1.93) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #aaa;
+}
+/* Pivot tables (PivotFactory / AreaModelPivot, since 1.1.94) */
+
+/* every value cell: numbers on the end side, same digit widths */
+.ge-table-pivot-value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the label in the group column ("Nord") */
+.ge-table-pivot-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* subtotals: group rows and the total columns of column groups */
+.ge-table-col-div.ge-table-pivot-subtotal {
+  background-color: var(--ge-table-pivot-subtotal-bg);
+  font-weight: var(--ge-table-pivot-subtotal-font-weight);
+}
+
+/* totals: the total column(s) and the total row */
+.ge-table-col-div.ge-table-pivot-total {
+  background-color: var(--ge-table-pivot-total-bg);
+  font-weight: var(--ge-table-pivot-total-font-weight);
+}
+
+/* a combination without data (emptyText, e.g. "–") */
+.ge-table-pivot-empty {
+  color: var(--ge-table-pivot-empty-text);
+}
+
+/* header: a column group ("2026", "Jan") starts at the left of its span, a column label ("Q1", "Revenue") sits above
+   its numbers (value columns only – the group column keeps its alignment) */
+.ge-table-pivot-header-group {
+  text-align: start;
+  padding-inline-start: 6px;
+}
+
+.ge-table-pivot-header.ge-table-pivot-header-column {
+  text-align: end;
 }
 /* Row grouping (RowGroupFactory / AreaModelRowGroups, since 1.1.94) */
 

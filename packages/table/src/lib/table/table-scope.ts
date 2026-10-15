@@ -31,7 +31,8 @@ import { EventAdapter } from './event-adapter';
 import { SimpleDomService } from './service/simple-dom-service';
 import { TableOptions } from './data/options/table-options';
 import { TreeRowIf } from './data/common/tree-row-if';
-import { isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import type { PivotConfigIf } from './pivot/pivot-config.if';
 import type { DerivedValuesChangeIf } from './data/tablemodel/areamodel/derived-values-change.if';
 import type { RowGroupField } from './rowgroup/row-group-field.type';
 import { updateRowGroupLayout } from './rowgroup/row-group-layout';
@@ -969,6 +970,39 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.repaintHard();
     this.stateService.markDirty('tree');
     this.stateService.markDirty('columns');
+    return true;
+  }
+
+  /**
+   * Pivots a pivot table again (see {@link TableApi.setPivotConfig}): new columns, header and totals in the same model,
+   * then the layout of the table is built again. Sorting and selection are reset (the columns are different).
+   *
+   * @param {Partial<PivotConfigIf>} changes - the changed parts of the configuration
+   * @param {unknown[]} [rows] - new source rows
+   * @returns {boolean} false if the table model is no pivot table
+   * @since 1.1.94
+   */
+  setPivotConfig(changes: Partial<PivotConfigIf>, rows?: unknown[]): boolean {
+    const model = this.tableModel;
+    if (!isPivotTableModel(model)) {
+      return false;
+    }
+    model.setPivotConfig(changes, rows);   // throws for an invalid configuration – before anything changes
+    // the column indices change: sorting, selection and focus refer to the old columns
+    (model.getColumnDefs() ?? []).forEach(def => def.sortState = undefined);
+    this.lastSortCompareFn = undefined;
+    this.clearSelection();
+    (this.getFocusModel ? this.getFocusModel() : undefined)?.clear();
+    for (const areaIdent of ['header', 'body', 'footer'] as const) {
+      this.colAndRowspanModels[areaIdent]?.init();
+    }
+    this.invalidateAggregates();
+    this.firstInit();
+    this.repaintHard();
+    this.stateService.markDirty('columns');
+    this.stateService.markDirty('sort');
+    this.stateService.markDirty('tree');
+    this.stateService.markDirty('headerGroups');
     return true;
   }
 

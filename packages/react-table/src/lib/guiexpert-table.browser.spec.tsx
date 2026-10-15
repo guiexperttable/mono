@@ -10,7 +10,7 @@ import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createGroupedModel, createHost, createModel, groupLabels, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -207,6 +207,26 @@ describe('GuiexpertTable (React)', () => {
     act(() => { api.setRowGroupBy(['produkt']); });
     await nextFrame();
     expect(groupLabels(host)[0]).toBe('A (4)');
+    expect(tableReady).toHaveBeenCalledTimes(1);
+    expect(destroy).not.toHaveBeenCalled();
+    rerender(<GuiexpertTable tableModel={createModel(3)} tableReady={tableReady} />);
+    await nextFrame();
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(tableReady).toHaveBeenCalledTimes(2);
+  });
+
+  it('a pivot table: rows and totals render, setPivotConfig pivots again without a rebuild (since 1.1.94)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const destroy = vi.spyOn(TableScope.prototype, 'destroy');
+    const host = mount(<GuiexpertTable tableModel={createPivotModel()} tableReady={tableReady} />);
+    await nextFrame();
+    expect(groupLabels(host)).toEqual(['Nord', 'Süd']);
+    expect(pivotTotals(host)).toEqual(['270', '180']);
+    const api = tableReady.mock.calls[0][0];
+    act(() => { api.setPivotConfig({ rowFields: ['produkt'] }); });
+    await nextFrame();
+    expect(groupLabels(host)).toEqual(['A', 'B']);
+    expect(pivotTotals(host)).toEqual(['330', '120']);
     expect(tableReady).toHaveBeenCalledTimes(1);
     expect(destroy).not.toHaveBeenCalled();
     rerender(<GuiexpertTable tableModel={createModel(3)} tableReady={tableReady} />);

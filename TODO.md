@@ -228,9 +228,23 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Gesamtzeile oben/Zwischensummen unten (ag-Grid `groupTotalRow`) · `AreaModelRowGroups` mit 1 Mio. Zeilen ~1,2 s im
       Container (eine `TreeRow` je Zeile; Engine 0,64 s) · Website-Showcases laden eine eigene CSS-Kopie
       (`src/styles/ge-table.css`) statt `@guiexpert/table/css/main.css` – neue Klassen dort jedes Mal nachtragen.
-- [ ] **007 Pivot-Tabellen** (`prompts/007-pivot.md`), nach 005 und 006; die Engine aus 006 steht bereit (`groupRows`,
-      `RowGroup.sourceIndices`, `computeLeaf`/`mergeChildren` in `rowgroup/group-rows-internals.ts`); auf der Website sind
-      „Row grouping“ und „Pivot tables“ schon getrennte Zeilen (Pivot weiter „–“).
+- [x] **007 Pivot-Tabellen** – Branch `feat/pivot`, Design `prompts/007-pivot.design.md`: DOM-freie Engine `pivotRows()` →
+      `PivotResult` (`pivot/`, nutzt `groupRowsResolved` aus 006), `PivotFactory.createTableModel()` → `PivotTableModel`
+      (Unterklasse von `TableModel`), `AreaModelPivot` (Unterklasse von `AreaModelTree`), `AreaModelPivotFooter`,
+      `PivotColumnDef`, `api.setPivotConfig()` / `getPivotConfig()`, `AreaModelCellGroups.setGroups()`,
+      `AreaModelIf.isRowHeaderCell?()`, `isPivotTableModel`, `isAreaModelPivot`, `isPivotColumnDef`; CSS `ge-table-pivot-*`.
+      Showcase `pivot`, Training-Kapitel 37, `videos/08-pivot-ohne-enterprise/`. Selbständig umgesetzt.
+      Offen: Demo-Repo `ep-037` (nach dem Release, Freigabe), Angular-Demo-Route `pivot` erst nach dem Release (die App
+      nutzt npm-Pakete), Bench auf dem Mac nachmessen.
+- [ ] Folgepunkte 007: Feldliste per Drag & Drop (baut auf `api.setPivotConfig`) · Zwischensummen-Zeilen unterhalb der
+      Gruppen (ag-Grid `groupTotalRow: "bottom"`) · Filter auf fertige Pivot-Zeilen („nur Regionen > 200“) · ein
+      Doppelklick auf eine Spaltengruppen-Zelle im Header („2026“) sortiert nach der ersten Spalte der Gruppe (Header-Gruppen
+      allgemein: die Gruppenzelle trägt den Spaltenindex ihrer ersten Spalte) · eine zugeklappte Header-Gruppe zeigt ihren
+      Pfeil in der unteren Header-Zeile (allgemeines Verhalten von `AreaModelCellGroups`: die zugeklappte Gruppe reicht über
+      zwei Zeilen) · Header-Gruppenzellen werden doppelt gezeichnet (Span-Zeile, s. unten) – Playwright klickt den Pfeil nur
+      mit `force` · `pivotRows` mit 1 Mio. Zeilen, 2 × 2 Ebenen, 2 Werten ~0,95 s im Container (Engine: zweimal
+      `groupRows`, dann ein Durchlauf) · Spaltenschlüssel folgen dem Filter nicht (bewusst stabil; `setPivotConfig({})`
+      baut sie aus allen Zeilen) · mit Filter kündigt `setPivotConfig` die Zeilenzahl erneut an und filtert zweimal (`firstInit()`).
 - [ ] **008 Berechnete Spalten, „Show values as“, Formeln** (`prompts/008-formeln-berechnete-spalten-show-values-as.md`).
 - [ ] **009 Zeilen ziehen (Row Drag)** (`prompts/009-row-drag.md`).
 - [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
@@ -570,6 +584,11 @@ Objekt-Tabelle hat `ge-focused-row`.
   Nummernspalte keine Verhaltensänderung. Mit Nummernspalte an Index 0 sitzen `CheckboxColumnDef`, Baumpfeil und
   `showCheckboxWihoutExtraColumn` an Index 1 (vorher fest an 0). `TableFactory.buildByTypedRows(rows, [])` wirft nicht
   mehr. `RenderScope.getTreeArrowColumnIndex()` liefert `number` statt `0 | 1` (protected).
+- **Pivot (007, ab 1.1.94)**: neu `PivotFactory`, `PivotTableModel`, `AreaModelPivot`, `AreaModelPivotFooter`, `pivotRows()`,
+  `api.setPivotConfig()`/`getPivotConfig()`. Ohne Pivot keine Verhaltensänderung, außer: `AreaModelCellGroups.groups` ist nicht
+  mehr `readonly` (neu `setGroups()`); neues optionales `AreaModelIf.isRowHeaderCell?()`; Zeilen-Divs eines Bereichs, deren
+  Zellen alle von einem Span darüber verdeckt sind (z. B. zweite Header-Zeile einer fixierten Spalte unter Header-Gruppen),
+  bekommen `role="presentation"` statt `row` (vorher axe-Fehler „aria-required-children“).
 - **Row Grouping (006, ab 1.1.94)**: neu `RowGroupFactory`, `AreaModelRowGroups`, `groupRows()`/`aggregateRowGroups()`,
   `api.setRowGroupBy()`/`getRowGroupBy()`. Ohne Gruppierung keine Verhaltensänderung, außer: `AreaModelIf.invalidateDerivedValues?()`
   bekommt nach Edit und `updateCells()` ein optionales Argument `{ area, rowIndices }` (eigene Modelle dürfen es ignorieren);

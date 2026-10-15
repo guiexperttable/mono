@@ -7,7 +7,7 @@
 // Imports only `@guiexpert/table` (alias) and relative files – no `vitest` here: the wrapper's own Vitest must be
 // used (CI installs only the wrapper packages, packages/table/node_modules is missing there).
 // Lives outside src/ on purpose: it must not end up in any npm package.
-import { RowGroupFactory, TableFactory } from '@guiexpert/table';
+import { PivotFactory, RowGroupFactory, TableFactory } from '@guiexpert/table';
 import type { GeMouseEvent, TableApi, TableModelIf } from '@guiexpert/table';
 import { nextFrame, renderedRows } from './mount-table'; // also loads css/main.css
 
@@ -35,6 +35,28 @@ export function createGroupedModel(): TableModelIf {
     groupBy: ['region'],
     aggregations: { umsatz: 'sum' },
   });
+}
+
+/**
+ * A pivot table (since 1.1.94): the 6 sales, rows `region`, columns `monat` (Jan, Feb), sum of `umsatz`, total column
+ * fixed on the right, total row. Group column first: the rows read "Nord", "Süd".
+ */
+export function createPivotModel(): TableModelIf {
+  return PivotFactory.createTableModel({
+    rows: [
+      { region: 'Nord', produkt: 'A', monat: 'Jan', umsatz: 100 }, { region: 'Nord', produkt: 'B', monat: 'Jan', umsatz: 50 },
+      { region: 'Süd', produkt: 'A', monat: 'Jan', umsatz: 80 }, { region: 'Nord', produkt: 'A', monat: 'Feb', umsatz: 120 },
+      { region: 'Süd', produkt: 'B', monat: 'Feb', umsatz: 70 }, { region: 'Süd', produkt: 'A', monat: 'Feb', umsatz: 30 },
+    ],
+    rowFields: ['region'],
+    columnFields: [{ value: 'monat', order: 'insertion' }],
+    values: ['umsatz'],
+  });
+}
+
+/** The texts of the rendered total column (fixed on the right) of a pivot table. */
+export function pivotTotals(container: Element): string[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('.ge-table-body-east .ge-table-label'), e => e.textContent ?? '');
 }
 
 /** The label texts of the rendered group column (fixed on the left, column 0). */

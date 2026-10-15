@@ -25,7 +25,8 @@ import { Code } from "astro-expressive-code/components";
   </table>
   <p>
     The tree table (<ChapterLink slug="tree-table" />) needs data that is already nested. Row grouping builds that tree
-    for you – since <code>@guiexpert/table@1.1.94</code> with one factory call. Pivot tables are not built in yet.
+    for you – since <code>@guiexpert/table@1.1.94</code> with one factory call. Data values as columns: the pivot table
+    (<ChapterLink slug="pivot-tables" />).
   </p>
 
   <h2 id="factory">One factory call</h2>
@@ -124,7 +125,7 @@ import { Code } from "astro-expressive-code/components";
 const perCountry = body.getGroups().map(g => ({ country: g.label, total: g.results["total"], orders: g.count }));`} />
 
   <Callout type="note" title="Not included">
-    <p>No group panel by drag and drop, no Excel outline levels, no pivot tables (data values as columns) – yet.
+    <p>No group panel by drag and drop, no Excel outline levels – yet. Data values as columns: <ChapterLink slug="pivot-tables" />.
       In ag-Grid, row grouping is an Enterprise feature; here it is MIT-licensed, also for commercial use.</p>
   </Callout>
   <Callout type="version">
@@ -132,5 +133,5 @@ const perCountry = body.getGroups().map(g => ({ country: g.label, total: g.resul
   </Callout>
 
   <h2 id="next">Next</h2>
-  <p>Back to the overview of all chapters, or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+  <p>Values of a field as columns – revenue per country <em>and</em> quarter: <ChapterLink slug="pivot-tables" />.</p>
 </TrainingLayout>

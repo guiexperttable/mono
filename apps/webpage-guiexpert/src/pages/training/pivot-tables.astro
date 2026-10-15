@@ -1,0 +1,124 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="pivot-tables">
+
+  <h2 id="idea">Pivot is not transposing</h2>
+  <p>
+    “Revenue per country and quarter” – the countries as rows, the quarters as columns. Transposing would only swap rows
+    and columns of a table you already have. A pivot table does three things at once:
+  </p>
+  <ol>
+    <li><strong>group</strong> the rows by row fields (country › city – a hierarchy, as in <ChapterLink slug="row-grouping" />),</li>
+    <li>turn the <strong>values of column fields into columns</strong> (2025, 2026 › Q1 … Q4 – a header made from the data,
+      as in <ChapterLink slug="header-groups" />),</li>
+    <li><strong>aggregate</strong> a value per row × column, with subtotals and totals (the aggregators of
+      <ChapterLink slug="footer-totals" />).</li>
+  </ol>
+  <p>
+    So the number of columns depends on the data, and there are no detail rows: every cell is a total. Since
+    <code>@guiexpert/table@1.1.94</code> this is one factory call – MIT-licensed; in ag-Grid pivoting is an Enterprise feature.
+  </p>
+
+  <h2 id="factory">One factory call</h2>
+  <p>
+    <ApiLink name="PivotFactory.createTableModel" /> takes the rows, the row fields, the column fields and the values.
+    Fields have the form of a row grouping level – a property path, a function or <ApiLink name="RowGroupFieldIf" /> with
+    name, label, format and order. The year and the quarter are functions of the order date:
+  </p>
+  <Snippet file="demos/pivot-tables.ts" region="fields" title="src/model/order-pivot.ts" />
+  <Snippet file="demos/pivot-tables.ts" region="model" />
+  <LiveDemo name="pivot-tables" title="100,000 orders as a pivot table" height={460}
+            caption="Open a country, collapse a year with its arrow, switch the columns, type “laptop” – click a cell for its orders." />
+  <p>What the factory builds:</p>
+  <ul>
+    <li>a <strong>group column</strong> with arrows and labels, fixed on the left (header <code>"Country › City"</code>);</li>
+    <li>one column per <strong>column key × value</strong> – with two column fields a two-row header, and behind every year a
+      <strong>year total</strong> (<code>columnSubtotals</code>): the arrow of the year collapses it to that total, the widths
+      of the other columns stay;</li>
+    <li>the <strong>total columns</strong> fixed on the right (<code>totalColumn: true</code> lets them scroll,
+      <code>false</code> removes them) and a <strong>total row</strong> in the footer (<code>totalRow: false</code>);</li>
+    <li>a <ApiLink name="PivotTableModel" /> – a normal table model for every framework wrapper – with an
+      <ApiLink name="AreaModelPivot" /> as body: a tree, so <ApiLink name="TableApi.expandAll" />, the keyboard and screen
+      readers work as in <ChapterLink slug="tree-table" />.</li>
+  </ul>
+
+  <h2 id="values">Several values, computed keys</h2>
+  <p>
+    A value is a property path (<code>"total"</code> – summed) or <ApiLink name="PivotValueIf" /> with an aggregator, a
+    label and a format. Two values give every column key two columns:
+  </p>
+  <Snippet file="demos/pivot-tables.ts" region="values" />
+  <ul>
+    <li>Keys are sorted ascending – <code>order: "desc"</code>, <code>"insertion"</code> (order in the data) or your own
+      comparison, e.g. month names in calendar order.</li>
+    <li><code>null</code>, <code>undefined</code> and <code>""</code> are one key <code>"(empty)"</code>, always last – for rows
+      and columns.</li>
+    <li>A combination without orders stays <strong>empty</strong> (<code>undefined</code>, an empty cell in Excel) – not 0.
+      <code>emptyText: "–"</code> shows a dash.</li>
+    <li>Too many column keys? <code>maxColumns</code> (default 1,000) cuts them off with a warning – the totals still count
+      every row.</li>
+  </ul>
+
+  <h2 id="average">The average trap</h2>
+  <p>Six sales, <code>rowFields: ["region"]</code>, <code>columnFields: ["monat"]</code>, the average of <code>umsatz</code>:</p>
+  <table>
+    <thead><tr><th></th><th>Jan</th><th>Feb</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><th>Nord</th><td>100, 50 → 75</td><td>120 → 120</td><td>90</td></tr>
+      <tr><th>Süd</th><td>80 → 80</td><td>70, 30 → 50</td><td>60</td></tr>
+      <tr><th>Total</th><td><strong>76.67</strong> – not (75 + 80) / 2 = 77.5</td><td>73.33</td><td>75</td></tr>
+    </tbody>
+  </table>
+  <p>
+    A subtotal or total is never computed from the finished cells. Every cell keeps the <em>state</em> of its aggregator
+    (sum and count), and subtotals and totals merge these states – first along the columns, then along the rows. One pass
+    over the rows, and every level is right – also for your own aggregator if its <code>merge</code> is right.
+  </p>
+
+  <h2 id="filter">Filter and pivot again</h2>
+  <p>
+    The filter function gets <strong>your orders</strong> – the same function as in a flat table
+    (<ChapterLink slug="filtering" />). It works <em>before</em> the aggregation: all cells, subtotals and totals follow,
+    rows without a match disappear, the columns stay:
+  </p>
+  <Snippet file="demos/pivot-tables.ts" region="filter" />
+  <p>
+    A new table model would rebuild the table in every framework wrapper. <ApiLink name="TableApi.setPivotConfig" /> changes
+    the fields, values or rows of the existing model – the same table gets new columns; open rows, the filter and the
+    widths of columns that stay are kept, sorting and selection start fresh:
+  </p>
+  <Snippet file="demos/pivot-tables.ts" region="repivot" />
+
+  <h2 id="drill">Sort, export, drill down</h2>
+  <ul>
+    <li>A double click on a value header sorts the rows of every level by that value, empty cells last
+      (<ChapterLink slug="sorting" />); on the group column by key.</li>
+    <li>Excel and the clipboard (<ChapterLink slug="excel-export" />) get the pivot as you see it: header labels, raw numbers,
+      subtotals and totals.</li>
+    <li>Which orders are behind a number? <ApiLink name="AreaModelPivot.getCellSourceRows" />:</li>
+  </ul>
+  <Snippet file="demos/pivot-tables.ts" region="drill" />
+  <p>For a chart next to the table, <ApiLink name="AreaModelPivot.getResult" /> gives the keys and every value – and
+    <ApiLink name="pivotRows" /> does the same for any array without a table:</p>
+  <Code lang="ts" code={`const result = pivotRows(orders, { rowFields: ["country"], columnFields: [YEAR], values: ["total"] });
+const perCountry = result.rowGroups.map(r => ({ country: r.label, revenue: result.getValue(r) }));`} />
+
+  <Callout type="note" title="Not included">
+    <p>No field list where users drag fields between rows, columns and values – it is a few lines of UI around
+      <code>setPivotConfig</code>. No subtotal rows below the groups, no filter on finished pivot rows, no Excel outline
+      levels. Compare with the alternatives: <ChapterLink slug="build-buy-or-guiexpert" />.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.94. The tag <code>ep-037</code> of the demo repository follows after the release.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview of all chapters, or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

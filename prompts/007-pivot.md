@@ -1,6 +1,6 @@
 # TODO-Prompt 007: Pivot-Tabellen – API, Vitest, Code, Doku, Website, Training, Demo-Repo, Video
 
-> Status: **offen** · angelegt 14.10.2026, erweitert 14.10.2026 · Ziel 1 (Code) **und** Ziel 2 (Content) aus CLAUDE.md
+> Status: **umgesetzt** (15.10.2026, selbständig, Branch `feat/pivot`; offen: Demo-Repo `ep-037` und Angular-Demo-Route nach dem Release) · angelegt 14.10.2026, erweitert 14.10.2026 · Ziel 1 (Code) **und** Ziel 2 (Content) aus CLAUDE.md
 > Slug `pivot` (Branch `feat/pivot`, Design `prompts/007-pivot.design.md`) · Verweis in `TODO.md` → Abschnitt
 > „Feature-Prompts“. Gemeinsame Regeln: `prompts/000-arbeitsweise.md` (gilt bei Widersprüchen).
 >
@@ -451,31 +451,31 @@ Danach:
 ## Definition of Done
 
 **Phase 1 – Entwurf**
-- [ ] `prompts/007-pivot.design.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
-- [ ] Beispiele für Fall 1–3, zwei Spaltenfelder, zwei Wertfelder, mit erwarteten Ergebnissen
-- [ ] Entscheidungen Kapitel-Platzierung (Phase 7) und Demo-Repo (Phase 8) vorgelegt
-- [ ] 🛑 Entwurf freigegeben
+- [x] `prompts/007-pivot.design.md`: Bausteinanalyse, Signaturen, Entscheidungen mit Empfehlung, offene Fragen
+- [x] Beispiele für Fall 1–3, zwei Spaltenfelder, zwei Wertfelder, mit erwarteten Ergebnissen
+- [x] Entscheidungen Kapitel-Platzierung (Phase 7) und Demo-Repo (Phase 8) vorgelegt
+- [x] 🛑 Entwurf freigegeben – selbständig umgesetzt (Auftrag „arbeite selbständig“), Empfehlungen übernommen
 
 **Phase 2–3 – Tests und Code**
-- [ ] Unit-, Browser-, Wrapper- und Typ-Tests vorhanden und grün; Shuffle-Lauf grün; Bench-Ergebnis notiert
-- [ ] Coverage-Ziele erreicht; Export-Snapshot aktualisiert (nur Zugänge)
-- [ ] Core, Libs und Angular 14–22 bauen
+- [x] Unit-, Browser-, Wrapper- und Typ-Tests vorhanden und grün; Shuffle-Lauf grün; Bench-Ergebnis notiert
+- [x] Coverage-Ziele erreicht; Export-Snapshot aktualisiert (nur Zugänge)
+- [x] Core, Libs und Angular 14–22 bauen
 
 **Phase 4 – Doku**
-- [ ] JSDoc + `docs:check` grün, typedoc-Kategorie, API-Doc neu erzeugt
-- [ ] `instructions.md` (Snippets kompilieren), Angular-Instructions, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
+- [x] JSDoc + `docs:check` grün, typedoc-Kategorie, API-Doc neu erzeugt
+- [x] `instructions.md` (Snippets kompilieren), Angular-Instructions, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
 
 **Phase 5–7 – Demos, Website, Training**
-- [ ] `createPivotModel` in `demo-table-models`, Pivot-Beispiel in `apps/table-demo` (Angular-Demo: Route + Hinweis)
-- [ ] Showcase `pivot` + Kachel + Feature-Liste; Vergleichszeile „Pivot tables“ auf ✔, „kein Pivot“-Aussagen
+- [x] `createPivotModel` in `demo-table-models`, Pivot-Beispiel in `apps/table-demo` (Angular-Demo: Route + Hinweis)
+- [x] Showcase `pivot` + Kachel + Feature-Liste; Vergleichszeile „Pivot tables“ auf ✔, „kein Pivot“-Aussagen
       korrigiert (`why.astro`,
       `build-buy-or-guiexpert`, `checklist`)
-- [ ] Training-Kapitel `pivot-tables` mit Live-Demo, Screenshots, `check:training` grün; Zahlen nachgezogen
-- [ ] `pnpm build:webpage-guiexpert` grün; kein Deploy
+- [x] Training-Kapitel `pivot-tables` mit Live-Demo, Screenshots, `check:training` grün; Zahlen nachgezogen
+- [x] `pnpm build:webpage-guiexpert` grün; kein Deploy
 
 **Phase 8–9 – Demo-Repo und Video**
-- [ ] 🛑 Demo-Repo: Entscheidung umgesetzt, Push/Tag erst nach Freigabe (und nach dem Release)
-- [ ] `videos/NN-pivot-ohne-enterprise/` mit `script.md`, `snippet.ts`, `demo.html`; `videos/README.md`, CLAUDE.md §10
+- [ ] 🛑 Demo-Repo: Entscheidung umgesetzt, Push/Tag erst nach Freigabe (und nach dem Release) – Option A entschieden, `ep-037` folgt nach dem Release
+- [x] `videos/NN-pivot-ohne-enterprise/` mit `script.md`, `snippet.ts`, `demo.html`; `videos/README.md`, CLAUDE.md §10
 
 **Immer**
-- [ ] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung
+- [x] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung

@@ -13,7 +13,10 @@ import {
   DerivedValuesChangeIf, RowGroupOrder, RowGroupFieldIf, RowGroupField, RowGroupIf, RowGroup, GroupRowsOptionsIf, groupRows,
   aggregateRowGroups, RowGroupColumnOptionsIf, RowGroupColumnDef, RowGroupExpanded, RowGroupModelOptionsIf,
   AreaModelRowGroups, RowGroupTableModelParaIf, RowGroupFactory, isRowGroup, isGroupRow, isAreaModelRowGroups,
-  isRowGroupColumnDef
+  isRowGroupColumnDef,
+  PivotValueIf, PivotValue, PivotValueInfoIf, PivotConfigIf, PivotColumnInfoIf, PivotColumnDef, PivotResult, pivotRows,
+  PivotTableModel, AreaModelPivot, AreaModelPivotFooter, PivotTableModelParaIf, PivotFactory, isPivotTableModel,
+  isAreaModelPivot, isPivotColumnDef
 } from "__CORE__";
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
@@ -76,3 +79,8 @@ declare const model: AreaModelRowGroups<Sale>;
 declare const select: HTMLSelectElement;
 declare const MONTHS: string[];
 declare function loadSales(): Promise<Sale[]>;
+// pivot tables (since 1.1.94): the reference cases of prompt 007
+declare const pivotModel: PivotTableModel<Sale>;
+declare const pivotBody: AreaModelPivot<Sale>;
+declare const result: PivotResult<Sale>;
+declare const nord: RowGroupIf<Sale>, jan: RowGroupIf<Sale>;

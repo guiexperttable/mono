@@ -408,3 +408,54 @@ html[data-theme= "dark"] {
   font-variant-numeric: tabular-nums;
   font-weight: var(--ge-table-row-group-label-font-weight);
 }
+
+/* Pivot tables (since 1.1.94) – as in packages/table/css/table-pivot.css */
+html[data-theme= "light"] {
+  --ge-table-pivot-subtotal-bg: rgba(0, 0, 0, 0.035);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(0, 0, 0, 0.07);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #6b7280;
+}
+
+html[data-theme= "dark"] {
+  --ge-table-pivot-subtotal-bg: rgba(255, 255, 255, 0.05);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(255, 255, 255, 0.1);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #9ca3af;
+}
+
+.ge-table-pivot-value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ge-table-pivot-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ge-table-col-div.ge-table-pivot-subtotal {
+  background-color: var(--ge-table-pivot-subtotal-bg);
+  font-weight: var(--ge-table-pivot-subtotal-font-weight);
+}
+
+.ge-table-col-div.ge-table-pivot-total {
+  background-color: var(--ge-table-pivot-total-bg);
+  font-weight: var(--ge-table-pivot-total-font-weight);
+}
+
+.ge-table-pivot-empty {
+  color: var(--ge-table-pivot-empty-text);
+}
+
+.ge-table-pivot-header-group {
+  text-align: start;
+  padding-inline-start: 6px;
+}
+
+.ge-table-pivot-header.ge-table-pivot-header-column {
+  text-align: end;
+}

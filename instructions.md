@@ -746,7 +746,129 @@ const perRegion = body.getGroups().map(g => ({ region: g.label, umsatz: g.result
 Without a table, the engine groups and aggregates any array: `groupRows(rows, ["region"])` +
 `aggregateRowGroups(groups, { umsatz: "avg" })`.
 
-Not included: a group panel to drag columns into (build it with `setRowGroupBy`), Excel outline levels, pivot tables.
+Not included: a group panel to drag columns into (build it with `setRowGroupBy`), Excel outline levels. Values of a
+property as columns: pivot tables (5.7).
+
+### 5.7 Pivot tables (since 1.1.94)
+
+A pivot table does three things at once: it **groups** the rows by row fields (several fields = a hierarchy with
+subtotals, as in a row grouping, 5.6), turns the **values of column fields into columns** (several fields = a multi-row
+header) and **aggregates** values per row × column – with a total column, a total row and a grand total. It is not a
+transposition: the number of columns depends on the data. There are no detail rows.
+
+```ts
+import { PivotFactory } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+
+const sales: Sale[] = [
+  { region: "Nord", produkt: "A", monat: "Jan", umsatz: 100 }, { region: "Nord", produkt: "B", monat: "Jan", umsatz: 50 },
+  { region: "Süd", produkt: "A", monat: "Jan", umsatz: 80 }, { region: "Nord", produkt: "A", monat: "Feb", umsatz: 120 },
+  { region: "Süd", produkt: "B", monat: "Feb", umsatz: 70 }, { region: "Süd", produkt: "A", monat: "Feb", umsatz: 30 }
+];
+const tableModel = PivotFactory.createTableModel<Sale>({
+  rows: sales,
+  rowFields: ["region"],                                   // like groupBy of a row grouping
+  columnFields: [{ value: "monat", order: "insertion" }],  // Jan before Feb (order in the data)
+  values: ["umsatz"]                                       // the sum of umsatz
+});
+// Region | Jan | Feb | Total
+// Nord   | 150 | 120 |   270
+// Süd    |  80 | 100 |   180
+// Total  | 230 | 220 |   450   (footer)
+```
+
+What the factory does: a group column (arrows and labels, fixed on the left, header `"Region"` from the field), one
+column per column key × value, the total column(s) fixed on the right (`totalColumn: true` scrolls them,
+`false` removes them), a grouped header (`AreaModelCellGroups`) and a total row (`totalRow: false` removes it). The body
+is an `AreaModelPivot` (a tree), the model a `PivotTableModel` – a normal `TableModelIf` for every wrapper.
+
+- **Fields** (`rowFields`, `columnFields`): the form of a row grouping level – a property path (`"address.city"`), a
+  function (`o => new Date(o.date).getFullYear()`) or `{ value, name, label, format, order }`. Keys are ordered ascending
+  by default; `null`, `undefined` and `""` are one key `"(empty)"` (`emptyLabel`), always last; `1` and `"1"` differ.
+- **Values**: `"umsatz"` (sum) or `{ value, aggregator, label, name, format }` with the aggregators of 5.4 (`sum`, `count`,
+  `avg`, `min`, `max`, `countDistinct`, `first`, `last` or your own `AggregatorIf`). Several values give every column key
+  one column per value (`Jan › Sum`, `Jan › Count`).
+- **Subtotals and totals** are merged from aggregation states, never from finished cells: the Jan total of an average
+  is 230 / 3 = 76.67, not the mean of the region averages (77.5).
+- **Empty combinations** are `undefined` (Excel: an empty cell), shown as `emptyText` (default `""`, e.g. `"–"`) – not 0.
+- **Hierarchies**: `rowFields: ["region", "produkt"]` – group rows carry the subtotals (`subtotals: false` leaves them
+  empty), `expanded` as in 5.6. Two column fields: a two-row header and a subtotal column per column group
+  (`columnSubtotals`, default with ≥ 2 column fields); the group gets a toggle and, collapsed, shows only its total.
+- **`maxColumns`** (default 1000 column keys): more keys → the first ones are shown and a warning is logged; totals and
+  subtotals still count all rows (`getResult().truncated`).
+
+Two column fields from a date, two values:
+
+```ts
+import { PivotFactory } from "@guiexpert/table";
+
+interface Order { country: string; city: string; date: string; quantity: number; total: number; }
+declare const orders: Order[];
+
+const tableModel = PivotFactory.createTableModel<Order>({
+  rows: orders,
+  rowFields: ["country", "city"],
+  columnFields: [
+    { name: "year", label: "Year", value: o => new Date(o.date).getFullYear() },
+    { name: "quarter", label: "Quarter", value: o => Math.floor(new Date(o.date).getMonth() / 3) + 1, format: q => `Q${q}` }
+  ],
+  values: [{ value: "total", label: "Revenue" }, { value: "quantity", aggregator: "count", label: "Orders" }],
+  expanded: 0,          // countries closed
+  emptyText: "–"
+});
+// header: 2025 (Q1 … Q4 | 2025 Total) 2026 (…) | Total – every key with "Revenue" and "Orders"
+```
+
+**Filter** – `externalFilterFunction` gets **your source objects** (as in a flat table and in a row grouping) and works
+before the aggregation; all cells and totals follow, rows without a match disappear, the columns stay:
+
+```ts
+import { TableApi, TableOptions } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+declare const tableApi: TableApi;
+declare const tableOptions: TableOptions;
+
+tableOptions.externalFilterFunction = (sale: Sale) => sale.produkt === "A";
+tableApi.externalFilterChanged();   // Nord: Jan 100, Feb 120 · Süd: Jan 80, Feb 30 · Total 330
+```
+
+**Pivot again at runtime** – other fields, values or rows – without a new model (a new model would rebuild the table in
+every framework wrapper). The same table gets new columns; expanded rows, the filter, the widths of columns that stay and
+columns hidden with `setColumnVisible` are kept, sorting, selection and focus are reset; an invalid configuration throws
+and changes nothing:
+
+```ts
+import { TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;   // from tableReady
+const select = document.createElement("select");   // options "monat", "produkt"
+select.addEventListener("change", () => tableApi.setPivotConfig({ columnFields: [select.value] }));
+tableApi.setPivotConfig({ values: [{ value: "umsatz", aggregator: "avg" }] });   // averages instead of sums
+```
+
+**Sorting**: a double click on a value header sorts the rows of every level by that value (empty cells last), on the group
+column by key; `tableApi.sortByColumn(body.getColumnProperty([])!, "desc")` sorts by the total. **Export**: copy and
+Excel contain the pivot view (header labels, raw numbers, totals). **Drill-down** and own evaluations:
+
+```ts
+import { PivotTableModel } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+declare const tableModel: PivotTableModel<Sale>;
+
+const body = tableModel.getPivotBody();
+const rowsOfCell = body.getCellSourceRows(0, body.getColumnIndex(["Jan"]));   // the sales behind "Nord, Jan"
+const result = body.getResult();                                            // keys and all values, DOM-free
+const perRegion = result.rowGroups.map(r => ({ region: r.label, total: result.getValue(r) }));
+```
+
+Without a table, the engine pivots any array: `pivotRows(rows, { rowFields, columnFields, values })` →
+`result.getValue(row?, column?, value?)`.
+
+Not included: a field list to drag fields into (build it with `setPivotConfig`), subtotal rows below the groups, a
+filter on finished pivot rows ("only regions > 200") and Excel outline levels.
 
 ---
 
@@ -1316,8 +1438,8 @@ To avoid surprises – these are **not** implemented in the current releases:
 
 - No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
   (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
-- No pivot tables and no drag & drop group panel – row grouping itself is built in (5.6), regroup with
-  `tableApi.setRowGroupBy()`.
+- No drag & drop group panel or pivot field list – row grouping (5.6) and pivot tables (5.7) themselves are built in;
+  change them with `tableApi.setRowGroupBy()` / `tableApi.setPivotConfig()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 
 ---

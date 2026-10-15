@@ -459,3 +459,17 @@ html[data-theme= "dark"] {
 .ge-table-pivot-header.ge-table-pivot-header-column {
   text-align: end;
 }
+
+/* Formulas: error values #DIV/0!, #NAME? … (since 1.1.95) – as in packages/table/css/table-calc.css */
+html[data-theme= "light"] {
+  --ge-table-cell-error-color: #b91c1c;
+}
+
+html[data-theme= "dark"] {
+  --ge-table-cell-error-color: #f87171;
+}
+
+.ge-table-col-div.ge-table-cell-error {
+  color: var(--ge-table-cell-error-color);
+  font-variant-numeric: tabular-nums;
+}

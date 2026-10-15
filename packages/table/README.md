@@ -42,6 +42,11 @@ This is the UI-agnostic table component for your next web app. 😊
   = a multi-row header with collapsible groups) × aggregated values, total column and total row, filter before the
   aggregation, pivot again at runtime (`PivotFactory.createTableModel({ rows, rowFields, columnFields, values })`,
   `tableApi.setPivotConfig()`, engine `pivotRows()`) – since 1.1.94
+- Calculated columns (`ColumnDef.valueGetter` – sorting, filter via `tableApi.getRowValue()`, copy, Excel, totals and
+  row grouping use the computed value), „Show values as“ (`showValuesAs`: share of the column / row / grand / parent
+  total, running total, difference, rank – also per pivot value) and formulas (`formula: "[price] * [quantity] * 1.19"`,
+  own parser and interpreter without `eval`, functions like `ROUND`, `IF`, `SUM([x])`, error values `#DIV/0!`,
+  `tableApi.setColumnFormula()`) – since 1.1.95
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

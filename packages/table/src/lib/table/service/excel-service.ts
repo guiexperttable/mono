@@ -1,5 +1,5 @@
 
-import { ExcelServiceIf } from './excel-service.if';
+import { ExcelServiceIf, isExcelFormattedValue } from './excel-service.if';
 
 let crcTable: Uint32Array | undefined;
 
@@ -71,6 +71,9 @@ interface ZipEntry {
  * @category Export & clipboard
  */
 export class ExcelService implements ExcelServiceIf {
+
+  /** Understands cells `{ value, numberFormat }` ({@link ExcelFormattedValueIf}), since 1.1.95. */
+  readonly supportsNumberFormats = true;
 
   /**
    * Downloads a matrix data as an Excel file.
@@ -158,10 +161,11 @@ export class ExcelService implements ExcelServiceIf {
 
     zip.set('xl/_rels/workbook.xml.rels', x1WorkbookXmlRels);
     zip.set('xl/theme/theme1.xml', x1ThemeTheme1Xml);
+    const stylesXml = this.withNumberFormats(x1StylesXml, data); // before the sheet: it needs the style indices
     zip.set('xl/worksheets/sheet1.xml', this.getX1WorksheetsSheet1Xml(data));
 
     zip.set('xl/sharedStrings.xml', x1SharedStringsXml);
-    zip.set('xl/styles.xml', x1StylesXml);
+    zip.set('xl/styles.xml', stylesXml);
     zip.set('xl/workbook.xml', x1WorksheetXml);
 
     zip.set('[Content_Types].xml', contentTypesXml);
@@ -194,6 +198,10 @@ export class ExcelService implements ExcelServiceIf {
         if (typeof cell === 'number') {
           sb.push(`<c r="${cellAddress}"><v>${cell}</v></c>`);
 
+        } else if (isExcelFormattedValue(cell) && Number.isFinite(cell.value)) {
+          // a number with format: style index 1… (see withNumberFormats)
+          sb.push(`<c r="${cellAddress}" s="${this.numberFormatStyles.get(cell.numberFormat) ?? 0}"><v>${cell.value}</v></c>`);
+
         } else if (cell instanceof Date) {
           const d: Date = cell;
           sb.push(`<c r="${cellAddress}" t="inlineStr"><is><t>${d.toISOString()}</t></is></c>`);
@@ -209,6 +217,32 @@ export class ExcelService implements ExcelServiceIf {
     sb.push('</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>');
     sb.push('</worksheet>');
     return sb.join('\n');
+  }
+
+  /** Number format → cell style index (1-based; 0 = default), filled by withNumberFormats() before the sheet is written. */
+  private numberFormatStyles = new Map<string, number>();
+
+  /** Adds one cell style per number format used in the matrix (`<numFmts>` + `<cellXfs>`); unchanged without formats. */
+  private withNumberFormats(stylesXml: string, data: Array<Array<any>>): string {
+    const formats: string[] = [];
+    for (const row of data) {
+      for (const cell of row) {
+        if (isExcelFormattedValue(cell) && !formats.includes(cell.numberFormat)) formats.push(cell.numberFormat);
+      }
+    }
+    this.numberFormatStyles = new Map(formats.map((format, i) => [format, i + 1]));
+    if (!formats.length) {
+      return stylesXml;
+    }
+    const numFmts = `<numFmts count="${formats.length}">`
+      + formats.map((format, i) => `<numFmt numFmtId="${164 + i}" formatCode="${this.escapeXml(format)}"/>`).join('')
+      + '</numFmts>';
+    const xfs = `<cellXfs count="${formats.length + 1}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>`
+      + formats.map((_, i) => `<xf numFmtId="${164 + i}" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>`).join('')
+      + '</cellXfs>';
+    return stylesXml
+      .replace('<fonts ', `${numFmts}<fonts `)
+      .replace('<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>', xfs);
   }
 
   private escapeXml(value: any): string {

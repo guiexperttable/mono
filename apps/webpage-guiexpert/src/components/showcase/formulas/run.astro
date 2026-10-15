@@ -1,0 +1,125 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="formula-bar">
+  <label class="formula-input">Custom formula
+    <input type="text" class={id + '-formula'} spellcheck="false" autocomplete="off"
+           aria-describedby={id + '-hint'}
+           value='IF([discount] > 0, ROUND([gross] / [quantity], 2), "–")'>
+  </label>
+  <label>Share of net as
+    <select class={id + '-mode'} aria-label="Show the share column as">
+      <option value="percentOfColumnTotal" selected>% of column total</option>
+      <option value="runningTotal">Running total</option>
+      <option value="differenceFromPrevious">Difference from previous</option>
+      <option value="rank">Rank</option>
+      <option value="">Value</option>
+    </select>
+  </label>
+  <label>Country
+    <select class={id + '-country'} aria-label="Filter by country">
+      <option value="" selected>– all –</option>
+      <option>Austria</option>
+      <option>Denmark</option>
+      <option>France</option>
+      <option>Germany</option>
+      <option>Italy</option>
+      <option>Poland</option>
+      <option>Spain</option>
+      <option>Switzerland</option>
+    </select>
+  </label>
+  <output id={id + '-hint'} class={id + '-hint'} aria-live="polite"></output>
+</div>
+<div
+    style="height: calc(100vh - 236px)"
+    class:list={[ id, 'formula-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService, FORMULA_FUNCTION_NAMES } from '/scripts/table/index.js'
+  import { createFormulaModelAndOptions } from "/scripts/demo-table-models/index.js";
+
+  // 500 invoice lines: net, VAT and gross are formulas; share and rank use „Show values as“; total row over the formulas
+  const {tableModel, tableOptions} = createFormulaModelAndOptions(500);
+  let country = '';
+  tableOptions.externalFilterFunction = line => !country || line.country === country;   // shares and totals follow
+
+  const ele = document.querySelector('.' + id);
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  const input = document.querySelector('.' + id + '-formula');
+  const hint = document.querySelector('.' + id + '-hint');
+  const defaultHint = `Fields in brackets, e.g. [net] * 1.1 – functions: ${FORMULA_FUNCTION_NAMES.join(', ')}`;
+  hint.textContent = defaultHint;
+
+  // the formula is compiled (no eval) – an invalid one shows #ERROR! in its cells and the message here
+  const apply = () => {
+    const error = tableApi.setColumnFormula('custom', input.value);
+    hint.textContent = error ? `${error.code} ${error.message}` : defaultHint;
+    hint.classList.toggle('formula-error', !!error);
+  };
+  input.addEventListener('change', apply);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') apply(); });
+
+  document.querySelector('.' + id + '-mode').addEventListener('change', e =>
+    tableApi.setShowValuesAs('share', e.target.value
+      ? (e.target.value === 'percentOfColumnTotal' ? { mode: e.target.value, fractionDigits: 2 } : e.target.value)
+      : undefined));
+
+  document.querySelector('.' + id + '-country').addEventListener('change', e => {
+    country = e.target.value;
+    tableApi.externalFilterChanged();
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .formula-bar {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .formula-bar input, .formula-bar select {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .formula-bar select option {
+        color: initial;
+    }
+    .formula-input {
+        flex: 1 1 380px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .formula-input input {
+        flex: 1;
+        min-width: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .formula-bar output {
+        flex-basis: 100%;
+        font-size: 13px;
+        opacity: 0.85;
+    }
+    .formula-bar output.formula-error {
+        color: #dc2626;
+        opacity: 1;
+    }
+</style>

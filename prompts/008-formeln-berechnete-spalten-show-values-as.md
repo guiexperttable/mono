@@ -1,6 +1,6 @@
 # TODO-Prompt 008: Berechnete Spalten, „Show values as“ und Formeln
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `calculated` (Branch `feat/calculated`, Design `prompts/008-formeln-berechnete-spalten-show-values-as.design.md`)
+> Status: **umgesetzt** (15.10.2026, Training/Demo-Repo/Video offen) · angelegt 14.10.2026 · Slug `calculated` (Branch `feat/calculated`, Design `prompts/008-formeln-berechnete-spalten-show-values-as.design.md`)
 > Abhängigkeiten: **005 (Aggregation)** für Summen; **006 (Row Grouping)** und **007 (Pivot)** für „Anteil an der
 > Gruppe“ bzw. „Anteil an Zeile/Spalte“. Teil A (berechnete Spalten) geht auch ohne sie.
 > ag-Grid: Formulas (v35), Calculated Columns und Show Values As (v36) sind dort **Enterprise**.
@@ -126,7 +126,7 @@ Tabellen, keine Verhaltensänderung für Spalten ohne `valueGetter`.
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Umfang je Teil (insbesondere Teil C) und Lieferreihenfolge 🛑
-- [ ] Teil A: `valueGetter` mit F1–F7
-- [ ] Teil B: Show values as mit F8–F12 (F10/F11 sobald 006/007 umgesetzt)
-- [ ] Teil C: Ausdruckssprache mit F13–F17, Sicherheitstests, Fuzzing, Bench
+- [x] Design-Dokument mit Umfang je Teil (insbesondere Teil C) und Lieferreihenfolge (selbständig, ohne Haltepunkt)
+- [x] Teil A: `valueGetter` mit F1–F7
+- [x] Teil B: Show values as mit F8–F12 (F10/F11 sobald 006/007 umgesetzt)
+- [x] Teil C: Ausdruckssprache mit F13–F17, Sicherheitstests, Fuzzing, Bench

@@ -1,3 +1,10 @@
+/* Calculated columns, „Show values as“, formulas (since 1.1.95) */
+
+/* a cell with a formula error (#DIV/0!, #NAME? …): the message is the tooltip */
+.ge-table-col-div.ge-table-cell-error {
+  color: var(--ge-table-cell-error-color);
+  font-variant-numeric: tabular-nums;
+}
 /* Defaults for the host element. :where() = zero specificity, so the app's own rules always win –
    e.g. ".table-div { height: 500px }" no longer depends on the order in which the stylesheets are bundled. */
 :where(.ge-table) {
@@ -446,6 +453,9 @@
   --ge-table-pivot-total-font-weight: 600;
   --ge-table-pivot-empty-text: #6b7280;
 
+  /* Formulas: error values #DIV/0!, #NAME? … (since 1.1.95) */
+  --ge-table-cell-error-color: #b91c1c;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
@@ -543,6 +553,9 @@ html[data-theme="dark"] {
   --ge-table-pivot-total-bg: rgba(255, 255, 255, 0.1);
   --ge-table-pivot-total-font-weight: 600;
   --ge-table-pivot-empty-text: #9ca3af;
+
+  /* Formulas: error values #DIV/0!, #NAME? … (since 1.1.95) */
+  --ge-table-cell-error-color: #f87171;
 
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */

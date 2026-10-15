@@ -6,6 +6,7 @@ import { RowGroupColumnDef } from "../../../rowgroup/row-group-column-def";
 import { formatAggregateValue } from "../../../aggregation/aggregate";
 import { AggregateCellRenderer } from "../../../renderer/aggregate-cell-renderer";
 import { DEFAULT_TOTAL_LABEL } from "../../../pivot/pivot-internals";
+import { formatShowValuesAs } from "../../../calc/show-values-as";
 
 /**
  * The total row of a pivot table: the label `"Total"` in the group column and the column totals (cells, subtotals,
@@ -61,7 +62,7 @@ export class AreaModelPivotFooter<T = any> extends AreaModel implements HasDefau
     if (!info) {
       return "";
     }
-    return this.body.getResult().getValue(undefined, info.column, info.valueIndex);
+    return this.body.getShownValue(undefined, info);
   }
 
   override getTextValueAt(rowIndex: number, columnIndex: number): string {
@@ -72,6 +73,9 @@ export class AreaModelPivotFooter<T = any> extends AreaModel implements HasDefau
     }
     if (value === undefined) {
       return this.body.getConfig().emptyText ?? "";
+    }
+    if (info.value.showValuesAs) {
+      return formatShowValuesAs(value, info.value.showValuesAs);
     }
     return info.value.format ? info.value.format(value) : formatAggregateValue(value);
   }

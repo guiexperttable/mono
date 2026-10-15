@@ -1,6 +1,7 @@
 import type { ValueAccessor } from "../aggregation/value-accessor.type";
 import type { AggregatorRef } from "../aggregation/aggregator-name.type";
 import type { AggregatorIf } from "../aggregation/aggregator.if";
+import type { ShowValuesAsConfig, ShowValuesAsIf } from "../calc/show-values-as.type";
 
 /**
  * One value of a pivot table in full form: where the value of a row comes from, how it is aggregated, and how its
@@ -32,6 +33,16 @@ export interface PivotValueIf<T = any> {
   label?: string;
   /** The text of a result in a cell. Default: numbers with at most two decimals (`"1,234.5"`). Excel gets the raw value. */
   format?: (result: unknown) => string;
+  /**
+   * „Show values as“ (since 1.1.95): `"percentOfRowTotal"` (each pivot row = 100 %), `"percentOfColumnTotal"`,
+   * `"percentOfGrandTotal"` or `"percentOfParentTotal"` (share of the parent row group). The cells then hold the
+   * fraction (Excel: number with percent format), the text is a percentage; `format` is not used. Other modes of
+   * {@link ShowValuesAs} don't apply to a pivot (the value is shown).
+   *
+   * @example
+   * values: [{ value: "umsatz", showValuesAs: "percentOfRowTotal" }]
+   */
+  showValuesAs?: ShowValuesAsConfig;
 }
 
 /**
@@ -66,4 +77,6 @@ export interface PivotValueInfoIf {
   readonly aggregator: AggregatorIf;
   /** The format of a result, if one was given. */
   readonly format?: (result: unknown) => string;
+  /** „Show values as“, if one was given (since 1.1.95). */
+  readonly showValuesAs?: ShowValuesAsIf;
 }

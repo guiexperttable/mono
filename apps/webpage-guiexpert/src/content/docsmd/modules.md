@@ -67,6 +67,7 @@
 - [EventCheckboxChangedHandler](classes/EventCheckboxChangedHandler.md)
 - [ExcelService](classes/ExcelService.md)
 - [FocusModel](classes/FocusModel.md)
+- [FormulaError](classes/FormulaError.md)
 - [GeCellIndices](classes/GeCellIndices.md)
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
 - [GeFilterService](classes/GeFilterService.md)
@@ -175,6 +176,7 @@
 - [ColorRgbIf](interfaces/ColorRgbIf.md)
 - [ColumnDefIf](interfaces/ColumnDefIf.md)
 - [ColumnWidthsIf](interfaces/ColumnWidthsIf.md)
+- [CompiledFormula](interfaces/CompiledFormula.md)
 - [CopyServiceIf](interfaces/CopyServiceIf.md)
 - [CreateTableModelPara](interfaces/CreateTableModelPara.md)
 - [CrudOptionsIf](interfaces/CrudOptionsIf.md)
@@ -184,8 +186,10 @@
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
 - [EventListenerIf](interfaces/EventListenerIf.md)
 - [EventSelectionChangedListenerIf](interfaces/EventSelectionChangedListenerIf.md)
+- [ExcelFormattedValueIf](interfaces/ExcelFormattedValueIf.md)
 - [ExcelServiceIf](interfaces/ExcelServiceIf.md)
 - [FocusModelIf](interfaces/FocusModelIf.md)
+- [FormulaOptionsIf](interfaces/FormulaOptionsIf.md)
 - [GroupRowsOptionsIf](interfaces/GroupRowsOptionsIf.md)
 - [HasDefaultRowHeightIf](interfaces/HasDefaultRowHeightIf.md)
 - [HeaderGroupOptionsIf](interfaces/HeaderGroupOptionsIf.md)
@@ -210,6 +214,7 @@
 - [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
+- [ShowValuesAsIf](interfaces/ShowValuesAsIf.md)
 - [SizeIf](interfaces/SizeIf.md)
 - [SortedOptionsIf](interfaces/SortedOptionsIf.md)
 - [StateStorageIf](interfaces/StateStorageIf.md)
@@ -235,6 +240,7 @@
 - [TwoColorGradientArgIf](interfaces/TwoColorGradientArgIf.md)
 - [UrlInfoIf](interfaces/UrlInfoIf.md)
 - [UrlsIf](interfaces/UrlsIf.md)
+- [ValueGetterContextIf](interfaces/ValueGetterContextIf.md)
 - [ValueLabelIf](interfaces/ValueLabelIf.md)
 - [editInputPipe](interfaces/editInputPipe.md)
 
@@ -254,6 +260,11 @@
 - [ExtendedSelectionType](modules.md#extendedselectiontype)
 - [FilterFunction](modules.md#filterfunction)
 - [FocusType](modules.md#focustype)
+- [FormulaBinaryOperator](modules.md#formulabinaryoperator)
+- [FormulaErrorCode](modules.md#formulaerrorcode)
+- [FormulaFunction](modules.md#formulafunction)
+- [FormulaNode](modules.md#formulanode)
+- [FormulaValue](modules.md#formulavalue)
 - [GeOverlayKind](modules.md#geoverlaykind)
 - [GetEditRenderer](modules.md#geteditrenderer)
 - [GetRowIdFn](modules.md#getrowidfn)
@@ -270,6 +281,8 @@
 - [SelectionMode](modules.md#selectionmode)
 - [SelectionType](modules.md#selectiontype)
 - [ShortcutActionIdMapping](modules.md#shortcutactionidmapping)
+- [ShowValuesAs](modules.md#showvaluesas)
+- [ShowValuesAsConfig](modules.md#showvaluesasconfig)
 - [SideIdent](modules.md#sideident)
 - [SizeUnitType](modules.md#sizeunittype)
 - [SortState](modules.md#sortstate)
@@ -278,12 +291,15 @@
 - [TreeArrowType](modules.md#treearrowtype)
 - [TreeRowExpandedFn](modules.md#treerowexpandedfn)
 - [ValueAccessor](modules.md#valueaccessor)
+- [ValueGetter](modules.md#valuegetter)
 - [ValueRowSortComparator](modules.md#valuerowsortcomparator)
+- [ValueSetter](modules.md#valuesetter)
 
 ### Variables
 
 - [ALL\_TABLE\_STATE\_PARTS](modules.md#all_table_state_parts)
 - [Aggregators](modules.md#aggregators)
+- [FORMULA\_FUNCTION\_NAMES](modules.md#formula_function_names)
 - [PROPERTY\_TYPE\_KEY\_ANY](modules.md#property_type_key_any)
 - [PROPERTY\_TYPE\_KEY\_ARRAY](modules.md#property_type_key_array)
 - [PROPERTY\_TYPE\_KEY\_BOOLEAN](modules.md#property_type_key_boolean)
@@ -292,6 +308,7 @@
 - [PROPERTY\_TYPE\_KEY\_OBJECT](modules.md#property_type_key_object)
 - [PROPERTY\_TYPE\_KEY\_STRING](modules.md#property_type_key_string)
 - [PROPERTY\_TYPE\_KEY\_UNDEFINED](modules.md#property_type_key_undefined)
+- [SHOW\_VALUES\_AS\_MODES](modules.md#show_values_as_modes)
 - [UNIMPORTANT\_TYPES](modules.md#unimportant_types)
 - [actionIds](modules.md#actionids)
 - [allCenter](modules.md#allcenter)
@@ -344,6 +361,9 @@
 - [aggregateColumns](modules.md#aggregatecolumns)
 - [aggregateRowGroups](modules.md#aggregaterowgroups)
 - [calcOverlayKind](modules.md#calcoverlaykind)
+- [calculateShowValuesAs](modules.md#calculateshowvaluesas)
+- [compileFormula](modules.md#compileformula)
+- [createFormulaValueGetter](modules.md#createformulavaluegetter)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [createValueGetter](modules.md#createvaluegetter)
 - [debounce](modules.md#debounce)
@@ -351,6 +371,7 @@
 - [escapeHtml](modules.md#escapehtml)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [formatAggregateValue](modules.md#formataggregatevalue)
+- [formatShowValuesAs](modules.md#formatshowvaluesas)
 - [getAggregator](modules.md#getaggregator)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
@@ -363,7 +384,10 @@
 - [isAreaModelTree](modules.md#isareamodeltree)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
+- [isExcelFormattedValue](modules.md#isexcelformattedvalue)
+- [isFormulaError](modules.md#isformulaerror)
 - [isGroupRow](modules.md#isgrouprow)
+- [isPercentShowValuesAs](modules.md#ispercentshowvaluesas)
 - [isPivotColumnDef](modules.md#ispivotcolumndef)
 - [isPivotTableModel](modules.md#ispivottablemodel)
 - [isRowGroup](modules.md#isrowgroup)
@@ -373,6 +397,8 @@
 - [pivotRows](modules.md#pivotrows)
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
+- [resolveShowValuesAs](modules.md#resolveshowvaluesas)
+- [sumOfNumbers](modules.md#sumofnumbers)
 - [throttle](modules.md#throttle)
 - [trimArraySuffixes](modules.md#trimarraysuffixes)
 
@@ -562,7 +588,7 @@ A number indicating the relative order of 'valueA' and 'valueB'.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L27)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L29)
 
 ___
 
@@ -1458,6 +1484,40 @@ It can take one of the following values: "asc", "desc", or "" (empty string).
 #### Defined in
 
 [src/lib/table/data/common/sort-state.type.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-state.type.ts#L9)
+
+## Export &amp; clipboard
+
+### isExcelFormattedValue
+
+▸ **isExcelFormattedValue**(`cell`): cell is ExcelFormattedValueIf
+
+True for a cell of the form [ExcelFormattedValueIf](interfaces/ExcelFormattedValueIf.md).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cell` | `unknown` | a cell of an Excel matrix |
+
+#### Returns
+
+cell is ExcelFormattedValueIf
+
+whether it is a number with format
+
+**`Example`**
+
+```ts
+isExcelFormattedValue({ value: 0.5, numberFormat: "0%" });   // true
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/service/excel-service.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L49)
 
 ## Keyboard
 
@@ -2569,7 +2629,7 @@ const values: PivotValue<Sale>[] = ["umsatz", { value: "umsatz", aggregator: "co
 
 #### Defined in
 
-[src/lib/table/pivot/pivot-value.type.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L47)
+[src/lib/table/pivot/pivot-value.type.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L58)
 
 ___
 
@@ -2731,6 +2791,638 @@ avg.getValue(undefined, jan);   // 76.666… (230 / 3) – not 77.5, the mean of
 #### Defined in
 
 [src/lib/table/pivot/pivot-result.ts:360](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-result.ts#L360)
+
+## Calculated columns &amp; formulas
+
+### FormulaBinaryOperator
+
+Ƭ **FormulaBinaryOperator**: ``"+"`` \| ``"-"`` \| ``"*"`` \| ``"/"`` \| ``"^"`` \| ``"&"`` \| ``"="`` \| ``"<>"`` \| ``"<"`` \| ``"<="`` \| ``">"`` \| ``">="``
+
+The binary operators of a formula: arithmetic (`+ - * / ^`), text concatenation (`&`) and comparisons
+(`=`/`==`, `<>`/`!=`, `<`, `<=`, `>`, `>=`; normalized to `=` and `<>`).
+
+**`Example`**
+
+```ts
+const op: FormulaBinaryOperator = "&";   // "Total: " & [total]
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-ast.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L29)
+
+___
+
+### FormulaErrorCode
+
+Ƭ **FormulaErrorCode**: ``"#ERROR!"`` \| ``"#NAME?"`` \| ``"#VALUE!"`` \| ``"#DIV/0!"`` \| ``"#NUM!"`` \| ``"#CIRC!"``
+
+The error codes of a formula – like in a spreadsheet:
+
+| Code | Meaning |
+|---|---|
+| `#ERROR!` | syntax error (the whole column shows it) |
+| `#NAME?` | unknown field or function |
+| `#VALUE!` | wrong type, e.g. `"abc" * 2` |
+| `#DIV/0!` | division by zero |
+| `#NUM!` | the result is not a finite number (`SQRT(-1)`, overflow) |
+| `#CIRC!` | circular reference between calculated columns |
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-error.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L16)
+
+___
+
+### FormulaFunction
+
+Ƭ **FormulaFunction**: (...`args`: [`FormulaValue`](modules.md#formulavalue)[]) => `unknown`
+
+#### Type declaration
+
+▸ (`...args`): `unknown`
+
+An own function for formulas. It gets the evaluated arguments (never an error – an error argument is returned
+without calling the function) and returns a number, text, boolean or `null`. Anything else, an exception or
+`NaN` becomes `#VALUE!` resp. `#NUM!`.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `...args` | [`FormulaValue`](modules.md#formulavalue)[] |
+
+##### Returns
+
+`unknown`
+
+**`Example`**
+
+```ts
+const VAT: FormulaFunction = (net) => Number(net) * 0.19;
+compileFormula("VAT([price])", { functions: { VAT } });
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-options.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-options.if.ts#L26)
+
+___
+
+### FormulaNode
+
+Ƭ **FormulaNode**: \{ `kind`: ``"literal"`` ; `value`: `number` \| `string` \| `boolean`  } \| \{ `kind`: ``"field"`` ; `name`: `string`  } \| \{ `kind`: ``"unary"`` ; `op`: ``"-"`` \| ``"+"`` ; `operand`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `kind`: ``"binary"`` ; `left`: [`FormulaNode`](modules.md#formulanode) ; `op`: [`FormulaBinaryOperator`](modules.md#formulabinaryoperator) ; `right`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `args`: readonly [`FormulaNode`](modules.md#formulanode)[] ; `kind`: ``"call"`` ; `name`: `string`  }
+
+A node of a compiled formula (abstract syntax tree). Read-only; the evaluator walks it – no code is generated
+(no `eval`, no `new Function`).
+
+**`Example`**
+
+```ts
+const ast = compileFormula("[price] * 2").ast;
+// { kind: "binary", op: "*", left: { kind: "field", name: "price" }, right: { kind: "literal", value: 2 } }
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-ast.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L12)
+
+___
+
+### FormulaValue
+
+Ƭ **FormulaValue**: `number` \| `string` \| `boolean` \| ``null`` \| [`FormulaError`](classes/FormulaError.md)
+
+A value inside a formula: a number, a text, a boolean, blank (`null`) or an error.
+
+**`Example`**
+
+```ts
+const fn: FormulaFunction = (x: FormulaValue) => typeof x === "number" ? x * 1.19 : x;
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-options.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-options.if.ts#L12)
+
+___
+
+### ShowValuesAs
+
+Ƭ **ShowValuesAs**: ``"percentOfColumnTotal"`` \| ``"percentOfGrandTotal"`` \| ``"percentOfParentTotal"`` \| ``"percentOfRowTotal"`` \| ``"differenceFromPrevious"`` \| ``"runningTotal"`` \| ``"rank"``
+
+How a column shows its numbers – without changing the data („Show values as“):
+
+| Mode | Shows | Flat table | Tree / row groups | Pivot |
+|---|---|---|---|---|
+| `"percentOfColumnTotal"` | value / sum of the column | ✓ | sum of the (filtered) leaf rows | cell / column total |
+| `"percentOfGrandTotal"` | value / grand total | = column total | = column total | cell / grand total |
+| `"percentOfParentTotal"` | value / total of the parent | = column total | value / sum of its siblings (each group = 100 %) | cell / parent row |
+| `"percentOfRowTotal"` | value / row total | – | – | cell / row total |
+| `"differenceFromPrevious"` | value − value of the row above | ✓ (first row empty) | among siblings | – |
+| `"runningTotal"` | sum up to this row (display order) | ✓ | among siblings | – |
+| `"rank"` | 1 = largest value, ties share a rank (1, 2, 2, 4) | ✓ | among siblings | – |
+
+The reference are the **filtered** rows (like the total row). Not applicable (–): the raw value is shown.
+Values that are no numbers and a total of 0 give an empty cell.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "share", headerLabel: "Share", valueGetter: o => o.total,
+                   showValuesAs: "percentOfColumnTotal" });
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.type.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.type.ts#L24)
+
+___
+
+### ShowValuesAsConfig
+
+Ƭ **ShowValuesAsConfig**: [`ShowValuesAs`](modules.md#showvaluesas) \| [`ShowValuesAsIf`](interfaces/ShowValuesAsIf.md)
+
+The configuration of a column: a mode or a mode with options.
+
+**`Example`**
+
+```ts
+const share: ShowValuesAsConfig = "percentOfColumnTotal";
+const precise: ShowValuesAsConfig = { mode: "percentOfColumnTotal", fractionDigits: 2 };
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.type.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.type.ts#L64)
+
+___
+
+### ValueGetter
+
+Ƭ **ValueGetter**\<`T`\>: (`row`: `T`, `context`: [`ValueGetterContextIf`](interfaces/ValueGetterContextIf.md)) => `unknown`
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `any` | the row type |
+
+#### Type declaration
+
+▸ (`row`, `context`): `unknown`
+
+Computes the value of a calculated column from the row (`ColumnDefIf.valueGetter`). The row is the data object
+(in a tree the `TreeRow.data`). The data is not changed – sorting, filter (`tableApi.getRowValue`), copy, Excel and
+totals use the computed value.
+
+Keep it fast and free of side effects: it runs for every visible cell on each render (values are not cached) and
+once per row for sorting and totals.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `T` |
+| `context` | [`ValueGetterContextIf`](interfaces/ValueGetterContextIf.md) |
+
+##### Returns
+
+`unknown`
+
+**`Example`**
+
+```ts
+const total: ValueGetter<Item> = row => row.price * row.quantity;
+ColumnDef.create({ property: "total", headerLabel: "Total", valueGetter: total });
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/value-getter.type.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/value-getter.type.ts#L19)
+
+___
+
+### ValueSetter
+
+Ƭ **ValueSetter**\<`T`\>: (`row`: `T`, `value`: `unknown`) => `boolean` \| `void`
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `any` | the row type |
+
+#### Type declaration
+
+▸ (`row`, `value`): `boolean` \| `void`
+
+Writes an edited value of a calculated column back into the row (`ColumnDefIf.valueSetter`). Without a setter a
+calculated column cannot be edited. Return `false` to reject the value.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `T` |
+| `value` | `unknown` |
+
+##### Returns
+
+`boolean` \| `void`
+
+**`Example`**
+
+```ts
+// "total" is price × quantity – editing the total changes the price
+const setTotal: ValueSetter<Item> = (row, value) => {
+  const total = Number(value);
+  if (!Number.isFinite(total) || !row.quantity) return false;
+  row.price = total / row.quantity;
+};
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/value-getter.type.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/value-getter.type.ts#L37)
+
+___
+
+### FORMULA\_FUNCTION\_NAMES
+
+• `Const` **FORMULA\_FUNCTION\_NAMES**: readonly `string`[]
+
+The names of the built-in formula functions (upper case), e.g. for the help text of an own formula input.
+
+**`Example`**
+
+```ts
+hint.textContent = `Functions: ${FORMULA_FUNCTION_NAMES.join(", ")}`;
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/compile-formula.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L20)
+
+___
+
+### SHOW\_VALUES\_AS\_MODES
+
+• `Const` **SHOW\_VALUES\_AS\_MODES**: readonly [`ShowValuesAs`](modules.md#showvaluesas)[]
+
+All modes of [ShowValuesAs](modules.md#showvaluesas), e.g. for an own select box.
+
+**`Example`**
+
+```ts
+select.append(...SHOW_VALUES_AS_MODES.map(mode => new Option(mode, mode)));
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L39)
+
+___
+
+### calculateShowValuesAs
+
+▸ **calculateShowValuesAs**(`values`, `mode`): (`number` \| `undefined`)[]
+
+„Show values as“ over a list of values in display order – DOM-free, for own area models. Percentages are
+fractions (`0.667`); the reference is the list itself (`percentOfRowTotal` is not applicable to a list: the values are
+returned unchanged). Values that are no numbers → `undefined`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `values` | `ArrayLike`\<`unknown`\> | the raw values in display order |
+| `mode` | [`ShowValuesAs`](modules.md#showvaluesas) | the mode |
+
+#### Returns
+
+(`number` \| `undefined`)[]
+
+the shown values
+
+**`Example`**
+
+```ts
+calculateShowValuesAs([2598, 1047, 250], "percentOfColumnTotal");   // [0.667…, 0.268…, 0.064…]
+calculateShowValuesAs([10, 20, 20, 5], "rank");                      // [3, 1, 1, 4]
+calculateShowValuesAs([10, 20, 5], "runningTotal");                  // [10, 30, 35]
+calculateShowValuesAs([10, 20, 5], "differenceFromPrevious");        // [undefined, 10, -15]
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L148)
+
+___
+
+### compileFormula
+
+▸ **compileFormula**(`source`, `options?`): [`CompiledFormula`](interfaces/CompiledFormula.md)
+
+Compiles a formula once – no `eval`, no `new Function` (works with a strict Content-Security-Policy, user input
+cannot run code). The result evaluates rows; never throws.
+
+Syntax (details: instructions.md „Formulas“):
+- fields in brackets: `[price]`, `[address.city]`, `[Unit price]` – own properties of the row or calculated columns
+- numbers `12`, `1.5`, `1e3`, texts `"a"` / `'a'`, `TRUE`, `FALSE`
+- operators: `+ - * / ^` (power), `&` (text), `= <> < <= > >=`; `-2^2 = -4`
+- functions: `ROUND(x, 2)`, `IF(c, a, b)`, `IFERROR`, `AND`, `OR`, `NOT`, `ABS`, `MOD`, `SQRT`, `POWER`, `FLOOR`,
+  `CEILING`, `CONCAT`, `LEN`, `UPPER`, `LOWER`, `TRIM`, `ISBLANK`; `SUM AVG MIN MAX COUNT` – with one field the
+  aggregate of the column (`[total] / SUM([total])`), otherwise of the arguments
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | `string` | the formula, e.g. `"[price] * [quantity] * 1.19"` (a leading `=` is ignored) |
+| `options?` | [`FormulaOptionsIf`](interfaces/FormulaOptionsIf.md) | own functions |
+
+#### Returns
+
+[`CompiledFormula`](interfaces/CompiledFormula.md)
+
+the compiled formula
+
+**`Example`**
+
+```ts
+const gross = compileFormula("ROUND([price] * [quantity] * 1.19, 2)");
+gross.evaluate({ price: 25, quantity: 10 });         // 297.5
+compileFormula("[price] / 0").evaluate({ price: 1 }); // FormulaError #DIV/0!
+compileFormula("[price] *").error?.code;             // "#ERROR!"
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/compile-formula.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L112)
+
+___
+
+### createFormulaValueGetter
+
+▸ **createFormulaValueGetter**(`formula`, `options?`): [`ValueGetter`](modules.md#valuegetter)
+
+The [ValueGetter](modules.md#valuegetter) of a formula – what `ColumnDef.create({ formula })` sets as `valueGetter`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `formula` | `string` \| [`CompiledFormula`](interfaces/CompiledFormula.md) | a compiled formula or its text |
+| `options?` | [`FormulaOptionsIf`](interfaces/FormulaOptionsIf.md) | own functions (only with a text) |
+
+#### Returns
+
+[`ValueGetter`](modules.md#valuegetter)
+
+the getter
+
+**`Example`**
+
+```ts
+const column = ColumnDef.create({ property: "gross", headerLabel: "Gross" });
+column.valueGetter = createFormulaValueGetter("[net] * 1.19");
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/compile-formula.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L159)
+
+___
+
+### formatShowValuesAs
+
+▸ **formatShowValuesAs**(`value`, `config`): `string`
+
+The text of a shown value: percentages with one decimal (`"66.7%"`), ranks without decimals, differences and
+running totals like totals (`"1,234.5"`). Not a number → `""`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `unknown` | the shown value (a fraction for percentages) |
+| `config` | [`ShowValuesAsConfig`](modules.md#showvaluesasconfig) | the configuration of the column |
+
+#### Returns
+
+`string`
+
+the text
+
+**`Example`**
+
+```ts
+formatShowValuesAs(0.667, "percentOfColumnTotal");                          // "66.7%"
+formatShowValuesAs(0.667, { mode: "percentOfColumnTotal", fractionDigits: 2 }); // "66.70%"
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L76)
+
+___
+
+### isFormulaError
+
+▸ **isFormulaError**(`value`): value is FormulaError
+
+True for an error value of a formula ([FormulaError](classes/FormulaError.md)) – also for one created by another copy of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `unknown` | any value |
+
+#### Returns
+
+value is FormulaError
+
+whether it is a formula error
+
+**`Example`**
+
+```ts
+const value = tableApi.getRowValue(row, "margin");
+if (!isFormulaError(value)) console.log(value);
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/formula/formula-error.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L68)
+
+___
+
+### isPercentShowValuesAs
+
+▸ **isPercentShowValuesAs**(`mode`): `boolean`
+
+True for the modes that show a share (a fraction, shown as percentage).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mode` | `undefined` \| [`ShowValuesAs`](modules.md#showvaluesas) | the mode |
+
+#### Returns
+
+`boolean`
+
+whether the shown value is a fraction
+
+**`Example`**
+
+```ts
+isPercentShowValuesAs("percentOfColumnTotal");   // true
+isPercentShowValuesAs("rank");                   // false
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L57)
+
+___
+
+### resolveShowValuesAs
+
+▸ **resolveShowValuesAs**(`config`): [`ShowValuesAsIf`](interfaces/ShowValuesAsIf.md) \| `undefined`
+
+The full options of a „Show values as“ configuration – `undefined` for none or an unknown mode.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `config` | `undefined` \| ``null`` \| [`ShowValuesAsConfig`](modules.md#showvaluesasconfig) | a mode or mode with options |
+
+#### Returns
+
+[`ShowValuesAsIf`](interfaces/ShowValuesAsIf.md) \| `undefined`
+
+the options
+
+**`Example`**
+
+```ts
+resolveShowValuesAs("rank");   // { mode: "rank" }
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L24)
+
+___
+
+### sumOfNumbers
+
+▸ **sumOfNumbers**(`values`): `number`
+
+The sum of the numbers of a list (Neumaier, like [Aggregators](modules.md#aggregators).sum); other values are skipped.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `values` | `ArrayLike`\<`unknown`\> | the values |
+
+#### Returns
+
+`number`
+
+the sum, 0 for none
+
+**`Example`**
+
+```ts
+sumOfNumbers([1, "2", 3, undefined]);   // 4
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/calc/show-values-as.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L123)
 
 ## DOM
 

@@ -146,7 +146,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
-  getEditRenderer, editInputPipe })`. Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions })` (die letzten fünf
+  seit 1.1.95, § 3.6 „Berechnete Spalten“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
 - Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
   `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
   Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
@@ -289,6 +290,28 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `body.getCellSourceRows(r, c)`. ARIA: neues optionales `AreaModelIf.isRowHeaderCell?()` → `rowheader`;
   `RenderScope.updateRowGroupRoles` macht Row-Divs ohne Zellen (von Spans verdeckt) zu `presentation`. CSS
   `ge-table-pivot-*`, `--ge-table-pivot-*`.
+- **Berechnete Spalten, „Show values as“, Formeln (seit 1.1.95, `calc/` + `formula/`, Design
+  `prompts/008-formeln-berechnete-spalten-show-values-as.design.md`)**: `ColumnDef.valueGetter(row, ctx)` – **eine**
+  Auswertungsstelle: `AreaModelObjectArray`/`AreaModelTree.getValueByT` fragen die interne `ColumnValues`
+  (`calc/column-values.ts`; Property → Getter lazy, neu bei `invalidateDerivedValues()` oder anderer Spaltenzahl; nur im
+  **Body**), sonst Pfad wie bisher (bit-gleich). Damit stimmen Sortierung (Memo je Sortierlauf, Fehler/leer zuletzt), Copy,
+  Excel, `footerAggregates` (Spec-Property einer berechneten Spalte → `body.getRowValue`) und Row Grouping (`aggregations`,
+  `groupBy` auf berechneter Spalte) automatisch. `ValueGetterContextIf` (`getValue`, `hasColumn`, `isCalculated`,
+  `aggregate(p, agg)` über gefilterte Zeilen, gecacht je Zeilen-Array + Länge). Zyklen → `#CIRC!`, Exceptions → `#VALUE!`.
+  Ohne `valueSetter` nie editierbar. Filter: `api.getRowValue(row, property)`. Neue optionale `AreaModelIf`-Methoden
+  `isCalculatedProperty?`, `getRowValue?`; `AbstractAreaModel.hasDerivedColumns()/isDerivedProperty()` →
+  `RenderScope.rerenderCalculatedCells()` nach `updateCells` ohne Repaint. **Show values as**: `ColumnDef.showValuesAs`
+  (`ShowValuesAs`, 7 Modi; Bezug gefilterte Zeilen; flach: Summe bzw. Arrays je Property gecacht, bei Filter/Sort/Invalidate
+  geleert; Baum/Row Groups: Blätter bzw. Geschwister über `getRawValueOfRow()` – Gruppenzeilen liefern ihr Aggregat), Text
+  über `getTextValueAt` + `AggregateCellRenderer`, Sortierung nach Rohwert; Pivot: `PivotValueIf.showValuesAs` (4
+  Anteils-Modi, `AreaModelPivot.getShownValue`, sortiert nach Anteil, Footer folgt); `api.setShowValuesAs/getShowValuesAs`.
+  Excel: Anteile als `ExcelFormattedValueIf { value, numberFormat: "0.0%" }` nur wenn `excelService.supportsNumberFormats`
+  (eigene `numFmt` ab 164). **Formeln**: `compileFormula(source, { functions })` → Tokenizer → Pratt-Parser (`-2^2 = -4`,
+  Länge ≤ 10 000, Tiefe ≤ 64) → AST → Closures (`FormulaEvaluator`, **kein `eval`/`new Function`**), Felder nur eigene
+  Properties (`[constructor]` → `#NAME?`), `SUM/AVG/MIN/MAX/COUNT([x])` = Spalten-Aggregat, Fehlerwerte `FormulaError`
+  (nie geworfen; CSS `ge-table-cell-error`, Tooltip = Meldung). `ColumnDef.create({ formula })` /
+  `createFormulaValueGetter` / `api.setColumnFormula(property, source)` (gibt Compile-Fehler zurück). Keine Zellbezüge,
+  keine Formel-UI. Bench `bench/formula.bench.ts` (1 Mio. Zeilen ~0,5 µs/Zeile im Container).
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -371,7 +394,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 463 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 501 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -382,8 +405,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~1.840 Tests) |
-  | `test:browser` | echtes Chromium, ~640 Tests in 24 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.050 Tests) |
+  | `test:browser` | echtes Chromium, ~655 Tests in 25 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -512,6 +535,8 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 26 | Summenzeile in einer Zeile Code – plus Statusleiste für die Auswahl (ohne Enterprise-Lizenz) | `videos/06-summenzeile/`, Training-Kapitel `footer-totals`, `apps/table-demo/aggregation.html` |
 | 27 | Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz | `videos/07-row-grouping/`, Showcase `rowgrouping`, Training-Kapitel `row-grouping`, `apps/table-demo/row-grouping.html`; Bezug zu Folge 12 „Baumtabelle & Checkboxen“ |
 | 28 | Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz | `videos/08-pivot-ohne-enterprise/`, Showcase `pivot`, Training-Kapitel `pivot-tables`, `apps/table-demo/pivot.html`; Bezug zu Folge 14 „Mehrzeilige Header-Gruppen“ |
+| 29 | Berechnete Spalten in 60 Sekunden (`valueGetter`, Sortieren/Summe stimmen) – geplant | Showcase `formulas`, `instructions.md` 5.2 |
+| 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, `instructions.md` 5.9 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

@@ -331,6 +331,28 @@ export interface AreaModelIf {
   isRowHeaderCell?(rowIndex: number, columnIndex: number): boolean;
 
   /**
+   * Optional: true if the column with this property is calculated (`ColumnDefIf.valueGetter` / `formula`).
+   * Implemented by the object-array, tree, row-group and pivot models.
+   *
+   * @example
+   * tableModel.getBodyModel().isCalculatedProperty?.("total");   // true
+   *
+   * @since 1.1.95
+   */
+  isCalculatedProperty?(property: string): boolean;
+
+  /**
+   * Optional: the value of a column for a row object – computed for a calculated column, otherwise the property
+   * path ({@link TableApi.getRowValue}). Implemented by the object-array, tree, row-group and pivot models.
+   *
+   * @example
+   * tableModel.getBodyModel().getRowValue?.({ price: 25, quantity: 10 }, "total");   // 250
+   *
+   * @since 1.1.95
+   */
+  getRowValue?(row: any, property: string): unknown;
+
+  /**
    * Returns the value of the cell at the specified row and column indices.
    * This is one of the most important methods in the area model, as it provides
    * the actual data to be displayed in each cell.

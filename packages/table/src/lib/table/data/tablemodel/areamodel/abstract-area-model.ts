@@ -7,12 +7,19 @@ import { CheckboxModelIf } from "../../../checkbox/checkbox-model.if";
 import { FilterFunction } from "../../common/filter-function";
 import { SortItem } from "../../common/sort-item";
 import { HasDefaultRowHeightIf } from "./has-default-row-height-if";
+import { ColumnValues } from "../../../calc/column-values";
+import { AggregateCellRenderer } from "../../../renderer/aggregate-cell-renderer";
+import { formatShowValuesAs } from "../../../calc/show-values-as";
+import { isFormulaError } from "../../../formula/formula-error";
+import { isTreeRow } from "../../../instanceof-workaround";
 
 
 /** @category Area models */
 export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRowHeightIf {
 
   public rowSelectionModel: CheckboxModelIf<any> | undefined = undefined;
+  private columnValuesInstance?: ColumnValues;
+  private calcTextRenderer?: AggregateCellRenderer;
   protected cellRenderers: (CellRendererIf | undefined)[];
   protected yPositions: number[] = [];
 
@@ -126,6 +133,9 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
 
   isEditable(_rowIndex: number, columnIndex: number): boolean {
     const columnDef = this.columnDefs?.[columnIndex];
+    if (this.areaIdent === "body" && columnDef?.valueGetter && !columnDef.valueSetter) {
+      return false; // a calculated column without a setter (since 1.1.95)
+    }
     return columnDef?.editable?.() ?? false;
   }
 
@@ -135,6 +145,10 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
       value = editInputPipe(value, rowIndex, columnIndex);
     }
     const row: T = this.getRowByIndex(rowIndex);
+    const columnDef = this.columnDefs[columnIndex];
+    if (this.areaIdent === "body" && columnDef?.valueGetter) {
+      return this.setCalculatedValue(row, columnDef, value);
+    }
     const property = this.columnDefs[columnIndex].property;
     if (property.includes(".")) {
       return this.setPropertyValue(row, property.split("."), value);
@@ -184,6 +198,139 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
     }
   }
 
+
+  // ---------------------------------------------------------------- calculated columns (since 1.1.95, prompt 008)
+
+  /**
+   * True if a column of this model with this property is calculated (`valueGetter` or `formula`).
+   *
+   * @param {string} property - the property of the column
+   * @returns {boolean} whether its values are computed
+   *
+   * @example
+   * tableModel.getBodyModel().isCalculatedProperty?.("total");   // true
+   *
+   * @since 1.1.95
+   */
+  isCalculatedProperty(property: string): boolean {
+    return this.getColumnValues().isCalculated(property);
+  }
+
+  /**
+   * The value of a column for a row object – the computed value of a calculated column, otherwise the property
+   * (path). A `TreeRow` is unwrapped. The table API offers it as {@link TableApi.getRowValue}.
+   *
+   * @param {any} row - a row object (or `TreeRow`)
+   * @param {string} property - the property of the column
+   * @returns {unknown} the value
+   *
+   * @example
+   * const body = tableModel.getBodyModel() as AreaModelObjectArray<Item>;
+   * body.getRowValue({ price: 25, quantity: 10 }, "total");   // 250
+   *
+   * @since 1.1.95
+   */
+  getRowValue(row: any, property: string): unknown {
+    if (isTreeRow(row)) {
+      row = row.data; // a TreeRow
+    }
+    return this.getColumnValues().get(row, property);
+  }
+
+  /**
+   * True if the model has calculated or „Show values as“ columns – their cells depend on other cells
+   * (the table redraws them after `updateCells`).
+   *
+   * @returns {boolean} whether derived columns exist
+   * @since 1.1.95
+   */
+  hasDerivedColumns(): boolean {
+    const values = this.getColumnValues();
+    return values.hasGetters() || values.hasShowValuesAs();
+  }
+
+  /**
+   * True if the cells of a column depend on other cells (calculated or „Show values as“).
+   *
+   * @param {string} property - the property of the column
+   * @returns {boolean} whether the column is derived
+   * @since 1.1.95
+   */
+  isDerivedProperty(property: string): boolean {
+    const values = this.getColumnValues();
+    return values.isCalculated(property) || !!values.getShowValuesAs(property);
+  }
+
+  /** The resolver of calculated values of this model (created on first use). @internal */
+  protected getColumnValues(): ColumnValues {
+    return this.columnValuesInstance ??= new ColumnValues({
+      // calculated columns and „Show values as“ apply to the body only (header and footer show their own data)
+      getColumnDefsForValues: () => this.areaIdent === "body" ? this.columnDefs : [],
+      readPath: (row: any, property: string) => this.readPropertyPath(row, property),
+      getAggregationSource: () => this.getAggregationSourceForValues(),
+    });
+  }
+
+  /** Drops the cached aggregates and the getter lookup of calculated columns. */
+  protected invalidateColumnValues(): void {
+    this.columnValuesInstance?.invalidate();
+  }
+
+  /** The value of a property path – overridden by the models with their own path semantics. */
+  protected readPropertyPath(row: any, property: string): unknown {
+    if (row === null || row === undefined || !property) return undefined;
+    let o: any = row;
+    for (const key of property.split(".")) {
+      if (o === null || o === undefined) return undefined;
+      o = o[key];
+    }
+    return o;
+  }
+
+  /** The rows of column aggregates in formulas (`SUM([total])`): the filtered row objects. */
+  protected getAggregationSourceForValues(): { signal: unknown; length: number; rows: () => ArrayLike<unknown> } {
+    const n = this.getRowCount();
+    return { signal: undefined, length: n, rows: () => Array.from({ length: n }, (_, i) => this.getRowByIndex(i)) };
+  }
+
+  /** Writes an edited value of a calculated column through its `valueSetter`; without one: rejected. */
+  protected setCalculatedValue(row: any, columnDef: ColumnDefIf, value: any): boolean {
+    if (!columnDef.valueSetter || row === undefined || row === null) {
+      return false;
+    }
+    if (isTreeRow(row)) {
+      row = row.data; // a TreeRow
+    }
+    return columnDef.valueSetter(row, value) !== false;
+  }
+
+  /** The text of a cell of a calculated / „Show values as“ column; `undefined` for a normal column. */
+  protected getCalculatedText(property: string | undefined, value: unknown): string | undefined {
+    if (property === undefined) return undefined;
+    const values = this.getColumnValues();
+    const showValuesAs = values.getShowValuesAs(property);
+    const calculated = values.isCalculated(property);
+    if (calculated && isFormulaError(value)) return value.code;
+    if (showValuesAs) return formatShowValuesAs(value, showValuesAs);
+    if (calculated) return value === undefined || value === null ? "" : `${value}`;
+    return undefined;
+  }
+
+  /** The renderer of a „Show values as“ column without an own renderer: the text of `getTextValueAt`. */
+  protected getCalculatedRenderer(property: string | undefined): CellRendererIf | undefined {
+    if (property !== undefined && this.getColumnValues().getShowValuesAs(property)) {
+      return this.calcTextRenderer ??= new AggregateCellRenderer();
+    }
+    return undefined;
+  }
+
+  /** The CSS class and tooltip of an error value of a formula. */
+  protected addCalculatedClasses(classes: string[], property: string | undefined, value: () => unknown): string[] {
+    if (property !== undefined && this.getColumnValues().isCalculated(property) && isFormulaError(value())) {
+      return [...classes, "ge-table-cell-error"];
+    }
+    return classes;
+  }
 }
 
 

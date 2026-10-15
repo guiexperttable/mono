@@ -209,8 +209,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Offen: Demo-Repo entfällt (kein neues Kapitel), Angular-Demo erst nach dem Release.
 - [ ] Folgepunkte 005: Excel-Formeln für die Gesamtzeile (`=SUBTOTAL(109, …)`; der XLSX-Writer kennt keine `<f>`-Zellen) ·
       Gesamtzeile oben (ag-Grid `grandTotalRow: "top"`) · Beschriftung über leere Nachbarspalten (Colspan) · Live-Daten mit
-      Millionen Zeilen: je `updateCells()` ein voller Durchlauf (inkrementelle Summen nur ohne Filter möglich) · 008:
-      `ColumnDef.valueGetter` im Footer zuerst auflösen (Design § 2.2) · Review-Nits (Design § 5): Auswahl-Aggregate im Baum
+      Millionen Zeilen: je `updateCells()` ein voller Durchlauf (inkrementelle Summen nur ohne Filter möglich) · ~~008:
+      `ColumnDef.valueGetter` im Footer zuerst auflösen~~ (erledigt mit 008) · Review-Nits (Design § 5): Auswahl-Aggregate im Baum
       zählen sichtbare Zeilen, der Footer Blätter · `footerAggregates` + `bodyData` ohne `columnDefs` warnt nicht · eigener
       Aggregator mit Feld `aggregator` wird als Spec gelesen.
 - [x] **006 Row Grouping** – Branch `feat/row-grouping`, Design `prompts/006-row-grouping.design.md`: DOM-freie Engine
@@ -245,7 +245,23 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       mit `force` · `pivotRows` mit 1 Mio. Zeilen, 2 × 2 Ebenen, 2 Werten ~0,95 s im Container (Engine: zweimal
       `groupRows`, dann ein Durchlauf) · Spaltenschlüssel folgen dem Filter nicht (bewusst stabil; `setPivotConfig({})`
       baut sie aus allen Zeilen) · mit Filter kündigt `setPivotConfig` die Zeilenzahl erneut an und filtert zweimal (`firstInit()`).
-- [ ] **008 Berechnete Spalten, „Show values as“, Formeln** (`prompts/008-formeln-berechnete-spalten-show-values-as.md`).
+- [x] **008 Berechnete Spalten, „Show values as“, Formeln** – Branch `feat/calculated`, Design
+      `prompts/008-formeln-berechnete-spalten-show-values-as.design.md`: `ColumnDef.valueGetter` / `valueSetter` /
+      `showValuesAs` / `formula` / `formulaOptions`, eine Auswertungsstelle (`calc/column-values.ts`, intern; Zyklen →
+      `#CIRC!`, Aggregate gecacht), `ValueGetterContextIf`, `ShowValuesAs` (7 Modi, flach/Baum/Row Groups/Pivot),
+      `calculateShowValuesAs`, `formatShowValuesAs`; Formel-Sprache `formula/` (Tokenizer, Pratt-Parser, AST → Closures,
+      kein `eval`), `compileFormula`, `createFormulaValueGetter`, `FormulaError` (`#ERROR! #NAME? #VALUE! #DIV/0! #NUM!
+      #CIRC!`), CSS `ge-table-cell-error`; `api.getRowValue`, `setShowValuesAs`, `getShowValuesAs`, `setColumnFormula`;
+      `AreaModelPivot.getShownValue`, `PivotValueIf.showValuesAs`; Excel: `ExcelFormattedValueIf` + `numFmt` (Prozent).
+      Showcase `formulas`, `why.astro`. Selbständig umgesetzt.
+      Offen: Training (Abschnitt in `column-definitions` + Kapitel 38 `formulas`), Demo-Repo `ep-038`, Videos 29/30,
+      Demo-Modell + `apps/table-demo`, Angular-Demo nach dem Release, Bench auf dem Mac nachmessen.
+- [ ] Folgepunkte 008: Footer einer „Show values as“-Spalte zeigt Rohsummen (z. B. 100 % wäre schöner) · Pivot: laufende
+      Summe/Rang/Differenz über Spalten (ag-Grid „Running total in“) · `valueGetter` für `AreaModelArrayOfArrays` (Spalten
+      werden dort physisch verschoben) · Zellwerte berechneter Spalten werden nicht gecacht (Sortierung 1 Mio. Zeilen ~1,6 s
+      im Container, Auswertung ~0,5 µs/Zeile) · Fehlerklasse `ge-table-cell-error` bleibt nach `updateCells` an einer
+      wiederverwendeten Zelle, bis neu gezeichnet wird (`rerenderCellContent` entfernt keine Klassen) · Excel-Formeln
+      (`<f>`) bewusst nicht · eigene Formel-Funktionen mit Lazy-Argumenten (heute nur `IF`/`IFERROR`/`AND`/`OR`).
 - [ ] **009 Zeilen ziehen (Row Drag)** (`prompts/009-row-drag.md`).
 - [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
       Zwischenablage als Folgeaufgaben.
@@ -481,6 +497,13 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.95 – berechnete Spalten (008)**, nur additiv: `ColumnDef` hat die neuen (leeren) Felder `valueGetter`,
+  `valueSetter`, `showValuesAs`, `formula`; eine berechnete Spalte ist nie editierbar ohne `valueSetter` (auch nicht mit
+  `editable: TrueFn`). `AreaModelObjectArray` und `AreaModelTree` implementieren jetzt `invalidateDerivedValues()` (leert
+  nur eigene Caches) – nach `updateCells()` ohne `repaintAll` werden deshalb auch Footer-Zellen eines Objekt-Array-Footers
+  neu gezeichnet. `AreaModelTree.getValueAt` liest über die neue geschützte Methode `getRawValueOfRow()` (Unterklassen,
+  die `getValueAt` überschreiben, laufen unverändert). Excel ohne Zahlenformate: `styles.xml` unverändert.
 
 - **Tastatur**: Shortcuts funktionieren (vorher löste jede Taste `START_EDITING` aus); Buchstaben öffnen den Editor
   nicht mehr (nur F2); Tab verlässt die Tabelle; Pfeile navigieren.

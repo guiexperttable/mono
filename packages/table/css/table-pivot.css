@@ -1,0 +1,42 @@
+/* Pivot tables (PivotFactory / AreaModelPivot, since 1.1.94) */
+
+/* every value cell: numbers on the end side, same digit widths */
+.ge-table-pivot-value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the label in the group column ("Nord") */
+.ge-table-pivot-label .ge-table-label-div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* subtotals: group rows and the total columns of column groups */
+.ge-table-col-div.ge-table-pivot-subtotal {
+  background-color: var(--ge-table-pivot-subtotal-bg);
+  font-weight: var(--ge-table-pivot-subtotal-font-weight);
+}
+
+/* totals: the total column(s) and the total row */
+.ge-table-col-div.ge-table-pivot-total {
+  background-color: var(--ge-table-pivot-total-bg);
+  font-weight: var(--ge-table-pivot-total-font-weight);
+}
+
+/* a combination without data (emptyText, e.g. "–") */
+.ge-table-pivot-empty {
+  color: var(--ge-table-pivot-empty-text);
+}
+
+/* header: a column group ("2026", "Jan") starts at the left of its span, a column label ("Q1", "Revenue") sits above
+   its numbers (value columns only – the group column keeps its alignment) */
+.ge-table-pivot-header-group {
+  text-align: start;
+  padding-inline-start: 6px;
+}
+
+.ge-table-pivot-header.ge-table-pivot-header-column {
+  text-align: end;
+}

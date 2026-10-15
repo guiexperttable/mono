@@ -30,7 +30,7 @@ export class AreaModelCellGroups implements AreaModelIf {
 
   constructor(
     public readonly areaIdent: AreaIdent = 'header',
-    readonly groups: CellGroupIf[],
+    public groups: CellGroupIf[],
     public columnDefs: ColumnDefIf[] = [],
     public readonly defaultRowHeight: number,
     private headerGroupOptions: HeaderGroupOptionsIf = new HeaderGroupOptions()
@@ -259,6 +259,32 @@ Gold A     Gold B    Gold C   Gold D    Gold Sum    HOH Loc    HOH A    HOH B   
       group.closed = closed;
       this.init();
     }
+    return this.mergeColumnDefs();
+  }
+
+  /**
+   * Replaces the header groups (e.g. a pivot table with other column keys): builds the header rows again and returns
+   * the column definitions in header order – existing definitions with the same property are kept (width, classes,
+   * renderers), their visibility follows the (collapsed) groups. Repaint the table afterwards (a pivot table does all of
+   * this in {@link TableApi.setPivotConfig}).
+   *
+   * @param {CellGroupIf[]} groups - the new groups; every column is a leaf with a `property`
+   * @param {ColumnDefIf[]} [columnDefs] - definitions to use for these properties (default: the current ones)
+   * @returns {ColumnDefIf[]} the column definitions, one per leaf, in header order
+   * @example
+   * const header = tableApi.getTableModel().getAreaModel("header") as AreaModelCellGroups;
+   * const columnDefs = header.setGroups([
+   *   { data: "Customer", children: [{ data: "Name", property: "name" }, { data: "City", property: "city" }] }
+   * ]);
+   * @since 1.1.94
+   */
+  setGroups(groups: CellGroupIf[], columnDefs?: ColumnDefIf[]): ColumnDefIf[] {
+    this.groups = groups;
+    this.groupExts = CellgroupFactory.buildGroupExts(groups);
+    if (columnDefs) {
+      this.columnDefs = columnDefs;
+    }
+    this.arr = this.buildArray();
     return this.mergeColumnDefs();
   }
 

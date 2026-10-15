@@ -47,6 +47,8 @@ searchInput.addEventListener("input", () => {
 
   ↳↳ [`AreaModelRowGroups`](AreaModelRowGroups.md)
 
+  ↳↳ [`AreaModelPivot`](AreaModelPivot.md)
+
 ## Table of contents
 
 ### Constructors

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+  Pivot table (since 1.1.94) – also the recording page of video 08.
+  Start: pnpm serve:table-demo → http://localhost:4200/pivot.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – pivot table</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .table-div { height: 520px; width: 100%; }
+    #drill { font-size: 14px; min-height: 1.4em; }
+  </style>
+</head>
+<body>
+<h1>50,000 orders as a pivot table</h1>
+<div class="bar">
+  <label>Rows
+    <select id="rows">
+      <option value="country,city" selected>Country › City</option>
+      <option value="country">Country</option>
+      <option value="category,product">Category › Product</option>
+    </select>
+  </label>
+  <label>Columns
+    <select id="columns">
+      <option value="year,quarter" selected>Year › Quarter</option>
+      <option value="year">Year</option>
+      <option value="category">Category</option>
+      <option value="">– totals only –</option>
+    </select>
+  </label>
+  <label>Value
+    <select id="values">
+      <option value="sum" selected>Revenue + orders</option>
+      <option value="avg">Average order value</option>
+    </select>
+  </label>
+  <button id="expand" type="button">Expand all</button>
+  <button id="collapse" type="button">Collapse all</button>
+  <label>Filter <input id="filter" type="search" placeholder="e.g. laptop"></label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<p id="drill" aria-live="polite">Click a cell to see how many orders it contains.</p>
+<script src="/src/pivot/pivot-demo.ts" type="module"></script>
+</body>
+</html>

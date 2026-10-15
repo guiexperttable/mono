@@ -62,6 +62,8 @@ class TotalsFooter extends AreaModel {
 
   ↳ [`AreaModelAggregateFooter`](AreaModelAggregateFooter.md)
 
+  ↳ [`AreaModelPivotFooter`](AreaModelPivotFooter.md)
+
 ## Implements
 
 - [`AreaModelIf`](../interfaces/AreaModelIf.md)

@@ -318,6 +318,19 @@ export interface AreaModelIf {
   invalidateDerivedValues?(change?: DerivedValuesChangeIf): void;
 
   /**
+   * Optional: true for a cell that names its row (a label such as "Nord" or "Total") – the table gives it
+   * `role="rowheader"` instead of `gridcell`, so screen readers announce it with the row.
+   *
+   * @example
+   * class LabeledBody extends AreaModel {
+   *   isRowHeaderCell(_rowIndex: number, columnIndex: number): boolean { return columnIndex === 0; }
+   * }
+   *
+   * @since 1.1.94
+   */
+  isRowHeaderCell?(rowIndex: number, columnIndex: number): boolean;
+
+  /**
    * Returns the value of the cell at the specified row and column indices.
    * This is one of the most important methods in the area model, as it provides
    * the actual data to be displayed in each cell.

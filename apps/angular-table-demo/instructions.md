@@ -179,6 +179,13 @@ oder `ariaLabel: "Bestellungen"`; deutsche Ansagen über `ariaTexts`. Diese Demo
 (`TODO.md`) – die Attribute erscheinen hier erst nach dem Release 1.1.91. Eine lauffähige Demo im Mono-Repo:
 `pnpm serve:table-demo` → `http://localhost:4200/aria.html`. Details: `instructions.md` 6.14 im Repo-Root.
 
+## Row Grouping und Pivot-Tabellen (ab `@guiexpert/table` 1.1.94)
+
+`RowGroupFactory` (Zeilen gruppieren) und `PivotFactory` (Pivot-Tabellen) gibt es ab 1.1.94. Diese Demo nutzt noch die
+npm-Pakete (`TODO.md`) – die Routen `rowgroup` und `pivot` kommen nach dem Release. Angular-Beispiele:
+`packages/angular-table/instructions.md` Abschnitt 11, lauffähige Demos im Mono-Repo: `pnpm serve:table-demo` →
+`/row-grouping.html` und `/pivot.html`.
+
 ## Lizenz
 
 **Aktuelle Releases: MIT-Lizenz** – kostenlos nutzbar, auch kommerziell. **Künftige Releases: mögliche

@@ -2,7 +2,7 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-036`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-037`), so every chapter can link to the exact code state of its episode.
  * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
@@ -386,6 +386,19 @@ export const CHAPTERS: Chapter[] = [
       "AreaModelRowGroups", "AreaModelRowGroups.getGroups", "RowGroupIf", "TableApi.setRowGroupBy", "TableApi.expandAll",
       "TableApi.collapseAll", "groupRows", "aggregateRowGroups", "isGroupRow"],
     showcases: [{ name: "rowgrouping", title: "Row grouping" }],
+    since: "1.1.94"
+  },
+  {
+    slug: "pivot-tables", no: 37, part: "advanced", episode: 37, minutes: 6,
+    title: "Pivot tables: countries × quarters in one call", nav: "Pivot tables",
+    lead: "100,000 flat orders become revenue per country, city, year and quarter – with subtotals, totals and a header made from the data.",
+    learn: ["tell a pivot table from a transposition and from row grouping", "turn the values of a field into columns",
+      "show several values per cell and computed keys like quarters", "know why totals are computed from the rows, not from the cells",
+      "filter, sort, drill down and pivot again at runtime"],
+    api: ["PivotFactory", "PivotFactory.createTableModel", "PivotTableModelParaIf", "PivotConfigIf", "PivotValueIf",
+      "PivotTableModel", "AreaModelPivot", "AreaModelPivot.getCellSourceRows", "AreaModelPivot.getResult", "PivotResult",
+      "PivotResult.getValue", "pivotRows", "TableApi.setPivotConfig", "RowGroupFieldIf"],
+    showcases: [{ name: "pivot", title: "Pivot table" }],
     since: "1.1.94"
   }
 ];

@@ -4,6 +4,9 @@ import type { AreaModelRowGroups } from './data/tablemodel/areamodel/area-model-
 import type { RowGroupIf } from './rowgroup/row-group.if';
 import type { RowGroupColumnDef } from './rowgroup/row-group-column-def';
 import type { TreeRowIf } from './data/common/tree-row-if';
+import type { AreaModelPivot } from './data/tablemodel/areamodel/area-model-pivot';
+import type { PivotTableModel } from './pivot/pivot-table-model';
+import type { PivotColumnDef } from './pivot/pivot-column-def';
 
 
 /*
@@ -165,4 +168,54 @@ export function isAreaModelRowGroups(o: any): o is AreaModelRowGroups {
  */
 export function isRowGroupColumnDef(o: any): o is RowGroupColumnDef {
   return !!o && o['type'] === 'RowGroupColumnDef';
+}
+
+/**
+ * True for the table model of a pivot table ({@link PivotTableModel}). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. `tableApi.getTableModel()`
+ * @returns {boolean} true for a pivot table
+ *
+ * @example
+ * const model = tableApi.getTableModel();
+ * const config = isPivotTableModel(model) ? model.getPivotConfig() : undefined;
+ *
+ * @since 1.1.94
+ * @category Pivot
+ */
+export function isPivotTableModel(o: any): o is PivotTableModel {
+  return !!o && o['kind'] === 'PivotTableModel';
+}
+
+/**
+ * True for the body of a pivot table ({@link AreaModelPivot}). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. `tableModel.getBodyModel()`
+ * @returns {boolean} true for a pivot body
+ *
+ * @example
+ * const body = tableModel.getBodyModel();
+ * const total = isAreaModelPivot(body) ? pivotBody.getResult().getValue() : undefined;
+ *
+ * @since 1.1.94
+ * @category Pivot
+ */
+export function isAreaModelPivot(o: any): o is AreaModelPivot {
+  return !!o && o['kind'] === 'AreaModelPivot';
+}
+
+/**
+ * True for a value column of a pivot table ({@link PivotColumnDef}). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. a column definition
+ * @returns {boolean} true for a value, subtotal or total column of a pivot
+ *
+ * @example
+ * const valueColumns = (tableModel.getColumnDefs() ?? []).filter(isPivotColumnDef);
+ *
+ * @since 1.1.94
+ * @category Pivot
+ */
+export function isPivotColumnDef(o: any): o is PivotColumnDef {
+  return !!o && o['type'] === 'PivotColumnDef';
 }

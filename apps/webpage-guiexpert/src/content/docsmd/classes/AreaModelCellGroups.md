@@ -52,6 +52,7 @@
 - [isRowChecked](AreaModelCellGroups.md#isrowchecked)
 - [isSelectable](AreaModelCellGroups.md#isselectable)
 - [setGroupClosed](AreaModelCellGroups.md#setgroupclosed)
+- [setGroups](AreaModelCellGroups.md#setgroups)
 - [setRowChecked](AreaModelCellGroups.md#setrowchecked)
 - [setValue](AreaModelCellGroups.md#setvalue)
 - [sort](AreaModelCellGroups.md#sort)
@@ -159,7 +160,7 @@ ___
 
 ### groups
 
-• `Readonly` **groups**: [`CellGroupIf`](../interfaces/CellGroupIf.md)[]
+• **groups**: [`CellGroupIf`](../interfaces/CellGroupIf.md)[]
 
 #### Defined in
 
@@ -1524,6 +1525,47 @@ the merged column definitions, `undefined` if there is no such group
 #### Defined in
 
 [src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L253)
+
+___
+
+### setGroups
+
+▸ **setGroups**(`groups`, `columnDefs?`): [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[]
+
+Replaces the header groups (e.g. a pivot table with other column keys): builds the header rows again and returns
+the column definitions in header order – existing definitions with the same property are kept (width, classes,
+renderers), their visibility follows the (collapsed) groups. Repaint the table afterwards (a pivot table does all of
+this in [TableApi.setPivotConfig](TableApi.md#setpivotconfig)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `groups` | [`CellGroupIf`](../interfaces/CellGroupIf.md)[] | the new groups; every column is a leaf with a `property` |
+| `columnDefs?` | [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[] | definitions to use for these properties (default: the current ones) |
+
+#### Returns
+
+[`ColumnDefIf`](../interfaces/ColumnDefIf.md)[]
+
+the column definitions, one per leaf, in header order
+
+**`Example`**
+
+```ts
+const header = tableApi.getTableModel().getAreaModel("header") as AreaModelCellGroups;
+const columnDefs = header.setGroups([
+  { data: "Customer", children: [{ data: "Name", property: "name" }, { data: "City", property: "city" }] }
+]);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts:281](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-cell-groups.ts#L281)
 
 ___
 

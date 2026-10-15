@@ -6,6 +6,7 @@
 
 - [`AbstractAreaModel`](../classes/AbstractAreaModel.md)
 - [`AreaModelAggregateFooter`](../classes/AreaModelAggregateFooter.md)
+- [`AreaModelPivotFooter`](../classes/AreaModelPivotFooter.md)
 
 ## Table of contents
 

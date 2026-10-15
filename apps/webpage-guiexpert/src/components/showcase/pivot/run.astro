@@ -1,0 +1,75 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="pivot-bar">
+  <label>Rows
+    <select class={id + '-rows'} aria-label="Row fields">
+      <option value="country,city" selected>Country › City</option>
+      <option value="country">Country</option>
+      <option value="category,product">Category › Product</option>
+    </select>
+  </label>
+  <label>Columns
+    <select class={id + '-columns'} aria-label="Column fields">
+      <option value="year,quarter" selected>Year › Quarter</option>
+      <option value="year">Year</option>
+      <option value="category">Category</option>
+    </select>
+  </label>
+  <button type="button" class={id + '-expand'}>Expand all</button>
+  <button type="button" class={id + '-collapse'}>Collapse all</button>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'pivot-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createPivotModelAndOptions, pivotQuarter, pivotYear } from "/scripts/demo-table-models/index.js";
+
+  // 50,000 orders: country › city × year › quarter, revenue and number of orders, year totals, total column and row
+  const {tableModel, tableOptions} = createPivotModelAndOptions(50_000);
+  const ele = document.querySelector('.' + id);
+
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  // "year,quarter" → fields (year and quarter are functions of the order date)
+  const fields = value => value.split(',').map(f => f === 'year' ? pivotYear : f === 'quarter' ? pivotQuarter : f);
+
+  // pivot again at runtime – no new table model, expanded rows and column widths stay
+  document.querySelector('.' + id + '-rows').addEventListener('change', e =>
+    tableApi.setPivotConfig({ rowFields: fields(e.target.value) }));
+  document.querySelector('.' + id + '-columns').addEventListener('change', e =>
+    tableApi.setPivotConfig({ columnFields: fields(e.target.value) }));
+  document.querySelector('.' + id + '-expand').addEventListener('click', () => tableApi.expandAll());
+  document.querySelector('.' + id + '-collapse').addEventListener('click', () => tableApi.collapseAll());
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .pivot-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .pivot-bar select, .pivot-bar button {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+</style>

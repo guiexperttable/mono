@@ -132,7 +132,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `isEditable`/`isSelectable`, `isRowCheckable`/`setRowChecked`, `doSort`/`sort`, `setValue`, `changeColumnOrder`.
 - Implementierungen: `AreaModel` (Basis zum Ableiten, z. B. `LargeBodyModel`), `AbstractAreaModel`,
   `AreaModelArrayOfArrays`, `AreaModelObjectArray` (+ `…WithColumndefs`), `AreaModelTree`, `AreaModelRowGroups` (1.1.94,
-  Unterklasse von `AreaModelTree`), `AreaModelCellGroups`
+  Unterklasse von `AreaModelTree`), `AreaModelPivot` + `AreaModelPivotFooter` (1.1.94, Pivot; Body = Unterklasse von `AreaModelTree`), `AreaModelCellGroups`
   (Header-Gruppen), `AreaModelHidden`, `CoverGridBodyModel`. (`AsyncBodyAreaModelObjectArray` = unfertige
   Source-Leiche, nicht exportiert – nicht verwenden, wird später entschieden.)
 - Fabriken (`factory/`):
@@ -142,7 +142,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     (1.1.94), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`,
-    `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“).
+    `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“),
+    `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
   getEditRenderer, editInputPipe })`. Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
@@ -266,6 +267,28 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Spalten ausgeblendet (`rowgroup/row-group-layout.ts`, merkt sich, was es selbst ausgeblendet hat), Footer aus 005.
   Umgruppieren: `api.setRowGroupBy(levels)` (kein neues Modell, Zustand bleibt), `getRowGroupBy()`. Persistenz: Gruppen-Id
   unabhängig von `getRowId` (`TableStateService.idOfRow`). CSS `ge-table-row-group*`, `--ge-table-row-group-*`.
+- **Pivot (seit 1.1.94, `pivot/`, Design `prompts/007-pivot.design.md`)**: DOM-freie Engine `pivotRows(rows, config, accept?)`
+  → `PivotResult` (nutzt `groupRowsResolved` aus 006 zweimal: Zeilen- und Spaltenfelder; `RowGroup` als Knoten; ein
+  `Int32Array` Quellzeile → Spaltenblatt; Zellen **sparse** je Zeilenknoten `Map<Spaltenknoten, {count, states}>`, leere
+  Kombination = `undefined`, nicht 0; ein Durchlauf je Zeilenblatt, darüber nur `merge` – erst Spalten-, dann
+  Zeilenrichtung; `maxColumns` kappt Spalten mit Warnung, Summen zählen alle Zeilen). `PivotConfigIf`: `rowFields`/
+  `columnFields` = `RowGroupField` (wie `groupBy`), `values: PivotValue[]` (`"pfad"` = Summe oder `{ value, aggregator,
+  name, label, format }`, Default-Name `"sum(umsatz)"`), `subtotals`, `columnSubtotals` (Default ≥ 2 Spaltenfelder:
+  Summenspalte je Spaltengruppe, `visibility: "always"`, Gruppe mit Toggle), `totalColumn` (`"fixed"` Default | `true` |
+  `false`), `totalRow`, `emptyText`, `totalLabel`. Modell `PivotTableModel extends TableModel` (überschreibt
+  `getFixedRightColumnCount`, Spalten austauschbar), Body `AreaModelPivot extends AreaModelTree` (`type` bleibt
+  `"AreaModelTree"`, `kind` `"AreaModelPivot"`; Zeilen = `TreeRow` mit `RowGroup`, ohne Zeilenfelder eine Zeile „Total“),
+  Header `AreaModelPivotHeader` (intern, `extends AreaModelCellGroups`, Klassen `ge-table-pivot-header-group|column`),
+  Footer `AreaModelPivotFooter` (Gesamtsummen aus der Engine, nie aus den Pivot-Zeilen). Spalten: `RowGroupColumnDef`
+  (wiederverwendet, `showCount: false`) + `PivotColumnDef` (`pivot: PivotColumnInfoIf` = kind/column/value; stabile
+  Property `pivot:[[feld,typSchlüssel]…,wert]`, `pivot:subtotal:…`, `pivot:total:[wert]`). Filter: Prädikat bekommt die
+  **Quellobjekte** (vor der Aggregation), Spalten bleiben. Sortierung: Geschwister nach Zellwert (leere zuletzt) bzw.
+  Schlüssel. Neu pivotieren: `api.setPivotConfig(changes, rows?)` → `PivotTableModel.setPivotConfig` (gleiche Objekte,
+  `AreaModelCellGroups.setGroups` neu in 1.1.94) + `TableScope.setPivotConfig` (Sortierung/Selektion zurück, Span-Modelle
+  neu, `firstInit()`); Breiten gleicher Properties, Auf-/Zu-Zustand und Filter bleiben. Drill-down
+  `body.getCellSourceRows(r, c)`. ARIA: neues optionales `AreaModelIf.isRowHeaderCell?()` → `rowheader`;
+  `RenderScope.updateRowGroupRoles` macht Row-Divs ohne Zellen (von Spans verdeckt) zu `presentation`. CSS
+  `ge-table-pivot-*`, `--ge-table-pivot-*`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -348,7 +371,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 418 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 463 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -359,8 +382,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~1.780 Tests) |
-  | `test:browser` | echtes Chromium, ~625 Tests in 23 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~1.840 Tests) |
+  | `test:browser` | echtes Chromium, ~640 Tests in 24 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -398,7 +421,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 31 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 32 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -488,6 +511,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 25 | Zeilennummern wie in Excel – eine Zeile Code (ohne Enterprise-Lizenz) | `videos/05-zeilennummern/`, Training-Kapitel `fixed-columns`, `apps/table-demo/row-numbers.html`, Showcase `large` |
 | 26 | Summenzeile in einer Zeile Code – plus Statusleiste für die Auswahl (ohne Enterprise-Lizenz) | `videos/06-summenzeile/`, Training-Kapitel `footer-totals`, `apps/table-demo/aggregation.html` |
 | 27 | Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz | `videos/07-row-grouping/`, Showcase `rowgrouping`, Training-Kapitel `row-grouping`, `apps/table-demo/row-grouping.html`; Bezug zu Folge 12 „Baumtabelle & Checkboxen“ |
+| 28 | Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz | `videos/08-pivot-ohne-enterprise/`, Showcase `pivot`, Training-Kapitel `pivot-tables`, `apps/table-demo/pivot.html`; Bezug zu Folge 14 „Mehrzeilige Header-Gruppen“ |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
@@ -496,10 +520,11 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 36 Kapitel = 36 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 37 Kapitel = 37 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
 Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`,
-Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94).
+Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94;
+seit Prompt 007: Kapitel 37 `pivot-tables`, Tag `ep-037` erst nach dem Release 1.1.94).
 
 ```
 apps/webpage-guiexpert/src/

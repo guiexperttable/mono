@@ -19,6 +19,8 @@
 - [AreaModelHidden](classes/AreaModelHidden.md)
 - [AreaModelObjectArray](classes/AreaModelObjectArray.md)
 - [AreaModelObjectArrayWithColumndefs](classes/AreaModelObjectArrayWithColumndefs.md)
+- [AreaModelPivot](classes/AreaModelPivot.md)
+- [AreaModelPivotFooter](classes/AreaModelPivotFooter.md)
 - [AreaModelRowGroups](classes/AreaModelRowGroups.md)
 - [AreaModelTree](classes/AreaModelTree.md)
 - [AreaObjectMap](classes/AreaObjectMap.md)
@@ -94,6 +96,10 @@
 - [OsxShortcutActionIdMapping](classes/OsxShortcutActionIdMapping.md)
 - [OverlayOptions](classes/OverlayOptions.md)
 - [Padding](classes/Padding.md)
+- [PivotColumnDef](classes/PivotColumnDef.md)
+- [PivotFactory](classes/PivotFactory.md)
+- [PivotResult](classes/PivotResult.md)
+- [PivotTableModel](classes/PivotTableModel.md)
 - [PositiveAndNegativeNumberRenderer](classes/PositiveAndNegativeNumberRenderer.md)
 - [ProgressBarCellRenderer](classes/ProgressBarCellRenderer.md)
 - [PropertyItem](classes/PropertyItem.md)
@@ -188,6 +194,11 @@
 - [OnActionTriggeredIf](interfaces/OnActionTriggeredIf.md)
 - [OverlayKindInput](interfaces/OverlayKindInput.md)
 - [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
+- [PivotColumnInfoIf](interfaces/PivotColumnInfoIf.md)
+- [PivotConfigIf](interfaces/PivotConfigIf.md)
+- [PivotTableModelParaIf](interfaces/PivotTableModelParaIf.md)
+- [PivotValueIf](interfaces/PivotValueIf.md)
+- [PivotValueInfoIf](interfaces/PivotValueInfoIf.md)
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
 - [RowGroupColumnOptionsIf](interfaces/RowGroupColumnOptionsIf.md)
@@ -250,6 +261,7 @@
 - [GetT](modules.md#gett)
 - [HtmlStyle](modules.md#htmlstyle)
 - [IsSameFn](modules.md#issamefn)
+- [PivotValue](modules.md#pivotvalue)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
 - [RowGroupExpanded](modules.md#rowgroupexpanded)
 - [RowGroupField](modules.md#rowgroupfield)
@@ -346,15 +358,19 @@
 - [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
 - [isAreaModelAggregateFooter](modules.md#isareamodelaggregatefooter)
+- [isAreaModelPivot](modules.md#isareamodelpivot)
 - [isAreaModelRowGroups](modules.md#isareamodelrowgroups)
 - [isAreaModelTree](modules.md#isareamodeltree)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isGroupRow](modules.md#isgrouprow)
+- [isPivotColumnDef](modules.md#ispivotcolumndef)
+- [isPivotTableModel](modules.md#ispivottablemodel)
 - [isRowGroup](modules.md#isrowgroup)
 - [isRowGroupColumnDef](modules.md#isrowgroupcolumndef)
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isTreeRow](modules.md#istreerow)
+- [pivotRows](modules.md#pivotrows)
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
 - [throttle](modules.md#throttle)
@@ -1726,7 +1742,7 @@ const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L78)
+[src/lib/table/instanceof-workaround.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L81)
 
 ## Aggregation
 
@@ -2203,7 +2219,7 @@ const totals = isAreaModelAggregateFooter(footer) ? footer.getResults() : {};
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L95)
+[src/lib/table/instanceof-workaround.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L98)
 
 ## Row grouping
 
@@ -2418,7 +2434,7 @@ const groups = isAreaModelRowGroups(body) ? body.getGroups() : [];
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L150)
+[src/lib/table/instanceof-workaround.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L153)
 
 ___
 
@@ -2456,7 +2472,7 @@ eventListener.onMouseClicked = (evt: GeMouseEvent) => {
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L132)
+[src/lib/table/instanceof-workaround.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L135)
 
 ___
 
@@ -2491,7 +2507,7 @@ if (isTreeRow(row) && isRowGroup(row.data)) console.log(row.data.label, row.data
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L112)
+[src/lib/table/instanceof-workaround.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L115)
 
 ___
 
@@ -2525,7 +2541,196 @@ const groupColumnIndex = (tableModel.getColumnDefs() ?? []).findIndex(isRowGroup
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L166)
+[src/lib/table/instanceof-workaround.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L169)
+
+## Pivot
+
+### PivotValue
+
+Ƭ **PivotValue**\<`T`\>: [`ValueAccessor`](modules.md#valueaccessor)\<`T`\> \| [`PivotValueIf`](interfaces/PivotValueIf.md)\<`T`\>
+
+A value of a pivot table: a property path or function (summed) or the full form [PivotValueIf](interfaces/PivotValueIf.md).
+
+**`Example`**
+
+```ts
+const values: PivotValue<Sale>[] = ["umsatz", { value: "umsatz", aggregator: "count", label: "Count" }];
+```
+
+**`Since`**
+
+1.1.94
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `any` | the row type |
+
+#### Defined in
+
+[src/lib/table/pivot/pivot-value.type.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-value.type.ts#L47)
+
+___
+
+### isAreaModelPivot
+
+▸ **isAreaModelPivot**(`o`): o is AreaModelPivot\<any\>
+
+True for the body of a pivot table ([AreaModelPivot](classes/AreaModelPivot.md)). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableModel.getBodyModel()` |
+
+#### Returns
+
+o is AreaModelPivot\<any\>
+
+true for a pivot body
+
+**`Example`**
+
+```ts
+const body = tableModel.getBodyModel();
+const total = isAreaModelPivot(body) ? pivotBody.getResult().getValue() : undefined;
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L203)
+
+___
+
+### isPivotColumnDef
+
+▸ **isPivotColumnDef**(`o`): o is PivotColumnDef
+
+True for a value column of a pivot table ([PivotColumnDef](classes/PivotColumnDef.md)). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. a column definition |
+
+#### Returns
+
+o is PivotColumnDef
+
+true for a value, subtotal or total column of a pivot
+
+**`Example`**
+
+```ts
+const valueColumns = (tableModel.getColumnDefs() ?? []).filter(isPivotColumnDef);
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L219)
+
+___
+
+### isPivotTableModel
+
+▸ **isPivotTableModel**(`o`): o is PivotTableModel\<any\>
+
+True for the table model of a pivot table ([PivotTableModel](classes/PivotTableModel.md)). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableApi.getTableModel()` |
+
+#### Returns
+
+o is PivotTableModel\<any\>
+
+true for a pivot table
+
+**`Example`**
+
+```ts
+const model = tableApi.getTableModel();
+const config = isPivotTableModel(model) ? model.getPivotConfig() : undefined;
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L186)
+
+___
+
+### pivotRows
+
+▸ **pivotRows**\<`T`\>(`rows`, `config`, `accept?`): [`PivotResult`](classes/PivotResult.md)\<`T`\>
+
+Pivots rows: groups them by the row fields and by the column fields and aggregates the values of every combination,
+with subtotals and totals – the engine behind [PivotFactory](classes/PivotFactory.md) (DOM-free, also usable without a table). One pass
+over the rows; empty combinations are `undefined`, averages are computed from sum and count.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | `ArrayLike`\<`T`\> | the rows (not changed) |
+| `config` | [`PivotConfigIf`](interfaces/PivotConfigIf.md)\<`T`\> | row fields, column fields, values (see [PivotConfigIf](interfaces/PivotConfigIf.md)) |
+| `accept?` | (`sourceIndex`: `number`) => `boolean` | a filter: only rows it accepts count (index into `rows`) |
+
+#### Returns
+
+[`PivotResult`](classes/PivotResult.md)\<`T`\>
+
+the hierarchies and the values
+
+**`Example`**
+
+```ts
+// case 1: regions × months, sum of umsatz
+const result = pivotRows(sales, { rowFields: ["region"], columnFields: ["monat"], values: ["umsatz"] });
+result.rowGroups.map(r => `${r.label}: ${result.getValue(r)}`);   // ["Nord: 270", "Süd: 180"]
+result.getValue();                                                // 450
+```
+
+**`Example`**
+
+```ts
+// case 3: the average of a column total is the average of its rows
+const avg = pivotRows(sales, { rowFields: ["region"], columnFields: ["monat"],
+  values: [{ value: "umsatz", aggregator: "avg" }] });
+const jan = avg.columnLeaves.find(c => c.key === "Jan");
+avg.getValue(undefined, jan);   // 76.666… (230 / 3) – not 77.5, the mean of 75 and 80
+```
+
+**`Since`**
+
+1.1.94
+
+#### Defined in
+
+[src/lib/table/pivot/pivot-result.ts:360](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/pivot/pivot-result.ts#L360)
 
 ## DOM
 
@@ -2858,7 +3063,7 @@ Determines if the given model is an AreaModelTree.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L36)
+[src/lib/table/instanceof-workaround.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L39)
 
 ___
 
@@ -2890,7 +3095,7 @@ isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L50)
+[src/lib/table/instanceof-workaround.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L53)
 
 ___
 
@@ -2914,7 +3119,7 @@ Checks if the given object is a CheckboxColumnDef.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L62)
+[src/lib/table/instanceof-workaround.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L65)
 
 ___
 
@@ -2938,7 +3143,7 @@ Checks if the given row is a tree row.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L22)
+[src/lib/table/instanceof-workaround.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L25)
 
 ___
 

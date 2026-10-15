@@ -36,12 +36,13 @@ const tableApi = tableScope.getApi();
 | style cells | [CellRendererIf](interfaces/CellRendererIf.html), [GeCssColorUtil](classes/GeCssColorUtil.html) | [Renderers](https://gui.expert/training/cell-renderers/), [Heatmap](https://gui.expert/training/heatmap/) |
 | show a tree | [TreeFactory](classes/TreeFactory.html), [TreeRow](classes/TreeRow.html) | [Tree table](https://gui.expert/training/tree-table/) |
 | group flat rows with totals | [RowGroupFactory](classes/RowGroupFactory.html), [AreaModelRowGroups](classes/AreaModelRowGroups.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | [Row grouping](https://gui.expert/training/row-grouping/) |
+| pivot rows × columns with totals | [PivotFactory](classes/PivotFactory.html), [AreaModelPivot](classes/AreaModelPivot.html), [pivotRows](functions/pivotRows.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | [Pivot tables](https://gui.expert/training/pivot-tables/) |
 | update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |
 | remember sorting and scroll position | [AutoRestoreOptions](classes/AutoRestoreOptions.html) | [Persist state](https://gui.expert/training/persist-state/) |
 
 The index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,
 **Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,
-**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Aggregation**, **Row grouping**, **DOM**,
+**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Aggregation**, **Row grouping**, **Pivot**, **DOM**,
 **CRUD**, **Utilities** –
 and **Internals** for the classes the table uses itself.
 

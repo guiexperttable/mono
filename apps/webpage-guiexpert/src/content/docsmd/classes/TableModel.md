@@ -20,6 +20,12 @@ will result in the presence of an east area.
  |  footer/west   |  footer/center    | footer/east  |
  +----------------+-------------------+--------------+ </pre>
 
+## Hierarchy
+
+- **`TableModel`**
+
+  ↳ [`PivotTableModel`](PivotTableModel.md)
+
 ## Implements
 
 - [`TableModelIf`](../interfaces/TableModelIf.md)

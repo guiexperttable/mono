@@ -472,6 +472,43 @@ export class RowGroupingComponent {
 }
 ```
 
+### Pivot tables (since 1.1.94)
+
+Rows grouped by row fields, the values of column fields as columns, aggregated cells, total column and total row
+(details: `instructions.md` 5.7). Pivot again with the `TableApi` from `(tableReady)` – same model, same table:
+
+```ts
+import { Component } from "@angular/core";
+import { TableComponent } from "@guiexpert/angular-table";
+import { PivotFactory, TableApi } from "@guiexpert/table";
+
+interface Sale { region: string; produkt: string; monat: string; umsatz: number; }
+
+@Component({
+  selector: "app-pivot",
+  standalone: true,
+  imports: [TableComponent],
+  template: `
+    <select (change)="pivot($any($event.target).value)">
+      <option value="monat">Month</option><option value="produkt">Product</option>
+    </select>
+    <guiexpert-table class="table-div" [tableModel]="tableModel" (tableReady)="api = $event" />`
+})
+export class PivotComponent {
+  api?: TableApi;
+  readonly tableModel = PivotFactory.createTableModel<Sale>({
+    rows: [{ region: "Nord", produkt: "A", monat: "Jan", umsatz: 100 }, { region: "Süd", produkt: "B", monat: "Feb", umsatz: 70 }],
+    rowFields: ["region"],
+    columnFields: ["monat"],
+    values: ["umsatz"]
+  });
+
+  pivot(field: string) {
+    this.api?.setPivotConfig({ columnFields: [field] });
+  }
+}
+```
+
 ---
 
 ## 12. Inline editing
@@ -546,7 +583,7 @@ html {
 ## 14. Not available yet
 
 - No built-in filter UI, context menu, pagination or row drag & drop.
-- No pivot tables and no drag & drop group panel (row grouping itself: section 11).
+- No drag & drop group panel or pivot field list (row grouping and pivot tables themselves: section 11).
 
 ## License
 

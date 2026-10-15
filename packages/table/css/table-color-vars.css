@@ -89,6 +89,13 @@ html, html[data-theme="light"] {
   --ge-table-row-group-text: inherit;
   --ge-table-row-group-label-font-weight: 600;
 
+  /* Pivot tables: subtotals, totals, empty cells (since 1.1.94) */
+  --ge-table-pivot-subtotal-bg: rgba(0, 0, 0, 0.035);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(0, 0, 0, 0.07);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #6b7280;
+
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(255, 255, 255, 0.7);
   --ge-table-overlay-content-bg: #fff;
@@ -179,6 +186,13 @@ html[data-theme="dark"] {
   --ge-table-row-group-bg: rgba(255, 255, 255, 0.06);
   --ge-table-row-group-text: inherit;
   --ge-table-row-group-label-font-weight: 600;
+
+  /* Pivot tables: subtotals, totals, empty cells (since 1.1.94) */
+  --ge-table-pivot-subtotal-bg: rgba(255, 255, 255, 0.05);
+  --ge-table-pivot-subtotal-font-weight: 600;
+  --ge-table-pivot-total-bg: rgba(255, 255, 255, 0.1);
+  --ge-table-pivot-total-font-weight: 600;
+  --ge-table-pivot-empty-text: #9ca3af;
 
   /* Overlays "Loading…" / "No rows" (since 1.1.92) */
   --ge-table-overlay-bg: rgba(17, 24, 39, 0.7); /* --ge-table-bg of the dark theme */

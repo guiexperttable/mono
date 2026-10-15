@@ -12,7 +12,8 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
-import { isAreaModelRowGroups, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelRowGroups, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import type { PivotConfigIf } from './pivot/pivot-config.if';
 import type { RowGroupField } from './rowgroup/row-group-field.type';
 import { TreeRowIf } from './data/common/tree-row-if';
 import { SelectionAggregator } from './selection/selection-aggregator';
@@ -1585,6 +1586,47 @@ export class TableApi {
   getRowGroupBy(): RowGroupField[] | undefined {
     const body = this.tableScope.tableModel.getBodyModel();
     return isAreaModelRowGroups(body) ? body.getGroupBy() : undefined;
+  }
+
+  /**
+   * Pivot table ({@link PivotFactory}): pivots again – other row fields, column fields or values, or new rows –
+   * without a new table model (a new model would rebuild the table in every framework wrapper). The model gets new
+   * columns, header and totals; rows whose path stays keep their expanded state, the filter stays, column widths of
+   * columns that stay are kept, so are columns hidden with `setColumnVisible`. Sorting, selection and focus are reset
+   * (the columns are different). An invalid configuration throws and changes nothing.
+   *
+   * @param {Partial<PivotConfigIf>} changes - the changed parts, e.g. `{ columnFields: ["jahr"] }`; `{}` = pivot the
+   *   current rows again (e.g. after new keys)
+   * @param {any[]} [rows] - new source rows (default: the current ones)
+   * @returns {boolean} false if the table model is no pivot table
+   *
+   * @example
+   * // a select with the column field
+   * select.addEventListener("change", () => tableApi.setPivotConfig({ columnFields: [select.value] }));
+   *
+   * @example
+   * tableApi.setPivotConfig({ values: [{ value: "umsatz", aggregator: "avg" }] });   // averages instead of sums
+   * tableApi.setPivotConfig({}, await loadSales());                                 // new data
+   *
+   * @since 1.1.94
+   */
+  setPivotConfig(changes: Partial<PivotConfigIf>, rows?: any[]): boolean {
+    return this.tableScope.setPivotConfig(changes, rows);
+  }
+
+  /**
+   * Pivot table: the current configuration.
+   *
+   * @returns {PivotConfigIf | undefined} a copy, undefined if the table model is no pivot table
+   *
+   * @example
+   * const columnFields = tableApi.getPivotConfig()?.columnFields;   // ["monat"]
+   *
+   * @since 1.1.94
+   */
+  getPivotConfig(): PivotConfigIf | undefined {
+    const model = this.tableScope.tableModel;
+    return isPivotTableModel(model) ? model.getPivotConfig() : undefined;
   }
 
   /**

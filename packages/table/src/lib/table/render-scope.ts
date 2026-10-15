@@ -1095,7 +1095,9 @@ export class RenderScope extends EleScope {
       // the label of a total row ("6 rows") names its row
       || (areaIdent === 'footer' && isAreaModelAggregateFooter(areaModel) && areaModel.isLabelCell(rowIndex, columnIndex))
       // the label of a group row ("Nord (3)") names its row
-      || (areaIdent === 'body' && isAreaModelRowGroups(areaModel) && areaModel.isGroupLabelCell(rowIndex, columnIndex));
+      || (areaIdent === 'body' && isAreaModelRowGroups(areaModel) && areaModel.isGroupLabelCell(rowIndex, columnIndex))
+      // a model that names its label cells (e.g. a pivot table)
+      || (!header && !!areaModel.isRowHeaderCell?.(rowIndex, columnIndex));
     ds.setAttribute(cell, 'role', header ? 'columnheader' : rowHeader ? 'rowheader' : 'gridcell');
     const colIndex = info.colIndex(columnIndex);
     if (colIndex > 0) {
@@ -1126,7 +1128,22 @@ export class RenderScope extends EleScope {
   /** An empty row group has role "presentation" (a rowgroup needs rows) – changed only when it changes. */
   private updateRowGroupRoles(...scopes: DivScope[]) {
     for (const scope of scopes) {
-      const role = scope.child.firstElementChild ? 'rowgroup' : 'presentation';
+      // a row whose cells are all covered by a span cell of a row above (e.g. the second header row of a fixed column
+      // under a grouped header) has no cell: no row for screen readers (a row needs cells)
+      let rows = 0;
+      for (const rowDiv of Array.from(scope.child.children)) {
+        if (!rowDiv.classList.contains('ge-table-row-div') || rowDiv.classList.contains('ge-table-span-row')) {
+          if (rowDiv.getAttribute('role') === 'row') rows++;
+          continue;
+        }
+        if (rowDiv.querySelector(':scope > [role="gridcell"], :scope > [role="columnheader"], :scope > [role="rowheader"]')) {
+          rows++;
+        } else if (rowDiv.getAttribute('role') === 'row') {
+          this.dom.domService.setAttribute(rowDiv as HTMLElement, 'role', 'presentation');
+          this.dom.removeAttribute(rowDiv as HTMLElement, 'aria-rowindex');
+        }
+      }
+      const role = scope.child.firstElementChild && rows ? 'rowgroup' : 'presentation';
       if (scope.child.getAttribute('role') !== role) {
         this.dom.domService.setAttribute(scope.child, 'role', role);
       }

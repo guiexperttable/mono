@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeModelChangeEvent, GeScrollEvent,
+  GeModelChangeEvent, GeScrollEvent, GeStateChangeEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -74,6 +74,15 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   checkboxChanged: Subject<any[]> = new Subject<any[]>();
 
+  /**
+   * The state changed (column layout, sorting, scroll position, tree, checked/selected rows …) – once after the
+   * changes settled. Save `evt.state` and pass it back as `tableOptions.initialState`.
+   *
+   * @since 1.1.92
+   */
+  @Output()
+  stateChanged: Subject<GeStateChangeEvent> = new Subject<GeStateChangeEvent>();
+
   @Input()
   tableModel?: TableModelIf;
 
@@ -122,6 +131,10 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onScroll(evt: GeScrollEvent): void {
     this.scroll.next(evt);
+  }
+
+  onStateChanged(evt: GeStateChangeEvent): void {
+    this.stateChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

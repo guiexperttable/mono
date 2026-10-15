@@ -45,7 +45,7 @@ The table fills its host element – give it a height:
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
 | Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.92: loading overlay, no re-creation) |
-| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`) |
+| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92) |
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
 `RendererWrapper`, `DomService`.
@@ -480,14 +480,16 @@ export function exportExcel(api: TableApi) {
   api.downloadExcel("export.xlsx", "Me");   // current view: filtered + sorted rows, header and footer
 }
 
-// Restore scroll position and sorting from localStorage:
+// Restore scroll position, sorting and column layout from localStorage
+// (all flags and the state API with (stateChanged): instructions.md 6.11):
 export const persistentOptions = {
   ...new TableOptions(),
   autoRestoreOptions: {
     ...new AutoRestoreOptions<any>(),
     getStorageKeyFn: () => "my-table",
     autoRestoreScrollPosition: true,
-    autoRestoreSortingState: true
+    autoRestoreSortingState: true,
+    autoRestoreColumnLayout: true   // widths, order, visibility (since 1.1.92)
   }
 };
 ```

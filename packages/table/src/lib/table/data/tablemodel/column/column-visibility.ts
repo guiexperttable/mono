@@ -34,6 +34,17 @@ export function setGroupColumnVisibility(columnDef: ColumnDefIf, isVisible: (() 
   applyColumnVisibility(columnDef);
 }
 
+/**
+ * Whether the column is shown apart from a collapsed header group: hidden with `setColumnVisible(…, false)` or by its
+ * own `isVisible` (e.g. `FalseFn` in the code) → false.
+ */
+export function isApiColumnVisible(columnDef: ColumnDefIf): boolean {
+  if (groupVisibility.has(columnDef)) {
+    return !hiddenByApi.has(columnDef);
+  }
+  return !hiddenByApi.has(columnDef) && columnDef.isVisible?.() !== false;
+}
+
 function applyColumnVisibility(columnDef: ColumnDefIf): void {
   const group = groupVisibility.get(columnDef);
   const apiVisible = !hiddenByApi.has(columnDef);

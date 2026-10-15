@@ -28,7 +28,7 @@ afterEach(() => {
   destroyAllTables();
   vi.restoreAllMocks();
   for (const key of storageKeys.splice(0)) {
-    for (const suffix of ['sortingState', 'scrollState', 'collapsedExpandedState']) localStorage.removeItem(key + suffix);
+    for (const suffix of ['tableState', 'sortingState', 'scrollState', 'collapsedExpandedState']) localStorage.removeItem(key + suffix);
   }
 });
 
@@ -61,13 +61,33 @@ describe('autoRestoreOptions (localStorage)', () => {
     const first = mountTable(objectModel(), { tableOptions });
     await nextFrame();
     first.api.sortByColumn('value', 'desc');
-    expect(JSON.parse(localStorage.getItem(key + 'sortingState')!)).toEqual([{ columnIndex: 2, sortState: 'desc' }]);
-    first.destroy();
+    first.destroy();   // stores the pending (debounced) state
+    // since 1.1.92: one key "<key>tableState", sorted by property
+    expect(JSON.parse(localStorage.getItem(key + 'tableState')!)).toEqual({ version: 1, sort: [{ property: 'value', sortState: 'desc' }] });
 
     const second = mountTable(objectModel(), { tableOptions });
     await nextFrame();
     expect(renderedRows(second.host)[0].querySelector('[data-col-index="2"]')!.textContent).toBe(String(999 * 3));
     expect(getCellDiv(second.host, 'header', 'center', 0, 2).querySelector('.ge-header-sorted-desc')!.textContent).toBe('↓');
+  });
+
+  // Regression (S5 of prompts/003): before 1.1.92 the sort item was stored by column INDEX – after a column drag it
+  // pointed at another column once the table was rebuilt (the column order is the default again).
+  it('sorts the same column after a column drag and a rebuild (S5)', async () => {
+    const key = storageKey();
+    const tableOptions = restoreOptions(key, { autoRestoreSortingState: true });
+    // value is not ordered like id: sorting by the wrong column gives another first row
+    const rows = () => createRows(1000).map(r => ({ ...r, value: (r.id * 7919) % 1000 }));
+    const first = mountTable(objectModel(rows()), { tableOptions });
+    await nextFrame();
+    first.scope.tableModel.changeColumnOrder(2, 0);          // value | id | name (like a header drag)
+    first.api.sortByColumn('value', 'desc');
+    first.destroy();
+
+    const second = mountTable(objectModel(rows()), { tableOptions });   // default order again: id | name | value
+    await nextFrame();
+    expect(renderedRows(second.host)[0].querySelector('[data-col-index="2"]')!.textContent).toBe('999');
+    expect(second.scope.tableModel.getColumnDefs()![2].sortState).toBe('desc');
   });
 
   it('restores the scroll position after re-mounting', async () => {
@@ -76,8 +96,9 @@ describe('autoRestoreOptions (localStorage)', () => {
     const first = mountTable(objectModel(), { tableOptions });
     await nextFrame();
     first.api.scrollToPixel(0, 200 * 34);
-    // saved 500 ms after the last render pass
-    await vi.waitFor(() => expect(localStorage.getItem(key + 'scrollState')).toBe(JSON.stringify([0, 200 * 34])), { timeout: 2_000 });
+    // saved 300 ms (stateChangedDebounceDelay) after the last render pass
+    await vi.waitFor(() => expect(JSON.parse(localStorage.getItem(key + 'tableState') ?? '{}').scroll)
+      .toEqual({ left: 0, top: 200 * 34, firstRowId: 200 }), { timeout: 2_000 });
     first.destroy();
 
     const second = mountTable(objectModel(), { tableOptions });
@@ -126,8 +147,9 @@ describe('autoRestoreOptions (localStorage)', () => {
       const first = mountTable(treeModel(), { tableOptions });
       await nextFrame();
       await userEvent.click(getCellDiv(first.host, 'body', 'center', 0, 0).querySelector('.ge-table-tree-arrow-div')!);
-      expect(localStorage.getItem(key + 'collapsedExpandedState')).toContain('"rowIds":[1]');
       first.destroy();
+      // the shorter list is stored (tie: the expanded nodes) – here: only B is open
+      expect(JSON.parse(localStorage.getItem(key + 'tableState')!).tree).toEqual({ expandedRowIds: [2] });
 
       const second = mountTable(treeModel(), { tableOptions });
       await nextFrame();

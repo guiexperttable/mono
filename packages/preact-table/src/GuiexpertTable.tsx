@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeScrollEvent, LicenseManager, SelectionModelIf,
+  GeMouseEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -16,6 +16,7 @@ export type GeModelChangeEventFn = (evt: GeModelChangeEvent) => void;
 export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
 export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
+export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -32,6 +33,12 @@ export interface GuiexpertTableProps {
   licenseKey?: string,
   selectionChanged?: GeSelectionChangeEventFn;
   focusChanged?: GeFocusChangeEventFn;
+  /**
+   * The state changed (column layout, sorting, scroll position, tree, checked/selected rows …) – once after the
+   * changes settled. Save `evt.state` (e.g. on your server) and pass it back as `tableOptions.initialState`.
+   * @since 1.1.92
+   */
+  stateChanged?: GeStateChangeEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -105,7 +112,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onMouseClicked: (evt: GeMouseEvent) => current().mouseClicked?.(evt),
       onMouseDragging: (evt: GeMouseEvent) => current().mouseDragging?.(evt),
       onMouseDraggingEnd: (evt: GeMouseEvent) => current().mouseDraggingEnd?.(evt),
-      onMouseMoved: (evt: GeMouseEvent) => current().mouseMoved?.(evt)
+      onMouseMoved: (evt: GeMouseEvent) => current().mouseMoved?.(evt),
+      onStateChanged: (evt: GeStateChangeEvent) => current().stateChanged?.(evt)
     };
 
     const tableScope = new TableScope(

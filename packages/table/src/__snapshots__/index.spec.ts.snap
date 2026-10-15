@@ -2,6 +2,7 @@
 
 exports[`public API (src/index.ts) > exports exactly the known set of runtime symbols 1`] = `
 [
+  "ALL_TABLE_STATE_PARTS",
   "AbstractAreaModel",
   "ActionEvent",
   "ActionsCellRenderer",
@@ -67,6 +68,7 @@ exports[`public API (src/index.ts) > exports exactly the known set of runtime sy
   "GeModelChangeEvent",
   "GeMouseEvent",
   "GeScrollEvent",
+  "GeStateChangeEvent",
   "GeoData",
   "HeaderGroupOptions",
   "Icon",
@@ -127,6 +129,7 @@ exports[`public API (src/index.ts) > exports exactly the known set of runtime sy
   "TableOptions",
   "TableOverlay",
   "TableScope",
+  "TableStateService",
   "ThreeColorGradientArg",
   "TreeAriaInfo",
   "TreeCheckboxModel",
@@ -197,6 +200,8 @@ exports[`public API (src/index.ts) > exports exactly the known set of runtime sy
   "px70",
   "px80",
   "px90",
+  "readLegacyState",
+  "removeLegacyState",
   "throttle",
   "trimArraySuffixes",
 ]

@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeMouseEvent } from '@guiexpert/table';
+import type { GeMouseEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
   bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
@@ -66,6 +66,17 @@ describe('GuiexpertTable (React)', () => {
     expect(grid.getAttribute('aria-label')).toBe('Orders');
     expect(grid.getAttribute('aria-rowcount')).toBe('6'); // header + 5 rows
     expect(grid.querySelectorAll('[role="row"]').length).toBeGreaterThan(1);
+  });
+
+  it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {
+    const stateChanged = vi.fn<(evt: GeStateChangeEvent) => void>();
+    let api: TableApi | undefined;
+    const tableOptions = { ...new TableOptions(), stateChangedDebounceDelay: 10 };
+    mount(<GuiexpertTable tableModel={createModel(5)} tableOptions={tableOptions} tableReady={a => api = a} stateChanged={stateChanged} />);
+    await nextFrame();
+    api!.setColumnWidth(0, 222);
+    await vi.waitFor(() => expect(stateChanged).toHaveBeenCalledTimes(1));
+    expect(stateChanged.mock.calls[0][0].changedParts).toEqual(['columns']);
   });
 
   it('a click on a body cell calls mouseClicked with row and column index', async () => {

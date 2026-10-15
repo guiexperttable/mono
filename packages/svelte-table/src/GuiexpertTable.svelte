@@ -48,6 +48,11 @@
   export let onFocusChanged = undefined;
   /** @type {((evt: import("@guiexpert/table").GeScrollEvent) => void) | undefined} */
   export let onScroll = undefined;
+  /**
+   * The state changed (column layout, sorting, scroll position …) – since 1.1.92.
+   * @type {((evt: import("@guiexpert/table").GeStateChangeEvent) => void) | undefined}
+   */
+  export let onStateChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -68,7 +73,8 @@
     onMouseDragging: (evt) => { dispatch("mouseDragging", evt); onMouseDragging?.(evt); },
     onMouseDraggingEnd: (evt) => { dispatch("mouseDraggingEnd", evt); onMouseDraggingEnd?.(evt); },
     onMouseMoved: (evt) => { dispatch("mouseMoved", evt); onMouseMoved?.(evt); },
-    onScroll: (evt) => { dispatch("scroll", evt); onScroll?.(evt); }
+    onScroll: (evt) => { dispatch("scroll", evt); onScroll?.(evt); },
+    onStateChanged: (evt) => { dispatch("stateChanged", evt); onStateChanged?.(evt); }
   };
 
   /**

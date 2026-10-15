@@ -152,8 +152,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 
 ### 3.6 Interaktion
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
-  `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`. Event-Typen: `GeMouseEvent`,
-  `GeKeyEvent`, `GeModelChangeEvent`, `GeScrollEvent`.
+  `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`
+  (optional). Event-Typen: `GeMouseEvent`, `GeKeyEvent`, `GeModelChangeEvent`, `GeScrollEvent`, `GeStateChangeEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -193,7 +193,19 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
   `TreeRow`, prüft alle Knoten (auch zugeklappte), Vorfahren von Treffern bleiben sichtbar.
-- Persistenz: `tableOptions.autoRestoreOptions` (Scroll-Pos, Sortierung, Collapsed/Expanded; `getStorageKeyFn`).
+- **Zustand / Persistenz (vervollständigt in 1.1.92, `state/`, Design `prompts/003-zustand-speichern.design.md`)**:
+  `TableStateIf` (JSON, `version: 1`; Teile `columns` (Reihenfolge, geänderte Breiten, API-Sichtbarkeit), `sort`, `scroll`
+  (+ `firstRowId`), `tree` (kürzere Id-Liste), `checkedRowIds`, `selection` (Rechtecke aus Zeilen-Id + Property),
+  `headerGroups` (`CellGroupIf.id` bzw. Label-Pfad), `custom`) – **nie Indizes**, Zeilen über `getRowId(row, rowIndex?)`.
+  `TableStateService` (`tableScope.stateService`): Start in `firstInit()` (nur beim ersten Mal; Vorrang: gespeichert, dann
+  `initialState`, dann Modell), danach `markDirty(part)` an jeder Änderungsstelle → entprellt (`stateChangedDebounceDelay`, 300 ms) **ein**
+  `setItem` + **ein** `onStateChanged(GeStateChangeEvent)`, nur bei echter Änderung; Scroll über `RenderScope.afterRenderPass()`;
+  `destroy()` schreibt Offenes. API: `getState(parts?)`, `applyState(state, parts?)` (fehlende Teile bleiben),
+  `resetState()`, `setCustomState()`, `setHeaderGroupCollapsed(id, collapsed)`. `autoRestoreOptions` = welche Teile wohin
+  (`<key>tableState`, `storage: StateStorageIf`, Default `localStorage`); Flags `autoRestoreSortingState`, `…ScrollPosition`,
+  `…CollapsedExpandedState`, `…CheckedState`, `…SelectedState`, `…ColumnLayout`, `…HeaderGroupState`, `…CustomState`.
+  Alte Schlüssel (`<key>sortingState` …) liest `readLegacyState` einmal (Index → Property der Standardreihenfolge).
+  Ohne `getStorageKeyFn` wird nichts gespeichert (eine Warnung).
 - Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
   Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via
   `getAllRows()`) über `new ExcelService().downloadExcel(matrix, …)`.
@@ -216,7 +228,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `treeOptions`, `headerGroupOptions`, `headerToggleExpandCollapseIcons`, `showCheckboxWihoutExtraColumn` (sic),
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
-seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`.
+seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
+`stateChangedDebounceDelay`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -234,7 +247,8 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 | angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
 
 Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
-ohne Neuaufbau der Tabelle.
+ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
+`@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -279,7 +293,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 310 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 329 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -290,8 +304,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.535 Tests) |
-  | `test:browser` | echtes Chromium, ~475 Tests in 19 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~2 s (~1.556 Tests) |
+  | `test:browser` | echtes Chromium, ~540 Tests in 20 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
@@ -312,7 +326,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   - Abdeckung (Okt. 2026): gesamt ~97 % Zeilen / ~89 % Zweige; DOM-freie Teile 92–100 %, Rendering (`RenderScope`,
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
-    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility` …).
+    `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -408,7 +422,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 16 | Excel-Export ohne Library | Showcase `downloadexcel`, `api.downloadExcel()` |
 | 17 | Theming mit CSS-Variablen / Dark Mode | Showcase `laf`, Demo `style/ultra` |
 | 18 | Live-Daten (Krypto-Ticker) | Showcase `crypto`, Demo `chunksocket` |
-| 19 | Zustand merken (Sortierung, Scroll) | `autoRestoreOptions` |
+| 19 | Spalten anpassen, neu laden – alles noch da (Zustand merken, State-API) | `videos/04-zustand-merken/`, Training-Kapitel `persist-state`, `apps/table-demo/state.html` |
 | 20 | Inline-Editing | `getEditRenderer`, `InputCellRenderer`, Demo `todo` |
 | 21 | Maus-Events & Kontextmenü | Showcase `mouseevents`, Demo `mouseevent` |
 | 22 | Warum nicht ag-Grid? (Vergleich, sachlich) | Website `post/top-framework-agnostic-…` |

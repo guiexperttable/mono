@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+  Remember the state: column layout, sorting, scroll position, selection (since 1.1.92) – recording page of video 04.
+  Start: pnpm serve:table-demo → http://localhost:4200/state.html
+  Resize, move (drag the header), hide and sort columns, select rows – then reload the page (F5).
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – remember the state</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button { font: inherit; padding: 4px 10px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; }
+    .table-div { height: 460px; width: 100%; }
+    pre { margin: 0; height: 460px; overflow: auto; font-size: 12px; padding: 8px; border: 1px solid #8884; border-radius: 4px; }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } pre { height: 200px; } }
+  </style>
+</head>
+<body>
+<h1>Orders – change the layout, then press F5</h1>
+<div class="bar">
+  <label><input id="city" type="checkbox" checked> column “City”</label>
+  <button id="reload">Rebuild the table</button>
+  <button id="reset">Reset layout</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="layout">
+  <div class="table-div"></div>
+  <pre id="state" aria-label="Table state (JSON)"></pre>
+</div>
+<script src="/src/state/state-demo.ts" type="module"></script>
+</body>
+</html>

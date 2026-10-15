@@ -69,6 +69,7 @@
 - [GeModelChangeEvent](classes/GeModelChangeEvent.md)
 - [GeMouseEvent](classes/GeMouseEvent.md)
 - [GeScrollEvent](classes/GeScrollEvent.md)
+- [GeStateChangeEvent](classes/GeStateChangeEvent.md)
 - [GeoData](classes/GeoData.md)
 - [HeaderGroupOptions](classes/HeaderGroupOptions.md)
 - [Icon](classes/Icon.md)
@@ -121,6 +122,7 @@
 - [TableOptions](classes/TableOptions.md)
 - [TableOverlay](classes/TableOverlay.md)
 - [TableScope](classes/TableScope.md)
+- [TableStateService](classes/TableStateService.md)
 - [ThreeColorGradientArg](classes/ThreeColorGradientArg.md)
 - [TreeAriaInfo](classes/TreeAriaInfo.md)
 - [TreeCheckboxModel](classes/TreeCheckboxModel.md)
@@ -176,11 +178,20 @@
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
 - [SizeIf](interfaces/SizeIf.md)
 - [SortedOptionsIf](interfaces/SortedOptionsIf.md)
+- [StateStorageIf](interfaces/StateStorageIf.md)
 - [TableCellUpdateEventIf](interfaces/TableCellUpdateEventIf.md)
+- [TableColumnStateIf](interfaces/TableColumnStateIf.md)
+- [TableHeaderGroupStateIf](interfaces/TableHeaderGroupStateIf.md)
 - [TableModelAndOptionsIf](interfaces/TableModelAndOptionsIf.md)
 - [TableModelIf](interfaces/TableModelIf.md)
 - [TableOptionsIf](interfaces/TableOptionsIf.md)
 - [TableOverlayChange](interfaces/TableOverlayChange.md)
+- [TableScrollStateIf](interfaces/TableScrollStateIf.md)
+- [TableSelectionStateIf](interfaces/TableSelectionStateIf.md)
+- [TableSortStateIf](interfaces/TableSortStateIf.md)
+- [TableStateIf](interfaces/TableStateIf.md)
+- [TableStateRangeIf](interfaces/TableStateRangeIf.md)
+- [TableTreeStateIf](interfaces/TableTreeStateIf.md)
 - [ThreeColorGradientArgIf](interfaces/ThreeColorGradientArgIf.md)
 - [TreeAriaModel](interfaces/TreeAriaModel.md)
 - [TreeAriaRowInfo](interfaces/TreeAriaRowInfo.md)
@@ -218,12 +229,15 @@
 - [SideIdent](modules.md#sideident)
 - [SizeUnitType](modules.md#sizeunittype)
 - [SortState](modules.md#sortstate)
+- [TableStatePart](modules.md#tablestatepart)
+- [TableStateRowId](modules.md#tablestaterowid)
 - [TreeArrowType](modules.md#treearrowtype)
 - [TreeRowExpandedFn](modules.md#treerowexpandedfn)
 - [ValueRowSortComparator](modules.md#valuerowsortcomparator)
 
 ### Variables
 
+- [ALL\_TABLE\_STATE\_PARTS](modules.md#all_table_state_parts)
 - [PROPERTY\_TYPE\_KEY\_ANY](modules.md#property_type_key_any)
 - [PROPERTY\_TYPE\_KEY\_ARRAY](modules.md#property_type_key_array)
 - [PROPERTY\_TYPE\_KEY\_BOOLEAN](modules.md#property_type_key_boolean)
@@ -293,6 +307,8 @@
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isTreeRow](modules.md#istreerow)
+- [readLegacyState](modules.md#readlegacystate)
+- [removeLegacyState](modules.md#removelegacystate)
 - [throttle](modules.md#throttle)
 - [trimArraySuffixes](modules.md#trimarraysuffixes)
 
@@ -1038,7 +1054,7 @@ Represents a function that always returns true.
 
 ### GetRowIdFn
 
-Ƭ **GetRowIdFn**\<`T`\>: (`row`: `T`) => `string` \| `number`
+Ƭ **GetRowIdFn**\<`T`\>: (`row`: `T`, `rowIndex?`: `number`) => `string` \| `number`
 
 #### Type parameters
 
@@ -1048,29 +1064,39 @@ Represents a function that always returns true.
 
 #### Type declaration
 
-▸ (`row`): `string` \| `number`
+▸ (`row`, `rowIndex?`): `string` \| `number`
 
-GetRowIdFn is a type alias for a function that accepts an instance of type T and returns a unique identifier
-(either a string or a number) for that instance. It is used for restoring state in conjunction with the
-AutoRestoreOptionsIf interface.
+Returns a unique, stable id for a row – used to remember expanded tree nodes, checked and selected rows and the
+first visible row ([AutoRestoreOptionsIf](interfaces/AutoRestoreOptionsIf.md), [TableStateIf](interfaces/TableStateIf.md)).
+
+Tree tables get the object of the node (`treeRow.data`). Models without row objects (e.g. an own `AreaModel`
+that computes its values) get `undefined` and the displayed row index – declare the second parameter to support
+them: `(_row, rowIndex) => rowIndex`.
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `row` | `T` |
+| `rowIndex?` | `number` |
 
 ##### Returns
 
 `string` \| `number`
 
+**`Example`**
+
+```ts
+const getRowId: GetRowIdFn<Order> = (order: Order) => order.id;
+```
+
 **`Typeparam`**
 
-T - The type of the object that the function is going to use.
+T - The type of the rows.
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L33)
+[src/lib/table/data/options/auto-restore-options.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L29)
 
 ___
 
@@ -1082,8 +1108,8 @@ ___
 
 ▸ (): `string`
 
-GetStorageKeyFn is a type alias for a function that returns a unique key (as a string) for storage.
-It is used for restoring state in conjunction with the AutoRestoreOptionsIf interface.
+Returns the storage key of a table – one key per table, e.g. `() => "orders"`. The state is stored under
+`<key>tableState`.
 
 ##### Returns
 
@@ -1091,7 +1117,7 @@ It is used for restoring state in conjunction with the AutoRestoreOptionsIf inte
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L42)
+[src/lib/table/data/options/auto-restore-options.if.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L37)
 
 ___
 
@@ -1109,34 +1135,31 @@ ___
 
 ▸ (`r1`, `r2`, `optionsIf`): `boolean`
 
-`IsSameFn` is a type alias for a function used within the `AutoRestoreOptionsIf` interface. The function is designed to compare
-two instances of a generic type `T`, in conjunction with supplied options of type `AutoRestoreOptionsIf<T>`.
-
-This function is used for determining if two instances of `T` are considered the same when restoring the state of an application.
-This helps in preserving specific states of the application, like sorting or selected state, across different stages or conditions
-based on the developer's implementation. By default, this function uses strict equality check (`===`) if not provided.
+`IsSameFn` compares two rows with the help of [AutoRestoreOptionsIf.getRowId](interfaces/AutoRestoreOptionsIf.md#getrowid).
 
 ##### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `r1` | `T` | The first object instance of type `T`. |
-| `r2` | `T` | The second object instance of type `T`. |
-| `optionsIf` | [`AutoRestoreOptionsIf`](interfaces/AutoRestoreOptionsIf.md)\<`T`\> | The options that dictate the behavior of auto-restoring. |
+| Name | Type |
+| :------ | :------ |
+| `r1` | `T` |
+| `r2` | `T` |
+| `optionsIf` | [`AutoRestoreOptionsIf`](interfaces/AutoRestoreOptionsIf.md)\<`T`\> |
 
 ##### Returns
 
 `boolean`
 
-- Returns `true` if the two instances are considered the same, `false` otherwise.
+**`Deprecated`**
+
+since 1.1.92 – never used by the table; rows are compared by [AutoRestoreOptionsIf.getRowId](interfaces/AutoRestoreOptionsIf.md#getrowid).
 
 **`Typeparam`**
 
-T - The type of the objects that the function is comparing.
+T - The type of the rows.
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L21)
+[src/lib/table/data/options/auto-restore-options.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L12)
 
 ## Tree &amp; checkboxes
 
@@ -1499,6 +1522,73 @@ if (tableApi.getOverlayState() === "noMatches") {
 #### Defined in
 
 [src/lib/table/overlay/ge-overlay-kind.type.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/ge-overlay-kind.type.ts#L17)
+
+## State
+
+### TableStatePart
+
+Ƭ **TableStatePart**: ``"columns"`` \| ``"sort"`` \| ``"scroll"`` \| ``"tree"`` \| ``"checked"`` \| ``"selection"`` \| ``"headerGroups"`` \| ``"custom"``
+
+One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or apply only some parts:
+`tableApi.getState(["columns", "sort"])`.
+
+| Part | Content | [AutoRestoreOptionsIf](interfaces/AutoRestoreOptionsIf.md) flag |
+|---|---|---|
+| `columns` | width, order and visibility of the columns | `autoRestoreColumnLayout` |
+| `sort` | sorted columns | `autoRestoreSortingState` |
+| `scroll` | scroll position | `autoRestoreScrollPosition` |
+| `tree` | expanded / collapsed tree nodes | `autoRestoreCollapsedExpandedState` |
+| `checked` | checked rows (row checkboxes) | `autoRestoreCheckedState` |
+| `selection` | selected rows, columns, cells or ranges | `autoRestoreSelectedState` |
+| `headerGroups` | collapsed header groups | `autoRestoreHeaderGroupState` |
+| `custom` | data of your application ([TableApi.setCustomState](classes/TableApi.md#setcustomstate)) | `autoRestoreCustomState` |
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/state/table-state.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L29)
+
+___
+
+### TableStateRowId
+
+Ƭ **TableStateRowId**: `string` \| `number`
+
+The id of a row in a [TableStateIf](interfaces/TableStateIf.md) – what [AutoRestoreOptionsIf.getRowId](interfaces/AutoRestoreOptionsIf.md#getrowid) returns.
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/state/table-state.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L9)
+
+___
+
+### ALL\_TABLE\_STATE\_PARTS
+
+• `Const` **ALL\_TABLE\_STATE\_PARTS**: readonly [`TableStatePart`](modules.md#tablestatepart)[]
+
+All parts of a [TableStateIf](interfaces/TableStateIf.md), in the order the table applies them.
+
+**`Example`**
+
+```ts
+const withoutScroll = ALL_TABLE_STATE_PARTS.filter(part => part !== "scroll");
+const state = tableApi.getState(withoutScroll);
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/state/table-state-part.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state-part.ts#L13)
 
 ## DOM
 
@@ -2006,3 +2096,77 @@ calcOverlayKind({ manual: "loading", rowCount: 0, autoNoRows: true });       // 
 #### Defined in
 
 [src/lib/table/overlay/calc-overlay-kind.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/overlay/calc-overlay-kind.ts#L32)
+
+___
+
+### readLegacyState
+
+▸ **readLegacyState**(`storage`, `key`, `properties`): [`TableStateIf`](interfaces/TableStateIf.md) \| `undefined`
+
+Reads the state that tables before 1.1.92 stored under `<key>sortingState`, `<key>scrollState` and
+`<key>collapsedExpandedState` and converts it to a [TableStateIf](interfaces/TableStateIf.md). The stored sort items hold a column
+INDEX – it is converted to the property of the column at that index in the default column order (the order a
+table of the old version always started with).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `storage` | [`StateStorageIf`](interfaces/StateStorageIf.md) | the storage |
+| `key` | `string` | the storage key of the table (`getStorageKeyFn()`) |
+| `properties` | `string`[] | the properties of the columns in the default order |
+
+#### Returns
+
+[`TableStateIf`](interfaces/TableStateIf.md) \| `undefined`
+
+the state, `undefined` if nothing was stored
+
+**`Example`**
+
+```ts
+localStorage.setItem("orderssortingState", '[{"columnIndex":2,"sortState":"desc"}]');
+readLegacyState(localStorage, "orders", ["id", "customer", "total"]);
+// → { version: 1, sort: [{ property: "total", sortState: "desc" }] }
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/state/table-state-migration.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state-migration.ts#L42)
+
+___
+
+### removeLegacyState
+
+▸ **removeLegacyState**(`storage`, `key`): `void`
+
+Removes the keys of tables before 1.1.92 (see [readLegacyState](modules.md#readlegacystate)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `storage` | [`StateStorageIf`](interfaces/StateStorageIf.md) | the storage |
+| `key` | `string` | the storage key of the table |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+removeLegacyState(localStorage, "orders");
+```
+
+**`Since`**
+
+1.1.92
+
+#### Defined in
+
+[src/lib/table/state/table-state-migration.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state-migration.ts#L96)

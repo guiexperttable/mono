@@ -18,6 +18,13 @@
  */
 export interface CellGroupIf {
 
+  /**
+   * A stable id of the group, used to remember whether it is collapsed ({@link TableHeaderGroupStateIf},
+   * {@link TableApi.setHeaderGroupCollapsed}). Default: the path of the labels, e.g. `"Customer"` or `"2026/Q1"`.
+   * @since 1.1.92
+   */
+  id?: string;
+
   /** The label of the group or column. */
   data: any;
   /** Set on leaves only: the property shown in this column. */

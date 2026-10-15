@@ -346,9 +346,11 @@ export const CHAPTERS: Chapter[] = [
   {
     slug: "persist-state", no: 33, part: "interaction", episode: 33, minutes: 4,
     title: "Remember the state: sorting, scroll position, open nodes", nav: "Persist state",
-    lead: "After a reload everything looks like before – one localStorage key per table.",
-    learn: ["switch on autoRestoreOptions", "remember expanded tree nodes", "choose a storage key"],
-    api: ["AutoRestoreOptions", "AutoRestoreOptionsIf", "TableOptionsIf.autoRestoreOptions"],
+    lead: "After a reload everything looks like before – one localStorage key per table, or your server.",
+    learn: ["switch on autoRestoreOptions", "remember expanded tree nodes", "choose a storage key",
+      "remember the column layout, checked and selected rows (since 1.1.92)", "save the state on your server (since 1.1.92)"],
+    api: ["AutoRestoreOptions", "AutoRestoreOptionsIf", "TableOptionsIf.autoRestoreOptions", "TableApi.getState",
+      "TableApi.applyState", "TableApi.resetState", "TableOptionsIf.initialState", "GeStateChangeEvent", "TableStateIf"],
     since: "1.1.89"
   },
   {

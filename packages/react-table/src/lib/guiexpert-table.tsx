@@ -2,7 +2,7 @@ import {
   EventListenerIf,
   FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeScrollEvent, LicenseManager, SelectionModelIf,
+  GeMouseEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableApi,
   TableModelIf,
@@ -18,6 +18,7 @@ export type GeModelChangeEventFn = (evt: GeModelChangeEvent) => void;
 export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
 export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
+export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -32,6 +33,12 @@ export interface GuiexpertTableProps {
   modelChanged?: GeModelChangeEventFn,
   selectionChanged?: GeSelectionChangeEventFn;
   focusChanged?: GeFocusChangeEventFn;
+  /**
+   * The state changed (column layout, sorting, scroll position, tree, checked/selected rows …) – once after the
+   * changes settled. Save `evt.state` (e.g. on your server) and pass it back as `tableOptions.initialState`.
+   * @since 1.1.92
+   */
+  stateChanged?: GeStateChangeEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**
@@ -57,6 +64,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.mouseDraggingEnd] - The callback for mouse dragging end events.
  * @param {Function} [props.tableReady] - The callback for when the table is ready.
  * @param {Function} [props.scroll] - The callback for scroll events.
+ * @param {Function} [props.stateChanged] - The state changed (layout, sorting …, since 1.1.92).
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
  * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.92).
  *
@@ -98,7 +106,8 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       onMouseDragging: (evt: GeMouseEvent) => propsRef.current.mouseDragging?.(evt),
       onMouseDraggingEnd: (evt: GeMouseEvent) => propsRef.current.mouseDraggingEnd?.(evt),
       onMouseMoved: (evt: GeMouseEvent) => propsRef.current.mouseMoved?.(evt),
-      onScroll: (evt: GeScrollEvent) => propsRef.current.scroll?.(evt)
+      onScroll: (evt: GeScrollEvent) => propsRef.current.scroll?.(evt),
+      onStateChanged: (evt: GeStateChangeEvent) => propsRef.current.stateChanged?.(evt)
     };
 
     // A new tableModel or tableOptions object re-creates the table (dependency array below);

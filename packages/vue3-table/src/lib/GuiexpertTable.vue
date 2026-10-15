@@ -16,7 +16,7 @@ import {
   TableOptions,
   TableScope,
   TableModelIf, TableOptionsIf,
-  GeScrollEvent
+  GeScrollEvent, GeStateChangeEvent
 } from '@guiexpert/table';
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -74,7 +74,8 @@ export default defineComponent({
     "selectionChanged",
     "mouseDraggingEnd",
     "mouseMoved",
-    "scroll"
+    "scroll",
+    "stateChanged"   // since 1.1.92
   ],
 
   setup(props, { emit }) {
@@ -149,6 +150,10 @@ export default defineComponent({
 
         onScroll: (evt: GeScrollEvent) => {
           emit("scroll", evt);
+        },
+
+        onStateChanged: (evt: GeStateChangeEvent) => {
+          emit("stateChanged", evt);
         },
       };
 

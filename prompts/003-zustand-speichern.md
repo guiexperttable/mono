@@ -1,6 +1,6 @@
 # TODO-Prompt 003: Zustand speichern vervollständigen (`autoRestoreOptions` + State-API)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `table-state` (Branch `feat/table-state`, Design `prompts/003-zustand-speichern.design.md`)
+> Status: **umgesetzt** (15.10.2026, Branch `feat/table-state`) · angelegt 14.10.2026 · Slug `table-state` (Branch `feat/table-state`, Design `prompts/003-zustand-speichern.design.md`)
 > Abhängigkeiten: keine (001 ARIA vorher ist gut, aber nicht nötig). Spätere Prompts hängen ihren Zustand hier ein
 > (006 Gruppen auf/zu, 009 Zeilenreihenfolge nicht, 011 aufgeklappte Details).
 > ag-Grid: „Grid State“ (`getState()`, `initialState`, Event bei Änderung) ist **Community**.
@@ -123,8 +123,8 @@ Speicher, keine doppelten Speicherzugriffe pro Scroll-Frame.
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Befund oben bestätigt (inkl. Test für S5) und im Design-Dokument festgehalten 🛑
-- [ ] `autoRestoreCheckedState` / `autoRestoreSelectedState` umgesetzt oder `@deprecated` mit Begründung
-- [ ] Spaltenlayout (Breite, Reihenfolge, Sichtbarkeit, Header-Gruppen) und Sortierung nach Property gespeichert
-- [ ] State-API (`getState`, `applyState`, `initialState`, `onStateChanged`, Speicher-Adapter) mit Tests
-- [ ] JSDoc korrigiert, Warnung ohne `getStorageKeyFn`, Kapitel `persist-state` aktualisiert
+- [x] Befund oben bestätigt (inkl. Test für S5) und im Design-Dokument festgehalten 🛑
+- [x] `autoRestoreCheckedState` / `autoRestoreSelectedState` umgesetzt oder `@deprecated` mit Begründung
+- [x] Spaltenlayout (Breite, Reihenfolge, Sichtbarkeit, Header-Gruppen) und Sortierung nach Property gespeichert
+- [x] State-API (`getState`, `applyState`, `initialState`, `onStateChanged`, Speicher-Adapter) mit Tests
+- [x] JSDoc korrigiert, Warnung ohne `getStorageKeyFn`, Kapitel `persist-state` aktualisiert

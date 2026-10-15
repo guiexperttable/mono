@@ -84,11 +84,11 @@ export class RenderScope extends EleScope {
   protected dragging = false;
   protected editing = false;
   protected storedColumnWidths: number[] = [];
+  /** @deprecated since 1.1.92 – no longer used, see {@link TableStateService}. */
   protected storeScrollPosStateService?: StoreStateScrollPosService;
   protected getSelectionModel?: GetT<SelectionModelIf>;
   protected getFocusModel?: GetT<FocusModelIf>;
   protected scrollLeft = 0;
-  private scrollPosSaveTimeout?: ReturnType<typeof setTimeout>;
   protected scrollViewportLeft = 0;
   protected scrollFactorY = 0;
   protected scrollFactorX = 0;
@@ -317,9 +317,6 @@ export class RenderScope extends EleScope {
     this.scrollTop = this.scrollViewport.scrollTop;
     this.scrollLeft = this.scrollViewport.scrollLeft;
     this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
-    // own timer: the shared debounce() is also used by debounceRepaint() and would cancel the saving
-    if (this.scrollPosSaveTimeout) clearTimeout(this.scrollPosSaveTimeout);
-    this.scrollPosSaveTimeout = setTimeout(() => this.checkForScrollPosSaving(), 500);
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
     this.scrollFactorX = this.scrollLeft / (this.scrollViewport.scrollWidth - this.scrollViewport.clientWidth);
@@ -392,6 +389,17 @@ export class RenderScope extends EleScope {
         'ge-table-body-west-vertical-border'));
     }
     this.updateOverlay(); // "no rows" after setRows / filter / tree toggle; one comparison when nothing changed
+    this.afterRenderPass();
+  }
+
+  /**
+   * Called at the end of every render pass (scroll, repaint). {@link TableScope} marks the scroll position of the
+   * table state as changed here (stored and reported debounced, see {@link TableStateService}).
+   *
+   * @since 1.1.92
+   */
+  protected afterRenderPass(): void {
+    // overwritten in TableScope
   }
 
   /**
@@ -426,15 +434,14 @@ export class RenderScope extends EleScope {
 
 
   /**
-   * Checks if the scroll position should be saved and saves it.
+   * Marks the scroll position as changed (it is stored with the table state, see {@link TableStateService}).
+   *
+   * @deprecated since 1.1.92 – the table does this after every render pass.
    *
    * @return {void}
    */
   checkForScrollPosSaving() {
-    if (this.storeScrollPosStateService
-      && this.tableOptions?.autoRestoreOptions?.autoRestoreScrollPosition) {
-      this.storeScrollPosStateService.updateScrollOffset([this.scrollLeft, this.scrollTop]);
-    }
+    this.afterRenderPass();
   }
 
   /**

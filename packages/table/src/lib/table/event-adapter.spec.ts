@@ -13,6 +13,7 @@ const METHODS = [
   'onMouseMoved',
   'onScroll',
   'onSelectionChanged',
+  'onStateChanged',  // since 1.1.92
 ];
 
 describe('EventAdapter', () => {

@@ -36,7 +36,7 @@ This is a monorepo containing multiple packages:
 - In-place cell editing
 - User-defined key and mouse events
 - Customizable look and feel via CSS variables
-- State persistence (row sorting, column order, selection)
+- State persistence: column layout (width, order, visibility), sorting, scroll position, expanded tree nodes, checked and selected rows, header groups, custom data – in localStorage (tableOptions.autoRestoreOptions: autoRestoreColumnLayout, autoRestoreSortingState, autoRestoreScrollPosition, autoRestoreCollapsedExpandedState, autoRestoreCheckedState, autoRestoreSelectedState, autoRestoreHeaderGroupState, autoRestoreCustomState; storage: StateStorageIf) or on your server (tableApi.getState(parts?), applyState(state, parts?), resetState(), setCustomState(), tableOptions.initialState, EventListenerIf.onStateChanged(GeStateChangeEvent), `stateChanged` event in all wrappers); columns by property, rows by getRowId – since 1.1.92
 - Customizable cell contents via renderers
 
 ## Usage

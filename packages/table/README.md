@@ -35,7 +35,9 @@ This is the UI-agnostic table component for your next web app. 😊
 - Customizable Look & Feel (via CSS variables)
 - Row sorting
 - Column Reordering (Drag and Drop)
-- State Persistence (Row Sorting, Column Order, Selection)
+- State persistence: column layout (width, order, visibility), sorting, scroll position, tree, checked and selected
+  rows, header groups – in `localStorage` (`autoRestoreOptions`) or on your server (`tableApi.getState()` /
+  `applyState()`, `initialState`, `onStateChanged`); stored by property and row id, never by index – since 1.1.92
 - Customizable Cell Contents via Renderer for Header, Body and Footer
 - Full control over the HTML structure and style
 

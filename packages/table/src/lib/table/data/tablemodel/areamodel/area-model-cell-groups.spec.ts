@@ -322,3 +322,60 @@ describe('AreaModelCellGroups', () => {
     expect(m.columnDefs.map(d => d.property)).toEqual(['id', 'date', 'customer', 'city']);
   });
 });
+
+describe('AreaModelCellGroups – group ids and setGroupClosed() (since 1.1.92)', () => {
+
+  const nested = (): CellGroupIf[] => [
+    {
+      data: '2026', toggle: true, children: [
+        { data: 'Q1', toggle: true, children: [{ data: 'Jan', property: 'jan' }, { data: 'Sum', property: 'q1', visibility: 'always' }] },
+        { data: 'Q2', toggle: true, closed: true, children: [{ data: 'Apr', property: 'apr' }] },
+      ],
+    },
+    { data: 'Fixed', toggle: true, visibility: 'always', children: [{ data: 'X', property: 'x' }] },
+    { data: 'Q1', toggle: true, children: [{ data: 'Y', property: 'y' }] },
+  ];
+
+  it('lists the toggleable groups with the path of their labels; a second equal path gets "#2"', () => {
+    const m = new AreaModelCellGroups('header', nested(), [], 34);
+    expect(m.getToggleGroupStates()).toEqual([
+      { id: '2026', closed: false },
+      { id: '2026/Q1', closed: false },
+      { id: '2026/Q2', closed: true },
+      { id: 'Q1', closed: false },
+    ]);
+  });
+
+  it('uses CellGroupIf.id', () => {
+    const groups = orderGroups();
+    groups[1].id = 'customer-group';
+    expect(new AreaModelCellGroups('header', groups, [], 34).getToggleGroupStates()).toEqual([{ id: 'customer-group', closed: false }]);
+  });
+
+  it('no groups without a toggle', () => {
+    expect(new AreaModelCellGroups('header', [{ data: 'A', children: [{ data: 'a', property: 'a' }] }], [], 34).getToggleGroupStates()).toEqual([]);
+  });
+
+  it('setGroupClosed() collapses a group, keeps the column definitions and hides its columns', () => {
+    const m = new AreaModelCellGroups('header', orderGroups(), [], 34);
+    const before = m.columnDefs.slice();
+    const defs = m.setGroupClosed('Customer', true)!;
+    expect(defs.map(d => d.property)).toEqual(['id', 'date', 'customer', 'city']);
+    expect(defs[3]).toBe(before[3]);
+    expect(defs[3].isVisible!()).toBe(false);
+    expect(defs[2].isVisible!()).toBe(true);
+    expect(m.getToggleGroupStates()).toEqual([{ id: 'Customer', closed: true }]);
+    m.setGroupClosed('Customer', false);
+    expect(defs[3].isVisible!()).toBe(true);
+  });
+
+  it('setGroupClosed() returns undefined for an unknown id', () => {
+    expect(new AreaModelCellGroups('header', orderGroups(), [], 34).setGroupClosed('nope', true)).toBeUndefined();
+  });
+
+  it('toggleHeaderGroup() and setGroupClosed() agree', () => {
+    const m = new AreaModelCellGroups('header', orderGroups(), [], 34);
+    m.toggleHeaderGroup(toggleAt(0, 2));
+    expect(m.getToggleGroupStates()).toEqual([{ id: 'Customer', closed: true }]);
+  });
+});

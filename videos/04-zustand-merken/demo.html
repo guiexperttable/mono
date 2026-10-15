@@ -1,0 +1,79 @@
+<!doctype html>
+<!--
+  Recording page for episode 04 "Spalten anpassen, neu laden – alles noch da".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/04-zustand-merken/demo.html
+  Runs the code of snippet.ts (plain JS); fetch("/api/orders") is replaced by generated rows – no server needed.
+  Resize a column (drag the header edge), move one (drag the header), sort (double-click), hide "stadt" – press F5.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Zustand merken</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button, .bar input { font: inherit; padding: 4px 12px; }
+    .table-div { height: calc(100vh - 250px); margin: 0 16px; font-size: 17px; }
+    pre { margin: 8px 16px; height: 80px; overflow: auto; font-size: 12px; opacity: .8; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<h1>Bestellungen</h1>
+<div class="bar">
+  <label><input id="stadt" type="checkbox" checked> Spalte „stadt“</label>
+  <button id="reload">Seite neu laden</button>
+  <button id="reset">Layout zurücksetzen</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+</div>
+<div class="table-div"></div>
+<pre id="state" aria-label="localStorage"></pre>
+<script type="module">
+  import {
+    AutoRestoreOptions, ColumnDef, EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, TrueFn
+  } from "@guiexpert/table";
+
+  const cities = ["Berlin", "Hamburg", "München", "Köln", "Leipzig"];
+  const rows = Array.from({ length: 100_000 }, (_, i) => ({
+    id: i + 1, kunde: `Kunde ${(i * 7919) % 997}`, stadt: cities[i % cities.length], summe: (i * 7919) % 1000
+  }));   // await (await fetch("/api/orders")).json()
+
+  // --- code of snippet.ts ---
+  const columnDefs = ["id", "kunde", "stadt", "summe"].map(property => ColumnDef.create({ property, headerLabel: property, sortable: TrueFn }));
+  const tableOptions = {
+    ...new TableOptions(),
+    autoRestoreOptions: {
+      ...new AutoRestoreOptions(),
+      getStorageKeyFn: () => "bestellungen",        // ein Schlüssel pro Tabelle
+      autoRestoreColumnLayout: true,                // Breite, Reihenfolge, ausgeblendete Spalten
+      autoRestoreSortingState: true
+    }
+  };
+  const host = document.querySelector(".table-div");
+  const tableModel = TableFactory.createTableModel({ rows, columnDefs });
+  // --- end of snippet.ts (the listener only fills the panel below) ---
+  const statePanel = document.querySelector("#state");
+  const showStored = () => statePanel.textContent = 'localStorage["bestellungentableState"] = ' +
+    (localStorage.getItem("bestellungentableState") ?? "–");
+  const listener = new EventAdapter();
+  listener.onStateChanged = () => showStored();
+  const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+  showStored();
+
+  const stadt = document.querySelector("#stadt");
+  stadt.checked = tableApi.isColumnVisible("stadt");
+  stadt.addEventListener("change", () => tableApi.setColumnVisible("stadt", stadt.checked));
+  document.querySelector("#reload").addEventListener("click", () => location.reload());
+  document.querySelector("#reset").addEventListener("click", () => {
+    tableApi.resetState();
+    stadt.checked = true;
+    showStored();
+  });
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

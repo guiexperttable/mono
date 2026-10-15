@@ -1,7 +1,7 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeMouseEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { GeMouseEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
@@ -79,6 +79,18 @@ describe('GuiexpertTable (Web Component)', () => {
     el.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollTop = 500;
     await vi.waitFor(() => expect(onElement).toHaveBeenCalled());
     expect(bubbled).not.toHaveBeenCalled();
+  });
+
+  it('"stateChanged" is dispatched (bubbling) after the state changed (since 1.1.92)', async () => {
+    const { host, el, events } = createTableElement();
+    const received: GeStateChangeEvent[] = [];
+    host.addEventListener('stateChanged', e => received.push((e as CustomEvent<GeStateChangeEvent>).detail));
+    el.data = data(createModel(5), { ...new TableOptions(), stateChangedDebounceDelay: 10 });
+    await nextFrame();
+    events.tableReady[0].setColumnWidth(0, 222);
+    await vi.waitFor(() => expect(received).toHaveLength(1));
+    expect(received[0]).toBeInstanceOf(GeStateChangeEvent);
+    expect(received[0].changedParts).toEqual(['columns']);
   });
 
   it('a click on a body cell dispatches mouseClicked with row and column index', async () => {

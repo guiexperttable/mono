@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng15",
-  "version": "15.1.91",
+  "version": "15.1.92",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 15 -> @guiexpert/angular-table@15.x",
   "license": "MIT",

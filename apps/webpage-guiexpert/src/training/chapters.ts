@@ -195,7 +195,8 @@ export const CHAPTERS: Chapter[] = [
       "since 1.1.94: totals in one option, sums of the selection"],
     api: ["AreaModel", "AreaModelObjectArray.getFilteredRows", "CreateTableModelPara.footerAreaModel",
       "TableModelIf.getBodyModel", "CreateTableModelPara.footerAggregates", "AreaModelAggregateFooter",
-      "aggregateColumns", "TableApi.getSelectionAggregates"]
+      "aggregateColumns", "TableApi.getSelectionAggregates"],
+    showcases: [{ name: "aggregation", title: "Totals & aggregation" }]
   },
   {
     slug: "custom-area-model", no: 17, part: "model", episode: 17, minutes: 6,

@@ -20,6 +20,7 @@ export * from "./lib/createOrderModel";
 export * from "./lib/createLargeModel";
 export * from "./lib/createManyTypesModel";
 export * from "./lib/createRowGroupModel";
+export * from "./lib/createAggregationModel";
 export * from "./lib/createPivotModel";
 export * from "./lib/treepeople/generateTreePeopleModel";
 export * from "./model/address.if";

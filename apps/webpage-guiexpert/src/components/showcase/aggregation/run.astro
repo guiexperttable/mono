@@ -1,0 +1,83 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="aggregation-bar">
+  <label>Country
+    <select class={id + '-country'} aria-label="Filter by country">
+      <option value="" selected>– all –</option>
+      <option>Austria</option>
+      <option>Denmark</option>
+      <option>France</option>
+      <option>Germany</option>
+      <option>Italy</option>
+      <option>Poland</option>
+      <option>Spain</option>
+      <option>Switzerland</option>
+    </select>
+  </label>
+  <output class={id + '-status'} aria-live="polite">Drag over Qty … Total – the numbers of the selection appear here</output>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'aggregation-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService, formatAggregateValue } from '/scripts/table/index.js'
+  import { createAggregationModelAndOptions } from "/scripts/demo-table-models/index.js";
+
+  // 50,000 orders, three total rows in the footer (sum, average, maximum), range selection
+  const {tableModel, tableOptions} = createAggregationModelAndOptions(50_000);
+  let country = '';
+  tableOptions.externalFilterFunction = order => !country || order.country === country;   // the totals follow the filter
+
+  const status = document.querySelector('.' + id + '-status');
+  const listener = new EventAdapter();
+  listener.onSelectionChanged = () => {
+    const a = tableApi.getSelectionAggregates();       // count, sum, average, min, max of the selected cells
+    status.textContent = a.capped ? 'Selection too large'
+      : a.numericCount
+        ? `Count ${a.count.toLocaleString('en-US')} · Sum ${formatAggregateValue(a.sum)} · Average ${formatAggregateValue(a.avg)} · Max ${formatAggregateValue(a.max)}`
+        : 'Select cells with numbers – drag, Shift-click, Ctrl+A';
+  };
+
+  const ele = document.querySelector('.' + id);
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  document.querySelector('.' + id + '-country').addEventListener('change', e => {
+    country = e.target.value;
+    tableApi.externalFilterChanged();
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .aggregation-bar {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .aggregation-bar select {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .aggregation-bar output {
+        font-variant-numeric: tabular-nums;
+        opacity: 0.85;
+    }
+</style>

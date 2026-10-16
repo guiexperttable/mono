@@ -2416,7 +2416,6 @@ export class RenderScope extends EleScope {
     // only the rows visible in the body, at their current position (before: ALL body rows from the top –
     // millions of divs for a large table)
     const firstRow = Math.max(0, this.firstVisibleRowIndex);
-    const bodyModel = this.tableModel.getAreaModel('body');
     const firstRowTop = y + this.getBodyRowTop(firstRow) - this.contentScrollTop;
     this.renderContentOfDraggingColumnForArea(columnGeo, 'body', firstRowTop, firstRow, this.hostElement.clientHeight);
     // we refrain from rendering the footer:

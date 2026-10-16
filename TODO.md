@@ -278,8 +278,30 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Position sagt die Tastatur nichts an · Auto-Scroll-Zone bei
       sehr niedrigen Tabellen (< 200 px) relativ statt 40 px · variable Zeilenhöhen (`defaultRowHeight: -1`): `yPositions`
       werden nach dem Verschieben nicht neu berechnet (wie schon beim Sortieren).
-- [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
-      Zwischenablage als Folgeaufgaben.
+- [x] **010 Fill-Handle und Batch-Edit** – Branch `feat/fill-batch`, Design `prompts/010-fill-handle-batch-edit.design.md`:
+      `tableOptions.fillHandle` (`FillHandleService`, Pointer Events nur am Handle, Vorschau, Auto-Scroll senkrecht und
+      waagerecht, Escape), Reihen-Erkennung DOM-frei (`fill/fill-series.ts`: Zahlen linear/Regression, Datum Tag/Monat inkl.
+      Monatsende, Text mit Endzahl, Kopie; ⌥/Alt schaltet um), `computeFillChanges`, Tastatur `FILL_DOWN`/`FILL_RIGHT`
+      (Strg/⌘+D, Strg/⌘+R – nur verbraucht mit Fill-Handle + Bereich), Batch-Edit (`tableOptions.batchEdit`,
+      `api.startBatchEdit/commitBatchEdit/cancelBatchEdit/getPendingChanges/hasPendingChanges/isBatchEditing`,
+      `PendingCellChanges` je Zeilenobjekt + Property, Anzeige-Overlay in `RenderScope`), `ColumnDef.validate`, **eine**
+      Schreibstelle `TableScope.applyCellChanges` / `api.applyCellChanges` (auch der Editor), `GeModelChangeEvent.changes/
+      source` (ein Event je Vorgang), `onBatchEditChanged` + Wrapper-Event `batchEditChanged` (alle 7). CSS
+      `table-fill-batch.css`. Showcase `batchedit`, Training-Abschnitt in Kapitel 31 `inline-editing`,
+      `videos/10-fill-handle-batch-edit/`, `apps/table-demo/fill-batch.html`. Selbständig umgesetzt.
+      Offen: Angular-Demo nach dem Release (die App nutzt npm-Pakete); Demo-Repo entfällt (kein neues Kapitel).
+- [ ] Folgepunkte 010: **Einfügen aus der Zwischenablage** (Strg/⌘+V: Text → Matrix → `applyCellChanges(…, "api")`, gleiche
+      Prüfungen) · **Undo/Redo** (Stapel aus `GeModelChangeEvent.changes`, Undo = `applyCellChanges` mit `oldValue`,
+      Strg/⌘+Z/Y; Batch: vorgemerkte Änderungen rückgängig) · Doppelklick auf das Handle = bis zum Ende der Nachbarspalte
+      füllen (ag-Grid/Excel) · Ziehen in den Bereich hinein = leeren (Excel) · Copy/Excel zeigen im Batch-Modus die
+      geschriebenen, nicht die vorgemerkten Werte (bewusst wie ag-Grid; ggf. Option) · vorgemerkte Werte werden bei
+      `api.setRows` bzw. beim Lesen über die API verworfen, wenn ihre Zeile nicht mehr im Modell ist – nur für Objekt-Arrays,
+      Bäume und Row Groupings (eigene Modelle behalten sie) · Screenreader hören den Zustand „vorgemerkt“ nicht je Zelle
+      (nur die Anzahl; ungültig = `aria-invalid`) · Geisterbild beim Spalten-Ziehen zeigt Modellwerte · eine Füllung, die
+      Ungültiges überspringt, sagt nur „n cells filled“ an (die „Invalid value“-Ansage wird überschrieben) · `editInputPipe`
+      läuft je Schreiben zweimal (Prüfung + `setValue`; Ergebnis einmal gespeichert) · Reihen: `2026-11` (Jahr-Monat) und
+      ISO-Datum mit Uhrzeit zählen als Text mit Endzahl · `aria-keyshortcuts` des Grids nennt Strg+D/R auch dann, wenn `shortcutActionIdMapping` andere Tasten belegt ·
+      Auto-Scroll waagerecht ohne Zeitskalierung bei gekappter Breite (nur senkrecht kappt die Tabelle).
 - [ ] **011 Master/Detail** (`prompts/011-master-detail.md`); enthält „Performance, Teil 2“ (variable Zeilenhöhen) als
       Voraussetzung.
 - [ ] **012 Rechts-nach-links-Sprachen (RTL)** (`prompts/012-rtl.md`), bewusst zuletzt.
@@ -406,7 +428,7 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Variable Zeilenhöhen: `TableModel.getAreaHeight` (`table-model.ts:275`) ignoriert `getRowHeight()`, sobald
       `defaultRowHeights.body` gesetzt ist (Factory setzt immer 34) → falsche Scrollhöhe; `AbstractAreaModel.getYPosByRowIndex`
       (`abstract-area-model.ts:95`) ignoriert ein überschriebenes `getRowHeight()` → `scrollToIndex` daneben.
-- [ ] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): `setValue` schreibt bei aktivem Filter in die falsche Zeile
+- [ ] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): ~~`setValue` schreibt bei aktivem Filter in die falsche Zeile~~ (behoben 1.1.96, Prompt 010)
       (`:46`); `changeColumnOrder` verschiebt ausgefilterte Zeilen nicht mit (`:70`) – Spalten-Drag ist Standard.
 - [ ] `ColumnDef`-Konstruktor überschreibt `minWidth`/`maxWidth` bei %-Breiten (`column-def.ts:62`).
 - [ ] `createTableModel({headerData, bodyData})` ohne `columnSizes` → Spaltenbreiten −1 (`table-model.ts:512`).
@@ -512,6 +534,21 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.96 – Fill-Handle und Batch-Edit (010)**, nur additiv: neue optionale Member `TableOptionsIf.fillHandle`,
+  `TableOptionsIf.batchEdit`, `ColumnDefIf.validate`, `EventListenerIf.onBatchEditChanged?`, `AriaTextsIf.cellsFilled?`
+  `/fillTooLarge?/pendingChanges?/changesCommitted?/changesDiscarded?/commitBlocked?/invalidValue?`; `EventAdapter` hat eine
+  neue leere Methode. `GeModelChangeEvent` hat die optionalen Felder `changes` und `source` (Konstruktor additiv) und kommt
+  jetzt auch nach Füllen und Batch-Commit – **einmal je Vorgang** mit allen Zellen (ein Edit: wie bisher eine Zelle).
+  `TableScope.updateModelValueAfterEdit` schreibt über die neue `applyCellChanges`-Schreibstelle (Verhalten gleich; ein
+  `ColumnDef.validate`, der eine Meldung liefert, verhindert das Schreiben). `ActionId` kennt `FILL_DOWN`/`FILL_RIGHT`
+  (Standard-Mappings Strg+D/Strg+R bzw. ⌘D/⌘R – nur verbraucht, wenn `fillHandle` an und ein Bereich markiert ist; sonst
+  bleibt die Browser-Aktion); `TableScope.actionsBlockedWhileLoading` enthält sie. `InputCellRenderer`/`SelectCellRenderer`
+  zeigen den übergebenen `cellValue` (bei der Tabelle = Modellwert bzw. vorgemerkter Wert), nur ohne ihn den Modellwert.
+  Neue CSS-Datei `table-fill-batch.css` (in `main.css` enthalten). `dist` 1,97 MB → 2,07 MB (`index.js` 716 → 767 kB).
+  **Verhaltensänderungen:** `editInputPipeForNumber(0)` liefert jetzt `0` statt `""` (leere Eingabe bleibt `""`) – sonst
+  wurden gefüllte Nullen gelöscht. `AreaModelArrayOfArrays.setValue` schreibt bei aktivem Filter in die **angezeigte**
+  Zeile (vorher in `arr[rowIndex]`, also die falsche) und gibt für einen Index außerhalb `false` zurück.
 
 - **1.1.95 – Zeilen ziehen (009)**, nur additiv: neue optionale Member `ColumnDef.rowDrag`, `TableOptionsIf.rowDragOptions`,
   `CreateTableModelPara.rowDrag`, `AreaModelIf.canMoveRows?/moveRows?`, `EventListenerIf.onRowDragStart?/Move?/End?`,

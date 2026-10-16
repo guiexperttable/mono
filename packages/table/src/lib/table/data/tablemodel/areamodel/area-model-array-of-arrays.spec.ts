@@ -156,8 +156,8 @@ describe('AreaModelArrayOfArrays', () => {
       expect(model.getValueAt(0, 0)).toBe(42);
     });
 
-    // BUG: setValue writes into this.arr[rowIndex] although rowIndex is a view index of filteredArr (getValueAt/getRowByIndex use filteredArr).
-    it.fails('writes into the displayed row while a filter is active', () => {
+    // fixed in 1.1.96 (before: setValue wrote into this.arr[rowIndex], a view index of filteredArr)
+    it('writes into the displayed row while a filter is active', () => {
       const model = create();
       model.externalFilterChanged((row: (string | number)[]) => row[0] === 3); // only "Rome" is shown, as row 0
       model.setValue(0, 1, 'Roma');

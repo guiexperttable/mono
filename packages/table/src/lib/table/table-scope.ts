@@ -53,6 +53,18 @@ import { ColumnDefIf } from './data/tablemodel/column/column-def.if';
 import { LiveAnnouncer } from './aria/live-announcer';
 import { CellGroupExt } from './data/tablemodel/cellgroup/cell-group-ext';
 import { RowDragService } from './row-drag/row-drag-service';
+import { BatchEditService, PendingInputIf } from './batch-edit/batch-edit-service';
+import { FillHandleService } from './fill/fill-handle-service';
+import { FillHandleOptions } from './fill/fill-handle-options';
+import type { FillHandleOptionsIf } from './fill/fill-handle-options.if';
+import type { CellChangeIf, CellChangeSource } from './batch-edit/cell-change.if';
+import type { CellValueChangeIf } from './batch-edit/cell-value-change.if';
+import type { FillDirection } from './fill/fill-direction.type';
+import type { FillMode } from './fill/fill-series';
+import { computeFillChanges, getFillRange } from './fill/compute-fill-changes';
+import { CellRange } from './data/common/cell-range';
+import { AriaTexts } from './aria/aria-texts';
+import type { AriaTextsIf } from './aria/aria-texts.if';
 
 
 /**
@@ -118,7 +130,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   readonly liveAnnouncer: LiveAnnouncer;
   /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
-  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN'];
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
@@ -161,6 +173,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
     this.shortcutService = new ShortcutService(this);
     this.rowDragService = new RowDragService(this);
+    this.batchEditService = new BatchEditService(this);
+    this.fillHandleService = new FillHandleService(this);
     this.shortcutService.addListener(this.selectionService);
 
     const sm = this.getSelectionModel ? this.getSelectionModel() : undefined;
@@ -239,6 +253,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       if (consumed !== undefined) {
         return consumed;
       }
+    }
+    if (actionId === 'FILL_DOWN' || actionId === 'FILL_RIGHT') {
+      // fill handle, keyboard alternative (since 1.1.96) – only with tableOptions.fillHandle and a selected range
+      return !this.headerFocus && this.fillByKeyboard(actionId === 'FILL_DOWN' ? 'down' : 'right');
     }
     if (actionId === 'MOVE_ROW_UP' || actionId === 'MOVE_ROW_DOWN') {
       // row drag, keyboard alternative (since 1.1.95) – only in the body
@@ -647,29 +665,365 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.repaint();
   }
 
+  /**
+   * Writes the text of a cell editor (called by the input handler on "change"). Batch edit: the value is marked as
+   * pending instead. Uses {@link applyCellChanges} – one `onModelChanged` per edit, as before.
+   *
+   * @param {AreaIdent} areaIdent - only `"body"` is edited
+   * @param {number} rowIndex - display index
+   * @param {number} columnIndex - model index
+   * @param {string} value - the text of the editor
+   */
   updateModelValueAfterEdit(areaIdent: AreaIdent, rowIndex: number, columnIndex: number, value: string) {
-    if (areaIdent === 'body') {
-      const bodyAreaModel = this.tableModel.getAreaModel(areaIdent);
-      const rowCountBefore = bodyAreaModel.getRowCount();
-      const buildsBefore = isAreaModelRowGroups(bodyAreaModel) ? bodyAreaModel.getBuildCount() : 0;
-      const ok: boolean = bodyAreaModel.setValue(rowIndex, columnIndex, value);
-      if (ok) {
-        this.resetEditorRenderer();
-        // one row changed: models may recompute less (a row grouping only the groups of this row)
-        const change: DerivedValuesChangeIf = { area: 'body', rowIndices: [rowIndex] };
-        this.invalidateAggregates(change);
-        const moved = isAreaModelRowGroups(bodyAreaModel) && bodyAreaModel.getBuildCount() !== buildsBefore;
-        if (moved || bodyAreaModel.getRowCount() !== rowCountBefore) {
-          this.repaintHard(); // e.g. a grouped value changed: the row moved to another group
-        } else {
-          this.repaint();
-        }
-        // values the app derives in onModelChanged (and repaints) are counted by the next repaint
-        this.invalidateAggregates(change);
-        this.eventListener.onModelChanged?.(GeModelChangeEvent.createSingle(rowIndex, columnIndex));
-        this.hostElement.focus();
-      }
+    if (areaIdent !== 'body') {
+      return;
     }
+    const closeEditor = () => {
+      this.resetEditorRenderer();
+    };
+    if (this.batchEditService?.isActive()) {
+      closeEditor();
+      this.markPending([{ rowIndex, column: columnIndex, value }], false);
+      this.repaint();
+      this.hostElement.focus();
+      return;
+    }
+    const result = this.writeCellsInternal([{ rowIndex, columnIndex, value }], 'edit', { beforeRepaint: closeEditor });
+    if (result.changes.length || result.invalid) {
+      if (!result.changes.length) {
+        closeEditor();   // an invalid value: not written, the editor closes (announced)
+        this.repaint();
+      }
+      this.hostElement.focus();
+    }
+  }
+
+  /**
+   * The one place that changes body cells (editor, fill handle, batch commit, {@link TableApi.applyCellChanges}):
+   * skips cells that are not editable (`editable`, calculated columns without `valueSetter`, group/pivot rows),
+   * applies `editInputPipe` and {@link ColumnDefIf.validate}, then writes – or, in a batch edit, marks the values as
+   * pending. Writing reports **one** `onModelChanged` with all cells; derived values (totals, calculated columns) are
+   * recomputed and the table repaints.
+   *
+   * @param {CellValueChangeIf[]} changes - cells and values (column as index or property)
+   * @param {CellChangeSource} [source="api"] - reported in the event
+   * @returns {CellChangeIf[]} the written (or, in a batch edit, newly pending) cells
+   * @since 1.1.96
+   */
+  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = 'api'): CellChangeIf[] {
+    const cells = this.resolveCellChanges(changes);
+    if (!cells.length) {
+      return [];
+    }
+    if (this.batchEditService?.isActive()) {
+      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true);
+      this.repaint();
+      return ret;
+    }
+    return this.writeCellsInternal(cells, source, {}).changes;
+  }
+
+  /**
+   * Writes cell values directly (no batch edit) – used by {@link applyCellChanges} and the batch commit.
+   *
+   * @param {{ rowIndex: number, columnIndex: number, value: unknown }[]} cells - resolved cells (display/model indices)
+   * @param {CellChangeSource} source - reported in the event
+   * @param {{ extraChanges?: CellChangeIf[], skipValidation?: boolean }} [opts] - changes written elsewhere (reported
+   *        in the same event), no validation (commit: already checked)
+   * @returns {CellChangeIf[]} the written cells (including `extraChanges`)
+   * @since 1.1.96
+   */
+  writeCells(cells: { rowIndex: number; columnIndex: number; value: unknown }[], source: CellChangeSource,
+             opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean } = {}): CellChangeIf[] {
+    return this.writeCellsInternal(cells, source, opts).changes;
+  }
+
+  private writeCellsInternal(
+    cells: { rowIndex: number; columnIndex: number; value: unknown }[],
+    source: CellChangeSource,
+    opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void }
+  ): { changes: CellChangeIf[]; invalid: number } {
+    const body = this.tableModel.getBodyModel();
+    const rowCountBefore = body.getRowCount();
+    const buildsBefore = isAreaModelRowGroups(body) ? body.getBuildCount() : 0;
+    const changes: CellChangeIf[] = [];
+    let invalid = 0;
+    let firstMessage = '';
+    const apply = () => {
+      for (const { rowIndex, columnIndex, value } of cells) {
+        if (!opts.skipValidation) {
+          const error = this.validateCellValue(rowIndex, columnIndex, this.pipeCellValue(rowIndex, columnIndex, value));
+          if (error) {
+            invalid++;
+            firstMessage = firstMessage || error;
+            continue;
+          }
+        }
+        const oldValue = body.getValueAt(rowIndex, columnIndex);
+        if (body.setValue(rowIndex, columnIndex, value)) {
+          changes.push({
+            row: this.rowObjectOf(rowIndex),
+            rowIndex,
+            columnIndex,
+            property: this.batchEditService!.propertyOf(columnIndex),
+            oldValue,
+            newValue: body.getValueAt(rowIndex, columnIndex)
+          });
+        }
+      }
+    };
+    // a row grouping moves rows with a changed grouped value only after the last cell (the indices stay valid)
+    if (isAreaModelRowGroups(body)) {
+      body.batch(apply);
+    } else {
+      apply();
+    }
+    if (invalid) {
+      this.announce(this.getEditTexts().invalidValue(firstMessage));
+    }
+    const all = opts.extraChanges?.length ? [...changes, ...opts.extraChanges] : changes;
+    if (!all.length) {
+      return { changes: all, invalid };
+    }
+    opts.beforeRepaint?.();
+    // only body rows changed: models may recompute less (a row grouping only the groups of these rows)
+    const derived: DerivedValuesChangeIf | undefined = opts.extraChanges?.length
+      ? undefined
+      : { area: 'body', rowIndices: changes.map(c => c.rowIndex) };
+    this.invalidateAggregates(derived);
+    const moved = isAreaModelRowGroups(body) && body.getBuildCount() !== buildsBefore;
+    if (moved || body.getRowCount() !== rowCountBefore || source === 'commit') {
+      this.repaintHard(); // e.g. a grouped value changed: the row moved to another group
+    } else {
+      this.repaint();
+    }
+    // values the app derives in onModelChanged (and repaints) are counted by the next repaint
+    this.invalidateAggregates(derived);
+    if (source === 'edit' && all.length === 1) {
+      // the same event as before 1.1.96 (createSingle) – plus the change
+      const evt = GeModelChangeEvent.createSingle(all[0].rowIndex, all[0].columnIndex);
+      evt.changes = all;
+      evt.source = source;
+      this.eventListener.onModelChanged?.(evt);
+    } else {
+      this.eventListener.onModelChanged?.(GeModelChangeEvent.createForChanges(all, source));
+    }
+    return { changes: all, invalid };
+  }
+
+  /** Marks values as pending (batch edit): pipe, validation, then the batch edit service. */
+  private markPending(changes: CellValueChangeIf[], resolved: boolean): CellChangeIf[] {
+    const cells = resolved
+      ? changes.map(c => ({ rowIndex: c.rowIndex, columnIndex: c.column as number, value: c.value }))
+      : this.resolveCellChanges(changes, false);
+    const inputs: PendingInputIf[] = cells.map(({ rowIndex, columnIndex, value }) => {
+      const piped = this.pipeCellValue(rowIndex, columnIndex, value);
+      const error = this.validateCellValue(rowIndex, columnIndex, piped);
+      return { rowIndex, columnIndex, value: piped, rawValue: value, ...(error ? { error } : {}) };
+    });
+    return this.batchEditService!.addPending(inputs);
+  }
+
+  /**
+   * Column property → index, range check, editable check (not for the editor: it was opened on an editable cell).
+   */
+  private resolveCellChanges(changes: CellValueChangeIf[], checkEditable = true): { rowIndex: number; columnIndex: number; value: unknown }[] {
+    const body = this.tableModel.getBodyModel();
+    const rowCount = body.getRowCount();
+    const columnCount = this.tableModel.getColumnCount();
+    const columnDefs = this.tableModel.getColumnDefs?.() ?? [];
+    const ret: { rowIndex: number; columnIndex: number; value: unknown }[] = [];
+    for (const change of changes) {
+      const columnIndex = typeof change.column === 'number'
+        ? change.column
+        : columnDefs.findIndex(def => def.property === change.column);
+      const rowIndex = change.rowIndex;
+      if (!(rowIndex >= 0 && rowIndex < rowCount && columnIndex >= 0 && columnIndex < columnCount)) {
+        continue;
+      }
+      if (checkEditable && !body.isEditable(rowIndex, columnIndex)) {
+        continue; // H5: not editable, calculated without valueSetter, group or pivot rows
+      }
+      ret.push({ rowIndex, columnIndex, value: change.value });
+    }
+    return ret;
+  }
+
+  /** The value after the column's `editInputPipe` (as `setValue` will store it). */
+  private pipeCellValue(rowIndex: number, columnIndex: number, value: unknown): unknown {
+    const pipe = this.tableModel.getColumnDef(columnIndex)?.editInputPipe;
+    return pipe ? pipe(value, rowIndex, columnIndex) : value;
+  }
+
+  /** The message of {@link ColumnDefIf.validate} – `undefined` if valid or without validator. */
+  private validateCellValue(rowIndex: number, columnIndex: number, value: unknown): string | undefined {
+    const validate = this.tableModel.getColumnDef(columnIndex)?.validate;
+    if (!validate) {
+      return undefined;
+    }
+    const message = validate(value, this.rowObjectOf(rowIndex));
+    return message ? String(message) : undefined;
+  }
+
+  /** The row object of a body row for events: the data of a `TreeRow`, `undefined` without objects. */
+  private rowObjectOf(rowIndex: number): unknown {
+    const row = this.tableModel.getBodyModel().getRowByIndex(rowIndex);
+    return isTreeRow(row) ? (row as TreeRowIf<any>).data : row;
+  }
+
+  /**
+   * The options of the fill handle, `undefined` if it is off ({@link TableOptionsIf.fillHandle}).
+   *
+   * @returns {FillHandleOptionsIf | undefined} complete options
+   * @since 1.1.96
+   */
+  getFillHandleOptions(): FillHandleOptionsIf | undefined {
+    return FillHandleOptions.create(this.tableOptions.fillHandle);
+  }
+
+  /**
+   * Fills cells next to a range (fill handle, Ctrl/⌘+D, {@link TableApi.fillRange}): computes the values
+   * ({@link computeFillChanges}, shown values – a batch edit's pending values count), writes them with
+   * {@link applyCellChanges} and selects source and filled cells.
+   *
+   * @param {CellRange} source - the source range (body display indices)
+   * @param {FillDirection} direction - down, up, right or left
+   * @param {number} count - rows or columns to fill (clamped to the table)
+   * @param {FillMode} [mode="auto"] - series or copy
+   * @param {CellRange} [selectAfter] - the selection afterwards (default: source and filled cells)
+   * @returns {number} the number of filled (or, in a batch edit, marked) cells; `-1` if refused (too many cells)
+   * @since 1.1.96
+   */
+  fillRange(source: CellRange, direction: FillDirection, count: number, mode: FillMode = 'auto', selectAfter?: CellRange): number {
+    const options = this.getFillHandleOptions() ?? FillHandleOptions.create(true)!;
+    const body = this.tableModel.getBodyModel();
+    const rowCount = body.getRowCount();
+    const columnCount = this.tableModel.getColumnCount();
+    const src = this.normalizeRange(source, rowCount, columnCount);
+    if (!src || count < 1) {
+      return 0;
+    }
+    const room = direction === 'down' ? rowCount - 1 - src.r2
+      : direction === 'up' ? src.r1
+        : direction === 'right' ? columnCount - 1 - src.c2
+          : src.c1;
+    const n = Math.min(count, room);
+    if (n < 1) {
+      return 0;
+    }
+    const lines = direction === 'down' || direction === 'up' ? src.c2 - src.c1 + 1 : src.r2 - src.r1 + 1;
+    if (n * lines > options.maxCells) {
+      this.announce(this.getEditTexts().fillTooLarge(options.maxCells));
+      return -1;
+    }
+    const batch = this.batchEditService!;
+    const changes = computeFillChanges({
+      source: src, direction, count: n, mode,
+      getValue: (r, c) => batch.getShownValue(r, c),
+      isFillable: (r, c) => this.tableModel.getColumnWidth(c) > 0 && body.isEditable(r, c),
+      fillValue: options.fillValue,
+      getCellInfo: (r, c) => ({ row: this.rowObjectOf(r), property: this.tableModel.getColumnDef(c)?.property ?? '' })
+    });
+    const applied = this.applyCellChanges(changes, 'fill');
+    const sm = this.selectionModel();
+    if (sm) {
+      this.holdSelectionEvents(() => {
+        sm.clear();
+        sm.addSelection(selectAfter ?? getFillRange(src, direction, n));
+        this.onSelectionChanged(sm);
+      });
+    }
+    this.repaint();
+    this.announce(this.getEditTexts().cellsFilled(applied.length));
+    return applied.length;
+  }
+
+  /** The last selected range, clamped to the body (`undefined` without one). */
+  getFillSourceRange(): CellRange | undefined {
+    const sm = this.selectionModel();
+    if (!sm || (sm as { selectionType?: string }).selectionType !== 'range' || sm.isAllSelected()) {
+      return undefined;
+    }
+    const ranges = sm.getRanges();
+    if (!ranges.length) {
+      return undefined;
+    }
+    return this.normalizeRange(ranges[ranges.length - 1], this.tableModel.getBodyModel().getRowCount(),
+      this.tableModel.getColumnCount());
+  }
+
+  private normalizeRange(range: CellRange, rowCount: number, columnCount: number): CellRange | undefined {
+    const r1 = Math.max(0, Math.min(range.r1, range.r2));
+    const r2 = Math.min(rowCount - 1, Math.max(range.r1, range.r2));
+    const c1 = Math.max(0, Math.min(range.c1, range.c2));
+    const c2 = Math.min(columnCount - 1, Math.max(range.c1, range.c2));
+    return r1 <= r2 && c1 <= c2 ? new CellRange(r1, c1, r2, c2) : undefined;
+  }
+
+  /**
+   * Ctrl/⌘+D (down) and Ctrl/⌘+R (right): the first row (column) of the selected range is copied into the rest; a
+   * range of one row (column) gets the cell above (left of) it – like a spreadsheet.
+   *
+   * @param {"down" | "right"} direction - the key
+   * @returns {boolean} true if the key was used (the browser's own action – bookmark, reload – is prevented then)
+   */
+  private fillByKeyboard(direction: 'down' | 'right'): boolean {
+    const options = this.getFillHandleOptions();
+    const vertical = direction === 'down';
+    if (!options || this.isEditing() || this.fillHandleService?.isFilling()
+      || options.direction === (vertical ? 'horizontal' : 'vertical')) {
+      return false;
+    }
+    const range = this.getFillSourceRange();
+    if (!range) {
+      return false;
+    }
+    const span = vertical ? range.r2 - range.r1 : range.c2 - range.c1;
+    if (span > 0) {
+      const src = vertical ? new CellRange(range.r1, range.c1, range.r1, range.c2) : new CellRange(range.r1, range.c1, range.r2, range.c1);
+      this.fillRange(src, direction, span, 'copy');
+    } else if (vertical ? range.r1 > 0 : range.c1 > 0) {
+      const src = vertical
+        ? new CellRange(range.r1 - 1, range.c1, range.r1 - 1, range.c2)
+        : new CellRange(range.r1, range.c1 - 1, range.r2, range.c1 - 1);
+      this.fillRange(src, direction, 1, 'copy', range);   // the range stays what it was (the source is not selected)
+    }
+    return true;
+  }
+
+  /**
+   * Sets `aria-keyshortcuts` of the host (the fill handle's keyboard alternative); removed again by {@link destroy}.
+   *
+   * @param {string | undefined} value - e.g. `"Control+D Control+R"`; `undefined` restores the value before
+   * @since 1.1.96
+   */
+  setHostKeyShortcuts(value: string | undefined): void {
+    if (value === undefined) {
+      this.restoreHostAriaAttribute('aria-keyshortcuts');   // the app's own value (or none) again
+    } else {
+      this.setHostAriaAttribute('aria-keyshortcuts', value);
+    }
+  }
+
+  /**
+   * The texts of fill and batch edit with defaults (an own {@link AriaTextsIf} implementation may lack them).
+   *
+   * @returns the texts
+   * @since 1.1.96
+   */
+  getEditTexts(): Required<Pick<AriaTextsIf, 'cellsFilled' | 'fillTooLarge' | 'pendingChanges' | 'changesCommitted' |
+    'changesDiscarded' | 'commitBlocked' | 'invalidValue'>> {
+    const texts = this.ariaTexts as Partial<AriaTextsIf>;
+    const defaults = new AriaTexts();
+    return {
+      cellsFilled: (n: number) => (texts.cellsFilled ?? defaults.cellsFilled).call(texts, n),
+      fillTooLarge: (n: number) => (texts.fillTooLarge ?? defaults.fillTooLarge).call(texts, n),
+      pendingChanges: (n: number) => (texts.pendingChanges ?? defaults.pendingChanges).call(texts, n),
+      changesCommitted: (n: number) => (texts.changesCommitted ?? defaults.changesCommitted).call(texts, n),
+      changesDiscarded: () => (texts.changesDiscarded ?? defaults.changesDiscarded).call(texts),
+      commitBlocked: (n: number) => (texts.commitBlocked ?? defaults.commitBlocked).call(texts, n),
+      invalidValue: (m: string) => (texts.invalidValue ?? defaults.invalidValue).call(texts, m)
+    };
   }
 
   /**
@@ -745,6 +1099,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     } catch (e) {
       console.error(e);
     }
+    this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
+
     this.destroyed = true;
     this.listenerAbortController.abort();
     this.resizeHandler.disconnect();
@@ -1124,6 +1480,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   protected override afterRenderPass(): void {
     this.stateService?.rendered(); // undefined while the constructor of the super class renders
+    this.fillHandleService?.update(); // the handle follows the selected range (scroll, selection, editor)
   }
 
   onSelectionChanged(sm: SelectionModelIf) {

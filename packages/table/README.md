@@ -50,6 +50,10 @@ This is the UI-agnostic table component for your next web app. 😊
 - Row drag: drag handle per row (`ColumnDef.rowDrag` or `rowDrag: true` in the factory), mouse, touch and pen, ghost,
   drop marker, auto-scroll, Escape, keyboard alternative Ctrl+Alt+↑/↓, several selected rows, trees; the table moves
   the rows (managed) or only reports the drop (`rowDragOptions: { managed: false }`, `onRowDragEnd`) – since 1.1.95
+- Fill handle and batch edit: a square at the corner of the selected range copies values or continues series (numbers,
+  dates, `Item 1` → `Item 2`; ⌥/Alt switches, Ctrl/⌘+D, Ctrl/⌘+R), batch edit collects changes (`ge-table-cell-pending`)
+  until `tableApi.commitBatchEdit()` / `cancelBatchEdit()`, `ColumnDef.validate`, one `onModelChanged` per change with
+  old and new values (`tableOptions.fillHandle`, `tableOptions.batchEdit`) – since 1.1.96
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

@@ -175,8 +175,30 @@ export interface ColumnDefIf {
    *
    * @since 1.1.95
    */
-  rowDrag?: RowDragColumnOption
+  rowDrag?: RowDragColumnOption,
+  /**
+   * Checks an edited, filled or pasted value (after `editInputPipe`): return a message for an invalid value,
+   * `undefined` for a valid one. Batch edit: invalid values are marked (`ge-table-cell-invalid`, the message as
+   * tooltip) and block {@link TableApi.commitBatchEdit}; otherwise an invalid value is not written.
+   *
+   * @example
+   * ColumnDef.create({
+   *   property: "price", headerLabel: "Price", editable: TrueFn, editInputPipe: editInputPipeForNumber,
+   *   validate: (value: unknown) => typeof value === "number" && value >= 0 ? undefined : "A price is a number ≥ 0",
+   * })
+   *
+   * @since 1.1.96
+   */
+  validate?: CellValidator
 }
+
+/**
+ * {@link ColumnDefIf.validate}: a message for an invalid value, `undefined` (or `null`, `""`) for a valid one.
+ *
+ * @category Fill handle & batch edit
+ * @since 1.1.96
+ */
+export type CellValidator<T = any> = (value: unknown, row: T) => string | undefined | null | void;
 
 /**
  * {@link ColumnDefIf.rowDrag}: `true` = every row has a drag handle in this column, a function decides per row

@@ -297,3 +297,19 @@ export * from './lib/table/row-drag/row-drag-options';
 export * from './lib/table/row-drag/move-rows';
 export * from './lib/table/row-drag/row-drag-service';
 export * from './lib/table/data/common/event/ge-row-drag-event';
+
+// Fill handle and batch edit (since 1.1.96)
+export * from './lib/table/batch-edit/cell-change.if';
+export * from './lib/table/batch-edit/cell-value-change.if';
+export * from './lib/table/fill/fill-direction.type';
+export * from './lib/table/fill/fill-value-context.if';
+export * from './lib/table/fill/fill-handle-options.if';
+export * from './lib/table/fill/fill-handle-options';
+export * from './lib/table/fill/fill-series';
+export * from './lib/table/fill/compute-fill-changes';
+export * from './lib/table/fill/fill-handle-service';
+export * from './lib/table/batch-edit/batch-edit-options.if';
+export * from './lib/table/batch-edit/batch-edit-options';
+export * from './lib/table/batch-edit/pending-cell-changes';
+export * from './lib/table/batch-edit/batch-edit-service';
+export * from './lib/table/data/common/event/ge-batch-edit-event';

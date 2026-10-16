@@ -32,3 +32,5 @@ export * from "./model/many-types.if";
 export * from "./model/sales-order.if";
 export * from "./model/pivot-order.if";
 export * from "./model/task.if";
+export * from "./lib/createPriceListModel";
+export * from "./model/price-item.if";

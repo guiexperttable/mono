@@ -4,6 +4,7 @@ import type {
   GeModelChangeEvent,
   GeMouseEvent,
   GeRowDragEvent,
+  GeBatchEditEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -36,6 +37,8 @@ export interface GuiexpertTableProps {
   onRowDragStart?: (evt: GeRowDragEvent) => void;
   onRowDragMove?: (evt: GeRowDragEvent) => void;
   onRowDragEnd?: (evt: GeRowDragEvent) => void;
+  /** Batch edit: values marked, set back, written or discarded. @since 1.1.96 */
+  onBatchEditChanged?: (evt: GeBatchEditEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -56,6 +59,8 @@ export interface GuiexpertTableEvents {
   rowDragStart: CustomEvent<GeRowDragEvent>;
   rowDragMove: CustomEvent<GeRowDragEvent>;
   rowDragEnd: CustomEvent<GeRowDragEvent>;
+  /** @since 1.1.96 */
+  batchEditChanged: CustomEvent<GeBatchEditEvent>;
 }
 
 /**

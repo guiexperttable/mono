@@ -38,6 +38,8 @@ export class WindowsShortcutActionIdMapping {
       "enter": "ACTIVATE_CELL",
       "ctrl+alt+up": "MOVE_ROW_UP",
       "ctrl+alt+down": "MOVE_ROW_DOWN",
+      "ctrl+d": "FILL_DOWN",
+      "ctrl+r": "FILL_RIGHT",
 
       "meta+c": "COPY_2_CLIPBOARD",
       "ctrl+c": "COPY_2_CLIPBOARD",

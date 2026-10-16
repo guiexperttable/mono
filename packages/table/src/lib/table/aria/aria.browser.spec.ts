@@ -7,6 +7,7 @@ import {
   AreaModelCellGroups,
   AreaModelObjectArrayWithColumndefs,
   CellgroupFactory,
+  CellRange,
   CheckboxColumnDef,
   ColumnDef,
   ConvenienceDomService,
@@ -1221,5 +1222,37 @@ describe('edge cases of the keyboard model and the ARIA attributes', () => {
       scope.destroy();
       host.remove();
     }
+  });
+
+  it('fill handle and batch edit (1.1.96): handle and preview hidden, keyboard shortcuts on the grid, invalid cells', async () => {
+    const sm = new SelectionModel('range', 'multi');
+    const rows = createRows(5);
+    const defs = [
+      ColumnDef.create({ property: 'id', headerLabel: 'Id' }),
+      ColumnDef.create({ property: 'name', headerLabel: 'Name', editable: TrueFn, validate: (v: unknown) => v ? undefined : 'Required' }),
+    ];
+    const host = document.createElement('div');
+    host.setAttribute('aria-keyshortcuts', 'Alt+F');   // own value of the app: restored on destroy
+    host.style.cssText = 'position:relative;width:400px;height:200px';
+    document.body.appendChild(host);
+    const scope = new TableScope(host, TableFactory.createTableModel({ rows, columnDefs: defs }), new SimpleDomService(),
+      { ...new TableOptions(), getSelectionModel: () => sm, fillHandle: true, batchEdit: true }, new EventAdapter());
+    try {
+      scope.firstInit();
+      sm.addSelection(new CellRange(0, 1, 1, 1));
+      scope.repaint();
+      expect(host.getAttribute('aria-keyshortcuts')).toBe('Control+D Control+R');
+      expect(host.querySelector('.ge-table-fill-handle')!.getAttribute('aria-hidden')).toBe('true');
+      scope.getApi().applyCellChanges([{ rowIndex: 0, column: 'name', value: '' }]);
+      await nextFrame();
+      const cell = host.querySelector('[data-area="body"][data-row-index="0"][data-col-index="1"]')!;
+      expect(cell.getAttribute('aria-invalid')).toBe('true');
+      expect(cell.getAttribute('title')).toBe('Required');
+      expect(await axeViolations(host)).toEqual([]);
+    } finally {
+      scope.destroy();
+    }
+    expect(host.getAttribute('aria-keyshortcuts')).toBe('Alt+F');
+    host.remove();
   });
 });

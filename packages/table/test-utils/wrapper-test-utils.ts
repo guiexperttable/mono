@@ -7,8 +7,8 @@
 // Imports only `@guiexpert/table` (alias) and relative files – no `vitest` here: the wrapper's own Vitest must be
 // used (CI installs only the wrapper packages, packages/table/node_modules is missing there).
 // Lives outside src/ on purpose: it must not end up in any npm package.
-import { PivotFactory, RowGroupFactory, TableFactory } from '@guiexpert/table';
-import type { GeMouseEvent, TableApi, TableModelIf } from '@guiexpert/table';
+import { CellRange, ColumnDef, PivotFactory, RowGroupFactory, SelectionModel, TableFactory, TableOptions, TrueFn } from '@guiexpert/table';
+import type { GeMouseEvent, TableApi, TableModelIf, TableOptionsIf } from '@guiexpert/table';
 import { nextFrame, renderedRows } from './mount-table'; // also loads css/main.css
 
 export { nextFrame, renderedRows };
@@ -151,4 +151,42 @@ export function dragRow(container: Element, fromRow: number, toRow: number): voi
   fire(document, 'pointermove', start.left + 4, start.top + 20);
   fire(document, 'pointermove', target.left + 10, target.top + target.height * 0.8);
   fire(document, 'pointerup', target.left + 10, target.top + target.height * 0.8);
+}
+
+/**
+ * Fill handle and batch edit (since 1.1.96): 5 rows `{ id, qty }` with qty 1, 2, 0, 0, 0 – `qty` (column 1) is
+ * editable. The options select rows 0–1 of `qty` (range selection) and switch the fill handle on.
+ */
+export function createFillModelAndOptions(batchEdit = false): { tableModel: TableModelIf; tableOptions: TableOptionsIf; rows: { id: number; qty: number }[] } {
+  const rows = [1, 2, 0, 0, 0].map((qty, id) => ({ id, qty }));
+  const tableModel = TableFactory.createTableModel({
+    rows,
+    columnDefs: [
+      ColumnDef.create({ property: 'id', headerLabel: 'Id' }),
+      ColumnDef.create({ property: 'qty', headerLabel: 'Qty', editable: TrueFn }),
+    ],
+  });
+  const sm = new SelectionModel('range', 'multi');
+  sm.addSelection(new CellRange(0, 1, 1, 1));
+  const tableOptions: TableOptionsIf = { ...new TableOptions(), getSelectionModel: () => sm, fillHandle: true, batchEdit };
+  return { tableModel, tableOptions, rows };
+}
+
+/** Drags the fill handle of the selected range down to the center of row `toRow`, column 1. */
+export function dragFillHandle(container: Element, toRow: number): void {
+  const handle = container.querySelector<HTMLElement>('.ge-table-fill-handle');
+  if (!handle) {
+    throw new Error('no fill handle');
+  }
+  const start = handle.getBoundingClientRect();
+  const target = bodyCell(container, toRow, 1).getBoundingClientRect();
+  const fire = (el: EventTarget, type: string, x: number, y: number) => el.dispatchEvent(new PointerEvent(type, {
+    bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 1, pointerType: 'mouse',
+    button: 0, buttons: type === 'pointerup' ? 0 : 1, isPrimary: true,
+  }));
+  const x = start.left + start.width / 2;
+  fire(handle, 'pointerdown', x, start.top + start.height / 2);
+  fire(document, 'pointermove', x, start.top + 10);
+  fire(document, 'pointermove', target.left + target.width / 2, target.top + target.height / 2);
+  fire(document, 'pointerup', target.left + target.width / 2, target.top + target.height / 2);
 }

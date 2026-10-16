@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -18,6 +18,7 @@ export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
+export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -44,6 +45,8 @@ export interface GuiexpertTableProps {
   rowDragStart?: GeRowDragEventFn;
   rowDragMove?: GeRowDragEventFn;
   rowDragEnd?: GeRowDragEventFn;
+  /** Batch edit: values marked, set back, written or discarded (since 1.1.96). */
+  batchEditChanged?: GeBatchEditEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -121,7 +124,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onStateChanged: (evt: GeStateChangeEvent) => current().stateChanged?.(evt),
       onRowDragStart: (evt: GeRowDragEvent) => current().rowDragStart?.(evt),
       onRowDragMove: (evt: GeRowDragEvent) => current().rowDragMove?.(evt),
-      onRowDragEnd: (evt: GeRowDragEvent) => current().rowDragEnd?.(evt)
+      onRowDragEnd: (evt: GeRowDragEvent) => current().rowDragEnd?.(evt),
+      onBatchEditChanged: (evt: GeBatchEditEvent) => current().batchEditChanged?.(evt)
     };
 
     const tableScope = new TableScope(

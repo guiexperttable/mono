@@ -24,13 +24,18 @@ import {
   isExcelFormattedValue,
   RowDropPosition, RowDropTargetIf, RowDragOptionsIf, RowDragOptions, normalizeRowIndices, getInsertBeforeIndex,
   calcMoveToIndex, moveArrayItems, getTopmostTreeRows, canMoveTreeRows, moveTreeRows, canMoveFlatRows, moveFlatRows,
-  RowDragService, RowDragHandleState, GeRowDragEvent, GeRowDragEventType, GeRowDragSource, RowDragColumnOption, findRowIndexAtY
+  RowDragService, RowDragHandleState, GeRowDragEvent, GeRowDragEventType, GeRowDragSource, RowDragColumnOption, findRowIndexAtY,
+  CellChangeIf, CellChangeSource, CellValueChangeIf, FillDirection, FillValueContextIf, FillHandleOptionsIf,
+  FillHandleOptions, FillMode, computeFillValues, isFillSeries, FillRequestIf, computeFillChanges, getFillRange,
+  FillHandleService, BatchEditOptionsIf, BatchEditOptions, PendingCellIf, PendingChangeResult, isSameCellValue,
+  PendingCellChanges, BatchEditService, GeBatchEditEvent, GeBatchEditEventType, CellValidator
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
 declare const input: HTMLInputElement;
 declare const hint: HTMLElement;
 declare const select: HTMLSelectElement;
+declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, editButton: HTMLButtonElement;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
   category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled"; }

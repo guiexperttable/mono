@@ -90,4 +90,33 @@ export class AriaTexts implements AriaTextsIf {
   rowDragCancelled(): string {
     return "Drag cancelled";
   }
+
+  cellsFilled(cellCount: number): string {
+    return cellCount === 1 ? "1 cell filled" : `${cellCount} cells filled`;
+  }
+
+  fillTooLarge(maxCells: number): string {
+    return `Too many cells to fill (at most ${maxCells})`;
+  }
+
+  pendingChanges(pendingCount: number): string {
+    if (pendingCount === 0) return "No unsaved changes";
+    return pendingCount === 1 ? "1 change not saved" : `${pendingCount} changes not saved`;
+  }
+
+  changesCommitted(cellCount: number): string {
+    return cellCount === 1 ? "1 change saved" : `${cellCount} changes saved`;
+  }
+
+  changesDiscarded(): string {
+    return "Changes discarded";
+  }
+
+  commitBlocked(invalidCount: number): string {
+    return invalidCount === 1 ? "1 invalid value – nothing saved" : `${invalidCount} invalid values – nothing saved`;
+  }
+
+  invalidValue(message: string): string {
+    return message ? `Invalid value: ${message}` : "Invalid value";
+  }
 }

@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  GeBatchEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -107,6 +107,14 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   rowDragEnd: Subject<GeRowDragEvent> = new Subject<GeRowDragEvent>();
 
+  /**
+   * Batch edit: values were marked, set back, written or discarded – e.g. to enable a "Save" button.
+   *
+   * @since 1.1.96
+   */
+  @Output()
+  batchEditChanged: Subject<GeBatchEditEvent> = new Subject<GeBatchEditEvent>();
+
   @Input()
   tableModel?: TableModelIf;
 
@@ -171,6 +179,10 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onRowDragEnd(evt: GeRowDragEvent): void {
     this.rowDragEnd.next(evt);
+  }
+
+  onBatchEditChanged(evt: GeBatchEditEvent): void {
+    this.batchEditChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

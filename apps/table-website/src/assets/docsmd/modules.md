@@ -29,6 +29,8 @@
 - [AriaTexts](classes/AriaTexts.md)
 - [ArrayPropertyType](classes/ArrayPropertyType.md)
 - [AutoRestoreOptions](classes/AutoRestoreOptions.md)
+- [BatchEditOptions](classes/BatchEditOptions.md)
+- [BatchEditService](classes/BatchEditService.md)
 - [BooleanPropertyType](classes/BooleanPropertyType.md)
 - [CellGroup](classes/CellGroup.md)
 - [CellGroupExt](classes/CellGroupExt.md)
@@ -66,8 +68,11 @@
 - [EventAdapter](classes/EventAdapter.md)
 - [EventCheckboxChangedHandler](classes/EventCheckboxChangedHandler.md)
 - [ExcelService](classes/ExcelService.md)
+- [FillHandleOptions](classes/FillHandleOptions.md)
+- [FillHandleService](classes/FillHandleService.md)
 - [FocusModel](classes/FocusModel.md)
 - [FormulaError](classes/FormulaError.md)
+- [GeBatchEditEvent](classes/GeBatchEditEvent.md)
 - [GeCellIndices](classes/GeCellIndices.md)
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
 - [GeFilterService](classes/GeFilterService.md)
@@ -98,6 +103,7 @@
 - [OsxShortcutActionIdMapping](classes/OsxShortcutActionIdMapping.md)
 - [OverlayOptions](classes/OverlayOptions.md)
 - [Padding](classes/Padding.md)
+- [PendingCellChanges](classes/PendingCellChanges.md)
 - [PivotColumnDef](classes/PivotColumnDef.md)
 - [PivotFactory](classes/PivotFactory.md)
 - [PivotResult](classes/PivotResult.md)
@@ -172,8 +178,11 @@
 - [ArgsRenderCellDiv](interfaces/ArgsRenderCellDiv.md)
 - [AriaTextsIf](interfaces/AriaTextsIf.md)
 - [AutoRestoreOptionsIf](interfaces/AutoRestoreOptionsIf.md)
+- [BatchEditOptionsIf](interfaces/BatchEditOptionsIf.md)
+- [CellChangeIf](interfaces/CellChangeIf.md)
 - [CellGroupIf](interfaces/CellGroupIf.md)
 - [CellRendererIf](interfaces/CellRendererIf.md)
+- [CellValueChangeIf](interfaces/CellValueChangeIf.md)
 - [CheckboxModelIf](interfaces/CheckboxModelIf.md)
 - [ChunkDataIf](interfaces/ChunkDataIf.md)
 - [ColorRgbIf](interfaces/ColorRgbIf.md)
@@ -191,6 +200,9 @@
 - [EventSelectionChangedListenerIf](interfaces/EventSelectionChangedListenerIf.md)
 - [ExcelFormattedValueIf](interfaces/ExcelFormattedValueIf.md)
 - [ExcelServiceIf](interfaces/ExcelServiceIf.md)
+- [FillHandleOptionsIf](interfaces/FillHandleOptionsIf.md)
+- [FillRequestIf](interfaces/FillRequestIf.md)
+- [FillValueContextIf](interfaces/FillValueContextIf.md)
 - [FocusModelIf](interfaces/FocusModelIf.md)
 - [FormulaOptionsIf](interfaces/FormulaOptionsIf.md)
 - [GroupRowsOptionsIf](interfaces/GroupRowsOptionsIf.md)
@@ -201,6 +213,8 @@
 - [OnActionTriggeredIf](interfaces/OnActionTriggeredIf.md)
 - [OverlayKindInput](interfaces/OverlayKindInput.md)
 - [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
+- [PendingCellIf](interfaces/PendingCellIf.md)
+- [PendingInputIf](interfaces/PendingInputIf.md)
 - [PivotColumnInfoIf](interfaces/PivotColumnInfoIf.md)
 - [PivotConfigIf](interfaces/PivotConfigIf.md)
 - [PivotTableModelParaIf](interfaces/PivotTableModelParaIf.md)
@@ -260,9 +274,13 @@
 - [AreaIdent](modules.md#areaident)
 - [AreaObjectMapType](modules.md#areaobjectmaptype)
 - [BooleanFunction](modules.md#booleanfunction)
+- [CellChangeSource](modules.md#cellchangesource)
+- [CellValidator](modules.md#cellvalidator)
 - [CheckedType](modules.md#checkedtype)
 - [DivScope](modules.md#divscope)
 - [ExtendedSelectionType](modules.md#extendedselectiontype)
+- [FillDirection](modules.md#filldirection)
+- [FillMode](modules.md#fillmode)
 - [FilterFunction](modules.md#filterfunction)
 - [FocusType](modules.md#focustype)
 - [FormulaBinaryOperator](modules.md#formulabinaryoperator)
@@ -270,6 +288,7 @@
 - [FormulaFunction](modules.md#formulafunction)
 - [FormulaNode](modules.md#formulanode)
 - [FormulaValue](modules.md#formulavalue)
+- [GeBatchEditEventType](modules.md#gebatchediteventtype)
 - [GeOverlayKind](modules.md#geoverlaykind)
 - [GeRowDragEventType](modules.md#gerowdrageventtype)
 - [GeRowDragSource](modules.md#gerowdragsource)
@@ -279,6 +298,7 @@
 - [GetT](modules.md#gett)
 - [HtmlStyle](modules.md#htmlstyle)
 - [IsSameFn](modules.md#issamefn)
+- [PendingChangeResult](modules.md#pendingchangeresult)
 - [PivotValue](modules.md#pivotvalue)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
 - [RowDragColumnOption](modules.md#rowdragcolumnoption)
@@ -376,6 +396,8 @@
 - [canMoveFlatRows](modules.md#canmoveflatrows)
 - [canMoveTreeRows](modules.md#canmovetreerows)
 - [compileFormula](modules.md#compileformula)
+- [computeFillChanges](modules.md#computefillchanges)
+- [computeFillValues](modules.md#computefillvalues)
 - [createFormulaValueGetter](modules.md#createformulavaluegetter)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [createValueGetter](modules.md#createvaluegetter)
@@ -389,6 +411,7 @@
 - [getAggregator](modules.md#getaggregator)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
+- [getFillRange](modules.md#getfillrange)
 - [getInsertBeforeIndex](modules.md#getinsertbeforeindex)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
 - [getTopmostTreeRows](modules.md#gettopmosttreerows)
@@ -401,6 +424,7 @@
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isExcelFormattedValue](modules.md#isexcelformattedvalue)
+- [isFillSeries](modules.md#isfillseries)
 - [isFormulaError](modules.md#isformulaerror)
 - [isGroupRow](modules.md#isgrouprow)
 - [isPercentShowValuesAs](modules.md#ispercentshowvaluesas)
@@ -409,6 +433,7 @@
 - [isRowGroup](modules.md#isrowgroup)
 - [isRowGroupColumnDef](modules.md#isrowgroupcolumndef)
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
+- [isSameCellValue](modules.md#issamecellvalue)
 - [isTreeRow](modules.md#istreerow)
 - [moveArrayItems](modules.md#movearrayitems)
 - [moveFlatRows](modules.md#moveflatrows)
@@ -1557,7 +1582,7 @@ module:myModule.actionIds
 
 #### Defined in
 
-[src/lib/table/action/action-id.type.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L45)
+[src/lib/table/action/action-id.type.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L49)
 
 ___
 
@@ -1579,7 +1604,7 @@ ___
 
 ### actionIds
 
-• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``]
+• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``]
 
 An array of action identifiers.
 
@@ -3493,7 +3518,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L188)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L210)
 
 ___
 
@@ -3919,6 +3944,318 @@ normalizeRowIndices([5, 2, 2, 99, -1], 10);   // [2, 5]
 #### Defined in
 
 [src/lib/table/row-drag/move-rows.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L17)
+
+## Fill handle &amp; batch edit
+
+### CellChangeSource
+
+Ƭ **CellChangeSource**: ``"edit"`` \| ``"fill"`` \| ``"commit"`` \| ``"api"``
+
+What started a change of cells: `"edit"` (cell editor), `"fill"` (fill handle, Ctrl/⌘+D, Ctrl/⌘+R),
+`"commit"` ([TableApi.commitBatchEdit](classes/TableApi.md#commitbatchedit)) or `"api"` ([TableApi.applyCellChanges](classes/TableApi.md#applycellchanges)).
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/batch-edit/cell-change.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L8)
+
+___
+
+### CellValidator
+
+Ƭ **CellValidator**\<`T`\>: (`value`: `unknown`, `row`: `T`) => `string` \| `undefined` \| ``null`` \| `void`
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Type declaration
+
+▸ (`value`, `row`): `string` \| `undefined` \| ``null`` \| `void`
+
+[ColumnDefIf.validate](interfaces/ColumnDefIf.md#validate): a message for an invalid value, `undefined` (or `null`, `""`) for a valid one.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+| `row` | `T` |
+
+##### Returns
+
+`string` \| `undefined` \| ``null`` \| `void`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:201](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L201)
+
+___
+
+### FillDirection
+
+Ƭ **FillDirection**: ``"down"`` \| ``"up"`` \| ``"right"`` \| ``"left"``
+
+The direction of a fill: the fill handle was dragged down, up, right or left of the selected range.
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/fill-direction.type.ts:7](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-direction.type.ts#L7)
+
+___
+
+### FillMode
+
+Ƭ **FillMode**: ``"auto"`` \| ``"alternate"`` \| ``"copy"``
+
+How [computeFillValues](modules.md#computefillvalues) continues the source values:
+- `"auto"`: the default rules – one number is copied, several numbers continue as a linear series, dates and texts
+  with a trailing number count up, everything else repeats;
+- `"alternate"`: the other choice for numbers, dates and texts with a number (⌥/Alt or Ctrl while dragging the fill
+  handle): one number counts up by 1, a series is copied;
+- `"copy"`: always repeat the source values (Ctrl/⌘+D, Ctrl/⌘+R).
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/fill-series.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-series.ts#L12)
+
+___
+
+### GeBatchEditEventType
+
+Ƭ **GeBatchEditEventType**: ``"start"`` \| ``"change"`` \| ``"commit"`` \| ``"cancel"``
+
+What happened in a batch edit: `"start"` ([TableApi.startBatchEdit](classes/TableApi.md#startbatchedit)), `"change"` (values were marked or a
+value was set back), `"commit"` (written), `"cancel"` (discarded).
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-batch-edit-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-batch-edit-event.ts#L10)
+
+___
+
+### computeFillChanges
+
+▸ **computeFillChanges**(`request`): [`CellValueChangeIf`](interfaces/CellValueChangeIf.md)[]
+
+The values a fill writes: per line of the source range (each column when filling down/up, each row when filling
+right/left) the continuation of its values ([computeFillValues](modules.md#computefillvalues)) – DOM-free, the table applies the result with
+[TableApi.applyCellChanges](classes/TableApi.md#applycellchanges).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `request` | [`FillRequestIf`](interfaces/FillRequestIf.md) | source range, direction, count, value access |
+
+#### Returns
+
+[`CellValueChangeIf`](interfaces/CellValueChangeIf.md)[]
+
+one change per fillable target cell (column = model index)
+
+**`Example`**
+
+```ts
+const values = [[1], [2]];                                    // a 2 × 1 source range
+computeFillChanges({
+  source: new CellRange(0, 0, 1, 0), direction: "down", count: 2,
+  getValue: (r, c) => values[r]?.[c],
+});   // [{ rowIndex: 2, column: 0, value: 3 }, { rowIndex: 3, column: 0, value: 4 }]
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/compute-fill-changes.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/compute-fill-changes.ts#L78)
+
+___
+
+### computeFillValues
+
+▸ **computeFillValues**(`sourceValues`, `count`, `backward?`, `mode?`): `unknown`[]
+
+Computes the values of a fill (fill handle, Ctrl/⌘+D): `count` values that continue `sourceValues` – forward
+(down/right) or backward (up/left: the value directly in front of the source first).
+
+| source | `"auto"` | `"alternate"` |
+|---|---|---|
+| one number `5` | 5, 5, 5 | 6, 7, 8 |
+| numbers `1, 2` | 3, 4, 5 (linear; uneven steps: best-fit line) | 1, 2, 1 |
+| date `2026-10-14` (`Date` or ISO text) | +1 day each; several dates a month apart: +1 month (month ends stay month ends) | copied |
+| text with a trailing number `Item 9` | `Item 10`, `Item 11` (leading zeros stay) | copied |
+| anything else | repeated: `A, B` → `A, B, A, B` | repeated |
+
+The type stays: a date text stays a text in the same format, a `Date` stays a `Date`, a number written as text
+stays a text. Decimal noise is rounded (0.1, 0.2 → 0.3, not 0.30000000000000004).
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `sourceValues` | `unknown`[] | `undefined` | the values of one line (column or row) of the source range, in display order |
+| `count` | `number` | `undefined` | the number of values to compute |
+| `backward?` | `boolean` | `false` | fill up/left: the values in front of the source, nearest first |
+| `mode?` | [`FillMode`](modules.md#fillmode) | `"auto"` | see [FillMode](modules.md#fillmode) |
+
+#### Returns
+
+`unknown`[]
+
+`count` values, nearest to the source first
+
+**`Example`**
+
+```ts
+computeFillValues([1, 2], 3);                       // [3, 4, 5]
+computeFillValues([5], 3);                          // [5, 5, 5]
+computeFillValues([5], 3, false, "alternate");      // [6, 7, 8]
+computeFillValues(["2026-10-14"], 2);               // ["2026-10-15", "2026-10-16"]
+computeFillValues(["Item 9"], 2);                   // ["Item 10", "Item 11"]
+computeFillValues([1, 2], 2, true);                 // [0, -1]  (filled upwards)
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/fill-series.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-series.ts#L54)
+
+___
+
+### getFillRange
+
+▸ **getFillRange**(`source`, `direction`, `count`): [`CellRange`](classes/CellRange.md)
+
+The cells a fill covers: the source range extended by `count` rows or columns in `direction`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | [`CellRange`](classes/CellRange.md) | the selected range |
+| `direction` | [`FillDirection`](modules.md#filldirection) | the direction of the fill |
+| `count` | `number` | rows or columns added |
+
+#### Returns
+
+[`CellRange`](classes/CellRange.md)
+
+source and filled cells together
+
+**`Example`**
+
+```ts
+getFillRange(new CellRange(2, 1, 3, 1), "down", 3);   // rows 2…6 of column 1
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/compute-fill-changes.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/compute-fill-changes.ts#L46)
+
+___
+
+### isFillSeries
+
+▸ **isFillSeries**(`sourceValues`, `mode?`): `boolean`
+
+`true` if [computeFillValues](modules.md#computefillvalues) continues the values as a series, `false` if it repeats them.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `sourceValues` | `unknown`[] | `undefined` | the values of one line of the source range |
+| `mode?` | [`FillMode`](modules.md#fillmode) | `"auto"` | see [FillMode](modules.md#fillmode) |
+
+#### Returns
+
+`boolean`
+
+whether the fill is a series
+
+**`Example`**
+
+```ts
+isFillSeries([5]);        // false – one number is copied
+isFillSeries([1, 2]);     // true
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/fill/fill-series.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-series.ts#L82)
+
+___
+
+### isSameCellValue
+
+▸ **isSameCellValue**(`a`, `b`): `boolean`
+
+True if two cell values are the same for a batch edit: `Object.is`, dates by time, a number and the text of the same
+number (an editor without `editInputPipe` returns texts), and `null` / `undefined` / `""` as "empty".
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `a` | `unknown` | one value |
+| `b` | `unknown` | another value |
+
+#### Returns
+
+`boolean`
+
+whether the cell would not change
+
+**`Example`**
+
+```ts
+isSameCellValue(5, "5");                                        // true
+isSameCellValue(new Date(2026, 0, 1), new Date(2026, 0, 1));    // true
+isSameCellValue(undefined, "");                                 // true
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/batch-edit/pending-cell-changes.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L47)
 
 ## DOM
 
@@ -4397,6 +4734,23 @@ The modified string with the suffix removed, or the original string if no suffix
 [src/lib/common/generator/string-util.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/string-util.ts#L31)
 
 ## Internals
+
+### PendingChangeResult
+
+Ƭ **PendingChangeResult**: ``"added"`` \| ``"changed"`` \| ``"removed"`` \| ``"unchanged"``
+
+What [PendingCellChanges.set](classes/PendingCellChanges.md#set) did: a new entry, a changed entry, an entry removed because the value is the
+old one again (B8), or nothing (the value equals the old one and there was no entry).
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/batch-edit/pending-cell-changes.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L29)
+
+___
 
 ### calcOverlayKind
 

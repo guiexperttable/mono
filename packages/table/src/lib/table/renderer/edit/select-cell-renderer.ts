@@ -27,13 +27,14 @@ export class SelectCellRenderer implements CellRendererIf {
     columnIndex: number,
     areaIdent: AreaIdent,
     areaModel: AreaModelIf,
-    _cellValue: any,
+    cellValue: any,
     domService: DomServiceIf): RendererCleanupFnType | undefined {
 
     if (areaModel.isEditable(rowIndex, columnIndex)) {
       domService.addClass(cellDiv, "ge-table-row-select-div");
 
-      const val = areaModel.getValueAt(rowIndex, columnIndex);
+      // the shown value: a pending value of a batch edit (since 1.1.96), otherwise the model value
+      const val = cellValue !== undefined ? cellValue : areaModel.getValueAt(rowIndex, columnIndex);
 
       let opts = [];
       for (let option of this.options) {

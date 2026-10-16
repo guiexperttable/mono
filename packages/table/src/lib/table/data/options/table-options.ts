@@ -14,6 +14,8 @@ import { HeaderGroupOptions } from './header-group-options';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
+import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
+import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 
 
 /**
@@ -108,4 +110,6 @@ export class TableOptions implements TableOptionsIf {
   /** Texts and behaviour of the "Loading…" / "No rows" overlays; missing fields use {@link OverlayOptions}. @since 1.1.92 */
   overlayOptions?: Partial<OverlayOptionsIf> = undefined;
   rowDragOptions?: Partial<RowDragOptionsIf> = undefined;
+  fillHandle?: boolean | Partial<FillHandleOptionsIf> = undefined;
+  batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;
 }

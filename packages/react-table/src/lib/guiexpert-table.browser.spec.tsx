@@ -7,10 +7,10 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
+import type { GeBatchEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -81,6 +81,28 @@ describe('GuiexpertTable (React)', () => {
     expect(rowDragEnd.mock.calls[0][0]).toMatchObject({ type: 'end', moved: true, toIndex: 3 });
     await nextFrame();
     expect(rowTexts(host)[3]).toContain('Row 1');
+  });
+
+  it('fill handle: one modelChanged with all filled cells; batch edit: batchEditChanged (since 1.1.96)', async () => {
+    const modelChanged = vi.fn<(evt: GeModelChangeEvent) => void>();
+    const { tableModel, tableOptions, rows } = createFillModelAndOptions();
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} modelChanged={modelChanged} />);
+    await nextFrame();
+    dragFillHandle(host, 4);
+    expect(rows.map(r => r.qty)).toEqual([1, 2, 3, 4, 5]);
+    expect(modelChanged).toHaveBeenCalledTimes(1);
+    expect(modelChanged.mock.calls[0][0]).toMatchObject({ source: 'fill' });
+    expect(modelChanged.mock.calls[0][0].cells).toHaveLength(3);
+    unmount();
+
+    const batch = createFillModelAndOptions(true);
+    const batchEditChanged = vi.fn<(evt: GeBatchEditEvent) => void>();
+    const host2 = mount(<GuiexpertTable tableModel={batch.tableModel} tableOptions={batch.tableOptions} batchEditChanged={batchEditChanged} />);
+    await nextFrame();
+    dragFillHandle(host2, 3);
+    expect(batch.rows.map(r => r.qty)).toEqual([1, 2, 0, 0, 0]);
+    expect(batchEditChanged).toHaveBeenCalledTimes(1);
+    expect(batchEditChanged.mock.calls[0][0]).toMatchObject({ type: 'change', pendingCount: 2 });
   });
 
   it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {

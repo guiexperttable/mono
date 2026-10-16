@@ -16,3 +16,4 @@ Regeln und Episoden-Backlog: siehe `CLAUDE.md` § 10.
 | 07 | [Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz](07-row-grouping/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.94 (Branch `feat/row-grouping`) |
 | 08 | [Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz](08-pivot-ohne-enterprise/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.94 (Branch `feat/pivot`) |
 | 09 | [Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur](09-zeilen-ziehen/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.95 (Branch `feat/row-drag`) |
+| 10 | [Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln](10-fill-handle-batch-edit/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.96 (Branch `feat/fill-batch`) |

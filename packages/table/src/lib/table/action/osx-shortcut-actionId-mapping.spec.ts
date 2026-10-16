@@ -41,6 +41,8 @@ describe('OsxShortcutActionIdMapping', () => {
       'enter': 'ACTIVATE_CELL',
       'ctrl+alt+up': 'MOVE_ROW_UP',
       'ctrl+alt+down': 'MOVE_ROW_DOWN',
+      'meta+d': 'FILL_DOWN',
+      'meta+r': 'FILL_RIGHT',
       'meta+c': 'COPY_2_CLIPBOARD',
       'ctrl+c': 'COPY_2_CLIPBOARD',
     });

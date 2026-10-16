@@ -31,6 +31,10 @@ export const actionIds = [
   // since 1.1.95 (row drag, keyboard alternative):
   "MOVE_ROW_UP",          // Ctrl+Alt+Up: move the focused row (or the selected rows) one position up
   "MOVE_ROW_DOWN",        // Ctrl+Alt+Down: one position down
+
+  // since 1.1.96 (fill handle, keyboard alternative – used only with tableOptions.fillHandle and a selected range):
+  "FILL_DOWN",            // Ctrl/⌘+D: the top row of the selected range is copied down (one row: the cell above)
+  "FILL_RIGHT",           // Ctrl/⌘+R: the left column is copied right (one column: the cell left of it)
 ] as const;
 
 /**

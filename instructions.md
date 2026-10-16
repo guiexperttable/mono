@@ -2044,6 +2044,49 @@ const tableOptions: TableOptionsIf = {
   clipboard is only read when there is no text, and only its cell texts (no markup ever reaches the page). Safari and
   Firefox are still being checked by hand with Excel and Google Sheets.
 
+### 6.22 Undo and redo (since 1.1.99)
+
+With `undo: true`, **Ctrl/⌘+Z** undoes the last change and **Ctrl+Y** or **Ctrl/⌘+Shift+Z** redoes it. A step is what
+the user did as one action: an edit, a fill (6.17), a paste or cut (6.21), Delete over a range. The cells are found by
+their **row object**, so sorting and filtering in between don't matter.
+
+```ts
+import { EventAdapter, TableOptions } from "@guiexpert/table";
+import type { GeUndoEvent, TableApi, TableOptionsIf } from "@guiexpert/table";
+
+const tableOptions: TableOptionsIf = { ...new TableOptions(), editing: true, clipboard: true, undo: true };
+
+const listener = new EventAdapter();                       // own buttons
+listener.onUndoStackChanged = (evt: GeUndoEvent) => {
+  undoButton.disabled = !evt.canUndo;
+  undoButton.textContent = evt.undoLabel ? `Undo ${evt.undoLabel}` : "Undo";
+};
+const undoButton = document.createElement("button");
+function wire(tableApi: TableApi) {
+  undoButton.addEventListener("click", () => tableApi.undo());
+}
+export { tableOptions, listener, wire };
+```
+
+- **What happens**: the old values are written back with **one** `modelChanged` (`source: "undo"` / `"redo"`), without
+  `editInputPipe` (the values are converted already); the cells are selected and scrolled into view; a screen reader
+  hears “Undo Paste, 6 cells”. A row a filter hides is set back as well (in the same event); a row that left the model
+  is skipped. In the open editor Ctrl/⌘+Z belongs to the editor (the browser's text undo).
+- **Changed by something else** (live data): such a cell is skipped and announced (`onConflict: "skip"`, default) – or
+  overwritten with `onConflict: "overwrite"`.
+- **Options** (`UndoOptionsIf`): `maxSteps` (100, the oldest step is dropped), `maxCells` (1,000,000 over all steps; a
+  larger change empties the history and is announced), `recordApiChanges` (`false`: `api.applyCellChanges(…)` is only
+  recorded with `{ undoable: true }` as third argument).
+- **API**: `undo()`, `redo()`, `canUndo()`, `canRedo()`, `clearUndoHistory()`, `getUndoState()`,
+  `batchUndoable(label, fn)` (several API calls as one step); event `onUndoStackChanged` (`GeUndoEvent`, wrapper event
+  `undoStackChanged`).
+- **Batch edit (6.17)**: undo takes marked values back; commit and cancel empty the history. Undo of an earlier,
+  written change while a batch edit runs marks the old values (cancel keeps the model as it is).
+- **Values your `onModelChanged` derives** with `applyCellChanges` belong to the same step.
+- **Not recorded**: `updateCells`, `setRows` and `api.addRows`/`removeRows` (another rows array empties the history),
+  sorting, filter, row drag. After undo the written cells are selected as one rectangle (after sorting it may span
+  rows in between).
+
 ---
 
 ## 7. Not available yet
@@ -2058,7 +2101,7 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 - No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
   to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
-- No undo/redo yet – it can be built on `tableApi.applyCellChanges()` (6.17). Paste: 6.21.
+- Paste: 6.21, undo and redo: 6.22.
 - Master/detail (6.18) only for flat tables – no detail rows below tree nodes, group rows or pivot rows.
 
 ---

@@ -2,7 +2,7 @@ import {GuiexpertTableProps} from "./GuiexpertTableProps";
 import {createEffect, mergeProps, onCleanup, untrack} from "solid-js";
 import {
   EventListenerIf,
-  FocusModelIf, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  FocusModelIf, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   LicenseManager,
   SelectionModelIf,
   SimpleDomService,
@@ -58,7 +58,8 @@ export default (props: GuiexpertTableProps) => {
     onRowDragEnd: (evt: GeRowDragEvent) => emit("rowDragEnd", evt, merged.rowDragEnd),
     onBatchEditChanged: (evt: GeBatchEditEvent) => emit("batchEditChanged", evt, merged.batchEditChanged),
     onDetailExpandedChanged: (evt: GeDetailEvent) => emit("detailExpandedChanged", evt, merged.detailExpandedChanged),
-    onEditingChanged: (evt: GeEditEvent) => emit("editingChanged", evt, merged.editingChanged)
+    onEditingChanged: (evt: GeEditEvent) => emit("editingChanged", evt, merged.editingChanged),
+    onUndoStackChanged: (evt: GeUndoEvent) => emit("undoStackChanged", evt, merged.undoStackChanged)
   };
 
   let currentScope: TableScope | undefined;

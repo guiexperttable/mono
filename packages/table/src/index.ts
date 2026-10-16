@@ -353,4 +353,15 @@ export * from './lib/table/clipboard/paste-plan';
 export * from './lib/table/clipboard/input-pipes';
 export * from './lib/table/clipboard/clipboard-keymap';
 export * from './lib/table/clipboard/clipboard-service';
+
+// Undo and redo (since 1.1.99, prompt 013 stage 3)
+export * from './lib/table/undo/undo-options.if';
+export * from './lib/table/undo/undo-options';
+export * from './lib/table/undo/undoable.if';
+export * from './lib/table/undo/undo-stack';
+export * from './lib/table/undo/cell-changes-undoable';
+export * from './lib/table/undo/pending-changes-undoable';
+export * from './lib/table/undo/undo-keymap';
+export * from './lib/table/undo/undo-service';
+export * from './lib/table/data/common/event/ge-undo-event';
 export * from './lib/table/data/common/event/ge-edit-event';

@@ -182,4 +182,28 @@ export class AriaTexts implements AriaTextsIf {
   copiedLastRangeOnly(): string {
     return "Only the last selected range was copied";
   }
+
+  undone(label: string, cellCount: number): string {
+    return `Undo ${label}, ${cellCount === 1 ? "1 cell" : `${cellCount} cells`}`;
+  }
+
+  redone(label: string, cellCount: number): string {
+    return `Redo ${label}, ${cellCount === 1 ? "1 cell" : `${cellCount} cells`}`;
+  }
+
+  nothingToUndo(): string {
+    return "Nothing to undo";
+  }
+
+  nothingToRedo(): string {
+    return "Nothing to redo";
+  }
+
+  undoSkipped(cellCount: number): string {
+    return `${cellCount === 1 ? "1 cell" : `${cellCount} cells`} skipped`;
+  }
+
+  undoHistoryCleared(maxCells: number): string {
+    return `This change cannot be undone (more than ${maxCells} cells)`;
+  }
 }

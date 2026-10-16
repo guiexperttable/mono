@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -207,6 +207,18 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onEditingChanged(evt: GeEditEvent): void {
     this.editingChanged.next(evt);
+  }
+
+  /**
+   * The undo history changed (undo and redo) – to enable and label own buttons.
+   *
+   * @since 1.1.99
+   */
+  @Output()
+  undoStackChanged: Subject<GeUndoEvent> = new Subject<GeUndoEvent>();
+
+  onUndoStackChanged(evt: GeUndoEvent): void {
+    this.undoStackChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

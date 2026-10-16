@@ -1,4 +1,5 @@
 import type { GeEditEvent } from './data/common/event/ge-edit-event';
+import type { GeUndoEvent } from './data/common/event/ge-undo-event';
 import type { GeDetailEvent } from './data/common/event/ge-detail-event';
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
@@ -127,4 +128,12 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.99
    */
   onEditingChanged?(evt: GeEditEvent): void;
+
+  /**
+   * The undo history changed (undo and redo, {@link TableOptionsIf.undo}) – to enable and label own buttons. Optional.
+   *
+   * @param {GeUndoEvent} evt - can undo/redo, labels, size
+   * @since 1.1.99
+   */
+  onUndoStackChanged?(evt: GeUndoEvent): void;
 }

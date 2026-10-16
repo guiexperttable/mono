@@ -120,6 +120,24 @@ export class PendingCellChanges {
   }
 
   /**
+   * Puts an entry back as it was (undo/redo of a batch edit step) – without comparing it with the old value.
+   *
+   * @param {PendingCellIf} entry - the entry
+   * @since 1.1.99
+   */
+  put(entry: PendingCellIf): void {
+    let cells = this.rows.get(entry.rowKey);
+    if (!cells) {
+      cells = new Map();
+      this.rows.set(entry.rowKey, cells);
+    }
+    if (!cells.has(entry.property)) {
+      this.count++;
+    }
+    cells.set(entry.property, { ...entry });
+  }
+
+  /**
    * The pending entry of a cell.
    *
    * @param {unknown} rowKey - the row object (or index)

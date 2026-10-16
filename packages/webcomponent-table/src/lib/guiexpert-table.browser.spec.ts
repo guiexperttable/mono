@@ -1,7 +1,7 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
@@ -150,6 +150,20 @@ describe('GuiexpertTable (Web Component)', () => {
     expect([plain.rows[1].qty, plain.rows[2].qty]).toEqual([4, 5]);
     expect(changes).toHaveLength(1);
     expect(changes[0].source).toBe('paste');
+  });
+
+  it('undo and redo: "undoStackChanged" (bubbling) (since 1.1.99)', async () => {
+    const { host, el, events } = createTableElement();
+    const received: GeUndoEvent[] = [];
+    host.addEventListener('undoStackChanged', e => received.push((e as CustomEvent<GeUndoEvent>).detail));
+    const plain = createFillModelAndOptions();
+    el.data = data(plain.tableModel, { ...plain.tableOptions, fillHandle: false, undo: true });
+    await nextFrame();
+    const api = events.tableReady[0];
+    api.applyCellChanges([{ rowIndex: 1, column: 1, value: 6 }], 'edit');
+    api.undo();
+    expect(received.map(e => [e.canUndo, e.canRedo])).toEqual([[true, false], [false, true]]);
+    expect(received[0]).toBeInstanceOf(GeUndoEvent);
   });
 
   it('master/detail: "detailExpandedChanged" (bubbling), a nested table in the detail, removal destroys it (since 1.1.97)', async () => {

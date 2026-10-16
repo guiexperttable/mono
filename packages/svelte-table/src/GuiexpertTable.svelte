@@ -77,6 +77,11 @@
    * @type {((evt: import("@guiexpert/table").GeEditEvent) => void) | undefined}
    */
   export let onEditingChanged = undefined;
+  /**
+   * Undo and redo (since 1.1.99): the undo history changed.
+   * @type {((evt: import("@guiexpert/table").GeUndoEvent) => void) | undefined}
+   */
+  export let onUndoStackChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -104,7 +109,8 @@
     onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); },
     onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); },
     onDetailExpandedChanged: (evt) => { dispatch("detailExpandedChanged", evt); onDetailExpandedChanged?.(evt); },
-    onEditingChanged: (evt) => { dispatch("editingChanged", evt); onEditingChanged?.(evt); }
+    onEditingChanged: (evt) => { dispatch("editingChanged", evt); onEditingChanged?.(evt); },
+    onUndoStackChanged: (evt) => { dispatch("undoStackChanged", evt); onUndoStackChanged?.(evt); }
   };
 
   /**

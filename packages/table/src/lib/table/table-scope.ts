@@ -77,6 +77,12 @@ import { clipboardShortcutLayer } from './clipboard/clipboard-keymap';
 import { ClipboardOptions } from './clipboard/clipboard-options';
 import type { ClipboardOptionsIf } from './clipboard/clipboard-options.if';
 import { ClipboardService } from './clipboard/clipboard-service';
+import { undoShortcutLayer } from './undo/undo-keymap';
+import { UndoOptions } from './undo/undo-options';
+import type { UndoOptionsIf } from './undo/undo-options.if';
+import { UndoService } from './undo/undo-service';
+import type { PendingSnapshotIf } from './undo/pending-changes-undoable';
+import { isSameCellValue } from './batch-edit/pending-cell-changes';
 import { findDataEdge } from './sheet-editing/sheet-navigation';
 import type { ShortcutActionIdMapping } from './action/shortcut-actionid-mapping.type';
 import { GeEditEvent } from './data/common/event/ge-edit-event';
@@ -146,7 +152,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   readonly liveAnnouncer: LiveAnnouncer;
   /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
-  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT', 'CLEAR_CELLS', 'CLEAR_AND_EDIT', 'CUT_2_CLIPBOARD', 'PASTE_FROM_CLIPBOARD'];
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT', 'CLEAR_CELLS', 'CLEAR_AND_EDIT', 'CUT_2_CLIPBOARD', 'PASTE_FROM_CLIPBOARD', 'UNDO', 'REDO'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
@@ -173,6 +179,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private readonly clipboardOptions?: ClipboardOptionsIf = ClipboardOptions.create(this.tableOptions?.clipboard);
   /** Copy, cut and paste: with the option keys and events, otherwise created for the API. @since 1.1.99 */
   clipboardService?: ClipboardService;
+  /** Undo and redo (`tableOptions.undo`), `undefined` = off. @since 1.1.99 */
+  private readonly undoOptions?: UndoOptionsIf = UndoOptions.create(this.tableOptions?.undo);
+  /** Undo and redo: records the changes of the write path (only with the option). @since 1.1.99 */
+  undoService?: UndoService;
   /** The key event the {@link ShortcutService} is handling right now (`undefined` for `triggerAction`). @since 1.1.99 */
   shortcutKeyEvent?: KeyboardEvent;
 
@@ -211,6 +221,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     if (this.clipboardOptions) {
       this.clipboardService = new ClipboardService(this, this.clipboardOptions, true); // since 1.1.99
+    }
+    if (this.undoOptions) {
+      this.undoService = new UndoService(this, this.undoOptions); // since 1.1.99
     }
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
@@ -376,6 +389,14 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         return true;
       }
     }
+    if (this.undoService && (actionId === 'UNDO' || actionId === 'REDO')) {
+      if (actionId === 'UNDO') {
+        this.undoService.undo();
+      } else {
+        this.undoService.redo();
+      }
+      return true; // also with nothing to undo: the browser's undo has nothing to do on the grid
+    }
     if (this.clipboardService && this.clipboardOptions
       && (actionId === 'COPY_2_CLIPBOARD' || actionId === 'CUT_2_CLIPBOARD' || actionId === 'PASTE_FROM_CLIPBOARD')) {
       const kind = actionId === 'COPY_2_CLIPBOARD' ? 'copy' : actionId === 'CUT_2_CLIPBOARD' ? 'cut' : 'paste';
@@ -423,6 +444,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const editing = this.editingOptions;
     if (this.clipboardOptions) {
       layers.push(clipboardShortcutLayer(mac));
+    }
+    if (this.undoOptions) {
+      layers.push(undoShortcutLayer(mac));
     }
     if (!editing) {
       return layers;
@@ -1292,17 +1316,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @returns {CellChangeIf[]} the written (or, in a batch edit, newly pending) cells
    * @since 1.1.96
    */
-  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = 'api'): CellChangeIf[] {
+  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = 'api', opts: { undoable?: boolean } = {}): CellChangeIf[] {
     const cells = this.resolveCellChanges(changes);
     if (!cells.length) {
       return [];
     }
     if (this.batchEditService?.isActive()) {
-      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true);
+      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true,
+        false, source, opts.undoable);
       this.repaint();
       return ret;
     }
-    return this.writeCellsInternal(cells, source, {}).changes;
+    return this.writeCellsInternal(cells, source, { undoable: opts.undoable }).changes;
   }
 
   /**
@@ -1324,7 +1349,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     cells: { rowIndex: number; columnIndex: number; value: unknown }[],
     source: CellChangeSource,
     opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void; deferRepaint?: boolean;
-      raw?: boolean }
+      raw?: boolean; undoable?: boolean }
   ): { changes: CellChangeIf[]; invalid: number; message?: string } {
     const body = this.tableModel.getBodyModel();
     const rowCountBefore = body.getRowCount();
@@ -1369,6 +1394,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (!all.length) {
       return { changes: all, invalid, message: firstMessage || undefined };
     }
+    this.undoService?.record(all, source, opts.undoable); // one step per write (since 1.1.99)
     opts.beforeRepaint?.();
     // only body rows changed: models may recompute less (a row grouping only the groups of these rows)
     const derived: DerivedValuesChangeIf | undefined = opts.extraChanges?.length
@@ -1385,14 +1411,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     // values the app derives in onModelChanged (and repaints) are counted by the next repaint
     this.invalidateAggregates(derived);
-    if (source === 'edit' && all.length === 1) {
-      // the same event as before 1.1.96 (createSingle) – plus the change
-      const evt = GeModelChangeEvent.createSingle(all[0].rowIndex, all[0].columnIndex);
-      evt.changes = all;
-      evt.source = source;
-      this.eventListener.onModelChanged?.(evt);
-    } else {
-      this.eventListener.onModelChanged?.(GeModelChangeEvent.createForChanges(all, source));
+    // writes of onModelChanged handlers (derived values) belong to this undo step (since 1.1.99)
+    this.undoService?.beginFold();
+    try {
+      if (source === 'edit' && all.length === 1) {
+        // the same event as before 1.1.96 (createSingle) – plus the change
+        const evt = GeModelChangeEvent.createSingle(all[0].rowIndex, all[0].columnIndex);
+        evt.changes = all;
+        evt.source = source;
+        this.eventListener.onModelChanged?.(evt);
+      } else {
+        this.eventListener.onModelChanged?.(GeModelChangeEvent.createForChanges(all, source));
+      }
+    } finally {
+      this.undoService?.endFold();
     }
     return { changes: all, invalid, message: firstMessage || undefined };
   }
@@ -1432,7 +1464,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return [];
     }
     if (this.batchEditService?.isActive()) {
-      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true, raw);
+      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true, raw, source);
       this.repaint();
       return ret;
     }
@@ -1477,6 +1509,59 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     return !!this.batchEditService?.isActive();
   }
 
+  /** The options of undo and redo ({@link TableOptionsIf.undo}), `undefined` if it is off. @since 1.1.99 */
+  getUndoOptions(): UndoOptionsIf | undefined {
+    return this.undoOptions;
+  }
+
+  /**
+   * Writes the values of an undo or redo: without `editInputPipe` (the values were piped already) and validation, only
+   * editable cells; cells of hidden rows (`hidden`, written into their objects already) in the same event; no new
+   * step.
+   *
+   * @param {{ rowIndex: number, columnIndex: number, value: unknown }[]} cells - shown cells
+   * @param {CellChangeIf[]} hidden - cells of rows a filter hides
+   * @param {"undo" | "redo"} source - reported in the event
+   * @returns {CellChangeIf[]} the written cells (including `hidden`)
+   * @since 1.1.99
+   */
+  writeUndoCells(cells: { rowIndex: number; columnIndex: number; value: unknown }[], hidden: CellChangeIf[],
+                 source: 'undo' | 'redo'): CellChangeIf[] {
+    if (!cells.length && !hidden.length) {
+      return [];
+    }
+    const body = this.tableModel.getBodyModel();
+    if (this.batchEditService?.isActive()) {
+      // a batch edit runs: undo marks the old values (cancel takes them back); hidden rows can't be marked
+      const ret = cells.length ? this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })),
+        true, true, source) : [];
+      this.repaint();
+      return ret;
+    }
+    const ret = this.writeCellsInternal(cells, source, { raw: true, skipValidation: true, extraChanges: hidden }).changes;
+    if (hidden.length && isAreaModelRowGroups(body)) {
+      body.regroup(); // values written past setValue may belong to another group now
+      this.invalidateAggregates();
+      this.repaintHard();
+    }
+    return ret;
+  }
+
+  /** The texts of undo and redo (own functions of `tableOptions.ariaTexts`, otherwise English). @since 1.1.99 */
+  getUndoTexts(): Required<Pick<AriaTextsIf, 'undone' | 'redone' | 'nothingToUndo' | 'nothingToRedo' | 'undoSkipped' |
+    'undoHistoryCleared'>> {
+    const texts = (this.ariaTexts ?? {}) as Partial<AriaTextsIf>;
+    const defaults = new AriaTexts();
+    return {
+      undone: (l: string, n: number) => (texts.undone ?? defaults.undone).call(texts, l, n),
+      redone: (l: string, n: number) => (texts.redone ?? defaults.redone).call(texts, l, n),
+      nothingToUndo: () => (texts.nothingToUndo ?? defaults.nothingToUndo).call(texts),
+      nothingToRedo: () => (texts.nothingToRedo ?? defaults.nothingToRedo).call(texts),
+      undoSkipped: (n: number) => (texts.undoSkipped ?? defaults.undoSkipped).call(texts, n),
+      undoHistoryCleared: (n: number) => (texts.undoHistoryCleared ?? defaults.undoHistoryCleared).call(texts, n),
+    };
+  }
+
   /** True while an overlay blocks the table ("Loading…"). @since 1.1.99 */
   isOverlayBlocking(): boolean {
     return this.tableOverlay.isBlocking();
@@ -1508,16 +1593,37 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /** Marks values as pending (batch edit): pipe, validation, then the batch edit service. */
-  private markPending(changes: CellValueChangeIf[], resolved: boolean, raw = false): CellChangeIf[] {
+  private markPending(changes: CellValueChangeIf[], resolved: boolean, raw = false,
+                      source: CellChangeSource = 'edit', undoable?: boolean): CellChangeIf[] {
     const cells = resolved
       ? changes.map(c => ({ rowIndex: c.rowIndex, columnIndex: c.column as number, value: c.value }))
       : this.resolveCellChanges(changes, false);
+    const batch = this.batchEditService!;
+    // undo (since 1.1.99): the pending state of the cells before …
+    const snapshots: PendingSnapshotIf[] | undefined = this.undoService
+      ? cells.map(({ rowIndex, columnIndex }) => {
+        const rowKey = batch.rowKeyOf(rowIndex);
+        const property = batch.propertyOf(columnIndex);
+        const before = batch.getPendingEntry(rowKey, property);
+        return { rowKey, property, before: before ? { ...before } : undefined };
+      })
+      : undefined;
     const inputs: PendingInputIf[] = cells.map(({ rowIndex, columnIndex, value }) => {
       const piped = raw ? value : this.pipeCellValue(rowIndex, columnIndex, value);
       const error = this.validateCellValue(rowIndex, columnIndex, piped);
       return { rowIndex, columnIndex, value: piped, rawValue: value, ...(error ? { error } : {}) };
     });
-    return this.batchEditService!.addPending(inputs);
+    const ret = batch.addPending(inputs);
+    if (snapshots && ret.length) {
+      // … and after: one step for the cells whose pending state changed
+      for (const snapshot of snapshots) {
+        const after = batch.getPendingEntry(snapshot.rowKey, snapshot.property);
+        snapshot.after = after ? { ...after } : undefined;
+      }
+      this.undoService!.recordPending(snapshots.filter(s => (!s.before !== !s.after)
+        || (!!s.before && !!s.after && !isSameCellValue(s.before.newValue, s.after.newValue))), source, undoable);
+    }
+    return ret;
   }
 
   /**

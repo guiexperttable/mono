@@ -20,6 +20,7 @@ const METHODS = [
   'onScroll',
   'onSelectionChanged',
   'onStateChanged',  // since 1.1.92
+  'onUndoStackChanged', // since 1.1.99
 ];
 
 describe('EventAdapter', () => {

@@ -324,4 +324,48 @@ export interface AriaTextsIf {
    * @since 1.1.99
    */
   copiedLastRangeOnly?(): string;
+
+  /**
+   * Announced after Ctrl/⌘+Z (undo and redo, `tableOptions.undo`).
+   *
+   * @param {string} label - the step: `"Edit"`, `"Paste"`, `"Fill"` …
+   * @param {number} cellCount - cells written back
+   * @returns {string} default: `"Undo Paste, 6 cells"`
+   * @since 1.1.99
+   */
+  undone?(label: string, cellCount: number): string;
+
+  /**
+   * Announced after Ctrl+Y / Ctrl/⌘+Shift+Z.
+   *
+   * @param {string} label - the step
+   * @param {number} cellCount - cells written again
+   * @returns {string} default: `"Redo Paste, 6 cells"`
+   * @since 1.1.99
+   */
+  redone?(label: string, cellCount: number): string;
+
+  /** @returns {string} default: `"Nothing to undo"` @since 1.1.99 */
+  nothingToUndo?(): string;
+
+  /** @returns {string} default: `"Nothing to redo"` @since 1.1.99 */
+  nothingToRedo?(): string;
+
+  /**
+   * Added to the undo/redo announcement when cells were left out (changed meanwhile, row gone, read only).
+   *
+   * @param {number} cellCount - cells left out
+   * @returns {string} default: `"2 cells skipped"`
+   * @since 1.1.99
+   */
+  undoSkipped?(cellCount: number): string;
+
+  /**
+   * Announced when one change has more cells than `UndoOptionsIf.maxCells`: the history is emptied.
+   *
+   * @param {number} maxCells - the limit
+   * @returns {string} default: `"This change cannot be undone (more than 1000000 cells)"`
+   * @since 1.1.99
+   */
+  undoHistoryCleared?(maxCells: number): string;
 }

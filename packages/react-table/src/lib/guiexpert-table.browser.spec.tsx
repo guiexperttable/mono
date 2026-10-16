@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
+import type { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
 import type { DetailComponentProps } from './detail-component-renderer-wrapper';
@@ -187,6 +187,20 @@ describe('GuiexpertTable (React)', () => {
     expect([rows[1].qty, rows[2].qty]).toEqual([8, 9]);
     expect(modelChanged).toHaveBeenCalledTimes(1);
     expect(modelChanged.mock.calls[0][0].source).toBe('paste');
+  });
+
+  it('undo and redo: undoStackChanged after a change and after api.undo() (since 1.1.99)', async () => {
+    const undoStackChanged = vi.fn<(evt: GeUndoEvent) => void>();
+    const { tableModel, tableOptions, rows } = createFillModelAndOptions();
+    let api: TableApi | undefined;
+    mount(<GuiexpertTable tableModel={tableModel} tableOptions={{ ...tableOptions, fillHandle: false, undo: true }}
+                          tableReady={a => api = a} undoStackChanged={undoStackChanged} />);
+    await nextFrame();
+    api!.applyCellChanges([{ rowIndex: 1, column: 1, value: 5 }], 'edit');
+    expect(undoStackChanged.mock.calls.at(-1)![0]).toMatchObject({ canUndo: true, undoLabel: 'Edit' });
+    api!.undo();
+    expect(rows[1].qty).not.toBe(5);
+    expect(undoStackChanged.mock.calls.at(-1)![0]).toMatchObject({ canUndo: false, canRedo: true });
   });
 
   it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {

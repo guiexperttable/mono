@@ -465,6 +465,18 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Escape/andere Änderung (`subscribe` → `onModelChanged`) hebt die Marke auf. Extern ohne Pipe: wie der Editor (Zahl in
   Zahlzelle, TRUE/FALSE, ISO-Datum). `CellChangeSource` + `"paste"`, `"cut"`; API `copySelection`, `cutSelection`,
   `pasteText`, `getSelectionAsText`, `cancelCut`. CSS `css/table-clipboard.css`, `--ge-table-cut-range-border(-alt)`.
+- **Undo/Redo (seit 1.1.99, `undo/`, Design 013 Teil 3)**: `tableOptions.undo` (`UndoOptionsIf`: `maxSteps`, `maxCells`,
+  `onConflict` skip|overwrite, `recordApiChanges`). `UndoService` (`tableScope.undoService`, nur mit Option) zeichnet in
+  `writeCellsInternal` auf (`record(all, source, opts.undoable)`; nicht `"undo"`/`"redo"`, `"api"` nur mit
+  `recordApiChanges` bzw. `applyCellChanges(…, source, { undoable })`, `"commit"` leert) und in `markPending`
+  (Batch: Vormerk-Zustand vorher/nachher → `PendingChangesUndoable`, `BatchEditService.getPendingEntry/restorePending`,
+  `PendingCellChanges.put`; Commit/Cancel leeren). DOM-frei `UndoStack` (Grenzen Schritte/Zellen). `CellChangesUndoable`:
+  Zuordnung über Zeilenobjekt (Map einmal je Undo), Spalte über Property; ausgefilterte Zeile → `writeRowValue`
+  (`batch-edit/write-row-value.ts`) + `extraChanges`; Schreiben über `TableScope.writeUndoCells` (roh, ohne Validierung,
+  nur editierbare Zellen). `setRows` erkannt am anderen `getAllRows()`-Array → Verlauf leer. `batchUndoable(label, fn)`
+  fasst zusammen (`GroupUndoable`). Tasten `undoShortcutLayer(mac)` (`UNDO`, `REDO`), im Editor nicht (INPUT-Ziel).
+  Event `onUndoStackChanged` (`GeUndoEvent`, Wrapper `undoStackChanged`), API `undo`, `redo`, `canUndo`, `canRedo`,
+  `clearUndoHistory`, `getUndoState`, `batchUndoable`. `CellChangeSource` + `"undo"`, `"redo"`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -484,7 +496,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
-seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`.
+seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -505,7 +517,7 @@ Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Compone
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
-(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`) – und je Wrapper `DetailComponentRendererWrapper`
+(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`), `undoStackChanged` (`GeUndoEvent`) – und je Wrapper `DetailComponentRendererWrapper`
 (Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`). `direction` (1.1.98) ist eine Option wie jede
 andere: kein Wrapper-Code, ein neues Options-Objekt baut neu auf (Smoke-Tests React + Web Component).
 
@@ -552,7 +564,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 622 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 635 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,

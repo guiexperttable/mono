@@ -447,6 +447,24 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Styles in `css/table-sheet-editing.css`) und `RenderScope.setEditorDraft` (Text des Zell-Editors bleibt über Repaints;
   wiederhergestellt = `data-ge-restored`, `InputHandler` übernimmt per Enter/`focusout`). CSS `css/table-sheet-editing.css`,
   `--ge-table-cell-editor-*`.
+- **Zwischenablage (seit 1.1.99, `clipboard/`, Design 013 Teil 2)**: `tableOptions.clipboard` (`ClipboardOptionsIf`:
+  `copyHeaders`, `copyValue` text|raw, `html`, `pasteAddsRows` + `createRow`, `maxPasteCells`, `processCopy`,
+  `processPaste`). `ClipboardService` (`tableScope.clipboardService`; mit Option Tasten + Events, sonst über
+  `getClipboardService()` nur für die API): `copy`/`cut`/`paste`-Events am `document` (nur wenn der Host fokussiert ist
+  oder das Event am Proxy hängt). Tasten über die Schicht `clipboardShortcutLayer(mac)` (`COPY_2_CLIPBOARD`,
+  `CUT_2_CLIPBOARD`, `PASTE_FROM_CLIPBOARD`; Strg+X ersetzt nur hier `DESELECT_ALL`): `onActionTriggered` → `arm()`
+  fokussiert für den Tastendruck ein verstecktes `textarea.ge-table-clipboard-proxy` (Safari feuert sonst nichts),
+  Aktion **nicht** verbraucht → Browser feuert das Event dort → Fokus zurück an den Host (sofort bzw. `setTimeout 0`).
+  Eigener `CopyServiceIf` (nicht `instanceof CopyService`): Kopieren bleibt beim alten async Weg. DOM-frei: `tsv.ts`
+  (`toTsv`/`parseTsv`, Excel-Quoting), `paste-plan.ts` (`computePastePlan`, `getPasteSize`: Kacheln, Abschneiden,
+  angezeigte Zeilen, sichtbare Spalten), `input-pipes.ts` (`createNumberInputPipe`, `createDateInputPipe`,
+  `booleanInputPipe`, `sheetInputPipe`); `clipboard-html.ts` (`toHtmlTable` mit `x:num`, `parseHtmlTable` per
+  `DOMParser`, nur `textContent`). Intern kopiert (gleicher Text wie der Speicher) = **Werte roh** (`writePastedCells`
+  mit `raw`: `editInputPipe` für den Aufruf ausgehängt, `validate` läuft). Ausschneiden: Rahmen `ge-table-cut-range`
+  (`afterRenderPass`), Quelle über Zeilenobjekte, Ziel + geleerte Quelle in **einem** `writePastedCells(…, "cut")`;
+  Escape/andere Änderung (`subscribe` → `onModelChanged`) hebt die Marke auf. Extern ohne Pipe: wie der Editor (Zahl in
+  Zahlzelle, TRUE/FALSE, ISO-Datum). `CellChangeSource` + `"paste"`, `"cut"`; API `copySelection`, `cutSelection`,
+  `pasteText`, `getSelectionAsText`, `cancelCut`. CSS `css/table-clipboard.css`, `--ge-table-cut-range-border(-alt)`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -466,7 +484,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
-seit 1.1.98 `direction`, seit 1.1.99 `editing`.
+seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -534,7 +552,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 603 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 622 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,

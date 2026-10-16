@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   actionIds,
+  clipboardShortcutLayer,
   editingShortcutLayer,
   createHarmonizedShortcutByKeyboardEvent,
   harmonizeShortcut,
@@ -72,8 +73,9 @@ describe('WindowsShortcutActionIdMapping', () => {
     }
   });
 
-  it('covers every ActionId with at least one shortcut – together with the Excel-style editing layer (1.1.99)', () => {
-    expect(new Set([...Object.values(mapping), ...Object.values(editingShortcutLayer(false))])).toEqual(new Set(actionIds));
+  it('covers every ActionId with at least one shortcut – together with the editing and clipboard layers (1.1.99)', () => {
+    expect(new Set([...Object.values(mapping), ...Object.values(editingShortcutLayer(false)),
+      ...Object.values(clipboardShortcutLayer(false))])).toEqual(new Set(actionIds));
   });
 
   it('returns a new object on every call', () => {

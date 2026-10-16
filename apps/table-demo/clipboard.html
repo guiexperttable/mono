@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+  Copy, cut and paste like Excel (since 1.1.99, prompt 013 stage 2).
+  Start: pnpm serve:table-demo → http://localhost:4200/clipboard.html
+  Manual check (Chrome, Firefox, Safari): copy B2:C4 → paste into Excel / Google Sheets / LibreOffice and back;
+  a cell with a line break; cut + paste; the Edit menu of the browser; a screen reader announces "… cells pasted".
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – Copy, cut and paste</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 900px; }
+    .bar { display: flex; gap: 16px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .table-div { height: 420px; width: 100%; max-width: 980px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+    textarea { width: 100%; max-width: 980px; height: 70px; font: 13px ui-monospace, monospace; }
+    kbd { font: 12px ui-monospace, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+<h1>Orders – copy, cut and paste</h1>
+<p>Select cells, <kbd>Ctrl/⌘</kbd>+<kbd>C</kbd> and paste into Excel or Google Sheets – and back with
+  <kbd>Ctrl/⌘</kbd>+<kbd>V</kbd>. A single value fills the selected range, a block is tiled. <kbd>Ctrl/⌘</kbd>+<kbd>X</kbd>
+  marks the cells; they move on the next paste (<kbd>Esc</kbd> cancels). <i>Id</i> is read only, prices take
+  “1.234,56” (de-DE) as well.</p>
+<div class="bar">
+  <button id="copy" type="button">Copy (API)</button>
+  <button id="cut" type="button">Cut (API)</button>
+  <button id="paste" type="button">Paste the text below (API)</button>
+  <label><input id="addRows" type="checkbox" checked> paste adds rows</label>
+  <label><input id="headers" type="checkbox"> copy headers</label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<textarea id="text" aria-label="Text to paste">Laptop	2	1299
+Dock	1	189</textarea>
+<pre id="log" aria-live="off"></pre>
+<script src="/src/clipboard/clipboard-demo.ts" type="module"></script>
+</body>
+</html>

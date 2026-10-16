@@ -49,6 +49,8 @@ describe('actionIds', () => {
       'SELECT_COLUMN',
       'CLEAR_CELLS',
       'CLEAR_AND_EDIT',
+      'CUT_2_CLIPBOARD',
+      'PASTE_FROM_CLIPBOARD',
     ]);
   });
 

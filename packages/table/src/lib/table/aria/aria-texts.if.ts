@@ -279,4 +279,49 @@ export interface AriaTextsIf {
    * @since 1.1.99
    */
   gridEditingHint?(): string;
+
+  /**
+   * Announced after Ctrl/⌘+V (copy, cut and paste, `tableOptions.clipboard`).
+   *
+   * @param {number} cellCount - the number of pasted cells
+   * @param {number} skippedCount - cells left out (read only, invalid, cut off at the last column)
+   * @returns {string} default: `"6 cells pasted"`, `"4 cells pasted, 2 skipped"`
+   * @since 1.1.99
+   */
+  cellsPasted?(cellCount: number, skippedCount: number): string;
+
+  /**
+   * Announced when more cells should be pasted than `ClipboardOptionsIf.maxPasteCells` allows.
+   *
+   * @param {number} maxCells - the limit
+   * @returns {string} default: `"Too many cells to paste (at most 1000000)"`
+   * @since 1.1.99
+   */
+  pasteTooLarge?(maxCells: number): string;
+
+  /**
+   * Announced when more cells should be copied than `CopyService.maxCopyCells` allows.
+   *
+   * @param {number} maxCells - the limit
+   * @returns {string} default: `"Too many cells to copy (at most 1000000)"`
+   * @since 1.1.99
+   */
+  copyTooLarge?(maxCells: number): string;
+
+  /**
+   * Announced after Ctrl/⌘+X: the cells are marked and move on the next paste.
+   *
+   * @param {number} cellCount - the number of cut cells
+   * @returns {string} default: `"6 cells cut, paste to move them"`
+   * @since 1.1.99
+   */
+  cutMarked?(cellCount: number): string;
+
+  /**
+   * Announced when several ranges are selected and only the last one is copied (like Google Sheets).
+   *
+   * @returns {string} default: `"Only the last selected range was copied"`
+   * @since 1.1.99
+   */
+  copiedLastRangeOnly?(): string;
 }

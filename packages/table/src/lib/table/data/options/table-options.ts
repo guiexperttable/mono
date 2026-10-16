@@ -18,6 +18,7 @@ import { OverlayOptionsIf } from "./overlay-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
+import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 
 
@@ -132,6 +133,8 @@ export class TableOptions implements TableOptionsIf {
   batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;
   /** Excel-style editing ({@link TableOptionsIf.editing}). Not set = off. @since 1.1.99 */
   editing?: boolean | Partial<EditingOptionsIf> = undefined;
+  /** Copy, cut and paste ({@link TableOptionsIf.clipboard}). Not set = off. @since 1.1.99 */
+  clipboard?: boolean | Partial<ClipboardOptionsIf> = undefined;
   /**
    * Writing direction (`"ltr"` | `"rtl"` | `"auto"`). Not set = `"ltr"`; a nested table (master/detail) without its
    * own value takes the direction of the outer table. @since 1.1.98

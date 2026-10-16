@@ -135,6 +135,23 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(received[0]).toBeInstanceOf(GeEditEvent);
   });
 
+  it('copy, cut and paste: a paste reports "modelChanged" once with source "paste" (since 1.1.99)', async () => {
+    const { host, el } = createTableElement();
+    const changes: GeModelChangeEvent[] = [];
+    host.addEventListener('modelChanged', e => changes.push((e as CustomEvent<GeModelChangeEvent>).detail));
+    const plain = createFillModelAndOptions();
+    el.data = data(plain.tableModel, { ...plain.tableOptions, fillHandle: false, editing: true, clipboard: true });
+    await nextFrame();
+    await userEvent.click(bodyCell(el, 1, 1));
+    const dt = new DataTransfer();
+    dt.setData('text/plain', '4\n5');
+    el.querySelector<HTMLElement>('[role="grid"], [role="treegrid"]')!.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    expect([plain.rows[1].qty, plain.rows[2].qty]).toEqual([4, 5]);
+    expect(changes).toHaveLength(1);
+    expect(changes[0].source).toBe('paste');
+  });
+
   it('master/detail: "detailExpandedChanged" (bubbling), a nested table in the detail, removal destroys it (since 1.1.97)', async () => {
     const { host, el, events } = createTableElement();
     const received: GeDetailEvent[] = [];

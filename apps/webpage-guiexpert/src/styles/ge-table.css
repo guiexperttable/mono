@@ -990,3 +990,54 @@ select.ge-table-cell-editor-select {
   padding: 0;
   padding-inline-start: 8px;
 }
+
+/* Copy, cut and paste (since 1.1.99) – as in packages/table/css/table-clipboard.css + table-color-vars.css */
+html[data-theme= "light"] {
+  --ge-table-cut-range-border: #0a6ebd;
+  --ge-table-cut-range-border-alt: #9ec9ec;
+}
+
+html[data-theme= "dark"] {
+  --ge-table-cut-range-border: #8ab4f8;
+  --ge-table-cut-range-border-alt: #3c5a85;
+}
+
+
+/* the hidden text field that gets the focus for the moment of Ctrl/⌘+C, X, V (the browser fires its clipboard event there) */
+.ge-table-clipboard-proxy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  resize: none;
+  pointer-events: none;
+}
+
+/* cut cells: a dashed frame ("marching ants") until they are pasted, Escape or another change */
+.ge-table-cut-range {
+  position: absolute;
+  display: none;
+  z-index: 8998; /* below the fill preview (8999) and the editor (9500) */
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 2px dashed var(--ge-table-cut-range-border);
+  animation: ge-table-cut-range-ants 0.8s linear infinite;
+}
+
+@keyframes ge-table-cut-range-ants {
+  50% {
+    border-color: var(--ge-table-cut-range-border-alt);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ge-table-cut-range {
+    animation: none; /* the dashed frame alone */
+  }
+}

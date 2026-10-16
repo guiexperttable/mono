@@ -1046,7 +1046,7 @@ LibreOffice im Container ja/nein (Etappe 4).
 |---|---|---|---|---|---|
 | 0 | Design | freigegeben (16.10.2026, zehn Kernentscheidungen) | `feat/spreadsheet-1-editing` (mit Etappe 1) | – | Review: 38 Befunde eingearbeitet (§ 13) |
 | 1 | Teil 1 Bedienung | umgesetzt, lokal committet | `feat/spreadsheet-1-editing` | – | Spike: **Variante A** (Fokus bleibt am Host, Editor-Element über der Zelle, per `clip-path` statt versteckt). Review: 17 Befunde, alle eingearbeitet außer Strg+Pfeil ohne Obergrenze und Zeile als neues Objekt (→ TODO). Abweichungen: Editor behält die Zellbreite; Touch nur über `dblclick`. Offen (manuell, Seite `sheet-editing-spike.html`): IME macOS/Windows, tote Tasten Chrome/Firefox/Safari, NVDA/VoiceOver |
-| 2 | Teil 2 Zwischenablage | offen | `feat/spreadsheet-2-clipboard` | | |
+| 2 | Teil 2 Zwischenablage | umgesetzt, lokal committet | `feat/spreadsheet-2-clipboard` (von Etappe 1) | – | Variante A bestätigt: Proxy-`textarea` nur für den Tastendruck, echtes Strg+C in Chromium automatisiert geprüft; Menü-Kopieren/Einfügen über `document`-Events bei fokussiertem Host. Review: 22 Befunde, eingearbeitet bis auf „weggefilterte Ausschnittzeilen werden nicht geleert“ (gewollt) und Pipe über Spaltengrenzen (dokumentiert). Abweichungen: intern roh mit `validate`; ohne Pipe Umwandlung wie im Editor. Offen (manuell, `clipboard.html`): Rundreise Excel/Sheets/LibreOffice in Chrome, Firefox, Safari; Bildschirmleser beim Fokuswechsel |
 | 3 | Teil 3 Undo/Redo | offen | `feat/spreadsheet-3-undo` | | |
 | 4 | Teil 4A Engine | offen | `feat/spreadsheet-4-engine` | | |
 | 5 | Teil 4B Formeln in der Tabelle | offen | `feat/spreadsheet-5-sheet` | | |

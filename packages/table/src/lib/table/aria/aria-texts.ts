@@ -161,4 +161,25 @@ export class AriaTexts implements AriaTextsIf {
   gridEditingHint(): string {
     return "Type to edit a cell, Enter to edit or commit, Escape to cancel. Tab in the last column leaves the table.";
   }
+
+  cellsPasted(cellCount: number, skippedCount: number): string {
+    const pasted = cellCount === 1 ? "1 cell pasted" : `${cellCount} cells pasted`;
+    return skippedCount > 0 ? `${pasted}, ${skippedCount} skipped` : pasted;
+  }
+
+  pasteTooLarge(maxCells: number): string {
+    return `Too many cells to paste (at most ${maxCells})`;
+  }
+
+  copyTooLarge(maxCells: number): string {
+    return `Too many cells to copy (at most ${maxCells})`;
+  }
+
+  cutMarked(cellCount: number): string {
+    return `${cellCount === 1 ? "1 cell" : `${cellCount} cells`} cut, paste to move them`;
+  }
+
+  copiedLastRangeOnly(): string {
+    return "Only the last selected range was copied";
+  }
 }

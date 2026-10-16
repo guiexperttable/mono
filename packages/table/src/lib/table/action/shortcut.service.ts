@@ -125,7 +125,14 @@ export class ShortcutService {
     }
     const actionId = this.findEntity(evt);
     if (actionId) {
-      const consumed = this.emit(actionId);
+      // the key event for the listeners (copy/paste must know it comes from a key, since 1.1.99)
+      this.tableScope.shortcutKeyEvent = evt;
+      let consumed: boolean;
+      try {
+        consumed = this.emit(actionId);
+      } finally {
+        this.tableScope.shortcutKeyEvent = undefined;
+      }
       if (consumed) {
         evt.preventDefault();
         evt.stopPropagation();

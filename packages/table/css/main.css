@@ -280,6 +280,47 @@
     animation: none; /* a still ring segment and the text */
   }
 }
+/* Copy, cut and paste (since 1.1.99, tableOptions.clipboard) */
+
+/* the hidden text field that gets the focus for the moment of Ctrl/⌘+C, X, V (the browser fires its clipboard event there) */
+.ge-table-clipboard-proxy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  resize: none;
+  pointer-events: none;
+  font-size: 16px; /* iOS zooms into a focused field with a smaller font */
+}
+
+/* cut cells: a dashed frame ("marching ants") until they are pasted, Escape or another change */
+.ge-table-cut-range {
+  position: absolute;
+  display: none;
+  z-index: 8998; /* below the fill preview (8999) and the editor (9500) */
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 2px dashed var(--ge-table-cut-range-border);
+  animation: ge-table-cut-range-ants 0.8s linear infinite;
+}
+
+@keyframes ge-table-cut-range-ants {
+  50% {
+    border-color: var(--ge-table-cut-range-border-alt);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ge-table-cut-range {
+    animation: none; /* the dashed frame alone */
+  }
+}
 
 
 .ge-table { background-color: var(--ge-table-bg); }
@@ -524,6 +565,8 @@
   --ge-table-cell-editor-border: #0a6ebd;
   --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   --ge-table-cell-editor-invalid-border: #d93025;
+  --ge-table-cut-range-border: #0a6ebd;
+  --ge-table-cut-range-border-alt: #9ec9ec;
 }
 
 
@@ -658,6 +701,8 @@ html[data-theme="dark"] {
   --ge-table-cell-editor-border: #8ab4f8;
   --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   --ge-table-cell-editor-invalid-border: #f28b82;
+  --ge-table-cut-range-border: #8ab4f8;
+  --ge-table-cut-range-border-alt: #3c5a85;
 }
 /* Fill handle and batch edit (since 1.1.96) – colors in table-color-vars.css (--ge-table-fill-*, --ge-table-cell-*) */
 

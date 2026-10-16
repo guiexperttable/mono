@@ -73,6 +73,10 @@ import type { EditingOptionsIf } from './sheet-editing/editing-options.if';
 import { CellEditorService } from './sheet-editing/cell-editor-service';
 import type { CellEditMode } from './sheet-editing/cell-editor.if';
 import { editingShortcutLayer } from './sheet-editing/editing-keymap';
+import { clipboardShortcutLayer } from './clipboard/clipboard-keymap';
+import { ClipboardOptions } from './clipboard/clipboard-options';
+import type { ClipboardOptionsIf } from './clipboard/clipboard-options.if';
+import { ClipboardService } from './clipboard/clipboard-service';
 import { findDataEdge } from './sheet-editing/sheet-navigation';
 import type { ShortcutActionIdMapping } from './action/shortcut-actionid-mapping.type';
 import { GeEditEvent } from './data/common/event/ge-edit-event';
@@ -142,7 +146,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   readonly liveAnnouncer: LiveAnnouncer;
   /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
-  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT', 'CLEAR_CELLS', 'CLEAR_AND_EDIT'];
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT', 'CLEAR_CELLS', 'CLEAR_AND_EDIT', 'CUT_2_CLIPBOARD', 'PASTE_FROM_CLIPBOARD'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
@@ -165,6 +169,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private readonly editingOptions?: EditingOptionsIf = EditingOptions.create(this.tableOptions?.editing);
   /** Listeners of {@link TableApi.subscribe}. @since 1.1.99 */
   private readonly subscribers = new Set<Partial<EventListenerIf>>();
+  /** Copy, cut and paste (`tableOptions.clipboard`), `undefined` = off. @since 1.1.99 */
+  private readonly clipboardOptions?: ClipboardOptionsIf = ClipboardOptions.create(this.tableOptions?.clipboard);
+  /** Copy, cut and paste: with the option keys and events, otherwise created for the API. @since 1.1.99 */
+  clipboardService?: ClipboardService;
+  /** The key event the {@link ShortcutService} is handling right now (`undefined` for `triggerAction`). @since 1.1.99 */
+  shortcutKeyEvent?: KeyboardEvent;
 
   constructor(
     hostElement: HTMLDivElement,
@@ -198,6 +208,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         (body as { defaultEditable: boolean }).defaultEditable = true; // AbstractAreaModel and its subclasses
       }
       this.setHostAriaAttribute('aria-description', this.getSheetTexts().gridEditingHint());
+    }
+    if (this.clipboardOptions) {
+      this.clipboardService = new ClipboardService(this, this.clipboardOptions, true); // since 1.1.99
     }
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
@@ -363,6 +376,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         return true;
       }
     }
+    if (this.clipboardService && this.clipboardOptions
+      && (actionId === 'COPY_2_CLIPBOARD' || actionId === 'CUT_2_CLIPBOARD' || actionId === 'PASTE_FROM_CLIPBOARD')) {
+      const kind = actionId === 'COPY_2_CLIPBOARD' ? 'copy' : actionId === 'CUT_2_CLIPBOARD' ? 'cut' : 'paste';
+      if (this.shortcutKeyEvent) {
+        if (this.clipboardService.arm(kind) || kind !== 'copy') {
+          return false; // not consumed: the browser fires its clipboard event (into the hidden text field)
+        }
+      } else if (kind !== 'copy' || Object.getPrototypeOf(this.copyService) === CopyService.prototype) {
+        void this.clipboardService.runWithoutKey(kind); // triggerAction (a menu): the asynchronous clipboard API
+        return true;
+      }
+    }
     if (actionId === 'COPY_2_CLIPBOARD') {
       const sm = this.getSelectionModel ? this.getSelectionModel() : undefined;
       const fm = this.getFocusModel ? this.getFocusModel() : undefined;
@@ -394,9 +419,13 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.99
    */
   getShortcutLayers(mac: boolean): ShortcutActionIdMapping[] {
+    const layers: ShortcutActionIdMapping[] = [];
     const editing = this.editingOptions;
+    if (this.clipboardOptions) {
+      layers.push(clipboardShortcutLayer(mac));
+    }
     if (!editing) {
-      return [];
+      return layers;
     }
     const layer = editingShortcutLayer(mac);
     if (!editing.tabMoves) {
@@ -407,7 +436,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       delete layer['delete'];
       delete layer['backspace'];
     }
-    return [layer];
+    return [layer, ...layers];
   }
 
   /**
@@ -646,7 +675,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   /** The texts of Excel-style editing (own functions of `tableOptions.ariaTexts`, otherwise English). @since 1.1.99 */
   getSheetTexts(): Required<Pick<AriaTextsIf, 'editingStarted' | 'readOnlyCell' | 'cellsCleared' | 'clearTooLarge' |
-    'rangeSelected' | 'rowSelected' | 'columnSelected' | 'gridEditingHint'>> {
+    'rangeSelected' | 'rowSelected' | 'columnSelected' | 'gridEditingHint' | 'cellsPasted' | 'pasteTooLarge' |
+    'copyTooLarge' | 'cutMarked' | 'copiedLastRangeOnly'>> {
     const texts = (this.ariaTexts ?? {}) as Partial<AriaTextsIf>;
     const defaults = new AriaTexts();
     return {
@@ -658,6 +688,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       rowSelected: (n: number) => (texts.rowSelected ?? defaults.rowSelected).call(texts, n),
       columnSelected: (n: number) => (texts.columnSelected ?? defaults.columnSelected).call(texts, n),
       gridEditingHint: () => (texts.gridEditingHint ?? defaults.gridEditingHint).call(texts),
+      cellsPasted: (n: number, s: number) => (texts.cellsPasted ?? defaults.cellsPasted).call(texts, n, s),
+      pasteTooLarge: (n: number) => (texts.pasteTooLarge ?? defaults.pasteTooLarge).call(texts, n),
+      copyTooLarge: (n: number) => (texts.copyTooLarge ?? defaults.copyTooLarge).call(texts, n),
+      cutMarked: (n: number) => (texts.cutMarked ?? defaults.cutMarked).call(texts, n),
+      copiedLastRangeOnly: () => (texts.copiedLastRangeOnly ?? defaults.copiedLastRangeOnly).call(texts),
     };
   }
 
@@ -1288,7 +1323,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private writeCellsInternal(
     cells: { rowIndex: number; columnIndex: number; value: unknown }[],
     source: CellChangeSource,
-    opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void; deferRepaint?: boolean }
+    opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void; deferRepaint?: boolean;
+      raw?: boolean }
   ): { changes: CellChangeIf[]; invalid: number; message?: string } {
     const body = this.tableModel.getBodyModel();
     const rowCountBefore = body.getRowCount();
@@ -1299,7 +1335,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const apply = () => {
       for (const { rowIndex, columnIndex, value } of cells) {
         if (!opts.skipValidation) {
-          const error = this.validateCellValue(rowIndex, columnIndex, this.pipeCellValue(rowIndex, columnIndex, value));
+          const error = this.validateCellValue(rowIndex, columnIndex,
+            opts.raw ? value : this.pipeCellValue(rowIndex, columnIndex, value));
           if (error) {
             invalid++;
             firstMessage = firstMessage || error;
@@ -1307,7 +1344,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
           }
         }
         const oldValue = body.getValueAt(rowIndex, columnIndex);
-        if (body.setValue(rowIndex, columnIndex, value)) {
+        if (opts.raw ? this.setRawValue(rowIndex, columnIndex, value) : body.setValue(rowIndex, columnIndex, value)) {
           changes.push({
             row: this.rowObjectOf(rowIndex),
             rowIndex,
@@ -1360,13 +1397,123 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     return { changes: all, invalid, message: firstMessage || undefined };
   }
 
+  /**
+   * Writes a value without the column's `editInputPipe` (values copied inside the table are already converted – a pipe
+   * that expects text could break them). All area models apply the pipe in `setValue`, so it is left out for the call.
+   */
+  private setRawValue(rowIndex: number, columnIndex: number, value: unknown): boolean {
+    const body = this.tableModel.getBodyModel();
+    const def = this.tableModel.getColumnDef(columnIndex);
+    const pipe = def?.editInputPipe;
+    if (!def || !pipe || Object.isFrozen(def)) {
+      return body.setValue(rowIndex, columnIndex, value); // a frozen column definition: with its pipe
+    }
+    def.editInputPipe = undefined;
+    try {
+      return body.setValue(rowIndex, columnIndex, value);
+    } finally {
+      def.editInputPipe = pipe;
+    }
+  }
+
+  /**
+   * Writes pasted cells (copy, cut and paste): like {@link applyCellChanges} – not editable cells skipped, `validate`,
+   * batch edit marks – with **one** `onModelChanged`; `raw` = values copied inside the table (no `editInputPipe`).
+   *
+   * @param {CellValueChangeIf[]} changes - target cells (and emptied cut cells)
+   * @param {CellChangeSource} source - `"paste"` or `"cut"`
+   * @param {boolean} raw - true: without `editInputPipe`
+   * @returns {CellChangeIf[]} the written (batch edit: newly pending) cells
+   * @since 1.1.99
+   */
+  writePastedCells(changes: CellValueChangeIf[], source: CellChangeSource, raw: boolean): CellChangeIf[] {
+    const cells = this.resolveCellChanges(changes);
+    if (!cells.length) {
+      return [];
+    }
+    if (this.batchEditService?.isActive()) {
+      const ret = this.markPending(cells.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true, raw);
+      this.repaint();
+      return ret;
+    }
+    return this.writeCellsInternal(cells, source, { raw }).changes;
+  }
+
+  /**
+   * Selects a body range (after pasting): its first cell becomes the active cell and the anchor.
+   *
+   * @param {CellRange} range - display rows, model columns
+   * @since 1.1.99
+   */
+  selectBodyRange(range: CellRange): void {
+    const fm = this.focusModel();
+    if (fm) {
+      this.headerFocus = undefined;
+      fm.setFocus(range.r1, range.c1);
+    }
+    this.selectionService.collapseTo(range.r1, range.c1); // range and cell selections (others: unchanged)
+    if (range.r2 !== range.r1 || range.c2 !== range.c1) {
+      this.selectionService.extendTo(range.r2, range.c2); // range selections only
+    }
+    this.repaint();
+  }
+
+  /**
+   * The message of the column's `validate` for a value that would be pasted, `undefined` if it is valid.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number} columnIndex - model column
+   * @param {unknown} value - the value
+   * @param {boolean} raw - true: without `editInputPipe`
+   * @returns {string | undefined} the message
+   * @since 1.1.99
+   */
+  checkPastedValue(rowIndex: number, columnIndex: number, value: unknown, raw: boolean): string | undefined {
+    return this.validateCellValue(rowIndex, columnIndex, raw ? value : this.pipeCellValue(rowIndex, columnIndex, value));
+  }
+
+  /** True while a batch edit collects changes. @since 1.1.99 */
+  isBatchEditActive(): boolean {
+    return !!this.batchEditService?.isActive();
+  }
+
+  /** True while an overlay blocks the table ("Loading…"). @since 1.1.99 */
+  isOverlayBlocking(): boolean {
+    return this.tableOverlay.isBlocking();
+  }
+
+  /** Rows were added at the end of the body (pasting with `pasteAddsRows`): derived values are recomputed. @since 1.1.99 */
+  rowsAppended(): void {
+    this.invalidateAggregates();
+  }
+
+  /** True for a tree, a row grouping or a pivot table in the body (rows cannot simply be appended). @since 1.1.99 */
+  isRowGroupingOrTree(): boolean {
+    const body = this.tableModel.getBodyModel();
+    return isAreaModelTree(body) || isAreaModelRowGroups(body) || isPivotTableModel(this.tableModel);
+  }
+
+  /**
+   * The clipboard service for the API ({@link TableApi.pasteText}, {@link TableApi.getSelectionAsText}): the one of
+   * the option, otherwise one with the defaults that does not listen to keys or events.
+   *
+   * @returns {ClipboardService} the service
+   * @since 1.1.99
+   */
+  getClipboardService(): ClipboardService {
+    if (!this.clipboardService) {
+      this.clipboardService = new ClipboardService(this, ClipboardOptions.create(true)!, false);
+    }
+    return this.clipboardService;
+  }
+
   /** Marks values as pending (batch edit): pipe, validation, then the batch edit service. */
-  private markPending(changes: CellValueChangeIf[], resolved: boolean): CellChangeIf[] {
+  private markPending(changes: CellValueChangeIf[], resolved: boolean, raw = false): CellChangeIf[] {
     const cells = resolved
       ? changes.map(c => ({ rowIndex: c.rowIndex, columnIndex: c.column as number, value: c.value }))
       : this.resolveCellChanges(changes, false);
     const inputs: PendingInputIf[] = cells.map(({ rowIndex, columnIndex, value }) => {
-      const piped = this.pipeCellValue(rowIndex, columnIndex, value);
+      const piped = raw ? value : this.pipeCellValue(rowIndex, columnIndex, value);
       const error = this.validateCellValue(rowIndex, columnIndex, piped);
       return { rowIndex, columnIndex, value: piped, rawValue: value, ...(error ? { error } : {}) };
     });
@@ -1650,6 +1797,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
     this.cellEditorService?.destroy(); // the editor above the cell (since 1.1.99)
+    this.clipboardService?.destroy(); // hidden text field and cut frame (since 1.1.99)
     this.subscribers.clear();
     try {
       this.masterDetailService?.destroy(); // detail contents: renderer cleanups, nested tables destroyed
@@ -2159,6 +2307,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.stateService?.rendered(); // undefined while the constructor of the super class renders
     this.fillHandleService?.update(); // the handle follows the selected range (scroll, selection, editor)
     this.cellEditorService?.update(); // the editor follows its cell (Excel-style editing, since 1.1.99)
+    this.clipboardService?.update(); // the frame of cut cells (since 1.1.99)
   }
 
   onSelectionChanged(sm: SelectionModelIf) {

@@ -173,6 +173,22 @@ describe('GuiexpertTable (React)', () => {
     expect(modelChanged).toHaveBeenCalledTimes(1);
   });
 
+  it('copy, cut and paste: Ctrl+V pastes – one modelChanged with source "paste" (since 1.1.99)', async () => {
+    const modelChanged = vi.fn<(evt: GeModelChangeEvent) => void>();
+    const { tableModel, tableOptions, rows } = createFillModelAndOptions();
+    const options = { ...tableOptions, fillHandle: false, editing: true, clipboard: true };
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={options} modelChanged={modelChanged} />);
+    await nextFrame();
+    await userEvent.click(bodyCell(host, 1, 1));
+    const dt = new DataTransfer();
+    dt.setData('text/plain', '8\n9');
+    host.querySelector<HTMLElement>('[role="grid"], [role="treegrid"]')!.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    expect([rows[1].qty, rows[2].qty]).toEqual([8, 9]);
+    expect(modelChanged).toHaveBeenCalledTimes(1);
+    expect(modelChanged.mock.calls[0][0].source).toBe('paste');
+  });
+
   it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {
     const stateChanged = vi.fn<(evt: GeStateChangeEvent) => void>();
     let api: TableApi | undefined;

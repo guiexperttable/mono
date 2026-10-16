@@ -59,6 +59,9 @@ export const actionIds = [
   "SELECT_COLUMN",               // Ctrl+Space: the columns of the active cell
   "CLEAR_CELLS",                 // Delete: clear the selected cells
   "CLEAR_AND_EDIT",              // Backspace: clear the active cell and open the editor (a range: like Delete)
+  // copy, cut and paste (tableOptions.clipboard, since 1.1.99)
+  "CUT_2_CLIPBOARD",             // Ctrl/⌘+X: copy and mark the cells, they move on the next paste
+  "PASTE_FROM_CLIPBOARD",        // Ctrl/⌘+V: paste from the anchor (tiled over a selected range)
 ] as const;
 
 /**

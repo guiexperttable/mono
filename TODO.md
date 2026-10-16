@@ -292,8 +292,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `table-fill-batch.css`. Showcase `batchedit`, Training-Abschnitt in Kapitel 31 `inline-editing`,
       `videos/10-fill-handle-batch-edit/`, `apps/table-demo/fill-batch.html`. Selbständig umgesetzt.
       Offen: Angular-Demo nach dem Release (die App nutzt npm-Pakete); Demo-Repo entfällt (kein neues Kapitel).
-- [ ] Folgepunkte 010: **Einfügen aus der Zwischenablage** (Strg/⌘+V: Text → Matrix → `applyCellChanges(…, "api")`, gleiche
-      Prüfungen) · **Undo/Redo** (Stapel aus `GeModelChangeEvent.changes`, Undo = `applyCellChanges` mit `oldValue`,
+- [ ] Folgepunkte 010: ~~Einfügen aus der Zwischenablage~~ – **erledigt in 1.1.99** (013 Etappe 2,
+      `tableOptions.clipboard`, `api.pasteText`) · **Undo/Redo** (Stapel aus `GeModelChangeEvent.changes`, Undo = `applyCellChanges` mit `oldValue`,
       Strg/⌘+Z/Y; Batch: vorgemerkte Änderungen rückgängig) · Doppelklick auf das Handle = bis zum Ende der Nachbarspalte
       füllen (ag-Grid/Excel) · Ziehen in den Bereich hinein = leeren (Excel) · Copy/Excel zeigen im Batch-Modus die
       geschriebenen, nicht die vorgemerkten Werte (bewusst wie ag-Grid; ggf. Option) · vorgemerkte Werte werden bei
@@ -372,6 +372,21 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Seitenhintergrund übernimmt, ungültiger Wert blockiert auch den Klick, Tab in offene Detailzeile, Spalten-/
       Zeilenobjekt-Folgen, Safari-IME (`keyCode` 229), Backspace auf 3+ Zellen, `editable` nachträglich, Alt+Taste,
       Header-Fokus, Website-CSS.
+      **Etappe 2 umgesetzt** (16.10.2026, Branch `feat/spreadsheet-2-clipboard`): Kopieren/Ausschneiden/Einfügen mit
+      `tableOptions.clipboard`. Offen aus Etappe 2: manuelle Rundreise Excel ↔ Tabelle ↔ Google Sheets in Chrome, Firefox
+      und Safari (Seite `apps/table-demo/clipboard.html`; in Chromium automatisiert: echtes Strg+C über das versteckte
+      Feld) · Bildschirmleser-Ansage beim kurzen Fokuswechsel ins versteckte Feld prüfen · mehrere Bereiche: nur der
+      letzte wird kopiert (wie Sheets) · Einfügen mit `pasteAddsRows` nur für Objekt-/Array-Modelle ohne Baum/Gruppierung
+      · intern eingefügte Werte laufen ohne `editInputPipe`, aber mit `validate` (Design: ohne beides), auch über
+      Spaltengrenzen; im Batch-Modus werden die Texte vorgemerkt · ohne Pipe wird wie im Editor umgewandelt (Zahl in
+      Zahlzelle, TRUE/FALSE, ISO-Datum) – Design sah „Text bleibt Text“ vor · „42“ in eine leere Zahlenspalte ohne Pipe
+      bleibt Text · ausgeschnittene Zeilen, die zwischendurch weggefiltert wurden, werden eingefügt, aber nicht geleert.
+      Review (unabhängiger Agent, 22 Befunde) eingearbeitet: Ausschneiden verschiebt nur Angekommenes und kachelt nicht,
+      große Ausschnitte ohne Stack-Überlauf und ohne O(n²), Modelle ohne Zeilenobjekte, Batch + interne Kopie,
+      Shadow DOM, `triggerAction` (async API), Lade-Overlay blockiert, API-Ausschnitt wird bei Änderung aufgehoben,
+      `pasteAddsRows` nicht im Batch-Modus, Kopfzeile nicht beim Ausschneiden, Locale-Pipes ohne Fehltreffer
+      („SKU 123“, „+49 123“, „1.2.3“), leere letzte Zeile im TSV, abgewählte Zellen, Datum/`null` als Text, Unterklassen
+      von `CopyService`, gefrorene Spaltendefinitionen, iOS-Zoom.
 
 ## Mono-Repo / Build
 
@@ -622,6 +637,15 @@ Objekt-Tabelle hat `ge-focused-row`.
   (`DEFAULT_GET_EDIT_RENDERER`) statt einer Funktion je Instanz. (5) `tableScope.getEventListener()` liefert einen Proxy
   um den eigenen Listener (für `api.subscribe`); ohne Abonnenten ruft er genau die Methoden des eigenen Listeners.
   (6) Der „change“-Handler ignoriert Eingaben eines Zell-Editors, der schon geschlossen ist (kein doppeltes Schreiben).
+  **Zwischenablage (013, Etappe 2)**, additiv: `TableOptionsIf.clipboard` (`ClipboardOptionsIf`, `ClipboardOptions`,
+  `CopyContextIf`, `PasteContextIf`), `ClipboardService` (Internals), `toTsv`, `parseTsv`, `toHtmlTable`,
+  `parseHtmlTable`, `HtmlTableCellIf`, `computePastePlan`, `getPasteSize`, `PasteRequestIf`, `PastePlanIf`,
+  `createNumberInputPipe`, `createDateInputPipe`, `booleanInputPipe`, `sheetInputPipe`, `clipboardShortcutLayer`,
+  `TableApi.copySelection/cutSelection/pasteText/getSelectionAsText/cancelCut`, `ActionId`s `CUT_2_CLIPBOARD`,
+  `PASTE_FROM_CLIPBOARD`, `AriaTextsIf.cellsPasted/pasteTooLarge/copyTooLarge/cutMarked/copiedLastRangeOnly`,
+  `TableScope.writePastedCells/selectBodyRange/getClipboardService`, CSS `table-clipboard.css`
+  (`--ge-table-cut-range-border`, `--ge-table-cut-range-border-alt`). **Typ-Erweiterung:** `CellChangeSource` hat die
+  neuen Werte `"paste"` und `"cut"`. Ohne Option keine Verhaltensänderung (Strg/⌘+X bleibt `DESELECT_ALL`).
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

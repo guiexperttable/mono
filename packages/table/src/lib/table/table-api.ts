@@ -2127,6 +2127,86 @@ export class TableApi {
     return this.tableScope.clearCells(ranges);
   }
 
+  // ---------------------------------------------------------------------- copy, cut and paste (since 1.1.99)
+
+  /**
+   * Copies the selected cells (the last selected range, everything after Ctrl/⌘+A, otherwise the focused cell) with
+   * the asynchronous clipboard API – for an own button or menu. Tab-separated text with Excel's quoting plus an HTML
+   * table (`ClipboardOptionsIf.html`); pasting it into this table pastes the values. The browser may ask for
+   * permission; Ctrl/⌘+C needs none ({@link TableOptionsIf.clipboard}). Works without the option (defaults).
+   *
+   * @returns {Promise<void>} resolves when the clipboard was written
+   *
+   * @example
+   * copyButton.addEventListener("click", () => tableApi.copySelection());
+   *
+   * @since 1.1.99
+   */
+  copySelection(): Promise<void> {
+    return this.tableScope.getClipboardService().writeSelection(false);
+  }
+
+  /**
+   * Like {@link copySelection}, and the cells are marked (dashed frame): the next paste of this content moves them –
+   * the cut cells are emptied in the same change (`source: "cut"`). Escape or another change removes the mark.
+   *
+   * @returns {Promise<void>} resolves when the clipboard was written
+   *
+   * @example
+   * cutButton.addEventListener("click", () => tableApi.cutSelection());
+   *
+   * @since 1.1.99
+   */
+  cutSelection(): Promise<void> {
+    return this.tableScope.getClipboardService().writeSelection(true);
+  }
+
+  /**
+   * Pastes tab-separated text like Ctrl/⌘+V – without clipboard permissions: from `target` (once), otherwise from the
+   * selection (tiled over a selected range that is an integer multiple, one value into every selected cell) or the
+   * focused cell. Hidden columns are skipped, read-only cells left out, the rest is cut off at the last column;
+   * **one** `onModelChanged` with `source: "paste"` (batch edit: marked). Works without {@link TableOptionsIf.clipboard}.
+   *
+   * @param {string} text - rows separated by line breaks, cells by tabs (quoted cells like Excel)
+   * @param {[number, number] | undefined} [target] - display row and model column of the first cell
+   * @returns {CellChangeIf[]} the written (batch edit: newly pending) cells
+   *
+   * @example
+   * tableApi.pasteText("a\tb\n1\t2", [0, 1]);   // A 2×2 block from row 0, column 1
+   *
+   * @since 1.1.99
+   */
+  pasteText(text: string, target?: [number, number]): CellChangeIf[] {
+    return this.tableScope.getClipboardService().paste(text, undefined, target);
+  }
+
+  /**
+   * The selected cells as tab-separated text, exactly as Ctrl/⌘+C copies them (Excel's quoting, `copyHeaders`,
+   * `copyValue`). `""` without cells or with more than `CopyService.maxCopyCells`.
+   *
+   * @returns {string} the text
+   *
+   * @example
+   * console.log(tableApi.getSelectionAsText());   // "a\tb\n1\t2"
+   *
+   * @since 1.1.99
+   */
+  getSelectionAsText(): string {
+    return this.tableScope.getClipboardService().getSelectionAsText();
+  }
+
+  /**
+   * Removes the mark of cut cells (like Escape): the next paste copies instead of moving.
+   *
+   * @example
+   * tableApi.cancelCut();
+   *
+   * @since 1.1.99
+   */
+  cancelCut(): void {
+    this.tableScope.clipboardService?.cancelCut();
+  }
+
   // ------------------------------------------------------------------------------- master/detail (since 1.1.97)
 
   /**

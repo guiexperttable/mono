@@ -76,7 +76,7 @@ The body as rows of values (`any[][]`).
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L128)
+[src/lib/table/factory/table-factory.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L131)
 
 ___
 
@@ -88,7 +88,7 @@ Number of columns. Default: derived from `columnDefs`, `headerData` or `columnSi
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L118)
+[src/lib/table/factory/table-factory.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L121)
 
 ___
 
@@ -100,7 +100,7 @@ The columns: property, header label, width, classes, renderers, sorting, editing
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L112)
+[src/lib/table/factory/table-factory.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L115)
 
 ___
 
@@ -112,7 +112,7 @@ Column widths in px – the simple alternative to `columnDefs` (e.g. with `bodyD
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L114)
+[src/lib/table/factory/table-factory.ts:117](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L117)
 
 ___
 
@@ -124,7 +124,7 @@ Row heights of header, body and footer in px. Default: `tableOptions.defaultRowH
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L110)
+[src/lib/table/factory/table-factory.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L113)
 
 ___
 
@@ -136,7 +136,7 @@ Number of columns fixed on the left (side "west"). Default 0.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L78)
+[src/lib/table/factory/table-factory.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L79)
 
 ___
 
@@ -148,7 +148,7 @@ Number of columns fixed on the right (side "east"). Default 0.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L80)
+[src/lib/table/factory/table-factory.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L81)
 
 ___
 
@@ -171,13 +171,17 @@ const tableModel = TableFactory.createTableModel({
 });
 ```
 
+**`See`**
+
+[Live demo: totals & aggregation](https://gui.expert/showcase/aggregation/run/) · Training: [Totals in one option](https://gui.expert/training/footer-totals/#built-in)
+
 **`Since`**
 
 1.1.94
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L76)
+[src/lib/table/factory/table-factory.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L77)
 
 ___
 
@@ -201,7 +205,7 @@ Footer rows as values (static – they don't follow filter or edits).
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L132)
+[src/lib/table/factory/table-factory.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L135)
 
 ___
 
@@ -213,7 +217,7 @@ Selection model factory. Default: `tableOptions.getSelectionModel`.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L122)
+[src/lib/table/factory/table-factory.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L125)
 
 ___
 
@@ -237,7 +241,7 @@ Header rows as values – several rows are possible.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L130)
+[src/lib/table/factory/table-factory.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L133)
 
 ___
 
@@ -249,7 +253,7 @@ A width in px for all columns; -1 (default) = use the column definitions.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L116)
+[src/lib/table/factory/table-factory.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L119)
 
 ___
 
@@ -261,7 +265,7 @@ Width of the parent element in px, used for percentage column widths before the 
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L120)
+[src/lib/table/factory/table-factory.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L123)
 
 ___
 
@@ -273,7 +277,7 @@ Which properties of `rows` become columns, in this order (ignored if `columnDefs
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L126)
+[src/lib/table/factory/table-factory.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L129)
 
 ___
 
@@ -285,7 +289,7 @@ Show a checkbox column for every row. Default false.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L82)
+[src/lib/table/factory/table-factory.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L83)
 
 ___
 
@@ -303,13 +307,17 @@ Default false.
 const tableModel = TableFactory.createTableModel({ rows: orders, rowDrag: true });
 ```
 
+**`See`**
+
+[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
+
 **`Since`**
 
 1.1.95
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L108)
+[src/lib/table/factory/table-factory.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L111)
 
 ___
 
@@ -331,13 +339,17 @@ their columns would shift – put a `RowNumberColumnDef` into the column definit
 const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs, rowNumbersVisible: true });
 ```
 
+**`See`**
+
+[Live demo: row numbers](https://gui.expert/showcase/rownumbers/run/) · Training: [Row numbers](https://gui.expert/training/fixed-columns/#row-numbers)
+
 **`Since`**
 
 1.1.93
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L97)
+[src/lib/table/factory/table-factory.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L99)
 
 ___
 
@@ -349,7 +361,7 @@ The rows as objects (`T[]`) or tree rows from [TreeFactory.buildTreeRows](../cla
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L124)
+[src/lib/table/factory/table-factory.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L127)
 
 ___
 
@@ -361,4 +373,4 @@ Options of the table; the factory reads `defaultRowHeights`, `getSelectionModel`
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L134)
+[src/lib/table/factory/table-factory.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L137)

@@ -65,8 +65,7 @@ Here’s a basic example:
 
 Replace "Path/To/guiexpert.js" with the actual path to your downloaded guiexpert.js file.
 
-Keep in mind that this may depend on any dependencies that guiexpert itself might have. 
-You might also need to manually download and include other files or libraries if they are required by guiexpert.
+The core has no runtime dependencies (only `tslib`) – there is nothing else to download.
 
 Also, note that using NPM typically makes managing dependencies easier and simplifies integrating modules into projects. 
 Manual inclusion might require more effort to ensure everything works correctly and stays up to date.

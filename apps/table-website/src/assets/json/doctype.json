@@ -130247,7 +130247,7 @@
 						"content": [
 							{
 								"kind": "text",
-								"text": "Training: [Pivot tables](https://gui.expert/training/pivot-tables/)"
+								"text": "[Live demo: pivot tables](https://gui.expert/showcase/pivot/run/) · Training: [Pivot tables](https://gui.expert/training/pivot-tables/)"
 							}
 						]
 					},
@@ -154592,7 +154592,7 @@
 						"content": [
 							{
 								"kind": "text",
-								"text": "Training: [Row grouping](https://gui.expert/training/row-grouping/)"
+								"text": "[Live demo: row grouping](https://gui.expert/showcase/rowgrouping/run/) · Training: [Row grouping](https://gui.expert/training/row-grouping/)"
 							}
 						]
 					},
@@ -179961,9 +179961,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 478,
+							"line": 481,
 							"character": 9,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L478"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L481"
 						}
 					],
 					"signatures": [
@@ -180021,9 +180021,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 478,
+									"line": 481,
 									"character": 9,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L478"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L481"
 								}
 							],
 							"typeParameter": [
@@ -180167,9 +180167,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 424,
+							"line": 427,
 							"character": 9,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L424"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L427"
 						}
 					],
 					"signatures": [
@@ -180217,9 +180217,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 424,
+									"line": 427,
 									"character": 9,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L424"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L427"
 								}
 							],
 							"typeParameter": [
@@ -180280,9 +180280,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 426,
+															"line": 429,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L426"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L429"
 														}
 													],
 													"type": {
@@ -180322,9 +180322,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 428,
+															"line": 431,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L428"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L431"
 														}
 													],
 													"type": {
@@ -180359,9 +180359,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 429,
+															"line": 432,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L429"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L432"
 														}
 													],
 													"type": {
@@ -180386,9 +180386,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 425,
+															"line": 428,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L425"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L428"
 														}
 													],
 													"type": {
@@ -180428,9 +180428,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 427,
+															"line": 430,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L427"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L430"
 														}
 													],
 													"type": {
@@ -180456,9 +180456,9 @@
 											"sources": [
 												{
 													"fileName": "src/lib/table/factory/table-factory.ts",
-													"line": 424,
+													"line": 427,
 													"character": 41,
-													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L424"
+													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L427"
 												}
 											]
 										}
@@ -180486,9 +180486,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 634,
+							"line": 637,
 							"character": 16,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L634"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L637"
 						}
 					],
 					"signatures": [
@@ -180536,9 +180536,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 634,
+									"line": 637,
 									"character": 16,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L634"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L637"
 								}
 							],
 							"parameters": [
@@ -180933,9 +180933,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 699,
+							"line": 702,
 							"character": 16,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L699"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L702"
 						}
 					],
 					"signatures": [
@@ -181044,9 +181044,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 699,
+									"line": 702,
 									"character": 16,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L699"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L702"
 								}
 							],
 							"parameters": [
@@ -181074,9 +181074,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 701,
+															"line": 704,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L701"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L704"
 														}
 													],
 													"type": {
@@ -181097,9 +181097,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 710,
+															"line": 713,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L710"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L713"
 														}
 													],
 													"type": {
@@ -181118,9 +181118,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 707,
+															"line": 710,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L707"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L710"
 														}
 													],
 													"type": {
@@ -181144,9 +181144,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 708,
+															"line": 711,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L708"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L711"
 														}
 													],
 													"type": {
@@ -181168,9 +181168,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 706,
+															"line": 709,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L706"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L709"
 														}
 													],
 													"type": {
@@ -181191,9 +181191,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 703,
+															"line": 706,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L703"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L706"
 														}
 													],
 													"type": {
@@ -181212,9 +181212,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 704,
+															"line": 707,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L704"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L707"
 														}
 													],
 													"type": {
@@ -181233,9 +181233,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 702,
+															"line": 705,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L702"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L705"
 														}
 													],
 													"type": {
@@ -181256,9 +181256,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 700,
+															"line": 703,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L700"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L703"
 														}
 													],
 													"type": {
@@ -181279,9 +181279,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 709,
+															"line": 712,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L709"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L712"
 														}
 													],
 													"type": {
@@ -181300,9 +181300,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 705,
+															"line": 708,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L705"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L708"
 														}
 													],
 													"type": {
@@ -181332,9 +181332,9 @@
 											"sources": [
 												{
 													"fileName": "src/lib/table/factory/table-factory.ts",
-													"line": 699,
+													"line": 702,
 													"character": 47,
-													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L699"
+													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L702"
 												}
 											]
 										}
@@ -181362,9 +181362,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 769,
+							"line": 772,
 							"character": 16,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L769"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L772"
 						}
 					],
 					"signatures": [
@@ -181469,9 +181469,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 769,
+									"line": 772,
 									"character": 16,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L769"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L772"
 								}
 							],
 							"typeParameter": [
@@ -181639,9 +181639,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 567,
+							"line": 570,
 							"character": 16,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L567"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L570"
 						}
 					],
 					"signatures": [
@@ -181738,9 +181738,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 567,
+									"line": 570,
 									"character": 16,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L567"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L570"
 								}
 							],
 							"typeParameter": [
@@ -181811,9 +181811,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 575,
+															"line": 578,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L575"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L578"
 														}
 													],
 													"type": {
@@ -181845,9 +181845,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 576,
+															"line": 579,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L576"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L579"
 														}
 													],
 													"type": {
@@ -181885,9 +181885,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 574,
+															"line": 577,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L574"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L577"
 														}
 													],
 													"type": {
@@ -181916,9 +181916,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 571,
+															"line": 574,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L571"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L574"
 														}
 													],
 													"type": {
@@ -181945,9 +181945,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 572,
+															"line": 575,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L572"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L575"
 														}
 													],
 													"type": {
@@ -181974,9 +181974,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 570,
+															"line": 573,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L570"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L573"
 														}
 													],
 													"type": {
@@ -182009,9 +182009,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 569,
+															"line": 572,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L569"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L572"
 														}
 													],
 													"type": {
@@ -182044,9 +182044,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 573,
+															"line": 576,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L573"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L576"
 														}
 													],
 													"type": {
@@ -182071,9 +182071,9 @@
 													"sources": [
 														{
 															"fileName": "src/lib/table/factory/table-factory.ts",
-															"line": 568,
+															"line": 571,
 															"character": 4,
-															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L568"
+															"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L571"
 														}
 													],
 													"type": {
@@ -182106,9 +182106,9 @@
 											"sources": [
 												{
 													"fileName": "src/lib/table/factory/table-factory.ts",
-													"line": 567,
+													"line": 570,
 													"character": 51,
-													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L567"
+													"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L570"
 												}
 											]
 										}
@@ -182136,9 +182136,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 185,
+							"line": 188,
 							"character": 16,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L185"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L188"
 						}
 					],
 					"signatures": [
@@ -182217,9 +182217,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/factory/table-factory.ts",
-									"line": 185,
+									"line": 188,
 									"character": 16,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L185"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L188"
 								}
 							],
 							"parameters": [
@@ -182289,9 +182289,9 @@
 			"sources": [
 				{
 					"fileName": "src/lib/table/factory/table-factory.ts",
-					"line": 168,
+					"line": 171,
 					"character": 13,
-					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L168"
+					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L171"
 				}
 			]
 		},
@@ -187015,6 +187015,15 @@
 										"text": "1.1.96"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)"
+									}
+								]
 							}
 						]
 					},
@@ -187452,6 +187461,15 @@
 									{
 										"kind": "text",
 										"text": "1.1.96"
+									}
+								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)"
 									}
 								]
 							}
@@ -188120,6 +188138,15 @@
 										"text": "1.1.97"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: master/detail](https://gui.expert/showcase/masterdetail/run/) · Training: [Master/detail](https://gui.expert/training/master-detail/)"
+									}
+								]
 							}
 						]
 					},
@@ -188425,6 +188452,15 @@
 									{
 										"kind": "text",
 										"text": "1.1.95"
+									}
+								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)"
 									}
 								]
 							}
@@ -227032,6 +227068,15 @@
 						],
 						"blockTags": [
 							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: formulas](https://gui.expert/showcase/formulas/run/) · Training: [Formulas your users can type](https://gui.expert/training/formulas/#formulas)"
+									}
+								]
+							},
+							{
 								"tag": "@since",
 								"content": [
 									{
@@ -227045,9 +227090,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-							"line": 166,
+							"line": 168,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L166"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L168"
 						}
 					],
 					"type": {
@@ -227447,9 +227492,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-							"line": 178,
+							"line": 180,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L178"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L180"
 						}
 					],
 					"type": {
@@ -227505,6 +227550,15 @@
 								]
 							},
 							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "Training: [Show values as](https://gui.expert/training/formulas/#show-values-as)"
+									}
+								]
+							},
+							{
 								"tag": "@since",
 								"content": [
 									{
@@ -227518,9 +227572,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-							"line": 159,
+							"line": 160,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L159"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L160"
 						}
 					],
 					"type": {
@@ -227863,9 +227917,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-							"line": 192,
+							"line": 194,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L192"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L194"
 						}
 					],
 					"type": {
@@ -227980,7 +228034,7 @@
 								"content": [
 									{
 										"kind": "text",
-										"text": "Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)"
+										"text": "[Live demo: formulas & calculated columns](https://gui.expert/showcase/formulas/run/) · Training: [Calculated columns, “Show values as” and formulas](https://gui.expert/training/formulas/)"
 									}
 								]
 							},
@@ -229439,9 +229493,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 128,
+							"line": 131,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L128"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L131"
 						}
 					],
 					"type": {
@@ -229496,9 +229550,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 118,
+							"line": 121,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L118"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L121"
 						}
 					],
 					"type": {
@@ -229534,9 +229588,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 112,
+							"line": 115,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L112"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L115"
 						}
 					],
 					"type": {
@@ -229582,9 +229636,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 114,
+							"line": 117,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L114"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L117"
 						}
 					],
 					"type": {
@@ -229620,9 +229674,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 110,
+							"line": 113,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L110"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L113"
 						}
 					],
 					"type": {
@@ -229649,9 +229703,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 78,
+							"line": 79,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L78"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L79"
 						}
 					],
 					"type": {
@@ -229676,9 +229730,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 80,
+							"line": 81,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L80"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L81"
 						}
 					],
 					"type": {
@@ -229771,6 +229825,15 @@
 								]
 							},
 							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: totals & aggregation](https://gui.expert/showcase/aggregation/run/) · Training: [Totals in one option](https://gui.expert/training/footer-totals/#built-in)"
+									}
+								]
+							},
+							{
 								"tag": "@since",
 								"content": [
 									{
@@ -229784,9 +229847,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 76,
+							"line": 77,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L76"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L77"
 						}
 					],
 					"type": {
@@ -229858,9 +229921,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 132,
+							"line": 135,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L132"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L135"
 						}
 					],
 					"type": {
@@ -229899,9 +229962,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 122,
+							"line": 125,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L122"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L125"
 						}
 					],
 					"type": {
@@ -229989,9 +230052,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 130,
+							"line": 133,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L130"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L133"
 						}
 					],
 					"type": {
@@ -230022,9 +230085,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 116,
+							"line": 119,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L116"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L119"
 						}
 					],
 					"type": {
@@ -230049,9 +230112,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 120,
+							"line": 123,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L120"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L123"
 						}
 					],
 					"type": {
@@ -230092,9 +230155,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 126,
+							"line": 129,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L126"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L129"
 						}
 					],
 					"type": {
@@ -230122,9 +230185,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 82,
+							"line": 83,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L82"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L83"
 						}
 					],
 					"type": {
@@ -230186,6 +230249,15 @@
 								]
 							},
 							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)"
+									}
+								]
+							},
+							{
 								"tag": "@since",
 								"content": [
 									{
@@ -230199,9 +230271,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 108,
+							"line": 111,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L108"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L111"
 						}
 					],
 					"type": {
@@ -230321,6 +230393,15 @@
 								]
 							},
 							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: row numbers](https://gui.expert/showcase/rownumbers/run/) · Training: [Row numbers](https://gui.expert/training/fixed-columns/#row-numbers)"
+									}
+								]
+							},
+							{
 								"tag": "@since",
 								"content": [
 									{
@@ -230334,9 +230415,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 97,
+							"line": 99,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L97"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L99"
 						}
 					],
 					"type": {
@@ -230401,9 +230482,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 124,
+							"line": 127,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L124"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L127"
 						}
 					],
 					"type": {
@@ -230455,9 +230536,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/factory/table-factory.ts",
-							"line": 134,
+							"line": 137,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L134"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L137"
 						}
 					],
 					"type": {
@@ -252924,7 +253005,7 @@
 								"content": [
 									{
 										"kind": "text",
-										"text": "Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)"
+										"text": "[Live demo: accessible order table](https://gui.expert/showcase/accessibility/run/) · Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)"
 									}
 								]
 							}
@@ -253232,15 +253313,24 @@
 										"text": "1.1.96"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 393,
+							"line": 397,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L393"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L397"
 						}
 					],
 					"type": {
@@ -253511,15 +253601,24 @@
 										"text": "1.1.98"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: right-to-left](https://gui.expert/showcase/rtl/run/) · Training: [Right-to-left](https://gui.expert/training/theming-dark-mode/#rtl)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 428,
+							"line": 434,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L428"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L434"
 						}
 					],
 					"type": {
@@ -253686,15 +253785,24 @@
 										"text": "1.1.96"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 381,
+							"line": 384,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L381"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L384"
 						}
 					],
 					"type": {
@@ -254294,15 +254402,24 @@
 										"text": "1.1.92"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: persisted layout](https://gui.expert/showcase/state/run/) · Training: [Remember the state](https://gui.expert/training/persist-state/)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 441,
+							"line": 448,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L441"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L448"
 						}
 					],
 					"type": {
@@ -254385,15 +254502,24 @@
 										"text": "1.1.97"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: master/detail](https://gui.expert/showcase/masterdetail/run/) · Training: [Master/detail](https://gui.expert/training/master-detail/)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 411,
+							"line": 416,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L411"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L416"
 						}
 					],
 					"type": {
@@ -254561,15 +254687,24 @@
 										"text": "1.1.92"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: loading & empty states](https://gui.expert/showcase/overlays/run/) · Training: [Loading and empty tables](https://gui.expert/training/live-data/#overlays)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 349,
+							"line": 350,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L349"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L350"
 						}
 					],
 					"type": {
@@ -254681,15 +254816,24 @@
 										"text": "1.1.95"
 									}
 								]
+							},
+							{
+								"tag": "@see",
+								"content": [
+									{
+										"kind": "text",
+										"text": "[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 363,
+							"line": 365,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L363"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L365"
 						}
 					],
 					"type": {
@@ -254990,9 +255134,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/options/table-options.if.ts",
-							"line": 449,
+							"line": 456,
 							"character": 2,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L449"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L456"
 						}
 					],
 					"type": {
@@ -260169,9 +260313,9 @@
 			"sources": [
 				{
 					"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-					"line": 201,
+					"line": 203,
 					"character": 12,
-					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L201"
+					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L203"
 				}
 			],
 			"typeParameters": [
@@ -260198,9 +260342,9 @@
 					"sources": [
 						{
 							"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-							"line": 201,
+							"line": 203,
 							"character": 37,
-							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L201"
+							"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L203"
 						}
 					],
 					"signatures": [
@@ -263946,9 +264090,9 @@
 			"sources": [
 				{
 					"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-					"line": 210,
+					"line": 212,
 					"character": 12,
-					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L210"
+					"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L212"
 				}
 			],
 			"type": {
@@ -263969,9 +264113,9 @@
 							"sources": [
 								{
 									"fileName": "src/lib/table/data/tablemodel/column/column-def.if.ts",
-									"line": 210,
+									"line": 212,
 									"character": 45,
-									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L210"
+									"url": "https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L212"
 								}
 							],
 							"signatures": [
@@ -280619,7 +280763,7 @@
 		},
 		{
 			"kind": "text",
-			"text": " is the framework-free core of the GuiExpert Table: virtual scrolling in both directions,\nmillions of rows, zero runtime dependencies, MIT-licensed. The framework packages (Angular, React, Vue,\nSvelte, Solid, Preact, Web Component) are thin wrappers around exactly this API.\n\n**New here?** The [training](https://gui.expert/training/) explains everything step by step – 36 short\nchapters with live demos. Every chapter links back to the classes on this site.\n\n"
+			"text": " is the framework-free core of the GuiExpert Table: virtual scrolling in both directions,\nmillions of rows, zero runtime dependencies, MIT-licensed. The framework packages (Angular, React, Vue,\nSvelte, Solid, Preact, Web Component) are thin wrappers around exactly this API.\n\n**New here?** The [training](https://gui.expert/training/) explains everything step by step – 39 short\nchapters with live demos. Every chapter links back to the classes on this site.\n\n"
 		},
 		{
 			"kind": "code",
@@ -280627,7 +280771,7 @@
 		},
 		{
 			"kind": "text",
-			"text": "\n\n## Where to start\n\n| You want to … | Look at | Training |\n|---|---|---|\n| create and control a table | [TableScope](classes/TableScope.html), [TableApi](classes/TableApi.html) | [First table](https://gui.expert/training/first-table/) |\n| turn data into a model | [TableFactory](classes/TableFactory.html), [CreateTableModelPara](interfaces/CreateTableModelPara.html) | [Array&lt;T&gt; → model](https://gui.expert/training/array-to-table-model/) |\n| define columns | [ColumnDef](classes/ColumnDef.html), [ColumnDefIf](interfaces/ColumnDefIf.html), [Size](classes/Size.html) | [ColumnDef](https://gui.expert/training/column-definitions/) |\n| write an own header, body or footer | [AreaModel](classes/AreaModel.html), [AreaModelIf](interfaces/AreaModelIf.html) | [Own AreaModel](https://gui.expert/training/custom-area-model/), [Footer totals](https://gui.expert/training/footer-totals/) |\n| configure behaviour and look | [TableOptions](classes/TableOptions.html), [TableOptionsIf](interfaces/TableOptionsIf.html) | [TableOptions](https://gui.expert/training/table-options/) |\n| sort and filter | [TableApi.sortByColumn](classes/TableApi.html#sortByColumn), [TableOptionsIf.externalFilterFunction](interfaces/TableOptionsIf.html#externalFilterFunction) | [Sorting](https://gui.expert/training/sorting/), [Filtering](https://gui.expert/training/filtering/) |\n| react to clicks, selection, edits | [EventAdapter](classes/EventAdapter.html), [EventListenerIf](interfaces/EventListenerIf.html), [GeMouseEvent](classes/GeMouseEvent.html) | [Events](https://gui.expert/training/events-and-context-menu/) |\n| select and copy | [SelectionModel](classes/SelectionModel.html), [TableApi.copyToClipboard](classes/TableApi.html#copyToClipboard) | [Selection & copy](https://gui.expert/training/selection-and-copy/) |\n| export to Excel | [TableApi.downloadExcel](classes/TableApi.html#downloadExcel), [ExcelService](classes/ExcelService.html) | [Excel export](https://gui.expert/training/excel-export/) |\n| style cells | [CellRendererIf](interfaces/CellRendererIf.html), [GeCssColorUtil](classes/GeCssColorUtil.html) | [Renderers](https://gui.expert/training/cell-renderers/), [Heatmap](https://gui.expert/training/heatmap/) |\n| show a tree | [TreeFactory](classes/TreeFactory.html), [TreeRow](classes/TreeRow.html) | [Tree table](https://gui.expert/training/tree-table/) |\n| group flat rows with totals | [RowGroupFactory](classes/RowGroupFactory.html), [AreaModelRowGroups](classes/AreaModelRowGroups.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | [Row grouping](https://gui.expert/training/row-grouping/) |\n| pivot rows × columns with totals | [PivotFactory](classes/PivotFactory.html), [AreaModelPivot](classes/AreaModelPivot.html), [pivotRows](functions/pivotRows.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | [Pivot tables](https://gui.expert/training/pivot-tables/) |\n| update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |\n| remember sorting and scroll position | [AutoRestoreOptions](classes/AutoRestoreOptions.html) | [Persist state](https://gui.expert/training/persist-state/) |\n\nThe index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,\n**Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,\n**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Aggregation**, **Row grouping**, **Pivot**, **DOM**,\n**CRUD**, **Utilities** –\nand **Internals** for the classes the table uses itself.\n\n## Packages\n\n| Package | Use |\n|---|---|\n| "
+			"text": "\n\n## Where to start\n\n| You want to … | Look at | Training |\n|---|---|---|\n| create and control a table | [TableScope](classes/TableScope.html), [TableApi](classes/TableApi.html) | [First table](https://gui.expert/training/first-table/) |\n| turn data into a model | [TableFactory](classes/TableFactory.html), [CreateTableModelPara](interfaces/CreateTableModelPara.html) | [Array&lt;T&gt; → model](https://gui.expert/training/array-to-table-model/) |\n| define columns | [ColumnDef](classes/ColumnDef.html), [ColumnDefIf](interfaces/ColumnDefIf.html), [Size](classes/Size.html) | [ColumnDef](https://gui.expert/training/column-definitions/) |\n| write an own header, body or footer | [AreaModel](classes/AreaModel.html), [AreaModelIf](interfaces/AreaModelIf.html) | [Own AreaModel](https://gui.expert/training/custom-area-model/), [Footer totals](https://gui.expert/training/footer-totals/) |\n| configure behaviour and look | [TableOptions](classes/TableOptions.html), [TableOptionsIf](interfaces/TableOptionsIf.html) | [TableOptions](https://gui.expert/training/table-options/) |\n| sort and filter | [TableApi.sortByColumn](classes/TableApi.html#sortByColumn), [TableOptionsIf.externalFilterFunction](interfaces/TableOptionsIf.html#externalFilterFunction) | [Sorting](https://gui.expert/training/sorting/), [Filtering](https://gui.expert/training/filtering/) |\n| react to clicks, selection, edits | [EventAdapter](classes/EventAdapter.html), [EventListenerIf](interfaces/EventListenerIf.html), [GeMouseEvent](classes/GeMouseEvent.html) | [Events](https://gui.expert/training/events-and-context-menu/) |\n| select and copy | [SelectionModel](classes/SelectionModel.html), [TableApi.copyToClipboard](classes/TableApi.html#copyToClipboard) | [Selection & copy](https://gui.expert/training/selection-and-copy/) |\n| export to Excel | [TableApi.downloadExcel](classes/TableApi.html#downloadExcel), [ExcelService](classes/ExcelService.html) | [Excel export](https://gui.expert/training/excel-export/) |\n| style cells | [CellRendererIf](interfaces/CellRendererIf.html), [GeCssColorUtil](classes/GeCssColorUtil.html) | [Renderers](https://gui.expert/training/cell-renderers/), [Heatmap](https://gui.expert/training/heatmap/) |\n| show a tree | [TreeFactory](classes/TreeFactory.html), [TreeRow](classes/TreeRow.html) | [Tree table](https://gui.expert/training/tree-table/) |\n| group flat rows with totals | [RowGroupFactory](classes/RowGroupFactory.html), [AreaModelRowGroups](classes/AreaModelRowGroups.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | [Row grouping](https://gui.expert/training/row-grouping/) |\n| pivot rows × columns with totals | [PivotFactory](classes/PivotFactory.html), [AreaModelPivot](classes/AreaModelPivot.html), [pivotRows](functions/pivotRows.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | [Pivot tables](https://gui.expert/training/pivot-tables/) |\n| update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |\n| remember layout, sorting, scroll position, selection | [AutoRestoreOptions](classes/AutoRestoreOptions.html), [TableApi.getState](classes/TableApi.html#getState), [TableApi.applyState](classes/TableApi.html#applyState) | [Persist state](https://gui.expert/training/persist-state/) |\n\n## New in October 2026 (1.1.91 – 1.1.98)\n\nTwelve features, all MIT-licensed – overview with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/).\n\n| Feature | Start here | Since | Training |\n|---|---|---|---|\n| Screen readers & keyboard (WAI-ARIA grid) | [TableOptionsIf.ariaLabelledBy](interfaces/TableOptionsIf.html#ariaLabelledBy), [AriaTextsIf](interfaces/AriaTextsIf.html), [TableApi.announce](classes/TableApi.html#announce) | 1.1.91 | [Accessibility](https://gui.expert/training/accessibility/) |\n| “Loading…” and “No rows” overlays | [TableApi.showLoadingOverlay](classes/TableApi.html#showLoadingOverlay), [OverlayOptionsIf](interfaces/OverlayOptionsIf.html) | 1.1.92 | [Live data](https://gui.expert/training/live-data/#overlays) |\n| Save & restore the state | [TableApi.getState](classes/TableApi.html#getState), [TableStateIf](interfaces/TableStateIf.html), [EventListenerIf.onStateChanged](interfaces/EventListenerIf.html#onStateChanged) | 1.1.92 | [Persist state](https://gui.expert/training/persist-state/) |\n| Row numbers | [CreateTableModelPara.rowNumbersVisible](interfaces/CreateTableModelPara.html#rowNumbersVisible), [RowNumberColumnDef](classes/RowNumberColumnDef.html) | 1.1.93 | [Fixed columns](https://gui.expert/training/fixed-columns/#row-numbers) |\n| Total rows, sum of the selection | [CreateTableModelPara.footerAggregates](interfaces/CreateTableModelPara.html#footerAggregates), [Aggregators](variables/Aggregators.html), [TableApi.getSelectionAggregates](classes/TableApi.html#getSelectionAggregates) | 1.1.94 | [Footer totals](https://gui.expert/training/footer-totals/#built-in) |\n| Row grouping | [RowGroupFactory](classes/RowGroupFactory.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | 1.1.94 | [Row grouping](https://gui.expert/training/row-grouping/) |\n| Pivot tables | [PivotFactory](classes/PivotFactory.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | 1.1.94 | [Pivot tables](https://gui.expert/training/pivot-tables/) |\n| Calculated columns, “Show values as”, formulas | [ColumnDefIf.valueGetter](interfaces/ColumnDefIf.html#valueGetter), [ColumnDefIf.showValuesAs](interfaces/ColumnDefIf.html#showValuesAs), [compileFormula](functions/compileFormula.html), [TableApi.setColumnFormula](classes/TableApi.html#setColumnFormula) | 1.1.95 | [Formulas](https://gui.expert/training/formulas/) |\n| Drag rows into order | [CreateTableModelPara.rowDrag](interfaces/CreateTableModelPara.html#rowDrag), [GeRowDragEvent](classes/GeRowDragEvent.html), [TableApi.moveRows](classes/TableApi.html#moveRows) | 1.1.95 | [Events](https://gui.expert/training/events-and-context-menu/#row-drag) |\n| Fill handle & batch edit | [TableOptionsIf.fillHandle](interfaces/TableOptionsIf.html#fillHandle), [TableOptionsIf.batchEdit](interfaces/TableOptionsIf.html#batchEdit), [TableApi.commitBatchEdit](classes/TableApi.html#commitBatchEdit) | 1.1.96 | [Inline editing](https://gui.expert/training/inline-editing/#fill-batch) |\n| Master/detail | [TableOptionsIf.masterDetail](interfaces/TableOptionsIf.html#masterDetail), [DetailRenderContextIf](interfaces/DetailRenderContextIf.html) | 1.1.97 | [Master/detail](https://gui.expert/training/master-detail/) |\n| Right-to-left | [TableOptionsIf.direction](interfaces/TableOptionsIf.html#direction), [TableApi.getDirection](classes/TableApi.html#getDirection) | 1.1.98 | [Theming](https://gui.expert/training/theming-dark-mode/#rtl) |\n\nThe index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,\n**Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,\n**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Accessibility**, **Overlays**, **State**,\n**Row numbers**, **Aggregation**, **Row grouping**, **Pivot**, **Calculated columns & formulas**, **Row drag**,\n**Fill handle & batch edit**, **Master/detail**, **DOM**, **CRUD**, **Utilities** –\nand **Internals** for the classes the table uses itself.\n\n## Packages\n\n| Package | Use |\n|---|---|\n| "
 		},
 		{
 			"kind": "code",
@@ -280731,7 +280875,7 @@
 		},
 		{
 			"kind": "text",
-			"text": " for any page |\n\nSource code: [github.com/guiexperttable/mono](https://github.com/guiexperttable/mono) ·\nShowcases: [gui.expert/showcase](https://gui.expert/showcase/) · Licence: MIT"
+			"text": " for any page |\n\nSource code: [github.com/guiexperttable/mono](https://github.com/guiexperttable/mono) ·\nShowcases: [gui.expert/showcase](https://gui.expert/showcase/) · What's new: [gui.expert/whats-new](https://gui.expert/whats-new/) · Licence: MIT"
 		}
 	],
 	"symbolIdMap": {

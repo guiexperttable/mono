@@ -71,6 +71,7 @@ export interface CreateTableModelPara {
    *   footerAggregates: { quantity: "sum", total: "sum" }       // footer: "100,000 rows" | … | 549,812 | 27,481,033.5
    * });
    *
+   * @see [Live demo: totals & aggregation](https://gui.expert/showcase/aggregation/run/) · Training: [Totals in one option](https://gui.expert/training/footer-totals/#built-in)
    * @since 1.1.94
    */
   footerAggregates: AggregateFooterConfig;
@@ -92,6 +93,7 @@ export interface CreateTableModelPara {
    * @example
    * const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs, rowNumbersVisible: true });
    *
+   * @see [Live demo: row numbers](https://gui.expert/showcase/rownumbers/run/) · Training: [Row numbers](https://gui.expert/training/fixed-columns/#row-numbers)
    * @since 1.1.93
    */
   rowNumbersVisible: boolean | Partial<RowNumberOptionsIf>;
@@ -103,6 +105,7 @@ export interface CreateTableModelPara {
    * @example
    * const tableModel = TableFactory.createTableModel({ rows: orders, rowDrag: true });
    *
+   * @see [Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
    * @since 1.1.95
    */
   rowDrag: boolean;

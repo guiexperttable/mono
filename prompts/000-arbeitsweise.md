@@ -128,6 +128,11 @@ Regeln aus CLAUDE.md §6:
   `src/components/showcase/<name>/run.astro`, Vorschaubild `src/assets/screens/thumbs/<name>.png`, Kachel in
   `src/components/showcase/index.astro`, optional `src/content/showcase/<name>.json`. Name klein, ohne Bindestrich.
 - Feature-Liste: `src/components/features.astro`.
+- **Neues Feature sichtbar machen:** Eintrag in `src/features/new-features.ts` (Problem, Snippet ≤ 15 Zeilen, Showcase,
+  Training-Abschnitt, API, ag-Grid-Stufe) – daraus entstehen `/whats-new/`, Home „What's new“, Training-Index „New since
+  the course“ und die „New“-Kacheln der Showcase-Übersicht. Prüfen: `pnpm --filter webpage-guiexpert check:features`.
+  `/doc/` (Tabellen `FEATURES`, `OPTION_GROUPS`, `API_GROUPS`, `EVENTS` in `src/components/doc/doc.astro`) mitpflegen.
+- Neues Tabellen-CSS auch in die Website-Kopie `src/styles/ge-table.css` übernehmen (die Showcases laden nur sie).
 - Vergleichsaussagen prüfen und ggf. anpassen: `src/components/home/why.astro` (Tabelle `ROWS` + „Rule of thumb“),
   `src/pages/training/build-buy-or-guiexpert.astro`, `src/pages/training/checklist.astro`, Beiträge unter
   `src/pages/post/` bzw. `src/components/post/`. Ehrlich bleiben: was fehlt, bleibt als fehlend stehen.
@@ -185,6 +190,7 @@ pnpm build:libs && pnpm build:angular
 pnpm --filter @guiexpert/demo-table-models build
 pnpm --filter @guiexpert/table typedoc:website
 pnpm --filter webpage-guiexpert check:training
+pnpm --filter webpage-guiexpert check:features
 pnpm build:webpage-guiexpert
 ```
 

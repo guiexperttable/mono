@@ -53,6 +53,7 @@ const DEMOS = {
   "fill-batch": { slug: "inline-editing", fillDown: 4 },
   "pivot-tables": { slug: "pivot-tables", button: "expand all" },
   "master-detail": { slug: "master-detail", wait: 900, toggleDetail: 3 },
+  "formulas": { slug: "formulas", wait: 800, search: "ROUND([gross] - [net], 2)" },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
 

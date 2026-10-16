@@ -35,37 +35,22 @@ You will also find the `main.css` in the downloaded node module: `node_modules/@
 Create a component and include the guiexpert tag in the template of your component
 
 ```tsx
-import React from 'react';
 import { GuiexpertTable } from '@guiexpert/react-table';
-import { TableFactory } from '@guiexpert/table';
-import { TableOptions} from '@guiexpert/table';
+import { TableFactory, TableOptions } from '@guiexpert/table';
 
-export const App = () => {
-    const headerData = [['Column 1', 'Column 2', 'Column 3']]; // array of array!
-    
-    const bodyData = [];
-    for (let i = 0; i < 100; i++) {
-      bodyData.push(['This is a very', 'simple', 'demo.']);
-    }
-    
-    const tableModel = TableFactory.createTableModel({
-        headerData,
-        bodyData,
-        overridingColumnWidth: 110,
-    });
-    
-    console.info(tableModel);
-    
-    return (
-        <>
-        <GuiexpertTable
-            tableModel={tableModel}
-            tableOptions={new TableOptions()}
-        />
-        </>
-    );
-};
+// created once, outside the component: a new model or options object rebuilds the table
+const headerData = [['Column 1', 'Column 2', 'Column 3']]; // array of array!
+const bodyData = Array.from({ length: 100 }, () => ['This is a very', 'simple', 'demo.']);
+const tableModel = TableFactory.createTableModel({ headerData, bodyData, overridingColumnWidth: 110 });
+const tableOptions = new TableOptions();
+
+export const App = () => (
+  <GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} />
+);
 ```
+
+Model or options that depend on props or state: create them with `useMemo`, so that they only change when their inputs
+change.
 
 Be sure, that your div containers expands. Add this CSS rule to your component's style.
 

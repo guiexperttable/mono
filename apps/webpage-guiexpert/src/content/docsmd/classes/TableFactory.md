@@ -113,7 +113,7 @@ as its property.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:478](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L478)
+[src/lib/table/factory/table-factory.ts:481](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L481)
 
 ___
 
@@ -152,7 +152,7 @@ The newly constructed table model.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:424](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L424)
+[src/lib/table/factory/table-factory.ts:427](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L427)
 
 ___
 
@@ -189,7 +189,7 @@ If a parameter isn't provided, the default value is used.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:634](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L634)
+[src/lib/table/factory/table-factory.ts:637](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L637)
 
 ___
 
@@ -245,7 +245,7 @@ const tableModel = TableFactory.createByAreaModelsParam({
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:699](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L699)
+[src/lib/table/factory/table-factory.ts:702](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L702)
 
 ___
 
@@ -304,7 +304,7 @@ const tableModel = TableFactory.createByObjectArray(rows, undefined, undefined, 
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:769](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L769)
+[src/lib/table/factory/table-factory.ts:772](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L772)
 
 ___
 
@@ -364,7 +364,7 @@ const tableModel = TableFactory.createByObjectArrayParam(param);
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:567](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L567)
+[src/lib/table/factory/table-factory.ts:570](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L570)
 
 ___
 
@@ -400,4 +400,4 @@ const tableModel = TableFactory.createTableModel({
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L185)
+[src/lib/table/factory/table-factory.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L188)

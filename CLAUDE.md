@@ -560,7 +560,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 36 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 37 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -651,8 +651,8 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 26 | Summenzeile in einer Zeile Code – plus Statusleiste für die Auswahl (ohne Enterprise-Lizenz) | `videos/06-summenzeile/`, Training-Kapitel `footer-totals`, `apps/table-demo/aggregation.html` |
 | 27 | Row Grouping in 60 Sekunden – ohne Enterprise-Lizenz | `videos/07-row-grouping/`, Showcase `rowgrouping`, Training-Kapitel `row-grouping`, `apps/table-demo/row-grouping.html`; Bezug zu Folge 12 „Baumtabelle & Checkboxen“ |
 | 28 | Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz | `videos/08-pivot-ohne-enterprise/`, Showcase `pivot`, Training-Kapitel `pivot-tables`, `apps/table-demo/pivot.html`; Bezug zu Folge 14 „Mehrzeilige Header-Gruppen“ |
-| 29 | Berechnete Spalten in 60 Sekunden (`valueGetter`, Sortieren/Summe stimmen) – geplant | Showcase `formulas`, `instructions.md` 5.2 |
-| 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, `instructions.md` 5.9 |
+| 29 | Berechnete Spalten in 60 Sekunden (`valueGetter`, Sortieren/Summe stimmen) – geplant | Showcase `formulas`, Training-Kapitel `formulas`, `instructions.md` 5.2 |
+| 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, Training-Kapitel `formulas` (#formulas), `instructions.md` 5.9 |
 | 31 | Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/09-zeilen-ziehen/`, Showcase `rowdrag`, Training-Kapitel `events-and-context-menu` (Abschnitt), `apps/table-demo/row-drag.html`, `instructions.md` 6.16 |
 | 32 | Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln, dann speichern | `videos/10-fill-handle-batch-edit/`, Showcase `batchedit`, Training-Kapitel `inline-editing` (Abschnitt), `apps/table-demo/fill-batch.html`, `instructions.md` 6.17 |
 | 33 | Master/Detail ohne Enterprise-Lizenz – Bestellung aufklappen, Positionen als zweite Tabelle, 100.000 Zeilen | `videos/11-master-detail/`, Showcase `masterdetail`, Training-Kapitel `master-detail`, `apps/table-demo/master-detail.html`, `instructions.md` 6.18 |
@@ -665,12 +665,19 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 38 Kapitel = 38 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 39 Kapitel = 39 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
 Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`,
 Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94;
 seit Prompt 007: Kapitel 37 `pivot-tables`, Tag `ep-037` erst nach dem Release 1.1.94; seit Prompt 011: Kapitel 38
-`master-detail`, Tag `ep-038` erst nach dem Release 1.1.97 – die Planung für `formulas` (008) rückt auf 39).
+`master-detail`, Tag `ep-038` erst nach dem Release 1.1.97; Kapitel 39 `formulas` (008, nachgeholt), Tag `ep-039` offen).
+
+**Neue Features sichtbar machen** (Seite `/whats-new/`, Home „What's new“, Training-Index „New since the course“ `#new`,
+Showcase-Übersicht „New“): eine Liste `src/features/new-features.ts` (je Feature Problem, Snippet ≤ 15 Zeilen, Showcase,
+Training-Abschnitt, API-Symbole, ag-Grid-Stufe). Snippets prüfen: `pnpm --filter webpage-guiexpert check:features`
+(kompiliert jedes Snippet gegen `packages/table/dist`); API-Namen, Kapitel und Showcases prüft der Build. Ein neues Feature
+= ein Eintrag dort + Vorschaubild `src/assets/screens/thumbs/<showcase>.png`. Die Website hat eine eigene Kopie des
+Tabellen-CSS (`src/styles/ge-table.css`) – neues Core-CSS dort nachtragen (Overlays/Zeilennummern fehlten bis Okt. 2026).
 
 ```
 apps/webpage-guiexpert/src/

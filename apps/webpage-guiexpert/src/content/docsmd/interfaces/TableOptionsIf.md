@@ -151,7 +151,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabel: "Orders
 
 **`See`**
 
-Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
+[Live demo: accessible order table](https://gui.expert/showcase/accessibility/run/) · Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
 
 #### Defined in
 
@@ -248,9 +248,13 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), batchEdit: true };
 
 1.1.96
 
+**`See`**
+
+[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:393](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L393)
+[src/lib/table/data/options/table-options.if.ts:397](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L397)
 
 ___
 
@@ -326,9 +330,13 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" }
 
 1.1.98
 
+**`See`**
+
+[Live demo: right-to-left](https://gui.expert/showcase/rtl/run/) · Training: [Right-to-left](https://gui.expert/training/theming-dark-mode/#rtl)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:428](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L428)
+[src/lib/table/data/options/table-options.if.ts:434](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L434)
 
 ___
 
@@ -387,9 +395,13 @@ const tableOptions: TableOptionsIf = {
 
 1.1.96
 
+**`See`**
+
+[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:381](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L381)
+[src/lib/table/data/options/table-options.if.ts:384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L384)
 
 ___
 
@@ -603,9 +615,13 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: save
 
 1.1.92
 
+**`See`**
+
+[Live demo: persisted layout](https://gui.expert/showcase/state/run/) · Training: [Remember the state](https://gui.expert/training/persist-state/)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:441](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L441)
+[src/lib/table/data/options/table-options.if.ts:448](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L448)
 
 ___
 
@@ -633,9 +649,13 @@ const tableOptions: TableOptionsIf = {
 
 1.1.97
 
+**`See`**
+
+[Live demo: master/detail](https://gui.expert/showcase/masterdetail/run/) · Training: [Master/detail](https://gui.expert/training/master-detail/)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:411](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L411)
+[src/lib/table/data/options/table-options.if.ts:416](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L416)
 
 ___
 
@@ -684,9 +704,13 @@ const tableOptions: TableOptionsIf = {
 
 1.1.92
 
+**`See`**
+
+[Live demo: loading & empty states](https://gui.expert/showcase/overlays/run/) · Training: [Loading and empty tables](https://gui.expert/training/live-data/#overlays)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L349)
+[src/lib/table/data/options/table-options.if.ts:350](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L350)
 
 ___
 
@@ -722,9 +746,13 @@ const tableOptions: TableOptionsIf = {
 
 1.1.95
 
+**`See`**
+
+[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
+
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:363](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L363)
+[src/lib/table/data/options/table-options.if.ts:365](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L365)
 
 ___
 
@@ -809,7 +837,7 @@ Delay in ms between the last change of the state (resize, sort, scroll …) and
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:449](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L449)
+[src/lib/table/data/options/table-options.if.ts:456](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L456)
 
 ___
 

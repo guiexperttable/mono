@@ -47,7 +47,7 @@ import { buildPivotLayout, pivotGroupHeaderLabel } from "../pivot/pivot-layout";
  * });
  * select.addEventListener("change", () => tableApi.setPivotConfig({ columnFields: [select.value] }));
  *
- * @see Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
+ * @see [Live demo: pivot tables](https://gui.expert/showcase/pivot/run/) · Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
  *
  * @since 1.1.94
  * @category Pivot

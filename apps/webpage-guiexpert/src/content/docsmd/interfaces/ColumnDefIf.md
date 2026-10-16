@@ -109,13 +109,17 @@ ___
 The formula of a formula column (`ColumnDef.create({ formula })` compiles it into the `valueGetter`), e.g.
 `"[price] * [quantity] * 1.19"`. Informational – change it with [TableApi.setColumnFormula](../classes/TableApi.md#setcolumnformula).
 
+**`See`**
+
+[Live demo: formulas](https://gui.expert/showcase/formulas/run/) · Training: [Formulas your users can type](https://gui.expert/training/formulas/#formulas)
+
 **`Since`**
 
 1.1.95
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L166)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L168)
 
 ___
 
@@ -248,7 +252,7 @@ ColumnDef.create({ property: "title", headerLabel: "Task", rowDrag: (task: { loc
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L178)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L180)
 
 ___
 
@@ -265,13 +269,17 @@ total, rank … (see [ShowValuesAs](../modules.md#showvaluesas)). Change it at r
 ColumnDef.create({ property: "total", headerLabel: "Share", showValuesAs: "percentOfColumnTotal" })
 ```
 
+**`See`**
+
+Training: [Show values as](https://gui.expert/training/formulas/#show-values-as)
+
 **`Since`**
 
 1.1.95
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L159)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L160)
 
 ___
 
@@ -369,7 +377,7 @@ ColumnDef.create({
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L192)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L194)
 
 ___
 
@@ -394,7 +402,7 @@ ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
 
 **`See`**
 
-Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)
+[Live demo: formulas & calculated columns](https://gui.expert/showcase/formulas/run/) · Training: [Calculated columns, “Show values as” and formulas](https://gui.expert/training/formulas/)
 
 **`Since`**
 

@@ -18,7 +18,8 @@ import Callout from "../../components/training/Callout.astro";
     <li>Extend <ApiLink name="AreaModel" /> and override what you need – the base class has sensible defaults for the rest.</li>
     <li><code>getValueAt()</code> is called for about 20 rows × 5 columns per frame, not for 2 million rows.</li>
     <li><ApiLink name="AreaModelIf.getConstantRowHeight" /> tells the table that all rows are equally high: it finds the first
-      visible row by division instead of adding up heights – O(1) instead of O(n) per scroll frame.</li>
+      visible row by division – O(1) per scroll frame. With different row heights the table keeps prefix sums and uses a
+      binary search (O(log n), since 1.1.97).</li>
   </ul>
 
   <h2 id="table">Use it</h2>

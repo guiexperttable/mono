@@ -1,0 +1,109 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="formulas">
+
+  <h2 id="idea">Computed, not stored</h2>
+  <p>
+    Your orders have a quantity and a price. The table should also show the net amount, the gross amount with VAT, the
+    share of each order in the total and its rank. You could add these fields to every object – and keep them right after
+    every edit, every filter and every new delivery from the server. Or the <strong>column computes them</strong> when a
+    cell becomes visible. Since <code>@guiexpert/table@1.1.95</code> there are three tools for that – MIT-licensed:
+  </p>
+  <ul>
+    <li><strong>calculated columns</strong> – a <code>valueGetter</code> function per column;</li>
+    <li><strong>“Show values as”</strong> – a value shown as a share, running total, difference or rank;</li>
+    <li><strong>formulas</strong> – a text like <code>ROUND([net] * 1.19, 2)</code> that your users can type.</li>
+  </ul>
+  <LiveDemo name="formulas" title="1,000 orders – net, gross, share and your own formula" height={460}
+            caption="Type a formula into the search field, e.g. ROUND([gross] - [net], 2) or IF([price] > 1000, &quot;big&quot;, &quot;&quot;). Sort by “Share of net”, switch it to a running total or rank, filter Germany." />
+
+  <h2 id="value-getter">valueGetter: one function per column</h2>
+  <p>
+    <ApiLink name="ColumnDefIf.valueGetter" /> gets the row and returns the value. <code>property</code> stays the id of the
+    column – it does not have to exist in the data:
+  </p>
+  <Snippet file="demos/formulas.ts" region="columns" title="src/order-columns.ts" />
+  <p>The important part is <strong>where</strong> the value is used – everywhere the table reads a cell:</p>
+  <ul>
+    <li>sorting (a click on “Net” sorts by the computed value), copy, Excel export;</li>
+    <li>the total row: <code>footerAggregates: {"{ net: \"sum\" }"}</code> sums the computed values
+      (<ChapterLink slug="footer-totals" />), row grouping can group and aggregate by them (<ChapterLink slug="row-grouping" />);</li>
+    <li>other calculated columns: the second parameter (<ApiLink name="ValueGetterContextIf" />) reads them with
+      <ApiLink name="ValueGetterContextIf.getValue" />, column totals over the filtered rows with
+      <ApiLink name="ValueGetterContextIf.aggregate" /> (cached).</li>
+  </ul>
+  <p>
+    The filter function gets your row object – read a computed value with <ApiLink name="TableApi.getRowValue" />:
+  </p>
+  <Code lang="ts" code={`tableOptions.externalFilterFunction = (o: Order) => Number(tableApi.getRowValue(o, "gross")) > 1000;`} />
+  <Callout type="note" title="Fast and free of side effects">
+    <p>Values are not cached: the getter runs for the visible cells on every render and once per row for a sort or a total.
+      A computed column is never editable – unless you give it a <ApiLink name="ColumnDefIf.valueSetter" /> that writes the
+      source fields back.</p>
+  </Callout>
+
+  <h2 id="show-values-as">Show values as: shares, running totals, ranks</h2>
+  <p>
+    The column “Share of net” has the same value as “Net” – it is only <em>shown</em> differently.
+    <ApiLink name="ColumnDefIf.showValuesAs" /> knows seven modes (<ApiLink name="ShowValuesAs" />):
+  </p>
+  <ul>
+    <li><code>percentOfColumnTotal</code>, <code>percentOfGrandTotal</code>, <code>percentOfParentTotal</code> (per group
+      in a tree or row grouping), <code>percentOfRowTotal</code> (pivot);</li>
+    <li><code>runningTotal</code>, <code>differenceFromPrevious</code>, <code>rank</code> (1 = largest).</li>
+  </ul>
+  <Snippet file="demos/formulas.ts" region="show-as" />
+  <p>
+    The reference is always the <strong>filtered</strong> rows, like the total row: switch on “only Germany” and the
+    visible shares add up to 100 % again. Sorting uses the raw value; Excel gets the shares as numbers with the format
+    <code>0.0%</code>. In a pivot table, every value can have its own mode (<ChapterLink slug="pivot-tables" />).
+  </p>
+  <Snippet file="demos/formulas.ts" region="filter" />
+
+  <h2 id="formulas">Formulas your users can type</h2>
+  <p>
+    A formula column is a calculated column whose getter is compiled from a text. Fields are written in brackets, the
+    functions look like a spreadsheet:
+  </p>
+  <Code lang="ts" code={`ColumnDef.create({ property: "gross", formula: "ROUND([net] * 1.19, 2)" })
+ColumnDef.create({ property: "margin", formula: "IF([net] = 0, 0, ([net] - [cost]) / [net])" })
+ColumnDef.create({ property: "share", formula: "ROUND([net] / SUM([net]) * 100, 1)" })   // SUM over the column`} />
+  <p>At runtime – e.g. from an input field of your app – <ApiLink name="TableApi.setColumnFormula" /> compiles and repaints:</p>
+  <Snippet file="demos/formulas.ts" region="formula" />
+  <ul>
+    <li><strong>Functions:</strong> <code>ROUND</code>, <code>ABS</code>, <code>IF</code>, <code>IFERROR</code>,
+      <code>AND</code>, <code>OR</code>, <code>CONCAT</code>, <code>UPPER</code> … (<ApiLink name="FORMULA_FUNCTION_NAMES" />),
+      column aggregates <code>SUM([x])</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>COUNT</code> –
+      and your own functions via <code>formulaOptions: {"{ functions: { VAT: net => Number(net) * 0.19 } }"}</code>.</li>
+    <li><strong>Errors are values, not exceptions:</strong> <code>#DIV/0!</code>, <code>#NAME?</code> (unknown field),
+      <code>#VALUE!</code>, <code>#CIRC!</code> (a column that uses itself) – shown in red with the message as tooltip, sorted
+      last, skipped by totals. Test it with <ApiLink name="compileFormula" /> and <ApiLink name="isFormulaError" />.</li>
+    <li><strong>Math, not Excel:</strong> <code>-2^2</code> is <code>-4</code>; <code>ROUND</code> rounds half away from zero.</li>
+  </ul>
+  <Callout type="note" title="Safe with user input">
+    <p>Formulas are parsed into a syntax tree and evaluated by a small interpreter – <strong>no <code>eval</code>, no
+      <code>new Function</code></strong>, so they work with a strict Content-Security-Policy. Only the listed functions exist,
+      fields read own properties only (<code>[constructor]</code> is <code>#NAME?</code>), and Excel gets values, never
+      formulas.</p>
+  </Callout>
+
+  <h2 id="limits">What it is not</h2>
+  <p>
+    There are no cell references like <code>=B2*C2</code>: with sorting, filtering and virtual scrolling, positions change
+    all the time – a formula refers to fields of the same row and to column totals. There is no built-in formula editor;
+    the input field belongs to your app. Compare with the alternatives: <ChapterLink slug="build-buy-or-guiexpert" />.
+  </p>
+  <Callout type="version">
+    <p>Since 1.1.95. The tag <code>ep-039</code> of the demo repository follows.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview of all chapters, or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

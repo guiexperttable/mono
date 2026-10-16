@@ -1,0 +1,101 @@
+---
+// Overlays showcase: an empty table, loading with a pure CSS spinner, a refresh over existing rows and "No matching rows".
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="ov-bar">
+  <button type="button" class={id + '-load'}>Load 5,000 orders</button>
+  <button type="button" class={id + '-empty'}>Load an empty result</button>
+  <button type="button" class={id + '-slow'}>Slow server (3 s)</button>
+  <label>Filter <input type="search" class={id + '-filter'} placeholder="try “xyz”" /></label>
+  <label><input type="checkbox" class={id + '-block'} checked /> block clicks while loading</label>
+  <span class="ov-state">overlay: <b class={id + '-state'}>–</b></span>
+</div>
+<div style="height: calc(100vh - 176px)" class:list={[ id, 'ov-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from '/scripts/table/index.js'
+
+  const cities = ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Leipzig', 'Bonn'];
+  const allOrders = Array.from({ length: 5_000 }, (_, i) => ({
+    id: 1000 + i,
+    customer: `Customer ${(i * 7919) % 997}`,
+    city: cities[i % cities.length],
+    total: Math.round(((i * 7919) % 100_000) / 10) / 10
+  }));
+  /** stands in for fetch("/api/orders") */
+  const fakeFetch = (rows, ms) => new Promise(resolve => setTimeout(() => resolve(rows), ms));
+
+  const ele = document.querySelector('.' + id);
+  const stateLabel = document.querySelector('.' + id + '-state');
+  const blockInput = document.querySelector('.' + id + '-block');
+  let filterText = '';
+  let tableApi;
+  let current = [];     // the rows of the last answer – kept when the table is rebuilt
+  let seq = 0;          // only the latest request may end the loading overlay
+
+  function create() {
+    tableApi?.destroy();
+    // an empty table shows "No orders yet" – no extra code
+    const tableModel = TableFactory.createTableModel({ rows: current, properties: ['id', 'customer', 'city', 'total'] });
+    const tableOptions = {
+      ...new TableOptions(),
+      externalFilterFunction: row => !filterText || row.customer.toLowerCase().includes(filterText),
+      overlayOptions: { noRowsText: 'No orders yet', blockInteractionWhileLoading: blockInput.checked }
+    };
+    const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+  }
+
+  async function load(rows, ms = 1000) {
+    const request = ++seq;
+    tableApi.showLoadingOverlay();            // CSS spinner + "Loading…"
+    const orders = await fakeFetch(rows, ms);
+    if (request !== seq) return;              // an older answer – a newer request is still loading
+    current = orders;
+    tableApi.setRows(orders);
+    tableApi.repaintHard();
+    tableApi.hideOverlay();                   // 0 rows → "No orders yet" by itself
+  }
+
+  create();
+  setInterval(() => { stateLabel.textContent = tableApi.getOverlayState(); }, 100);
+  document.querySelector('.' + id + '-load').addEventListener('click', () => load(allOrders));
+  document.querySelector('.' + id + '-empty').addEventListener('click', () => load([]));
+  document.querySelector('.' + id + '-slow').addEventListener('click', () => load(allOrders.slice().reverse(), 3000));
+  document.querySelector('.' + id + '-filter').addEventListener('input', e => {
+    filterText = e.target.value.trim().toLowerCase();
+    tableApi.externalFilterChanged();         // nothing found → "No matching rows"
+  });
+  blockInput.addEventListener('change', () => { seq++; create(); });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .ov-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .ov-bar button, .ov-bar input[type="search"] {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .ov-state {
+        opacity: 0.85;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+</style>

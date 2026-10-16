@@ -14,8 +14,11 @@ Add the following NPM package to your existing angular project
 (run this in your project root directory):
 
 ```shell
-npm install --save @guiexpert/table @guiexpert/angular-table
+npm install --save @guiexpert/table @guiexpert/angular-table@17
 ```
+
+The major version of `@guiexpert/angular-table` is the major version of Angular: use `@14` … `@22` for your project
+(`latest` is Angular 22).
 
 ## Import standalone component
 
@@ -29,22 +32,10 @@ Import the (standalone) table component in your angular module (or in your angul
 
 ```
 
-## Add global table CSS
+## Table CSS
 
-To add the global guiexpert CSS file in your Angular project, 
-you can include the file in the styles array within the angular.json file.
-
-- Open the `angular.json` file of your project.
-
-- Look for the styles section within the configuration object for your project. It typically looks like this:
-
-```json
-"styles": [
-  "src/styles.css",
-  "node_modules/@guiexpert/table/css/main.css"
-  ...
-],
-```
+Nothing to do: the Angular component ships the table styles. To change colors, override the `--ge-table-*` CSS
+variables in your global styles.
 
 
 # Create an example component

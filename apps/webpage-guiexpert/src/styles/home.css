@@ -49,6 +49,32 @@
 .home-btn-ghost { border: 1px solid rgb(255 255 255 / 0.55); color: #fff; }
 .home-btn-ghost:hover { color: #fff; background: rgb(255 255 255 / 0.12); }
 
+.home-new {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  margin: -0.5rem 0 1.25rem;
+  padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #fff;
+  background: rgb(0 0 0 / 0.22);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  transition: background 0.15s ease;
+}
+.home-new:hover { background: rgb(0 0 0 / 0.36); color: #fff; }
+.home-new b {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #fff;
+  color: #4a2a8a;
+}
+
 .home-install {
   display: inline-flex;
   align-items: center;

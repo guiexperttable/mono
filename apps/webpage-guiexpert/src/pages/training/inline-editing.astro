@@ -25,7 +25,8 @@ import Callout from "../../components/training/Callout.astro";
   <h2 id="after">After the edit</h2>
   <p>
     The table writes the new value into your object (via <ApiLink name="AreaModelIf.setValue" />) and reports it:
-    <ApiLink name="EventListenerIf.onModelChanged" /> with a <ApiLink name="GeModelChangeEvent" />. Derived values are your job:
+    <ApiLink name="EventListenerIf.onModelChanged" /> with a <ApiLink name="GeModelChangeEvent" />. This demo updates its derived values by hand – since 1.1.95 a calculated column
+    (<code>valueGetter</code>, <ChapterLink slug="formulas" />) and <code>footerAggregates</code> follow an edit by themselves:
   </p>
   <Snippet file="demos/inline-editing.ts" region="events" />
   <Snippet file="demos/inline-editing.ts" region="wire" />

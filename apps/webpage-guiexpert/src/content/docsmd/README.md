@@ -6,7 +6,7 @@ GuiExpert Table API / [Exports](modules.md)
 millions of rows, zero runtime dependencies, MIT-licensed. The framework packages (Angular, React, Vue,
 Svelte, Solid, Preact, Web Component) are thin wrappers around exactly this API.
 
-**New here?** The [training](https://gui.expert/training/) explains everything step by step – 36 short
+**New here?** The [training](https://gui.expert/training/) explains everything step by step – 39 short
 chapters with live demos. Every chapter links back to the classes on this site.
 
 ```ts
@@ -38,12 +38,32 @@ const tableApi = tableScope.getApi();
 | group flat rows with totals | [RowGroupFactory](classes/RowGroupFactory.html), [AreaModelRowGroups](classes/AreaModelRowGroups.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | [Row grouping](https://gui.expert/training/row-grouping/) |
 | pivot rows × columns with totals | [PivotFactory](classes/PivotFactory.html), [AreaModelPivot](classes/AreaModelPivot.html), [pivotRows](functions/pivotRows.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | [Pivot tables](https://gui.expert/training/pivot-tables/) |
 | update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |
-| remember sorting and scroll position | [AutoRestoreOptions](classes/AutoRestoreOptions.html) | [Persist state](https://gui.expert/training/persist-state/) |
+| remember layout, sorting, scroll position, selection | [AutoRestoreOptions](classes/AutoRestoreOptions.html), [TableApi.getState](classes/TableApi.html#getState), [TableApi.applyState](classes/TableApi.html#applyState) | [Persist state](https://gui.expert/training/persist-state/) |
+
+## New in October 2026 (1.1.91 – 1.1.98)
+
+Twelve features, all MIT-licensed – overview with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/).
+
+| Feature | Start here | Since | Training |
+|---|---|---|---|
+| Screen readers & keyboard (WAI-ARIA grid) | [TableOptionsIf.ariaLabelledBy](interfaces/TableOptionsIf.html#ariaLabelledBy), [AriaTextsIf](interfaces/AriaTextsIf.html), [TableApi.announce](classes/TableApi.html#announce) | 1.1.91 | [Accessibility](https://gui.expert/training/accessibility/) |
+| “Loading…” and “No rows” overlays | [TableApi.showLoadingOverlay](classes/TableApi.html#showLoadingOverlay), [OverlayOptionsIf](interfaces/OverlayOptionsIf.html) | 1.1.92 | [Live data](https://gui.expert/training/live-data/#overlays) |
+| Save & restore the state | [TableApi.getState](classes/TableApi.html#getState), [TableStateIf](interfaces/TableStateIf.html), [EventListenerIf.onStateChanged](interfaces/EventListenerIf.html#onStateChanged) | 1.1.92 | [Persist state](https://gui.expert/training/persist-state/) |
+| Row numbers | [CreateTableModelPara.rowNumbersVisible](interfaces/CreateTableModelPara.html#rowNumbersVisible), [RowNumberColumnDef](classes/RowNumberColumnDef.html) | 1.1.93 | [Fixed columns](https://gui.expert/training/fixed-columns/#row-numbers) |
+| Total rows, sum of the selection | [CreateTableModelPara.footerAggregates](interfaces/CreateTableModelPara.html#footerAggregates), [Aggregators](variables/Aggregators.html), [TableApi.getSelectionAggregates](classes/TableApi.html#getSelectionAggregates) | 1.1.94 | [Footer totals](https://gui.expert/training/footer-totals/#built-in) |
+| Row grouping | [RowGroupFactory](classes/RowGroupFactory.html), [TableApi.setRowGroupBy](classes/TableApi.html#setRowGroupBy) | 1.1.94 | [Row grouping](https://gui.expert/training/row-grouping/) |
+| Pivot tables | [PivotFactory](classes/PivotFactory.html), [TableApi.setPivotConfig](classes/TableApi.html#setPivotConfig) | 1.1.94 | [Pivot tables](https://gui.expert/training/pivot-tables/) |
+| Calculated columns, “Show values as”, formulas | [ColumnDefIf.valueGetter](interfaces/ColumnDefIf.html#valueGetter), [ColumnDefIf.showValuesAs](interfaces/ColumnDefIf.html#showValuesAs), [compileFormula](functions/compileFormula.html), [TableApi.setColumnFormula](classes/TableApi.html#setColumnFormula) | 1.1.95 | [Formulas](https://gui.expert/training/formulas/) |
+| Drag rows into order | [CreateTableModelPara.rowDrag](interfaces/CreateTableModelPara.html#rowDrag), [GeRowDragEvent](classes/GeRowDragEvent.html), [TableApi.moveRows](classes/TableApi.html#moveRows) | 1.1.95 | [Events](https://gui.expert/training/events-and-context-menu/#row-drag) |
+| Fill handle & batch edit | [TableOptionsIf.fillHandle](interfaces/TableOptionsIf.html#fillHandle), [TableOptionsIf.batchEdit](interfaces/TableOptionsIf.html#batchEdit), [TableApi.commitBatchEdit](classes/TableApi.html#commitBatchEdit) | 1.1.96 | [Inline editing](https://gui.expert/training/inline-editing/#fill-batch) |
+| Master/detail | [TableOptionsIf.masterDetail](interfaces/TableOptionsIf.html#masterDetail), [DetailRenderContextIf](interfaces/DetailRenderContextIf.html) | 1.1.97 | [Master/detail](https://gui.expert/training/master-detail/) |
+| Right-to-left | [TableOptionsIf.direction](interfaces/TableOptionsIf.html#direction), [TableApi.getDirection](classes/TableApi.html#getDirection) | 1.1.98 | [Theming](https://gui.expert/training/theming-dark-mode/#rtl) |
 
 The index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,
 **Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,
-**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Aggregation**, **Row grouping**, **Pivot**, **DOM**,
-**CRUD**, **Utilities** –
+**Sorting & filtering**, **Export & clipboard**, **Styling**, **Keyboard**, **Accessibility**, **Overlays**, **State**,
+**Row numbers**, **Aggregation**, **Row grouping**, **Pivot**, **Calculated columns & formulas**, **Row drag**,
+**Fill handle & batch edit**, **Master/detail**, **DOM**, **CRUD**, **Utilities** –
 and **Internals** for the classes the table uses itself.
 
 ## Packages
@@ -58,4 +78,4 @@ and **Internals** for the classes the table uses itself.
 | `@guiexpert/webcomponent-table` | `<guiexpert-table>` for any page |
 
 Source code: [github.com/guiexperttable/mono](https://github.com/guiexperttable/mono) ·
-Showcases: [gui.expert/showcase](https://gui.expert/showcase/) · Licence: MIT
+Showcases: [gui.expert/showcase](https://gui.expert/showcase/) · What's new: [gui.expert/whats-new](https://gui.expert/whats-new/) · Licence: MIT

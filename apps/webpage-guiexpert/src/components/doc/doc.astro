@@ -68,6 +68,9 @@ const AREA_MODELS = [
   { name: "AreaModelArrayOfArrays", text: "rows as arrays of values (CSV, matrices)", slug: "array-of-arrays" },
   { name: "AreaModelCellGroups", text: "grouped, collapsible header rows", slug: "header-groups" },
   { name: "AreaModelTree", text: "hierarchical rows for tree tables", slug: "tree-table" },
+  { name: "AreaModelAggregateFooter", text: "a footer with totals of the filtered rows (footerAggregates)", slug: "footer-totals" },
+  { name: "AreaModelRowGroups", text: "rows grouped by fields, with subtotals (RowGroupFactory)", slug: "row-grouping" },
+  { name: "AreaModelPivot", text: "pivot rows with values per column group (PivotFactory)", slug: "pivot-tables" },
   { name: "AreaModel", text: "base class for your own models: computed values, totals, server data", slug: "custom-area-model" }
 ];
 
@@ -79,7 +82,10 @@ const OPTION_GROUPS = [
   { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction"] },
   { title: "Selection and keyboard", names: ["getSelectionModel", "getFocusModel", "shortcutActionIdMapping", "shortcutActionsDisabled"] },
   { title: "Trees, groups, editing", names: ["treeOptions", "headerGroupOptions", "showCheckboxWihoutExtraColumn", "getEditRenderer"] },
-  { title: "State", names: ["autoRestoreOptions"] }
+  { title: "State", names: ["autoRestoreOptions", "initialState"] },
+  { title: "Accessibility and overlays", names: ["ariaLabel", "ariaLabelledBy", "ariaTexts", "overlayOptions"] },
+  { title: "Editing and rows", names: ["fillHandle", "batchEdit", "rowDragOptions", "masterDetail"] },
+  { title: "Direction", names: ["direction"] }
 ];
 
 // ── TableApi ──────────────────────────────────────────────────────────────
@@ -88,7 +94,10 @@ const API_GROUPS = [
   { title: "Sorting and filtering", names: ["sortByColumn", "sort", "reSort", "externalFilterChanged"] },
   { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
   { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
-  { title: "Columns", names: ["autoResizeColumns", "setColumnWidth", "recalcColumnWidths"] },
+  { title: "Columns", names: ["autoResizeColumns", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "setColumnFormula", "setShowValuesAs"] },
+  { title: "Grouping and pivot", names: ["setRowGroupBy", "setPivotConfig", "getSelectionAggregates"] },
+  { title: "Editing, rows and details", names: ["applyCellChanges", "commitBatchEdit", "cancelBatchEdit", "moveRows", "setDetailExpanded"] },
+  { title: "State, overlays, announcements", names: ["getState", "applyState", "resetState", "showLoadingOverlay", "hideOverlay", "announce"] },
   { title: "Selection and keyboard", names: ["getSelectionModel", "setSelectionModel", "clearSelection", "copyToClipboard", "triggerAction"] },
   { title: "Export and lifecycle", names: ["downloadExcel", "destroy"] }
 ];
@@ -101,10 +110,14 @@ const EVENTS = [
   { event: "mouseDragging", listener: "onMouseDragging", payload: "GeMouseEvent", note: "" },
   { event: "mouseDraggingEnd", listener: "onMouseDraggingEnd", payload: "GeMouseEvent", note: "Angular: mouseDraggingEnded" },
   { event: "checkboxChanged", listener: "onCheckboxChanged", payload: "checked rows", note: "row and tree checkboxes" },
-  { event: "modelChanged", listener: "onModelChanged", payload: "GeModelChangeEvent", note: "after inline editing" },
+  { event: "modelChanged", listener: "onModelChanged", payload: "GeModelChangeEvent", note: "after editing, filling, a batch commit or applyCellChanges – one event with all changes" },
   { event: "selectionChanged", listener: "onSelectionChanged", payload: "SelectionModelIf", note: "" },
   { event: "focusChanged", listener: "onFocusChanged", payload: "FocusModelIf", note: "" },
-  { event: "scroll", listener: "onScroll", payload: "GeScrollEvent", note: "not forwarded by the React wrapper" }
+  { event: "scroll", listener: "onScroll", payload: "GeScrollEvent", note: "scrollLeft from the start of the row (also in right-to-left)" },
+  { event: "stateChanged", listener: "onStateChanged", payload: "GeStateChangeEvent", note: "layout, sorting, selection … changed (debounced)" },
+  { event: "rowDragEnd", listener: "onRowDragEnd", payload: "GeRowDragEvent", note: "also rowDragStart, rowDragMove" },
+  { event: "batchEditChanged", listener: "onBatchEditChanged", payload: "GeBatchEditEvent", note: "start, change, commit, cancel" },
+  { event: "detailExpandedChanged", listener: "onDetailExpandedChanged", payload: "GeDetailEvent", note: "a detail row opened or closed" }
 ];
 
 // ── features ──────────────────────────────────────────────────────────────
@@ -112,7 +125,11 @@ const FEATURES = [
   { feature: "Millions of rows", text: "an own area model that computes cells on demand", api: ["AreaModel", "AreaModelIf.getConstantRowHeight"], slug: "custom-area-model" },
   { feature: "Fixed columns", text: "left and right, set in the model", api: ["CreateTableModelPara.fixedLeftColumnCount", "CreateTableModelPara.fixedRightColumnCount"], slug: "fixed-columns" },
   { feature: "Header groups", text: "multi-row, collapsible headers", api: ["AreaModelCellGroups", "CellgroupFactory.buildColumnDefs"], slug: "header-groups" },
-  { feature: "Footer totals", text: "a footer model that sums the displayed rows", api: ["AreaModelObjectArray.getFilteredRows"], slug: "footer-totals" },
+  { feature: "Footer totals", text: "one option: sum, average, count … of the filtered rows, plus sums of the selection", api: ["CreateTableModelPara.footerAggregates", "TableApi.getSelectionAggregates"], slug: "footer-totals" },
+  { feature: "Row numbers", text: "a fixed “#” column, one flag", api: ["CreateTableModelPara.rowNumbersVisible"], slug: "fixed-columns" },
+  { feature: "Row grouping", text: "groups with subtotals, regroup at runtime", api: ["RowGroupFactory.createTableModel", "TableApi.setRowGroupBy"], slug: "row-grouping" },
+  { feature: "Pivot tables", text: "row fields × column fields, subtotals and totals", api: ["PivotFactory.createTableModel", "TableApi.setPivotConfig"], slug: "pivot-tables" },
+  { feature: "Calculated columns and formulas", text: "valueGetter, “show values as”, formulas without eval", api: ["ColumnDefIf.valueGetter", "ColumnDefIf.formula"], slug: "formulas" },
   { feature: "Column resizing and reordering", text: "drag handles and drag & drop", api: ["TableOptionsIf.columnsResizable", "TableOptionsIf.columnsDraggable", "TableApi.autoResizeColumns"], slug: "table-options" },
   { feature: "Sorting", text: "header double-click, own comparators, from code", api: ["ColumnDefIf.sortComparator", "TableApi.sortByColumn"], slug: "sorting" },
   { feature: "Filtering", text: "your filter UI – the table asks per row", api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged"], slug: "filtering" },
@@ -126,8 +143,14 @@ const FEATURES = [
   { feature: "Rowspan and colspan", text: "merged cells, defined by the model", api: ["AreaModelIf.getRowspanAt", "AreaModelIf.getColspanAt"], slug: "rowspan-colspan" },
   { feature: "Tree table with checkboxes", text: "hierarchical data, expanded or collapsed", api: ["TreeFactory.buildTreeRows", "EventListenerIf.onCheckboxChanged"], slug: "tree-table" },
   { feature: "Inline editing", text: "text and select editors, input conversion", api: ["ColumnDefIf.editable", "ColumnDefIf.getEditRenderer"], slug: "inline-editing" },
+  { feature: "Fill handle and batch edit", text: "continue series, collect changes, then save", api: ["TableOptionsIf.fillHandle", "TableOptionsIf.batchEdit"], slug: "inline-editing" },
+  { feature: "Row drag", text: "drag rows into order – mouse, touch, keyboard", api: ["CreateTableModelPara.rowDrag", "TableApi.moveRows"], slug: "events-and-context-menu" },
+  { feature: "Master/detail", text: "expandable detail rows with any content", api: ["TableOptionsIf.masterDetail"], slug: "master-detail" },
+  { feature: "Accessibility", text: "WAI-ARIA grid, keyboard, screen reader announcements", api: ["TableOptionsIf.ariaLabel", "TableApi.announce"], slug: "accessibility" },
+  { feature: "Loading and empty overlays", text: "CSS spinner, “No rows”, “No matching rows”", api: ["TableApi.showLoadingOverlay", "TableOptionsIf.overlayOptions"], slug: "live-data" },
+  { feature: "Right-to-left", text: "Arabic, Hebrew, Persian – one option", api: ["TableOptionsIf.direction"], slug: "theming-dark-mode" },
   { feature: "Live data", text: "update single cells – only visible ones are redrawn", api: ["TableApi.updateCells"], slug: "live-data" },
-  { feature: "Persisted state", text: "sorting, scroll position and open tree nodes", api: ["TableOptionsIf.autoRestoreOptions"], slug: "persist-state" }
+  { feature: "Persisted state", text: "column layout, sorting, scroll position, tree, checked and selected rows – automatically or as JSON for your server", api: ["TableOptionsIf.autoRestoreOptions", "TableApi.getState"], slug: "persist-state" }
 ];
 
 // ── CSS variables, read from the core stylesheet ──────────────────────────
@@ -188,7 +211,7 @@ const chapterCount = CHAPTERS.length;
     <a class="chapter-card" href="/training/">
       <span class="card-no">TRAINING</span>
       <b>Step by step</b>
-      <p>Short chapters with live demos – from the first table to editing and live data.</p>
+      <p>Short chapters with live demos – from the first table to row grouping, pivot tables, master/detail and formulas.</p>
       <span class="card-meta">{chapterCount} chapters · free</span>
     </a>
     <a class="chapter-card" href="/showcase/">
@@ -781,8 +804,8 @@ html[data-theme="dark"] .brand-table {
       <ul class="doc-checklist">
         <li><strong>Constant row height.</strong> If all rows have the same height, return it from
           <ApiLink name="AreaModelIf.getConstantRowHeight" label="getConstantRowHeight()" /> in your own models. The table
-          then finds the first visible row directly instead of adding up the heights of all rows above it. The built-in
-          models do this automatically.</li>
+          then finds the first visible row by a division instead of a binary search over the row heights (which it uses
+          for different heights since 1.1.97). The built-in models do this automatically.</li>
         <li><strong>Stable model and options.</strong> Create them once; a new object rebuilds the table (see
           <a href="#building-blocks">{T["building-blocks"]}</a>).</li>
         <li><strong>Filter, don't rebuild.</strong> Use <ApiLink name="TableOptionsIf.externalFilterFunction" label="externalFilterFunction" />
@@ -811,8 +834,9 @@ html[data-theme="dark"] .brand-table {
           <tr><td>Context menu</td><td class="wrap">the <code>contextmenu</code> event plus a menu in the style of your app (<ChapterLink slug="events-and-context-menu" />)</td></tr>
           <tr><td>Pagination</td><td class="wrap">not needed for display thanks to virtual scrolling; to load data page by page, use an own area model (<ChapterLink slug="custom-area-model" />)</td></tr>
           <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend</td></tr>
-          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> (also <code>setHeaderVisible()</code> / <code>setFooterVisible()</code>, since 1.1.91)</td></tr>
-          <tr><td>Row drag and drop</td><td class="wrap">not available</td></tr>
+          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> (also <code>setHeaderVisible()</code> / <code>setFooterVisible()</code>)</td></tr>
+          <tr><td>Paste from the clipboard, undo / redo</td><td class="wrap">not built in yet – every edit, fill and commit arrives as one <code>modelChanged</code> event with old and new values, a base for your own undo stack</td></tr>
+          <tr><td>Group panel, pivot field list, formula editor</td><td class="wrap">your UI around <ApiLink name="TableApi.setRowGroupBy" label="setRowGroupBy()" />, <ApiLink name="TableApi.setPivotConfig" label="setPivotConfig()" /> and <ApiLink name="TableApi.setColumnFormula" label="setColumnFormula()" /></td></tr>
         </tbody>
       </table>
       <p>A checklist for planning your own table – and for deciding when another product fits better:

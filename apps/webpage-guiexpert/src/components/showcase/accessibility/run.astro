@@ -1,0 +1,188 @@
+---
+// Accessibility showcase: a WAI-ARIA grid with a visible name, a key legend and a visible copy of what a screen reader hears.
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="a11y-bar">
+  <h2 id={id + '-title'} class="a11y-title">Orders 2026</h2>
+  <label>Filter <input type="search" class={id + '-filter'} placeholder="customer …" /></label>
+  <label>Announcements
+    <select class={id + '-lang'}>
+      <option value="en" selected>English</option>
+      <option value="de">Deutsch</option>
+    </select>
+  </label>
+  <button type="button" class={id + '-focus'}>Focus the table</button>
+</div>
+<p id={id + '-hint'} class="a11y-hint">
+  Keys: ↑ ↓ ← → · Home / End · Ctrl+Home / Ctrl+End · Page ↑ / ↓ · ↑ in the first row = header, Enter sorts ·
+  Space selects · Ctrl+A · Ctrl+C
+</p>
+<div class="a11y-main">
+  <div style="height: calc(100vh - 230px)" class:list={[ id, 'a11y-demo' ]}></div>
+  <aside class="a11y-log-box" aria-label="What a screen reader hears">
+    <b>A screen reader hears</b>
+    <ol class={id + '-log'}></ol>
+    <small>A copy of the live region. Try a screen reader (VoiceOver: ⌘ F5, NVDA, JAWS) for the full picture: cell,
+      row and column position, sort state, selection.</small>
+  </aside>
+</div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import {
+    ColumnDef, EventAdapter, SelectionModel, SimpleDomService, StarRatingCellRenderer, TableFactory, TableOptions,
+    TableScope, TrueFn, px100, px120, px200
+  } from '/scripts/table/index.js'
+
+  const cities = ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Leipzig', 'Bonn'];
+  const orders = Array.from({ length: 10_000 }, (_, i) => ({
+    id: 1000 + i,
+    customer: `Customer ${(i * 7919) % 997}`,
+    city: cities[i % cities.length],
+    rating: 1 + (i * 31) % 5,
+    total: Math.round(((i * 7919) % 100_000) / 10) / 10
+  }));
+
+  // own announcement texts – here German, English is the default
+  const german = {
+    sorted: (column, state) => state ? `Sortiert nach ${column}, ${state === 'asc' ? 'aufsteigend' : 'absteigend'}` : `Sortierung von ${column} entfernt`,
+    filtered: rowCount => rowCount === 1 ? '1 Zeile' : `${rowCount} Zeilen`,
+    copied: cellCount => cellCount === 1 ? '1 Zelle kopiert' : `${cellCount} Zellen kopiert`,
+    allSelected: () => 'Alle Zellen ausgewählt',
+    selectionCleared: () => 'Auswahl aufgehoben'
+  };
+
+  const ele = document.querySelector('.' + id);
+  const log = document.querySelector('.' + id + '-log');
+  let filterText = '';
+  let tableScope;
+  let observer;
+
+  function create(language) {
+    tableScope?.destroy();
+    observer?.disconnect();
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', headerLabel: 'Order', width: px100, sortable: TrueFn }),
+      ColumnDef.create({ property: 'customer', headerLabel: 'Customer', width: px200, sortable: TrueFn }),
+      ColumnDef.create({ property: 'city', headerLabel: 'City', width: px120, sortable: TrueFn }),
+      ColumnDef.create({ property: 'rating', headerLabel: 'Rating', width: px120, bodyRenderer: new StarRatingCellRenderer('rating') }),
+      ColumnDef.create({ property: 'total', headerLabel: 'Total', width: px120, sortable: TrueFn,
+        headerClasses: ['ge-table-text-align-right'], bodyClasses: ['ge-table-text-align-right'] })
+    ];
+    const selectionModel = new SelectionModel('range', 'multi');
+    const tableOptions = {
+      ...new TableOptions(),
+      ariaLabelledBy: id + '-title',          // the visible heading names the grid
+      ariaDescribedBy: id + '-hint',          // the key legend describes it
+      ariaTexts: language === 'de' ? german : undefined,
+      getSelectionModel: () => selectionModel,
+      externalFilterFunction: order => !filterText || order.customer.toLowerCase().includes(filterText)
+    };
+    const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs, rowNumbersVisible: true, tableOptions });
+    tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+    tableScope.firstInit();
+    const tableApi = tableScope.getApi();
+
+    // mirror the live region (only for this page – a screen reader reads it itself)
+    tableApi.announce(language === 'de' ? 'Tabelle bereit' : 'Table ready');
+    const region = tableScope.liveAnnouncer.getElement();
+    if (region) {
+      observer = new MutationObserver(() => {
+        const text = region.textContent ?? '';
+        if (!text) return;
+        const li = document.createElement('li');
+        li.textContent = text;
+        log.prepend(li);
+        while (log.children.length > 8) log.lastElementChild.remove();
+      });
+      observer.observe(region, { childList: true, characterData: true, subtree: true });
+      log.replaceChildren();
+    }
+    return tableApi;
+  }
+
+  let tableApi = create('en');
+  document.querySelector('.' + id + '-filter').addEventListener('input', e => {
+    filterText = e.target.value.trim().toLowerCase();
+    tableApi.externalFilterChanged();
+  });
+  document.querySelector('.' + id + '-lang').addEventListener('change', e => { tableApi = create(e.target.value); });
+  document.querySelector('.' + id + '-focus').addEventListener('click', () => ele.focus());
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .a11y-bar {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 8px 0 4px;
+        flex-wrap: wrap;
+    }
+    .a11y-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-inline-end: 8px;
+    }
+    .a11y-bar input, .a11y-bar select, .a11y-bar button {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .a11y-bar select option {
+        color: initial;
+    }
+    .a11y-hint {
+        margin: 0 0 8px;
+        font-size: 13px;
+        opacity: 0.8;
+    }
+    .a11y-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 260px;
+        gap: 16px;
+    }
+    .a11y-log-box {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-size: 13px;
+        overflow: auto;
+    }
+    .a11y-log-box ol {
+        display: grid;
+        gap: 6px;
+        padding: 0;
+        list-style: none;
+    }
+    .a11y-log-box :global(li) {
+        padding: 6px 8px;
+        border-radius: 6px;
+        background: var(--color-background-offset);
+    }
+    .a11y-log-box :global(li:first-child) {
+        font-weight: 600;
+        border-inline-start: 3px solid var(--color-primary);
+    }
+    .a11y-log-box small {
+        margin-top: auto;
+        opacity: 0.75;
+    }
+    @media (max-width: 800px) {
+        .a11y-main {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+</style>

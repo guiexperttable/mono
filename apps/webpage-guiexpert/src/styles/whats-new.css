@@ -1,0 +1,114 @@
+/* /whats-new/ – builds on training.css (hero, sections, buttons). Colors only from the site variables (light + dark). */
+
+.whats-new { font-size: 1rem; padding-bottom: 4rem; }
+
+.wn-install {
+  display: inline-flex;
+  margin-top: 1.5rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background-offset);
+}
+.wn-install code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92rem; }
+.wn-install code span { opacity: 0.6; margin-right: 0.35rem; }
+
+/* ── index of the twelve ─────────────────────────────────────────────── */
+.wn-index {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  scroll-margin-top: 80px;
+}
+.wn-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-background);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.wn-chip:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+.wn-chip b { display: block; font-size: 0.9rem; line-height: 1.3; }
+.wn-chip small { display: block; margin-top: 0.15rem; font-size: 0.75rem; color: var(--color-text-offset); }
+.wn-chip-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+.wn-chip-icon svg { width: 1.25rem; height: 1.25rem; }
+
+/* ── one feature ─────────────────────────────────────────────────────── */
+.wn-feature {
+  display: grid;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.5rem;
+  align-items: start;
+  padding-top: 4rem;
+  scroll-margin-top: 70px;
+}
+.wn-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; font-size: 0.8rem; }
+.wn-no {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+.wn-version, .wn-ag {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-offset);
+}
+.wn-ag-enterprise { border-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+.wn-feature h2 { margin: 0.6rem 0 0.75rem; font-size: 1.9rem; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; }
+.wn-problem { font-size: 1.08rem; line-height: 1.6; }
+.wn-points { display: grid; gap: 0.4rem; margin: 1rem 0 1.25rem; color: var(--color-text-offset); line-height: 1.5; }
+.wn-points li { position: relative; padding-inline-start: 1.1rem; }
+.wn-points li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--color-primary); font-weight: 700; }
+.wn-links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.wn-links a { font-size: 0.92rem; }
+.wn-api { margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-offset); line-height: 1.8; }
+.wn-api a { color: var(--color-secondary); }
+.wn-api a:hover { text-decoration: underline; }
+
+.wn-side { display: grid; gap: 1rem; min-width: 0; }
+.wn-thumb {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  aspect-ratio: 16 / 7;
+  transition: border-color 0.15s ease;
+}
+.wn-thumb:hover { border-color: var(--color-primary); }
+.wn-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.wn-side > * { min-width: 0; max-width: 100%; }
+.wn-side .expressive-code { margin: 0; overflow: hidden; }
+.wn-side .expressive-code pre { overflow-x: auto; }
+
+.wn-end { padding-top: 5rem; }
+.wn-end a { color: var(--color-secondary); }
+.wn-end a:hover { text-decoration: underline; }
+
+@media (max-width: 1100px) {
+  .wn-index { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .wn-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wn-feature { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; padding-top: 3rem; }
+}
+@media (max-width: 560px) {
+  .wn-index { grid-template-columns: minmax(0, 1fr); }
+  .wn-feature h2 { font-size: 1.5rem; }
+  .training-section.wn-feature, .training-section.wn-index { padding-left: 1rem; padding-right: 1rem; }
+}

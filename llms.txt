@@ -62,7 +62,8 @@ Basic usage involves:
 
 ## Documentation
 - Demos: https://gui.expert/demos
-- Training (38 chapters, step by step): https://gui.expert/training/
+- Training (39 chapters, step by step): https://gui.expert/training/
+- What's new (twelve features of October 2026 with code): https://gui.expert/whats-new/
 - Documentation: https://gui.expert/doc
 - API: https://gui.expert/api
 

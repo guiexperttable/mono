@@ -288,7 +288,7 @@ export interface TableOptionsIf {
    * const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabel: "Orders" };
    *
    * @since 1.1.91
-   * @see Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
+   * @see [Live demo: accessible order table](https://gui.expert/showcase/accessibility/run/) · Training: [Accessible tables: keyboard and screen readers](https://gui.expert/training/accessibility/)
    */
   ariaLabel?: string;
 
@@ -345,6 +345,7 @@ export interface TableOptionsIf {
    * };
    *
    * @since 1.1.92
+   * @see [Live demo: loading & empty states](https://gui.expert/showcase/overlays/run/) · Training: [Loading and empty tables](https://gui.expert/training/live-data/#overlays)
    */
   overlayOptions?: Partial<OverlayOptionsIf>;
 
@@ -359,6 +360,7 @@ export interface TableOptionsIf {
    * };
    *
    * @since 1.1.95
+   * @see [Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
    */
   rowDragOptions?: Partial<RowDragOptionsIf>;
 
@@ -377,6 +379,7 @@ export interface TableOptionsIf {
    * };
    *
    * @since 1.1.96
+   * @see [Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
    */
   fillHandle?: boolean | Partial<FillHandleOptionsIf>;
 
@@ -389,6 +392,7 @@ export interface TableOptionsIf {
    * const tableOptions: TableOptionsIf = { ...new TableOptions(), batchEdit: true };
    *
    * @since 1.1.96
+   * @see [Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
    */
   batchEdit?: boolean | Partial<BatchEditOptionsIf>;
 
@@ -407,6 +411,7 @@ export interface TableOptionsIf {
    * };
    *
    * @since 1.1.97
+   * @see [Live demo: master/detail](https://gui.expert/showcase/masterdetail/run/) · Training: [Master/detail](https://gui.expert/training/master-detail/)
    */
   masterDetail?: Partial<MasterDetailOptionsIf>;
 
@@ -424,6 +429,7 @@ export interface TableOptionsIf {
    * const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" };
    *
    * @since 1.1.98
+   * @see [Live demo: right-to-left](https://gui.expert/showcase/rtl/run/) · Training: [Right-to-left](https://gui.expert/training/theming-dark-mode/#rtl)
    */
   direction?: TableDirection;
 
@@ -437,6 +443,7 @@ export interface TableOptionsIf {
    * const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: saved ?? undefined };
    *
    * @since 1.1.92
+   * @see [Live demo: persisted layout](https://gui.expert/showcase/state/run/) · Training: [Remember the state](https://gui.expert/training/persist-state/)
    */
   initialState?: Partial<TableStateIf>;
 

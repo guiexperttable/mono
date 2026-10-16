@@ -33,8 +33,9 @@ import { Code } from "astro-expressive-code/components";
     <li><strong>Listen first, then set <code>data</code></strong>: <code>tableReady</code> fires right away when the data is set.</li>
   </ol>
   <p>
-    All events (<code>tableReady</code>, <code>mouseClicked</code>, <code>selectionChanged</code>, <code>contextmenu</code> …) arrive as
-    <strong>bubbling <code>CustomEvent</code>s</strong>; the payload is in <code>event.detail</code>. For <code>tableReady</code> it is the
+    All events (<code>tableReady</code>, <code>mouseClicked</code>, <code>selectionChanged</code> …) arrive as
+    <strong>bubbling <code>CustomEvent</code>s</strong> – except <code>contextmenu</code>, which does not bubble: listen on the
+    element itself. The payload is in <code>event.detail</code>. For <code>tableReady</code> it is the
     <ApiLink name="TableApi" />.
   </p>
 
@@ -42,7 +43,7 @@ import { Code } from "astro-expressive-code/components";
   <p>A single HTML file is enough – stylesheet and modules come from jsDelivr, an import map resolves the bare package names:</p>
   <Snippet file="examples/cdn/index.html" title="cdn/index.html" />
   <Callout type="tip" title="Pin the version">
-    <p>Use an exact version in CDN URLs (<code>@guiexpert/table@1.1.90</code>) – both packages must have the <strong>same</strong>
+    <p>Use an exact version in CDN URLs (<code>@guiexpert/table@1.1.98</code>) – both packages must have the <strong>same</strong>
       version, because the web component imports the core through the import map.</p>
   </Callout>
   <Callout type="pitfall" title="file:// does not work">

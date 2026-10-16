@@ -108,7 +108,7 @@ export class BatchEditService {
    */
   getShownValue(rowIndex: number, columnIndex: number): unknown {
     const entry = this.getPendingAt(rowIndex, columnIndex);
-    return entry ? entry.newValue : this.tableScope.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex);
+    return entry ? entry.newValue : this.tableScope.getCellInput(rowIndex, columnIndex);
   }
 
   /**
@@ -118,12 +118,11 @@ export class BatchEditService {
    * @returns {CellChangeIf[]} the cells whose pending state changed
    */
   addPending(inputs: PendingInputIf[]): CellChangeIf[] {
-    const body = this.tableScope.tableModel.getBodyModel();
     const changes: CellChangeIf[] = [];
     for (const input of inputs) {
       const rowKey = this.rowKeyOf(input.rowIndex);
       const property = this.propertyOf(input.columnIndex);
-      const modelValue = body.getValueAt(input.rowIndex, input.columnIndex);
+      const modelValue = this.tableScope.getCellInput(input.rowIndex, input.columnIndex); // a formula: its text
       const result = this.pending.set(rowKey, property, modelValue, input.value, input.rawValue, input.error);
       if (result !== "unchanged") {
         const entry = this.pending.get(rowKey, property);
@@ -187,7 +186,7 @@ export class BatchEditService {
     const changes: CellChangeIf[] = cells.map(cell => {
       const rowIndex = typeof cell.rowKey === "number" ? cell.rowKey : indexOfRow.get(cell.rowKey) ?? -1;
       const columnIndex = this.findColumnIndex(cell.property);
-      const modelValue = rowIndex >= 0 && columnIndex >= 0 ? body.getValueAt(rowIndex, columnIndex) : undefined;
+      const modelValue = rowIndex >= 0 && columnIndex >= 0 ? this.tableScope.getCellInput(rowIndex, columnIndex) : undefined;
       return {
         row: typeof cell.rowKey === "number" ? undefined : cell.rowKey,
         rowIndex,

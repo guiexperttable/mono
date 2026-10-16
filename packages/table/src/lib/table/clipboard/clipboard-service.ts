@@ -1,3 +1,4 @@
+import { CopiedFormula } from "../sheet/table-sheet";
 import type { TableScope } from "../table-scope";
 import type { ClipboardOptionsIf, PasteContextIf } from "./clipboard-options.if";
 import type { CellValueChangeIf } from "../batch-edit/cell-value-change.if";
@@ -212,7 +213,10 @@ export class ClipboardService {
     const lastShown = shownColumns[Math.min(shownColumns.length - 1, startShown + mCols - 1)];
     // a batch edit marks texts (its commit writes them through editInputPipe); otherwise the copied values
     const batch = scope.isBatchEditActive();
-    let values: unknown[][] = memory && !batch ? memory.values : matrix;
+    let values: unknown[][] = memory && !batch ? memory.values
+      // a batch edit marks texts – formulas copied inside the table stay formulas (since 1.1.99)
+      : memory ? matrix.map((row, r) => row.map((text, c) => memory.values[r]?.[c] instanceof CopiedFormula ? memory.values[r][c] : text))
+        : matrix;
     let raw = !!memory && !batch;
     const process = this.options.processPaste;
     if (process) {
@@ -245,6 +249,12 @@ export class ClipboardService {
     });
     if (plan.addRows) {
       this.appendRows(plan.addRows);
+    }
+    if (memory) {
+      // formulas copied inside the table: their references move to the target (a cut formula moves unchanged)
+      for (const cell of plan.cells) {
+        cell.value = scope.resolvePastedValue(cell.value, cell.rowIndex, cell.columnIndex, !!cut);
+      }
     }
     const changes: CellValueChangeIf[] = [];
     let source: CellChangeSource = "paste";
@@ -493,13 +503,15 @@ export class ClipboardService {
           text = def.getRowNumberText(r, body);
           value = text;
         } else {
-          value = scope.getShownCellValue(r, c);
+          value = scope.getCopyValue(r, c); // a cell formula: the formula (pasted inside the table, since 1.1.99)
+          const shown = value instanceof CopiedFormula ? value.value : value;
           // the shown text – a Date as ISO date (its default text is long and not readable by Excel), no "null"
-          text = raw || value === null || value === undefined || value instanceof Date ? rawText(value) : body.getTextValueAt(r, c);
+          text = raw || shown === null || shown === undefined || shown instanceof Date ? rawText(shown) : body.getTextValueAt(r, c);
         }
         textRow.push(text);
         valueRow.push(value);
-        htmlRow.push(typeof value === "number" ? { text, num: value } : { text });
+        const num = value instanceof CopiedFormula ? value.value : value;
+        htmlRow.push(typeof num === "number" ? { text, num } : { text });
       }
       texts.push(textRow);
       values.push(valueRow);
@@ -582,7 +594,7 @@ export class ClipboardService {
       return value;
     }
     const current = rowIndex < scope.tableModel.getBodyModel().getRowCount()
-      ? scope.getShownCellValue(rowIndex, columnIndex) : undefined;
+      ? scope.getTypedCellValue(rowIndex, columnIndex) : undefined;
     const text = value.trim();
     if (typeof current === "number" || def?.editor === "number") {
       return text !== "" && /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(text) ? Number(text) : value;

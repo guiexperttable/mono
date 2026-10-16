@@ -22,6 +22,7 @@ import {
   FormulaError, isFormulaError, FormulaNode, FormulaBinaryOperator, FormulaValue, FormulaFunction, FormulaOptionsIf,
   FORMULA_FUNCTION_NAMES, CompiledFormula, compileFormula, createFormulaValueGetter, ExcelFormattedValueIf,
   isExcelFormattedValue,
+  isExcelFormulaCell,
   RowDropPosition, RowDropTargetIf, RowDragOptionsIf, RowDragOptions, normalizeRowIndices, getInsertBeforeIndex,
   calcMoveToIndex, moveArrayItems, getTopmostTreeRows, canMoveTreeRows, moveTreeRows, canMoveFlatRows, moveFlatRows,
   RowDragService, RowDragHandleState, GeRowDragEvent, GeRowDragEventType, GeRowDragSource, RowDragColumnOption, findRowIndexAtY,

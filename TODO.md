@@ -415,6 +415,18 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Neuberechnung einmal gesucht, Lookups ohne Kopie + Typrang, `maxRangeCells` zur Auswertungszeit, leeres Argument,
       Exponent ab 16 Stellen, `TEXT` von Text, Einfügen am Blattende, `adjustForStructureChange` nur bei echter
       Änderung (Schreibweise bleibt), `DATE(1900,2,29)` = 60, `WEEKDAY` 11–17, `DATEDIF` ym/md/yd, `isSheetDate`.
+      **Etappe 5 umgesetzt** (17.10.2026, Branch `feat/spreadsheet-5-sheet`): `tableOptions.cellFormulas` – Formeln in
+      den Daten, `TableSheet` verbindet Body-Modell (Haken `sheetCells` in `getValueByT`/`getValueAt`) und Engine,
+      Schreibweg meldet Zellen vor dem Repaint, Eingabe ≠ Wert (`getInputValueAt`), Füllen/Kopieren verschieben Bezüge,
+      Excel-Export mit `<f>`, Demo `apps/table-demo/cell-formulas.html`. Offen aus Etappe 5: Ausschneiden + Einfügen
+      passt Bezüge **auf** die verschobenen Zellen nicht an (`moveCells`, Excel tut es) · `addRows`/`removeRows`/`moveRows`
+      passen Bezüge nicht an (Etappe 7: `insertRows`/`deleteRows`) · Datumsergebnisse zeigt der Standard-Renderer als
+      `Date`-Text (Formatierung: Etappe 7) · `getPrecedents` liefert Adressen, keine Anzeige-Bereiche.
+      Review (unabhängiger Agent, 13 Befunde) eingearbeitet: berechnete Spalten (008) lesen Ergebnisse (`readPath`,
+      Kontext `isCalculated`), Formeln auf berechnete Spalten rechnen beim Schreiben der Zeile neu, `'=`-Text bleibt beim
+      Kopieren Text, Zahl über Formel bleibt Zahl (`getTypedCellValue`), Excel: Feldbezüge/Syntaxfehler als Wert, ganze
+      Spalten/Zeilen auf die Datenzeilen begrenzt, Excel-Grenzen, Datumsformat; Batch-Kopieren behält Formeln,
+      `updateCells` schreibt Formeln roh, `getDependents` linear, JSDoc-Beispiele.
 
 ## Mono-Repo / Build
 
@@ -691,6 +703,15 @@ Objekt-Tabelle hat `ge-focused-row`.
   `FORMULA_FUNCTION_INFO`, `FormulaFunctionInfoIf`, `FormulaRefNode`. **Typ-Erweiterungen:** `FormulaNode` hat die
   Knoten `ref`, `range`, `error` und den unären Operator `"%"` (Spaltenformeln 008 erzeugen sie nie; ein erschöpfendes
   `switch` beim Anwender meldet sie), `FormulaErrorCode` hat `"#REF!"` und `"#N/A"`. Spaltenformeln (008) unverändert.
+  **Zellformeln in der Tabelle (013, Etappe 5)**, additiv: `TableOptionsIf.cellFormulas`, `ColumnDefIf.cellFormulas`
+  (+ `ColumnDef.create`), optional `AreaModelIf.getInputValueAt?` (Objekt- und Array-Modell), `TableSheet` (Internals),
+  `ExcelFormulaCellIf`, `isExcelFormulaCell`, `ExcelServiceIf.supportsFormulas?`, `ExcelExportOptionsIf.cellFormulas`,
+  `TableApi.downloadExcel(fileName, author, options?)` (3. Parameter), `TableApi.hasCellFormulas/getCellAddress/
+  getCellByAddress/getCellInput/getCellValue/setCellInput/evaluateFormula/getSheetValue/recalculate/getPrecedents/
+  getDependents/getSheetEngine`, `TableScope.getCellInput/getCopyValue/resolvePastedValue`, `RenderScope.tableSheet`.
+  `FormulaNode` `literal` darf `value: null` haben (leeres Argument in Zellformeln). Ohne Option keine
+  Verhaltensänderung – bis auf eine: `ExcelService` schreibt eine Matrixzelle der Form `{ formula: string, value }`
+  jetzt als Formel (vorher als Text `[object Object]`).
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

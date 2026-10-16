@@ -3,6 +3,7 @@ import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
 import type { UndoOptionsIf } from "../../undo/undo-options.if";
+import type { CellFormulaOptionsIf } from "../../sheet/cell-formula-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
@@ -442,6 +443,26 @@ export interface TableOptionsIf {
    * @since 1.1.99
    */
   undo?: boolean | Partial<UndoOptionsIf>;
+
+  /**
+   * Cell formulas like in Excel: a text with a leading `=` in the data (`row.total = "=B2*C2"`) is calculated –
+   * references `A1`, `$B$3`, `B2:D10`, `A:A`, ≈ 70 functions, dependencies are recalculated after every write.
+   * Row 1 is the first row of `getAllRows()` (sorting and filtering keep the references), column A the first data
+   * column (row numbers and checkboxes don't count). The data keep the formula text; sorting, filters, totals, copy
+   * and the Excel export use the results. `'=…` is the text `=…`. `true` = every data column with the defaults of
+   * {@link CellFormulaOptions}; `{ columns: ["total"] }` = only these properties. Flat bodies only (objects or
+   * arrays; a tree, row grouping, pivot table or master/detail: a warning, no formulas). Not set: `"=1+1"` is text.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   editing: { defaultEditable: true },
+   *   cellFormulas: true,
+   * };
+   *
+   * @since 1.1.99
+   */
+  cellFormulas?: boolean | Partial<CellFormulaOptionsIf>;
 
   /**
    * Batch edit always on: edited and filled values are collected (marked `ge-table-cell-pending`) and written with

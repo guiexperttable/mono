@@ -104,11 +104,15 @@ export class RowDragService {
 
   /**
    * Why a managed drag is not possible right now: `"sorted"` (a column has the sort state asc/desc), `"filtered"`
-   * (a filter hides rows) – `undefined` if it is possible or the drag is unmanaged.
+   * (a filter hides rows), `"cellFormulas"` (moved rows would change the references of cell formulas, since 1.1.99)
+   * – `undefined` if it is possible or the drag is unmanaged.
    */
-  getBlockReason(): "sorted" | "filtered" | undefined {
+  getBlockReason(): "sorted" | "filtered" | "cellFormulas" | undefined {
     if (!this.isManaged()) {
       return undefined;
+    }
+    if (this.tableScope.tableSheet) {
+      return "cellFormulas";
     }
     if (this.isSorted()) {
       return "sorted";
@@ -410,7 +414,7 @@ export class RowDragService {
       return true;
     }
     const body = this.tableScope.tableModel.getBodyModel();
-    return !!body.moveRows && (body.canMoveRows ? body.canMoveRows(rowIndices, target) : true);
+    return !!body.moveRows && !this.tableScope.tableSheet && (body.canMoveRows ? body.canMoveRows(rowIndices, target) : true);
   }
 
   private drop(evt: PointerEvent): void {
@@ -554,7 +558,8 @@ export class RowDragService {
     const scope = this.tableScope;
     const body = scope.tableModel.getBodyModel();
     const indices = normalizeRowIndices(rowIndices, body.getRowCount());
-    if (!indices.length || !body.moveRows || this.isSorted() || (body.canMoveRows && !body.canMoveRows(indices, target))) {
+    if (!indices.length || !body.moveRows || this.isSorted() || scope.tableSheet
+      || (body.canMoveRows && !body.canMoveRows(indices, target))) {
       return -1; // a sorted view has no order of its own to change (the sort would be lost silently)
     }
     const tree = isAreaModelTree(body);

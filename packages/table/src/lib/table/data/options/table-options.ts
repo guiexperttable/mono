@@ -20,6 +20,7 @@ import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
 import type { UndoOptionsIf } from "../../undo/undo-options.if";
+import type { CellFormulaOptionsIf } from "../../sheet/cell-formula-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 
 
@@ -138,6 +139,8 @@ export class TableOptions implements TableOptionsIf {
   clipboard?: boolean | Partial<ClipboardOptionsIf> = undefined;
   /** Undo and redo ({@link TableOptionsIf.undo}). Not set = off. @since 1.1.99 */
   undo?: boolean | Partial<UndoOptionsIf> = undefined;
+  /** Cell formulas ({@link TableOptionsIf.cellFormulas}). Not set = off. @since 1.1.99 */
+  cellFormulas?: boolean | Partial<CellFormulaOptionsIf> = undefined;
   /**
    * Writing direction (`"ltr"` | `"rtl"` | `"auto"`). Not set = `"ltr"`; a nested table (master/detail) without its
    * own value takes the direction of the outer table. @since 1.1.98

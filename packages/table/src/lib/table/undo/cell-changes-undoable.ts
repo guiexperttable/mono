@@ -116,7 +116,7 @@ export class CellChangesUndoable implements UndoableIf {
       const rowIndex = findRow(e);
       if (rowIndex >= 0) {
         if (!body.isEditable(rowIndex, columnIndex)
-          || (!overwrite && !isSameCellValue(body.getValueAt(rowIndex, columnIndex), expected))) {
+          || (!overwrite && !isSameCellValue(scope.getCellInput(rowIndex, columnIndex), expected))) {
           skipped++;
           continue;
         }

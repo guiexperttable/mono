@@ -33,6 +33,13 @@ import type { FillDirection } from './fill/fill-direction.type';
 import type { FillMode } from './fill/fill-series';
 import { CellRange } from './data/common/cell-range';
 import type { EventListenerIf } from './event-listener.if';
+import type { ExcelExportOptionsIf } from './service/excel-export-options.if';
+import { toExcelFormula } from './sheet/excel-formula';
+import type { ExcelSheetPlacementIf } from './sheet/excel-formula';
+import { SHEET_MAX_COLUMNS, SHEET_MAX_ROWS } from './sheet/cell-address';
+import { parseCellAddress } from './sheet/cell-address';
+import type { TableSheet } from './sheet/table-sheet';
+import type { SheetEngine } from './sheet/sheet-engine';
 
 
 /**
@@ -985,10 +992,15 @@ export class TableApi {
    * @example
    * // Download table data with custom filename only
    * tableApi.downloadExcel('quarterly-data.xlsx');
+   *
+   * @example
+   * // cell formulas as Excel formulas (since 1.1.99, tableOptions.cellFormulas)
+   * tableApi.downloadExcel('budget.xlsx', '', { cellFormulas: true });
    */
   downloadExcel(
     fileName: string = 'table.xlsx',
-    author: string = ''
+    author: string = '',
+    exportOptions: Partial<ExcelExportOptionsIf> = {}
   ): Promise<void> {
     const matrix: Array<Array<any>> = [];
     const tableModel = this.tableScope.tableModel;
@@ -1000,22 +1012,79 @@ export class TableApi {
       columns.push(c);
     }
 
+    // cell formulas as Excel formulas (since 1.1.99): only if the export is the sheet itself
+    const formulas = exportOptions.cellFormulas ? this.getExcelFormulaOffset(columns) : undefined;
     const areas: AreaIdent[] = ["header" , "body" , "footer"];
     for (const area of areas) {
       const areaModel = tableModel.getAreaModel(area);
       const rowCount = areaModel?.getRowCount() ?? 0;
       for (let r = 0; r < rowCount; r++) {
-        matrix.push(columns.map(c => this.getExportValue(tableModel, area, areaModel, r, c)));
+        matrix.push(columns.map(c => formulas && area === 'body'
+          ? this.getExcelFormulaCell(areaModel, r, c, formulas) ?? this.getExportValue(tableModel, area, areaModel, r, c)
+          : this.getExportValue(tableModel, area, areaModel, r, c)));
       }
     }
     // a custom ExcelServiceIf may return void – the API always returns a Promise
     // a right-to-left table becomes a right-to-left sheet (column A on the right, since 1.1.98)
-    const options = this.tableScope.isRtl() ? { rightToLeft: true } : undefined;
+    const rtl = this.tableScope.isRtl() ? { rightToLeft: true } : undefined;
+    const options = Object.keys(exportOptions).length ? { ...exportOptions, ...rtl } : rtl;
     return Promise.resolve(options
       ? this.tableScope.excelService.downloadExcel(matrix, fileName, author, options)
       : this.tableScope.excelService.downloadExcel(matrix, fileName, author));
   }
 
+
+  /**
+   * Where the data of a sheet start in the Excel file (rows above, columns in front) – `undefined` with a warning if
+   * the export is not the sheet: no cell formulas, a filter, sorting, a hidden data column or no formula support.
+   */
+  private getExcelFormulaOffset(columns: number[]): (ExcelSheetPlacementIf & { sheet: TableSheet }) | undefined {
+    const scope = this.tableScope;
+    const sheet = scope.tableSheet;
+    if (!sheet) {
+      return undefined;
+    }
+    const warn = (why: string) => {
+      console.warn(`GuiExpert Table – downloadExcel: values instead of formulas (${why}).`);
+      return undefined;
+    };
+    if (!scope.excelService.supportsFormulas) return warn('the Excel service writes no formulas');
+    const body = scope.tableModel.getBodyModel();
+    const rows = body.getRowCount();
+    if (rows !== (body.getUnfilteredRowCount?.() ?? rows)) return warn('a filter hides rows');
+    for (let i = 0; i < rows; i++) {
+      if (sheet.physicalRow(i) !== i) return warn('the rows are sorted');
+    }
+    const dataPositions = columns.map(c => sheet.engineColumn(c));
+    const dCol = dataPositions.findIndex(p => p !== undefined);
+    let expected = 0;
+    for (let i = 0; i < columns.length; i++) {
+      const p = dataPositions[i];
+      if (p === undefined) continue;
+      if (p !== expected || i !== dCol + expected) return warn('a data column is hidden or moved');
+      expected++;
+    }
+    for (let c = 0; c < scope.tableModel.getColumnCount(); c++) {
+      if (sheet.engineColumn(c) !== undefined && !columns.includes(c)) return warn('a data column is hidden');
+    }
+    const dRow = scope.tableModel.getAreaModel('header')?.getRowCount() ?? 0;
+    if (dRow + rows > SHEET_MAX_ROWS || Math.max(0, dCol) + expected > SHEET_MAX_COLUMNS) {
+      return warn('the sheet is larger than an Excel sheet');
+    }
+    return { dRow, dCol: Math.max(0, dCol), rows, cols: expected, sheet };
+  }
+
+  /** A body cell with a cell formula as Excel formula cell (`undefined` for other cells). */
+  private getExcelFormulaCell(areaModel: AreaModelIf, rowIndex: number, columnIndex: number,
+                              offset: ExcelSheetPlacementIf & { sheet: TableSheet }): unknown {
+    const input = areaModel.getInputValueAt?.(rowIndex, columnIndex);
+    if (!offset.sheet.isFormulaInput(columnIndex, input)) {
+      return undefined;
+    }
+    // a syntax error or a field ([price]): Excel can't read it – the value
+    const formula = toExcelFormula(input, offset);
+    return formula === undefined ? undefined : { formula, value: areaModel.getValueAt(rowIndex, columnIndex) };
+  }
 
   /** The value of a cell for the Excel export – the shown number in a row number column (body; footer empty). */
   private getExportValue(tableModel: TableModelIf, area: AreaIdent, areaModel: AreaModelIf, rowIndex: number, columnIndex: number): any {
@@ -2317,6 +2386,216 @@ export class TableApi {
   batchUndoable<T>(label: string, fn: () => T): T {
     const service = this.tableScope.undoService;
     return service ? service.batch(label, fn) : fn();
+  }
+
+  // ------------------------------------------------------------------------------- cell formulas (since 1.1.99)
+
+  /**
+   * True if the table calculates cell formulas ({@link TableOptionsIf.cellFormulas}, flat body).
+   *
+   * @returns {boolean} whether cell formulas are on
+   *
+   * @example
+   * const showAddresses = tableApi.hasCellFormulas();
+   *
+   * @since 1.1.99
+   */
+  hasCellFormulas(): boolean {
+    return !!this.tableScope.tableSheet;
+  }
+
+  /**
+   * The address of a body cell in cell formulas: `"B3"` = second data column, third row of `getAllRows()` (the
+   * physical row – sorting and filtering don't change it). `undefined` without cell formulas or for a row number or
+   * checkbox column.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @returns {string | undefined} the address
+   *
+   * @example
+   * tableApi.getCellAddress(1, "total");   // "D2" – the second row of getAllRows()
+   *
+   * @since 1.1.99
+   */
+  getCellAddress(rowIndex: number, column: number | string): string | undefined {
+    return this.tableScope.tableSheet?.address(rowIndex, this.toColumnIndex(column));
+  }
+
+  /**
+   * The body cell of an address (`"B3"`, `"$B$3"`): display row (`-1` if a filter hides it) and model column;
+   * `undefined` without cell formulas or for an address outside the data.
+   *
+   * @param {string} address - the address
+   * @returns {[number, number] | undefined} display row and model column
+   *
+   * @example
+   * const cell = tableApi.getCellByAddress("D5");
+   * if (cell && cell[0] >= 0) tableApi.scrollToIndex(cell[1], cell[0]);
+   *
+   * @since 1.1.99
+   */
+  getCellByAddress(address: string): [number, number] | undefined {
+    return this.tableScope.tableSheet?.cellOfAddress(address);
+  }
+
+  /**
+   * The input of a body cell – what was typed: the formula text of a cell formula (`"=B2*C2"`), otherwise the value.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @returns {unknown} the input
+   *
+   * @example
+   * tableApi.getCellInput(1, "total");   // "=B2*C2"
+   *
+   * @since 1.1.99
+   */
+  getCellInput(rowIndex: number, column: number | string): unknown {
+    const columnIndex = this.toColumnIndex(column);
+    const body = this.tableScope.tableModel.getBodyModel();
+    if (rowIndex < 0 || rowIndex >= body.getRowCount() || columnIndex < 0) return undefined;
+    return this.tableScope.getCellInput(rowIndex, columnIndex);
+  }
+
+  /**
+   * The value of a body cell – the result of a cell formula (`2598`), otherwise the value (= `getValueAt`).
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @returns {unknown} the value
+   *
+   * @example
+   * tableApi.getCellValue(1, "total");   // 2598
+   *
+   * @since 1.1.99
+   */
+  getCellValue(rowIndex: number, column: number | string): unknown {
+    const columnIndex = this.toColumnIndex(column);
+    const body = this.tableScope.tableModel.getBodyModel();
+    if (rowIndex < 0 || rowIndex >= body.getRowCount() || columnIndex < 0) return undefined;
+    return body.getValueAt(rowIndex, columnIndex);
+  }
+
+  /**
+   * Writes the input of a body cell (a value or a formula `"=B2*C2"`) like the editor: one {@link applyCellChanges}.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @param {unknown} input - the input
+   * @returns {boolean} true if written (or marked in a batch edit)
+   *
+   * @example
+   * tableApi.setCellInput(4, "total", "=SUM(D2:D4)");
+   *
+   * @since 1.1.99
+   */
+  setCellInput(rowIndex: number, column: number | string, input: unknown): boolean {
+    return this.tableScope.applyCellChanges([{ rowIndex, column, value: input }], 'api').length > 0;
+  }
+
+  /**
+   * Calculates a formula once against the sheet (not stored), e.g. for a preview: `"=SUM(D2:D4)"`.
+   * `undefined` without cell formulas.
+   *
+   * @param {string} source - the formula (the `=` is optional)
+   * @returns {unknown} the result (a {@link FormulaError} for an error)
+   *
+   * @example
+   * tableApi.evaluateFormula("=SUM(D2:D4)");   // 3895
+   *
+   * @since 1.1.99
+   */
+  evaluateFormula(source: string): unknown {
+    return this.tableScope.tableSheet?.evaluate(source);
+  }
+
+  /**
+   * The value of a cell by its address – also of a row a filter hides. `undefined` without cell formulas.
+   *
+   * @param {string} address - e.g. `"D5"`
+   * @returns {unknown} the value
+   *
+   * @example
+   * tableApi.getSheetValue("D5");   // 3895
+   *
+   * @since 1.1.99
+   */
+  getSheetValue(address: string): unknown {
+    const sheet = this.tableScope.tableSheet;
+    if (!sheet) return undefined;
+    const cell = parseCellAddress(address);
+    return cell ? sheet.cellValue(cell.row, cell.col) : undefined;
+  }
+
+  /**
+   * Calculates all cell formulas again – after the app changed the data without the table ({@link updateCells},
+   * {@link applyCellChanges} and the editor recalculate by themselves; {@link repaint} does not). Also renews
+   * `TODAY()`, `NOW()` and `RAND()`.
+   *
+   * @example
+   * rows[3].price = 30;          // changed outside the table
+   * tableApi.recalculate();
+   *
+   * @since 1.1.99
+   */
+  recalculate(): void {
+    const sheet = this.tableScope.tableSheet;
+    if (!sheet) return;
+    sheet.recalculate();
+    this.tableScope.invalidateAggregates();
+    this.tableScope.repaint();
+  }
+
+  /**
+   * The cells and ranges a cell formula reads, as addresses.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @returns {string[]} e.g. `["B2", "C2"]` (empty for a value cell or without cell formulas)
+   *
+   * @example
+   * tableApi.getPrecedents(1, "total");   // ["B2", "C2"]
+   *
+   * @since 1.1.99
+   */
+  getPrecedents(rowIndex: number, column: number | string): string[] {
+    return this.tableScope.tableSheet?.precedents(rowIndex, this.toColumnIndex(column)) ?? [];
+  }
+
+  /**
+   * The cells whose formulas read a cell directly (display row, model column; rows a filter hides are left out).
+   *
+   * @param {number} rowIndex - display row
+   * @param {number | string} column - model column index or property
+   * @returns {Array<[number, number]>} the dependent cells
+   *
+   * @example
+   * tableApi.getDependents(1, "price");   // [[1, 3]] – D2 reads B2
+   *
+   * @since 1.1.99
+   */
+  getDependents(rowIndex: number, column: number | string): Array<[number, number]> {
+    return this.tableScope.tableSheet?.dependents(rowIndex, this.toColumnIndex(column)) ?? [];
+  }
+
+  /**
+   * The formula engine of the cell formulas (`undefined` without them) – physical rows, data columns.
+   *
+   * @returns {SheetEngine | undefined} the engine
+   *
+   * @example
+   * tableApi.getSheetEngine()?.getFormulaCount();   // 4
+   *
+   * @since 1.1.99
+   */
+  getSheetEngine(): SheetEngine | undefined {
+    return this.tableScope.tableSheet?.engine;
+  }
+
+  /** A column index or property → index (`-1` if unknown). */
+  private toColumnIndex(column: number | string): number {
+    return typeof column === 'number' ? column : this.getColumnIndex(column);
   }
 
   // ------------------------------------------------------------------------------- master/detail (since 1.1.97)

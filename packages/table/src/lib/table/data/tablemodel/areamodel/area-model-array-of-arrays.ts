@@ -76,7 +76,27 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
   }
 
   getValueAt(rowIndex: number, columnIndex: number): any {
-    return this.filteredArr[rowIndex][columnIndex];
+    const row = this.filteredArr[rowIndex];
+    const value = row[columnIndex];
+    // cell formulas (since 1.1.99): "=B2*C2" → its result
+    return this.sheetCells && typeof value === "string" ? this.sheetCells.valueAt(row, columnIndex, value) : value;
+  }
+
+  /**
+   * The input of a cell – the formula text of a cell formula (`"=B2*C2"`), otherwise the value (since 1.1.99,
+   * {@link TableOptionsIf.cellFormulas}).
+   *
+   * @param {number} rowIndex - display index
+   * @param {number} columnIndex - column
+   * @returns {unknown} the input
+   *
+   * @example
+   * new AreaModelArrayOfArrays("body", [[2, "=A1*2"]], 30).getInputValueAt(0, 1);   // "=A1*2"
+   *
+   * @since 1.1.99
+   */
+  getInputValueAt(rowIndex: number, columnIndex: number): unknown {
+    return this.filteredArr[rowIndex]?.[columnIndex];
   }
 
   override setValue(rowIndex: number, columnIndex: number, value: any): boolean {

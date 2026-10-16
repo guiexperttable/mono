@@ -87,6 +87,8 @@ import { findDataEdge } from './sheet-editing/sheet-navigation';
 import type { ShortcutActionIdMapping } from './action/shortcut-actionid-mapping.type';
 import { GeEditEvent } from './data/common/event/ge-edit-event';
 import { createEventListenerHub } from './event-listener-hub';
+import { CellFormulaOptions } from './sheet/cell-formula-options';
+import { CopiedFormula, TableSheet } from './sheet/table-sheet';
 
 
 /**
@@ -224,6 +226,15 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     if (this.undoOptions) {
       this.undoService = new UndoService(this, this.undoOptions); // since 1.1.99
+    }
+    const formulaOptions = CellFormulaOptions.create(tableOptions?.cellFormulas);
+    if (formulaOptions) {
+      // cell formulas (since 1.1.99): flat bodies only
+      if (tableOptions.masterDetail) {
+        console.warn('GuiExpert Table – cellFormulas: no cell formulas with master/detail.');
+      } else {
+        this.tableSheet = TableSheet.create(tableModel, formulaOptions);
+      }
     }
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
@@ -511,7 +522,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /**
-   * The value a body cell shows: a pending value of a batch edit, otherwise the model value.
+   * The value a body cell shows: a pending value of a batch edit, otherwise the model value – with cell formulas the
+   * input ({@link getCellInput}: the formula text for the editor).
    *
    * @param {number} rowIndex - display row index
    * @param {number} columnIndex - model column index
@@ -521,7 +533,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   getShownCellValue(rowIndex: number, columnIndex: number): unknown {
     return this.batchEditService
       ? this.batchEditService.getShownValue(rowIndex, columnIndex)
-      : this.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex);
+      : this.getCellInput(rowIndex, columnIndex);
   }
 
   /** The body cell with the keyboard focus, `undefined` if there is none (or the header has the focus). @since 1.1.99 */
@@ -1357,26 +1369,30 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const changes: CellChangeIf[] = [];
     let invalid = 0;
     let firstMessage = '';
+    const sheet = this.tableSheet;
     const apply = () => {
       for (const { rowIndex, columnIndex, value } of cells) {
+        // a cell formula (since 1.1.99) is written as typed: no editInputPipe, no validate
+        const formula = !!sheet?.isFormulaInput(columnIndex, value);
         if (!opts.skipValidation) {
-          const error = this.validateCellValue(rowIndex, columnIndex,
-            opts.raw ? value : this.pipeCellValue(rowIndex, columnIndex, value));
+          const error = formula ? this.checkFormulaSyntax(value as string)
+            : this.validateCellValue(rowIndex, columnIndex, opts.raw ? value : this.pipeCellValue(rowIndex, columnIndex, value));
           if (error) {
             invalid++;
             firstMessage = firstMessage || error;
             continue;
           }
         }
-        const oldValue = body.getValueAt(rowIndex, columnIndex);
-        if (opts.raw ? this.setRawValue(rowIndex, columnIndex, value) : body.setValue(rowIndex, columnIndex, value)) {
+        // with cell formulas the event reports inputs (formula texts) – undo puts them back
+        const oldValue = this.getCellInput(rowIndex, columnIndex);
+        if (opts.raw || formula ? this.setRawValue(rowIndex, columnIndex, value) : body.setValue(rowIndex, columnIndex, value)) {
           changes.push({
             row: this.rowObjectOf(rowIndex),
             rowIndex,
             columnIndex,
             property: this.batchEditService!.propertyOf(columnIndex),
             oldValue,
-            newValue: body.getValueAt(rowIndex, columnIndex)
+            newValue: this.getCellInput(rowIndex, columnIndex)
           });
         }
       }
@@ -1394,6 +1410,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (!all.length) {
       return { changes: all, invalid, message: firstMessage || undefined };
     }
+    sheet?.cellsWritten(all); // cell formulas: dependents are recalculated before the repaint (since 1.1.99)
     this.undoService?.record(all, source, opts.undoable); // one step per write (since 1.1.99)
     opts.beforeRepaint?.();
     // only body rows changed: models may recompute less (a row grouping only the groups of these rows)
@@ -1427,25 +1444,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       this.undoService?.endFold();
     }
     return { changes: all, invalid, message: firstMessage || undefined };
-  }
-
-  /**
-   * Writes a value without the column's `editInputPipe` (values copied inside the table are already converted – a pipe
-   * that expects text could break them). All area models apply the pipe in `setValue`, so it is left out for the call.
-   */
-  private setRawValue(rowIndex: number, columnIndex: number, value: unknown): boolean {
-    const body = this.tableModel.getBodyModel();
-    const def = this.tableModel.getColumnDef(columnIndex);
-    const pipe = def?.editInputPipe;
-    if (!def || !pipe || Object.isFrozen(def)) {
-      return body.setValue(rowIndex, columnIndex, value); // a frozen column definition: with its pipe
-    }
-    def.editInputPipe = undefined;
-    try {
-      return body.setValue(rowIndex, columnIndex, value);
-    } finally {
-      def.editInputPipe = pipe;
-    }
   }
 
   /**
@@ -1501,7 +1499,86 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.99
    */
   checkPastedValue(rowIndex: number, columnIndex: number, value: unknown, raw: boolean): string | undefined {
+    if (this.tableSheet?.isFormulaInput(columnIndex, value)) {
+      return this.checkFormulaSyntax(value);
+    }
     return this.validateCellValue(rowIndex, columnIndex, raw ? value : this.pipeCellValue(rowIndex, columnIndex, value));
+  }
+
+  /**
+   * The input of a body cell – what was typed: the formula text of a cell formula (`"=B2*C2"`), otherwise the value
+   * ({@link AreaModelIf.getInputValueAt}). Editor, undo and the batch edit use it.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number} columnIndex - model column
+   * @returns {unknown} the input
+   * @since 1.1.99
+   */
+  getCellInput(rowIndex: number, columnIndex: number): unknown {
+    const body = this.tableModel.getBodyModel();
+    return this.tableSheet && body.getInputValueAt
+      ? body.getInputValueAt(rowIndex, columnIndex)
+      : body.getValueAt(rowIndex, columnIndex);
+  }
+
+  /**
+   * The value of a body cell to choose an editor or convert pasted text by: the result of a formula cell (a number
+   * stays a number when overwritten), otherwise {@link getShownCellValue}.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number} columnIndex - model column
+   * @returns {unknown} the value
+   * @since 1.1.99
+   */
+  getTypedCellValue(rowIndex: number, columnIndex: number): unknown {
+    const shown = this.getShownCellValue(rowIndex, columnIndex);
+    return this.tableSheet?.isFormulaInput(columnIndex, shown)
+      ? this.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex) : shown;
+  }
+
+  /** A syntax error of a formula refuses it only with `rejectInvalidFormulas` (otherwise it is stored: `#ERROR!`). */
+  private checkFormulaSyntax(input: string): string | undefined {
+    const sheet = this.tableSheet!;
+    return sheet.options.rejectInvalidFormulas ? sheet.syntaxError(input) : undefined;
+  }
+
+  /**
+   * Resolves a formula copied inside the table for a target cell: its relative references move (Excel); a target
+   * without formulas gets the copied value. A cut formula moves unchanged.
+   *
+   * @param {unknown} value - a pasted value (maybe a {@link CopiedFormula})
+   * @param {number} rowIndex - display row of the target
+   * @param {number} columnIndex - model column of the target
+   * @param {boolean} cut - true: the formula moves (cut and paste)
+   * @returns {unknown} the value to write
+   * @since 1.1.99
+   */
+  resolvePastedValue(value: unknown, rowIndex: number, columnIndex: number, cut: boolean): unknown {
+    if (!(value instanceof CopiedFormula)) {
+      return value;
+    }
+    const sheet = this.tableSheet;
+    if (!sheet || !sheet.isFormulaColumnIndex(columnIndex)) {
+      return value.value;
+    }
+    return cut ? value.input : sheet.moveFormula(value.input, value.row, value.col, rowIndex, columnIndex) ?? value.value;
+  }
+
+  /**
+   * The value of a cell for a copy inside the table: a formula cell gives a {@link CopiedFormula}.
+   *
+   * @param {number} rowIndex - display row
+   * @param {number} columnIndex - model column
+   * @returns {unknown} the value
+   * @since 1.1.99
+   */
+  getCopyValue(rowIndex: number, columnIndex: number): unknown {
+    const sheet = this.tableSheet;
+    const shown = this.getShownCellValue(rowIndex, columnIndex);
+    if (!sheet || this.batchEditService?.getPendingAt(rowIndex, columnIndex)) {
+      return shown; // a pending formula is copied as typed
+    }
+    return sheet.copyOf(rowIndex, columnIndex, shown, this.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex));
   }
 
   /** True while a batch edit collects changes. @since 1.1.99 */
@@ -1609,6 +1686,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       })
       : undefined;
     const inputs: PendingInputIf[] = cells.map(({ rowIndex, columnIndex, value }) => {
+      if (this.tableSheet?.isFormulaInput(columnIndex, value)) {
+        // a cell formula: marked as typed, calculated after the commit (since 1.1.99)
+        const error = this.checkFormulaSyntax(value);
+        return { rowIndex, columnIndex, value, rawValue: value, ...(error ? { error } : {}) };
+      }
       const piped = raw ? value : this.pipeCellValue(rowIndex, columnIndex, value);
       const error = this.validateCellValue(rowIndex, columnIndex, piped);
       return { rowIndex, columnIndex, value: piped, rawValue: value, ...(error ? { error } : {}) };
@@ -1726,6 +1808,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       fillValue: options.fillValue,
       getCellInfo: (r, c) => ({ row: this.rowObjectOf(r), property: this.tableModel.getColumnDef(c)?.property ?? '' })
     });
+    if (this.tableSheet) {
+      this.moveFilledFormulas(changes, src, direction);
+    }
     const applied = this.applyCellChanges(changes, 'fill');
     const sm = this.selectionModel();
     if (sm) {
@@ -1738,6 +1823,30 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.repaint();
     this.announce(this.getEditTexts().cellsFilled(applied.length));
     return applied.length;
+  }
+
+  /**
+   * Cell formulas (since 1.1.99): a filled cell whose source cell (the source repeats) holds a formula gets the formula
+   * with moved references (Excel: `=B2*C2` → `=B3*C3`, `$B$1` stays) instead of a series value.
+   */
+  private moveFilledFormulas(changes: CellValueChangeIf[], src: CellRange, direction: FillDirection): void {
+    const sheet = this.tableSheet!;
+    const h = src.r2 - src.r1 + 1;
+    const w = src.c2 - src.c1 + 1;
+    const mod = (a: number, n: number) => ((a % n) + n) % n;
+    for (const change of changes) {
+      const r = change.rowIndex;
+      const c = change.column as number;
+      const sr = direction === 'down' ? src.r1 + mod(r - src.r2 - 1, h) : direction === 'up' ? src.r2 - mod(src.r1 - 1 - r, h) : r;
+      const sc = direction === 'right' ? src.c1 + mod(c - src.c2 - 1, w) : direction === 'left' ? src.c2 - mod(src.c1 - 1 - c, w) : c;
+      const input = this.getShownCellValue(sr, sc);
+      if (!sheet.isFormulaInput(sc, input)) continue;
+      const fromRow = sheet.physicalRow(sr);
+      const fromCol = sheet.engineColumn(sc);
+      if (fromRow === undefined || fromCol === undefined) continue;
+      const moved = sheet.moveFormula(input, fromRow, fromCol, r, c);
+      if (moved !== undefined) change.value = moved;
+    }
   }
 
   /** The last selected range, clamped to the body (`undefined` without one). */
@@ -1904,6 +2013,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
     this.cellEditorService?.destroy(); // the editor above the cell (since 1.1.99)
     this.clipboardService?.destroy(); // hidden text field and cut frame (since 1.1.99)
+    this.tableSheet?.destroy(); // cell formulas: detached from the body (since 1.1.99)
     this.subscribers.clear();
     try {
       this.masterDetailService?.destroy(); // detail contents: renderer cleanups, nested tables destroyed
@@ -2144,7 +2254,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     } else if (!this.mouseStartAction && this.selectionService.onMouseDragging(mouseEvent, startMouseEvent)) {
       this.repaint(); // drag selection (selection type "range")
 
-    } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable) {
+    } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable
+      && this.tableSheet?.allowsColumnDrag() !== false) {
 
       // no column in front of the row numbers (RowNumberColumnDef, since 1.1.93)
       this.draggingTargetColumnIndex = Math.max(mouseEvent.columnIndex, this.getFirstDataColumnIndex());

@@ -759,11 +759,33 @@ export class AreaModelObjectArray<T>
       return values.get(t, property); // a calculated column (since 1.1.95)
     }
 
-    if (property.includes('.')) {
-      return this.getPropertyValue(t, property.split('.'));
-    }
     // @ts-expect-error: we access an unknown property name:
-    return t[property];
+    const value = property.includes('.') ? this.getPropertyValue(t, property.split('.')) : t[property];
+    // cell formulas (since 1.1.99): "=B2*C2" → its result
+    return this.sheetCells && typeof value === 'string' ? this.sheetCells.valueOfProperty(t, property, value) : value;
+  }
+
+  /**
+   * The input of a cell – what was typed: the formula text of a cell formula (`"=B2*C2"`), otherwise the value
+   * (since 1.1.99, {@link TableOptionsIf.cellFormulas}).
+   *
+   * @param {number} rowIndex - display index
+   * @param {number} columnIndex - model column
+   * @returns {unknown} the input
+   *
+   * @example
+   * bodyAreaModel.getInputValueAt(0, 3);   // "=B2*C2" (getValueAt: 2598)
+   *
+   * @since 1.1.99
+   */
+  getInputValueAt(rowIndex: number, columnIndex: number): unknown {
+    const sheet = this.sheetCells;
+    this.sheetCells = undefined;
+    try {
+      return this.getValueAt(rowIndex, columnIndex);
+    } finally {
+      this.sheetCells = sheet;
+    }
   }
 
   /**

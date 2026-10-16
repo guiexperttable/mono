@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+  Cell formulas in the table (since 1.1.99, prompt 013 stage 5).
+  Start: pnpm serve:table-demo → http://localhost:4200/cell-formulas.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – Cell formulas</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 900px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .table-div { height: 360px; width: 100%; max-width: 900px; }
+    #cell { font: 13px ui-monospace, monospace; min-width: 22em; }
+    kbd { font: 12px ui-monospace, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+<h1>Offer – cell formulas</h1>
+<p>Type <kbd>=B2*C2</kbd>, <kbd>=SUM(D2:D6)</kbd> or <kbd>=IF(C2>5,"bulk","")</kbd>; <kbd>F2</kbd> shows the formula.
+  Drag the fill handle or copy and paste a formula: its references move. Sort by a column: the references stay with
+  the rows. Undo with <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd>.</p>
+<div class="bar">
+  <span id="cell" aria-live="polite"></span>
+  <button id="excel" type="button">Excel with formulas</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<script src="/src/cell-formulas/cell-formulas-demo.ts" type="module"></script>
+</body>
+</html>

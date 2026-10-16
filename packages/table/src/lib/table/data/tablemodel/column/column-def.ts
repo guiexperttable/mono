@@ -63,6 +63,8 @@ export class ColumnDef implements ColumnDefIf {
   public editor?: ColumnEditorOption;
   /** The value of a cleared cell, see {@link ColumnDefIf.emptyValue} (since 1.1.99). */
   public emptyValue?: unknown;
+  /** `false`: no cell formulas in this column, see {@link ColumnDefIf.cellFormulas} (since 1.1.99). */
+  public cellFormulas?: boolean;
 
   constructor(
     public property: string,
@@ -171,6 +173,8 @@ export class ColumnDef implements ColumnDefIf {
     editor?: ColumnEditorOption,
     /** The value of a cleared cell (Delete) – default `EditingOptionsIf.emptyValue` (since 1.1.99). */
     emptyValue?: unknown,
+    /** `false`: `"=…"` stays text in this column of a table with cell formulas (since 1.1.99). */
+    cellFormulas?: boolean,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -220,6 +224,7 @@ export class ColumnDef implements ColumnDefIf {
     if (param.validate) def.validate = param.validate;
     if (param.editor) def.editor = param.editor;
     if (param.emptyValue !== undefined) def.emptyValue = param.emptyValue;
+    if (param.cellFormulas !== undefined) def.cellFormulas = param.cellFormulas;
     return def;
   }
 

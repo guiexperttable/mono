@@ -305,9 +305,12 @@ export class CellEditorService {
     if (typeof option === "function") {
       return (option as CellEditorFactory)(ctx);
     }
+    // a formula cell: by its result (typing 100 over =B2*C2 writes a number)
+    const typed = this.tableScope.getTypedCellValue(ctx.rowIndex, ctx.columnIndex);
+    const formula = typed !== ctx.value; // the input is a formula text: no date picker
     const kind = option ?? (
-      ctx.value instanceof Date ? "date"
-        : typeof ctx.value === "number" || ctx.columnDef?.editInputPipe === editInputPipeForNumber ? "number"
+      typed instanceof Date && !formula ? "date"
+        : typeof typed === "number" || ctx.columnDef?.editInputPipe === editInputPipeForNumber ? "number"
           : "text");
     if (kind === "number") return new NumberCellEditor();
     if (kind === "date") return new DateCellEditor();

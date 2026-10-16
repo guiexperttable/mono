@@ -375,4 +375,5 @@ export { formatFormula } from './lib/table/sheet/format-formula';
 export * from './lib/table/sheet/shift-formula';
 export * from './lib/table/sheet/sheet-engine';
 export * from './lib/table/sheet/sheet-function-info';
+export { TableSheet } from './lib/table/sheet/table-sheet';
 export * from './lib/table/data/common/event/ge-edit-event';

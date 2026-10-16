@@ -534,3 +534,26 @@ describe('right-to-left sheet (ExcelExportOptionsIf, since 1.1.98)', () => {
     expect(spy).toHaveBeenCalledWith([['a']], 'me', { rightToLeft: true });
   });
 });
+
+describe('right-to-left sheet (ExcelExportOptionsIf, since 1.1.98)', () => {
+
+  it('rightToLeft writes <sheetView rightToLeft="1">', async () => {
+    const zip = await readZipBlob(await new ExcelService().createExcelBlob([['المدينة'], ['الرياض']], '', { rightToLeft: true }));
+    expect(zip.get('xl/worksheets/sheet1.xml')!.text).toContain('<sheetView rightToLeft="1" tabSelected="1" workbookViewId="0"/>');
+  });
+
+  it('without options the sheet is unchanged (left-to-right)', async () => {
+    const sheet = (await xlsxOfX()).get('xl/worksheets/sheet1.xml')!.text;
+    expect(sheet).toContain('<sheetView tabSelected="1" workbookViewId="0"/>');
+    expect(sheet).not.toContain('rightToLeft');
+  });
+
+  it('downloadExcel passes the options on', async () => {
+    const service = new ExcelService();
+    const spy = vi.spyOn(service, 'createExcelBlob').mockResolvedValue(new Blob(['x']));
+    vi.stubGlobal('document', { createElement: () => ({ click() {} }), body: { appendChild() {}, removeChild() {} } });
+    vi.stubGlobal('URL', { createObjectURL: () => 'blob:x', revokeObjectURL() {} });
+    await service.downloadExcel([['a']], 'a.xlsx', 'me', { rightToLeft: true });
+    expect(spy).toHaveBeenCalledWith([['a']], 'me', { rightToLeft: true });
+  });
+});

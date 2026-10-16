@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng18",
-  "version": "18.1.97",
+  "version": "18.1.98",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 18 -> @guiexpert/angular-table@18.x",
   "license": "MIT",

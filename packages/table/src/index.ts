@@ -326,3 +326,8 @@ export * from './lib/table/data/common/event/ge-detail-event';
 export * from './lib/table/rtl/table-direction.type';
 export * from './lib/table/rtl/rtl-util';
 export * from './lib/table/service/excel-export-options.if';
+
+// Right-to-left (since 1.1.98)
+export * from './lib/table/rtl/table-direction.type';
+export * from './lib/table/rtl/rtl-util';
+export * from './lib/table/service/excel-export-options.if';

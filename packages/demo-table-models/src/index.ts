@@ -38,3 +38,5 @@ export * from "./lib/createMasterDetailModel";
 export * from "./model/master-order.if";
 export * from "./lib/createRtlCitiesModel";
 export * from "./model/rtl-city-sales.if";
+export * from "./lib/createRtlCitiesModel";
+export * from "./model/rtl-city-sales.if";

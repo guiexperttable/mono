@@ -1,0 +1,122 @@
+---
+/**
+ * /whats-new/ – the twelve features of October 2026 (releases 1.1.91 – 1.1.98) on one page:
+ * problem, code (checked: pnpm --filter webpage-guiexpert check:features), live showcase, training chapter, API.
+ * Data: src/features/new-features.ts (also used by the home page and the training index).
+ */
+import IndexLayout from "../layouts/IndexLayout.astro";
+import Header from "../components/header.astro";
+import Footer from "../components/footer.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { Icon } from "astro-icon/components";
+import { Code } from "astro-expressive-code/components";
+import { NEW_FEATURES, agGridLabel, showcaseHref, trainingHref } from "../features/new-features";
+import { apiEntry } from "../training/api";
+import { chapterBySlug } from "../training/chapters";
+import corePkg from "../../../../packages/table/package.json";
+import "../styles/training.css";
+import "../styles/whats-new.css";
+
+const thumbs = import.meta.glob<{ default: ImageMetadata }>("/src/assets/screens/thumbs/*.png", { eager: true });
+const thumbOf = (name: string) => {
+  const t = thumbs[`/src/assets/screens/thumbs/${name}.png`];
+  if (!t) throw new Error(`whats-new: missing thumbnail src/assets/screens/thumbs/${name}.png`);
+  return t.default;
+};
+// fail the build on dead links: training chapter, showcase page, API symbols
+const showcasePages = import.meta.glob("/src/pages/showcase/*/run.astro");
+for (const f of NEW_FEATURES) {
+  chapterBySlug(f.training.slug);
+  if (!showcasePages[`/src/pages/showcase/${f.showcase.name}/run.astro`]) throw new Error(`whats-new: unknown showcase ${f.showcase.name}`);
+}
+const short = (name: string) => {
+  const member = name.includes(".") ? name.slice(name.indexOf(".") + 1) : name;
+  return apiEntry(name).kind === "method" ? `${member}()` : member;
+};
+const enterprise = NEW_FEATURES.filter(f => f.agGrid === "enterprise").length;
+const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.length - 1].since}`;
+---
+<IndexLayout
+  title="What's new · GuiExpert Table"
+  description="Twelve new features in one month: accessibility, overlays, state, row numbers, totals, row grouping, pivot tables, formulas, row drag, fill handle, master/detail and right-to-left – MIT-licensed.">
+  <Header splashMode={false} smallGap={true} />
+
+  <div class="whats-new">
+    <section class="training-hero">
+      <p class="chapter-no">Releases {versions} · October 2026</p>
+      <h1><span class="gradient-text">Twelve new features.</span><br />One month. Still MIT.</h1>
+      <p class="lead">
+        From screen readers to pivot tables: everything you see on this page is part of the free core – in Angular, React,
+        Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. {enterprise} of the twelve are Enterprise features
+        at ag-Grid.
+      </p>
+      <div class="training-cta">
+        <a class="btn-gradient" href="#features">See all twelve ↓</a>
+        <a class="btn-outline" href="/showcase/">Live showcases</a>
+        <a class="btn-outline" href="/training/#new">In the training</a>
+      </div>
+      <div class="wn-install">
+        <code><span aria-hidden="true">$</span> npm i @guiexpert/table@{corePkg.version}</code>
+      </div>
+    </section>
+
+    <nav class="wn-index training-section" id="features" aria-label="The twelve features">
+      {NEW_FEATURES.map(f => (
+        <a href={`#${f.id}`} class="wn-chip">
+          <span class="wn-chip-icon"><Icon name={f.icon} /></span>
+          <span><b>{f.title}</b><small>v{f.since}{f.agGrid === "enterprise" ? " · Enterprise at ag-Grid" : ""}</small></span>
+        </a>
+      ))}
+    </nav>
+
+    {NEW_FEATURES.map((f, i) => (
+      <section class="wn-feature training-section" id={f.id} aria-labelledby={`${f.id}-title`}>
+        <div class="wn-text">
+          <p class="wn-meta">
+            <span class="wn-no">{String(i + 1).padStart(2, "0")}</span>
+            <span class="wn-version">since v{f.since}</span>
+            <span class:list={["wn-ag", `wn-ag-${f.agGrid}`]}>{agGridLabel(f)}</span>
+          </p>
+          <h2 id={`${f.id}-title`}>{f.title}</h2>
+          <p class="wn-problem">{f.problem}</p>
+          <ul class="wn-points">
+            {f.points.map(p => <li>{p}</li>)}
+          </ul>
+          <div class="wn-links">
+            <a class="btn-gradient" href={showcaseHref(f)}><span aria-hidden="true">▶</span> Live: {f.showcase.title}</a>
+            <a class="btn-outline" href={trainingHref(f)}>{f.training.label}</a>
+          </div>
+          <p class="wn-api">API:{" "}
+            {f.api.map((name, j) => (
+              <Fragment>{j > 0 && " · "}<a href={apiEntry(name).url}><code>{short(name)}</code></a></Fragment>
+            ))}
+          </p>
+        </div>
+        <div class="wn-side">
+          <a class="wn-thumb" href={showcaseHref(f)} aria-label={`Open the live showcase ${f.showcase.title}`}>
+            <Image src={thumbOf(f.showcase.name)} alt="" width={640} loading="lazy" />
+          </a>
+          <Code lang="ts" code={f.snippet} />
+        </div>
+      </section>
+    ))}
+
+    <section class="training-section wn-end">
+      <h2>What is still missing</h2>
+      <p class="sub">
+        Honest list: a drag &amp; drop group panel and pivot field list, spreadsheet cell references with an in-cell formula
+        editor, paste from the clipboard, undo/redo and a server-side row model are not built in. The comparison with
+        ag-Grid Community and Enterprise is on the <a href="/#why">home page</a> and in
+        <a href="/training/build-buy-or-guiexpert/">chapter 3 of the training</a>.
+      </p>
+      <p class="sub">
+        Release notes with every detail: <a href="https://github.com/guiexperttable/mono/releases">GitHub releases</a> ·
+        developer guide: <a href="https://github.com/guiexperttable/mono/blob/main/instructions.md">instructions.md</a> ·
+        <a href="/api/">API reference</a>.
+      </p>
+    </section>
+  </div>
+
+  <Footer />
+</IndexLayout>

@@ -435,3 +435,23 @@ html:not([data-theme="dark"]) .shot-dark { display: none; }
 .shot-missing { padding: 4rem 1rem; text-align: center; border: 2px dashed var(--color-border); color: var(--color-text-offset); }
 .training-prose :not(pre) > code, .api-link code, .chapter-meta code { overflow-wrap: anywhere; }
 .training-section .expressive-code { margin-top: 1.25rem; }
+
+/* ── training index: "New since the course" ──────────────────────────────── */
+.training-section .text-link { color: var(--color-secondary); }
+.training-section .text-link:hover { text-decoration: underline; }
+.new-finder { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem 1.5rem; }
+.new-finder-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.new-finder-title { flex: 1; min-width: 0; }
+.new-finder-title b { display: block; font-size: 0.95rem; }
+.new-finder-title span { display: block; font-size: 0.82rem; color: var(--color-text-offset); }
+.new-finder-title:hover b { color: var(--color-secondary); }
+.new-finder-meta { font-family: ui-monospace, monospace; font-size: 0.75rem; color: var(--color-text-offset); }
+.new-finder-live { font-size: 0.82rem; font-weight: 600; color: var(--color-primary); white-space: nowrap; }
+.new-finder-live:hover { text-decoration: underline; }
+@media (max-width: 760px) { .new-finder { grid-template-columns: minmax(0, 1fr); } }

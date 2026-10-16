@@ -5,6 +5,7 @@ import Figure from "../../components/training/Figure.astro";
 import BuildingBlocks from "../../components/training/diagrams/BuildingBlocks.astro";
 import { Code } from "astro-expressive-code/components";
 import { CHAPTERS, DEMO_REPO, PARTS, chapterUrl, chaptersOf, pad } from "../../training/chapters";
+import { NEW_FEATURES, showcaseHref, trainingHref } from "../../features/new-features";
 import "../../styles/training.css";
 
 const minutes = CHAPTERS.reduce((sum, c) => sum + c.minutes, 0);
@@ -18,12 +19,14 @@ const demos = Object.keys(import.meta.glob("/src/training/demos/*.ts")).length;
       <p class="chapter-no">Free training · {CHAPTERS.length} chapters</p>
       <h1><span class="gradient-text">GuiExpert Table</span><br />step by step</h1>
       <p class="lead">
-        From “why does my table freeze?” to a table with two million rows, totals, sorting, filtering, Excel export, editing and
-        live data – in short chapters with code that runs right on the page.
+        From “why does my table freeze?” to a table with two million rows, totals, sorting, filtering, Excel export, editing,
+        live data, row grouping, pivot tables, master/detail and formulas – in short chapters with code that runs right on
+        the page.
       </p>
       <div class="training-cta">
         <a class="btn-gradient" href={chapterUrl(CHAPTERS[0].slug)}>Start with chapter 1 →</a>
         <a class="btn-outline" href={chapterUrl("first-table")}>Skip to the first table</a>
+        <a class="btn-outline" href="#new">New since the course</a>
         <a class="btn-outline" href="/api/">API reference</a>
       </div>
     </section>
@@ -34,6 +37,22 @@ const demos = Object.keys(import.meta.glob("/src/training/demos/*.ts")).length;
       <div><b>≈ {Math.round(minutes / 60 * 10) / 10} h</b><span>reading time</span></div>
       <div><b>8</b><span>frameworks</span></div>
     </div>
+
+    <section class="training-section" id="new">
+      <h2>New since the course</h2>
+      <p class="sub">Twelve features arrived in October 2026 (1.1.91 – 1.1.98). Some got a chapter of their own, the others a
+        section in the chapter where they belong – here is where to find each one.
+        All twelve with code on one page: <a class="text-link" href="/whats-new/">What's new</a>.</p>
+      <div class="new-finder">
+        {NEW_FEATURES.map(f => (
+          <div class="new-finder-row">
+            <a class="new-finder-title" href={trainingHref(f)}><b>{f.title}</b><span>{f.training.label}</span></a>
+            <span class="new-finder-meta">v{f.since}</span>
+            <a class="new-finder-live" href={showcaseHref(f)} aria-label={`Live showcase: ${f.showcase.title}`}><span aria-hidden="true">▶</span> live</a>
+          </div>
+        ))}
+      </div>
+    </section>
 
     <section class="training-section">
       <h2>How it works</h2>

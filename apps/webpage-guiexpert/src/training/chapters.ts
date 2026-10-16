@@ -2,7 +2,7 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-038`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-039`), so every chapter can link to the exact code state of its episode.
  * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
@@ -61,7 +61,7 @@ export const PARTS: Part[] = [
   { id: "data", no: 5, title: "Options & data", lead: "Options, sorting, filtering, selection, events and Excel export." },
   { id: "look", no: 6, title: "Look & feel", lead: "Renderers, components, heatmaps, themes, spans and trees." },
   { id: "interaction", no: 7, title: "Interaction & state", lead: "Editing, live data and a table that remembers its state." },
-  { id: "advanced", no: 8, title: "Beyond the basics", lead: "Features added after the course: accessibility and more." }
+  { id: "advanced", no: 8, title: "Beyond the basics", lead: "Added after the course: accessibility, row grouping, pivot tables, master/detail and formulas." }
 ];
 
 export const CHAPTERS: Chapter[] = [
@@ -421,6 +421,19 @@ export const CHAPTERS: Chapter[] = [
       "EventListenerIf.onDetailExpandedChanged", "GeDetailEvent", "RowLayout"],
     showcases: [{ name: "masterdetail", title: "Master/detail" }],
     since: "1.1.97"
+  },
+  {
+    slug: "formulas", no: 39, part: "advanced", episode: 39, minutes: 6,
+    title: "Calculated columns, “Show values as” and formulas", nav: "Calculated columns & formulas",
+    lead: "Net, VAT, gross, share of the total and rank – computed when a cell becomes visible, without touching the data, and still sortable, filterable and exportable.",
+    learn: ["add a calculated column with valueGetter", "read other columns and column totals in a getter",
+      "show values as shares, running totals and ranks", "let users type formulas – safely, without eval",
+      "know where computed values are used: sorting, filter, totals, copy, Excel"],
+    api: ["ColumnDefIf.valueGetter", "ValueGetterContextIf", "ValueGetterContextIf.getValue", "ValueGetterContextIf.aggregate",
+      "ColumnDefIf.showValuesAs", "ShowValuesAs", "TableApi.setShowValuesAs", "ColumnDefIf.formula", "TableApi.setColumnFormula",
+      "compileFormula", "FormulaError", "isFormulaError", "FORMULA_FUNCTION_NAMES", "TableApi.getRowValue", "ColumnDefIf.valueSetter"],
+    showcases: [{ name: "formulas", title: "Formulas & calculated columns" }],
+    since: "1.1.95"
   }
 ];
 

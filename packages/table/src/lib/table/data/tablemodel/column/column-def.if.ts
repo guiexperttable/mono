@@ -134,7 +134,7 @@ export interface ColumnDefIf {
    * ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
    *                    valueGetter: (o: Item) => o.price * o.quantity })
    *
-   * @see Training: [Columns with ColumnDef](https://gui.expert/training/column-definitions/)
+   * @see [Live demo: formulas & calculated columns](https://gui.expert/showcase/formulas/run/) · Training: [Calculated columns, “Show values as” and formulas](https://gui.expert/training/formulas/)
    * @since 1.1.95
    */
   valueGetter?: ValueGetter,
@@ -154,6 +154,7 @@ export interface ColumnDefIf {
    * @example
    * ColumnDef.create({ property: "total", headerLabel: "Share", showValuesAs: "percentOfColumnTotal" })
    *
+   * @see Training: [Show values as](https://gui.expert/training/formulas/#show-values-as)
    * @since 1.1.95
    */
   showValuesAs?: ShowValuesAsConfig,
@@ -161,6 +162,7 @@ export interface ColumnDefIf {
    * The formula of a formula column (`ColumnDef.create({ formula })` compiles it into the `valueGetter`), e.g.
    * `"[price] * [quantity] * 1.19"`. Informational – change it with {@link TableApi.setColumnFormula}.
    *
+   * @see [Live demo: formulas](https://gui.expert/showcase/formulas/run/) · Training: [Formulas your users can type](https://gui.expert/training/formulas/#formulas)
    * @since 1.1.95
    */
   formula?: string,

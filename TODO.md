@@ -255,8 +255,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       #CIRC!`), CSS `ge-table-cell-error`; `api.getRowValue`, `setShowValuesAs`, `getShowValuesAs`, `setColumnFormula`;
       `AreaModelPivot.getShownValue`, `PivotValueIf.showValuesAs`; Excel: `ExcelFormattedValueIf` + `numFmt` (Prozent).
       Showcase `formulas`, `why.astro`. Selbständig umgesetzt.
-      Offen: Training (Abschnitt in `column-definitions` + Kapitel 39 `formulas` – 38 ist seit 011 `master-detail`; die
-      Planung hatte noch keine Seite, keinen Tag und keinen Link), Demo-Repo `ep-039`, Videos 29/30,
+      Training erledigt (Okt. 2026): Kapitel 39 `formulas` (Demo `formulas.ts`, Screenshots) + Verweis in `column-definitions`.
+      Offen: Demo-Repo `ep-039`, Videos 29/30,
       Demo-Modell + `apps/table-demo`, Angular-Demo nach dem Release, Bench auf dem Mac nachmessen.
 - [ ] Folgepunkte 008: Footer einer „Show values as“-Spalte zeigt Rohsummen (z. B. 100 % wäre schöner) · Pivot: laufende
       Summe/Rang/Differenz über Spalten (ag-Grid „Running total in“) · `valueGetter` für `AreaModelArrayOfArrays` (Spalten

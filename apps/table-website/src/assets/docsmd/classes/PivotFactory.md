@@ -46,7 +46,7 @@ select.addEventListener("change", () => tableApi.setPivotConfig({ columnFields: 
 
 **`See`**
 
-Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
+[Live demo: pivot tables](https://gui.expert/showcase/pivot/run/) · Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
 
 **`Since`**
 

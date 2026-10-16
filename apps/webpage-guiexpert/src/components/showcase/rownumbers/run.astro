@@ -1,0 +1,124 @@
+---
+// Row numbers showcase: one flag, a fixed "#" column whose width follows the largest number – up to 1,000,000 rows.
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="rn-bar">
+  <label>Rows
+    <select class={id + '-rows'}>
+      <option value="9">9</option>
+      <option value="1000">1,000</option>
+      <option value="100000" selected>100,000</option>
+      <option value="1000000">1,000,000</option>
+    </select>
+  </label>
+  <label>Numbers
+    <select class={id + '-mode'}>
+      <option value="display" selected>of the view (1, 2, 3 … after sorting)</option>
+      <option value="original">original position (stays with the row)</option>
+    </select>
+  </label>
+  <label><input type="checkbox" class={id + '-sep'} checked /> separators</label>
+  <button type="button" class={id + '-sort'}>Sort by total ↓</button>
+  <label>Filter <input type="search" class={id + '-filter'} placeholder="customer …" /></label>
+  <span class="rn-info">selected rows: <b class={id + '-selected'}>0</b></span>
+</div>
+<div style="height: calc(100vh - 176px)" class:list={[ id, 'rn-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import {
+    ColumnDef, EventAdapter, FocusModel, SelectionModel, SimpleDomService, TableFactory, TableOptions, TableScope,
+    px100, px120, px200
+  } from '/scripts/table/index.js'
+
+  const cities = ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Leipzig', 'Bonn'];
+  const createOrders = count => Array.from({ length: count }, (_, i) => ({
+    id: 1000 + i,
+    customer: `Customer ${(i * 7919) % 997}`,
+    city: cities[i % cities.length],
+    total: Math.round(((i * 7919) % 100_000) / 10) / 10
+  }));
+
+  const ele = document.querySelector('.' + id);
+  const rowsSelect = document.querySelector('.' + id + '-rows');
+  const modeSelect = document.querySelector('.' + id + '-mode');
+  const sepInput = document.querySelector('.' + id + '-sep');
+  const selectedLabel = document.querySelector('.' + id + '-selected');
+  let filterText = '';
+  let tableApi;
+
+  function create() {
+    tableApi?.destroy();
+    const columnDefs = [
+      new ColumnDef('id', 'ID', px100),
+      new ColumnDef('customer', 'Customer', px200),
+      new ColumnDef('city', 'City', px120),
+      ColumnDef.create({ property: 'total', headerLabel: 'Total', width: px120,
+        headerClasses: ['ge-table-text-align-right'], bodyClasses: ['ge-table-text-align-right'] })
+    ];
+    const tableModel = TableFactory.createTableModel({
+      rows: createOrders(Number(rowsSelect.value)),
+      columnDefs,
+      rowNumbersVisible: {                         // or simply: rowNumbersVisible: true
+        mode: modeSelect.value,
+        format: sepInput.checked ? n => n.toLocaleString('en-US') : String
+      }
+    });
+    const selectionModel = new SelectionModel('range', 'multi');
+    const tableOptions = {
+      ...new TableOptions(),
+      getSelectionModel: () => selectionModel,
+      getFocusModel: () => new FocusModel('cell'),
+      externalFilterFunction: row => !filterText || row.customer.toLowerCase().includes(filterText)
+    };
+    const listener = new EventAdapter();
+    listener.onSelectionChanged = () => {
+      selectedLabel.textContent = String(selectionModel.getMergedRowIndices(tableModel.getBodyModel().getRowCount()).length);
+    };
+    const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+    selectedLabel.textContent = '0';
+  }
+
+  create();
+  rowsSelect.addEventListener('change', create);
+  modeSelect.addEventListener('change', create);
+  sepInput.addEventListener('change', create);
+  document.querySelector('.' + id + '-sort').addEventListener('click', () => tableApi.sort((a, b) => b.total - a.total));
+  document.querySelector('.' + id + '-filter').addEventListener('input', e => {
+    filterText = e.target.value.trim().toLowerCase();
+    tableApi.externalFilterChanged();             // fewer rows → the "#" column gets narrower
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .rn-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .rn-bar select, .rn-bar button, .rn-bar input[type="search"] {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .rn-bar select option {
+        color: initial;
+    }
+    .rn-info {
+        opacity: 0.85;
+    }
+</style>

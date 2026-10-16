@@ -43,7 +43,7 @@ import { isCheckboxColumnDef, isRowNumberColumnDef } from "../instanceof-workaro
  * });
  * select.addEventListener("change", () => tableApi.setRowGroupBy(select.value.split(",")));
  *
- * @see Training: [Row grouping](https://gui.expert/training/row-grouping/)
+ * @see [Live demo: row grouping](https://gui.expert/showcase/rowgrouping/run/) · Training: [Row grouping](https://gui.expert/training/row-grouping/)
  *
  * @since 1.1.94
  * @category Row grouping

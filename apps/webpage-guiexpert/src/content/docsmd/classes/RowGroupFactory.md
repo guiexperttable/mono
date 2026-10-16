@@ -39,7 +39,7 @@ select.addEventListener("change", () => tableApi.setRowGroupBy(select.value.spli
 
 **`See`**
 
-Training: [Row grouping](https://gui.expert/training/row-grouping/)
+[Live demo: row grouping](https://gui.expert/showcase/rowgrouping/run/) · Training: [Row grouping](https://gui.expert/training/row-grouping/)
 
 **`Since`**
 

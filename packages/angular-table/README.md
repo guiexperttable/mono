@@ -54,6 +54,24 @@ This is the UI-agnostic table component for your next web app. 😊
 - Full control over the HTML structure and style
 
 
+### New in October 2026 (1.1.91 – 1.1.98) – all MIT-licensed
+
+- Screen readers and keyboard: WAI-ARIA grid, announcements, full keyboard navigation (1.1.91)
+- “Loading…” and “No rows” overlays with a CSS spinner, `loading` prop (1.1.92)
+- Save and restore the state: column layout, sorting, scroll position, selection – localStorage or your server (1.1.92)
+- Row numbers like in a spreadsheet: `rowNumbersVisible: true` (1.1.93)
+- Total rows that follow the filter, sums of the selection: `footerAggregates` (1.1.94)
+- Row grouping with subtotals: `RowGroupFactory` (1.1.94)
+- Pivot tables: `PivotFactory` (1.1.94)
+- Calculated columns, “Show values as” and formulas without `eval`: `valueGetter`, `showValuesAs`, `formula` (1.1.95)
+- Drag rows into order – mouse, touch, keyboard: `rowDrag: true` (1.1.95)
+- Fill handle and batch edit: `fillHandle`, `batchEdit` (1.1.96)
+- Master/detail with nested tables or components: `masterDetail` (1.1.97)
+- Right-to-left for Arabic, Hebrew, Persian: `direction: "rtl"` (1.1.98)
+
+All twelve with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/) ·
+training: [gui.expert/training](https://gui.expert/training/)
+
 ## Links
 
 - [Demos](https://gui.expert/demos)

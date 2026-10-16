@@ -60,10 +60,11 @@ import { Code } from "astro-expressive-code/components";
     <ApiLink name="ColumnDefIf.isVisible" /> is a function – it may also depend on state (<code>() =&gt; showDetails</code>), followed
     by <ApiLink name="TableApi.repaint" />. Hidden columns are not copied and not exported (<ChapterLink slug="excel-export" />).
   </p>
-  <Callout type="pitfall" title="setColumnVisible() is still a stub">
-    <p><ApiLink name="TableApi.setColumnVisible" /> exists in the API but does nothing yet. Use <code>isVisible</code> on the
-      ColumnDef.</p>
-  </Callout>
+  <p>At runtime – e.g. from a “visible columns” menu – use <ApiLink name="TableApi.setColumnVisible" /> with the property;
+    it sets <code>isVisible</code> for you and remembers the width for when the column comes back:</p>
+  <Code lang="ts" code={`tableApi.setColumnVisible("category", false);   // by property – no index needed
+tableApi.isColumnVisible("category");            // false`} />
+  <p>The hidden columns can be remembered across reloads (<ChapterLink slug="persist-state" />).</p>
 
   <h2 id="all-fields">Everything a ColumnDef can do</h2>
   <table>
@@ -71,7 +72,9 @@ import { Code } from "astro-expressive-code/components";
     <tbody>
       <tr><td><code>sortable</code>, <code>sortComparator</code>, <code>sortState</code></td><td><ChapterLink slug="sorting" /></td></tr>
       <tr><td><code>headerRenderer</code>, <code>bodyRenderer</code>, <code>footerRenderer</code> (<code>rendererMap</code>)</td><td><ChapterLink slug="cell-renderers" /></td></tr>
-      <tr><td><code>editable</code>, <code>editInputPipe</code>, <code>getEditRenderer</code></td><td><ChapterLink slug="inline-editing" /></td></tr>
+      <tr><td><code>editable</code>, <code>editInputPipe</code>, <code>getEditRenderer</code>, <code>validate</code></td><td><ChapterLink slug="inline-editing" /></td></tr>
+      <tr><td><code>valueGetter</code>, <code>valueSetter</code>, <code>showValuesAs</code>, <code>formula</code></td><td><ChapterLink slug="formulas" /></td></tr>
+      <tr><td><code>rowDrag</code></td><td><ChapterLink slug="events-and-context-menu" hash="#row-drag" /></td></tr>
     </tbody>
   </table>
 

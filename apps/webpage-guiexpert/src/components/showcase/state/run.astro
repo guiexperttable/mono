@@ -1,0 +1,148 @@
+---
+// State showcase: resize, move (drag a header), hide, sort, scroll and select – then reload the page. Everything is back.
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="st-bar">
+  <span>Change the layout, then</span>
+  <button type="button" class={id + '-reload'}>Rebuild the table</button>
+  <button type="button" class={id + '-page'}>Reload the page</button>
+  <button type="button" class={id + '-reset'}>Reset</button>
+  <label><input type="checkbox" class={id + '-city'} checked /> City column</label>
+</div>
+<div class="st-main">
+  <div style="height: calc(100vh - 176px)" class:list={[ id, 'st-demo' ]}></div>
+  <aside class="st-json" aria-label="The saved state">
+    <b>onStateChanged → JSON</b>
+    <small>The whole state (what you would send to your server). localStorage keeps the parts switched on in
+      autoRestoreOptions. Rows by id, columns by property, never by index.</small>
+    <pre class={id + '-json'}></pre>
+  </aside>
+</div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import {
+    AutoRestoreOptions, ColumnDef, EventAdapter, SelectionModel, SimpleDomService, TableFactory, TableOptions,
+    TableScope, TrueFn, px80, px100, px120, px160
+  } from '/scripts/table/index.js'
+
+  const cities = ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Leipzig', 'Bonn'];
+  const orders = Array.from({ length: 10_000 }, (_, i) => ({
+    id: 1000 + i,
+    customer: `Customer ${(i * 7919) % 997}`,
+    city: cities[i % cities.length],
+    product: ['Laptop', 'Monitor', 'Keyboard', 'Mouse', 'Headset'][i % 5],
+    total: Math.round(((i * 7919) % 100_000) / 10) / 10
+  }));
+
+  const ele = document.querySelector('.' + id);
+  const json = document.querySelector('.' + id + '-json');
+  const cityInput = document.querySelector('.' + id + '-city');
+  let tableApi;
+
+  function create() {
+    tableApi?.destroy();
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', headerLabel: 'ID', width: px80, sortable: TrueFn }),
+      ColumnDef.create({ property: 'customer', headerLabel: 'Customer', width: px160, sortable: TrueFn }),
+      ColumnDef.create({ property: 'city', headerLabel: 'City', width: px120, sortable: TrueFn }),
+      ColumnDef.create({ property: 'product', headerLabel: 'Product', width: px120, sortable: TrueFn }),
+      ColumnDef.create({ property: 'total', headerLabel: 'Total', width: px100, sortable: TrueFn,
+        headerClasses: ['ge-table-text-align-right'], bodyClasses: ['ge-table-text-align-right'] })
+    ];
+    const selectionModel = new SelectionModel('row', 'multi');
+    const tableOptions = {
+      ...new TableOptions(),
+      getSelectionModel: () => selectionModel,
+      autoRestoreOptions: {
+        ...new AutoRestoreOptions(),
+        getStorageKeyFn: () => 'showcase-orders',     // localStorage["showcase-orderstableState"]
+        getRowId: order => order.id,
+        autoRestoreColumnLayout: true,                // widths, order, hidden columns
+        autoRestoreSortingState: true,
+        autoRestoreScrollPosition: true,
+        autoRestoreSelectedState: true
+      }
+    };
+    const listener = new EventAdapter();
+    listener.onStateChanged = evt => { json.textContent = JSON.stringify(evt.state, null, 2); };
+    const tableModel = TableFactory.createTableModel({ rows: orders, columnDefs });
+    const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+    cityInput.checked = tableApi.isColumnVisible('city');
+    json.textContent = JSON.stringify(tableApi.getState(), null, 2);
+  }
+
+  create();
+  document.querySelector('.' + id + '-reload').addEventListener('click', create);
+  document.querySelector('.' + id + '-page').addEventListener('click', () => {
+    tableApi.destroy();                               // writes what is still pending
+    location.reload();
+  });
+  document.querySelector('.' + id + '-reset').addEventListener('click', () => {
+    tableApi.resetState();                            // the layout of the code; the localStorage entry is removed
+    cityInput.checked = true;
+    json.textContent = JSON.stringify(tableApi.getState(), null, 2);
+  });
+  cityInput.addEventListener('change', () => tableApi.setColumnVisible('city', cityInput.checked));
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .st-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .st-bar button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .st-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 16px;
+    }
+    .st-json {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-height: 0;
+        max-height: calc(100vh - 176px);
+        padding: 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-size: 13px;
+    }
+    .st-json small {
+        opacity: 0.75;
+    }
+    .st-json pre {
+        flex: 1;
+        overflow: auto;
+        margin: 0;
+        padding: 8px;
+        border-radius: 6px;
+        background: var(--color-background-offset);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+    @media (max-width: 800px) {
+        .st-main {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+</style>

@@ -186,6 +186,10 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), batchEdit: true };
 
 1.1.96
 
+**`See`**
+
+[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[batchEdit](../interfaces/TableOptionsIf.md#batchedit)
@@ -340,6 +344,10 @@ const tableOptions: TableOptionsIf = {
 **`Since`**
 
 1.1.96
+
+**`See`**
+
+[Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
 
 #### Implementation of
 
@@ -611,6 +619,10 @@ const tableOptions: TableOptionsIf = {
 
 1.1.97
 
+**`See`**
+
+[Live demo: master/detail](https://gui.expert/showcase/masterdetail/run/) · Training: [Master/detail](https://gui.expert/training/master-detail/)
+
 #### Implementation of
 
 [TableOptionsIf](../interfaces/TableOptionsIf.md).[masterDetail](../interfaces/TableOptionsIf.md#masterdetail)
@@ -708,6 +720,10 @@ const tableOptions: TableOptionsIf = {
 **`Since`**
 
 1.1.95
+
+**`See`**
+
+[Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
 
 #### Implementation of
 

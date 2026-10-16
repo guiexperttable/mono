@@ -48,6 +48,7 @@ const DEMOS = {
   "persist-state": { slug: "persist-state" },
   "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
   "row-grouping": { slug: "row-grouping", search: "laptop" },
+  "row-drag": { slug: "events-and-context-menu", button: "move down" },
   "pivot-tables": { slug: "pivot-tables", button: "expand all" },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };

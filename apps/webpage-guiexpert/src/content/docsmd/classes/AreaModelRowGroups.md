@@ -77,6 +77,7 @@ Training: [Row grouping](https://gui.expert/training/row-grouping/)
 - [applyShowValuesAs](AreaModelRowGroups.md#applyshowvaluesas)
 - [arrayMove](AreaModelRowGroups.md#arraymove)
 - [batch](AreaModelRowGroups.md#batch)
+- [canMoveRows](AreaModelRowGroups.md#canmoverows)
 - [changeColumnOrder](AreaModelRowGroups.md#changecolumnorder)
 - [doSort](AreaModelRowGroups.md#dosort)
 - [ensureAggregates](AreaModelRowGroups.md#ensureaggregates)
@@ -133,6 +134,7 @@ Training: [Row grouping](https://gui.expert/training/row-grouping/)
 - [isRowCheckable](AreaModelRowGroups.md#isrowcheckable)
 - [isRowChecked](AreaModelRowGroups.md#isrowchecked)
 - [isSelectable](AreaModelRowGroups.md#isselectable)
+- [moveRows](AreaModelRowGroups.md#moverows)
 - [readPropertyPath](AreaModelRowGroups.md#readpropertypath)
 - [recalcVisibleTreeRows](AreaModelRowGroups.md#recalcvisibletreerows)
 - [regroup](AreaModelRowGroups.md#regroup)
@@ -177,7 +179,7 @@ Training: [Row grouping](https://gui.expert/training/row-grouping/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L103)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L104)
 
 ## Properties
 
@@ -211,7 +213,7 @@ if (areaModel.areaIdent === "body") {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L69)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L71)
 
 ___
 
@@ -239,7 +241,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L72)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L74)
 
 ___
 
@@ -253,7 +255,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L71)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L73)
 
 ___
 
@@ -265,7 +267,7 @@ Marker for [isAreaModelRowGroups](../modules.md#isareamodelrowgroups) (works acr
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L68)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L69)
 
 ___
 
@@ -277,7 +279,7 @@ The options (groupBy as set by [setGroupBy](AreaModelRowGroups.md#setgroupby)).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L71)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L72)
 
 ___
 
@@ -291,7 +293,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L53)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L55)
 
 ___
 
@@ -336,7 +338,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L70)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L72)
 
 ___
 
@@ -350,7 +352,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L51)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L53)
 
 ___
 
@@ -392,7 +394,7 @@ The CSS class and tooltip of an error value of a formula.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L327)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:328](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L328)
 
 ___
 
@@ -422,7 +424,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L271)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:334](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L334)
 
 ___
 
@@ -482,7 +484,41 @@ const moved = body.batch(() => {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:343](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L343)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:344](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L344)
+
+___
+
+### canMoveRows
+
+▸ **canMoveRows**(`_rowIndices`, `_target`): `boolean`
+
+Row drag: `false` – the table does not move rows of a grouped table itself (group rows are built from the data, a change of group means changing data). With
+`rowDragOptions.managed: false` the app gets the events and decides.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_rowIndices` | `number`[] |
+| `_target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) |
+
+#### Returns
+
+`boolean`
+
+always false
+
+**`Since`**
+
+1.1.95
+
+#### Overrides
+
+[AreaModelTree](AreaModelTree.md).[canMoveRows](AreaModelTree.md#canmoverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:381](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L381)
 
 ___
 
@@ -530,7 +566,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L79)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L81)
 
 ___
 
@@ -565,7 +601,7 @@ tableApi.repaint();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:497](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L497)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:519](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L519)
 
 ___
 
@@ -581,7 +617,7 @@ Computes what is missing: everything after a change of data/filter/grouping, oth
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:614](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L614)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:639](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L639)
 
 ___
 
@@ -611,7 +647,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:310](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L310)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:311](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L311)
 
 ___
 
@@ -652,7 +688,7 @@ tableApi.externalFilterChanged();   // Nord (2) 150 · Süd (1) 80
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:475](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L475)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:497](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L497)
 
 ___
 
@@ -682,7 +718,7 @@ body.findGroup(["Nord", "A"])?.results.umsatz;   // 220
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L213)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:214](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L214)
 
 ___
 
@@ -720,7 +756,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L474)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:537](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L537)
 
 ___
 
@@ -746,7 +782,7 @@ The rows of column aggregates in formulas (`SUM([total])`): the filtered row obj
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:306](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L306)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:369](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L369)
 
 ___
 
@@ -773,7 +809,7 @@ const moved = body.getBuildCount() !== before;   // true: "region" is grouped
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:326](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L326)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L327)
 
 ___
 
@@ -799,7 +835,7 @@ The renderer of a „Show values as“ column without an own renderer: the text 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:319](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L319)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L320)
 
 ___
 
@@ -853,7 +889,7 @@ Group rows: the [AggregateCellRenderer](AggregateCellRenderer.md) for aggregates
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:390](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L390)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:412](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L412)
 
 ___
 
@@ -877,7 +913,7 @@ const selected = body.getCheckedRows();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:292](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L292)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:293](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L293)
 
 ___
 
@@ -954,7 +990,7 @@ The constant row height or `undefined`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:324](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L324)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:387](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L387)
 
 ___
 
@@ -1021,7 +1057,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:399](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L399)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:421](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L421)
 
 ___
 
@@ -1110,7 +1146,7 @@ const sale = body.getDetailRow(1);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:253](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L253)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:254](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L254)
 
 ___
 
@@ -1151,7 +1187,7 @@ const shown = treeModel.getDisplayedChildren(treeModel.rows[0]).length;
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L143)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L145)
 
 ___
 
@@ -1174,7 +1210,7 @@ the top-level rows that are shown
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L112)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L114)
 
 ___
 
@@ -1196,7 +1232,7 @@ the displayed tree rows (do not modify the array)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:174](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L174)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L176)
 
 ___
 
@@ -1220,7 +1256,7 @@ body.getGroupBy();   // ["region", "produkt"]
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L156)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L157)
 
 ___
 
@@ -1242,7 +1278,7 @@ The label of a group row in the group column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:605](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L605)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:630](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L630)
 
 ___
 
@@ -1266,7 +1302,7 @@ body.getGroups().map(g => `${g.label}: ${g.results.umsatz}`);   // ["Nord: 270",
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:199](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L199)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:200](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L200)
 
 ___
 
@@ -1306,7 +1342,7 @@ const total = aggregate(treeModel.getLeafRows(), row => row.data.total, "sum");
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:163](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L163)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L165)
 
 ___
 
@@ -1419,7 +1455,7 @@ Group rows: the label resp. the aggregate of the column; detail rows: the value 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:361](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L361)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:362](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L362)
 
 ___
 
@@ -1466,7 +1502,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:335](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L335)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:398](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L398)
 
 ___
 
@@ -1506,7 +1542,7 @@ getRowCount(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L178)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L180)
 
 ___
 
@@ -1536,7 +1572,7 @@ const group = body.getRowGroup(0);   // the first group (if the first row is a g
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L235)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L236)
 
 ___
 
@@ -1599,7 +1635,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L314)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:377](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L377)
 
 ___
 
@@ -1718,7 +1754,7 @@ const all = body.getSourceRows().length;
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L129)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L130)
 
 ___
 
@@ -1748,7 +1784,7 @@ the text
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:373](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L373)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:395](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L395)
 
 ___
 
@@ -1775,7 +1811,7 @@ The message of a formula error as tooltip.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:246](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L246)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:309](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L309)
 
 ___
 
@@ -1799,7 +1835,7 @@ body.getTotals().umsatz;   // 450
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:279](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L279)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:280](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L280)
 
 ___
 
@@ -1826,7 +1862,7 @@ displayed rows before filtering
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L190)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L192)
 
 ___
 
@@ -1890,7 +1926,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L194)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:257](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L257)
 
 ___
 
@@ -1915,7 +1951,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:339](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L339)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:402](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L402)
 
 ___
 
@@ -2034,7 +2070,7 @@ true if the row has displayed children
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L123)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L125)
 
 ___
 
@@ -2123,7 +2159,7 @@ tableApi.repaint();           // calls invalidateDerivedValues() – all groups 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:546](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L546)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:568](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L568)
 
 ___
 
@@ -2220,7 +2256,7 @@ Group rows and the group column are not editable.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:428](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L428)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:450](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L450)
 
 ___
 
@@ -2288,7 +2324,7 @@ true for the group label
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:423](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L423)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:445](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L445)
 
 ___
 
@@ -2318,7 +2354,7 @@ const bold = body.isGroupRowIndex(rowIndex);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:267](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L267)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:268](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L268)
 
 ___
 
@@ -2482,6 +2518,39 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 ___
 
+### moveRows
+
+▸ **moveRows**(`_rowIndices`, `_target`): `boolean`
+
+Row drag: does nothing (see [canMoveRows](AreaModelRowGroups.md#canmoverows)).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_rowIndices` | `number`[] |
+| `_target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) |
+
+#### Returns
+
+`boolean`
+
+always false
+
+**`Since`**
+
+1.1.95
+
+#### Overrides
+
+[AreaModelTree](AreaModelTree.md).[moveRows](AreaModelTree.md#moverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:391](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L391)
+
+___
+
 ### readPropertyPath
 
 ▸ **readPropertyPath**(`t`, `property`): `unknown`
@@ -2505,7 +2574,7 @@ The value of a property path – overridden by the models with their own path se
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:299](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L299)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:362](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L362)
 
 ___
 
@@ -2544,7 +2613,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L102)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L104)
 
 ___
 
@@ -2569,7 +2638,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L187)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L188)
 
 ___
 
@@ -2593,7 +2662,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L443)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:506](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L506)
 
 ___
 
@@ -2652,7 +2721,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L171)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L172)
 
 ___
 
@@ -2759,7 +2828,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L143)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L144)
 
 ___
 
@@ -2788,7 +2857,7 @@ value changed, the row moves to its new group (the row count may change).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:439](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L439)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:461](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L461)
 
 ___
 
@@ -2821,7 +2890,7 @@ tableApi.sort((a: Sale, b: Sale) => b.umsatz - a.umsatz);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:528](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L528)
+[src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts:550](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-row-groups.ts#L550)
 
 ___
 
@@ -2847,4 +2916,4 @@ Expands or collapses every row on every level and applies the active filter agai
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:438](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L438)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:501](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L501)

@@ -12,6 +12,8 @@ import type { DerivedValuesChangeIf } from './derived-values-change.if';
 import { calculateShowValuesAs, sumOfNumbers } from '../../../calc/show-values-as';
 import type { ShowValuesAsIf } from '../../../calc/show-values-as.type';
 import { isFormulaError } from '../../../formula/formula-error';
+import type { RowDropTargetIf } from '../../../row-drag/row-drop-target.if';
+import { canMoveFlatRows, moveFlatRows } from '../../../row-drag/move-rows';
 
 /**
  * @class AreaModelObjectArray
@@ -323,6 +325,46 @@ export class AreaModelObjectArray<T>
    */
   getUnfilteredRowCount(): number {
     return this.rows?.length ?? 0;
+  }
+
+  /**
+   * Row drag: true if the rows can be moved – no filter hides a row and the target is a row of this model
+   * (`"before"` / `"after"`).
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target
+   * @returns {boolean} true if {@link moveRows} would move them
+   *
+   * @example
+   * bodyAreaModel.canMoveRows([2], { rowIndex: 6, position: "after" });   // true without a filter
+   *
+   * @since 1.1.95
+   */
+  canMoveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    return canMoveFlatRows(this.filteredRows.length, this.rows.length, rowIndices, target);
+  }
+
+  /**
+   * Row drag: moves the rows in the display order and writes that order back to {@link getAllRows} – **in place**
+   * (like `Array.prototype.sort`: with `TableFactory.createTableModel({ rows })` your array has the new order).
+   * Works only without a hiding filter ({@link canMoveRows}). The table repaints after a drop; from code use
+   * `tableApi.moveRows()`.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target (display index before the move)
+   * @returns {boolean} true if moved
+   *
+   * @example
+   * bodyAreaModel.moveRows([2], { rowIndex: 6, position: "after" });   // row 3 becomes row 7
+   *
+   * @since 1.1.95
+   */
+  moveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    const moved = moveFlatRows(this.filteredRows, this.rows, rowIndices, target);
+    if (moved) {
+      this.invalidateDerivedValues();
+    }
+    return moved;
   }
 
   /**

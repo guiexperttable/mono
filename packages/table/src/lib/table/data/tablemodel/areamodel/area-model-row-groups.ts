@@ -1,4 +1,5 @@
 import { AreaModelTree } from "./area-model-tree";
+import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
 import { TreeRow } from "../../common/tree-row";
 import type { TreeRowIf } from "../../common/tree-row-if";
 import type { ColumnDefIf } from "../column/column-def.if";
@@ -368,6 +369,27 @@ export class AreaModelRowGroups<T = any> extends AreaModelTree<any> {
       return this.specByKey.has(property) ? group.results[property] : "";
     }
     return property === RowGroupColumnDef.PROPERTY ? "" : super.getRawValueOfRow(row, property);
+  }
+
+  /**
+   * Row drag: `false` – the table does not move rows of a grouped table itself (group rows are built from the data, a change of group means changing data). With
+   * `rowDragOptions.managed: false` the app gets the events and decides.
+   *
+   * @returns {boolean} always false
+   * @since 1.1.95
+   */
+  override canMoveRows(_rowIndices: number[], _target: RowDropTargetIf): boolean {
+    return false;
+  }
+
+  /**
+   * Row drag: does nothing (see {@link canMoveRows}).
+   *
+   * @returns {boolean} always false
+   * @since 1.1.95
+   */
+  override moveRows(_rowIndices: number[], _target: RowDropTargetIf): boolean {
+    return false;
   }
 
   override getTextValueAt(rowIndex: number, columnIndex: number): string {

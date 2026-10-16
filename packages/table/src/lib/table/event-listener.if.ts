@@ -2,6 +2,7 @@ import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
 import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
+import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 import { EventFocusChangedListenerIf } from './focus/event-focus-changed-listener.if';
@@ -74,4 +75,29 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.92
    */
   onStateChanged?(evt: GeStateChangeEvent): void;
+
+  /**
+   * Optional: a row drag started (drag handle moved past the threshold, or Ctrl+Alt+↑/↓). `evt.preventDefault()`
+   * cancels it. See {@link GeRowDragEvent}.
+   *
+   * @since 1.1.95
+   */
+  onRowDragStart?(evt: GeRowDragEvent): void;
+
+  /**
+   * Optional: the drop target of a row drag changed (not on every pixel). `evt.preventDefault()` marks the target as
+   * invalid (no drop marker, no drop).
+   *
+   * @since 1.1.95
+   */
+  onRowDragMove?(evt: GeRowDragEvent): void;
+
+  /**
+   * Optional: a row drag ended – `evt.type` is `"end"` (dropped; `evt.moved` = the table moved the rows) or `"cancel"`.
+   * Managed: called after the move (`evt.toIndex` = the real position). Save the new order here; to veto a drop, call
+   * `evt.preventDefault()` in {@link onRowDragMove}.
+   *
+   * @since 1.1.95
+   */
+  onRowDragEnd?(evt: GeRowDragEvent): void;
 }

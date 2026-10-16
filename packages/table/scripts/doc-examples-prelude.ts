@@ -21,7 +21,10 @@ import {
   resolveShowValuesAs, isPercentShowValuesAs, formatShowValuesAs, sumOfNumbers, calculateShowValuesAs, FormulaErrorCode,
   FormulaError, isFormulaError, FormulaNode, FormulaBinaryOperator, FormulaValue, FormulaFunction, FormulaOptionsIf,
   FORMULA_FUNCTION_NAMES, CompiledFormula, compileFormula, createFormulaValueGetter, ExcelFormattedValueIf,
-  isExcelFormattedValue
+  isExcelFormattedValue,
+  RowDropPosition, RowDropTargetIf, RowDragOptionsIf, RowDragOptions, normalizeRowIndices, getInsertBeforeIndex,
+  calcMoveToIndex, moveArrayItems, getTopmostTreeRows, canMoveTreeRows, moveTreeRows, canMoveFlatRows, moveFlatRows,
+  RowDragService, RowDragHandleState, GeRowDragEvent, GeRowDragEventType, GeRowDragSource, RowDragColumnOption, findRowIndexAtY
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }

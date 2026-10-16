@@ -94,4 +94,40 @@ export interface AriaTextsIf {
    * @returns {string} default: `"Collapse group Q1"`
    */
   collapseGroup(groupLabel: string): string;
+
+  /**
+   * Announced when a row drag starts (optional – {@link AriaTexts} has a default).
+   *
+   * @param {number} rowCount - number of dragged rows
+   * @returns {string} default: `"Dragging 1 row. Press Escape to cancel."`
+   * @since 1.1.95
+   */
+  rowDragStarted?(rowCount: number): string;
+
+  /**
+   * Announced after rows were moved by drag and drop or Ctrl+Alt+↑/↓ (optional – {@link AriaTexts} has a default).
+   *
+   * @param {number} position - 1-based position of the first moved row
+   * @param {number} rowCount - number of displayed rows
+   * @returns {string} default: `"Row moved to position 7 of 20"`
+   * @since 1.1.95
+   */
+  rowMoved?(position: number, rowCount: number): string;
+
+  /**
+   * Announced when rows cannot be moved: the table is sorted or filtered (managed row drag), or the row cannot move
+   * further (optional – {@link AriaTexts} has a default).
+   *
+   * @returns {string} default: `"Rows cannot be moved while the table is sorted or filtered"`
+   * @since 1.1.95
+   */
+  rowMoveNotPossible?(): string;
+
+  /**
+   * Announced when a row drag was cancelled (Escape) – optional, {@link AriaTexts} has a default.
+   *
+   * @returns {string} default: `"Drag cancelled"`
+   * @since 1.1.95
+   */
+  rowDragCancelled?(): string;
 }

@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeModelChangeEvent, GeMouseEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -12,6 +12,7 @@ export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
 export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
+export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -33,6 +34,10 @@ export interface GuiexpertTableProps {
    * @since 1.1.92
    */
   stateChanged?: GeStateChangeEventFn,
+  /** Row drag (since 1.1.95, handles via `ColumnDef.rowDrag`): started / target changed / ended ("end" or "cancel"). */
+  rowDragStart?: GeRowDragEventFn,
+  rowDragMove?: GeRowDragEventFn,
+  rowDragEnd?: GeRowDragEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

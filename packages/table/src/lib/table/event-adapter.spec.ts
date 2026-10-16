@@ -11,6 +11,9 @@ const METHODS = [
   'onMouseDragging',
   'onMouseDraggingEnd',
   'onMouseMoved',
+  'onRowDragEnd',
+  'onRowDragMove',
+  'onRowDragStart',
   'onScroll',
   'onSelectionChanged',
   'onStateChanged',  // since 1.1.92

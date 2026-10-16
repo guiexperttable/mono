@@ -7,10 +7,10 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeMouseEvent, GeStateChangeEvent } from '@guiexpert/table';
+import type { GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -66,6 +66,21 @@ describe('GuiexpertTable (React)', () => {
     expect(grid.getAttribute('aria-label')).toBe('Orders');
     expect(grid.getAttribute('aria-rowcount')).toBe('6'); // header + 5 rows
     expect(grid.querySelectorAll('[role="row"]').length).toBeGreaterThan(1);
+  });
+
+  it('rowDragStart / rowDragMove / rowDragEnd are called, the row is moved (since 1.1.95)', async () => {
+    const types: string[] = [];
+    const rowDragEnd = vi.fn<(evt: GeRowDragEvent) => void>(e => { types.push(e.type); });
+    const host = mount(<GuiexpertTable tableModel={createRowDragModel()} rowDragStart={e => types.push(e.type)}
+                                       rowDragMove={e => types.push(e.type)} rowDragEnd={rowDragEnd} />);
+    await nextFrame();
+    dragRow(host, 1, 3);
+    expect(types[0]).toBe('start');
+    expect(types).toContain('move');
+    expect(rowDragEnd).toHaveBeenCalledTimes(1);
+    expect(rowDragEnd.mock.calls[0][0]).toMatchObject({ type: 'end', moved: true, toIndex: 3 });
+    await nextFrame();
+    expect(rowTexts(host)[3]).toContain('Row 1');
   });
 
   it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {

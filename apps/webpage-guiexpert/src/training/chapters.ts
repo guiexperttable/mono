@@ -259,10 +259,12 @@ export const CHAPTERS: Chapter[] = [
     slug: "events-and-context-menu", no: 23, part: "data", episode: 23, minutes: 6,
     title: "Events and a context menu of your own", nav: "Events & context menu",
     lead: "Override only the events you need – and build a context menu that looks exactly like your app.",
-    learn: ["extend EventAdapter", "tell single from double clicks", "map a displayed row back to your object"],
+    learn: ["extend EventAdapter", "tell single from double clicks", "map a displayed row back to your object",
+      "let users drag rows into order (since 1.1.95)"],
     api: ["EventAdapter", "EventListenerIf", "EventListenerIf.onMouseClicked", "EventListenerIf.onContextmenu",
-      "GeMouseEvent", "AreaModelIf.getRowByIndex"],
-    showcases: [{ name: "mouseevents", title: "Mouse events" }]
+      "GeMouseEvent", "AreaModelIf.getRowByIndex", "ColumnDefIf.rowDrag", "EventListenerIf.onRowDragEnd", "GeRowDragEvent",
+      "TableApi.moveRows"],
+    showcases: [{ name: "mouseevents", title: "Mouse events" }, { name: "rowdrag", title: "Row drag" }]
   },
   {
     slug: "excel-export", no: 24, part: "data", episode: 24, minutes: 4,

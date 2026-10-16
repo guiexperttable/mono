@@ -1,0 +1,77 @@
+<!doctype html>
+<!--
+  Recording page for episode 09 "Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/09-zeilen-ziehen/demo.html
+  Runs the code of snippet.ts (plain JS) with 10,000 generated tasks.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Zeilen ziehen</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button { font: inherit; padding: 4px 12px; }
+    .log { font: 16px ui-monospace, monospace; opacity: 0.85; }
+    .table-div { height: calc(100vh - 130px); margin: 0 16px; font-size: 17px; }
+  </style>
+</head>
+<body>
+<h1>Prioritäten – 10.000 Aufgaben</h1>
+<div class="bar">
+  <button id="sort">nach Stunden sortieren</button>
+  <button id="unsort">Sortierung weg</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+  <span class="log" id="log"></span>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, px300 } from "@guiexpert/table";
+
+  const TITEL = ["Login-Timeout beheben", "Release-Notes schreiben", "Pull Requests prüfen", "Abhängigkeiten aktualisieren",
+    "Dark Mode fürs Dashboard", "Excel-Export", "Tastaturhilfe", "Onboarding-Video", "Wackelnden Test fixen",
+    "Einstellungen übersetzen", "Barrierefreiheit prüfen", "API-Antworten cachen"];
+  const WER = ["Anna", "Ben", "Chen", "Dana", "Emil"];
+  const aufgaben = Array.from({ length: 10_000 }, (_, i) => ({
+    titel: i < TITEL.length ? TITEL[i] : `${TITEL[i % TITEL.length]} #${Math.floor(i / TITEL.length) + 1}`,
+    wer: WER[i % WER.length],
+    stunden: 1 + ((i * 7) % 13)
+  }));
+  const log = document.querySelector("#log");
+
+  // --- code of snippet.ts ---
+  const tableModel = TableFactory.createTableModel({
+    rows: aufgaben,
+    rowNumbersVisible: true,
+    rowDrag: true
+  });
+  const listener = new EventAdapter();
+  listener.onRowDragEnd = evt => {
+    if (evt.moved) log.textContent = `${evt.rows[0].titel} → Platz ${evt.toIndex + 1}`;
+  };
+  const host = document.querySelector(".table-div");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), listener);
+  scope.firstInit();
+  // ---
+
+  tableModel.getColumnDef(1).width = px300;           // readable titles (not in the snippet)
+  const api = scope.getApi();
+  api.recalcColumnWidths();
+  document.querySelector("#sort").addEventListener("click", () => {
+    api.sortByColumn(3, "desc");
+    log.textContent = "sortiert – Griffe gesperrt";
+  });
+  document.querySelector("#unsort").addEventListener("click", () => {
+    tableModel.getColumnDef(3).sortState = "";
+    api.repaint();
+    log.textContent = "Ziehen wieder möglich";
+  });
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

@@ -45,8 +45,36 @@ import Callout from "../../components/training/Callout.astro";
   <LiveDemo name="events-and-context-menu" title="Double-click and context menu" height={400}
             caption="Double-click a row: the toolbar shows the order. Right-click: own menu – filter to one customer, copy, export." />
 
+  <h2 id="row-drag">Dragging rows into order</h2>
+  <Callout type="version">
+    <p>Row drag is new in 1.1.95.</p>
+  </Callout>
+  <p>
+    A priority list, a playlist, the steps of a process: users want to put rows in order themselves. Give a column a drag
+    handle – <ApiLink name="ColumnDefIf.rowDrag" label="rowDrag" /> – and the table does the rest: ghost, drop marker,
+    auto-scroll at the edges (also through millions of rows), mouse, touch and pen, Escape cancels.
+  </p>
+  <Snippet file="demos/row-drag.ts" region="model" title="src/main.ts" />
+  <p>
+    The table moves the rows in your array and then calls <ApiLink name="EventListenerIf.onRowDragEnd" label="onRowDragEnd" />
+    with a <ApiLink name="GeRowDragEvent" /> – the place to save the new order:
+  </p>
+  <Snippet file="demos/row-drag.ts" region="events" title="src/order-events.ts" />
+  <p>
+    Dragging is not for everyone: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> moves the focused row, and screen
+    readers hear "Row moved to position 4 of 1000". Two buttons do the same for users who cannot drag:
+  </p>
+  <Snippet file="demos/row-drag.ts" region="buttons" title="src/main.ts" />
+  <LiveDemo name="row-drag" title="Drag rows into order" height={400}
+            caption="Drag a grip in the customer column. Select rows first (click, Ctrl/⌘-click) to move several at once." />
+  <Callout type="pitfall" title="Sorted or filtered">
+    <p>The table does not move rows of a sorted or filtered view – the grips are dimmed. Need it anyway, e.g. because the
+      server decides? <code>rowDragOptions: {"{ managed: false }"}</code> only reports the drop; move the rows with
+      <ApiLink name="TableApi.moveRows" /> afterwards. Trees, several rows and all options: instructions.md 6.16.</p>
+  </Callout>
+
   <h2 id="frameworks">In the framework wrappers</h2>
-  <p>The same events arrive as props or outputs: <code>mouseClicked</code>, <code>contextmenu</code>, <code>selectionChanged</code> …
+  <p>The same events arrive as props or outputs: <code>mouseClicked</code>, <code>contextmenu</code>, <code>selectionChanged</code>, <code>rowDragEnd</code> …
     (<ChapterLink slug="one-model-every-framework" />).</p>
   <Callout type="pitfall" title="Single click vs. double click">
     <p>A double click also produces a first click with <code>clickCount === 1</code>. If both do something different, handle the

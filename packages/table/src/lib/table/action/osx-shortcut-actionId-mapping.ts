@@ -43,6 +43,8 @@ export class OsxShortcutActionIdMapping {
       "pageup": "NAVIGATE_PAGE_UP",
       "pagedown": "NAVIGATE_PAGE_DOWN",
       "enter": "ACTIVATE_CELL",
+      "ctrl+alt+up": "MOVE_ROW_UP",
+      "ctrl+alt+down": "MOVE_ROW_DOWN",
 
       "meta+c": "COPY_2_CLIPBOARD",
       "ctrl+c": "COPY_2_CLIPBOARD",

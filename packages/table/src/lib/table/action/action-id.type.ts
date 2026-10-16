@@ -27,6 +27,10 @@ export const actionIds = [
   "NAVIGATE_PAGE_UP",     // Page Up: one page up
   "NAVIGATE_PAGE_DOWN",   // Page Down: one page down
   "ACTIVATE_CELL",        // Enter: toggle checkbox / tree node (body), header group / sort (header)
+
+  // since 1.1.95 (row drag, keyboard alternative):
+  "MOVE_ROW_UP",          // Ctrl+Alt+Up: move the focused row (or the selected rows) one position up
+  "MOVE_ROW_DOWN",        // Ctrl+Alt+Down: one position down
 ] as const;
 
 /**

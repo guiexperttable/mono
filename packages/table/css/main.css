@@ -467,6 +467,15 @@
   /* Row numbers (since 1.1.93): like the header, muted digits (#555 on the header gray ≈ 6.9 : 1) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #555;
+
+  /* Row drag (since 1.1.95): handle ≥ 3 : 1 against white (WCAG 1.4.11), marker, ghost */
+  --ge-table-row-drag-handle-color: #6b7280;
+  --ge-table-row-drop-indicator-color: #1a73e8;
+  --ge-table-row-drop-inside-bg: rgba(26, 115, 232, 0.12);
+  --ge-table-row-drag-ghost-bg: #fff;
+  --ge-table-row-drag-ghost-text: #1f2937;
+  --ge-table-row-drag-ghost-border: #1a73e8;
+  --ge-table-row-dragging-opacity: 0.4;
 }
 
 
@@ -568,6 +577,15 @@ html[data-theme="dark"] {
   /* Row numbers (since 1.1.93) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #aaa;
+
+  /* Row drag (since 1.1.95) */
+  --ge-table-row-drag-handle-color: #9ca3af;
+  --ge-table-row-drop-indicator-color: #8ab4f8;
+  --ge-table-row-drop-inside-bg: rgba(138, 180, 248, 0.16);
+  --ge-table-row-drag-ghost-bg: #1f2937;
+  --ge-table-row-drag-ghost-text: #f3f4f6;
+  --ge-table-row-drag-ghost-border: #8ab4f8;
+  --ge-table-row-dragging-opacity: 0.4;
 }
 /* Pivot tables (PivotFactory / AreaModelPivot, since 1.1.94) */
 
@@ -610,6 +628,87 @@ html[data-theme="dark"] {
 
 .ge-table-pivot-header.ge-table-pivot-header-column {
   text-align: end;
+}
+/* Row drag (since 1.1.95): handle, ghost, drop marker – colors in table-color-vars.css (--ge-table-row-drag-*) */
+
+/* the cell with the handle: room for the grip at the start (a tree cell has its indent already) */
+.ge-table-row-drag-cell:not(.ge-table-col-tree) {
+  box-sizing: border-box;
+  padding-inline-start: 16px;
+}
+
+/* the grip: 2 × 3 dots, drawn with CSS (no text, no image); touch-action: none = touch drags instead of scrolling */
+.ge-table-row-drag-handle {
+  position: absolute;
+  inset-inline-start: 2px;
+  top: 50%;
+  width: 12px;
+  height: 18px;
+  margin-top: -9px;
+  cursor: grab;
+  touch-action: none;
+  border-radius: 3px;
+  background-image: radial-gradient(circle, var(--ge-table-row-drag-handle-color) 1.5px, transparent 1.6px);
+  background-size: 6px 6px;
+  background-position: 0 0;
+}
+
+.ge-table-row-drag-handle:hover {
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+/* managed drag while the table is sorted or filtered */
+.ge-table-row-drag-handle.ge-table-row-drag-handle-disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* the dragged rows while the drag runs */
+.ge-table-row-dragging {
+  opacity: var(--ge-table-row-dragging-opacity);
+}
+
+.ge-table-row-drag-active,
+.ge-table-row-drag-active * {
+  cursor: grabbing !important;
+}
+
+.ge-table-row-drag-active.ge-table-row-drag-invalid,
+.ge-table-row-drag-active.ge-table-row-drag-invalid * {
+  cursor: no-drop !important;
+}
+
+.ge-table-row-drag-ghost {
+  position: absolute;
+  z-index: 10001; /* above the overlay (10000) */
+  pointer-events: none;
+  max-width: 280px;
+  padding: 4px 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: var(--ge-table-row-drag-ghost-text);
+  background: var(--ge-table-row-drag-ghost-bg);
+  border: 1px solid var(--ge-table-row-drag-ghost-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ge-table-row-drop-indicator {
+  position: absolute;
+  display: none;
+  z-index: 10000;
+  pointer-events: none;
+  background: var(--ge-table-row-drop-indicator-color);
+}
+
+/* tree: drop into the row (becomes its child) */
+.ge-table-row-drop-indicator.ge-table-row-drop-indicator-inside {
+  box-sizing: border-box;
+  background: var(--ge-table-row-drop-inside-bg);
+  border: 2px solid var(--ge-table-row-drop-indicator-color);
 }
 /* Row grouping (RowGroupFactory / AreaModelRowGroups, since 1.1.94) */
 

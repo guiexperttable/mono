@@ -74,6 +74,7 @@
 - [GeKeyEvent](classes/GeKeyEvent.md)
 - [GeModelChangeEvent](classes/GeModelChangeEvent.md)
 - [GeMouseEvent](classes/GeMouseEvent.md)
+- [GeRowDragEvent](classes/GeRowDragEvent.md)
 - [GeScrollEvent](classes/GeScrollEvent.md)
 - [GeStateChangeEvent](classes/GeStateChangeEvent.md)
 - [GeoData](classes/GeoData.md)
@@ -109,6 +110,8 @@
 - [Renderer](classes/Renderer.md)
 - [RequestChunk](classes/RequestChunk.md)
 - [ResizeHandler](classes/ResizeHandler.md)
+- [RowDragOptions](classes/RowDragOptions.md)
+- [RowDragService](classes/RowDragService.md)
 - [RowGroup](classes/RowGroup.md)
 - [RowGroupColumnDef](classes/RowGroupColumnDef.md)
 - [RowGroupFactory](classes/RowGroupFactory.md)
@@ -205,6 +208,8 @@
 - [PivotValueInfoIf](interfaces/PivotValueInfoIf.md)
 - [PropertyType](interfaces/PropertyType.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
+- [RowDragOptionsIf](interfaces/RowDragOptionsIf.md)
+- [RowDropTargetIf](interfaces/RowDropTargetIf.md)
 - [RowGroupColumnOptionsIf](interfaces/RowGroupColumnOptionsIf.md)
 - [RowGroupFieldIf](interfaces/RowGroupFieldIf.md)
 - [RowGroupIf](interfaces/RowGroupIf.md)
@@ -266,6 +271,8 @@
 - [FormulaNode](modules.md#formulanode)
 - [FormulaValue](modules.md#formulavalue)
 - [GeOverlayKind](modules.md#geoverlaykind)
+- [GeRowDragEventType](modules.md#gerowdrageventtype)
+- [GeRowDragSource](modules.md#gerowdragsource)
 - [GetEditRenderer](modules.md#geteditrenderer)
 - [GetRowIdFn](modules.md#getrowidfn)
 - [GetStorageKeyFn](modules.md#getstoragekeyfn)
@@ -274,6 +281,9 @@
 - [IsSameFn](modules.md#issamefn)
 - [PivotValue](modules.md#pivotvalue)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
+- [RowDragColumnOption](modules.md#rowdragcolumnoption)
+- [RowDragHandleState](modules.md#rowdraghandlestate)
+- [RowDropPosition](modules.md#rowdropposition)
 - [RowGroupExpanded](modules.md#rowgroupexpanded)
 - [RowGroupField](modules.md#rowgroupfield)
 - [RowGroupOrder](modules.md#rowgrouporder)
@@ -360,8 +370,11 @@
 - [aggregate](modules.md#aggregate)
 - [aggregateColumns](modules.md#aggregatecolumns)
 - [aggregateRowGroups](modules.md#aggregaterowgroups)
+- [calcMoveToIndex](modules.md#calcmovetoindex)
 - [calcOverlayKind](modules.md#calcoverlaykind)
 - [calculateShowValuesAs](modules.md#calculateshowvaluesas)
+- [canMoveFlatRows](modules.md#canmoveflatrows)
+- [canMoveTreeRows](modules.md#canmovetreerows)
 - [compileFormula](modules.md#compileformula)
 - [createFormulaValueGetter](modules.md#createformulavaluegetter)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
@@ -369,13 +382,16 @@
 - [debounce](modules.md#debounce)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
 - [escapeHtml](modules.md#escapehtml)
+- [findRowIndexAtY](modules.md#findrowindexaty)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [formatAggregateValue](modules.md#formataggregatevalue)
 - [formatShowValuesAs](modules.md#formatshowvaluesas)
 - [getAggregator](modules.md#getaggregator)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
 - [getEntityName](modules.md#getentityname)
+- [getInsertBeforeIndex](modules.md#getinsertbeforeindex)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
+- [getTopmostTreeRows](modules.md#gettopmosttreerows)
 - [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
 - [isAreaModelAggregateFooter](modules.md#isareamodelaggregatefooter)
@@ -394,6 +410,10 @@
 - [isRowGroupColumnDef](modules.md#isrowgroupcolumndef)
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isTreeRow](modules.md#istreerow)
+- [moveArrayItems](modules.md#movearrayitems)
+- [moveFlatRows](modules.md#moveflatrows)
+- [moveTreeRows](modules.md#movetreerows)
+- [normalizeRowIndices](modules.md#normalizerowindices)
 - [pivotRows](modules.md#pivotrows)
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
@@ -1537,7 +1557,7 @@ module:myModule.actionIds
 
 #### Defined in
 
-[src/lib/table/action/action-id.type.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L41)
+[src/lib/table/action/action-id.type.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L45)
 
 ___
 
@@ -1559,7 +1579,7 @@ ___
 
 ### actionIds
 
-• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``]
+• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``]
 
 An array of action identifiers.
 
@@ -3247,7 +3267,7 @@ column.valueGetter = createFormulaValueGetter("[net] * 1.19");
 
 #### Defined in
 
-[src/lib/table/formula/compile-formula.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L159)
+[src/lib/table/formula/compile-formula.ts:162](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L162)
 
 ___
 
@@ -3423,6 +3443,482 @@ sumOfNumbers([1, "2", 3, undefined]);   // 4
 #### Defined in
 
 [src/lib/table/calc/show-values-as.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/calc/show-values-as.ts#L123)
+
+## Row drag
+
+### GeRowDragEventType
+
+Ƭ **GeRowDragEventType**: ``"start"`` \| ``"move"`` \| ``"end"`` \| ``"cancel"``
+
+Phase of a row drag: `"start"` (the pointer moved past the threshold, or a move key), `"move"` (the drop target
+changed), `"end"` (dropped) or `"cancel"` (Escape, `pointercancel`, `tableApi.cancelRowDrag()`, destroy).
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-row-drag-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-row-drag-event.ts#L10)
+
+___
+
+### GeRowDragSource
+
+Ƭ **GeRowDragSource**: ``"pointer"`` \| ``"keyboard"``
+
+What started the drag: the pointer (mouse, touch, pen) on a drag handle, or the keyboard
+(`MOVE_ROW_UP` / `MOVE_ROW_DOWN`, Ctrl+Alt+↑/↓).
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-row-drag-event.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-row-drag-event.ts#L19)
+
+___
+
+### RowDragColumnOption
+
+Ƭ **RowDragColumnOption**: `boolean` \| (`row`: `any`, `rowIndex`: `number`) => `boolean`
+
+[ColumnDefIf.rowDrag](interfaces/ColumnDefIf.md#rowdrag): `true` = every row has a drag handle in this column, a function decides per row
+(`row` = the row object, a `TreeRow` in a tree; `rowIndex` = display index).
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L188)
+
+___
+
+### RowDragHandleState
+
+Ƭ **RowDragHandleState**: ``"none"`` \| ``"enabled"`` \| ``"disabled"``
+
+Whether a body cell shows a drag handle: `"none"`, `"enabled"`, or `"disabled"` (managed drag while the table is
+sorted or filtered).
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/row-drag-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L21)
+
+___
+
+### RowDropPosition
+
+Ƭ **RowDropPosition**: ``"before"`` \| ``"after"`` \| ``"inside"``
+
+Where dragged rows are dropped, relative to the row under the drop marker:
+`"before"` / `"after"` that row, or `"inside"` it (it becomes the last child – trees only).
+
+**`Example`**
+
+```ts
+const target: RowDropTargetIf = { rowIndex: 7, position: "before" };   // between row 7 and row 8 (1-based)
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/row-drop-target.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drop-target.if.ts#L11)
+
+___
+
+### calcMoveToIndex
+
+▸ **calcMoveToIndex**(`rowIndices`, `target`): `number`
+
+The index of the first moved row after a move in a flat list: the insert position minus the moved rows in front
+of it. A target inside the moved rows (or right next to them) returns their current index – nothing changes.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndices` | readonly `number`[] | ascending, unique row indices ([normalizeRowIndices](modules.md#normalizerowindices)) |
+| `target` | [`RowDropTargetIf`](interfaces/RowDropTargetIf.md) | the drop target |
+
+#### Returns
+
+`number`
+
+the new index of the first moved row, -1 without rows
+
+**`Example`**
+
+```ts
+// D1: row 3 (index 2) dropped between row 7 and 8 → it is row 7 (index 6) afterwards
+calcMoveToIndex([2], { rowIndex: 6, position: "after" });   // 6
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L67)
+
+___
+
+### canMoveFlatRows
+
+▸ **canMoveFlatRows**(`displayedCount`, `allCount`, `rowIndices`, `target`): `boolean`
+
+Flat area models: true if the dragged rows can be moved – all rows are displayed (no filter hides one), the target
+row exists and is not `"inside"`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `displayedCount` | `number` | displayed rows (`getRowCount()`) |
+| `allCount` | `number` | all rows (`getUnfilteredRowCount()`) |
+| `rowIndices` | readonly `number`[] | display indices of the dragged rows |
+| `target` | [`RowDropTargetIf`](interfaces/RowDropTargetIf.md) | the drop target |
+
+#### Returns
+
+`boolean`
+
+true if a move is possible
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L239)
+
+___
+
+### canMoveTreeRows
+
+▸ **canMoveTreeRows**\<`S`\>(`rows`, `targetRow`): `boolean`
+
+True if the tree rows can be dropped at the target row: the target is none of the dragged rows and no descendant
+of them (a node cannot become its own child – no cycle).
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `S` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | readonly [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[] | dragged rows |
+| `targetRow` | `undefined` \| [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\> | the row under the drop marker |
+
+#### Returns
+
+`boolean`
+
+false for a cycle
+
+**`Example`**
+
+```ts
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+const node = treeModel.rows[0];
+canMoveTreeRows([node], node.children?.[0]);   // false – into its own child
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:151](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L151)
+
+___
+
+### findRowIndexAtY
+
+▸ **findRowIndexAtY**(`contentY`, `rowCount`, `getYPosByRowIndex`, `constantRowHeight?`): `number`
+
+The row at a content position (y in px from the top of all body rows): constant row heights are computed directly,
+variable ones by a binary search over the row tops. Positions above / below the rows give the first / last row.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `contentY` | `number` | y in content pixels |
+| `rowCount` | `number` | number of rows (> 0) |
+| `getYPosByRowIndex` | (`rowIndex`: `number`) => `number` | top of a row in content pixels (`AreaModelIf.getYPosByRowIndex`) |
+| `constantRowHeight?` | `number` | the height of every row, if they are all equal (`AreaModelIf.getConstantRowHeight`) |
+
+#### Returns
+
+`number`
+
+the row index, 0 … rowCount - 1
+
+**`Example`**
+
+```ts
+const body = tableModel.getBodyModel();
+const rowIndex = findRowIndexAtY(1234, body.getRowCount(), i => body.getYPosByRowIndex(i), body.getConstantRowHeight?.());
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:290](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L290)
+
+___
+
+### getInsertBeforeIndex
+
+▸ **getInsertBeforeIndex**(`target`): `number`
+
+The index in front of which the rows are inserted (before the move): `"after"` row 7 = in front of row 8.
+`"inside"` counts like `"after"` (flat lists have no children).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `target` | [`RowDropTargetIf`](interfaces/RowDropTargetIf.md) | the drop target |
+
+#### Returns
+
+`number`
+
+the insert position, 0 … rowCount
+
+**`Example`**
+
+```ts
+getInsertBeforeIndex({ rowIndex: 7, position: "after" });    // 8
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L48)
+
+___
+
+### getTopmostTreeRows
+
+▸ **getTopmostTreeRows**\<`S`\>(`rows`): [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[]
+
+The dragged tree rows without the ones that travel with an ancestor (a child of a dragged node moves with it).
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `S` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | readonly [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[] | dragged rows in display order |
+
+#### Returns
+
+[`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[]
+
+the topmost dragged rows, same order
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L125)
+
+___
+
+### moveArrayItems
+
+▸ **moveArrayItems**\<`T`\>(`array`, `indices`, `insertBefore`): `number`
+
+Moves items of an array **in place** (like `Array.prototype.sort`): the items at `indices` keep their order and are
+inserted in front of `insertBefore` (an index of the array before the move, `array.length` = at the end).
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `array` | `T`[] | the array to change |
+| `indices` | readonly `number`[] | ascending, unique indices ([normalizeRowIndices](modules.md#normalizerowindices)) |
+| `insertBefore` | `number` | 0 … array.length |
+
+#### Returns
+
+`number`
+
+the new index of the first moved item (-1 if nothing was given)
+
+**`Example`**
+
+```ts
+const list = ["a", "b", "c", "d", "e"];
+moveArrayItems(list, [1, 3], 5);   // 3
+list;                              // ["a", "c", "e", "b", "d"]
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L92)
+
+___
+
+### moveFlatRows
+
+▸ **moveFlatRows**\<`T`\>(`displayed`, `all`, `rowIndices`, `target`): `boolean`
+
+Flat area models: moves the rows in the displayed array and writes the new order back to the array of all rows –
+both in place. Used by `AreaModelObjectArray` and `AreaModelArrayOfArrays`.
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `displayed` | `T`[] | displayed rows (display order) |
+| `all` | `T`[] | all rows (same rows – no filter hides one) |
+| `rowIndices` | readonly `number`[] | display indices of the dragged rows |
+| `target` | [`RowDropTargetIf`](interfaces/RowDropTargetIf.md) | the drop target |
+
+#### Returns
+
+`boolean`
+
+true if moved
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:260](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L260)
+
+___
+
+### moveTreeRows
+
+▸ **moveTreeRows**\<`S`\>(`roots`, `rows`, `targetRow`, `position`): `boolean`
+
+Moves tree rows **in place**: in front of / behind `targetRow` (siblings, same parent) or `"inside"` it (last
+children; the target is expanded). Children travel with their parent; `parent` and `deep` are updated.
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `S` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `roots` | [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[] | the top-level rows (e.g. `AreaModelTree.rows`) |
+| `rows` | readonly [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\>[] | dragged rows in display order |
+| `targetRow` | [`TreeRowIf`](interfaces/TreeRowIf.md)\<`S`\> | the row under the drop marker |
+| `position` | [`RowDropPosition`](modules.md#rowdropposition) | where to drop |
+
+#### Returns
+
+`boolean`
+
+false if nothing was moved (cycle, no rows)
+
+**`Example`**
+
+```ts
+const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+moveTreeRows(treeModel.rows, [treeModel.rows[2]], treeModel.rows[0], "inside");   // 3rd root → child of the 1st
+treeModel.recalcVisibleTreeRows();
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L180)
+
+___
+
+### normalizeRowIndices
+
+▸ **normalizeRowIndices**(`rowIndices`, `rowCount`): `number`[]
+
+Sorted, unique row indices inside `0 … rowCount - 1` (the order of the dragged rows is their display order).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndices` | readonly `number`[] | any indices, e.g. from a selection |
+| `rowCount` | `number` | number of rows |
+
+#### Returns
+
+`number`[]
+
+a new, ascending array
+
+**`Example`**
+
+```ts
+normalizeRowIndices([5, 2, 2, 99, -1], 10);   // [2, 5]
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/row-drag/move-rows.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L17)
 
 ## DOM
 

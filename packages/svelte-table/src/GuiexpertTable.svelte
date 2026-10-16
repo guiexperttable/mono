@@ -53,6 +53,15 @@
    * @type {((evt: import("@guiexpert/table").GeStateChangeEvent) => void) | undefined}
    */
   export let onStateChanged = undefined;
+  /**
+   * Row drag (since 1.1.95): started / drop target changed / ended ("end" or "cancel").
+   * @type {((evt: import("@guiexpert/table").GeRowDragEvent) => void) | undefined}
+   */
+  export let onRowDragStart = undefined;
+  /** @type {((evt: import("@guiexpert/table").GeRowDragEvent) => void) | undefined} */
+  export let onRowDragMove = undefined;
+  /** @type {((evt: import("@guiexpert/table").GeRowDragEvent) => void) | undefined} */
+  export let onRowDragEnd = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -74,7 +83,10 @@
     onMouseDraggingEnd: (evt) => { dispatch("mouseDraggingEnd", evt); onMouseDraggingEnd?.(evt); },
     onMouseMoved: (evt) => { dispatch("mouseMoved", evt); onMouseMoved?.(evt); },
     onScroll: (evt) => { dispatch("scroll", evt); onScroll?.(evt); },
-    onStateChanged: (evt) => { dispatch("stateChanged", evt); onStateChanged?.(evt); }
+    onStateChanged: (evt) => { dispatch("stateChanged", evt); onStateChanged?.(evt); },
+    onRowDragStart: (evt) => { dispatch("rowDragStart", evt); onRowDragStart?.(evt); },
+    onRowDragMove: (evt) => { dispatch("rowDragMove", evt); onRowDragMove?.(evt); },
+    onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); }
   };
 
   /**

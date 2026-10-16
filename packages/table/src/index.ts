@@ -289,3 +289,11 @@ export * from './lib/table/formula/formula-error';
 export * from './lib/table/formula/formula-ast.if';
 export * from './lib/table/formula/formula-options.if';
 export * from './lib/table/formula/compile-formula';
+
+// Row drag (since 1.1.95)
+export * from './lib/table/row-drag/row-drop-target.if';
+export * from './lib/table/row-drag/row-drag-options.if';
+export * from './lib/table/row-drag/row-drag-options';
+export * from './lib/table/row-drag/move-rows';
+export * from './lib/table/row-drag/row-drag-service';
+export * from './lib/table/data/common/event/ge-row-drag-event';

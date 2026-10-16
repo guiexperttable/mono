@@ -24,6 +24,7 @@ import { excelFormatOfShowValuesAs } from './calc/show-values-as-internals';
 import { compileFormula, createFormulaValueGetter } from './formula/compile-formula';
 import type { FormulaOptionsIf } from './formula/formula-options.if';
 import { FormulaError } from './formula/formula-error';
+import type { RowDropTargetIf } from './row-drag/row-drop-target.if';
 
 
 /**
@@ -621,8 +622,8 @@ export class TableApi {
    * @param {ActionId} actionId - The ID of the action to trigger.
    * @return {void}
    */
-  triggerAction(actionId: ActionId){
-    this.tableScope.onActionTriggered(actionId);
+  triggerAction(actionId: ActionId): boolean {
+    return this.tableScope.onActionTriggered(actionId);
   }
 
 
@@ -1798,6 +1799,80 @@ export class TableApi {
    */
   sort(compareFn: (a: any, b: any) => number): void {
     this.tableScope.sort(compareFn);
+  }
+
+  /**
+   * Moves body rows – the code way to do what row drag does (e.g. "up"/"down" buttons, the pointer alternative of
+   * WCAG 2.5.7, or after the server confirmed an unmanaged drag). The body model must support it
+   * ({@link AreaModelIf.moveRows}: object arrays, arrays of arrays, trees); no filter may hide rows and no column may be
+   * sorted (asc/desc – a sorted view has no order of its own). Focus and a multi-row selection follow the rows; screen
+   * readers hear "Row moved to position 7 of 20". No row drag events. `false` if nothing moved (also for a target
+   * where the rows already are).
+   *
+   * @param {number[] | number} rowIndices - display index or indices of the rows to move
+   * @param {RowDropTargetIf | number} target - drop target; a number = in front of that display index
+   *        (`getDisplayedRowCount()` = behind the last row)
+   * @returns {boolean} true if the rows were moved
+   *
+   * @example
+   * tableApi.moveRows(2, { rowIndex: 6, position: "after" });   // row 3 becomes row 7
+   * tableApi.moveRows([0, 1], tableApi.getDisplayedRowCount());   // the first two rows to the end
+   *
+   * @example
+   * // unmanaged drag: the server decides, then the table moves the rows
+   * const listener = new EventAdapter();
+   * listener.onRowDragEnd = async (evt: GeRowDragEvent) => {
+   *   if (evt.type === "end" && evt.target && (await fetch("/api/move", { method: "POST" })).ok) {
+   *     tableApi.moveRows(evt.rowIndices, evt.target);
+   *   }
+   * };
+   *
+   * @since 1.1.95
+   */
+  moveRows(rowIndices: number[] | number, target: RowDropTargetIf | number): boolean {
+    const service = this.tableScope.rowDragService;
+    if (!service) {
+      return false;
+    }
+    const indices = Array.isArray(rowIndices) ? rowIndices : [rowIndices];
+    let dropTarget: RowDropTargetIf;
+    if (typeof target === "number") {
+      const rowCount = this.tableScope.tableModel.getBodyModel().getRowCount();
+      dropTarget = target >= rowCount
+        ? { rowIndex: rowCount - 1, position: "after" }
+        : { rowIndex: Math.max(0, target), position: "before" };
+    } else {
+      dropTarget = target;
+    }
+    return service.moveRows(indices, dropTarget, true) > -1;
+  }
+
+  /**
+   * True while rows are dragged with the pointer (mouse, touch, pen).
+   *
+   * @returns {boolean} true during a row drag
+   *
+   * @example
+   * if (!tableApi.isRowDragging()) {
+   *   tableApi.updateCells([], true);   // e.g. live data: wait until the drag is done
+   * }
+   *
+   * @since 1.1.95
+   */
+  isRowDragging(): boolean {
+    return !!this.tableScope.rowDragService?.isDragging();
+  }
+
+  /**
+   * Cancels a running row drag (like Escape): nothing is moved, `onRowDragEnd` gets the type `"cancel"`.
+   *
+   * @example
+   * tableApi.cancelRowDrag();   // e.g. new data arrived from the server
+   *
+   * @since 1.1.95
+   */
+  cancelRowDrag(): void {
+    this.tableScope.rowDragService?.cancel();
   }
 
 

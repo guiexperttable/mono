@@ -18,7 +18,7 @@ import {
   AreaModelObjectArrayWithColumndefs
 } from "../data/tablemodel/areamodel/area-model-object-array-with-columndefs";
 import { TableOptions } from "../data/options/table-options";
-import { isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
+import { isCheckboxColumnDef, isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
 import { RowNumberColumnDef } from "../data/common/row-number-column-def";
 import { RowNumberOptionsIf } from "../data/common/row-number-options.if";
 import { getLeadingRowNumberColumnCount } from "../data/common/row-number-columns";
@@ -95,6 +95,17 @@ export interface CreateTableModelPara {
    * @since 1.1.93
    */
   rowNumbersVisible: boolean | Partial<RowNumberOptionsIf>;
+  /**
+   * Row drag: `true` puts a drag handle into the first data column (behind row numbers and checkboxes) –
+   * sets {@link ColumnDefIf.rowDrag} on that column definition. Options: {@link TableOptionsIf.rowDragOptions}.
+   * Default false.
+   *
+   * @example
+   * const tableModel = TableFactory.createTableModel({ rows: orders, rowDrag: true });
+   *
+   * @since 1.1.95
+   */
+  rowDrag: boolean;
   /** Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34. */
   defaultRowHeights: DefaultRowHeightsIf;
   /** The columns: property, header label, width, classes, renderers, sorting, editing. See {@link ColumnDef}. */
@@ -213,6 +224,12 @@ export class TableFactory {
     }
 
     TableFactory.addRowNumberColumn(p);
+    if (p.rowDrag) {
+      const dataColumn = p.columnDefs?.find(def => !isRowNumberColumnDef(def) && !isCheckboxColumnDef(def));
+      if (dataColumn) {
+        dataColumn.rowDrag = dataColumn.rowDrag || true;
+      }
+    }
 
     if (p.columnCount === undefined) {
       if (p.columnDefs?.length) {

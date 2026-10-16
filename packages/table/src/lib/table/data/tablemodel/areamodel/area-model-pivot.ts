@@ -1,4 +1,5 @@
 import { AreaModelTree } from "./area-model-tree";
+import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
 import { TreeRow } from "../../common/tree-row";
 import type { TreeRowIf } from "../../common/tree-row-if";
 import type { ColumnDefIf } from "../column/column-def.if";
@@ -338,6 +339,27 @@ export class AreaModelPivot<T = any> extends AreaModelTree<any> {
         return value; // running totals, differences and ranks don't apply to a pivot
     }
     return typeof total === "number" && total !== 0 ? value / total : undefined;
+  }
+
+  /**
+   * Row drag: `false` – the table does not move rows of a pivot table itself (pivot rows are aggregates). With
+   * `rowDragOptions.managed: false` the app gets the events and decides.
+   *
+   * @returns {boolean} always false
+   * @since 1.1.95
+   */
+  override canMoveRows(_rowIndices: number[], _target: RowDropTargetIf): boolean {
+    return false;
+  }
+
+  /**
+   * Row drag: does nothing (see {@link canMoveRows}).
+   *
+   * @returns {boolean} always false
+   * @since 1.1.95
+   */
+  override moveRows(_rowIndices: number[], _target: RowDropTargetIf): boolean {
+    return false;
   }
 
   override getTextValueAt(rowIndex: number, columnIndex: number): string {

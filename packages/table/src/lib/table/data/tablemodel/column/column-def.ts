@@ -1,6 +1,6 @@
 import { Size } from "../../common/size";
 import { SizeIf } from "../../common/size.if";
-import { ColumnDefIf, ValueRowSortComparator } from "./column-def.if";
+import { ColumnDefIf, RowDragColumnOption, ValueRowSortComparator } from "./column-def.if";
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { AreaObjectMapType } from "../../common/area-map.type";
 import { AreaObjectMap } from "../../common/area-map";
@@ -53,6 +53,7 @@ export class ColumnDef implements ColumnDefIf {
   public showValuesAs?: ShowValuesAsConfig;
   /** The formula of a formula column, see {@link ColumnDefIf.formula}. */
   public formula?: string;
+  public rowDrag?: RowDragColumnOption;
 
   constructor(
     public property: string,
@@ -154,6 +155,7 @@ export class ColumnDef implements ColumnDefIf {
     formula?: string,
     /** Own functions of the formula (since 1.1.95). */
     formulaOptions?: FormulaOptionsIf,
+    rowDrag?: RowDragColumnOption,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -199,6 +201,7 @@ export class ColumnDef implements ColumnDefIf {
     }
     if (param.valueSetter) def.valueSetter = param.valueSetter;
     if (param.showValuesAs) def.showValuesAs = param.showValuesAs;
+    if (param.rowDrag !== undefined) def.rowDrag = param.rowDrag;
     return def;
   }
 

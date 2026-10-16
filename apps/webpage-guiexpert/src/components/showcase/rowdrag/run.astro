@@ -1,0 +1,87 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="rowdrag-bar">
+  <button type="button" class={id + '-up'}>▲ Move up</button>
+  <button type="button" class={id + '-down'}>▼ Move down</button>
+  <label><input type="checkbox" class={id + '-sort'}> sorted by hours</label>
+  <span class:list={[id + '-log', 'rowdrag-log']} aria-live="off"></span>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'rowdrag-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createRowDragModelAndOptions, generateTasks } from "/scripts/demo-table-models/index.js";
+
+  // a priority list: grip in the "Task" column (not for the locked first task), row numbers = the position
+  const tasks = generateTasks(200, true);
+  const {tableModel, tableOptions} = createRowDragModelAndOptions(tasks);
+  const ele = document.querySelector('.' + id);
+  const log = document.querySelector('.' + id + '-log');
+
+  const listener = new EventAdapter();
+  listener.onRowDragEnd = evt => {
+    if (evt.type === 'cancel') {
+      log.textContent = 'Cancelled';
+    } else if (evt.moved) {
+      // the tasks array has the new order – save it here (e.g. PUT /api/tasks/order)
+      const titles = evt.rows.map(t => t.title).join(', ');
+      log.textContent = `${titles} → position ${evt.toIndex + 1}`;
+    }
+  };
+
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  // a single-pointer alternative to dragging (WCAG 2.5.7): click a row, then a button
+  const move = action => {
+    if (!tableApi.triggerAction(action)) log.textContent = 'Click a task first';
+  };
+  document.querySelector('.' + id + '-up').addEventListener('click', () => move('MOVE_ROW_UP'));
+  document.querySelector('.' + id + '-down').addEventListener('click', () => move('MOVE_ROW_DOWN'));
+
+  // sorted: the grips are dimmed – the table does not move rows of a sorted view
+  document.querySelector('.' + id + '-sort').addEventListener('change', e => {
+    const column = tableApi.getColumnIndex('estimate');
+    if (e.target.checked) {
+      tableApi.sortByColumn(column, 'desc');
+    } else {
+      tableModel.getColumnDef(column).sortState = '';
+      tableApi.sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));   // back to the list order
+      tableApi.repaint();
+    }
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .rowdrag-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .rowdrag-bar button {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .rowdrag-log {
+        opacity: 0.8;
+    }
+</style>

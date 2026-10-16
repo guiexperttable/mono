@@ -3,6 +3,7 @@ import type {
   FocusModelIf,
   GeModelChangeEvent,
   GeMouseEvent,
+  GeRowDragEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -31,6 +32,10 @@ export interface GuiexpertTableProps {
   onScroll?: (evt: GeScrollEvent) => void;
   /** The state changed (column layout, sorting, scroll position …). @since 1.1.92 */
   onStateChanged?: (evt: GeStateChangeEvent) => void;
+  /** Row drag: started / drop target changed / ended ("end" or "cancel"). @since 1.1.95 */
+  onRowDragStart?: (evt: GeRowDragEvent) => void;
+  onRowDragMove?: (evt: GeRowDragEvent) => void;
+  onRowDragEnd?: (evt: GeRowDragEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -47,6 +52,10 @@ export interface GuiexpertTableEvents {
   scroll: CustomEvent<GeScrollEvent>;
   /** @since 1.1.92 */
   stateChanged: CustomEvent<GeStateChangeEvent>;
+  /** @since 1.1.95 */
+  rowDragStart: CustomEvent<GeRowDragEvent>;
+  rowDragMove: CustomEvent<GeRowDragEvent>;
+  rowDragEnd: CustomEvent<GeRowDragEvent>;
 }
 
 /**

@@ -1,7 +1,7 @@
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableModelAndOptionsIf,
   TableOptions,
@@ -17,7 +17,8 @@ import {
  *   re-creates it from `data`. Data set on an element that is not connected yet is shown when it is connected.
  * - Events are dispatched on the element as bubbling `CustomEvent`s (payload in `detail`): `tableReady`,
  *   `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
- *   `modelChanged`, `selectionChanged`, `focusChanged`, `stateChanged` (since 1.1.92) – and `scroll` and
+ *   `modelChanged`, `selectionChanged`, `focusChanged`, `stateChanged` (since 1.1.92), `rowDragStart`, `rowDragMove`,
+ *   `rowDragEnd` (since 1.1.95) – and `scroll` and
  *   `contextmenu`, which do **not** bubble
  *   (the browser's own `contextmenu` MouseEvent reaches a listener on the element, too: check
  *   `e instanceof CustomEvent`).
@@ -144,7 +145,10 @@ export class GuiexpertTable extends HTMLElement {
         onMouseMoved: (evt: GeMouseEvent) => dispatch("mouseMoved", evt),
         // not bubbling (like the native event): window/document "scroll" listeners must not see every table scroll
         onScroll: (evt: GeScrollEvent) => dispatch("scroll", evt, false),
-        onStateChanged: (evt: GeStateChangeEvent) => dispatch("stateChanged", evt)
+        onStateChanged: (evt: GeStateChangeEvent) => dispatch("stateChanged", evt),
+        onRowDragStart: (evt: GeRowDragEvent) => dispatch("rowDragStart", evt),
+        onRowDragMove: (evt: GeRowDragEvent) => dispatch("rowDragMove", evt),
+        onRowDragEnd: (evt: GeRowDragEvent) => dispatch("rowDragEnd", evt)
       };
 
       const tableScope = new TableScope(

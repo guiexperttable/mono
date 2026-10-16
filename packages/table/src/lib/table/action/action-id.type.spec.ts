@@ -22,6 +22,8 @@ describe('actionIds', () => {
       'NAVIGATE_PAGE_UP',
       'NAVIGATE_PAGE_DOWN',
       'ACTIVATE_CELL',
+      'MOVE_ROW_UP',
+      'MOVE_ROW_DOWN',
     ]);
   });
 

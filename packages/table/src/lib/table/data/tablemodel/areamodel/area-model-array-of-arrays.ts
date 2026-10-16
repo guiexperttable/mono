@@ -2,6 +2,8 @@ import { AbstractAreaModel } from "./abstract-area-model";
 import { AreaIdent } from "../area-ident.type";
 import { ColumnDefIf } from "../column/column-def.if";
 import { FilterFunction } from "../../common/filter-function";
+import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
+import { canMoveFlatRows, moveFlatRows } from "../../../row-drag/move-rows";
 
 /**
  * Represents a model for an area containing a two-dimensional array of data.
@@ -42,6 +44,35 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
    */
   getUnfilteredRowCount(): number {
     return this.arr?.length ?? 0;
+  }
+
+  /**
+   * Row drag: true if the rows can be moved (no filter hides a row, target `"before"` / `"after"` a row).
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target
+   * @returns {boolean} true if {@link moveRows} would move them
+   * @since 1.1.95
+   */
+  canMoveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    return canMoveFlatRows(this.filteredArr.length, this.arr.length, rowIndices, target);
+  }
+
+  /**
+   * Row drag: moves the rows – in place in the displayed rows and in {@link arr}.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target (display index before the move)
+   * @returns {boolean} true if moved
+   *
+   * @example
+   * const model = new AreaModelArrayOfArrays("body", [["a"], ["b"], ["c"]], 30);
+   * model.moveRows([0], { rowIndex: 2, position: "after" });   // b, c, a
+   *
+   * @since 1.1.95
+   */
+  moveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    return moveFlatRows(this.filteredArr, this.arr, rowIndices, target);
   }
 
   getValueAt(rowIndex: number, columnIndex: number): any {

@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -17,6 +17,7 @@ export type GeSelectionChangeEventFn = (evt: SelectionModelIf) => void;
 export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
+export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -39,6 +40,10 @@ export interface GuiexpertTableProps {
    * @since 1.1.92
    */
   stateChanged?: GeStateChangeEventFn;
+  /** Row drag (since 1.1.95, handles via `ColumnDef.rowDrag`): started / target changed / ended ("end" or "cancel"). */
+  rowDragStart?: GeRowDragEventFn;
+  rowDragMove?: GeRowDragEventFn;
+  rowDragEnd?: GeRowDragEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -113,7 +118,10 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onMouseDragging: (evt: GeMouseEvent) => current().mouseDragging?.(evt),
       onMouseDraggingEnd: (evt: GeMouseEvent) => current().mouseDraggingEnd?.(evt),
       onMouseMoved: (evt: GeMouseEvent) => current().mouseMoved?.(evt),
-      onStateChanged: (evt: GeStateChangeEvent) => current().stateChanged?.(evt)
+      onStateChanged: (evt: GeStateChangeEvent) => current().stateChanged?.(evt),
+      onRowDragStart: (evt: GeRowDragEvent) => current().rowDragStart?.(evt),
+      onRowDragMove: (evt: GeRowDragEvent) => current().rowDragMove?.(evt),
+      onRowDragEnd: (evt: GeRowDragEvent) => current().rowDragEnd?.(evt)
     };
 
     const tableScope = new TableScope(

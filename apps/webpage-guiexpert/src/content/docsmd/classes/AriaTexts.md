@@ -35,6 +35,10 @@ texts.filtered(42);    // "42 rows" (default)
 - [copied](AriaTexts.md#copied)
 - [expandGroup](AriaTexts.md#expandgroup)
 - [filtered](AriaTexts.md#filtered)
+- [rowDragCancelled](AriaTexts.md#rowdragcancelled)
+- [rowDragStarted](AriaTexts.md#rowdragstarted)
+- [rowMoveNotPossible](AriaTexts.md#rowmovenotpossible)
+- [rowMoved](AriaTexts.md#rowmoved)
 - [selectAllRows](AriaTexts.md#selectallrows)
 - [selectRow](AriaTexts.md#selectrow)
 - [selectionCleared](AriaTexts.md#selectioncleared)
@@ -184,6 +188,124 @@ default: `"42 rows"`, `"1 row"`, `"No rows"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L45)
+
+___
+
+### rowDragCancelled
+
+▸ **rowDragCancelled**(): `string`
+
+Announced when a row drag was cancelled (Escape) – optional, [AriaTexts](AriaTexts.md) has a default.
+
+#### Returns
+
+`string`
+
+default: `"Drag cancelled"`
+
+**`Since`**
+
+1.1.95
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[rowDragCancelled](../interfaces/AriaTextsIf.md#rowdragcancelled)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L90)
+
+___
+
+### rowDragStarted
+
+▸ **rowDragStarted**(`rowCount`): `string`
+
+Announced when a row drag starts (optional – [AriaTexts](AriaTexts.md) has a default).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowCount` | `number` | number of dragged rows |
+
+#### Returns
+
+`string`
+
+default: `"Dragging 1 row. Press Escape to cancel."`
+
+**`Since`**
+
+1.1.95
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[rowDragStarted](../interfaces/AriaTextsIf.md#rowdragstarted)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L78)
+
+___
+
+### rowMoveNotPossible
+
+▸ **rowMoveNotPossible**(): `string`
+
+Announced when rows cannot be moved: the table is sorted or filtered (managed row drag), or the row cannot move
+further (optional – [AriaTexts](AriaTexts.md) has a default).
+
+#### Returns
+
+`string`
+
+default: `"Rows cannot be moved while the table is sorted or filtered"`
+
+**`Since`**
+
+1.1.95
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[rowMoveNotPossible](../interfaces/AriaTextsIf.md#rowmovenotpossible)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L86)
+
+___
+
+### rowMoved
+
+▸ **rowMoved**(`position`, `rowCount`): `string`
+
+Announced after rows were moved by drag and drop or Ctrl+Alt+↑/↓ (optional – [AriaTexts](AriaTexts.md) has a default).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `position` | `number` | 1-based position of the first moved row |
+| `rowCount` | `number` | number of displayed rows |
+
+#### Returns
+
+`string`
+
+default: `"Row moved to position 7 of 20"`
+
+**`Since`**
+
+1.1.95
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[rowMoved](../interfaces/AriaTextsIf.md#rowmoved)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L82)
 
 ___
 

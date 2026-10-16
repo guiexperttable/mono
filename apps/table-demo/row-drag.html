@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+  Row drag (since 1.1.95) – also the recording page of video 09.
+  Start: pnpm serve:table-demo → http://localhost:4200/row-drag.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – row drag</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    h2 { font-size: 16px; margin: 20px 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button { font: inherit; padding: 4px 10px; }
+    .table-div { height: 420px; width: 100%; max-width: 760px; }
+    .tree-div { height: 260px; width: 100%; max-width: 760px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<h1>Priority list – drag the grip, or press Ctrl+Alt+↑/↓</h1>
+<div class="bar">
+  <label><input id="managed" type="checkbox" checked> managed (the table moves the rows)</label>
+  <button id="sort" type="button">Sort by hours</button>
+  <button id="reset" type="button">Reset</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<pre id="log" aria-live="off"></pre>
+<h2>Tree – drop on the middle of a row to make it a child</h2>
+<div class="tree-div"></div>
+<script src="/src/row-drag/row-drag-demo.ts" type="module"></script>
+</body>
+</html>

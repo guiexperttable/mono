@@ -1,3 +1,4 @@
+import type { RowDragService } from "./row-drag/row-drag-service";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { EleScope } from './ele-scope';
 import { TableModelIf } from './data/tablemodel/table-model.if';
@@ -138,6 +139,12 @@ export class RenderScope extends EleScope {
    */
   protected headerFocus?: [number, number];
 
+  /**
+   * Row drag of this table (drag handles, pointer and keyboard drag) – created by {@link TableScope}.
+   * @since 1.1.95
+   */
+  rowDragService?: RowDragService;
+
   constructor(
     hostElement: HTMLDivElement,
     tableModel: TableModelIf,
@@ -176,6 +183,50 @@ export class RenderScope extends EleScope {
     );
   }
 
+
+  /**
+   * The DOM service of this table (all DOM access of the table goes through it).
+   *
+   * @returns {ConvenienceDomService} the service
+   * @since 1.1.95
+   */
+  getDomService(): ConvenienceDomService {
+    return this.dom;
+  }
+
+  /**
+   * The visible body in client (viewport) coordinates – including fixed west/east columns, without the scroll bar –
+   * and the content pixels scrolled out at its top. Row drag computes the row under the pointer with it.
+   *
+   * @returns {{ top: number, height: number, left: number, width: number, contentScrollTop: number }} the geometry
+   * @since 1.1.95
+   */
+  getBodyViewport(): { top: number; height: number; left: number; width: number; contentScrollTop: number } {
+    const host = this.hostElement;
+    const rect = host.getBoundingClientRect();
+    return {
+      top: rect.top + host.clientTop + this.tableModel.getPadding().top,
+      height: this.areaBodyCenterGeo.height,
+      left: rect.left + host.clientLeft,
+      width: this.scrollViewport.clientWidth,
+      contentScrollTop: this.contentScrollTop
+    };
+  }
+
+  /**
+   * Scroll bar pixels per content pixel: 1, below 1 for a capped scroll height ({@link isScrollHeightCapped}).
+   *
+   * @returns {number} the factor for `scrollTop` changes
+   * @since 1.1.95
+   */
+  getScrollerToContentRatioY(): number {
+    if (!this.isScrollHeightCapped()) {
+      return 1;
+    }
+    const contentRange = this.getContentScrollRangeY();
+    const scrollerRange = this.getScrollerRangeY();
+    return contentRange > 0 && scrollerRange > 0 ? scrollerRange / contentRange : 1;
+  }
 
   isEditing() {
     return this.editing;
@@ -1807,6 +1858,14 @@ export class RenderScope extends EleScope {
     }
     if (areaIdent === 'header' && !rowNumberColumn) {
       this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // the row numbers stay in front
+    }
+    if (areaIdent === 'body' && this.rowDragService && !editor) {
+      if (columnDef?.rowDrag) {
+        this.rowDragService.decorateCell(cell, this.rowDragService.getHandleState(rowIndex, columnDef, areaModel));
+      }
+      if (this.rowDragService.isDragSourceRow(rowIndex)) {
+        this.dom.addClass('ge-table-row-dragging', cell);
+      }
     }
 
     const styles = areaModel.getCustomStyleAt(rowIndex, index);

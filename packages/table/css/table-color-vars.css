@@ -110,6 +110,15 @@ html, html[data-theme="light"] {
   /* Row numbers (since 1.1.93): like the header, muted digits (#555 on the header gray ≈ 6.9 : 1) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #555;
+
+  /* Row drag (since 1.1.95): handle ≥ 3 : 1 against white (WCAG 1.4.11), marker, ghost */
+  --ge-table-row-drag-handle-color: #6b7280;
+  --ge-table-row-drop-indicator-color: #1a73e8;
+  --ge-table-row-drop-inside-bg: rgba(26, 115, 232, 0.12);
+  --ge-table-row-drag-ghost-bg: #fff;
+  --ge-table-row-drag-ghost-text: #1f2937;
+  --ge-table-row-drag-ghost-border: #1a73e8;
+  --ge-table-row-dragging-opacity: 0.4;
 }
 
 
@@ -211,4 +220,13 @@ html[data-theme="dark"] {
   /* Row numbers (since 1.1.93) */
   --ge-table-row-number-bg: var(--ge-table-header-west-bg);
   --ge-table-row-number-color: #aaa;
+
+  /* Row drag (since 1.1.95) */
+  --ge-table-row-drag-handle-color: #9ca3af;
+  --ge-table-row-drop-indicator-color: #8ab4f8;
+  --ge-table-row-drop-inside-bg: rgba(138, 180, 248, 0.16);
+  --ge-table-row-drag-ghost-bg: #1f2937;
+  --ge-table-row-drag-ghost-text: #f3f4f6;
+  --ge-table-row-drag-ghost-border: #8ab4f8;
+  --ge-table-row-dragging-opacity: 0.4;
 }

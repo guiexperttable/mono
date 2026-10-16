@@ -324,4 +324,17 @@ describe('GuiexpertTable (React)', () => {
     expect(destroy).toHaveBeenCalledTimes(1);
     expect(tableReady).toHaveBeenCalledTimes(2);
   });
+
+  it('direction "rtl" reaches the core: dir="rtl" on the table, the first column on the right (since 1.1.98)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const tableOptions = { ...new TableOptions(), direction: 'rtl' as const };
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} tableOptions={tableOptions} tableReady={tableReady} />);
+    await nextFrame();
+    const table = host.querySelector<HTMLElement>('.ge-table')!;
+    expect(table.getAttribute('dir')).toBe('rtl');
+    expect(tableReady.mock.calls[0][0].getDirection()).toBe('rtl');
+    const first = bodyCell(host, 0, 0)!;
+    expect(first.style.right).toBe('0px');
+    expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
 });

@@ -17,6 +17,7 @@ import { HeaderGroupOptionsIf } from './header-group-options.if';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
+import type { TableDirection } from "../../rtl/table-direction.type";
 
 /**
  * Represents the options for configuring a table.
@@ -408,6 +409,23 @@ export interface TableOptionsIf {
    * @since 1.1.97
    */
   masterDetail?: Partial<MasterDetailOptionsIf>;
+
+  /**
+   * Writing direction: `"ltr"` (default), `"rtl"` for Arabic, Hebrew, Persian, Urdu … (first column on the right,
+   * horizontal scrolling, fixed columns, tree indent, resize handles and arrow keys mirrored) or `"auto"` (the
+   * direction of the page: `dir="rtl"` on `<html>` or a parent element). Read once when the table is built – a new
+   * options object rebuilds the table in the wrappers.
+   *
+   * In right-to-left, the "left" and "right" in names of the API mean **start** and **end**:
+   * `fixedLeftColumnCount` fixes columns at the start (right), `fixedRightColumnCount` at the end (left),
+   * `ge-table-text-align-left` aligns to the start. The table sets `dir` on its host element (also `dir="ltr"`).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" };
+   *
+   * @since 1.1.98
+   */
+  direction?: TableDirection;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

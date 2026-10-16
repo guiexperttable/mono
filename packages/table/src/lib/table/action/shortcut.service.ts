@@ -5,6 +5,7 @@ import { WindowsShortcutActionIdMapping } from "./windows-shortcut-actionId-mapp
 import { OsxShortcutActionIdMapping } from "./osx-shortcut-actionId-mapping";
 import { OnActionTriggeredIf } from "./on-action-triggered.if";
 import { createHarmonizedShortcutByKeyboardEvent, harmonizeShortcut } from './shortcut-util';
+import { mirrorArrowKeys } from '../rtl/rtl-util';
 
 
 /**
@@ -121,7 +122,11 @@ export class ShortcutService {
   }
 
   private findEntity(evt: KeyboardEvent): ActionId | undefined {
-    const shortcut = createHarmonizedShortcutByKeyboardEvent(evt);
+    let shortcut = createHarmonizedShortcutByKeyboardEvent(evt);
+    if (this.tableScope.isRtl?.()) {
+      // right-to-left (since 1.1.98): → moves backwards in reading direction – the mappings speak of "left" = backwards
+      shortcut = mirrorArrowKeys(shortcut);
+    }
 
     if (this.isDebug()) {
       console.debug("ShortcutService shortcut  :",  shortcut);

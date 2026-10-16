@@ -1,12 +1,14 @@
 /* Fill handle and batch edit (since 1.1.96) – colors in table-color-vars.css (--ge-table-fill-*, --ge-table-cell-*) */
 
-/* the square at the bottom right corner of the selected range; its center sits on the corner */
+/* the square at the bottom end corner of the selected range (right-to-left: bottom left); its center sits on it */
 .ge-table-fill-handle {
   position: absolute;
   z-index: 9000; /* above the cells, below the overlay (10000) */
   width: 7px;
   height: 7px;
-  margin: -4px 0 0 -4px;
+  margin: 0;
+  margin-block-start: -4px;
+  margin-inline-start: -4px;
   box-sizing: border-box;
   background: var(--ge-table-fill-handle-color);
   border: 1px solid var(--ge-table-fill-handle-border);
@@ -39,6 +41,11 @@
 /* batch edit: a value that is not saved yet – a colored cell and a small corner mark (not color only, WCAG 1.4.1) */
 .ge-table-col-div.ge-table-cell-pending {
   background-image: linear-gradient(225deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
+}
+
+/* right-to-left: the corner mark at the top end (left) */
+.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending {
+  background-image: linear-gradient(135deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
 }
 
 /* the color only while the cell is not selected – a selected cell keeps the selection color (and the corner mark) */

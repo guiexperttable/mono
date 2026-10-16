@@ -122,7 +122,7 @@ describe('N1 – 1,000 rows', () => {
     expect(cell.classList.contains('ge-table-row-number')).toBe(true);
     const style = getComputedStyle(cell.querySelector('.ge-table-label')!);
     expect(style.fontVariantNumeric).toContain('tabular-nums');
-    expect(getComputedStyle(cell).textAlign).toBe('right');
+    expect(getComputedStyle(cell).textAlign).toBe('end'); // logical since 1.1.98: right in left-to-right, left in right-to-left
   });
 });
 
@@ -407,7 +407,7 @@ describe('N7 – tree', () => {
   it('the numbers stay right aligned in a tree (review: tree cell classes made them left aligned)', async () => {
     const { host } = await mount(treeModel());
     const cell = getCellDiv(host, 'body', 'west', 1, 0);
-    expect(getComputedStyle(cell).textAlign).toBe('right');
+    expect(getComputedStyle(cell).textAlign).toBe('end'); // logical since 1.1.98 (right in left-to-right)
     expect(getComputedStyle(cell.querySelector('.ge-table-label-div')!).display).toBe('block');
   });
 

@@ -13,6 +13,7 @@ import { SortState } from "../data/common/sort-state.type";
 import { SortedOptions } from "../data/options/sorted-options";
 import { SortedOptionsIf } from "../data/options/sorted-options.if";
 import { HtmlStyle } from "./data/html-style.type";
+import { ResolvedTableDirection } from "../rtl/table-direction.type";
 
 
 /** @category DOM */
@@ -43,21 +44,87 @@ export class ConvenienceDomService {
   /** Width of the focus frame of a cell in px (WCAG 2.4.7: visible focus, not only a color). @since 1.1.91 */
   static focusBorderWidthInPx = 2;
 
+  /** Right-to-left: `left` is written as `right` and vice versa (see {@link setDirection}). */
+  private rtl = false;
+  /** The physical CSS property of the inline start (`left`, right-to-left `right`). */
+  private startKey = "left";
+  /** The physical CSS property of the inline end (`right`, right-to-left `left`). */
+  private endKey = "right";
+
   constructor(
     public readonly domService: DomServiceIf
   ) {
   }
 
+  /**
+   * Sets the writing direction of the table. All positions of the table are computed from the **start** of a row
+   * (x = 0 is the first column); in right-to-left this service writes them as `right` instead of `left` – in
+   * {@link setStyle}, {@link applyStyle}, {@link applyStyleInPx} and all `add…` methods – so that the whole table is
+   * mirrored. Called once by the table before anything is positioned.
+   *
+   * @param {ResolvedTableDirection} direction - `"ltr"` or `"rtl"`
+   *
+   * @example
+   * const dom = new ConvenienceDomService(new SimpleDomService());
+   * dom.setDirection("rtl");
+   * const div = document.createElement("div");
+   * dom.setStyle(div, "left", "20px"); // div.style.right = "20px"
+   *
+   * @since 1.1.98
+   */
+  setDirection(direction: ResolvedTableDirection): void {
+    this.rtl = direction === "rtl";
+    this.startKey = this.rtl ? "right" : "left";
+    this.endKey = this.rtl ? "left" : "right";
+  }
+
+  /**
+   * The writing direction set with {@link setDirection} (default `"ltr"`).
+   *
+   * @returns {ResolvedTableDirection} `"ltr"` or `"rtl"`
+   * @since 1.1.98
+   */
+  getDirection(): ResolvedTableDirection {
+    return this.rtl ? "rtl" : "ltr";
+  }
+
+  /**
+   * The physical CSS property for a logical position key: in right-to-left `left` ↔ `right`, everything else as is.
+   *
+   * @param {string} key - a CSS property
+   * @returns {string} the property to write
+   * @since 1.1.98
+   */
+  toPhysicalStyleKey(key: string): string {
+    if (this.rtl) {
+      if (key === "left") return "right";
+      if (key === "right") return "left";
+    }
+    return key;
+  }
+
+  /**
+   * The position of an element from the inline start in px, as written by this service (`style.left`, right-to-left
+   * `style.right`); 0 if it has none.
+   *
+   * @param {HTMLElement} ele - an element positioned by this service
+   * @returns {number} px
+   * @since 1.1.98
+   */
+  getInlineStart(ele: HTMLElement): number {
+    return parseFloat(ele.style.getPropertyValue(this.startKey)) || 0;
+  }
+
 
   setStyle(el: any, style: string, value: any): any {
-    this.domService.setStyle(el, style, value);
+    this.domService.setStyle(el, this.toPhysicalStyleKey(style), value);
     return el;
   };
 
 
   applyStyle(ele: HTMLDivElement, style: HtmlStyle): HTMLDivElement {
     for (const key in style) {
-      this.domService.setStyle(ele, key, style[key]);
+      this.domService.setStyle(ele, this.toPhysicalStyleKey(key), style[key]);
     }
     return ele;
   }
@@ -74,7 +141,7 @@ export class ConvenienceDomService {
 
   applyStyleInPx(ele: HTMLDivElement, geoData: GeoData): HTMLDivElement {
     Object.entries(geoData)
-      .forEach(([key, value]) => this.domService.setStyle(ele, key, value + "px"));
+      .forEach(([key, value]) => this.domService.setStyle(ele, this.toPhysicalStyleKey(key), value + "px"));
     return ele;
   }
 
@@ -231,7 +298,7 @@ export class ConvenienceDomService {
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
 
-    this.domService.setStyle(div, "left", `${geo.left}px`);
+    this.domService.setStyle(div, this.startKey, `${geo.left}px`);
     this.domService.setStyle(div, "top", `${geo.top}px`);
     this.domService.setStyle(div, "width", `${geo.width}px`);
     this.domService.setStyle(div, "height", `${geo.height}px`);
@@ -274,7 +341,7 @@ export class ConvenienceDomService {
 
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
+    this.domService.setStyle(div, this.startKey, `${geo.left}px`);
     this.domService.setStyle(div, "top", `${geo.top}px`);
     this.domService.setStyle(div, "width", `${geo.width}px`);
     this.domService.setStyle(div, "height", `${geo.height}px`);
@@ -394,7 +461,7 @@ export class ConvenienceDomService {
     this.setAriaHidden(div); // the sort state is aria-sort of the header cell
     this.domService.setStyle(div, "position", "absolute");
     this.domService.setStyle(div, "top", "0");
-    this.domService.setStyle(div, "right", "0");
+    this.domService.setStyle(div, this.endKey, "0");
     this.domService.setStyle(div, "width", "20px");
     this.domService.setStyle(div, "background", "transparent");
     this.domService.setStyle(div, "cursor", "pointer");
@@ -506,7 +573,7 @@ export class ConvenienceDomService {
     this.setAriaHidden(div);
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
+    this.domService.setStyle(div, this.startKey, `${geo.left}px`);
     this.domService.setStyle(div, "top", `${(geo.top)}px`);
     this.domService.setStyle(div, "width", `${geo.width}px`);
     this.domService.setStyle(div, "height", `1px`);
@@ -534,7 +601,7 @@ export class ConvenienceDomService {
       this.setAriaHidden(div);
       this.domService.setStyle(div, "display", "clip");
       this.domService.setStyle(div, "position", "absolute");
-      this.domService.setStyle(div, "left", `${left}px`);
+      this.domService.setStyle(div, this.startKey, `${left}px`);
       this.domService.setStyle(div, "top", `${top}px`);
       this.domService.setStyle(div, "width", `${width}px`);
       this.domService.setStyle(div, "height", `${height}px`);
@@ -556,7 +623,7 @@ export class ConvenienceDomService {
     this.setAriaHidden(div);
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
+    this.domService.setStyle(div, this.startKey, `${geo.left}px`);
     this.domService.setStyle(div, "top", `${geo.top}px`);
     this.domService.setStyle(div, "width", `1px`);
     this.domService.setStyle(div, "height", `${geo.height}px`);
@@ -572,7 +639,7 @@ export class ConvenienceDomService {
     this.setAriaHidden(div); // decorative or mouse-only (e.g. the "expand/collapse all" icon)
     this.domService.setStyle(div, "display", "clip");
     this.domService.setStyle(div, "position", "absolute");
-    this.domService.setStyle(div, "left", `${geo.left}px`);
+    this.domService.setStyle(div, this.startKey, `${geo.left}px`);
     this.domService.setStyle(div, "top", `${geo.top}px`);
     this.domService.setStyle(div, "width", `${geo.width}px`);
     this.domService.setStyle(div, "height", `${geo.height}px`);

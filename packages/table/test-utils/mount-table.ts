@@ -100,9 +100,21 @@ export function columnIndices(rowDiv: HTMLElement): number[] {
 }
 
 /** A pixel value of an inline style as number, e.g. `stylePx(cell, 'left')` → 100. */
-export function stylePx(element: HTMLElement, property: 'left' | 'top' | 'width' | 'height'): number {
+export function stylePx(element: HTMLElement, property: 'left' | 'right' | 'top' | 'width' | 'height'): number {
   return parseFloat(element.style[property]);
 }
+
+/**
+ * The position of an element from the **start** of its parent row/area – `style.left`, in a right-to-left table
+ * (`dir="rtl"` on the host, since 1.1.98) `style.right`. Lets one expectation cover both directions.
+ */
+export function startPx(element: HTMLElement): number {
+  const rtl = element.closest('.ge-table')?.getAttribute('dir') === 'rtl';
+  return parseFloat(rtl ? element.style.right : element.style.left);
+}
+
+/** Both writing directions, for `describe.each(DIRECTIONS)`. */
+export const DIRECTIONS = ['ltr', 'rtl'] as const;
 
 /** Creates `count` simple row objects `{ id, name, value }`. */
 export function createRows(count: number): { id: number; name: string; value: number }[] {

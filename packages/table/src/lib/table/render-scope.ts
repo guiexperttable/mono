@@ -614,7 +614,7 @@ export class RenderScope extends EleScope {
     this.hideHoverColumn();
 
     this.scrollTop = this.scrollViewport.scrollTop;
-    this.scrollLeft = this.scrollViewport.scrollLeft;
+    this.scrollLeft = this.getViewportScrollLeft(); // from the start (right-to-left: 0 at the right, see 1.1.98)
     this.scrollViewportLeft = this.scrollLeft; // read once per render pass (was read for every row)
 
     this.scrollFactorY = this.scrollTop / (this.scrollViewport.scrollHeight - this.scrollViewport.clientHeight);
@@ -907,7 +907,7 @@ export class RenderScope extends EleScope {
       const styles = areaModel.getCustomStyleAt(rowIndex, columnIndex);
       if (styles) {
         for (const css in styles) {
-          this.dom.setStyle(cell, css, styles[css]);
+          this.dom.domService.setStyle(cell, css, styles[css]); // own styles of the app: as given (no RTL mirroring)
         }
       }
     }
@@ -1070,7 +1070,7 @@ export class RenderScope extends EleScope {
 
     this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
     // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
-    const scrollLeft = this.areaHeightsOfRenderPass ? this.scrollLeft : this.scrollViewport.scrollLeft;
+    const scrollLeft = this.areaHeightsOfRenderPass ? this.scrollLeft : this.getViewportScrollLeft();
     this.dom.setStyle(this.contentDiv, 'left', `${scrollLeft}px`);
 
     this.adjustArea('body', virtualRowDivTop);
@@ -1270,7 +1270,7 @@ export class RenderScope extends EleScope {
           ? this.findCellDiv(rowDivs, this.getTreeArrowColumnIndex())
           : undefined;
         if (arrowHeaderCell?.parentElement) {
-          const iconLeft = (parseFloat(arrowHeaderCell.style.left) || 0) + 16;
+          const iconLeft = this.dom.getInlineStart(arrowHeaderCell) + 16;
           const div =
             this.dom.applyStyle(
               this.dom.setAttribute(
@@ -2147,7 +2147,7 @@ export class RenderScope extends EleScope {
     const styles = areaModel.getCustomStyleAt(rowIndex, index);
     if (styles) {
       for (const css in styles) {
-        this.dom.setStyle(cell, css, styles[css]);
+        this.dom.domService.setStyle(cell, css, styles[css]); // own styles of the app: as given (no RTL mirroring)
       }
     }
     return [cell, fn];
@@ -2385,7 +2385,10 @@ export class RenderScope extends EleScope {
       const width = this.tableModel.getColumnWidth(sourceColumnIndex);
 
       if (mouseMoveEvent.originalEvent?.clientX) {
-        const left = mouseMoveEvent.originalEvent?.clientX - width / 2;
+        // right-to-left: x in the host from its right edge (LTR kept as before – pixel for pixel, see TODO.md)
+        const left = (this.isRtl()
+          ? this.clientXToHostX(mouseMoveEvent.originalEvent.clientX)
+          : mouseMoveEvent.originalEvent.clientX) - width / 2;
         const top = 0;
         const geo: GeoData = { left, width, height, top, index: sourceColumnIndex };
         this.dom.applyStyle(this.draggingColumn, {
@@ -2486,7 +2489,7 @@ export class RenderScope extends EleScope {
         const styles = areaModel.getCustomStyleAt(rowIndex, columnIndex);
         if (styles) {
           for (const css in styles) {
-            this.dom.setStyle(cell, css, styles[css]);
+            this.dom.domService.setStyle(cell, css, styles[css]); // own styles of the app: as given (no RTL mirroring)
           }
         }
         y = y + height;
@@ -2671,7 +2674,8 @@ export class RenderScope extends EleScope {
     domService.setStyle(div, 'display', 'clip');
     domService.setStyle(div, 'position', 'absolute');
     domService.setStyle(div, 'cursor', 'col-resize');
-    domService.setStyle(div, 'left', `${(cellLeft + cellWidth - handleWidth)}px`);
+    // at the end of the cell (right-to-left: its left edge) – the DOM service mirrors "left"
+    this.dom.setStyle(div, 'left', `${(cellLeft + cellWidth - handleWidth)}px`);
     domService.setStyle(div, 'top', `${cellTop}px`);
     domService.setStyle(div, 'width', `${handleWidth}px`);
     domService.setStyle(div, 'height', `${cellHeight}px`);

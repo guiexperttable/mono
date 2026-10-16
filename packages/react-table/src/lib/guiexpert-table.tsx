@@ -2,7 +2,7 @@ import {
   EventListenerIf,
   FocusModelIf,
   GeModelChangeEvent,
-  GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableApi,
   TableModelIf,
@@ -20,6 +20,7 @@ export type GeFocusChangeEventFn = (evt: FocusModelIf) => void;
 export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
+export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -47,6 +48,8 @@ export interface GuiexpertTableProps {
   rowDragStart?: GeRowDragEventFn,
   rowDragMove?: GeRowDragEventFn,
   rowDragEnd?: GeRowDragEventFn,
+  /** Batch edit: values marked, set back, written or discarded – e.g. to enable "Save" (since 1.1.96). */
+  batchEditChanged?: GeBatchEditEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**
@@ -74,6 +77,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.scroll] - The callback for scroll events.
  * @param {Function} [props.stateChanged] - The state changed (layout, sorting …, since 1.1.92).
  * @param {Function} [props.rowDragStart] - Row drag started (since 1.1.95); also `rowDragMove`, `rowDragEnd`.
+ * @param {Function} [props.batchEditChanged] - Batch edit: pending changes changed (since 1.1.96).
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
  * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.92).
  *
@@ -119,7 +123,8 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       onStateChanged: (evt: GeStateChangeEvent) => propsRef.current.stateChanged?.(evt),
       onRowDragStart: (evt: GeRowDragEvent) => propsRef.current.rowDragStart?.(evt),
       onRowDragMove: (evt: GeRowDragEvent) => propsRef.current.rowDragMove?.(evt),
-      onRowDragEnd: (evt: GeRowDragEvent) => propsRef.current.rowDragEnd?.(evt)
+      onRowDragEnd: (evt: GeRowDragEvent) => propsRef.current.rowDragEnd?.(evt),
+      onBatchEditChanged: (evt: GeBatchEditEvent) => propsRef.current.batchEditChanged?.(evt)
     };
 
     // A new tableModel or tableOptions object re-creates the table (dependency array below);

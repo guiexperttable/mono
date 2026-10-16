@@ -24,6 +24,8 @@ describe('actionIds', () => {
       'ACTIVATE_CELL',
       'MOVE_ROW_UP',
       'MOVE_ROW_DOWN',
+      'FILL_DOWN',
+      'FILL_RIGHT',
     ]);
   });
 

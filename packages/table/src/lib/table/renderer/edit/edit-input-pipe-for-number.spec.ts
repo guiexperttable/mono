@@ -22,9 +22,9 @@ describe('editInputPipeForNumber', () => {
     expect(pipe(undefined, 0, 0)).toBe('');
   });
 
-  it('returns "" for the number 0', () => {
-    // NOTE: falsy check – the number 0 becomes "" while the text "0" becomes 0.
-    expect(pipe(0, 0, 0)).toBe('');
+  it('keeps the number 0 (since 1.1.96 – the fill handle passes numbers)', () => {
+    expect(pipe(0, 0, 0)).toBe(0);
+    expect(pipe(12, 0, 0)).toBe(12);
   });
 
   it('returns NaN for text that is not a number (incl. a decimal comma)', () => {

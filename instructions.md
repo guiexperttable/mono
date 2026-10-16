@@ -1187,7 +1187,8 @@ listener.onSelectionChanged = () => {
   override with `tableOptions.shortcutActionIdMapping` or disable with `shortcutActionsDisabled: true`.
   Action ids: `COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`, `DESELECT_ALL`,
   `NAVIGATE_LEFT/RIGHT/UP/DOWN`, since 1.1.91 also `NAVIGATE_ROW_START/ROW_END/FIRST_CELL/LAST_CELL/PAGE_UP/PAGE_DOWN`
-  and `ACTIVATE_CELL` (keys: 6.14), since 1.1.95 `MOVE_ROW_UP/DOWN` (Ctrl+Alt+↑/↓, row drag: 6.16); trigger them with
+  and `ACTIVATE_CELL` (keys: 6.14), since 1.1.95 `MOVE_ROW_UP/DOWN` (Ctrl+Alt+↑/↓, row drag: 6.16), since 1.1.96
+  `FILL_DOWN` / `FILL_RIGHT` (Ctrl/⌘+D, Ctrl/⌘+R, fill handle: 6.17); trigger them with
   `tableApi.triggerAction("SELECT_ALL")` (returns `true` if the action was used).
 
 ### 6.5 Events
@@ -1198,11 +1199,12 @@ listener.onSelectionChanged = () => {
 | `mouseClicked` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`, `originalEvent`) | debounced in Angular and Vue (`debounceMouseClickDelay`, default 150 ms) |
 | `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded` |
 | `checkboxChanged` | `any[]` (checked rows) | tree/row checkboxes |
-| `modelChanged` | `GeModelChangeEvent` | e.g. after inline editing |
+| `modelChanged` | `GeModelChangeEvent` | once per edit, fill or batch commit; since 1.1.96 with `changes` (old/new values) and `source` (6.17) |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` | |
 | `scroll` | `GeScrollEvent` | not forwarded by the React wrapper |
 | `stateChanged` | `GeStateChangeEvent` | since 1.1.92, see 6.11 |
 | `rowDragStart`, `rowDragMove`, `rowDragEnd` | `GeRowDragEvent` | since 1.1.95, see 6.16 (core: `onRowDragStart/Move/End`) |
+| `batchEditChanged` | `GeBatchEditEvent` | since 1.1.96, pending changes of a batch edit, see 6.17 (core: `onBatchEditChanged`) |
 
 ### 6.6 Tree table and checkboxes
 
@@ -1258,7 +1260,8 @@ const columnDefs = [
 ```
 
 Editing starts with a double click or the `START_EDITING` shortcut (F2); changes are written into the row objects and
-reported via `modelChanged`. Since 1.1.89 this also works on cells with a renderer or a framework component, the
+reported via `modelChanged` (since 1.1.96 with old and new value in `evt.changes`; checks with `ColumnDef.validate`,
+filling with the fill handle and collecting changes until "Save": 6.17). Since 1.1.89 this also works on cells with a renderer or a framework component, the
 editor keeps the focus, and table shortcuts are ignored while typing in it.
 
 ### 6.8 Rowspan and colspan
@@ -1473,6 +1476,7 @@ const tableOptions: TableOptionsIf = {
 | Header groups | the toggle is a button "Collapse group Q1" with `aria-expanded` |
 | Editor | the input is named after the column; Escape closes it and the focus returns to the table |
 | Row drag (1.1.95) | the drag handle is `aria-hidden`; its cell has `aria-keyshortcuts` for the keyboard alternative Ctrl+Alt+↑/↓; announcements "Dragging 1 row…", "Row moved to position 7 of 20", "Drag cancelled" (6.16) |
+| Fill handle, batch edit (1.1.96) | the handle is `aria-hidden`; the grid has `aria-keyshortcuts` for Ctrl/⌘+D, Ctrl/⌘+R; invalid pending cells have `aria-invalid` and the message as `title`; announcements "3 cells filled", "2 changes not saved", "2 changes saved" (6.17) |
 | Announcements | a polite live region (in `document.body`, removed by `destroy()`): sorting, filter result ("42 rows"), copy ("12 cells copied"), select all; own messages with `tableApi.announce("Orders loaded")`. Inside a modal dialog (`aria-modal="true"`) screen readers ignore it – use a live region of your own there |
 | Decoration | borders, hover, focus frame, drag ghost, resize handles, icons: `aria-hidden="true"` |
 
@@ -1683,6 +1687,108 @@ listener.onRowDragEnd = async (evt: GeRowDragEvent<{ id: number }>) => {
   grip does nothing. Screen readers hear "Dragging 1 row…", "Row moved to position 7 of 20" and "Drag cancelled".
 - **Saving the order** is up to your app (`rowDragEnd`) – it is data, not part of `getState()`.
 
+### 6.17 Fill handle and batch edit (since 1.1.96)
+
+Two features for tables that are edited a lot – both well known from spreadsheets.
+
+**Fill handle:** a small square at the bottom right corner of the selected range. Drag it down, up, right or left to
+fill the neighbouring cells: one number is copied (5, 5, 5), several numbers continue (1, 2 → 3, 4, 5), dates count
+up by a day (or by months: 31 Jan, 28 Feb → 31 Mar; the type stays – an ISO text stays an ISO text), `Item 9` becomes
+`Item 10`, anything else repeats. Hold **⌥/Alt** (or Ctrl) while dropping to switch between series and copy. Keyboard:
+**Ctrl/⌘+D** copies the top row of the range down, **Ctrl/⌘+R** the left column to the right (a range of one row/column
+gets the cell above / left of it).
+
+**Batch edit:** edits (and fills) are **collected** – shown and marked, but not written into your rows – until
+`commitBatchEdit()` writes them or `cancelBatchEdit()` discards them. Typical before saving to a server:
+
+```ts
+import {
+  ColumnDef, EventAdapter, GeBatchEditEvent, SelectionModel, SimpleDomService, TableFactory, TableOptions,
+  TableOptionsIf, TableScope, TrueFn, editInputPipeForNumber
+} from "@guiexpert/table";
+
+interface Price { id: number; product: string; price: number }
+declare const prices: Price[];
+declare const host: HTMLDivElement;
+declare const saveButton: HTMLButtonElement;
+declare const discardButton: HTMLButtonElement;
+
+const tableModel = TableFactory.createTableModel({
+  rows: prices,
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product" }),
+    ColumnDef.create({
+      property: "price", headerLabel: "Price", editable: TrueFn, editInputPipe: editInputPipeForNumber,
+      validate: (value: unknown) => typeof value === "number" && value >= 0 ? undefined : "A price is a number ≥ 0",
+    }),
+  ],
+});
+const selectionModel = new SelectionModel("range", "multi");   // one model (a new one per call would lose the selection)
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  getSelectionModel: () => selectionModel,
+  fillHandle: true,          // the square at the corner of the selection
+  batchEdit: true,           // collect changes until "Save"
+};
+const listener = new EventAdapter();
+listener.onBatchEditChanged = (evt: GeBatchEditEvent) => {
+  saveButton.disabled = evt.pendingCount === 0 || evt.invalidCount > 0;
+  discardButton.disabled = evt.pendingCount === 0;
+};
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+
+saveButton.onclick = async () => {
+  const body = tableApi.getPendingChanges()
+    .map(c => ({ id: (c.row as Price).id, field: c.property, value: c.newValue }));
+  const response = await fetch("/api/prices", { method: "PATCH", body: JSON.stringify(body) });
+  if (response.ok) tableApi.commitBatchEdit();     // now the values are written into `prices`
+};
+discardButton.onclick = () => tableApi.cancelBatchEdit();
+```
+
+- **Fill handle options** (`tableOptions.fillHandle: true | { … }`): `direction` (`"both"` default, `"vertical"`,
+  `"horizontal"`), `fillValue(ctx)` (own series – return `undefined` for the default; `ctx.sourceValues`, `ctx.step`,
+  `ctx.row`, `ctx.property` …), `maxCells` (100,000; a bigger fill is refused and announced),
+  `autoScrollZoneInPx` / `autoScrollMaxSpeedInPx` (the table scrolls at the edges, also through millions of rows),
+  `dragThresholdInPx`. Needs a `SelectionModel("range", …)`; only the **last** range has a handle. Escape cancels.
+- **What is filled:** only editable cells (`editable`, a calculated column needs a `valueSetter`, no group or pivot
+  rows) of shown columns – the series keeps counting over skipped cells. Values run through `editInputPipe` and
+  `validate` like typed values. A sorted or filtered table fills the **shown** rows in display order. Afterwards source
+  and filled cells are selected. Code: `tableApi.fillRange(new CellRange(r1, c1, r2, c2), "down", 5, mode?)`; the series
+  logic alone: `computeFillValues([1, 2], 3)` → `[3, 4, 5]`.
+- **Batch edit:** `tableOptions.batchEdit: true` = always collect (after a commit the next changes are collected again);
+  without it `tableApi.startBatchEdit()` collects until `commitBatchEdit()` / `cancelBatchEdit()`. `isBatchEditing()`,
+  `hasPendingChanges()`, `getPendingChanges()` → `{ row, rowIndex, columnIndex, property, oldValue, newValue, error? }`.
+  The changes belong to the row **objects** – sorting and filtering keep them on their rows (`rowIndex` is `-1` while a
+  filter hides the row; a commit writes it anyway). Setting a value back to its original removes the change.
+- **Shown, not written:** cells show the pending value (`ge-table-cell-pending`, a yellow cell with a corner mark), the
+  editor starts with it, the fill handle uses it. Sorting, filtering, totals, copy and Excel export use the **written**
+  data until the commit (like ag-Grid).
+- **Validation:** `ColumnDef.validate(value, row)` returns a message for an invalid value. In a batch edit invalid values
+  are marked (`ge-table-cell-invalid`, `aria-invalid`, the message as tooltip) and `commitBatchEdit()` returns `false`
+  (`batchEdit: { blockCommitOnInvalid: false }` writes them anyway); without batch edit an invalid value is not written
+  and screen readers hear "Invalid value: …".
+- **Events:** `onModelChanged` comes **once per change** – one edit, one fill, one commit – with all cells
+  (`evt.cells`), and since 1.1.96 `evt.changes` (`CellChangeIf`: row, property, old and new value) and `evt.source`
+  (`"edit" | "fill" | "commit" | "api"`). Collected values don't change data: no `onModelChanged`, but
+  `onBatchEditChanged` (`type` `"start" | "change" | "commit" | "cancel"`, `changes`, `pendingCount`, `invalidCount`,
+  `pendingChanges`). Wrappers: `batchEditChanged` (React/Preact/Solid callback prop, Vue `@batchEditChanged`, Svelte
+  `on:batchEditChanged` / `onBatchEditChanged`, Angular `(batchEditChanged)`, Web Component `CustomEvent`).
+- **Writing cells from code:** `tableApi.applyCellChanges([{ rowIndex, column: "price", value }], source?)` – the one
+  write path of the table (editor, fill and commit use it): skips non-editable cells, pipe, validation, totals, one
+  event; in a batch edit it collects. With old and new values in `CellChangeIf`, undo is
+  `applyCellChanges(changes.map(c => ({ rowIndex: c.rowIndex, column: c.property, value: c.oldValue })))`.
+- **Look:** `.ge-table-fill-handle`, `.ge-table-fill-preview`, `.ge-table-fill-active` (host while dragging),
+  `.ge-table-cell-pending`, `.ge-table-cell-invalid`; variables `--ge-table-fill-handle-color|-border`,
+  `--ge-table-fill-preview-border`, `--ge-table-cell-pending-bg|-text|-marker`, `--ge-table-cell-invalid-bg|-text|-border`
+  (light and dark).
+- **Keys and screen readers:** the handle is hidden for screen readers; the grid has `aria-keyshortcuts="Control+D
+  Control+R"` (macOS `Meta+…`). Ctrl/⌘+D and Ctrl/⌘+R are only taken from the browser (bookmark, reload) while the fill
+  handle is on and a range is selected; map other keys with `shortcutActionIdMapping` (`FILL_DOWN`, `FILL_RIGHT`).
+  Announcements: "3 cells filled", "2 changes not saved", "2 changes saved", "Changes discarded", "1 invalid value –
+  nothing saved" (texts in `ariaTexts`).
+- **CRUD:** `CrudTableModelFactory` saves single objects; for batch edits send `getPendingChanges()` yourself (see above).
+
 ---
 
 ## 7. Not available yet
@@ -1697,6 +1803,7 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 - No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
   to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
+- No paste from the clipboard and no undo/redo yet – both can be built on `tableApi.applyCellChanges()` (6.17).
 
 ---
 

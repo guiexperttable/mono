@@ -574,3 +574,85 @@ html[data-theme= "dark"] {
   background: var(--ge-table-row-drop-inside-bg);
   border: 2px solid var(--ge-table-row-drop-indicator-color);
 }
+
+/* Fill handle and batch edit (since 1.1.96) – as in packages/table/css/table-fill-batch.css + table-color-vars.css */
+html[data-theme= "light"] {
+  --ge-table-fill-handle-color: #0a6ebd;
+  --ge-table-fill-handle-border: #fff;
+  --ge-table-fill-preview-border: #0a6ebd;
+  --ge-table-cell-pending-bg: #fff3c4;
+  --ge-table-cell-pending-text: #3d2e00;
+  --ge-table-cell-pending-marker: #c27c00;
+  --ge-table-cell-invalid-bg: #fde2e1;
+  --ge-table-cell-invalid-text: #8a1c14;
+  --ge-table-cell-invalid-border: #d93025;
+}
+
+html[data-theme= "dark"] {
+  --ge-table-fill-handle-color: #8ab4f8;
+  --ge-table-fill-handle-border: #1e1e1e;
+  --ge-table-fill-preview-border: #8ab4f8;
+  --ge-table-cell-pending-bg: #4a3b0b;
+  --ge-table-cell-pending-text: #fde68a;
+  --ge-table-cell-pending-marker: #f5b82e;
+  --ge-table-cell-invalid-bg: #5c1d1a;
+  --ge-table-cell-invalid-text: #fecaca;
+  --ge-table-cell-invalid-border: #f28b82;
+}
+
+/* the square at the bottom right corner of the selected range; its center sits on the corner */
+.ge-table-fill-handle {
+  position: absolute;
+  z-index: 9000; /* above the cells, below the overlay (10000) */
+  width: 7px;
+  height: 7px;
+  margin: -4px 0 0 -4px;
+  box-sizing: border-box;
+  background: var(--ge-table-fill-handle-color);
+  border: 1px solid var(--ge-table-fill-handle-border);
+  cursor: crosshair;
+  touch-action: none; /* touch drags the handle instead of scrolling */
+}
+
+/* a bigger target for touch and pen (the visible square stays small) */
+.ge-table-fill-handle::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* the cells a fill will cover */
+.ge-table-fill-preview {
+  position: absolute;
+  z-index: 8999;
+  box-sizing: border-box;
+  border: 2px dashed var(--ge-table-fill-preview-border);
+  pointer-events: none;
+}
+
+.ge-table-fill-active,
+.ge-table-fill-active * {
+  cursor: crosshair !important;
+  user-select: none;
+}
+
+/* batch edit: a value that is not saved yet – a colored cell and a small corner mark (not color only, WCAG 1.4.1) */
+.ge-table-col-div.ge-table-cell-pending {
+  background-image: linear-gradient(225deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
+}
+
+/* the color only while the cell is not selected – a selected cell keeps the selection color (and the corner mark) */
+.ge-table-col-div.ge-table-cell-pending:not([class*="-selected-range"]) {
+  background-color: var(--ge-table-cell-pending-bg);
+  color: var(--ge-table-cell-pending-text);
+}
+
+/* an invalid value (ColumnDef.validate): the message is the tooltip */
+.ge-table-col-div.ge-table-cell-invalid:not([class*="-selected-range"]) {
+  background-color: var(--ge-table-cell-invalid-bg);
+  color: var(--ge-table-cell-invalid-text);
+}
+
+.ge-table-col-div.ge-table-cell-invalid {
+  box-shadow: inset 0 0 0 2px var(--ge-table-cell-invalid-border);
+}

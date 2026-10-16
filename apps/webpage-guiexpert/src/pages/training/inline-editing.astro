@@ -47,6 +47,40 @@ import Callout from "../../components/training/Callout.astro";
     the new value is already in your object – and, if the server rejects it, write the old value back and repaint.
   </p>
 
+  <h2 id="fill-batch">Fill handle and batch edit</h2>
+  <Callout type="version">
+    <p>Fill handle and batch edit are new in 1.1.96.</p>
+  </Callout>
+  <p>
+    Users who edit a lot want spreadsheet comfort: select cells, drag the small square at the bottom right corner – one value
+    is copied, two numbers continue as a series, dates count up, <code>Item 9</code> becomes <code>Item 10</code>. And they
+    want to look at their changes before anything is saved. Two options switch both on:
+    <ApiLink name="TableOptionsIf.fillHandle" label="fillHandle" /> and <ApiLink name="TableOptionsIf.batchEdit" label="batchEdit" />.
+  </p>
+  <Snippet file="demos/fill-batch.ts" region="options" title="src/main.ts" />
+  <p>
+    Only editable cells are filled, and every value runs through <code>editInputPipe</code> and the new
+    <ApiLink name="ColumnDefIf.validate" label="validate" /> – exactly like a typed value:
+  </p>
+  <Snippet file="demos/fill-batch.ts" region="columns" title="src/model/order-columns.ts" />
+  <p>
+    With batch edit the cells show the new values (marked yellow, invalid ones red) while your <code>orders</code> stay as
+    they are. <ApiLink name="EventListenerIf.onBatchEditChanged" label="onBatchEditChanged" /> tells you how many changes
+    are pending – the moment to enable a "Save" button. <ApiLink name="TableApi.getPendingChanges" /> lists them with row,
+    property, old and new value for your server; <ApiLink name="TableApi.commitBatchEdit" /> writes them (one
+    <code>onModelChanged</code> with all cells), <ApiLink name="TableApi.cancelBatchEdit" /> drops them:
+  </p>
+  <Snippet file="demos/fill-batch.ts" region="events" title="src/order-events.ts" />
+  <Snippet file="demos/fill-batch.ts" region="save" title="src/main.ts" />
+  <LiveDemo name="fill-batch" title="Fill handle and batch edit" height={400}
+            caption="Drag the small square below the two selected quantities. Double-click a quantity and type 0: the cell turns red and save refuses." />
+  <Callout type="tip" title="Keyboard and screen readers">
+    <p><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>D</kbd> copies the top row of the selection down, <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>R</kbd>
+      the left column to the right – only while the fill handle is on and a range is selected, otherwise the browser keeps its
+      keys. Screen readers hear "3 cells filled" and "2 changes not saved". Sorting and filtering keep pending changes on
+      their rows; totals, copy and Excel use the saved data. All options: instructions.md 6.17.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>Not the user changes the values, the market does: <ChapterLink slug="live-data" />.</p>
 </TrainingLayout>

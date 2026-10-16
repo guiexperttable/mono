@@ -146,8 +146,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
-  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag })` (die letzten
-  sechs seit 1.1.95, § 3.6 „Berechnete Spalten“ bzw. „Row Drag“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag, validate })`
+  (`valueGetter` … `rowDrag` seit 1.1.95, § 3.6 „Berechnete Spalten“ bzw. „Row Drag“; `validate` seit 1.1.96, § 3.6
+  „Fill-Handle und Batch-Edit“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
 - Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
   `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
   Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
@@ -168,8 +169,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 ### 3.6 Interaktion
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
-  seit 1.1.95 `onRowDragStart/Move/End` (optional). Event-Typen: `GeMouseEvent`, `GeKeyEvent`, `GeModelChangeEvent`,
-  `GeScrollEvent`, `GeStateChangeEvent`, `GeRowDragEvent`.
+  seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged` (optional). Event-Typen: `GeMouseEvent`,
+  `GeKeyEvent`, `GeModelChangeEvent` (seit 1.1.96 + `changes`/`source`), `GeScrollEvent`, `GeStateChangeEvent`,
+  `GeRowDragEvent`, `GeBatchEditEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -184,7 +186,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (`NAVIGATE_FIRST/LAST_CELL`, macOS auch ⌘↑/⌘↓), Bild↑/↓ (`NAVIGATE_PAGE_UP/DOWN`), Enter (`ACTIVATE_CELL`: Body =
   Zeilen-Checkbox bzw. Baumknoten, Header = Gruppe bzw. Sortieren). **Header-Fokus**: ↑ in Body-Zeile 0 → unterste
   Header-Zeile, ↓ zurück; Zustand in `TableScope` (`getHeaderFocus()`), das `FocusModel` bleibt Body-only. Seit 1.1.95
-  `MOVE_ROW_UP/DOWN` (Strg+Alt+↑/↓, Row Drag). `api.triggerAction()` liefert seit 1.1.95 `boolean` (Taste verwendet).
+  `MOVE_ROW_UP/DOWN` (Strg+Alt+↑/↓, Row Drag), seit 1.1.96 `FILL_DOWN/FILL_RIGHT` (Strg/⌘+D, Strg/⌘+R – nur verbraucht
+  mit `fillHandle` + markiertem Bereich, sonst behält der Browser Lesezeichen/Neu laden). `api.triggerAction()` liefert seit 1.1.95 `boolean` (Taste verwendet).
 - **Barrierefreiheit (seit 1.1.91, `aria/`, Design `prompts/001-aria-screenreader.design.md`)**: Host `role="grid"`/
   `"treegrid"` mit `aria-rowcount` (Header + **alle** Body-Zeilen + Footer), `aria-colcount` (sichtbare Spalten),
   `aria-owns` (9 Rowgroups in der Reihenfolge Header → Body → Footer, leere = `presentation`), `aria-activedescendant`
@@ -339,6 +342,35 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (200.000 Zeilen) in O(n) ohne Spread. DOM-frei `row-drag/move-rows.ts`
   (`moveArrayItems`, `calcMoveToIndex`, `moveTreeRows`, `canMoveTreeRows` …). CSS `css/table-row-drag.css`,
   `--ge-table-row-drag-*`, `--ge-table-row-drop-*`. Website-Showcases: CSS auch in `src/styles/ge-table.css`.
+- **Fill-Handle und Batch-Edit (seit 1.1.96, `fill/` + `batch-edit/`, Design
+  `prompts/010-fill-handle-batch-edit.design.md`)**: **eine** Schreibstelle `TableScope.applyCellChanges(changes, source)`
+  (`api.applyCellChanges([{ rowIndex, column: index | property, value }])`; Editor `updateModelValueAfterEdit`, Fill und
+  Commit laufen darüber): überspringt Nicht-Editierbares (`isEditable`, berechnet ohne `valueSetter`, Gruppen/Pivot),
+  `editInputPipe` + `ColumnDef.validate(value, row)` (Meldung = ungültig → nicht geschrieben, Ansage), Row Groups in
+  `batch()`, Aggregate, Repaint und **ein** `onModelChanged` (`GeModelChangeEvent.changes: CellChangeIf[]` = row, rowIndex,
+  columnIndex, property, oldValue, newValue; `source` `"edit" | "fill" | "commit" | "api"`; ein Edit weiter wie
+  `createSingle`). **Fill-Handle** `tableOptions.fillHandle: true | Partial<FillHandleOptionsIf>` (`direction`, `fillValue(ctx)`,
+  `maxCells`, Schwelle, Auto-Scroll), nur Selektionstyp `range`, letzter Bereich: `FillHandleService`
+  (`tableScope.fillHandleService`, `@category Internals`) – **ein** Host-Div `ge-table-fill-handle`
+  (`data-ge-action="fill-handle"`, `aria-hidden`), Lage gerechnet über `RenderScope.getBodyCellRectInHost()` (auch fixierte
+  Spalten, versteckt, wenn die Ecke herausgescrollt ist), gesetzt in `afterRenderPass()`; Ziehen mit Pointer Events wie
+  009 (Dokument-Listener, Escape, `pointercancel`, Click wird geschluckt), Ziel über `getBodyCellAtHostPoint()` (gerechnet),
+  Achse = weiter außerhalb, Vorschau `ge-table-fill-preview`, Auto-Scroll senkrecht + waagerecht, ⌥/Alt bzw. Strg =
+  `"alternate"`. `TableScope.fillRange(source, direction, count, mode)` (= `api.fillRange`) nimmt die **angezeigten** Werte
+  (Batch: vorgemerkte), setzt danach die Auswahl auf Quelle + Ziel. Reihen DOM-frei `computeFillValues` (eine Zahl kopiert,
+  mehrere linear bzw. Regression, `toPrecision(15)`; Datum `Date`/ISO-Text: +1 Tag, Monatsschritt, Monatsende bleibt;
+  „Item 9“ → „Item 10“ mit führenden Nullen; Rest zyklisch), `computeFillChanges`, `getFillRange`. **Batch-Edit**
+  `tableOptions.batchEdit` (dauerhaft) bzw. `api.startBatchEdit()` (bis commit/cancel): `BatchEditService`
+  (`tableScope.batchEditService`) mit `PendingCellChanges` (`Map<Zeilenobjekt, Map<property, …>>`; TreeRow → `data`, ohne
+  Objekte der Index, ohne Property `#<index>`; zurück auf den Ursprungswert = entfernt, `isSameCellValue`). Anzeige
+  **nur** in `RenderScope.addAndRenderCellDiv` (Wert, `ge-table-cell-pending`, ungültig `ge-table-cell-invalid` +
+  `aria-invalid` + `title`; Input-/Select-Editor nehmen `cellValue`); Sortieren, Filtern, Summen, Copy, Excel = geschriebene
+  Daten (wie ag-Grid). Commit schreibt die **Roheingabe** über `setValue` (Pipe genau einmal), ausgefilterte Zeilen direkt
+  ins Objekt, `repaintHard`, ein `onModelChanged` + `onBatchEditChanged` (`GeBatchEditEvent` start/change/commit/cancel,
+  `pendingCount`, `invalidCount`, `pendingChanges` lazy). `blockCommitOnInvalid` (Default `true`). API `getPendingChanges`,
+  `hasPendingChanges`, `isBatchEditing`, `commitBatchEdit` (`boolean`), `cancelBatchEdit`, `isFilling`, `cancelFill`.
+  Wrapper-Event `batchEditChanged`. CSS `css/table-fill-batch.css`, `--ge-table-fill-*`, `--ge-table-cell-pending-*`,
+  `--ge-table-cell-invalid-*`. Kein Einfügen, kein Undo (Folgepunkte in `TODO.md`).
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -357,7 +389,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
-`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`.
+`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -377,7 +409,8 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
-Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`).
+Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
+(`GeBatchEditEvent`).
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -422,7 +455,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 526 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 554 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -433,8 +466,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.080 Tests) |
-  | `test:browser` | echtes Chromium, ~700 Tests in 26 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.140 Tests) |
+  | `test:browser` | echtes Chromium, ~780 Tests in 27 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -457,7 +490,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag` …).
+    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -472,7 +505,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 32 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 34 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -566,6 +599,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 29 | Berechnete Spalten in 60 Sekunden (`valueGetter`, Sortieren/Summe stimmen) – geplant | Showcase `formulas`, `instructions.md` 5.2 |
 | 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, `instructions.md` 5.9 |
 | 31 | Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/09-zeilen-ziehen/`, Showcase `rowdrag`, Training-Kapitel `events-and-context-menu` (Abschnitt), `apps/table-demo/row-drag.html`, `instructions.md` 6.16 |
+| 32 | Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln, dann speichern | `videos/10-fill-handle-batch-edit/`, Showcase `batchedit`, Training-Kapitel `inline-editing` (Abschnitt), `apps/table-demo/fill-batch.html`, `instructions.md` 6.17 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

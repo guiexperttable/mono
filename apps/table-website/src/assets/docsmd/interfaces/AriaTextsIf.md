@@ -40,10 +40,17 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 ### Methods
 
 - [allSelected](AriaTextsIf.md#allselected)
+- [cellsFilled](AriaTextsIf.md#cellsfilled)
+- [changesCommitted](AriaTextsIf.md#changescommitted)
+- [changesDiscarded](AriaTextsIf.md#changesdiscarded)
 - [collapseGroup](AriaTextsIf.md#collapsegroup)
+- [commitBlocked](AriaTextsIf.md#commitblocked)
 - [copied](AriaTextsIf.md#copied)
 - [expandGroup](AriaTextsIf.md#expandgroup)
+- [fillTooLarge](AriaTextsIf.md#filltoolarge)
 - [filtered](AriaTextsIf.md#filtered)
+- [invalidValue](AriaTextsIf.md#invalidvalue)
+- [pendingChanges](AriaTextsIf.md#pendingchanges)
 - [rowDragCancelled](AriaTextsIf.md#rowdragcancelled)
 - [rowDragStarted](AriaTextsIf.md#rowdragstarted)
 - [rowMoveNotPossible](AriaTextsIf.md#rowmovenotpossible)
@@ -73,6 +80,84 @@ default: `"All cells selected"`
 
 ___
 
+### cellsFilled
+
+▸ **cellsFilled**(`cellCount`): `string`
+
+Announced after a fill (fill handle, Ctrl/⌘+D, Ctrl/⌘+R) – optional, [AriaTexts](../classes/AriaTexts.md) has a default.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of filled cells |
+
+#### Returns
+
+`string`
+
+default: `"3 cells filled"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L141)
+
+___
+
+### changesCommitted
+
+▸ **changesCommitted**(`cellCount`): `string`
+
+Announced after [TableApi.commitBatchEdit](../classes/TableApi.md#commitbatchedit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of written cells |
+
+#### Returns
+
+`string`
+
+default: `"3 changes saved"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L168)
+
+___
+
+### changesDiscarded
+
+▸ **changesDiscarded**(): `string`
+
+Announced after [TableApi.cancelBatchEdit](../classes/TableApi.md#cancelbatchedit).
+
+#### Returns
+
+`string`
+
+default: `"Changes discarded"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L176)
+
+___
+
 ### collapseGroup
 
 ▸ **collapseGroup**(`groupLabel`): `string`
@@ -94,6 +179,34 @@ default: `"Collapse group Q1"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L96)
+
+___
+
+### commitBlocked
+
+▸ **commitBlocked**(`invalidCount`): `string`
+
+Announced when invalid values block [TableApi.commitBatchEdit](../classes/TableApi.md#commitbatchedit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `invalidCount` | `number` | the number of invalid cells |
+
+#### Returns
+
+`string`
+
+default: `"2 invalid values – nothing saved"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L185)
 
 ___
 
@@ -145,6 +258,34 @@ default: `"Expand group Q1"`
 
 ___
 
+### fillTooLarge
+
+▸ **fillTooLarge**(`maxCells`): `string`
+
+Announced when a fill is refused because it covers too many cells ([FillHandleOptionsIf.maxCells](FillHandleOptionsIf.md#maxcells)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"Too many cells to fill (at most 100000)"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L150)
+
+___
+
 ### filtered
 
 ▸ **filtered**(`rowCount`): `string`
@@ -166,6 +307,62 @@ default: `"42 rows"`, `"1 row"`, `"No rows"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L43)
+
+___
+
+### invalidValue
+
+▸ **invalidValue**(`message`): `string`
+
+Announced when an edited value is invalid ([ColumnDefIf.validate](ColumnDefIf.md#validate)) and not written (without batch edit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | the message of the validator |
+
+#### Returns
+
+`string`
+
+default: `"Invalid value: <message>"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L194)
+
+___
+
+### pendingChanges
+
+▸ **pendingChanges**(`pendingCount`): `string`
+
+Announced after a value was marked in a batch edit (or set back).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `pendingCount` | `number` | the number of pending cells |
+
+#### Returns
+
+`string`
+
+default: `"3 changes not saved"`, `"No unsaved changes"`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L159)
 
 ___
 

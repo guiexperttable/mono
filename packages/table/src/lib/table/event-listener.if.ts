@@ -3,6 +3,7 @@ import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
 import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
 import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
+import { GeBatchEditEvent } from "./data/common/event/ge-batch-edit-event";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 import { EventFocusChangedListenerIf } from './focus/event-focus-changed-listener.if';
@@ -100,4 +101,13 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.95
    */
   onRowDragEnd?(evt: GeRowDragEvent): void;
+
+  /**
+   * The pending changes of a batch edit changed: values were marked, set back, written or discarded
+   * ({@link TableApi.startBatchEdit}, {@link TableOptionsIf.batchEdit}). Optional.
+   *
+   * @param {GeBatchEditEvent} evt - type, cells of this step, number of pending and invalid cells
+   * @since 1.1.96
+   */
+  onBatchEditChanged?(evt: GeBatchEditEvent): void;
 }

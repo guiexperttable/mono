@@ -11,6 +11,7 @@ Row grouping with aggregates per group – `RowGroupFactory.createTableModel({ r
 Pivot tables – row fields × column fields with subtotals, totals and multi-row headers – `PivotFactory.createTableModel({ rows, rowFields: ["country"], columnFields: ["year"], values: ["total"] })`, pivot again at runtime with `tableApi.setPivotConfig()` (since 1.1.94).
 Calculated columns, „Show values as“ and formulas – `ColumnDef.create({ property: "total", valueGetter: o => o.price * o.quantity })` (sorting, filter, copy, Excel and totals use the computed value), `showValuesAs: "percentOfColumnTotal"` (also `runningTotal`, `rank`, `percentOfRowTotal` in pivots …), `formula: "ROUND([price] * [quantity] * 1.19, 2)"` (own parser, no `eval`, error values like `#DIV/0!`) (since 1.1.95).
 Drag rows into order – a grip per row (`rowDrag: true`), mouse, touch and Ctrl+Alt+↑/↓, auto-scroll through millions of rows, trees, several rows at once; the table moves the rows or only reports the drop (since 1.1.95).
+Spreadsheet feeling: a fill handle at the corner of the selection (copy or continue series – 1, 2, 3 …, dates, `Item 1` → `Item 2`; Ctrl/⌘+D, Ctrl/⌘+R) and batch edit – changes are collected and marked until "Save" (`commitBatchEdit()`) or "Discard", with validation per column (`fillHandle: true`, `batchEdit: true`, since 1.1.96).
 
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 

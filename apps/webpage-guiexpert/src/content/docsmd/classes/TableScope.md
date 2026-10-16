@@ -67,6 +67,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [areaHeightsOfRenderPass](TableScope.md#areaheightsofrenderpass)
 - [ariaIds](TableScope.md#ariaids)
 - [ariaTexts](TableScope.md#ariatexts)
+- [batchEditService](TableScope.md#batcheditservice)
 - [borderFixedEast](TableScope.md#borderfixedeast)
 - [borderFixedWest](TableScope.md#borderfixedwest)
 - [borderFooterTop](TableScope.md#borderfootertop)
@@ -86,6 +87,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [editing](TableScope.md#editing)
 - [eventListener](TableScope.md#eventlistener)
 - [excelService](TableScope.md#excelservice)
+- [fillHandleService](TableScope.md#fillhandleservice)
 - [firstFullVisibleRowIndex](TableScope.md#firstfullvisiblerowindex)
 - [firstVisibleRowIndex](TableScope.md#firstvisiblerowindex)
 - [getFocusModel](TableScope.md#getfocusmodel)
@@ -146,6 +148,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [announce](TableScope.md#announce)
 - [announceCopied](TableScope.md#announcecopied)
 - [applyCellAria](TableScope.md#applycellaria)
+- [applyCellChanges](TableScope.md#applycellchanges)
 - [applyCssClasses](TableScope.md#applycssclasses)
 - [applyRowAria](TableScope.md#applyrowaria)
 - [applySortItems](TableScope.md#applysortitems)
@@ -165,6 +168,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [ensureColumnIsVisible](TableScope.md#ensurecolumnisvisible)
 - [ensureRowIsVisible](TableScope.md#ensurerowisvisible)
 - [externalFilterChanged](TableScope.md#externalfilterchanged)
+- [fillRange](TableScope.md#fillrange)
 - [findRowOfImportantRowspanCell](TableScope.md#findrowofimportantrowspancell)
 - [firstInit](TableScope.md#firstinit)
 - [focusModel](TableScope.md#focusmodel)
@@ -174,6 +178,8 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [getAreaChild](TableScope.md#getareachild)
 - [getAriaGridInfo](TableScope.md#getariagridinfo)
 - [getAvailableColumnWidth](TableScope.md#getavailablecolumnwidth)
+- [getBodyCellAtHostPoint](TableScope.md#getbodycellathostpoint)
+- [getBodyCellRectInHost](TableScope.md#getbodycellrectinhost)
 - [getBodyViewport](TableScope.md#getbodyviewport)
 - [getCheckboxAriaLabel](TableScope.md#getcheckboxarialabel)
 - [getColumnAriaLabel](TableScope.md#getcolumnarialabel)
@@ -183,7 +189,10 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [getContentScrollRangeY](TableScope.md#getcontentscrollrangey)
 - [getDisplayedRowCount](TableScope.md#getdisplayedrowcount)
 - [getDomService](TableScope.md#getdomservice)
+- [getEditTexts](TableScope.md#getedittexts)
 - [getEventListener](TableScope.md#geteventlistener)
+- [getFillHandleOptions](TableScope.md#getfillhandleoptions)
+- [getFillSourceRange](TableScope.md#getfillsourcerange)
 - [getFirstDataColumnIndex](TableScope.md#getfirstdatacolumnindex)
 - [getFirstFullVisibleRowIndex](TableScope.md#getfirstfullvisiblerowindex)
 - [getFirstVisibleRowIndex](TableScope.md#getfirstvisiblerowindex)
@@ -251,6 +260,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [setHeaderGroupCollapsed](TableScope.md#setheadergroupcollapsed)
 - [setHeaderVisible](TableScope.md#setheadervisible)
 - [setHostAriaAttribute](TableScope.md#sethostariaattribute)
+- [setHostKeyShortcuts](TableScope.md#sethostkeyshortcuts)
 - [setPivotConfig](TableScope.md#setpivotconfig)
 - [setRowGroupBy](TableScope.md#setrowgroupby)
 - [setSelectionModel](TableScope.md#setselectionmodel)
@@ -268,6 +278,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 - [updateCells](TableScope.md#updatecells)
 - [updateModelValueAfterEdit](TableScope.md#updatemodelvalueafteredit)
 - [updateOverlay](TableScope.md#updateoverlay)
+- [writeCells](TableScope.md#writecells)
 - [create](TableScope.md#create)
 
 ## Constructors
@@ -298,7 +309,7 @@ Training: [Your first table in plain TypeScript](https://gui.expert/training/fir
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L141)
+[src/lib/table/table-scope.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L153)
 
 ## Properties
 
@@ -310,7 +321,7 @@ The last "expand / collapse all" state – the header icon toggles it.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:967](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L967)
+[src/lib/table/table-scope.ts:1323](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1323)
 
 ___
 
@@ -502,7 +513,7 @@ Area heights read once at the start of adjustAfterScrolling() (before the DOM is
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:117](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L117)
+[src/lib/table/render-scope.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L120)
 
 ___
 
@@ -542,7 +553,27 @@ Texts for screen readers (English defaults + `tableOptions.ariaTexts`).
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L126)
+[src/lib/table/render-scope.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L129)
+
+___
+
+### batchEditService
+
+• `Optional` **batchEditService**: [`BatchEditService`](BatchEditService.md)
+
+Batch edit of this table (pending values, shown in the cells) – created by [TableScope](TableScope.md).
+
+**`Since`**
+
+1.1.96
+
+#### Inherited from
+
+[RenderScope](RenderScope.md).[batchEditService](RenderScope.md#batcheditservice)
+
+#### Defined in
+
+[src/lib/table/render-scope.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L155)
 
 ___
 
@@ -620,7 +651,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L99)
+[src/lib/table/render-scope.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L102)
 
 ___
 
@@ -634,7 +665,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L109)
+[src/lib/table/render-scope.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L112)
 
 ___
 
@@ -664,7 +695,7 @@ Content pixels scrolled out at the top, i.e. the offset that is actually rendere
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L113)
+[src/lib/table/render-scope.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L116)
 
 ___
 
@@ -688,7 +719,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L147)
+[src/lib/table/table-scope.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L159)
 
 ___
 
@@ -702,7 +733,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L119)
+[src/lib/table/render-scope.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L122)
 
 ___
 
@@ -716,7 +747,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L83)
+[src/lib/table/render-scope.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L86)
 
 ___
 
@@ -744,7 +775,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L88)
+[src/lib/table/render-scope.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L91)
 
 ___
 
@@ -772,7 +803,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L110)
+[src/lib/table/render-scope.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L113)
 
 ___
 
@@ -786,7 +817,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L89)
+[src/lib/table/render-scope.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L92)
 
 ___
 
@@ -796,7 +827,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L146)
+[src/lib/table/table-scope.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L158)
 
 ___
 
@@ -806,7 +837,27 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L148)
+[src/lib/table/table-scope.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L160)
+
+___
+
+### fillHandleService
+
+• `Optional` **fillHandleService**: [`FillHandleService`](FillHandleService.md)
+
+Fill handle of this table – created by [TableScope](TableScope.md).
+
+**`Since`**
+
+1.1.96
+
+#### Inherited from
+
+[RenderScope](RenderScope.md).[fillHandleService](RenderScope.md#fillhandleservice)
+
+#### Defined in
+
+[src/lib/table/render-scope.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L161)
 
 ___
 
@@ -820,7 +871,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L81)
+[src/lib/table/render-scope.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L84)
 
 ___
 
@@ -834,7 +885,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L79)
+[src/lib/table/render-scope.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L82)
 
 ___
 
@@ -848,7 +899,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L94)
+[src/lib/table/render-scope.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L97)
 
 ___
 
@@ -862,7 +913,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L93)
+[src/lib/table/render-scope.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L96)
 
 ___
 
@@ -879,7 +930,7 @@ first body row, see `TableScope`. `undefined`: the focus is in the body ([FocusM
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L140)
+[src/lib/table/render-scope.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L143)
 
 ___
 
@@ -931,7 +982,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L95)
+[src/lib/table/table-scope.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L107)
 
 ___
 
@@ -941,7 +992,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L111)
+[src/lib/table/table-scope.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L123)
 
 ___
 
@@ -955,7 +1006,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L82)
+[src/lib/table/render-scope.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L85)
 
 ___
 
@@ -969,7 +1020,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L80)
+[src/lib/table/render-scope.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L83)
 
 ___
 
@@ -979,7 +1030,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L87)
+[src/lib/table/table-scope.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L99)
 
 ___
 
@@ -992,7 +1043,7 @@ Signal for all DOM listeners of this table (host element, scroll viewport, windo
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L92)
+[src/lib/table/table-scope.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L104)
 
 ___
 
@@ -1009,7 +1060,7 @@ Use [TableApi.announce](TableApi.md#announce) for own messages.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L119)
+[src/lib/table/table-scope.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L131)
 
 ___
 
@@ -1023,7 +1074,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L86)
+[src/lib/table/render-scope.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L89)
 
 ___
 
@@ -1037,7 +1088,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L111)
+[src/lib/table/render-scope.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L114)
 
 ___
 
@@ -1047,7 +1098,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L94)
+[src/lib/table/table-scope.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L106)
 
 ___
 
@@ -1070,7 +1121,7 @@ Exact content position requested by scrollToPixel() for a capped scroll height (
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L115)
+[src/lib/table/render-scope.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L118)
 
 ___
 
@@ -1084,7 +1135,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L85)
+[src/lib/table/render-scope.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L88)
 
 ___
 
@@ -1094,7 +1145,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L96)
+[src/lib/table/table-scope.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L108)
 
 ___
 
@@ -1114,7 +1165,7 @@ Row drag of this table (drag handles, pointer and keyboard drag) – created by 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L146)
+[src/lib/table/render-scope.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L149)
 
 ___
 
@@ -1128,7 +1179,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L98)
+[src/lib/table/render-scope.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L101)
 
 ___
 
@@ -1142,7 +1193,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L97)
+[src/lib/table/render-scope.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L100)
 
 ___
 
@@ -1156,7 +1207,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L95)
+[src/lib/table/render-scope.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L98)
 
 ___
 
@@ -1198,7 +1249,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L96)
+[src/lib/table/render-scope.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L99)
 
 ___
 
@@ -1208,7 +1259,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L110)
+[src/lib/table/table-scope.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L122)
 
 ___
 
@@ -1218,7 +1269,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L97)
+[src/lib/table/table-scope.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L109)
 
 ___
 
@@ -1235,7 +1286,7 @@ and selected rows …). Use [TableApi.getState](TableApi.md#getstate) / [TableAp
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L108)
+[src/lib/table/table-scope.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L120)
 
 ___
 
@@ -1253,7 +1304,7 @@ since 1.1.92 – no longer used, see [TableStateService](TableStateService.md).
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L92)
+[src/lib/table/render-scope.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L95)
 
 ___
 
@@ -1267,7 +1318,7 @@ since 1.1.92 – always `undefined`; the state is kept by [stateService](TableSc
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L102)
+[src/lib/table/table-scope.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L114)
 
 ___
 
@@ -1281,7 +1332,7 @@ since 1.1.92 – always `undefined`; the state is kept by [stateService](TableSc
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L100)
+[src/lib/table/table-scope.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L112)
 
 ___
 
@@ -1295,7 +1346,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L90)
+[src/lib/table/render-scope.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L93)
 
 ___
 
@@ -1357,19 +1408,19 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L108)
+[src/lib/table/render-scope.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L111)
 
 ___
 
 ### actionsBlockedWhileLoading
 
-▪ `Static` **actionsBlockedWhileLoading**: (``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"``)[]
+▪ `Static` **actionsBlockedWhileLoading**: (``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"``)[]
 
 Keyboard actions ignored while a blocking loading overlay is shown ([OverlayOptionsIf.blockInteractionWhileLoading](../interfaces/OverlayOptionsIf.md#blockinteractionwhileloading)).
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L121)
+[src/lib/table/table-scope.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L133)
 
 ___
 
@@ -1381,7 +1432,7 @@ Delay of the "42 rows" announcement after a filter change (typing in a filter fi
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L123)
+[src/lib/table/table-scope.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L135)
 
 ___
 
@@ -1424,7 +1475,7 @@ and GPU rasterization loses precision long before (1px borders disappear and tex
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1729](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1729)
+[src/lib/table/render-scope.ts:1835](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1835)
 
 ___
 
@@ -1445,7 +1496,7 @@ to the table's appearance and behavior after a scroll event occurs.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1322](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1322)
+[src/lib/table/table-scope.ts:1679](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1679)
 
 ___
 
@@ -1473,7 +1524,7 @@ This method is used internally and should not be called directly.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:896](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L896)
+[src/lib/table/render-scope.ts:1002](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1002)
 
 ___
 
@@ -1491,7 +1542,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:841](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L841)
+[src/lib/table/render-scope.ts:947](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L947)
 
 ___
 
@@ -1517,7 +1568,7 @@ Adjusts the columns to fit the width of the row's parent element.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1499](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1499)
+[src/lib/table/render-scope.ts:1605](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1605)
 
 ___
 
@@ -1565,7 +1616,7 @@ Adjusts the dragging column during a mouse move event.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2091](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2091)
+[src/lib/table/render-scope.ts:2208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2208)
 
 ___
 
@@ -1591,7 +1642,7 @@ Adjusts the position and size of the hover column based on the mouse move event.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1981](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1981)
+[src/lib/table/render-scope.ts:2098](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2098)
 
 ___
 
@@ -1617,7 +1668,7 @@ Adjusts the position and size of the hover row based on the mouse move event.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1939](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1939)
+[src/lib/table/render-scope.ts:2056](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2056)
 
 ___
 
@@ -1644,7 +1695,7 @@ true if the width changed (the containers must be adjusted)
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1672](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1672)
+[src/lib/table/render-scope.ts:1778](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1778)
 
 ___
 
@@ -1669,7 +1720,7 @@ table state as changed here (stored and reported debounced, see [TableStateServi
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1125)
+[src/lib/table/table-scope.ts:1481](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1481)
 
 ___
 
@@ -1691,7 +1742,7 @@ The caller repaints.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:315](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L315)
+[src/lib/table/table-scope.ts:333](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L333)
 
 ___
 
@@ -1718,7 +1769,7 @@ Speaks a message to screen reader users (polite live region, see [LiveAnnouncer]
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L327)
+[src/lib/table/table-scope.ts:345](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L345)
 
 ___
 
@@ -1740,7 +1791,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:399](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L399)
+[src/lib/table/table-scope.ts:417](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L417)
 
 ___
 
@@ -1772,7 +1823,40 @@ rowspan and colspan of the cell (≥ 1)
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1166)
+[src/lib/table/render-scope.ts:1272](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1272)
+
+___
+
+### applyCellChanges
+
+▸ **applyCellChanges**(`changes`, `source?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+The one place that changes body cells (editor, fill handle, batch commit, [TableApi.applyCellChanges](TableApi.md#applycellchanges)):
+skips cells that are not editable (`editable`, calculated columns without `valueSetter`, group/pivot rows),
+applies `editInputPipe` and [ColumnDefIf.validate](../interfaces/ColumnDefIf.md#validate), then writes – or, in a batch edit, marks the values as
+pending. Writing reports **one** `onModelChanged` with all cells; derived values (totals, calculated columns) are
+recomputed and the table repaints.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `changes` | [`CellValueChangeIf`](../interfaces/CellValueChangeIf.md)[] | `undefined` | cells and values (column as index or property) |
+| `source?` | [`CellChangeSource`](../modules.md#cellchangesource) | `'api'` | reported in the event |
+
+#### Returns
+
+[`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+the written (or, in a batch edit, newly pending) cells
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:713](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L713)
 
 ___
 
@@ -1799,7 +1883,7 @@ Applies CSS classes to an HTML element.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1887](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1887)
+[src/lib/table/render-scope.ts:2004](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2004)
 
 ___
 
@@ -1829,7 +1913,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1133)
+[src/lib/table/render-scope.ts:1239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1239)
 
 ___
 
@@ -1856,7 +1940,7 @@ state. Does not repaint.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1704](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1704)
+[src/lib/table/table-scope.ts:2061](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2061)
 
 ___
 
@@ -1876,7 +1960,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1662](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1662)
+[src/lib/table/table-scope.ts:2019](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2019)
 
 ___
 
@@ -1899,7 +1983,7 @@ one width in px per column (at least 50 px)
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1556](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1556)
+[src/lib/table/table-scope.ts:1913](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1913)
 
 ___
 
@@ -1921,7 +2005,7 @@ Closes the cell editor without changing the model (Escape in the editor).
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:638](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L638)
+[src/lib/table/table-scope.ts:656](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L656)
 
 ___
 
@@ -1939,7 +2023,7 @@ true if a repaint was pending
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1100)
+[src/lib/table/table-scope.ts:1456](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1456)
 
 ___
 
@@ -1963,7 +2047,7 @@ since 1.1.92 – the table does this after every render pass.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:540](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L540)
+[src/lib/table/render-scope.ts:646](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L646)
 
 ___
 
@@ -1989,7 +2073,7 @@ Clears the selection in the component.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:258](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L258)
+[src/lib/table/render-scope.ts:364](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L364)
 
 ___
 
@@ -2011,7 +2095,7 @@ Triggers the context menu event based on the mouse move event.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:934](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L934)
+[src/lib/table/table-scope.ts:1290](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1290)
 
 ___
 
@@ -2035,7 +2119,7 @@ Creates a GeMouseEvent object based on a MouseEvent.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:775](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L775)
+[src/lib/table/table-scope.ts:1131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1131)
 
 ___
 
@@ -2060,7 +2144,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2073](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2073)
+[src/lib/table/render-scope.ts:2190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2190)
 
 ___
 
@@ -2074,7 +2158,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1091](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1091)
+[src/lib/table/table-scope.ts:1447](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1447)
 
 ___
 
@@ -2106,7 +2190,7 @@ new TableScope(hostDiv, newTableModel, new SimpleDomService(), new TableOptions(
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:734](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L734)
+[src/lib/table/table-scope.ts:1088](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1088)
 
 ___
 
@@ -2127,7 +2211,7 @@ Cancels a pending debounced rendering and calls all renderer cleanup functions
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2058](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2058)
+[src/lib/table/render-scope.ts:2175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2175)
 
 ___
 
@@ -2158,7 +2242,7 @@ Draws big cells (rowspan and or colspan) in body/center
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1376](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1376)
+[src/lib/table/render-scope.ts:1482](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1482)
 
 ___
 
@@ -2192,7 +2276,7 @@ tableScope.ensureColumnIsVisible(12);
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1791](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1791)
+[src/lib/table/table-scope.ts:2148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2148)
 
 ___
 
@@ -2239,7 +2323,7 @@ Implicitly may throw if rowIndex is not a number or if required properties are u
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1761](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1761)
+[src/lib/table/table-scope.ts:2118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2118)
 
 ___
 
@@ -2261,7 +2345,41 @@ Updates the table (repaint) when an external filter is changed.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1169)
+[src/lib/table/table-scope.ts:1526](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1526)
+
+___
+
+### fillRange
+
+▸ **fillRange**(`source`, `direction`, `count`, `mode?`, `selectAfter?`): `number`
+
+Fills cells next to a range (fill handle, Ctrl/⌘+D, [TableApi.fillRange](TableApi.md#fillrange)): computes the values
+([computeFillChanges](../modules.md#computefillchanges), shown values – a batch edit's pending values count), writes them with
+[applyCellChanges](TableScope.md#applycellchanges) and selects source and filled cells.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `source` | [`CellRange`](CellRange.md) | `undefined` | the source range (body display indices) |
+| `direction` | [`FillDirection`](../modules.md#filldirection) | `undefined` | down, up, right or left |
+| `count` | `number` | `undefined` | rows or columns to fill (clamped to the table) |
+| `mode?` | [`FillMode`](../modules.md#fillmode) | `'auto'` | series or copy |
+| `selectAfter?` | [`CellRange`](CellRange.md) | `undefined` | the selection afterwards (default: source and filled cells) |
+
+#### Returns
+
+`number`
+
+the number of filled (or, in a batch edit, marked) cells; `-1` if refused (too many cells)
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:897](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L897)
 
 ___
 
@@ -2291,7 +2409,7 @@ Finds the row index of an important rowspan cell in a given area model.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1478](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1478)
+[src/lib/table/render-scope.ts:1584](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1584)
 
 ___
 
@@ -2317,7 +2435,7 @@ TableScope
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:693](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L693)
+[src/lib/table/table-scope.ts:1047](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1047)
 
 ___
 
@@ -2335,7 +2453,7 @@ The focus model if it exists, or undefined otherwise.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1443)
+[src/lib/table/table-scope.ts:1800](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1800)
 
 ___
 
@@ -2353,7 +2471,7 @@ The TableApi object.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:680](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L680)
+[src/lib/table/table-scope.ts:1034](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1034)
 
 ___
 
@@ -2386,7 +2504,7 @@ Retrieves the specified area from the grid layout.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:761](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L761)
+[src/lib/table/render-scope.ts:867](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L867)
 
 ___
 
@@ -2410,7 +2528,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:741](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L741)
+[src/lib/table/render-scope.ts:847](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L847)
 
 ___
 
@@ -2463,7 +2581,7 @@ the counts
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1125)
+[src/lib/table/render-scope.ts:1231](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1231)
 
 ___
 
@@ -2491,7 +2609,87 @@ the width in px (0 if the host has no width yet, e.g. while it is hidden)
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:368](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L368)
+[src/lib/table/render-scope.ts:474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L474)
+
+___
+
+### getBodyCellAtHostPoint
+
+▸ **getBodyCellAtHostPoint**(`x`, `y`): [`number`, `number`]
+
+The body cell at a point in host coordinates, clamped to the body (a point above the body = row 0, right of the
+columns = the last column …) – computed, not read from the DOM.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `x` | `number` | x relative to the host's padding box |
+| `y` | `number` | y relative to the host's padding box |
+
+#### Returns
+
+[`number`, `number`]
+
+row and column index, `[-1, -1]` without rows or columns
+
+**`Since`**
+
+1.1.96
+
+#### Inherited from
+
+[RenderScope](RenderScope.md).[getBodyCellAtHostPoint](RenderScope.md#getbodycellathostpoint)
+
+#### Defined in
+
+[src/lib/table/render-scope.ts:283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L283)
+
+___
+
+### getBodyCellRectInHost
+
+▸ **getBodyCellRectInHost**(`rowIndex`, `columnIndex`): `Object`
+
+The rectangle of a body cell in host coordinates (relative to the padding box of the host) – computed from the
+row and column positions, also for cells that are not rendered – and the visible part of its area (`clip…`: the
+body between header and footer, horizontally the fixed west/east area or the scrollable center).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display index |
+| `columnIndex` | `number` | model index |
+
+#### Returns
+
+`Object`
+
+the geometry
+
+| Name | Type |
+| :------ | :------ |
+| `clipBottom` | `number` |
+| `clipLeft` | `number` |
+| `clipRight` | `number` |
+| `clipTop` | `number` |
+| `height` | `number` |
+| `left` | `number` |
+| `top` | `number` |
+| `width` | `number` |
+
+**`Since`**
+
+1.1.96
+
+#### Inherited from
+
+[RenderScope](RenderScope.md).[getBodyCellRectInHost](RenderScope.md#getbodycellrectinhost)
+
+#### Defined in
+
+[src/lib/table/render-scope.ts:241](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L241)
 
 ___
 
@@ -2526,7 +2724,7 @@ the geometry
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:204](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L204)
+[src/lib/table/render-scope.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L219)
 
 ___
 
@@ -2553,7 +2751,7 @@ Name of a row checkbox: "Select row 5" (body) resp. "Select all rows" (header).
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1305](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1305)
+[src/lib/table/render-scope.ts:1411](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1411)
 
 ___
 
@@ -2586,7 +2784,7 @@ e.g. "Total"
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1287](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1287)
+[src/lib/table/render-scope.ts:1393](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1393)
 
 ___
 
@@ -2615,7 +2813,7 @@ the left position in px
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2006](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2006)
+[src/lib/table/render-scope.ts:2123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2123)
 
 ___
 
@@ -2644,7 +2842,7 @@ An array containing the widths of the columns within the specified range.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1908](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1908)
+[src/lib/table/render-scope.ts:2025](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2025)
 
 ___
 
@@ -2665,7 +2863,7 @@ Content pixels of the center columns scrolled out on the left – the offset tha
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2026](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2026)
+[src/lib/table/render-scope.ts:2143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2143)
 
 ___
 
@@ -2685,7 +2883,7 @@ Scrollable range of the content in content pixels (content height minus visible 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:806](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L806)
+[src/lib/table/render-scope.ts:912](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L912)
 
 ___
 
@@ -2703,7 +2901,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:723](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L723)
+[src/lib/table/render-scope.ts:829](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L829)
 
 ___
 
@@ -2729,7 +2927,29 @@ the service
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:193](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L193)
+[src/lib/table/render-scope.ts:208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L208)
+
+___
+
+### getEditTexts
+
+▸ **getEditTexts**(): `Required`\<`Pick`\<[`AriaTextsIf`](../interfaces/AriaTextsIf.md), ``"cellsFilled"`` \| ``"fillTooLarge"`` \| ``"pendingChanges"`` \| ``"changesCommitted"`` \| ``"changesDiscarded"`` \| ``"commitBlocked"`` \| ``"invalidValue"``\>\>
+
+The texts of fill and batch edit with defaults (an own [AriaTextsIf](../interfaces/AriaTextsIf.md) implementation may lack them).
+
+#### Returns
+
+`Required`\<`Pick`\<[`AriaTextsIf`](../interfaces/AriaTextsIf.md), ``"cellsFilled"`` \| ``"fillTooLarge"`` \| ``"pendingChanges"`` \| ``"changesCommitted"`` \| ``"changesDiscarded"`` \| ``"commitBlocked"`` \| ``"invalidValue"``\>\>
+
+the texts
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:1014](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1014)
 
 ___
 
@@ -2751,7 +2971,45 @@ the listener
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:304](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L304)
+[src/lib/table/table-scope.ts:322](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L322)
+
+___
+
+### getFillHandleOptions
+
+▸ **getFillHandleOptions**(): `undefined` \| [`FillHandleOptionsIf`](../interfaces/FillHandleOptionsIf.md)
+
+The options of the fill handle, `undefined` if it is off ([TableOptionsIf.fillHandle](../interfaces/TableOptionsIf.md#fillhandle)).
+
+#### Returns
+
+`undefined` \| [`FillHandleOptionsIf`](../interfaces/FillHandleOptionsIf.md)
+
+complete options
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:880](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L880)
+
+___
+
+### getFillSourceRange
+
+▸ **getFillSourceRange**(): `undefined` \| [`CellRange`](CellRange.md)
+
+The last selected range, clamped to the body (`undefined` without one).
+
+#### Returns
+
+`undefined` \| [`CellRange`](CellRange.md)
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:942](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L942)
 
 ___
 
@@ -2778,7 +3036,7 @@ The checkbox of `showCheckboxWihoutExtraColumn` and the tree arrow are bound to 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1645](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1645)
+[src/lib/table/render-scope.ts:1751](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1751)
 
 ___
 
@@ -2796,7 +3054,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:715](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L715)
+[src/lib/table/render-scope.ts:821](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L821)
 
 ___
 
@@ -2814,7 +3072,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:707](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L707)
+[src/lib/table/render-scope.ts:813](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L813)
 
 ___
 
@@ -2836,7 +3094,7 @@ header row and column index of the cell, `undefined` if the focus is in the body
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L443)
+[src/lib/table/table-scope.ts:461](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L461)
 
 ___
 
@@ -2854,7 +3112,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:719](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L719)
+[src/lib/table/render-scope.ts:825](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L825)
 
 ___
 
@@ -2872,7 +3130,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:711](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L711)
+[src/lib/table/render-scope.ts:817](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L817)
 
 ___
 
@@ -2898,7 +3156,7 @@ the target element
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:803](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L803)
+[src/lib/table/table-scope.ts:1159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1159)
 
 ___
 
@@ -2927,7 +3185,7 @@ Returns a number value extracted from the specified attribute of the source elem
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:862](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L862)
+[src/lib/table/render-scope.ts:968](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L968)
 
 ___
 
@@ -2947,7 +3205,7 @@ The overlay shown now (see [TableApi.getOverlayState](TableApi.md#getoverlaystat
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:367](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L367)
+[src/lib/table/table-scope.ts:385](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L385)
 
 ___
 
@@ -2977,7 +3235,7 @@ Retrieves the heights of rows within a specified range.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1924](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1924)
+[src/lib/table/render-scope.ts:2041](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2041)
 
 ___
 
@@ -3003,7 +3261,7 @@ scrollLeft in scroll bar pixels
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1297](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1297)
+[src/lib/table/table-scope.ts:1654](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1654)
 
 ___
 
@@ -3023,7 +3281,7 @@ Scrollable range of the scroll viewport in scroll bar pixels.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:811](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L811)
+[src/lib/table/render-scope.ts:917](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L917)
 
 ___
 
@@ -3049,7 +3307,7 @@ the factor for `scrollTop` changes
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:222](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L222)
+[src/lib/table/render-scope.ts:328](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L328)
 
 ___
 
@@ -3078,7 +3336,7 @@ The value of the specified attribute, or an empty string if the attribute is not
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:879](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L879)
+[src/lib/table/render-scope.ts:985](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L985)
 
 ___
 
@@ -3101,7 +3359,7 @@ The column index of the tree arrow column: the first data column (0, behind a ro
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1626](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1626)
+[src/lib/table/render-scope.ts:1732](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1732)
 
 ___
 
@@ -3122,7 +3380,7 @@ state as changed.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1393](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1393)
+[src/lib/table/table-scope.ts:1750](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1750)
 
 ___
 
@@ -3143,7 +3401,7 @@ This method is protected and can only be accessed within the class.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2219)
+[src/lib/table/render-scope.ts:2336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2336)
 
 ___
 
@@ -3170,7 +3428,7 @@ ClassName
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2040](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2040)
+[src/lib/table/render-scope.ts:2157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2157)
 
 ___
 
@@ -3200,7 +3458,7 @@ ClassName
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1970](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1970)
+[src/lib/table/render-scope.ts:2087](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2087)
 
 ___
 
@@ -3220,7 +3478,7 @@ Ends an overlay shown by the API (see [TableApi.hideOverlay](TableApi.md#hideove
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:358](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L358)
+[src/lib/table/table-scope.ts:376](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L376)
 
 ___
 
@@ -3243,7 +3501,7 @@ up to three: `clear()`, adding the new range and the selection service itself).
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1147)
+[src/lib/table/table-scope.ts:1504](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1504)
 
 ___
 
@@ -3295,7 +3553,7 @@ Initializes and renders the editor for a specified row and column index.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:274](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L274)
+[src/lib/table/render-scope.ts:380](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L380)
 
 ___
 
@@ -3327,7 +3585,7 @@ the public `tableApi.repaint()` / `repaintHard()`), not on scrolling.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:318](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L318)
+[src/lib/table/render-scope.ts:424](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L424)
 
 ___
 
@@ -3353,7 +3611,7 @@ false for a row number column: it has no resize handle (its width follows the nu
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1650](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1650)
+[src/lib/table/render-scope.ts:1756](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1756)
 
 ___
 
@@ -3369,7 +3627,7 @@ Returns `true` once [destroy](TableScope.md#destroy) has been called.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:765](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L765)
+[src/lib/table/table-scope.ts:1121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1121)
 
 ___
 
@@ -3387,7 +3645,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:231](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L231)
+[src/lib/table/render-scope.ts:337](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L337)
 
 ___
 
@@ -3408,7 +3666,7 @@ scaled and scrollTop is no longer a content pixel position.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:801](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L801)
+[src/lib/table/render-scope.ts:907](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L907)
 
 ___
 
@@ -3438,7 +3696,7 @@ the width and whether it is approximate
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:1707](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1707)
+[src/lib/table/render-scope.ts:1813](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L1813)
 
 ___
 
@@ -3460,7 +3718,7 @@ Handles the end of mouse dragging event on a frame.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:893](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L893)
+[src/lib/table/table-scope.ts:1249](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1249)
 
 ___
 
@@ -3483,7 +3741,7 @@ Handles mouse dragging on the frame.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:850](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L850)
+[src/lib/table/table-scope.ts:1206](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1206)
 
 ___
 
@@ -3505,7 +3763,7 @@ Handles the mouse move event.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:921](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L921)
+[src/lib/table/table-scope.ts:1277](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1277)
 
 ___
 
@@ -3521,7 +3779,7 @@ This function can be invoked manually via the table API or by keyboard shortcuts
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` | The identifier of the action to be triggered. |
+| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"`` | The identifier of the action to be triggered. |
 
 #### Returns
 
@@ -3535,7 +3793,7 @@ This function can be invoked manually via the table API or by keyboard shortcuts
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:233](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L233)
+[src/lib/table/table-scope.ts:247](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L247)
 
 ___
 
@@ -3559,7 +3817,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1113)
+[src/lib/table/table-scope.ts:1469](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1469)
 
 ___
 
@@ -3583,7 +3841,7 @@ Handle the double click event on the table header.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1198](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1198)
+[src/lib/table/table-scope.ts:1555](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1555)
 
 ___
 
@@ -3606,7 +3864,7 @@ Handle mouse click events.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1070](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1070)
+[src/lib/table/table-scope.ts:1426](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1426)
 
 ___
 
@@ -3628,7 +3886,7 @@ Handles the mouse down event.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:828](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L828)
+[src/lib/table/table-scope.ts:1184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1184)
 
 ___
 
@@ -3656,7 +3914,7 @@ announcement ([AriaTextsIf.filtered](../interfaces/AriaTextsIf.md#filtered)) alr
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:376](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L376)
+[src/lib/table/table-scope.ts:394](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L394)
 
 ___
 
@@ -3680,7 +3938,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1129)
+[src/lib/table/table-scope.ts:1486](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1486)
 
 ___
 
@@ -3707,7 +3965,7 @@ by the usual amount of pixels (otherwise it would jump many rows). No-op for nor
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:821](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L821)
+[src/lib/table/render-scope.ts:927](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L927)
 
 ___
 
@@ -3727,7 +3985,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1109)
+[src/lib/table/table-scope.ts:1465](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1465)
 
 ___
 
@@ -3741,7 +3999,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1680](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1680)
+[src/lib/table/table-scope.ts:2037](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2037)
 
 ___
 
@@ -3758,7 +4016,7 @@ the last `sort(compareFn)` call, otherwise the columns with a `sortState` (heade
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1722](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1722)
+[src/lib/table/table-scope.ts:2079](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2079)
 
 ___
 
@@ -3784,7 +4042,7 @@ Recalculates the column widths of the table (% and weight columns depend on the 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:351](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L351)
+[src/lib/table/render-scope.ts:457](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L457)
 
 ___
 
@@ -3798,7 +4056,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1674](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1674)
+[src/lib/table/table-scope.ts:2031](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2031)
 
 ___
 
@@ -3850,7 +4108,7 @@ The y-coordinate of the rendered content.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2128)
+[src/lib/table/render-scope.ts:2245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2245)
 
 ___
 
@@ -3882,7 +4140,7 @@ The final y-position after rendering all the content.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:2148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2148)
+[src/lib/table/render-scope.ts:2265](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L2265)
 
 ___
 
@@ -3902,7 +4160,7 @@ Adjusts the content after scrolling and initiates a repaint of the component.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:306](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L306)
+[src/lib/table/render-scope.ts:412](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L412)
 
 ___
 
@@ -3926,7 +4184,7 @@ This method does not return any value.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:332](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L332)
+[src/lib/table/render-scope.ts:438](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L438)
 
 ___
 
@@ -3947,7 +4205,7 @@ the body again (they depend on the changed cells, e.g. `total = price * quantity
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:596](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L596)
+[src/lib/table/render-scope.ts:702](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L702)
 
 ___
 
@@ -3973,7 +4231,7 @@ Rerenders the content of a table cell based on the given parameters.
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:666](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L666)
+[src/lib/table/render-scope.ts:772](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L772)
 
 ___
 
@@ -4000,7 +4258,7 @@ footer implements [AreaModelIf.invalidateDerivedValues](../interfaces/AreaModelI
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:642](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L642)
+[src/lib/table/render-scope.ts:748](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L748)
 
 ___
 
@@ -4021,7 +4279,7 @@ again (they follow the changed rows; labels and counts don't change – a moved 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:621](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L621)
+[src/lib/table/render-scope.ts:727](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L727)
 
 ___
 
@@ -4049,7 +4307,7 @@ ClassName
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:244](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L244)
+[src/lib/table/render-scope.ts:350](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L350)
 
 ___
 
@@ -4129,7 +4387,7 @@ A fixed west column scrolls back to the start (x = 0, like before columns were s
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1283)
+[src/lib/table/table-scope.ts:1640](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1640)
 
 ___
 
@@ -4152,7 +4410,7 @@ Scrolls the viewport to the specified pixel coordinates.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1255)
+[src/lib/table/table-scope.ts:1612](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1612)
 
 ___
 
@@ -4170,7 +4428,7 @@ The selection model if available, otherwise undefined.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1431](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1431)
+[src/lib/table/table-scope.ts:1788](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1788)
 
 ___
 
@@ -4195,7 +4453,7 @@ false if the column has no column definition (or the table model can't hide colu
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1621](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1621)
+[src/lib/table/table-scope.ts:1978](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1978)
 
 ___
 
@@ -4216,7 +4474,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1609](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1609)
+[src/lib/table/table-scope.ts:1966](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1966)
 
 ___
 
@@ -4236,7 +4494,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1450](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1450)
+[src/lib/table/table-scope.ts:1807](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1807)
 
 ___
 
@@ -4258,7 +4516,7 @@ Shows or hides the footer and repaints (see [TableApi.setFooterVisible](TableApi
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1644](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1644)
+[src/lib/table/table-scope.ts:2001](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2001)
 
 ___
 
@@ -4287,7 +4545,7 @@ false if the header has no such group
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1375](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1375)
+[src/lib/table/table-scope.ts:1732](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1732)
 
 ___
 
@@ -4309,7 +4567,7 @@ Shows or hides the header and repaints (see [TableApi.setHeaderVisible](TableApi
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1635](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1635)
+[src/lib/table/table-scope.ts:1992](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1992)
 
 ___
 
@@ -4345,6 +4603,32 @@ time, so that [removeHostAria](TableScope.md#removehostaria) can restore it (e.g
 
 ___
 
+### setHostKeyShortcuts
+
+▸ **setHostKeyShortcuts**(`value`): `void`
+
+Sets `aria-keyshortcuts` of the host (the fill handle's keyboard alternative); removed again by [destroy](TableScope.md#destroy).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `undefined` \| `string` | e.g. `"Control+D Control+R"`; `undefined` restores the value before |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:1000](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1000)
+
+___
+
 ### setPivotConfig
 
 ▸ **setPivotConfig**(`changes`, `rows?`): `boolean`
@@ -4371,7 +4655,7 @@ false if the table model is no pivot table
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1018](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1018)
+[src/lib/table/table-scope.ts:1374](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1374)
 
 ___
 
@@ -4395,7 +4679,7 @@ false if the body is no row grouping
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:994](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L994)
+[src/lib/table/table-scope.ts:1350](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1350)
 
 ___
 
@@ -4420,7 +4704,7 @@ Sets the selection model for the table.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1345](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1345)
+[src/lib/table/table-scope.ts:1702](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1702)
 
 ___
 
@@ -4445,7 +4729,7 @@ false if the body is no tree or the state was already set
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:976](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L976)
+[src/lib/table/table-scope.ts:1332](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1332)
 
 ___
 
@@ -4471,7 +4755,7 @@ Shows the loading overlay over the body (see [TableApi.showLoadingOverlay](Table
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:339](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L339)
+[src/lib/table/table-scope.ts:357](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L357)
 
 ___
 
@@ -4497,7 +4781,7 @@ Shows the "no rows" overlay (see [TableApi.showNoRowsOverlay](TableApi.md#showno
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L349)
+[src/lib/table/table-scope.ts:367](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L367)
 
 ___
 
@@ -4526,7 +4810,7 @@ offset snapped to the device pixel grid
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:792](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L792)
+[src/lib/table/render-scope.ts:898](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L898)
 
 ___
 
@@ -4546,7 +4830,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1688](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1688)
+[src/lib/table/table-scope.ts:2045](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L2045)
 
 ___
 
@@ -4573,7 +4857,7 @@ false if the column does not exist
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1216)
+[src/lib/table/table-scope.ts:1573](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1573)
 
 ___
 
@@ -4599,7 +4883,7 @@ Reports a changed state to the event listener (called by [TableStateService](Tab
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1121)
+[src/lib/table/table-scope.ts:1477](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1477)
 
 ___
 
@@ -4623,7 +4907,7 @@ storeColumnWidths
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:734](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L734)
+[src/lib/table/render-scope.ts:840](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L840)
 
 ___
 
@@ -4645,7 +4929,7 @@ Toggles the expand or collapse state of all items in the body area model.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:955](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L955)
+[src/lib/table/table-scope.ts:1311](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1311)
 
 ___
 
@@ -4665,7 +4949,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1358](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1358)
+[src/lib/table/table-scope.ts:1715](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1715)
 
 ___
 
@@ -4691,7 +4975,7 @@ Toggles the checkbox state of a specific row in a table.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:1051](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1051)
+[src/lib/table/table-scope.ts:1407](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L1407)
 
 ___
 
@@ -4718,7 +5002,7 @@ Updates the cells in the table with the provided values and optionally repaints 
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:552](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L552)
+[src/lib/table/render-scope.ts:658](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L658)
 
 ___
 
@@ -4726,14 +5010,17 @@ ___
 
 ▸ **updateModelValueAfterEdit**(`areaIdent`, `rowIndex`, `columnIndex`, `value`): `void`
 
+Writes the text of a cell editor (called by the input handler on "change"). Batch edit: the value is marked as
+pending instead. Uses [applyCellChanges](TableScope.md#applycellchanges) – one `onModelChanged` per edit, as before.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `areaIdent` | [`AreaIdent`](../modules.md#areaident) |
-| `rowIndex` | `number` |
-| `columnIndex` | `number` |
-| `value` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `areaIdent` | [`AreaIdent`](../modules.md#areaident) | only `"body"` is edited |
+| `rowIndex` | `number` | display index |
+| `columnIndex` | `number` | model index |
+| `value` | `string` | the text of the editor |
 
 #### Returns
 
@@ -4741,7 +5028,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:650](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L650)
+[src/lib/table/table-scope.ts:677](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L677)
 
 ___
 
@@ -4766,7 +5053,39 @@ Shows the overlay that fits the body now (see [TableOverlay.update](TableOverlay
 
 #### Defined in
 
-[src/lib/table/render-scope.ts:508](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L508)
+[src/lib/table/render-scope.ts:614](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/render-scope.ts#L614)
+
+___
+
+### writeCells
+
+▸ **writeCells**(`cells`, `source`, `opts?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+Writes cell values directly (no batch edit) – used by [applyCellChanges](TableScope.md#applycellchanges) and the batch commit.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cells` | \{ `columnIndex`: `number` ; `rowIndex`: `number` ; `value`: `unknown`  }[] | resolved cells (display/model indices) |
+| `source` | [`CellChangeSource`](../modules.md#cellchangesource) | reported in the event |
+| `opts?` | `Object` | changes written elsewhere (reported in the same event), no validation (commit: already checked) |
+| `opts.extraChanges?` | [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[] | - |
+| `opts.skipValidation?` | `boolean` | - |
+
+#### Returns
+
+[`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+the written cells (including `extraChanges`)
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/table-scope.ts:736](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L736)
 
 ___
 
@@ -4795,4 +5114,4 @@ Creates a TableScope instance.
 
 #### Defined in
 
-[src/lib/table/table-scope.ts:221](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L221)
+[src/lib/table/table-scope.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-scope.ts#L235)

@@ -130,4 +130,66 @@ export interface AriaTextsIf {
    * @since 1.1.95
    */
   rowDragCancelled?(): string;
+
+  /**
+   * Announced after a fill (fill handle, Ctrl/⌘+D, Ctrl/⌘+R) – optional, {@link AriaTexts} has a default.
+   *
+   * @param {number} cellCount - the number of filled cells
+   * @returns {string} default: `"3 cells filled"`
+   * @since 1.1.96
+   */
+  cellsFilled?(cellCount: number): string;
+
+  /**
+   * Announced when a fill is refused because it covers too many cells ({@link FillHandleOptionsIf.maxCells}).
+   *
+   * @param {number} maxCells - the limit
+   * @returns {string} default: `"Too many cells to fill (at most 100000)"`
+   * @since 1.1.96
+   */
+  fillTooLarge?(maxCells: number): string;
+
+  /**
+   * Announced after a value was marked in a batch edit (or set back).
+   *
+   * @param {number} pendingCount - the number of pending cells
+   * @returns {string} default: `"3 changes not saved"`, `"No unsaved changes"`
+   * @since 1.1.96
+   */
+  pendingChanges?(pendingCount: number): string;
+
+  /**
+   * Announced after {@link TableApi.commitBatchEdit}.
+   *
+   * @param {number} cellCount - the number of written cells
+   * @returns {string} default: `"3 changes saved"`
+   * @since 1.1.96
+   */
+  changesCommitted?(cellCount: number): string;
+
+  /**
+   * Announced after {@link TableApi.cancelBatchEdit}.
+   *
+   * @returns {string} default: `"Changes discarded"`
+   * @since 1.1.96
+   */
+  changesDiscarded?(): string;
+
+  /**
+   * Announced when invalid values block {@link TableApi.commitBatchEdit}.
+   *
+   * @param {number} invalidCount - the number of invalid cells
+   * @returns {string} default: `"2 invalid values – nothing saved"`
+   * @since 1.1.96
+   */
+  commitBlocked?(invalidCount: number): string;
+
+  /**
+   * Announced when an edited value is invalid ({@link ColumnDefIf.validate}) and not written (without batch edit).
+   *
+   * @param {string} message - the message of the validator
+   * @returns {string} default: `"Invalid value: <message>"`
+   * @since 1.1.96
+   */
+  invalidValue?(message: string): string;
 }

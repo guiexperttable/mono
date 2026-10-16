@@ -1,6 +1,6 @@
 # TODO-Prompt 010: Fill-Handle und Batch-Edit
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `fill-batch` (Branch `feat/fill-batch`, Design `prompts/010-fill-handle-batch-edit.design.md`)
+> Status: **umgesetzt** (16.10.2026, selbständig, Branch `feat/fill-batch`) · angelegt 14.10.2026 · Slug `fill-batch` (Branch `feat/fill-batch`, Design `prompts/010-fill-handle-batch-edit.design.md`)
 > Abhängigkeiten: **001 (ARIA)** für Tastatur-Alternative und Ansagen; **008 Teil A** (berechnete Spalten werden
 > nicht befüllt); 005 (Footer aktualisiert sich nach dem Füllen). Keine harte Abhängigkeit.
 > ag-Grid: Fill Handle (Teil der Bereichsauswahl) und Batch Editing (v34) sind dort **Enterprise**.
@@ -115,6 +115,6 @@ Reihen-Erkennung bei Randfällen.
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Reihen-Regeln, Batch-API, Änderungssatz-Format, Event-Strategie 🛑
-- [ ] H1–H9 und B1–B8 umgesetzt und getestet
-- [ ] Undo/Redo und Einfügen aus der Zwischenablage als Folgeaufgaben in `TODO.md`
+- [x] Design-Dokument mit Reihen-Regeln, Batch-API, Änderungssatz-Format, Event-Strategie 🛑
+- [x] H1–H9 und B1–B8 umgesetzt und getestet
+- [x] Undo/Redo und Einfügen aus der Zwischenablage als Folgeaufgaben in `TODO.md`

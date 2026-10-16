@@ -382,7 +382,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L110)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L115)
 
 ___
 
@@ -701,7 +701,7 @@ The constant row height or `undefined`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:105](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L105)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L110)
 
 ___
 
@@ -960,7 +960,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L91)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L96)
 
 ___
 
@@ -1063,7 +1063,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L95)
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L100)
 
 ___
 

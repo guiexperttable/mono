@@ -54,6 +54,7 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 - [sortState](ColumnDefIf.md#sortstate)
 - [sortStatesOrder](ColumnDefIf.md#sortstatesorder)
 - [sortable](ColumnDefIf.md#sortable)
+- [validate](ColumnDefIf.md#validate)
 - [valueGetter](ColumnDefIf.md#valuegetter)
 - [valueSetter](ColumnDefIf.md#valuesetter)
 - [width](ColumnDefIf.md#width)
@@ -342,6 +343,33 @@ The column can be sorted by a double-click on its header (e.g. `TrueFn`).
 #### Defined in
 
 [src/lib/table/data/tablemodel/column/column-def.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L82)
+
+___
+
+### validate
+
+• `Optional` **validate**: [`CellValidator`](../modules.md#cellvalidator)\<`any`\>
+
+Checks an edited, filled or pasted value (after `editInputPipe`): return a message for an invalid value,
+`undefined` for a valid one. Batch edit: invalid values are marked (`ge-table-cell-invalid`, the message as
+tooltip) and block [TableApi.commitBatchEdit](../classes/TableApi.md#commitbatchedit); otherwise an invalid value is not written.
+
+**`Example`**
+
+```ts
+ColumnDef.create({
+  property: "price", headerLabel: "Price", editable: TrueFn, editInputPipe: editInputPipeForNumber,
+  validate: (value: unknown) => typeof value === "number" && value >= 0 ? undefined : "A price is a number ≥ 0",
+})
+```
+
+**`Since`**
+
+1.1.96
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L192)
 
 ___
 

@@ -334,9 +334,13 @@ export const CHAPTERS: Chapter[] = [
     slug: "inline-editing", no: 31, part: "interaction", episode: 31, minutes: 6,
     title: "Inline editing", nav: "Inline editing",
     lead: "Change quantity and status right in the table – and recalculate what depends on them.",
-    learn: ["make a column editable", "convert input with editInputPipe", "use a select editor", "react to changes"],
+    learn: ["make a column editable", "convert input with editInputPipe", "use a select editor", "react to changes",
+      "fill cells with the fill handle and collect changes until saving (since 1.1.96)"],
     api: ["ColumnDefIf.editable", "ColumnDefIf.editInputPipe", "ColumnDefIf.getEditRenderer", "SelectCellRenderer",
-      "ValueLabel", "EventListenerIf.onModelChanged", "GeModelChangeEvent", "TableApi.repaint"],
+      "ValueLabel", "EventListenerIf.onModelChanged", "GeModelChangeEvent", "TableApi.repaint",
+      "TableOptionsIf.fillHandle", "TableOptionsIf.batchEdit", "ColumnDefIf.validate", "TableApi.commitBatchEdit",
+      "TableApi.getPendingChanges"],
+    showcases: [{ name: "batchedit", title: "Fill handle & batch edit" }],
     since: "1.1.89"
   },
   {

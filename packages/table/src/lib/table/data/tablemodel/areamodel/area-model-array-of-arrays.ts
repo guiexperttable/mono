@@ -84,7 +84,12 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
     if (editInputPipe) {
       value = editInputPipe(value, rowIndex, columnIndex);
     }
-    this.arr[rowIndex][columnIndex] = value;
+    // display index → the shown row (before 1.1.96: `arr[rowIndex]` – with a filter the wrong row)
+    const row = this.filteredArr[rowIndex];
+    if (!row) {
+      return false;
+    }
+    row[columnIndex] = value;
     return true;
   }
 

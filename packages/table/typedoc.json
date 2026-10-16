@@ -19,7 +19,7 @@
   "categoryOrder": [
     "Table & API", "Table model", "Area models", "Columns", "Options", "Header groups", "Tree & checkboxes",
     "Renderers & editing", "Events", "Selection & focus", "Sorting & filtering", "Export & clipboard", "Styling",
-    "Keyboard", "Accessibility", "Overlays", "State", "Row numbers", "Aggregation", "Row grouping", "Pivot", "Calculated columns & formulas", "Row drag", "DOM", "CRUD", "Utilities", "Internals", "*"
+    "Keyboard", "Accessibility", "Overlays", "State", "Row numbers", "Aggregation", "Row grouping", "Pivot", "Calculated columns & formulas", "Row drag", "Fill handle & batch edit", "DOM", "CRUD", "Utilities", "Internals", "*"
   ],
   "navigation": { "includeCategories": true, "includeGroups": false },
   "excludePrivate": true,

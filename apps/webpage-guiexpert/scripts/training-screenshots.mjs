@@ -49,6 +49,7 @@ const DEMOS = {
   "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
   "row-grouping": { slug: "row-grouping", search: "laptop" },
   "row-drag": { slug: "events-and-context-menu", button: "move down" },
+  "fill-batch": { slug: "inline-editing", fillDown: 4 },
   "pivot-tables": { slug: "pivot-tables", button: "expand all" },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
@@ -94,6 +95,17 @@ for (const theme of ["light", "dark"]) {
         await page.mouse.move(b.x + 20, b.y + 10, { steps: 8 });
         await page.mouse.up();
         await page.waitForTimeout(200);
+      }
+    }
+    if (step.fillDown) {                                  // drag the fill handle n rows down
+      const h = await demo.locator(".ge-table-fill-handle").first().boundingBox();
+      if (h) {
+        await page.mouse.move(h.x + 3, h.y + 3);
+        await page.mouse.down();
+        await page.mouse.move(h.x + 3, h.y + 20, { steps: 4 });
+        await page.mouse.move(h.x + 3, h.y + 34 * step.fillDown, { steps: 8 });
+        await page.mouse.up();
+        await page.waitForTimeout(300);
       }
     }
     if (step.contextmenu) {

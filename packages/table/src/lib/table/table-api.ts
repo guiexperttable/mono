@@ -25,6 +25,11 @@ import { compileFormula, createFormulaValueGetter } from './formula/compile-form
 import type { FormulaOptionsIf } from './formula/formula-options.if';
 import { FormulaError } from './formula/formula-error';
 import type { RowDropTargetIf } from './row-drag/row-drop-target.if';
+import type { CellChangeIf, CellChangeSource } from './batch-edit/cell-change.if';
+import type { CellValueChangeIf } from './batch-edit/cell-value-change.if';
+import type { FillDirection } from './fill/fill-direction.type';
+import type { FillMode } from './fill/fill-series';
+import { CellRange } from './data/common/cell-range';
 
 
 /**
@@ -50,7 +55,8 @@ import type { RowDropTargetIf } from './row-drag/row-drop-target.if';
  * | sort | {@link sortByColumn}, {@link sort}, {@link reSort} |
  * | filter | {@link externalFilterChanged} (with {@link TableOptionsIf.externalFilterFunction}) |
  * | export | {@link copyToClipboard}, {@link downloadExcel} |
- * | change data | {@link updateCells}, {@link setRows}, {@link addRows}, {@link updateRows}, {@link removeRows} |
+ * | change data | {@link updateCells}, {@link setRows}, {@link addRows}, {@link updateRows}, {@link removeRows}, {@link applyCellChanges} |
+ * | fill, batch edit | {@link fillRange}, {@link startBatchEdit}, {@link getPendingChanges}, {@link commitBatchEdit}, {@link cancelBatchEdit} |
  * | redraw | {@link repaint} (same row count), {@link repaintHard} (row count or heights changed) |
  * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths}, {@link getColumnIndex} |
  * | tree | {@link expandAll}, {@link collapseAll}, {@link setRowExpanded} |
@@ -1202,6 +1208,7 @@ export class TableApi {
       // Type assertion with unknown as intermediate step for type safety
       const am = bodyModel as unknown as AreaModelObjectArray<T>;
       am.setRows(rows); 
+      this.tableScope.batchEditService?.pruneOrphans();   // pending values of replaced rows are dropped (since 1.1.96)
     } else {
       console.warn('setRows<T>(rows: T[]) only works with AreaModelObjectArray<T>, but this body area model is ', (typeof bodyModel), bodyModel)
     }
@@ -1873,6 +1880,194 @@ export class TableApi {
    */
   cancelRowDrag(): void {
     this.tableScope.rowDragService?.cancel();
+  }
+
+  // ---------------------------------------------------------------- change cells, fill, batch edit (since 1.1.96)
+
+  /**
+   * Writes values into body cells like the cell editor does – the one way the table changes cells (editor, fill
+   * handle and batch commit use it too): cells that are not editable are skipped (`editable`, calculated columns
+   * without `valueSetter`, group and pivot rows), values run through `editInputPipe` and {@link ColumnDefIf.validate}
+   * (invalid ones are not written), totals and calculated columns follow, and **one** `onModelChanged` reports all
+   * cells with old and new values. In a batch edit the values are marked as pending instead.
+   *
+   * Paste from the clipboard and undo/redo can be built on it: a {@link CellChangeIf} has the old and the new value.
+   *
+   * @param {CellValueChangeIf[]} changes - display row index, column (index or property) and value per cell
+   * @param {CellChangeSource} [source="api"] - reported in {@link GeModelChangeEvent.source}
+   * @returns {CellChangeIf[]} the written (batch edit: newly pending) cells
+   *
+   * @example
+   * tableApi.applyCellChanges([
+   *   { rowIndex: 0, column: "price", value: 9.9 },
+   *   { rowIndex: 1, column: "price", value: 12 },
+   * ]);
+   *
+   * @example
+   * // undo the last change set (from onModelChanged)
+   * const undo = (changes: CellChangeIf[]) => tableApi.applyCellChanges(
+   *   changes.map(c => ({ rowIndex: c.rowIndex, column: c.property, value: c.oldValue })));
+   *
+   * @since 1.1.96
+   */
+  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = "api"): CellChangeIf[] {
+    return this.tableScope.applyCellChanges(changes, source);
+  }
+
+  /**
+   * Fills cells next to a range – what dragging the fill handle does ({@link TableOptionsIf.fillHandle} is not
+   * needed for this call): continues series (1, 2 → 3, 4; dates; `Item 1` → `Item 2`) or copies, writes with
+   * {@link applyCellChanges} (one `onModelChanged`, source `"fill"`) and selects source and filled cells.
+   *
+   * @param {CellRange} source - the source range (body display indices)
+   * @param {FillDirection} direction - `"down"`, `"up"`, `"right"` or `"left"`
+   * @param {number} count - rows or columns to fill (clamped to the table)
+   * @param {FillMode} [mode="auto"] - `"auto"`, `"alternate"` (like ⌥/Alt while dragging) or `"copy"`
+   * @returns {number} the number of filled cells (batch edit: marked); `-1` if more than `maxCells`
+   *
+   * @example
+   * // rows 0 and 1 of column 2 hold 1 and 2: rows 2…9 get 3…10
+   * tableApi.fillRange(new CellRange(0, 2, 1, 2), "down", 8);
+   *
+   * @since 1.1.96
+   */
+  fillRange(source: CellRange, direction: FillDirection, count: number, mode: FillMode = "auto"): number {
+    return this.tableScope.fillRange(source, direction, count, mode);
+  }
+
+  /**
+   * True while the fill handle is dragged.
+   *
+   * @returns {boolean} true during a fill
+   *
+   * @example
+   * if (!tableApi.isFilling()) {
+   *   tableApi.updateCells([], true);   // e.g. live data: wait until the fill is done
+   * }
+   *
+   * @since 1.1.96
+   */
+  isFilling(): boolean {
+    return !!this.tableScope.fillHandleService?.isFilling();
+  }
+
+  /**
+   * Cancels a running fill (like Escape): nothing is changed.
+   *
+   * @example
+   * tableApi.cancelFill();
+   *
+   * @since 1.1.96
+   */
+  cancelFill(): void {
+    this.tableScope.fillHandleService?.cancel();
+  }
+
+  /**
+   * Starts a batch edit: from now on edited and filled values are **collected** – shown in the cells (class
+   * `ge-table-cell-pending`), but not written into your rows – until {@link commitBatchEdit} or
+   * {@link cancelBatchEdit}. Sorting, filtering, totals, copy and Excel use the written data. For a batch edit that is
+   * always on use {@link TableOptionsIf.batchEdit}.
+   *
+   * @returns {boolean} false if a batch edit is already running
+   *
+   * @example
+   * editButton.onclick = () => tableApi.startBatchEdit();
+   * saveButton.onclick = () => tableApi.commitBatchEdit();
+   * discardButton.onclick = () => tableApi.cancelBatchEdit();
+   *
+   * @since 1.1.96
+   */
+  startBatchEdit(): boolean {
+    const started = !!this.tableScope.batchEditService?.start();
+    if (started) {
+      this.tableScope.repaint();
+    }
+    return started;
+  }
+
+  /**
+   * True while values are collected (after {@link startBatchEdit}, or always with {@link TableOptionsIf.batchEdit}).
+   *
+   * @returns {boolean} whether a batch edit runs
+   *
+   * @example
+   * saveButton.hidden = !tableApi.isBatchEditing();
+   *
+   * @since 1.1.96
+   */
+  isBatchEditing(): boolean {
+    return !!this.tableScope.batchEditService?.isActive();
+  }
+
+  /**
+   * True if a batch edit has values that are not written yet.
+   *
+   * @returns {boolean} whether there are pending changes
+   *
+   * @example
+   * window.addEventListener("beforeunload", evt => {
+   *   if (tableApi.hasPendingChanges()) evt.preventDefault();   // "Leave site? Changes may not be saved."
+   * });
+   *
+   * @since 1.1.96
+   */
+  hasPendingChanges(): boolean {
+    this.tableScope.batchEditService?.pruneOrphans();   // rows replaced by setRows() have no pending values
+    return !!this.tableScope.batchEditService?.hasPending();
+  }
+
+  /**
+   * The values of a batch edit that are not written yet: row object, property, old and new value, the current display
+   * index (`-1` while a filter hides the row) and the message of an invalid value. The changes belong to the rows, not
+   * to their positions – sorting and filtering don't mix them up.
+   *
+   * @returns {CellChangeIf[]} the pending cells
+   *
+   * @example
+   * saveButton.onclick = async () => {
+   *   const changes = tableApi.getPendingChanges()
+   *     .map(c => ({ id: (c.row as { id: number }).id, field: c.property, value: c.newValue }));
+   *   const response = await fetch("/api/prices", { method: "PATCH", body: JSON.stringify(changes) });
+   *   if (response.ok) tableApi.commitBatchEdit();
+   * };
+   *
+   * @since 1.1.96
+   */
+  getPendingChanges(): CellChangeIf[] {
+    return this.tableScope.batchEditService?.getPendingChanges() ?? [];
+  }
+
+  /**
+   * Writes the pending values of a batch edit into the rows (through `setValue`, like the editor) and ends a batch edit
+   * started with {@link startBatchEdit}: **one** `onModelChanged` (source `"commit"`) with all cells, then
+   * `onBatchEditChanged` with the type `"commit"`. While a value is invalid ({@link ColumnDefIf.validate}) nothing is
+   * written and the result is `false` (unless {@link BatchEditOptionsIf.blockCommitOnInvalid} is `false`).
+   *
+   * @returns {boolean} true if written
+   *
+   * @example
+   * if (!tableApi.commitBatchEdit()) {
+   *   alert("Please fix the marked cells first.");
+   * }
+   *
+   * @since 1.1.96
+   */
+  commitBatchEdit(): boolean {
+    return !!this.tableScope.batchEditService?.commit();
+  }
+
+  /**
+   * Discards the pending values of a batch edit (the cells show the data again) and ends a batch edit started with
+   * {@link startBatchEdit}.
+   *
+   * @example
+   * discardButton.onclick = () => tableApi.cancelBatchEdit();
+   *
+   * @since 1.1.96
+   */
+  cancelBatchEdit(): void {
+    this.tableScope.batchEditService?.cancel();
   }
 
 

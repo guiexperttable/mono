@@ -3,6 +3,7 @@ import { EventAdapter, FocusModel, SelectionModel } from '@guiexpert/table';
 import type { EventListenerIf, GeModelChangeEvent, GeMouseEvent, GeScrollEvent } from '@guiexpert/table';
 
 const METHODS = [
+  'onBatchEditChanged',
   'onCheckboxChanged',
   'onContextmenu',
   'onFocusChanged',

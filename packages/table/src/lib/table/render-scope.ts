@@ -1,4 +1,7 @@
 import type { RowDragService } from "./row-drag/row-drag-service";
+import { findRowIndexAtY } from "./row-drag/move-rows";
+import type { BatchEditService } from "./batch-edit/batch-edit-service";
+import type { FillHandleService } from "./fill/fill-handle-service";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { EleScope } from './ele-scope';
 import { TableModelIf } from './data/tablemodel/table-model.if';
@@ -145,6 +148,18 @@ export class RenderScope extends EleScope {
    */
   rowDragService?: RowDragService;
 
+  /**
+   * Batch edit of this table (pending values, shown in the cells) – created by {@link TableScope}.
+   * @since 1.1.96
+   */
+  batchEditService?: BatchEditService;
+
+  /**
+   * Fill handle of this table – created by {@link TableScope}.
+   * @since 1.1.96
+   */
+  fillHandleService?: FillHandleService;
+
   constructor(
     hostElement: HTMLDivElement,
     tableModel: TableModelIf,
@@ -211,6 +226,97 @@ export class RenderScope extends EleScope {
       width: this.scrollViewport.clientWidth,
       contentScrollTop: this.contentScrollTop
     };
+  }
+
+  /**
+   * The rectangle of a body cell in host coordinates (relative to the padding box of the host) – computed from the
+   * row and column positions, also for cells that are not rendered – and the visible part of its area (`clip…`: the
+   * body between header and footer, horizontally the fixed west/east area or the scrollable center).
+   *
+   * @param {number} rowIndex - display index
+   * @param {number} columnIndex - model index
+   * @returns {{ left: number, top: number, width: number, height: number, clipLeft: number, clipRight: number, clipTop: number, clipBottom: number }} the geometry
+   * @since 1.1.96
+   */
+  getBodyCellRectInHost(rowIndex: number, columnIndex: number): {
+    left: number; top: number; width: number; height: number;
+    clipLeft: number; clipRight: number; clipTop: number; clipBottom: number;
+  } {
+    const tableModel = this.tableModel;
+    const body = tableModel.getBodyModel();
+    const padding = tableModel.getPadding();
+    const hostWidth = this.hostElement.clientWidth;
+    const hostHeight = this.hostElement.clientHeight;
+    const top = padding.top + body.getYPosByRowIndex(rowIndex) - this.contentScrollTop;
+    const left = this.getColumnLeftInHost(columnIndex, tableModel.getXPosByColumnIndex(columnIndex));
+    const columnCount = tableModel.getColumnCount();
+    const fixedLeft = tableModel.getFixedLeftColumnCount();
+    const fixedRight = tableModel.getFixedRightColumnCount();
+    let clipLeft = padding.left;
+    let clipRight = hostWidth - padding.right;
+    if (columnIndex < fixedLeft) {
+      clipLeft = 0;
+      clipRight = padding.left;
+    } else if (fixedRight > 0 && columnIndex >= columnCount - fixedRight) {
+      clipLeft = hostWidth - padding.right;
+      clipRight = hostWidth;
+    }
+    return {
+      left, top,
+      width: tableModel.getColumnWidth(columnIndex),
+      height: body.getRowHeight(rowIndex),
+      clipLeft, clipRight,
+      clipTop: padding.top,
+      clipBottom: hostHeight - padding.bottom
+    };
+  }
+
+  /**
+   * The body cell at a point in host coordinates, clamped to the body (a point above the body = row 0, right of the
+   * columns = the last column …) – computed, not read from the DOM.
+   *
+   * @param {number} x - x relative to the host's padding box
+   * @param {number} y - y relative to the host's padding box
+   * @returns {[number, number]} row and column index, `[-1, -1]` without rows or columns
+   * @since 1.1.96
+   */
+  getBodyCellAtHostPoint(x: number, y: number): [number, number] {
+    const tableModel = this.tableModel;
+    const body = tableModel.getBodyModel();
+    const rowCount = body.getRowCount();
+    const columnCount = tableModel.getColumnCount();
+    if (rowCount < 1 || columnCount < 1) {
+      return [-1, -1];
+    }
+    const padding = tableModel.getPadding();
+    const hostWidth = this.hostElement.clientWidth;
+    const bodyHeight = this.hostElement.clientHeight - padding.top - padding.bottom;
+    const contentY = Math.min(Math.max(y - padding.top, 0), Math.max(0, bodyHeight - 1)) + this.contentScrollTop;
+    const rowIndex = findRowIndexAtY(contentY, rowCount, i => body.getYPosByRowIndex(i), body.getConstantRowHeight?.());
+
+    const fixedLeft = tableModel.getFixedLeftColumnCount();
+    const fixedRight = tableModel.getFixedRightColumnCount();
+    let first: number;
+    let last: number;
+    let absX: number;
+    if (fixedLeft > 0 && x < padding.left) {
+      [first, last, absX] = [0, fixedLeft - 1, x];
+    } else if (fixedRight > 0 && x >= hostWidth - padding.right) {
+      const firstEast = columnCount - fixedRight;
+      [first, last, absX] = [firstEast, columnCount - 1, x - (hostWidth - padding.right) + tableModel.getXPosByColumnIndex(firstEast)];
+    } else {
+      const centerRight = hostWidth - padding.right;
+      const cx = Math.min(Math.max(x, padding.left), Math.max(padding.left, centerRight - 1));
+      [first, last, absX] = [fixedLeft, columnCount - fixedRight - 1, cx + this.getContentScrollLeft()];
+    }
+    let columnIndex = last;
+    for (let c = first; c <= last; c++) {
+      if (absX < tableModel.getXPosByColumnIndex(c) + tableModel.getColumnWidth(c)) {
+        columnIndex = c;
+        break;
+      }
+    }
+    return [rowIndex, Math.min(columnCount - 1, Math.max(first, columnIndex))];
   }
 
   /**
@@ -1780,7 +1886,11 @@ export class RenderScope extends EleScope {
       }
     }
 
-    const val = areaModel.getValueAt(rowIndex, index);
+    // batch edit: a pending value is shown instead of the model value (since 1.1.96)
+    const pending = areaIdent === 'body' && this.batchEditService?.hasPending()
+      ? this.batchEditService.getPendingAt(rowIndex, index)
+      : undefined;
+    const val = pending ? pending.newValue : areaModel.getValueAt(rowIndex, index);
     // undefined/null → empty cell (e.g. parent rows of a tree); the footer of a row number column stays empty
     const text = cellRenderer || (rowNumberColumn && areaIdent === 'footer') ? '' : `${val ?? ''}`;
     const checkedType = areaModel.isRowChecked(rowIndex);
@@ -1806,9 +1916,16 @@ export class RenderScope extends EleScope {
       });
     const [rowspan, colspan] = this.applyCellAria(cell, areaIdent, areaModel, rowIndex, index);
 
-    const tooltip = areaModel.getTooltipAt(rowIndex, index);
+    const tooltip = pending?.error || areaModel.getTooltipAt(rowIndex, index);
     if (tooltip) {
       this.dom.setAttribute(cell, 'title', tooltip);
+    }
+    if (pending) {
+      this.dom.addClass('ge-table-cell-pending', cell);
+      if (pending.error) {
+        this.dom.addClass('ge-table-cell-invalid', cell);
+        this.dom.setAttribute(cell, 'aria-invalid', 'true');
+      }
     }
 
     if (columnDef && columnDef.classes[areaIdent]) {

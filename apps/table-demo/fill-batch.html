@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+  Fill handle and batch edit (since 1.1.96) – also the recording page of video 10.
+  Start: pnpm serve:table-demo → http://localhost:4200/fill-batch.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – fill handle and batch edit</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 820px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button { font: inherit; padding: 4px 12px; }
+    .table-div { height: 460px; width: 100%; max-width: 940px; }
+    #status { font-weight: 600; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<h1>Price list – fill handle and batch edit</h1>
+<p>Select cells, drag the small square at the bottom right corner (⌥/Alt switches series ↔ copy) or press Ctrl/⌘+D.
+  Edit with F2 or a double click. Changes are marked until you save or discard them.</p>
+<div class="bar">
+  <button id="save" type="button" disabled>Save</button>
+  <button id="discard" type="button" disabled>Discard</button>
+  <span id="status">No unsaved changes</span>
+  <label><input id="batch" type="checkbox" checked> collect changes (batch edit)</label>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<pre id="log" aria-live="off"></pre>
+<script src="/src/fill-batch/fill-batch-demo.ts" type="module"></script>
+</body>
+</html>

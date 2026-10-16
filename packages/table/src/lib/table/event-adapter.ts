@@ -5,6 +5,7 @@ import { EventListenerIf } from "./event-listener.if";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
+import { GeBatchEditEvent } from "./data/common/event/ge-batch-edit-event";
 import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
 
 /**
@@ -64,6 +65,10 @@ export class EventAdapter implements EventListenerIf {
   }
 
   onRowDragEnd(_evt: GeRowDragEvent): void {
+  }
+
+  /** @since 1.1.96 */
+  onBatchEditChanged(_evt: GeBatchEditEvent): void {
   }
 
 }

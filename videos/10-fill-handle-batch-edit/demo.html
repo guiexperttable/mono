@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  Recording page for episode 10 "Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/10-fill-handle-batch-edit/demo.html
+  Runs the code of snippet.ts (plain JS) with 1,000 generated articles.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Fill-Handle und Batch-Edit</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button { font: inherit; padding: 4px 14px; }
+    .status { font-weight: 600; }
+    .log { font: 16px ui-monospace, monospace; opacity: 0.85; }
+    .table-div { height: calc(100vh - 130px); margin: 0 16px; font-size: 17px; max-width: 760px; }
+  </style>
+</head>
+<body>
+<h1>Preisliste – 1.000 Artikel</h1>
+<div class="bar">
+  <button id="speichern" disabled>Speichern</button>
+  <button id="verwerfen" disabled>Verwerfen</button>
+  <span class="status" id="status">keine Änderungen</span>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+  <span class="log" id="log"></span>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import {
+    CellRange, ColumnDef, EventAdapter, SelectionModel, SimpleDomService, TableFactory, TableOptions, TableScope, TrueFn,
+    editInputPipeForNumber, px120, px200
+  } from "@guiexpert/table";
+
+  const ARTIKEL = ["Schreibtischlampe", "Bürostuhl", "Monitorarm", "Notizblock A5", "USB-C-Kabel", "Tastatur", "Maus",
+    "Webcam", "Headset", "Kaffeebohnen", "Teeauswahl", "Trinkflasche"];
+  const preise = Array.from({ length: 1_000 }, (_, i) => ({
+    artikel: i < ARTIKEL.length ? ARTIKEL[i] : `${ARTIKEL[i % ARTIKEL.length]} ${Math.floor(i / ARTIKEL.length) + 1}`,
+    preis: i === 0 ? 10 : i === 1 ? 20 : Math.round((5 + ((i * i * 37 + i * 11) % 150)) * 100) / 100,
+    ab: "2026-11-01"
+  }));
+  const speichern = document.querySelector("#speichern");
+  const verwerfen = document.querySelector("#verwerfen");
+  const status = document.querySelector("#status");
+  const log = document.querySelector("#log");
+
+  // --- code of snippet.ts ---
+  const columnDefs = ["artikel", "preis", "ab"].map(property => ColumnDef.create({ property, headerLabel: property, editable: TrueFn }));
+  const auswahl = new SelectionModel("range", "multi");
+  const tableOptions = { ...new TableOptions(), getSelectionModel: () => auswahl,
+    fillHandle: true,
+    batchEdit: true };
+  const host = document.querySelector(".table-div");
+  const listener = new EventAdapter();       // (not in the snippet: buttons and status line follow the pending changes)
+  const api = new TableScope(host, TableFactory.createTableModel({ rows: preise, columnDefs }), new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+  speichern.onclick = async () => {
+    const n = api.getPendingChanges().length;
+    await new Promise(resolve => setTimeout(resolve, 300));   // stands in for fetch("/api/preise", …)
+    api.commitBatchEdit();
+    log.textContent = `${n} Änderung(en) gespeichert`;
+  };
+  // ---
+
+  // not in the snippet: number input, a check, wider column, status line
+  columnDefs[1].editInputPipe = editInputPipeForNumber;
+  columnDefs[1].validate = v => typeof v === "number" && v >= 0 ? undefined : "Preis ≥ 0";
+  columnDefs[0].width = px200;
+  columnDefs[2].width = px120;
+  api.recalcColumnWidths();
+  listener.onBatchEditChanged = evt => {
+    speichern.disabled = evt.pendingCount === 0 || evt.invalidCount > 0;
+    verwerfen.disabled = evt.pendingCount === 0;
+    status.textContent = evt.pendingCount
+      ? `${evt.pendingCount} ungespeichert${evt.invalidCount ? `, ${evt.invalidCount} ungültig` : ""}`
+      : "keine Änderungen";
+  };
+  verwerfen.onclick = () => { api.cancelBatchEdit(); log.textContent = "verworfen"; };
+  auswahl.addSelection(new CellRange(0, 1, 1, 1));   // 10, 20 – the handle is visible right away
+  api.repaint();
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

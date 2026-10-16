@@ -1,0 +1,89 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="batchedit-bar">
+  <button type="button" class={id + '-save'} disabled>Save</button>
+  <button type="button" class={id + '-discard'} disabled>Discard</button>
+  <span class:list={[id + '-status', 'batchedit-status']}>No unsaved changes</span>
+  <span class:list={[id + '-log', 'batchedit-log']} aria-live="off"></span>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'batchedit-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService, CellRange } from '/scripts/table/index.js'
+  import { createPriceListModelAndOptions, generatePriceItems } from "/scripts/demo-table-models/index.js";
+
+  // a price list: range selection + fill handle, changes are collected until "Save" (batch edit)
+  const items = generatePriceItems(200);
+  const {tableModel, tableOptions} = createPriceListModelAndOptions(items);
+  const ele = document.querySelector('.' + id);
+  const saveButton = document.querySelector('.' + id + '-save');
+  const discardButton = document.querySelector('.' + id + '-discard');
+  const status = document.querySelector('.' + id + '-status');
+  const log = document.querySelector('.' + id + '-log');
+
+  const listener = new EventAdapter();
+  listener.onBatchEditChanged = evt => {
+    saveButton.disabled = evt.pendingCount === 0 || evt.invalidCount > 0;
+    discardButton.disabled = evt.pendingCount === 0;
+    status.textContent = evt.pendingCount
+      ? `${evt.pendingCount} unsaved change(s)` + (evt.invalidCount ? ` – ${evt.invalidCount} invalid` : '')
+      : 'No unsaved changes';
+  };
+
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+  tableApi.getSelectionModel().addSelection(new CellRange(0, 4, 1, 4));   // the fill handle is visible right away
+  tableApi.repaint();
+
+  saveButton.addEventListener('click', async () => {
+    // your server gets the changes – row, field, old and new value
+    const body = tableApi.getPendingChanges().map(c => ({ sku: c.row.sku, field: c.property, value: c.newValue }));
+    await new Promise(resolve => setTimeout(resolve, 300));   // e.g. await fetch('/api/prices', { method: 'PATCH', body })
+    log.textContent = `Saved ${body.length} change(s)`;
+    tableApi.commitBatchEdit();
+  });
+  discardButton.addEventListener('click', () => {
+    tableApi.cancelBatchEdit();
+    log.textContent = 'Discarded';
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .batchedit-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .batchedit-bar button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .batchedit-bar button:disabled {
+        opacity: 0.4;
+    }
+    .batchedit-status {
+        font-weight: 600;
+    }
+    .batchedit-log {
+        opacity: 0.8;
+    }
+</style>

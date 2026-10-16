@@ -1,4 +1,6 @@
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
+import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
+import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TreeOptionsIf } from "./tree-options.if";
 import { FilterFunction } from "../common/filter-function";
@@ -357,6 +359,36 @@ export interface TableOptionsIf {
    * @since 1.1.95
    */
   rowDragOptions?: Partial<RowDragOptionsIf>;
+
+  /**
+   * The fill handle: a small square at the bottom right corner of the selected range. Dragging it fills the
+   * neighbouring cells (copy, or a series: 1, 2, 3 …, dates, `Item 1` → `Item 2`); ⌥/Alt switches between series and
+   * copy. Keyboard: Ctrl/⌘+D fills down, Ctrl/⌘+R fills right. Needs a selection model of the type `"range"`;
+   * only editable cells are filled. `true` = defaults ({@link FillHandleOptions}).
+   *
+   * @example
+   * const selectionModel = new SelectionModel("range", "multi");   // one model – not a new one per call
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   getSelectionModel: () => selectionModel,
+   *   fillHandle: true,
+   * };
+   *
+   * @since 1.1.96
+   */
+  fillHandle?: boolean | Partial<FillHandleOptionsIf>;
+
+  /**
+   * Batch edit always on: edited and filled values are collected (marked `ge-table-cell-pending`) and written with
+   * {@link TableApi.commitBatchEdit} or discarded with {@link TableApi.cancelBatchEdit}. Without it, start a batch
+   * edit with {@link TableApi.startBatchEdit} (it ends with commit or cancel).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), batchEdit: true };
+   *
+   * @since 1.1.96
+   */
+  batchEdit?: boolean | Partial<BatchEditOptionsIf>;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

@@ -1,11 +1,11 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { GeBatchEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -96,6 +96,29 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(received[received.length - 1]).toMatchObject({ type: 'end', moved: true, toIndex: 3 });
     await nextFrame();
     expect(rowTexts(el)[3]).toContain('Row 1');
+  });
+
+  it('fill handle and batch edit: "modelChanged" once with all cells, "batchEditChanged" (since 1.1.96)', async () => {
+    const { host, el } = createTableElement();
+    const changes: GeModelChangeEvent[] = [];
+    host.addEventListener('modelChanged', e => changes.push((e as CustomEvent<GeModelChangeEvent>).detail));
+    const plain = createFillModelAndOptions();
+    el.data = data(plain.tableModel, plain.tableOptions);
+    await nextFrame();
+    dragFillHandle(el, 4);
+    expect(plain.rows.map(r => r.qty)).toEqual([1, 2, 3, 4, 5]);
+    expect(changes).toHaveLength(1);
+    expect(changes[0].cells).toHaveLength(3);
+
+    const batch = createFillModelAndOptions(true);
+    const batchEvents: GeBatchEditEvent[] = [];
+    host.addEventListener('batchEditChanged', e => batchEvents.push((e as CustomEvent<GeBatchEditEvent>).detail));
+    el.data = data(batch.tableModel, batch.tableOptions);
+    await nextFrame();
+    dragFillHandle(el, 2);
+    expect(batchEvents).toHaveLength(1);
+    expect(batchEvents[0]).toBeInstanceOf(GeBatchEditEvent);
+    expect(batch.rows[2].qty).toBe(0);
   });
 
   it('"stateChanged" is dispatched (bubbling) after the state changed (since 1.1.92)', async () => {

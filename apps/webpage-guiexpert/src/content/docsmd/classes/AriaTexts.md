@@ -31,10 +31,17 @@ texts.filtered(42);    // "42 rows" (default)
 ### Methods
 
 - [allSelected](AriaTexts.md#allselected)
+- [cellsFilled](AriaTexts.md#cellsfilled)
+- [changesCommitted](AriaTexts.md#changescommitted)
+- [changesDiscarded](AriaTexts.md#changesdiscarded)
 - [collapseGroup](AriaTexts.md#collapsegroup)
+- [commitBlocked](AriaTexts.md#commitblocked)
 - [copied](AriaTexts.md#copied)
 - [expandGroup](AriaTexts.md#expandgroup)
+- [fillTooLarge](AriaTexts.md#filltoolarge)
 - [filtered](AriaTexts.md#filtered)
+- [invalidValue](AriaTexts.md#invalidvalue)
+- [pendingChanges](AriaTexts.md#pendingchanges)
 - [rowDragCancelled](AriaTexts.md#rowdragcancelled)
 - [rowDragStarted](AriaTexts.md#rowdragstarted)
 - [rowMoveNotPossible](AriaTexts.md#rowmovenotpossible)
@@ -79,6 +86,96 @@ default: `"All cells selected"`
 
 ___
 
+### cellsFilled
+
+▸ **cellsFilled**(`cellCount`): `string`
+
+Announced after a fill (fill handle, Ctrl/⌘+D, Ctrl/⌘+R) – optional, [AriaTexts](AriaTexts.md) has a default.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of filled cells |
+
+#### Returns
+
+`string`
+
+default: `"3 cells filled"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[cellsFilled](../interfaces/AriaTextsIf.md#cellsfilled)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L94)
+
+___
+
+### changesCommitted
+
+▸ **changesCommitted**(`cellCount`): `string`
+
+Announced after [TableApi.commitBatchEdit](TableApi.md#commitbatchedit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of written cells |
+
+#### Returns
+
+`string`
+
+default: `"3 changes saved"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[changesCommitted](../interfaces/AriaTextsIf.md#changescommitted)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L107)
+
+___
+
+### changesDiscarded
+
+▸ **changesDiscarded**(): `string`
+
+Announced after [TableApi.cancelBatchEdit](TableApi.md#cancelbatchedit).
+
+#### Returns
+
+`string`
+
+default: `"Changes discarded"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[changesDiscarded](../interfaces/AriaTextsIf.md#changesdiscarded)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L111)
+
+___
+
 ### collapseGroup
 
 ▸ **collapseGroup**(`groupLabel`): `string`
@@ -104,6 +201,38 @@ default: `"Collapse group Q1"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L74)
+
+___
+
+### commitBlocked
+
+▸ **commitBlocked**(`invalidCount`): `string`
+
+Announced when invalid values block [TableApi.commitBatchEdit](TableApi.md#commitbatchedit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `invalidCount` | `number` | the number of invalid cells |
+
+#### Returns
+
+`string`
+
+default: `"2 invalid values – nothing saved"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[commitBlocked](../interfaces/AriaTextsIf.md#commitblocked)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L115)
 
 ___
 
@@ -163,6 +292,38 @@ default: `"Expand group Q1"`
 
 ___
 
+### fillTooLarge
+
+▸ **fillTooLarge**(`maxCells`): `string`
+
+Announced when a fill is refused because it covers too many cells ([FillHandleOptionsIf.maxCells](../interfaces/FillHandleOptionsIf.md#maxcells)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"Too many cells to fill (at most 100000)"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[fillTooLarge](../interfaces/AriaTextsIf.md#filltoolarge)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L98)
+
+___
+
 ### filtered
 
 ▸ **filtered**(`rowCount`): `string`
@@ -188,6 +349,70 @@ default: `"42 rows"`, `"1 row"`, `"No rows"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L45)
+
+___
+
+### invalidValue
+
+▸ **invalidValue**(`message`): `string`
+
+Announced when an edited value is invalid ([ColumnDefIf.validate](../interfaces/ColumnDefIf.md#validate)) and not written (without batch edit).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | the message of the validator |
+
+#### Returns
+
+`string`
+
+default: `"Invalid value: <message>"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[invalidValue](../interfaces/AriaTextsIf.md#invalidvalue)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L119)
+
+___
+
+### pendingChanges
+
+▸ **pendingChanges**(`pendingCount`): `string`
+
+Announced after a value was marked in a batch edit (or set back).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `pendingCount` | `number` | the number of pending cells |
+
+#### Returns
+
+`string`
+
+default: `"3 changes not saved"`, `"No unsaved changes"`
+
+**`Since`**
+
+1.1.96
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[pendingChanges](../interfaces/AriaTextsIf.md#pendingchanges)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L102)
 
 ___
 

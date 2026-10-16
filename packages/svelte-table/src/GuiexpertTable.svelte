@@ -62,6 +62,11 @@
   export let onRowDragMove = undefined;
   /** @type {((evt: import("@guiexpert/table").GeRowDragEvent) => void) | undefined} */
   export let onRowDragEnd = undefined;
+  /**
+   * Batch edit (since 1.1.96): values marked, set back, written or discarded.
+   * @type {((evt: import("@guiexpert/table").GeBatchEditEvent) => void) | undefined}
+   */
+  export let onBatchEditChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -86,7 +91,8 @@
     onStateChanged: (evt) => { dispatch("stateChanged", evt); onStateChanged?.(evt); },
     onRowDragStart: (evt) => { dispatch("rowDragStart", evt); onRowDragStart?.(evt); },
     onRowDragMove: (evt) => { dispatch("rowDragMove", evt); onRowDragMove?.(evt); },
-    onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); }
+    onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); },
+    onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); }
   };
 
   /**

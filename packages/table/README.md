@@ -47,6 +47,9 @@ This is the UI-agnostic table component for your next web app. 😊
   total, running total, difference, rank – also per pivot value) and formulas (`formula: "[price] * [quantity] * 1.19"`,
   own parser and interpreter without `eval`, functions like `ROUND`, `IF`, `SUM([x])`, error values `#DIV/0!`,
   `tableApi.setColumnFormula()`) – since 1.1.95
+- Row drag: drag handle per row (`ColumnDef.rowDrag` or `rowDrag: true` in the factory), mouse, touch and pen, ghost,
+  drop marker, auto-scroll, Escape, keyboard alternative Ctrl+Alt+↑/↓, several selected rows, trees; the table moves
+  the rows (managed) or only reports the drop (`rowDragOptions: { managed: false }`, `onRowDragEnd`) – since 1.1.95
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

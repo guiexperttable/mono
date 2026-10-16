@@ -1,11 +1,11 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeMouseEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -79,6 +79,23 @@ describe('GuiexpertTable (Web Component)', () => {
     el.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollTop = 500;
     await vi.waitFor(() => expect(onElement).toHaveBeenCalled());
     expect(bubbled).not.toHaveBeenCalled();
+  });
+
+  it('"rowDragStart", "rowDragMove", "rowDragEnd" are dispatched (bubbling), the row is moved (since 1.1.95)', async () => {
+    const { host, el } = createTableElement();
+    const received: GeRowDragEvent[] = [];
+    for (const name of ['rowDragStart', 'rowDragMove', 'rowDragEnd']) {
+      host.addEventListener(name, e => received.push((e as CustomEvent<GeRowDragEvent>).detail));
+    }
+    el.data = data(createRowDragModel());
+    await nextFrame();
+    dragRow(el, 1, 3);
+    expect(received[0]).toBeInstanceOf(GeRowDragEvent);
+    expect(received[0].type).toBe('start');
+    expect(received.map(e => e.type)).toContain('move');
+    expect(received[received.length - 1]).toMatchObject({ type: 'end', moved: true, toIndex: 3 });
+    await nextFrame();
+    expect(rowTexts(el)[3]).toContain('Row 1');
   });
 
   it('"stateChanged" is dispatched (bubbling) after the state changed (since 1.1.92)', async () => {

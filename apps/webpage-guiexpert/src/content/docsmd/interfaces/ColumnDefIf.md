@@ -47,6 +47,7 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 - [minWidth](ColumnDefIf.md#minwidth)
 - [property](ColumnDefIf.md#property)
 - [rendererMap](ColumnDefIf.md#renderermap)
+- [rowDrag](ColumnDefIf.md#rowdrag)
 - [showValuesAs](ColumnDefIf.md#showvaluesas)
 - [sortComparator](ColumnDefIf.md#sortcomparator)
 - [sortIconVisible](ColumnDefIf.md#sorticonvisible)
@@ -222,6 +223,31 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
 #### Defined in
 
 [src/lib/table/data/tablemodel/column/column-def.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L75)
+
+___
+
+### rowDrag
+
+• `Optional` **rowDrag**: [`RowDragColumnOption`](../modules.md#rowdragcolumnoption)
+
+Row drag: the body cells of this column get a drag handle (`true`, or a function that decides per row – e.g. no
+handle for locked rows). Dragging the handle moves the row (see [TableOptionsIf.rowDragOptions](TableOptionsIf.md#rowdragoptions)); the keyboard
+alternative is Ctrl+Alt+↑/↓. `TableFactory.createTableModel({ rows, rowDrag: true })` sets it on the first data
+column.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "title", headerLabel: "Task", rowDrag: (task: { locked: boolean }) => !task.locked })
+```
+
+**`Since`**
+
+1.1.95
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L178)
 
 ___
 

@@ -52,6 +52,7 @@ import { ExcelServiceIf } from './service/excel-service.if';
 import { ColumnDefIf } from './data/tablemodel/column/column-def.if';
 import { LiveAnnouncer } from './aria/live-announcer';
 import { CellGroupExt } from './data/tablemodel/cellgroup/cell-group-ext';
+import { RowDragService } from './row-drag/row-drag-service';
 
 
 /**
@@ -117,7 +118,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   readonly liveAnnouncer: LiveAnnouncer;
   /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
-  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL'];
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
@@ -159,6 +160,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.resizeHandler = new ResizeHandler(this, tableOptions.resizeEventDebounceDelay);
 
     this.shortcutService = new ShortcutService(this);
+    this.rowDragService = new RowDragService(this);
     this.shortcutService.addListener(this.selectionService);
 
     const sm = this.getSelectionModel ? this.getSelectionModel() : undefined;
@@ -238,6 +240,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         return consumed;
       }
     }
+    if (actionId === 'MOVE_ROW_UP' || actionId === 'MOVE_ROW_DOWN') {
+      // row drag, keyboard alternative (since 1.1.95) – only in the body
+      return !this.headerFocus && !!this.rowDragService?.moveByKeyboard(actionId === 'MOVE_ROW_UP' ? -1 : 1);
+    }
     if (actionId === 'NAVIGATE_UP' && this.moveFocusIntoHeader()) {
       return true;
     }
@@ -287,6 +293,28 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
     }
     return false;
+  }
+
+  /**
+   * The event listener of this table (the one given to the constructor, or an empty {@link EventAdapter}).
+   *
+   * @returns {EventListenerIf} the listener
+   * @since 1.1.95
+   */
+  getEventListener(): EventListenerIf {
+    return this.eventListener;
+  }
+
+  /**
+   * Called after rows were moved in the body model (row drag, {@link TableApi.moveRows}): drops derived values
+   * (totals, „Show values as“) and forgets a sort function of `tableApi.sort(fn)` – the moved order wins.
+   * The caller repaints.
+   *
+   * @since 1.1.95
+   */
+  afterRowsMoved(): void {
+    this.lastSortCompareFn = undefined;
+    this.invalidateAggregates();
   }
 
   /**
@@ -711,6 +739,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       this.stateService.destroy(); // stores and reports a pending change
     } catch (e) {
       console.error(e);            // an own onStateChanged / getRowId threw – release the table anyway
+    }
+    try {
+      this.rowDragService?.destroy(); // a running row drag: "cancel" event, ghost and marker removed
+    } catch (e) {
+      console.error(e);
     }
     this.destroyed = true;
     this.listenerAbortController.abort();

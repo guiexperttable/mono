@@ -1,3 +1,4 @@
+import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
 import type { DerivedValuesChangeIf } from "./derived-values-change.if";
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { CheckedType } from "../../common/checked-type";
@@ -289,6 +290,42 @@ export interface AreaModelIf {
    * @since 1.1.92
    */
   getUnfilteredRowCount?(): number;
+
+  /**
+   * Optional (row drag, managed mode): true if the rows can be moved to the target – e.g. false for a node dropped
+   * into its own child, or while a filter hides rows. Without {@link moveRows} the table cannot move rows itself.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows (ascending)
+   * @param {RowDropTargetIf} target - the drop target (display index before the move)
+   * @returns {boolean} true if {@link moveRows} would move them
+   *
+   * @example
+   * class TasksBodyModel extends AreaModel {
+   *   tasks: string[] = ["Write", "Test", "Ship"];
+   *   override getRowCount(): number { return this.tasks.length; }
+   *   override getValueAt(rowIndex: number): any { return this.tasks[rowIndex]; }
+   *   canMoveRows(rowIndices: number[], target: RowDropTargetIf): boolean { return target.position !== "inside"; }
+   *   moveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+   *     return moveArrayItems(this.tasks, rowIndices, getInsertBeforeIndex(target)) > -1;
+   *   }
+   * }
+   *
+   * @since 1.1.95
+   */
+  canMoveRows?(rowIndices: number[], target: RowDropTargetIf): boolean;
+
+  /**
+   * Optional (row drag, managed mode): moves the rows to the target in the model – the table calls it on a drop and
+   * for `tableApi.moveRows()`, then repaints. Implemented by `AreaModelObjectArray`, `AreaModelArrayOfArrays` and
+   * `AreaModelTree` (in place in their row arrays). See {@link canMoveRows} for an example.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows (ascending)
+   * @param {RowDropTargetIf} target - the drop target (display index before the move)
+   * @returns {boolean} true if the rows were moved
+   *
+   * @since 1.1.95
+   */
+  moveRows?(rowIndices: number[], target: RowDropTargetIf): boolean;
 
   /**
    * Optional: drops cached, derived values (e.g. the totals of an {@link AreaModelAggregateFooter}). The table calls

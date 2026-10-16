@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeModelChangeEvent, GeScrollEvent, GeStateChangeEvent,
+  GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -83,6 +83,30 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   stateChanged: Subject<GeStateChangeEvent> = new Subject<GeStateChangeEvent>();
 
+  /**
+   * Row drag (handles via `ColumnDef.rowDrag`): a drag started. `evt.preventDefault()` cancels it.
+   *
+   * @since 1.1.95
+   */
+  @Output()
+  rowDragStart: Subject<GeRowDragEvent> = new Subject<GeRowDragEvent>();
+
+  /**
+   * Row drag: the drop target changed. `evt.preventDefault()` marks it as invalid.
+   *
+   * @since 1.1.95
+   */
+  @Output()
+  rowDragMove: Subject<GeRowDragEvent> = new Subject<GeRowDragEvent>();
+
+  /**
+   * Row drag: dropped (`evt.type` "end", managed: after the move) or cancelled ("cancel"). Save the new order here.
+   *
+   * @since 1.1.95
+   */
+  @Output()
+  rowDragEnd: Subject<GeRowDragEvent> = new Subject<GeRowDragEvent>();
+
   @Input()
   tableModel?: TableModelIf;
 
@@ -135,6 +159,18 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onStateChanged(evt: GeStateChangeEvent): void {
     this.stateChanged.next(evt);
+  }
+
+  onRowDragStart(evt: GeRowDragEvent): void {
+    this.rowDragStart.next(evt);
+  }
+
+  onRowDragMove(evt: GeRowDragEvent): void {
+    this.rowDragMove.next(evt);
+  }
+
+  onRowDragEnd(evt: GeRowDragEvent): void {
+    this.rowDragEnd.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

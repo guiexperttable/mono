@@ -72,6 +72,7 @@ Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
 - [addCalculatedClasses](AreaModelPivot.md#addcalculatedclasses)
 - [applyShowValuesAs](AreaModelPivot.md#applyshowvaluesas)
 - [arrayMove](AreaModelPivot.md#arraymove)
+- [canMoveRows](AreaModelPivot.md#canmoverows)
 - [changeColumnOrder](AreaModelPivot.md#changecolumnorder)
 - [doSort](AreaModelPivot.md#dosort)
 - [externalFilterChanged](AreaModelPivot.md#externalfilterchanged)
@@ -127,6 +128,7 @@ Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
 - [isRowChecked](AreaModelPivot.md#isrowchecked)
 - [isRowHeaderCell](AreaModelPivot.md#isrowheadercell)
 - [isSelectable](AreaModelPivot.md#isselectable)
+- [moveRows](AreaModelPivot.md#moverows)
 - [readPropertyPath](AreaModelPivot.md#readpropertypath)
 - [recalcVisibleTreeRows](AreaModelPivot.md#recalcvisibletreerows)
 - [setAllParentsOk](AreaModelPivot.md#setallparentsok)
@@ -168,7 +170,7 @@ Training: [Pivot tables](https://gui.expert/training/pivot-tables/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L78)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L79)
 
 ## Properties
 
@@ -202,7 +204,7 @@ if (areaModel.areaIdent === "body") {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L69)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L71)
 
 ___
 
@@ -230,7 +232,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L72)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L74)
 
 ___
 
@@ -244,7 +246,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L71)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L73)
 
 ___
 
@@ -256,7 +258,7 @@ Marker for [isAreaModelPivot](../modules.md#isareamodelpivot) (works across copi
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L58)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L59)
 
 ___
 
@@ -270,7 +272,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L53)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L55)
 
 ___
 
@@ -315,7 +317,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L70)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L72)
 
 ___
 
@@ -329,7 +331,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L51)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L53)
 
 ___
 
@@ -371,7 +373,7 @@ The CSS class and tooltip of an error value of a formula.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L327)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:328](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L328)
 
 ___
 
@@ -401,7 +403,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L271)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:334](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L334)
 
 ___
 
@@ -428,6 +430,40 @@ ___
 #### Defined in
 
 [src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L186)
+
+___
+
+### canMoveRows
+
+▸ **canMoveRows**(`_rowIndices`, `_target`): `boolean`
+
+Row drag: `false` – the table does not move rows of a pivot table itself (pivot rows are aggregates). With
+`rowDragOptions.managed: false` the app gets the events and decides.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_rowIndices` | `number`[] |
+| `_target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) |
+
+#### Returns
+
+`boolean`
+
+always false
+
+**`Since`**
+
+1.1.95
+
+#### Overrides
+
+[AreaModelTree](AreaModelTree.md).[canMoveRows](AreaModelTree.md#canmoverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:351](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L351)
 
 ___
 
@@ -475,7 +511,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L79)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L81)
 
 ___
 
@@ -511,7 +547,7 @@ tableApi.repaint();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:445](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L445)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:467](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L467)
 
 ___
 
@@ -552,7 +588,7 @@ tableApi.externalFilterChanged();   // Nord: Jan 100, Feb 120 · Süd: Jan 80, F
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:424](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L424)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:446](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L446)
 
 ___
 
@@ -590,7 +626,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L474)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:537](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L537)
 
 ___
 
@@ -616,7 +652,7 @@ The rows of column aggregates in formulas (`SUM([total])`): the filtered row obj
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:306](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L306)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:369](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L369)
 
 ___
 
@@ -640,7 +676,7 @@ const before = pivotBody.getBuildCount();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L136)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L137)
 
 ___
 
@@ -666,7 +702,7 @@ The renderer of a „Show values as“ column without an own renderer: the text 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:319](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L319)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L320)
 
 ___
 
@@ -720,7 +756,7 @@ Value columns: the [AggregateCellRenderer](AggregateCellRenderer.md) (text node)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:360](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L360)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:382](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L382)
 
 ___
 
@@ -751,7 +787,7 @@ pivotBody.getCellSourceRows(0, 1).map(s => s.umsatz);   // [100, 50] – Nord, J
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L270)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L271)
 
 ___
 
@@ -836,7 +872,7 @@ pivotBody.getColumnIndex(["Jan"]);   // 1
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L255)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:256](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L256)
 
 ___
 
@@ -866,7 +902,7 @@ pivotBody.getColumnInfo(1)?.column?.label;   // "Jan"
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L210)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:211](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L211)
 
 ___
 
@@ -897,7 +933,7 @@ tableApi.sortByColumn(pivotBody.getColumnProperty([])!, "desc");   // rows by th
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:225](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L225)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:226](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L226)
 
 ___
 
@@ -921,7 +957,7 @@ pivotBody.getConfig().columnFields;   // ["monat"]
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L96)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L97)
 
 ___
 
@@ -944,7 +980,7 @@ The constant row height or `undefined`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:324](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L324)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:387](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L387)
 
 ___
 
@@ -1011,7 +1047,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:368](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L368)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:390](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L390)
 
 ___
 
@@ -1111,7 +1147,7 @@ const shown = treeModel.getDisplayedChildren(treeModel.rows[0]).length;
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L143)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L145)
 
 ___
 
@@ -1134,7 +1170,7 @@ the top-level rows that are shown
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L112)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L114)
 
 ___
 
@@ -1156,7 +1192,7 @@ the displayed tree rows (do not modify the array)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:174](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L174)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L176)
 
 ___
 
@@ -1178,7 +1214,7 @@ The label of a row in the group column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:496](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L496)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:518](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L518)
 
 ___
 
@@ -1218,7 +1254,7 @@ const total = aggregate(treeModel.getLeafRows(), row => row.data.total, "sum");
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:163](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L163)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L165)
 
 ___
 
@@ -1334,7 +1370,7 @@ pivotBody.getPropertyAt(0);   // "RowGroupColumn"
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:183](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L183)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L184)
 
 ___
 
@@ -1368,7 +1404,7 @@ the raw value
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L216)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:279](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L279)
 
 ___
 
@@ -1395,7 +1431,7 @@ result.getValue();                       // 450
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L111)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L112)
 
 ___
 
@@ -1442,7 +1478,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:335](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L335)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:398](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L398)
 
 ___
 
@@ -1482,7 +1518,7 @@ getRowCount(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L178)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L180)
 
 ___
 
@@ -1512,7 +1548,7 @@ pivotBody.getRowGroup(0)?.path;   // ["Nord"]
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L196)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:197](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L197)
 
 ___
 
@@ -1575,7 +1611,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L314)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:377](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L377)
 
 ___
 
@@ -1707,7 +1743,7 @@ body.getShownValue(body.getRowGroup(0), body.getColumnInfo(2)!);   // 0.4 – 40
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L314)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:315](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L315)
 
 ___
 
@@ -1731,7 +1767,7 @@ pivotBody.getSourceRows().length;   // 6
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L124)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L125)
 
 ___
 
@@ -1761,7 +1797,7 @@ the text
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:343](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L343)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:365](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L365)
 
 ___
 
@@ -1788,7 +1824,7 @@ The message of a formula error as tooltip.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:246](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L246)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:309](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L309)
 
 ___
 
@@ -1815,7 +1851,7 @@ displayed rows before filtering
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L190)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L192)
 
 ___
 
@@ -1879,7 +1915,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:280](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L280)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:281](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L281)
 
 ___
 
@@ -1904,7 +1940,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:339](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L339)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:402](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L402)
 
 ___
 
@@ -2023,7 +2059,7 @@ true if the row has displayed children
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L123)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L125)
 
 ___
 
@@ -2105,7 +2141,7 @@ tableApi.repaint();      // calls invalidateDerivedValues() – all cells are co
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:483](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L483)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:505](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L505)
 
 ___
 
@@ -2202,7 +2238,7 @@ Pivot cells are computed – not editable.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:402](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L402)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:424](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L424)
 
 ___
 
@@ -2376,7 +2412,7 @@ true for the group column
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:397](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L397)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:419](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L419)
 
 ___
 
@@ -2434,6 +2470,39 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 ___
 
+### moveRows
+
+▸ **moveRows**(`_rowIndices`, `_target`): `boolean`
+
+Row drag: does nothing (see [canMoveRows](AreaModelPivot.md#canmoverows)).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_rowIndices` | `number`[] |
+| `_target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) |
+
+#### Returns
+
+`boolean`
+
+always false
+
+**`Since`**
+
+1.1.95
+
+#### Overrides
+
+[AreaModelTree](AreaModelTree.md).[moveRows](AreaModelTree.md#moverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:361](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L361)
+
+___
+
 ### readPropertyPath
 
 ▸ **readPropertyPath**(`t`, `property`): `unknown`
@@ -2457,7 +2526,7 @@ The value of a property path – overridden by the models with their own path se
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:299](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L299)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:362](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L362)
 
 ___
 
@@ -2496,7 +2565,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L102)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L104)
 
 ___
 
@@ -2520,7 +2589,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:443](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L443)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:506](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L506)
 
 ___
 
@@ -2653,7 +2722,7 @@ Pivot cells are computed – `setValue` does nothing (`false`).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:407](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L407)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:429](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L429)
 
 ___
 
@@ -2685,7 +2754,7 @@ tableApi.sort((a: RowGroupIf, b: RowGroupIf) => b.count - a.count);   // most so
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:472](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L472)
+[src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts:494](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-pivot.ts#L494)
 
 ___
 
@@ -2711,4 +2780,4 @@ Expands or collapses every row on every level and applies the active filter agai
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:438](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L438)
+[src/lib/table/data/tablemodel/areamodel/area-model-tree.ts:501](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-tree.ts#L501)

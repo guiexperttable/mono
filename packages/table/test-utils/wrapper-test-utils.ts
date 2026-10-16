@@ -124,3 +124,31 @@ export function overlayKind(container: Element): string {
   if (overlay.classList.contains('ge-table-overlay-no-rows')) return 'noRows';
   return 'none';
 }
+
+/**
+ * Row drag (since 1.1.95): 5 rows `{ id, name: "Row <i>" }`, drag handle in the `name` column (index 0).
+ */
+export function createRowDragModel(rows = Array.from({ length: 5 }, (_, i) => ({ id: i, name: `Row ${i}` }))): TableModelIf {
+  return TableFactory.createTableModel({ rows, properties: ['name', 'id'], rowDrag: true });
+}
+
+/**
+ * Drags the row `fromRow` by its drag handle and drops it on the lower half of `toRow` (pointer events, like a mouse).
+ * Managed tables move the row: `fromRow` lands behind `toRow`.
+ */
+export function dragRow(container: Element, fromRow: number, toRow: number): void {
+  const handle = bodyCell(container, fromRow, 0).querySelector<HTMLElement>('.ge-table-row-drag-handle');
+  if (!handle) {
+    throw new Error(`row ${fromRow} has no drag handle`);
+  }
+  const start = handle.getBoundingClientRect();
+  const target = bodyCell(container, toRow, 1).getBoundingClientRect();
+  const fire = (el: EventTarget, type: string, x: number, y: number) => el.dispatchEvent(new PointerEvent(type, {
+    bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 1, pointerType: 'mouse',
+    button: 0, buttons: type === 'pointerup' ? 0 : 1, isPrimary: true,
+  }));
+  fire(handle, 'pointerdown', start.left + 4, start.top + 4);
+  fire(document, 'pointermove', start.left + 4, start.top + 20);
+  fire(document, 'pointermove', target.left + 10, target.top + target.height * 0.8);
+  fire(document, 'pointerup', target.left + 10, target.top + target.height * 0.8);
+}

@@ -194,8 +194,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       kein Export ohne `exported: true`, nicht zieh-/sortier-/resizebar, Checkbox/Baumpfeil rücken hinter die Nummer;
       neu `api.getColumnIndex(property)`. Selbständig umgesetzt (Entscheidungen im Design ohne Freigabe-Runde).
       Offen: Demo-Repo entfällt (kein neues Kapitel), Angular-Demo erst nach dem Release.
-- [ ] Folgepunkte 004: Gruppenzeilen (006) nicht nummerieren (`isGroupRow?` am Body-Modell, s. Design § 2.7) · Row Drag
-      (009) kann die Nummernspalte als Griff nutzen · `MouseHandler.getArrowColumnIndex` ignoriert
+- [ ] Folgepunkte 004: Gruppenzeilen (006) nicht nummerieren (`isGroupRow?` am Body-Modell, s. Design § 2.7) · ~~Row Drag
+      (009) kann die Nummernspalte als Griff nutzen~~ (erledigt: `rowNumberColumnDef.rowDrag = true`) · `MouseHandler.getArrowColumnIndex` ignoriert
       `showCheckboxWihoutExtraColumn` (anders als `RenderScope.getTreeArrowColumnIndex`, schon vor 004) · Speicher der
       Positions-`Map` im Modus `original` (evtl. Index am Modell statt Map).
 - [x] **005 Aggregation und Gesamtzeile** – Branch `feat/aggregation`, Design `prompts/005-aggregation-gesamtzeile.design.md`:
@@ -262,7 +262,22 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       im Container, Auswertung ~0,5 µs/Zeile) · Fehlerklasse `ge-table-cell-error` bleibt nach `updateCells` an einer
       wiederverwendeten Zelle, bis neu gezeichnet wird (`rerenderCellContent` entfernt keine Klassen) · Excel-Formeln
       (`<f>`) bewusst nicht · eigene Formel-Funktionen mit Lazy-Argumenten (heute nur `IF`/`IFERROR`/`AND`/`OR`).
-- [ ] **009 Zeilen ziehen (Row Drag)** (`prompts/009-row-drag.md`).
+- [x] **009 Zeilen ziehen (Row Drag)** – Branch `feat/row-drag`, Design `prompts/009-row-drag.design.md`: Griff über
+      `ColumnDef.rowDrag` bzw. `rowDrag: true` in der Fabrik, `RowDragService` (Pointer Events nur am Griff, Geisterbild,
+      Einfügemarke, Auto-Scroll, Escape, Touch), managed über optionale `AreaModelIf.canMoveRows?/moveRows?`
+      (`AreaModelObjectArray`, `AreaModelArrayOfArrays`, `AreaModelTree`; Row Grouping/Pivot gesperrt) oder unmanaged
+      (`rowDragOptions.managed: false`), `GeRowDragEvent` + `onRowDragStart/Move/End` (alle Wrapper), Tastatur
+      `MOVE_ROW_UP/DOWN` (Strg+Alt+↑/↓), `api.moveRows/isRowDragging/cancelRowDrag`, `api.triggerAction` liefert `boolean`;
+      CSS `table-row-drag.css`. Showcase `rowdrag`, Training-Abschnitt in Kapitel 23, `videos/09-zeilen-ziehen/`,
+      `apps/table-demo/row-drag.html`. Selbständig umgesetzt.
+      Offen: Angular-Demo nach dem Release (die App nutzt npm-Pakete); Demo-Repo entfällt (kein neues Kapitel).
+- [ ] Folgepunkte 009: Ziehen in eine andere GuiExpert-Tabelle (heute nur `outside: true` im Event) · Gruppenwechsel per
+      Ziehen bei Row Grouping (heute nur unmanaged) · eingebauter Klick-Aufnehmen/Ablegen-Modus (WCAG 2.5.7 heute über
+      `api.moveRows`/eigene Knöpfe) · Animation der verschobenen Zeilen · `aria-keyshortcuts` der Griff-Zellen nennt immer
+      Strg+Alt+↑/↓, auch wenn `shortcutActionIdMapping` andere Tasten belegt · Baum: an der ersten/letzten Geschwister-
+      Position sagt die Tastatur nichts an · Auto-Scroll-Zone bei
+      sehr niedrigen Tabellen (< 200 px) relativ statt 40 px · variable Zeilenhöhen (`defaultRowHeight: -1`): `yPositions`
+      werden nach dem Verschieben nicht neu berechnet (wie schon beim Sortieren).
 - [ ] **010 Fill-Handle und Batch-Edit** (`prompts/010-fill-handle-batch-edit.md`); Undo/Redo und Einfügen aus der
       Zwischenablage als Folgeaufgaben.
 - [ ] **011 Master/Detail** (`prompts/011-master-detail.md`); enthält „Performance, Teil 2“ (variable Zeilenhöhen) als
@@ -497,6 +512,14 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.95 – Zeilen ziehen (009)**, nur additiv: neue optionale Member `ColumnDef.rowDrag`, `TableOptionsIf.rowDragOptions`,
+  `CreateTableModelPara.rowDrag`, `AreaModelIf.canMoveRows?/moveRows?`, `EventListenerIf.onRowDragStart?/Move?/End?`,
+  `AriaTextsIf.rowDragStarted?/rowMoved?/rowMoveNotPossible?`; `EventAdapter` hat drei neue leere Methoden. `ActionId`
+  kennt `MOVE_ROW_UP`/`MOVE_ROW_DOWN` (Strg+Alt+↑/↓ in beiden Standard-Mappings – wer diese Tasten selbst belegt, prüft
+  sein `shortcutActionIdMapping`). `TableApi.triggerAction()` gibt jetzt `boolean` zurück (vorher `void`).
+  `TableScope.actionsBlockedWhileLoading` enthält die beiden neuen Aktionen. Neue CSS-Datei `table-row-drag.css` (in
+  `main.css` enthalten).
 
 - **1.1.95 – berechnete Spalten (008)**, nur additiv: `ColumnDef` hat die neuen (leeren) Felder `valueGetter`,
   `valueSetter`, `showValuesAs`, `formula`; eine berechnete Spalte ist nie editierbar ohne `valueSetter` (auch nicht mit

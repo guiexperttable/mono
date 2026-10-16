@@ -1,3 +1,4 @@
+import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TreeOptionsIf } from "./tree-options.if";
 import { FilterFunction } from "../common/filter-function";
@@ -342,6 +343,20 @@ export interface TableOptionsIf {
    * @since 1.1.92
    */
   overlayOptions?: Partial<OverlayOptionsIf>;
+
+  /**
+   * Row drag: managed or events only, multi-row drag, tree drop, auto-scroll (see {@link RowDragOptionsIf}). The drag
+   * handles come from {@link ColumnDefIf.rowDrag}. Fields you leave out keep their default ({@link RowDragOptions}).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   rowDragOptions: { managed: false },   // only events – e.g. the server decides
+   * };
+   *
+   * @since 1.1.95
+   */
+  rowDragOptions?: Partial<RowDragOptionsIf>;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

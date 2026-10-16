@@ -13,6 +13,7 @@ import { ShortcutActionIdMapping } from "../../action/shortcut-actionid-mapping.
 import { HeaderGroupOptions } from './header-group-options';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
+import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 
 
 /**
@@ -106,4 +107,5 @@ export class TableOptions implements TableOptionsIf {
 
   /** Texts and behaviour of the "Loading…" / "No rows" overlays; missing fields use {@link OverlayOptions}. @since 1.1.92 */
   overlayOptions?: Partial<OverlayOptionsIf> = undefined;
+  rowDragOptions?: Partial<RowDragOptionsIf> = undefined;
 }

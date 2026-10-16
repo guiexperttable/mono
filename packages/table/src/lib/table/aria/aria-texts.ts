@@ -74,4 +74,20 @@ export class AriaTexts implements AriaTextsIf {
   collapseGroup(groupLabel: string): string {
     return groupLabel ? `Collapse group ${groupLabel}` : "Collapse group";
   }
+
+  rowDragStarted(rowCount: number): string {
+    return rowCount === 1 ? "Dragging 1 row. Press Escape to cancel." : `Dragging ${rowCount} rows. Press Escape to cancel.`;
+  }
+
+  rowMoved(position: number, rowCount: number): string {
+    return `Row moved to position ${position} of ${rowCount}`;
+  }
+
+  rowMoveNotPossible(): string {
+    return "Rows cannot be moved while the table is sorted or filtered";
+  }
+
+  rowDragCancelled(): string {
+    return "Drag cancelled";
+  }
 }

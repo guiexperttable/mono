@@ -1,6 +1,6 @@
 # TODO-Prompt 009: Zeilen ziehen (Row Drag)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `row-drag` (Branch `feat/row-drag`, Design `prompts/009-row-drag.design.md`)
+> Status: **umgesetzt** (15.10.2026, selbständig; Design `prompts/009-row-drag.design.md`) · angelegt 14.10.2026 · Slug `row-drag` (Branch `feat/row-drag`, Design `prompts/009-row-drag.design.md`)
 > Abhängigkeiten: **001 (ARIA)** für die Tastatur-Alternative und Ansagen; **004 (Zeilennummern)**, falls der Griff dort
 > sitzen soll; **006 (Row Grouping)**, damit Ziehen zwischen Gruppen mitgedacht wird (geht auch ohne).
 > ag-Grid: Row Dragging ist dort Community; Ziehen zwischen Tabellen ebenfalls (Drag-and-Drop-Modul).
@@ -89,5 +89,5 @@ Konflikte mit Bereichsauswahl und Spalten-Drag, Auto-Scroll bei großen Tabellen
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Griff, Modus, Pointer-Entscheidung, Baum/Gruppen 🛑
-- [ ] D1–D13 umgesetzt bzw. begründet ausgelassen und getestet
+- [x] Design-Dokument mit Griff, Modus, Pointer-Entscheidung, Baum/Gruppen 🛑 (selbständig entschieden)
+- [x] D1–D13 umgesetzt bzw. begründet ausgelassen und getestet (D11 nur als Event `outside`, D8 managed gesperrt)

@@ -239,7 +239,7 @@ The CSS class and tooltip of an error value of a formula.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L327)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:328](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L328)
 
 ___
 
@@ -477,7 +477,7 @@ The renderer of a „Show values as“ column without an own renderer: the text 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:319](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L319)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L320)
 
 ___
 

@@ -5,6 +5,7 @@ import { EventListenerIf } from "./event-listener.if";
 import { SelectionModelIf } from './selection/selection-model.if';
 import { FocusModelIf } from './focus/focus-model.if';
 import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
+import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
 
 /**
  * Empty implementation of {@link EventListenerIf} – extend it and override only the events you need.
@@ -54,6 +55,15 @@ export class EventAdapter implements EventListenerIf {
 
   /** @since 1.1.92 */
   onStateChanged(_evt: GeStateChangeEvent): void {
+  }
+
+  onRowDragStart(_evt: GeRowDragEvent): void {
+  }
+
+  onRowDragMove(_evt: GeRowDragEvent): void {
+  }
+
+  onRowDragEnd(_evt: GeRowDragEvent): void {
   }
 
 }

@@ -45,7 +45,7 @@ The table fills its host element – give it a height:
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
 | Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.92: loading overlay, no re-creation) |
-| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92) |
+| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92), `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`, since 1.1.95 – row drag, instructions.md 6.16) |
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
 `RendererWrapper`, `DomService`.

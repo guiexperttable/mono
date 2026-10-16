@@ -926,6 +926,24 @@ describe('axe-core: no violations (WCAG 2.1 A/AA + best practices)', () => {
     }
   });
 
+  it('row drag (1.1.95): handles are hidden, the cell names the keyboard alternative, light and dark', async () => {
+    const defs = [ColumnDef.create({ property: 'name', headerLabel: 'Name', rowDrag: true }), ...columnDefs(3).slice(2)];
+    const { host } = mountTable(TableFactory.createTableModel({ rows: createRows(30), columnDefs: defs, rowNumbersVisible: true }),
+      { tableOptions: { ariaLabel: 'Tasks' } });
+    await nextFrame();
+    const handle = host.querySelector('.ge-table-row-drag-handle')!;
+    expect(handle.getAttribute('aria-hidden')).toBe('true');
+    expect(handle.closest('[role="gridcell"]')!.getAttribute('aria-keyshortcuts')).toContain('Control+Alt+ArrowDown');
+    expect(await axeViolations(host)).toEqual([]);
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.style.background = '#111827';
+    try {
+      expect(await axeViolations(host)).toEqual([]);
+    } finally {
+      document.body.style.background = '';
+    }
+  });
+
   it('fixed columns + selection + footer', async () => {
     const defs = columnDefs(6);
     const rows = createRows(40).map(r => ({ ...r, d: 1, e: 2, f: 3 }));

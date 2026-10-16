@@ -163,5 +163,26 @@ export interface ColumnDefIf {
    *
    * @since 1.1.95
    */
-  formula?: string
+  formula?: string,
+  /**
+   * Row drag: the body cells of this column get a drag handle (`true`, or a function that decides per row – e.g. no
+   * handle for locked rows). Dragging the handle moves the row (see {@link TableOptionsIf.rowDragOptions}); the keyboard
+   * alternative is Ctrl+Alt+↑/↓. `TableFactory.createTableModel({ rows, rowDrag: true })` sets it on the first data
+   * column.
+   *
+   * @example
+   * ColumnDef.create({ property: "title", headerLabel: "Task", rowDrag: (task: { locked: boolean }) => !task.locked })
+   *
+   * @since 1.1.95
+   */
+  rowDrag?: RowDragColumnOption
 }
+
+/**
+ * {@link ColumnDefIf.rowDrag}: `true` = every row has a drag handle in this column, a function decides per row
+ * (`row` = the row object, a `TreeRow` in a tree; `rowIndex` = display index).
+ *
+ * @category Row drag
+ * @since 1.1.95
+ */
+export type RowDragColumnOption = boolean | ((row: any, rowIndex: number) => boolean);

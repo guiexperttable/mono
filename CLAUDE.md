@@ -139,15 +139,15 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   - `TableFactory.createTableModel(Partial<CreateTableModelPara>)` – Universal-Einstieg
     (`rows`+`properties` | `bodyData`/`headerData`/`footerData` | `bodyAreaModel` …, `columnDefs`, `fixedLeftColumnCount`,
     `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `footerAggregates`
-    (1.1.94), `tableOptions`).
+    (1.1.94), `rowDrag` (1.1.95), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`,
     `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“),
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
-  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions })` (die letzten fünf
-  seit 1.1.95, § 3.6 „Berechnete Spalten“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag })` (die letzten
+  sechs seit 1.1.95, § 3.6 „Berechnete Spalten“ bzw. „Row Drag“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
 - Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
   `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
   Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
@@ -167,8 +167,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 
 ### 3.6 Interaktion
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
-  `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`
-  (optional). Event-Typen: `GeMouseEvent`, `GeKeyEvent`, `GeModelChangeEvent`, `GeScrollEvent`, `GeStateChangeEvent`.
+  `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
+  seit 1.1.95 `onRowDragStart/Move/End` (optional). Event-Typen: `GeMouseEvent`, `GeKeyEvent`, `GeModelChangeEvent`,
+  `GeScrollEvent`, `GeStateChangeEvent`, `GeRowDragEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -182,7 +183,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Seit 1.1.91 zusätzlich (WAI-ARIA-Grid): Pos1/Ende (`NAVIGATE_ROW_START/END`, macOS auch ⌘←/⌘→), Strg+Pos1/Ende
   (`NAVIGATE_FIRST/LAST_CELL`, macOS auch ⌘↑/⌘↓), Bild↑/↓ (`NAVIGATE_PAGE_UP/DOWN`), Enter (`ACTIVATE_CELL`: Body =
   Zeilen-Checkbox bzw. Baumknoten, Header = Gruppe bzw. Sortieren). **Header-Fokus**: ↑ in Body-Zeile 0 → unterste
-  Header-Zeile, ↓ zurück; Zustand in `TableScope` (`getHeaderFocus()`), das `FocusModel` bleibt Body-only.
+  Header-Zeile, ↓ zurück; Zustand in `TableScope` (`getHeaderFocus()`), das `FocusModel` bleibt Body-only. Seit 1.1.95
+  `MOVE_ROW_UP/DOWN` (Strg+Alt+↑/↓, Row Drag). `api.triggerAction()` liefert seit 1.1.95 `boolean` (Taste verwendet).
 - **Barrierefreiheit (seit 1.1.91, `aria/`, Design `prompts/001-aria-screenreader.design.md`)**: Host `role="grid"`/
   `"treegrid"` mit `aria-rowcount` (Header + **alle** Body-Zeilen + Footer), `aria-colcount` (sichtbare Spalten),
   `aria-owns` (9 Rowgroups in der Reihenfolge Header → Body → Footer, leere = `presentation`), `aria-activedescendant`
@@ -312,6 +314,31 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (nie geworfen; CSS `ge-table-cell-error`, Tooltip = Meldung). `ColumnDef.create({ formula })` /
   `createFormulaValueGetter` / `api.setColumnFormula(property, source)` (gibt Compile-Fehler zurück). Keine Zellbezüge,
   keine Formel-UI. Bench `bench/formula.bench.ts` (1 Mio. Zeilen ~0,5 µs/Zeile im Container).
+- **Row Drag (seit 1.1.95, `row-drag/`, Design `prompts/009-row-drag.design.md`)**: Griff über `ColumnDef.rowDrag`
+  (`true` | `(row, rowIndex) => boolean`) bzw. Fabrik-Flag `rowDrag: true` (erste Datenspalte). `RowDragService`
+  (`tableScope.rowDragService`, `@category Internals`): **Pointer Events** nur am Griff (`data-ge-action="drag-row"`,
+  `pointerdown` wird `preventDefault`-et → keine Kompatibilitäts-Mausereignisse, `MouseHandler`/Bereichsauswahl/Spalten-Drag
+  unberührt), danach `pointermove/up/cancel` + `keydown` (Escape) am **Dokument** über einen eigenen `AbortController`
+  (kein `setPointerCapture` – der Griff wird beim virtuellen Rendern ersetzt), Schwelle 4 px, der `click` nach einem
+  Ziehen wird einmal geschluckt. Ziel **gerechnet** (`clientY` → Inhalts-y → Zeile über `getYPosByRowIndex`, Binärsuche;
+  `RenderScope.getBodyViewport()`), nie aus dem DOM; flach obere/untere Hälfte = davor/dahinter, Baum Viertel + Mitte
+  `inside`. Auto-Scroll per rAF in der Rand-Zone (quadratisch, `getScrollerToContentRatioY()` für gekappte Höhen).
+  Geisterbild `ge-table-row-drag-ghost` (Text, `textContent`), Marke `ge-table-row-drop-indicator(-inside)`, gezogene
+  Zeilen `ge-table-row-dragging` (`RenderScope.addAndRenderCellDiv` fragt den Dienst). **managed** (Default): optionale
+  `AreaModelIf.canMoveRows?/moveRows?(rowIndices, target: RowDropTargetIf)` – `AreaModelObjectArray`/`ArrayOfArrays`
+  verschieben in der **Anzeige-Reihenfolge** und schreiben sie **in place** in die Zeilen der Anwendung, `AreaModelTree`
+  hängt um (Zyklus-Schutz, `deep`), `AreaModelRowGroups`/`Pivot` → `false`; gesperrt, wenn eine Spalte `sortState`
+  asc/desc hat oder ein Filter Zeilen ausblendet (Griff `…-disabled`, Ansage). **unmanaged**
+  (`rowDragOptions.managed: false`): nur Events. `GeRowDragEvent` (`type` start/move/end/cancel, `source`
+  pointer/keyboard, `rows`, `rowIndices`, `target`, `toIndex`, `outside`, `moved`, `preventDefault()` in start/move);
+  `onRowDragEnd` kommt managed **nach** dem Verschieben. Mehrfach: Zeilen der Auswahl (`getMergedRowIndices`).
+  Danach `TableScope.afterRowsMoved()` (Aggregate, `lastSortCompareFn` weg), Fokus/Auswahl folgen, `repaintHard()`,
+  Ansage `rowMoved`. Tastatur `MOVE_ROW_UP/DOWN` (Baum: unter Geschwistern), Zellen mit Griff `aria-keyshortcuts`.
+  API `moveRows(indices, target | index)` (`false` solange sortiert oder ohne Wirkung), `isRowDragging()`, `cancelRowDrag()`.
+  Kein Ziehen bei offenem Editor; Listener dürfen abbrechen (Sitzung wird nach jedem Aufruf geprüft); große Auswahlen
+  (200.000 Zeilen) in O(n) ohne Spread. DOM-frei `row-drag/move-rows.ts`
+  (`moveArrayItems`, `calcMoveToIndex`, `moveTreeRows`, `canMoveTreeRows` …). CSS `css/table-row-drag.css`,
+  `--ge-table-row-drag-*`, `--ge-table-row-drop-*`. Website-Showcases: CSS auch in `src/styles/ge-table.css`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -330,7 +357,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
-`stateChangedDebounceDelay`.
+`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -350,6 +377,7 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
+Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`).
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -394,7 +422,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 501 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 526 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -405,8 +433,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.050 Tests) |
-  | `test:browser` | echtes Chromium, ~655 Tests in 25 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.080 Tests) |
+  | `test:browser` | echtes Chromium, ~700 Tests in 26 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -429,7 +457,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers`, `aggregation`, `rowgroup/row-group` …).
+    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -537,6 +565,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 28 | Pivot-Tabelle in 60 Sekunden – ohne Enterprise-Lizenz | `videos/08-pivot-ohne-enterprise/`, Showcase `pivot`, Training-Kapitel `pivot-tables`, `apps/table-demo/pivot.html`; Bezug zu Folge 14 „Mehrzeilige Header-Gruppen“ |
 | 29 | Berechnete Spalten in 60 Sekunden (`valueGetter`, Sortieren/Summe stimmen) – geplant | Showcase `formulas`, `instructions.md` 5.2 |
 | 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, `instructions.md` 5.9 |
+| 31 | Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/09-zeilen-ziehen/`, Showcase `rowdrag`, Training-Kapitel `events-and-context-menu` (Abschnitt), `apps/table-demo/row-drag.html`, `instructions.md` 6.16 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

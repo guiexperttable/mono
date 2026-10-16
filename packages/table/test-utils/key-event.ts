@@ -41,6 +41,9 @@ export const KEY_EVENTS_BY_MAPPING_KEY: Record<string, KeyEventInit> = {
   'pageup': { key: 'PageUp', code: 'PageUp' },
   'pagedown': { key: 'PageDown', code: 'PageDown' },
   'enter': { key: 'Enter', code: 'Enter' },
+  // since 1.1.95 (row drag, keyboard alternative, prompts/009-row-drag.design.md § 2.8)
+  'ctrl+alt+up': { key: 'ArrowUp', code: 'ArrowUp', ctrlKey: true, altKey: true },
+  'ctrl+alt+down': { key: 'ArrowDown', code: 'ArrowDown', ctrlKey: true, altKey: true },
 };
 
 export function keyEvent(init: KeyEventInit): KeyboardEvent {

@@ -12,6 +12,8 @@ import type { DerivedValuesChangeIf } from "./derived-values-change.if";
 import type { ShowValuesAsIf } from "../../../calc/show-values-as.type";
 import { calculateShowValuesAs, sumOfNumbers } from "../../../calc/show-values-as";
 import { isFormulaError } from "../../../formula/formula-error";
+import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
+import { canMoveTreeRows, getTopmostTreeRows, moveTreeRows, normalizeRowIndices } from "../../../row-drag/move-rows";
 
 /**
  * Represents a  tree-based table model.
@@ -189,6 +191,67 @@ export class AreaModelTree<S> extends AbstractAreaModel<TreeRow<S>> {
    */
   getUnfilteredRowCount(): number {
     return this.flattenRows.length;
+  }
+
+  /**
+   * Row drag: true if the rows can be moved to the target – no filter hides a displayed row, and the target is none of
+   * the dragged rows and no descendant of them (no cycle). `"before"` / `"after"` = sibling of the target row,
+   * `"inside"` = last child.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target
+   * @returns {boolean} true if {@link moveRows} would move them
+   *
+   * @example
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * treeModel.canMoveRows([0], { rowIndex: 1, position: "inside" });   // false if row 1 is a child of row 0
+   *
+   * @since 1.1.95
+   */
+  canMoveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    if (this.getRowCount() !== this.getUnfilteredRowCount()) {
+      return false;
+    }
+    const rows = this.getDragRows(rowIndices);
+    return rows.length > 0 && canMoveTreeRows(rows, this.getRowByIndex(target.rowIndex));
+  }
+
+  /**
+   * Row drag: moves tree rows (with their children) in front of / behind the target row (siblings) or into it
+   * (`"inside"`: last children, the target is expanded) – in place in {@link rows} and the `children` arrays;
+   * `parent` and `deep` follow. See {@link canMoveRows}.
+   *
+   * @param {number[]} rowIndices - display indices of the dragged rows
+   * @param {RowDropTargetIf} target - the drop target (display index before the move)
+   * @returns {boolean} true if moved
+   *
+   * @example
+   * const treeModel = tableModel.getBodyModel() as AreaModelTree<OrderNode>;
+   * treeModel.moveRows([3], { rowIndex: 0, position: "inside" });
+   * tableApi.repaintHard();   // or simply tableApi.moveRows([3], { rowIndex: 0, position: "inside" })
+   *
+   * @since 1.1.95
+   */
+  moveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
+    if (!this.canMoveRows(rowIndices, target)) {
+      return false;
+    }
+    const targetRow = this.getRowByIndex(target.rowIndex)!;
+    const moved = moveTreeRows(this.rows, this.getDragRows(rowIndices), targetRow, target.position);
+    if (moved) {
+      this.showValuesCache.clear();
+      this.invalidateColumnValues();
+      this.refreshDisplayedRows(true);
+    }
+    return moved;
+  }
+
+  /** The topmost tree rows of the display indices (children travel with their parent). */
+  private getDragRows(rowIndices: number[]): TreeRowIf<S>[] {
+    const rows = normalizeRowIndices(rowIndices, this.getRowCount())
+      .map(i => this.getRowByIndex(i))
+      .filter((row): row is TreeRowIf<S> => !!row);
+    return getTopmostTreeRows(rows);
   }
 
   getValueAt(rowIndex: number, columnIndex: number): any {

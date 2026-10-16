@@ -1187,7 +1187,8 @@ listener.onSelectionChanged = () => {
   override with `tableOptions.shortcutActionIdMapping` or disable with `shortcutActionsDisabled: true`.
   Action ids: `COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`, `DESELECT_ALL`,
   `NAVIGATE_LEFT/RIGHT/UP/DOWN`, since 1.1.91 also `NAVIGATE_ROW_START/ROW_END/FIRST_CELL/LAST_CELL/PAGE_UP/PAGE_DOWN`
-  and `ACTIVATE_CELL` (keys: 6.14); trigger them with `tableApi.triggerAction("SELECT_ALL")`.
+  and `ACTIVATE_CELL` (keys: 6.14), since 1.1.95 `MOVE_ROW_UP/DOWN` (Ctrl+Alt+↑/↓, row drag: 6.16); trigger them with
+  `tableApi.triggerAction("SELECT_ALL")` (returns `true` if the action was used).
 
 ### 6.5 Events
 
@@ -1200,6 +1201,8 @@ listener.onSelectionChanged = () => {
 | `modelChanged` | `GeModelChangeEvent` | e.g. after inline editing |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` | |
 | `scroll` | `GeScrollEvent` | not forwarded by the React wrapper |
+| `stateChanged` | `GeStateChangeEvent` | since 1.1.92, see 6.11 |
+| `rowDragStart`, `rowDragMove`, `rowDragEnd` | `GeRowDragEvent` | since 1.1.95, see 6.16 (core: `onRowDragStart/Move/End`) |
 
 ### 6.6 Tree table and checkboxes
 
@@ -1469,6 +1472,7 @@ const tableOptions: TableOptionsIf = {
 | Checkboxes | named "Select row 5" / "Select all rows"; partly checked = native `indeterminate` ("mixed") |
 | Header groups | the toggle is a button "Collapse group Q1" with `aria-expanded` |
 | Editor | the input is named after the column; Escape closes it and the focus returns to the table |
+| Row drag (1.1.95) | the drag handle is `aria-hidden`; its cell has `aria-keyshortcuts` for the keyboard alternative Ctrl+Alt+↑/↓; announcements "Dragging 1 row…", "Row moved to position 7 of 20", "Drag cancelled" (6.16) |
 | Announcements | a polite live region (in `document.body`, removed by `destroy()`): sorting, filter result ("42 rows"), copy ("12 cells copied"), select all; own messages with `tableApi.announce("Orders loaded")`. Inside a modal dialog (`aria-modal="true"`) screen readers ignore it – use a live region of your own there |
 | Decoration | borders, hover, focus frame, drag ghost, resize handles, icons: `aria-hidden="true"` |
 
@@ -1599,14 +1603,95 @@ an own overlay element.
 
 `CrudTableModelFactory` shows the loading overlay while its requests run (view, edit, clone, create, delete).
 
+### 6.16 Dragging rows into order (since 1.1.95)
+
+A drag handle in a column (`ColumnDef.rowDrag`) moves rows with the mouse, touch or a pen – priority lists,
+playlists, steps. The table scrolls automatically at the top and bottom edge (also through millions of rows), shows a
+ghost with the row's text and a drop marker; Escape cancels. Keyboard alternative: **Ctrl+Alt+↑/↓** (macOS ⌃⌥↑/↓)
+moves the focused row, screen readers hear "Row moved to position 7 of 20".
+
+```ts
+import { EventAdapter, GeRowDragEvent, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+
+interface Task { id: number; title: string; done: boolean }
+declare const tasks: Task[];
+declare const host: HTMLDivElement;
+
+const tableModel = TableFactory.createTableModel({ rows: tasks, properties: ["title", "done"], rowDrag: true });
+const listener = new EventAdapter();
+listener.onRowDragEnd = (evt: GeRowDragEvent<Task>) => {
+  if (evt.moved) {
+    console.log(`${evt.rows[0].title} → position ${evt.toIndex + 1}`);   // tasks has the new order (in place)
+  }
+};
+new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), listener).firstInit();
+```
+
+- **Handle:** `ColumnDef.create({ property: "title", rowDrag: true })` – or a function `(row, rowIndex) => boolean` for
+  locked rows. `TableFactory.createTableModel({ …, rowDrag: true })` puts it into the first data column (behind row
+  numbers and checkboxes); in a `RowNumberColumnDef` it feels like Excel. Only the handle starts a drag – dragging over
+  normal cells still selects a range.
+- **Managed** (default): the table moves the rows in the body model (`AreaModelObjectArray`, `AreaModelArrayOfArrays`,
+  `AreaModelTree` – your array is reordered **in place**, like `Array.prototype.sort`). Only while the table is
+  neither sorted (a column with sort state asc/desc) nor filtered: then the handles are dimmed and a drag only
+  announces why. `tableApi.sort(fn)` does not block (one-time ordering).
+- **Unmanaged** – `rowDragOptions: { managed: false }`: only events, nothing moves, no blocking. Move the rows yourself,
+  e.g. after the server confirmed:
+
+```ts
+import { EventAdapter, GeRowDragEvent, TableApi, TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+const tableOptions: TableOptionsIf = { ...new TableOptions(), rowDragOptions: { managed: false } };
+const listener = new EventAdapter();
+listener.onRowDragEnd = async (evt: GeRowDragEvent<{ id: number }>) => {
+  if (evt.type !== "end" || !evt.target) return;                    // cancelled or dropped outside
+  const response = await fetch("/api/tasks/move", {
+    method: "POST", body: JSON.stringify({ ids: evt.rows.map(t => t.id), toIndex: evt.toIndex })
+  });
+  if (response.ok) tableApi.moveRows(evt.rowIndices, evt.target);
+};
+```
+
+- **Events** (`GeRowDragEvent`): `onRowDragStart` → `onRowDragMove` (only when the drop target changes) →
+  `onRowDragEnd` (`type` `"end"` or `"cancel"`; managed: **after** the move, `moved` + `toIndex`). Fields: `rows`,
+  `rowIndices`, `target` (`{ rowIndex, position: "before" | "after" | "inside" }`, display index before the move),
+  `toIndex` (flat: new index of the first row), `outside` (pointer outside the table), `source` (`"pointer"` |
+  `"keyboard"`), `originalEvent`. `evt.preventDefault()` in start = no drag, in move = invalid target (no drop).
+  Wrappers: `rowDragStart` / `rowDragMove` / `rowDragEnd` (React/Preact/Solid callback props, Vue `@rowDragEnd`,
+  Svelte `on:rowDragEnd` / `onRowDragEnd`, Angular `(rowDragEnd)`, Web Component `CustomEvent`).
+- **Several rows:** grabbing a selected row drags all rows with a selection (their order stays, they stay selected);
+  `multiRow: false` turns it off.
+- **Trees:** upper/lower quarter of a row = before/after it (siblings), the middle = inside (last child; the target
+  is expanded); `treeDropInside: false` turns that off. A node never moves into its own descendants.
+- **Row grouping and pivot tables:** managed is not possible (a new group means changed data) – use `managed: false`,
+  change the group field and call `tableApi.setRowGroupBy(tableApi.getRowGroupBy())`. Group rows have no handle.
+- **Code:** `tableApi.moveRows(rowIndices, target)` (number target = in front of that index; also the pointer
+  alternative of WCAG 2.5.7, e.g. "up"/"down" buttons in a cell; `false` while a column is sorted – also in unmanaged
+  mode: remove the sort first), `tableApi.isRowDragging()`,
+  `tableApi.cancelRowDrag()`. Own area models: implement the optional `moveRows` / `canMoveRows` of `AreaModelIf`
+  (helpers `moveArrayItems`, `getInsertBeforeIndex`).
+- **Options** (`tableOptions.rowDragOptions`): `managed`, `multiRow`, `treeDropInside`, `dragThresholdInPx` (4),
+  `autoScrollZoneInPx` (40), `autoScrollMaxSpeedInPx` (24 px per frame), `ghostText(rows)`.
+- **Look:** classes `.ge-table-row-drag-handle` (`…-disabled`), `.ge-table-row-dragging`, `.ge-table-row-drag-ghost`,
+  `.ge-table-row-drop-indicator` (`…-inside`); variables `--ge-table-row-drag-handle-color`,
+  `--ge-table-row-drop-indicator-color`, `--ge-table-row-drop-inside-bg`, `--ge-table-row-drag-ghost-bg|-text|-border`,
+  `--ge-table-row-dragging-opacity` (light and dark).
+- **Keys:** Ctrl+Alt+↑/↓ is also a table-navigation key of NVDA/JAWS (browse mode) and, in some desktops, switches
+  workspaces – map other keys with `tableOptions.shortcutActionIdMapping` (`MOVE_ROW_UP` / `MOVE_ROW_DOWN`); the
+  `aria-keyshortcuts` of the grip cells names the default keys. No drag while a cell editor is open; a double click on a
+  grip does nothing. Screen readers hear "Dragging 1 row…", "Row moved to position 7 of 20" and "Drag cancelled".
+- **Saving the order** is up to your app (`rowDragEnd`) – it is data, not part of `getState()`.
+
 ---
 
 ## 7. Not available yet
 
 To avoid surprises – these are **not** implemented in the current releases:
 
-- No built-in filter UI, context menu, pagination or row drag & drop – build them with the events
-  (`contextmenu`, `mouseClicked`) and `externalFilterFunction`.
+- No built-in filter UI, context menu or pagination – build them with the events (`contextmenu`, `mouseClicked`) and
+  `externalFilterFunction`. Row drag (6.16) works inside one table; dragging rows into **another** table is up to
+  your code (`rowDragEnd` with `outside: true`).
 - No drag & drop group panel or pivot field list – row grouping (5.6) and pivot tables (5.7) themselves are built in;
   change them with `tableApi.setRowGroupBy()` / `tableApi.setPivotConfig()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).

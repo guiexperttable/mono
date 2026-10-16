@@ -35,6 +35,30 @@ export const actionIds = [
   // since 1.1.96 (fill handle, keyboard alternative – used only with tableOptions.fillHandle and a selected range):
   "FILL_DOWN",            // Ctrl/⌘+D: the top row of the selected range is copied down (one row: the cell above)
   "FILL_RIGHT",           // Ctrl/⌘+R: the left column is copied right (one column: the cell left of it)
+
+  // since 1.1.99 (Excel-style editing – used only with tableOptions.editing):
+  "NAVIGATE_NEXT_CELL",          // Tab: commit and next shown column (not used in the last column: the focus leaves)
+  "NAVIGATE_PREVIOUS_CELL",      // Shift+Tab
+  "EXTEND_SELECTION_UP",         // Shift+↑: the selected range grows from the active cell
+  "EXTEND_SELECTION_DOWN",       // Shift+↓
+  "EXTEND_SELECTION_LEFT",       // Shift+←
+  "EXTEND_SELECTION_RIGHT",      // Shift+→
+  "EXTEND_SELECTION_ROW_START",  // Shift+Home
+  "EXTEND_SELECTION_ROW_END",    // Shift+End
+  "EXTEND_SELECTION_PAGE_UP",    // Shift+Page Up
+  "EXTEND_SELECTION_PAGE_DOWN",  // Shift+Page Down
+  "NAVIGATE_DATA_EDGE_UP",       // Ctrl+↑ (macOS ⌘+↑): edge of the data block
+  "NAVIGATE_DATA_EDGE_DOWN",     // Ctrl+↓
+  "NAVIGATE_DATA_EDGE_LEFT",     // Ctrl+←
+  "NAVIGATE_DATA_EDGE_RIGHT",    // Ctrl+→
+  "EXTEND_TO_DATA_EDGE_UP",      // Ctrl+Shift+↑ (macOS ⌘+Shift+↑)
+  "EXTEND_TO_DATA_EDGE_DOWN",    // Ctrl+Shift+↓
+  "EXTEND_TO_DATA_EDGE_LEFT",    // Ctrl+Shift+←
+  "EXTEND_TO_DATA_EDGE_RIGHT",   // Ctrl+Shift+→
+  "SELECT_ROW",                  // Shift+Space: the rows of the active cell
+  "SELECT_COLUMN",               // Ctrl+Space: the columns of the active cell
+  "CLEAR_CELLS",                 // Delete: clear the selected cells
+  "CLEAR_AND_EDIT",              // Backspace: clear the active cell and open the editor (a range: like Delete)
 ] as const;
 
 /**

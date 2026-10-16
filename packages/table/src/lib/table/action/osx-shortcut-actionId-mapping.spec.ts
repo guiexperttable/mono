@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   actionIds,
+  editingShortcutLayer,
   createHarmonizedShortcutByKeyboardEvent,
   harmonizeShortcut,
   OsxShortcutActionIdMapping,
@@ -71,8 +72,8 @@ describe('OsxShortcutActionIdMapping', () => {
     }
   });
 
-  it('covers every ActionId with at least one shortcut', () => {
-    expect(new Set(Object.values(mapping))).toEqual(new Set(actionIds));
+  it('covers every ActionId with at least one shortcut – together with the Excel-style editing layer (1.1.99)', () => {
+    expect(new Set([...Object.values(mapping), ...Object.values(editingShortcutLayer(true))])).toEqual(new Set(actionIds));
   });
 
   it('has no "ctrl+x" and no "meta -" shortcut (unlike the Windows mapping)', () => {

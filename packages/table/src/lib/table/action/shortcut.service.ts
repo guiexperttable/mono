@@ -15,6 +15,10 @@ import { mirrorArrowKeys } from '../rtl/rtl-util';
  */
 export class ShortcutService {
 
+  /**
+   * The mapping as written: system, feature layers, then the app's mapping – one entry per key (a later spelling of
+   * the same key replaces the earlier one). See {@link getShortcutActionMapping}.
+   */
   private shortcutActionIdMapping: ShortcutActionIdMapping = {};
   private listener: OnActionTriggeredIf[] = [];
 
@@ -50,9 +54,12 @@ export class ShortcutService {
 
     } else {
       this.assignPredefinedSystemShortcutMappings();
-
+      // layers of features that are switched on (since 1.1.99: Excel-style editing)
+      for (const layer of this.tableScope.getShortcutLayers?.(this.isMacintosh()) ?? []) {
+        this.assignMapping(layer);
+      }
       // Overwrite predefined mapping with mapping from the table options:
-      Object.assign(this.shortcutActionIdMapping, this.tableScope.tableOptions.shortcutActionIdMapping);
+      this.assignMapping(this.tableScope.tableOptions.shortcutActionIdMapping);
 
       if (this.isDebug()) {
         console.debug("ShortcutService", this.shortcutActionIdMapping);
@@ -67,9 +74,28 @@ export class ShortcutService {
 
   private assignPredefinedSystemShortcutMappings(){
     if (this.isMacintosh()) {
-      Object.assign(this.shortcutActionIdMapping, new OsxShortcutActionIdMapping().get());
+      this.assignMapping(new OsxShortcutActionIdMapping().get());
     } else {
-      Object.assign(this.shortcutActionIdMapping, new WindowsShortcutActionIdMapping().get());
+      this.assignMapping(new WindowsShortcutActionIdMapping().get());
+    }
+  }
+
+  /**
+   * Adds a mapping under harmonized keys: a later mapping replaces an earlier one even if it spells the key
+   * differently ("meta+arrowleft" replaces "meta+left"; before 1.1.99 the first spelling silently won).
+   */
+  private assignMapping(mapping?: ShortcutActionIdMapping): void {
+    if (!mapping) {
+      return;
+    }
+    for (const key of Object.keys(mapping)) {
+      const harmonized = harmonizeShortcut(key);
+      for (const existing of Object.keys(this.shortcutActionIdMapping)) {
+        if (existing !== key && harmonizeShortcut(existing) === harmonized) {
+          delete this.shortcutActionIdMapping[existing]; // the same key in another spelling
+        }
+      }
+      this.shortcutActionIdMapping[key] = mapping[key];
     }
   }
 
@@ -132,7 +158,8 @@ export class ShortcutService {
       console.debug("ShortcutService shortcut  :",  shortcut);
     }
     for (const key in this.shortcutActionIdMapping) {
-      // compare with the (harmonized) mapping key – "ctrl+c", "meta+c", "arrowup" … – not with the event itself
+      // compare with the (harmonized) mapping key – "ctrl+c", "meta+c", "arrowup" … – not with the event itself;
+      // assignMapping() keeps one spelling per key, so the first match is the only one
       if (harmonizeShortcut(key) === shortcut) {
         if (this.isDebug()) {
           console.debug("ShortcutService action    :", this.shortcutActionIdMapping[key]);

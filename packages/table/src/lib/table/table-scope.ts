@@ -68,6 +68,15 @@ import { computeFillChanges, getFillRange } from './fill/compute-fill-changes';
 import { CellRange } from './data/common/cell-range';
 import { AriaTexts } from './aria/aria-texts';
 import type { AriaTextsIf } from './aria/aria-texts.if';
+import { EditingOptions } from './sheet-editing/editing-options';
+import type { EditingOptionsIf } from './sheet-editing/editing-options.if';
+import { CellEditorService } from './sheet-editing/cell-editor-service';
+import type { CellEditMode } from './sheet-editing/cell-editor.if';
+import { editingShortcutLayer } from './sheet-editing/editing-keymap';
+import { findDataEdge } from './sheet-editing/sheet-navigation';
+import type { ShortcutActionIdMapping } from './action/shortcut-actionid-mapping.type';
+import { GeEditEvent } from './data/common/event/ge-edit-event';
+import { createEventListenerHub } from './event-listener-hub';
 
 
 /**
@@ -133,7 +142,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   readonly liveAnnouncer: LiveAnnouncer;
   /** Keyboard actions ignored while a blocking loading overlay is shown ({@link OverlayOptionsIf.blockInteractionWhileLoading}). */
-  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT'];
+  static actionsBlockedWhileLoading: ActionId[] = ['START_EDITING', 'TOGGLE_SELECTION', 'ACTIVATE_CELL', 'MOVE_ROW_UP', 'MOVE_ROW_DOWN', 'FILL_DOWN', 'FILL_RIGHT', 'CLEAR_CELLS', 'CLEAR_AND_EDIT'];
   /** Delay of the "42 rows" announcement after a filter change (typing in a filter field: one announcement). */
   static filterAnnouncementDelayInMs = 400;
   /** The text announced when the loading overlay appeared (dropped if loading ends before it is spoken). */
@@ -152,6 +161,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private firstDraggingRendering = true;
   /** Last comparator passed to `sort()`; re-applied after filtering. Cleared by a header sort. */
   private lastSortCompareFn?: (a: any, b: any) => number;
+  /** Excel-style editing (`tableOptions.editing`), `undefined` = off. @since 1.1.99 */
+  private readonly editingOptions?: EditingOptionsIf = EditingOptions.create(this.tableOptions?.editing);
+  /** Listeners of {@link TableApi.subscribe}. @since 1.1.99 */
+  private readonly subscribers = new Set<Partial<EventListenerIf>>();
 
   constructor(
     hostElement: HTMLDivElement,
@@ -166,9 +179,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     tableModel.setTableScope(this);
     this.liveAnnouncer = new LiveAnnouncer(hostElement.ownerDocument, this.ariaIds.liveRegion(), domService);
 
-    if (!eventListener) {
-      this.eventListener = new EventAdapter();
-    }
+    // the constructor's listener plus the listeners of TableApi.subscribe() (since 1.1.99)
+    this.eventListener = createEventListenerHub(eventListener ?? new EventAdapter(), this.subscribers);
     this.stateService = new TableStateService(this);
     this.mouseHandler = new MouseHandler(this);
     this.inputHandler = new InputHandler(this);
@@ -178,6 +190,15 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.rowDragService = new RowDragService(this);
     this.batchEditService = new BatchEditService(this);
     this.fillHandleService = new FillHandleService(this);
+    if (this.editingOptions) {
+      // Excel-style editing (since 1.1.99): the editor above the cell, typing to edit
+      this.cellEditorService = new CellEditorService(this, this.editingOptions);
+      const body = tableModel.getBodyModel();
+      if (this.editingOptions.defaultEditable && 'defaultEditable' in body) {
+        (body as { defaultEditable: boolean }).defaultEditable = true; // AbstractAreaModel and its subclasses
+      }
+      this.setHostAriaAttribute('aria-description', this.getSheetTexts().gridEditingHint());
+    }
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
         (host, model, options, listener) => new TableScope(host, model, new SimpleDomService(),
@@ -295,6 +316,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       // fill handle, keyboard alternative (since 1.1.96) – only with tableOptions.fillHandle and a selected range
       return !this.headerFocus && this.fillByKeyboard(actionId === 'FILL_DOWN' ? 'down' : 'right');
     }
+    const sheetAction = this.onSheetAction(actionId);
+    if (sheetAction !== undefined) {
+      return sheetAction; // Excel-style editing (since 1.1.99)
+    }
     if (actionId === 'MOVE_ROW_UP' || actionId === 'MOVE_ROW_DOWN') {
       // row drag, keyboard alternative (since 1.1.95) – only in the body
       return !this.headerFocus && !!this.rowDragService?.moveByKeyboard(actionId === 'MOVE_ROW_UP' ? -1 : 1);
@@ -332,8 +357,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         if (fm) {
           const [rowIdx, colIdx] = fm.getFocus();
           if (this.tableModel.getBodyModel().isEditable(rowIdx, colIdx)) {
-            this.clearSelection();
-            this.initRenderEditor(rowIdx, colIdx);
+            this.startEditing(rowIdx, colIdx, 'edit', 'end'); // F2: caret at the end (Excel)
           }
         }
         return true;
@@ -348,6 +372,456 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
     }
     return false;
+  }
+
+  // ------------------------------------------------------------------- Excel-style editing (since 1.1.99)
+
+  /**
+   * The options of Excel-style editing ({@link TableOptionsIf.editing}), `undefined` if it is off.
+   *
+   * @returns {EditingOptionsIf | undefined} complete options
+   * @since 1.1.99
+   */
+  getEditingOptions(): EditingOptionsIf | undefined {
+    return this.editingOptions;
+  }
+
+  /**
+   * Shortcut layers of switched-on features, applied over the system mapping (see {@link ShortcutService}).
+   *
+   * @param {boolean} mac - macOS keys
+   * @returns {ShortcutActionIdMapping[]} the layers (none without Excel-style editing)
+   * @since 1.1.99
+   */
+  getShortcutLayers(mac: boolean): ShortcutActionIdMapping[] {
+    const editing = this.editingOptions;
+    if (!editing) {
+      return [];
+    }
+    const layer = editingShortcutLayer(mac);
+    if (!editing.tabMoves) {
+      delete layer['tab'];
+      delete layer['shift+tab'];
+    }
+    if (!editing.clearKeys) {
+      delete layer['delete'];
+      delete layer['backspace'];
+    }
+    return [layer];
+  }
+
+  /**
+   * Adds a listener next to the one given to the constructor (see {@link TableApi.subscribe}).
+   *
+   * @param {Partial<EventListenerIf>} listener - the events of interest
+   * @returns {() => void} removes the listener again
+   * @since 1.1.99
+   */
+  subscribe(listener: Partial<EventListenerIf>): () => void {
+    this.subscribers.add(listener);
+    return () => {
+      this.subscribers.delete(listener);
+    };
+  }
+
+  /**
+   * Opens the cell editor of a body cell: the editor above the cell (Excel-style editing) or – for columns with an
+   * own `getEditRenderer`, and without `tableOptions.editing` – the editor inside the cell.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @param {CellEditMode} [mode="edit"] - "edit" (F2, Enter, double click) or "enter" (typing)
+   * @param {"all" | "end"} [textSelection] - select the text or put the caret at the end (default: the option)
+   * @returns {boolean} true if an editor is open
+   * @since 1.1.99
+   */
+  startEditing(rowIndex: number, columnIndex: number, mode: CellEditMode = 'edit', textSelection?: 'all' | 'end'): boolean {
+    if (this.cellEditorService?.handlesColumn(columnIndex)) {
+      return this.cellEditorService.start(rowIndex, columnIndex, { mode, textSelection });
+    }
+    if (!this.tableModel.getBodyModel().isEditable(rowIndex, columnIndex)) {
+      return false;
+    }
+    this.clearSelection();
+    this.initRenderEditor(rowIndex, columnIndex);
+    const open = this.getInCellEditorCell();
+    if (open) {
+      this.eventListener.onEditingChanged?.(new GeEditEvent('start', rowIndex, columnIndex, mode));
+    }
+    return !!open;
+  }
+
+  /** True if a new editor may open now: no header focus, no blocking overlay, no running drag or fill. @since 1.1.99 */
+  canStartEditing(): boolean {
+    return !this.isDestroyed() && !this.headerFocus && !this.tableOverlay.isBlocking()
+      && !this.rowDragService?.isDragging() && !this.fillHandleService?.isFilling() && !this.editing;
+  }
+
+  /**
+   * The value a body cell shows: a pending value of a batch edit, otherwise the model value.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @returns {unknown} the value
+   * @since 1.1.99
+   */
+  getShownCellValue(rowIndex: number, columnIndex: number): unknown {
+    return this.batchEditService
+      ? this.batchEditService.getShownValue(rowIndex, columnIndex)
+      : this.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex);
+  }
+
+  /** The body cell with the keyboard focus, `undefined` if there is none (or the header has the focus). @since 1.1.99 */
+  getActiveBodyCell(): [number, number] | undefined {
+    const fm = this.focusModel();
+    if (!fm || this.headerFocus) {
+      return undefined;
+    }
+    const [row, col] = fm.getFocus();
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    return row >= 0 && col >= 0 && row < rowCount && col < this.tableModel.getColumnCount() ? [row, col] : undefined;
+  }
+
+  /**
+   * True if there is a shown column (no row number column) next to `columnIndex` in that direction – Tab uses it:
+   * in the last column it leaves the table.
+   *
+   * @param {number} columnIndex - model column index
+   * @param {number} direction - 1 or -1
+   * @returns {boolean} true if Tab can move
+   * @since 1.1.99
+   */
+  hasShownColumnBeside(columnIndex: number, direction: number): boolean {
+    const next = this.getNextShownColumnIndex(columnIndex, direction, this.tableModel.getColumnCount());
+    return next !== columnIndex && !isRowNumberColumnDef(this.tableModel.getColumnDef(next));
+  }
+
+  /**
+   * Moves the keyboard focus from a cell by rows/columns (Excel-style editing: Enter, Tab and arrow keys after
+   * committing); the selection follows with `collapseSelectionOnNavigate`.
+   *
+   * @param {number} rowIndex - start row
+   * @param {number} columnIndex - start column
+   * @param {number} dRow - rows
+   * @param {number} dColumn - columns (hidden columns are skipped)
+   * @returns {boolean} true if a focus model exists
+   * @since 1.1.99
+   */
+  moveActiveCell(rowIndex: number, columnIndex: number, dRow: number, dColumn: number): boolean {
+    const fm = this.focusModel();
+    if (!fm) {
+      return false;
+    }
+    if (!fm.hasFocus(rowIndex, columnIndex)) {
+      fm.setFocus(rowIndex, columnIndex);
+    }
+    return this.changeFocusCell(dColumn, dRow);
+  }
+
+  /**
+   * The selected body cells (shown columns, inside the table) – `undefined` if there are more than `maxCells`.
+   *
+   * @param {number} maxCells - upper limit
+   * @returns {Array<[number, number]> | undefined} row and column per cell; none without selection
+   * @since 1.1.99
+   */
+  getSelectedBodyCells(maxCells: number): Array<[number, number]> | undefined {
+    return this.collectSelectedBodyCells(maxCells);
+  }
+
+  /**
+   * The body cells of the selection (or of `given` ranges): clamped to the table, shown columns without row number
+   * column, each cell once – `undefined` if there are more than `maxCells` (checked before the cells are visited).
+   */
+  private collectSelectedBodyCells(maxCells: number, given?: CellRange[]): Array<[number, number]> | undefined {
+    const sm = this.selectionModel();
+    if (!given && !sm?.hasSelection() && !sm?.isAllSelected()) {
+      return [];
+    }
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    const columnCount = this.tableModel.getColumnCount();
+    const ranges = given ?? (sm!.isAllSelected() ? [new CellRange(0, 0, rowCount - 1, columnCount - 1)] : sm!.getRanges());
+    const shown = (c: number) => this.tableModel.getColumnWidth(c) > 0
+      && !isRowNumberColumnDef(this.tableModel.getColumnDef(c));
+    const ret: Array<[number, number]> = [];
+    const seen = ranges.length > 1 ? new Set<number>() : undefined;
+    for (const range of ranges) {
+      const r1 = Math.max(0, range.r1);
+      const r2 = Math.min(rowCount - 1, range.r2);
+      const c1 = Math.max(0, range.c1);
+      const c2 = Math.min(columnCount - 1, range.c2);
+      if (r2 >= r1 && c2 >= c1 && (r2 - r1 + 1) * (c2 - c1 + 1) > maxCells) {
+        return undefined;
+      }
+      for (let r = r1; r <= r2; r++) {
+        for (let c = c1; c <= c2; c++) {
+          if (!shown(c) || (!given && !sm!.isSelected(r, c))) continue;
+          if (seen) {
+            const key = r * columnCount + c;
+            if (seen.has(key)) continue;
+            seen.add(key);
+          }
+          ret.push([r, c]);
+          if (ret.length > maxCells) return undefined;
+        }
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Clears body cells (Delete in Excel-style editing): editable cells get `ColumnDef.emptyValue` (default
+   * `EditingOptionsIf.emptyValue`, `""`), cells that are already empty are left alone; **one** `onModelChanged` with
+   * the source `"clear"`. Without `ranges`: the selected cells, or the focused cell.
+   *
+   * @param {CellRange[]} [ranges] - body ranges (display indices)
+   * @returns {number} the number of cleared cells; `-1` if more than `maxClearCells`
+   * @since 1.1.99
+   */
+  clearCells(ranges?: CellRange[]): number {
+    const max = this.editingOptions?.maxClearCells ?? CopyService.maxCopyCells;
+    const cells = this.collectSelectedBodyCells(max, ranges);
+    if (!cells) {
+      this.announce(this.getSheetTexts().clearTooLarge(max));
+      return -1;
+    }
+    if (!cells.length && !ranges) {
+      const active = this.getActiveBodyCell();
+      if (active) cells.push(active);
+    }
+    const body = this.tableModel.getBodyModel();
+    const empty = (v: unknown) => v === null || v === undefined || v === '';
+    const changes: CellValueChangeIf[] = [];
+    for (const [r, c] of cells) {
+      if (r < 0 || c < 0 || r >= body.getRowCount() || c >= this.tableModel.getColumnCount()) continue;
+      if (!body.isEditable(r, c) || empty(this.getShownCellValue(r, c))) continue;
+      const def = this.tableModel.getColumnDef(c);
+      const value = def?.emptyValue !== undefined ? def.emptyValue : (this.editingOptions?.emptyValue ?? '');
+      changes.push({ rowIndex: r, column: c, value });
+    }
+    const written = changes.length ? this.applyCellChanges(changes, 'clear') : [];
+    this.announce(this.getSheetTexts().cellsCleared(written.length));
+    return written.length;
+  }
+
+  /**
+   * Writes the value of the editor above the cell (Excel-style editing): into one cell, or – Ctrl/⌘+Enter – into
+   * several; batch edit: marks it. Used by {@link CellEditorService}.
+   *
+   * @param {Array<[number, number]>} cells - display row and model column per cell
+   * @param {unknown} value - the editor value (it runs through `editInputPipe` and `validate`)
+   * @param {boolean} deferRepaint - repaint after the current mouse click
+   * @returns {{ written: number, invalid: number, message?: string }} what happened
+   * @since 1.1.99
+   */
+  commitCellEditor(cells: Array<[number, number]>, value: unknown, deferRepaint: boolean): { written: number; invalid: number; message?: string } {
+    const changes = cells.map(([rowIndex, column]) => ({ rowIndex, column, value }));
+    const resolved = this.resolveCellChanges(changes, cells.length > 1);
+    if (!resolved.length) {
+      return { written: 0, invalid: 0 };
+    }
+    if (this.batchEditService?.isActive()) {
+      this.markPending(resolved.map(c => ({ rowIndex: c.rowIndex, column: c.columnIndex, value: c.value })), true);
+      if (deferRepaint) {
+        this.debounceRepaint();
+      } else {
+        this.repaint();
+      }
+      return { written: resolved.length, invalid: 0 }; // invalid pending values are marked, not refused
+    }
+    const result = this.writeCellsInternal(resolved, 'edit', { deferRepaint });
+    return { written: result.changes.length, invalid: result.invalid, message: result.message };
+  }
+
+  /**
+   * Space on a cell with a `true`/`false` value (Excel-style editing): writes the opposite value.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @since 1.1.99
+   */
+  toggleBooleanCell(rowIndex: number, columnIndex: number): void {
+    this.applyCellChanges([{ rowIndex, column: columnIndex, value: !this.getShownCellValue(rowIndex, columnIndex) }], 'edit');
+  }
+
+  /** The texts of Excel-style editing (own functions of `tableOptions.ariaTexts`, otherwise English). @since 1.1.99 */
+  getSheetTexts(): Required<Pick<AriaTextsIf, 'editingStarted' | 'readOnlyCell' | 'cellsCleared' | 'clearTooLarge' |
+    'rangeSelected' | 'rowSelected' | 'columnSelected' | 'gridEditingHint'>> {
+    const texts = (this.ariaTexts ?? {}) as Partial<AriaTextsIf>;
+    const defaults = new AriaTexts();
+    return {
+      editingStarted: (l: string) => (texts.editingStarted ?? defaults.editingStarted).call(texts, l),
+      readOnlyCell: () => (texts.readOnlyCell ?? defaults.readOnlyCell).call(texts),
+      cellsCleared: (n: number) => (texts.cellsCleared ?? defaults.cellsCleared).call(texts, n),
+      clearTooLarge: (n: number) => (texts.clearTooLarge ?? defaults.clearTooLarge).call(texts, n),
+      rangeSelected: (r: number, c: number) => (texts.rangeSelected ?? defaults.rangeSelected).call(texts, r, c),
+      rowSelected: (n: number) => (texts.rowSelected ?? defaults.rowSelected).call(texts, n),
+      columnSelected: (n: number) => (texts.columnSelected ?? defaults.columnSelected).call(texts, n),
+      gridEditingHint: () => (texts.gridEditingHint ?? defaults.gridEditingHint).call(texts),
+    };
+  }
+
+  /** The keys of Excel-style editing that are ActionIds (Tab, Shift+arrows, Ctrl+arrows, Delete …). */
+  private onSheetAction(actionId: ActionId): boolean | undefined {
+    const editing = this.editingOptions;
+    if (!editing) {
+      return undefined;
+    }
+    switch (actionId) {
+      case 'NAVIGATE_NEXT_CELL':
+      case 'NAVIGATE_PREVIOUS_CELL': {
+        const cell = this.getActiveBodyCell();
+        const dir = actionId === 'NAVIGATE_NEXT_CELL' ? 1 : -1;
+        if (!cell || this.isEditing() || !this.hasShownColumnBeside(cell[1], dir)) {
+          return false; // the last (first) column: Tab leaves the table – no keyboard trap
+        }
+        if (dir > 0 && this.masterDetailService?.hasTabTarget(cell[0])) {
+          return false; // an open detail row: Tab goes into it (master/detail)
+        }
+        return this.moveActiveCell(cell[0], cell[1], 0, dir);
+      }
+      case 'EXTEND_SELECTION_UP':
+      case 'EXTEND_SELECTION_DOWN':
+      case 'EXTEND_SELECTION_LEFT':
+      case 'EXTEND_SELECTION_RIGHT':
+      case 'EXTEND_SELECTION_ROW_START':
+      case 'EXTEND_SELECTION_ROW_END':
+      case 'EXTEND_SELECTION_PAGE_UP':
+      case 'EXTEND_SELECTION_PAGE_DOWN': {
+        const from = this.getSelectionExtent();
+        if (!from || this.isEditing()) {
+          return false;
+        }
+        const [r, c] = from;
+        const rowCount = this.tableModel.getBodyModel().getRowCount();
+        const columnCount = this.tableModel.getColumnCount();
+        const page = Math.max(1, this.displayedRowCount - 1);
+        const targets: Partial<Record<ActionId, [number, number]>> = {
+          EXTEND_SELECTION_UP: [Math.max(0, r - 1), c],
+          EXTEND_SELECTION_DOWN: [Math.min(rowCount - 1, r + 1), c],
+          EXTEND_SELECTION_LEFT: [r, this.getNextShownColumnIndex(c, -1, columnCount)],
+          EXTEND_SELECTION_RIGHT: [r, this.getNextShownColumnIndex(c, 1, columnCount)],
+          EXTEND_SELECTION_ROW_START: [r, this.getFirstShownDataColumnIndex()],
+          EXTEND_SELECTION_ROW_END: [r, this.getLastShownColumnIndex()],
+          EXTEND_SELECTION_PAGE_UP: [Math.max(0, r - page), c],
+          EXTEND_SELECTION_PAGE_DOWN: [Math.min(rowCount - 1, r + page), c],
+        };
+        const [tr, tc] = targets[actionId]!;
+        return this.extendSelectionTo(tr, isRowNumberColumnDef(this.tableModel.getColumnDef(tc)) ? c : tc);
+      }
+      case 'NAVIGATE_DATA_EDGE_UP':
+      case 'NAVIGATE_DATA_EDGE_DOWN':
+      case 'NAVIGATE_DATA_EDGE_LEFT':
+      case 'NAVIGATE_DATA_EDGE_RIGHT': {
+        const cell = this.getActiveBodyCell();
+        if (!cell || this.isEditing()) {
+          return false;
+        }
+        const [tr, tc] = this.dataEdge(cell, actionId);
+        return this.setFocusCell(tr, tc);
+      }
+      case 'EXTEND_TO_DATA_EDGE_UP':
+      case 'EXTEND_TO_DATA_EDGE_DOWN':
+      case 'EXTEND_TO_DATA_EDGE_LEFT':
+      case 'EXTEND_TO_DATA_EDGE_RIGHT': {
+        const from = this.getSelectionExtent();
+        if (!from || this.isEditing()) {
+          return false;
+        }
+        const [tr, tc] = this.dataEdge(from, actionId);
+        return this.extendSelectionTo(tr, tc);
+      }
+      case 'SELECT_ROW':
+      case 'SELECT_COLUMN':
+        return this.selectWholeRowsOrColumns(actionId === 'SELECT_ROW');
+      case 'CLEAR_CELLS':
+        if (!editing.clearKeys || this.isEditing() || this.headerFocus) return false;
+        this.clearCells();
+        return true;
+      case 'CLEAR_AND_EDIT': {
+        if (!editing.clearKeys || this.isEditing() || this.headerFocus) return false;
+        const cell = this.getActiveBodyCell();
+        const selected = this.collectSelectedBodyCells(1); // undefined: more than one cell – clear like Delete
+        if (cell && selected
+          && this.cellEditorService?.handlesColumn(cell[1]) && this.tableModel.getBodyModel().isEditable(cell[0], cell[1])) {
+          // Excel: Backspace empties the active cell in the editor – Escape keeps the old value
+          this.cellEditorService.start(cell[0], cell[1], { mode: 'enter', typedText: '' });
+          return true;
+        }
+        this.clearCells();
+        return true;
+      }
+      default:
+        return undefined;
+    }
+  }
+
+  /** The moving corner of the selected range (Shift+arrows), the active cell if there is none. */
+  private getSelectionExtent(): [number, number] | undefined {
+    if (this.headerFocus) {
+      return undefined; // the header has the focus: nothing to extend
+    }
+    return this.selectionService.getExtent() ?? this.getActiveBodyCell();
+  }
+
+  /** The first shown column that is no row number column. */
+  private getFirstShownDataColumnIndex(): number {
+    const first = this.getFirstShownColumnIndex();
+    return isRowNumberColumnDef(this.tableModel.getColumnDef(first))
+      ? this.getNextShownColumnIndex(first, 1, this.tableModel.getColumnCount()) : first;
+  }
+
+  /** Ctrl+arrow: Excel's edge of the data block from a cell (shown columns, no row number column). */
+  private dataEdge(from: [number, number], actionId: ActionId): [number, number] {
+    const dRow = actionId.endsWith('_UP') ? -1 : actionId.endsWith('_DOWN') ? 1 : 0;
+    const dCol = actionId.endsWith('_LEFT') ? -1 : actionId.endsWith('_RIGHT') ? 1 : 0;
+    const empty = (r: number, c: number) => {
+      const v = this.getShownCellValue(r, c);
+      return v === null || v === undefined || v === '';
+    };
+    return findDataEdge(empty, this.tableModel.getBodyModel().getRowCount(), this.tableModel.getColumnCount(),
+      from[0], from[1], dRow, dCol,
+      c => this.tableModel.getColumnWidth(c) > 0 && !isRowNumberColumnDef(this.tableModel.getColumnDef(c)));
+  }
+
+  /** Shift+arrows: the range from the anchor to `(row, column)`, scrolled into view and announced. */
+  private extendSelectionTo(rowIndex: number, columnIndex: number): boolean {
+    const range = this.selectionService.extendTo(rowIndex, columnIndex);
+    if (!range) {
+      return false;
+    }
+    this.ensureColumnIsVisible(columnIndex);
+    this.ensureRowIsVisible(rowIndex);
+    this.repaint();
+    let columns = 0;
+    for (let c = range.c1; c <= range.c2; c++) {
+      if (this.tableModel.getColumnWidth(c) > 0) columns++;
+    }
+    this.announce(this.getSheetTexts().rangeSelected(range.r2 - range.r1 + 1, columns));
+    return true;
+  }
+
+  /** Shift+Space / Ctrl+Space: the rows (columns) of the last range or of the active cell. */
+  private selectWholeRowsOrColumns(rows: boolean): boolean {
+    const sm = this.selectionModel();
+    const cell = this.getActiveBodyCell();
+    if (!sm || !cell || this.isEditing() || (sm as unknown as { selectionType?: string }).selectionType !== 'range') {
+      return false;
+    }
+    const ranges = sm.getRanges();
+    const last = ranges.length ? ranges[ranges.length - 1] : CellRange.singleCell(cell[0], cell[1]);
+    const range = rows
+      ? new CellRange(last.r1, 0, last.r2, Number.MAX_SAFE_INTEGER)
+      : new CellRange(0, last.c1, Number.MAX_SAFE_INTEGER, last.c2);
+    this.holdSelectionEvents(() => {
+      sm.clear();
+      sm.addSelection(range);
+      this.onSelectionChanged(sm);
+    });
+    this.repaint();
+    const texts = this.getSheetTexts();
+    this.announce(rows ? texts.rowSelected(last.r2 - last.r1 + 1) : texts.columnSelected(last.c2 - last.c1 + 1));
+    return true;
   }
 
   /**
@@ -509,8 +983,16 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     fm.setFocus(rowIndex, columnIndex);
     this.ensureColumnIsVisible(columnIndex); // first: ensureRowIsVisible() keeps the horizontal position
     this.ensureRowIsVisible(rowIndex);
+    this.afterActiveCellMoved(rowIndex, columnIndex);
     this.repaint();
     return true;
+  }
+
+  /** Excel-style editing: the keyboard moved the active cell – it becomes the selection and the anchor. */
+  private afterActiveCellMoved(rowIndex: number, columnIndex: number): void {
+    if (this.editingOptions?.collapseSelectionOnNavigate) {
+      this.selectionService.collapseTo(rowIndex, columnIndex);
+    }
   }
 
   private getFirstShownColumnIndex(): number {
@@ -554,8 +1036,26 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         return this.setFocusCell(Math.max(0, currentRow - page), currentCol);
       case 'NAVIGATE_PAGE_DOWN':
         return this.setFocusCell(Math.min(rowCount - 1, currentRow + page), currentCol);
-      default:
-        return row < 0 || col < 0 ? false : this.activateBodyCell(row, col);
+      default: {
+        if (row < 0 || col < 0) {
+          return false;
+        }
+        if (this.activateBodyCell(row, col)) {
+          return true;
+        }
+        // Excel-style editing (since 1.1.99): Enter edits (Google Sheets) or moves down (Excel)
+        const editing = this.editingOptions;
+        if (!editing) {
+          return false;
+        }
+        if (editing.enterKey === 'moveDown') {
+          return this.moveActiveCell(row, col, 1, 0);
+        }
+        if (this.tableModel.getBodyModel().isEditable(row, col)) {
+          return this.startEditing(row, col, 'edit');
+        }
+        return false;
+      }
     }
   }
 
@@ -694,6 +1194,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    *        first, so the blur caused by closing does not commit the typed text ("change" event)
    */
   cancelEditing(editor?: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+    const cell = this.getInCellEditorCell();
+    if (cell) {
+      this.eventListener.onEditingChanged?.(new GeEditEvent('cancel', cell[0], cell[1], 'edit'));
+    }
     if (editor instanceof HTMLSelectElement) {
       const defaultOption = Array.from(editor.options).find(o => o.defaultSelected);
       editor.selectedIndex = defaultOption ? defaultOption.index : -1;
@@ -717,6 +1221,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   updateModelValueAfterEdit(areaIdent: AreaIdent, rowIndex: number, columnIndex: number, value: string) {
     if (areaIdent !== 'body') {
       return;
+    }
+    if (this.getInCellEditorCell()) {
+      this.eventListener.onEditingChanged?.(new GeEditEvent('commit', rowIndex, columnIndex, 'edit', value));
     }
     const closeEditor = () => {
       this.resetEditorRenderer();
@@ -781,8 +1288,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private writeCellsInternal(
     cells: { rowIndex: number; columnIndex: number; value: unknown }[],
     source: CellChangeSource,
-    opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void }
-  ): { changes: CellChangeIf[]; invalid: number } {
+    opts: { extraChanges?: CellChangeIf[]; skipValidation?: boolean; beforeRepaint?: () => void; deferRepaint?: boolean }
+  ): { changes: CellChangeIf[]; invalid: number; message?: string } {
     const body = this.tableModel.getBodyModel();
     const rowCountBefore = body.getRowCount();
     const buildsBefore = isAreaModelRowGroups(body) ? body.getBuildCount() : 0;
@@ -823,7 +1330,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     const all = opts.extraChanges?.length ? [...changes, ...opts.extraChanges] : changes;
     if (!all.length) {
-      return { changes: all, invalid };
+      return { changes: all, invalid, message: firstMessage || undefined };
     }
     opts.beforeRepaint?.();
     // only body rows changed: models may recompute less (a row grouping only the groups of these rows)
@@ -834,6 +1341,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const moved = isAreaModelRowGroups(body) && body.getBuildCount() !== buildsBefore;
     if (moved || body.getRowCount() !== rowCountBefore || source === 'commit') {
       this.repaintHard(); // e.g. a grouped value changed: the row moved to another group
+    } else if (opts.deferRepaint) {
+      this.debounceRepaint(); // a mouse click commits: repaint after it (the mouse handler holds it until mouseup)
     } else {
       this.repaint();
     }
@@ -848,7 +1357,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     } else {
       this.eventListener.onModelChanged?.(GeModelChangeEvent.createForChanges(all, source));
     }
-    return { changes: all, invalid };
+    return { changes: all, invalid, message: firstMessage || undefined };
   }
 
   /** Marks values as pending (batch edit): pipe, validation, then the batch edit service. */
@@ -1140,6 +1649,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       console.error(e);
     }
     this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
+    this.cellEditorService?.destroy(); // the editor above the cell (since 1.1.99)
+    this.subscribers.clear();
     try {
       this.masterDetailService?.destroy(); // detail contents: renderer cleanups, nested tables destroyed
     } catch (e) {
@@ -1647,6 +2158,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   protected override afterRenderPass(): void {
     this.stateService?.rendered(); // undefined while the constructor of the super class renders
     this.fillHandleService?.update(); // the handle follows the selected range (scroll, selection, editor)
+    this.cellEditorService?.update(); // the editor follows its cell (Excel-style editing, since 1.1.99)
   }
 
   onSelectionChanged(sm: SelectionModelIf) {
@@ -2005,6 +2517,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
           fm.setFocus(newRowIdx, newColIdx);
           this.ensureColumnIsVisible(newColIdx); // first: ensureRowIsVisible() keeps the horizontal position
           this.ensureRowIsVisible(newRowIdx);
+          this.afterActiveCellMoved(newRowIdx, newColIdx);
+          this.repaint();
+        } else if (this.editingOptions?.collapseSelectionOnNavigate) {
+          this.afterActiveCellMoved(newRowIdx, newColIdx); // at the edge: an arrow key still ends a range (Excel)
           this.repaint();
         }
         return true;

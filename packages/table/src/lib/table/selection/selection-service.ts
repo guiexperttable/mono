@@ -23,6 +23,10 @@ export class SelectionService implements OnActionTriggeredIf {
   protected anchorRanges: CellRange[] = [];
   /** The selection before a Ctrl/⌘-drag – each drag frame replaces only the dragged rectangle. */
   protected dragSnapshot?: SelectionSnapshot;
+  /** The cell a Shift+click or Shift+arrow range starts at (the last click, or the active cell). @since 1.1.99 */
+  protected anchor?: [number, number];
+  /** The moving corner of the range of Shift+arrows (Excel); `undefined` = the anchor. @since 1.1.99 */
+  protected extent?: [number, number];
 
 
   constructor(
@@ -72,6 +76,8 @@ export class SelectionService implements OnActionTriggeredIf {
         fm.setFocus(startEvt.rowIndex, startEvt.columnIndex); // fires onFocusChanged (TableScope listens to the model)
       }
       this.previousEvt = startEvt.clone();
+      this.anchor = [startEvt.rowIndex, startEvt.columnIndex];
+      this.extent = [evt.rowIndex, evt.columnIndex];
       this.anchorRanges = [];
       this.ignoreNextClick = evt.rowIndex !== startEvt.rowIndex || evt.columnIndex !== startEvt.columnIndex;
       this.tableScope.onSelectionChanged(sm);
@@ -125,13 +131,16 @@ export class SelectionService implements OnActionTriggeredIf {
           // a click on a row number with selection type "range": whole rows (since 1.1.93)
           const wholeRows = this.isRowNumberColumn(evt.columnIndex) && SelectionService.isRangeSelection(sm);
 
-          if (shiftKey && this.previousEvt) {
+          if (shiftKey && (this.anchor || this.previousEvt)) {
             if (this.anchorRanges.length && SelectionService.hasSnapshots(sm)) {
               // what the anchor click (or the previous shift-click) selected is replaced by the new rectangle
               const current = sm.createSnapshot();
               sm.restoreSnapshot({ ...current, ranges: current.ranges.filter(r => !this.anchorRanges.includes(r)) });
             }
-            const range = this.createRangeByEvents(evt, this.previousEvt);
+            // from the anchor: the last click – or, since 1.1.99, the active cell set by the keyboard
+            const [ar, ac] = this.anchor ?? [this.previousEvt!.rowIndex, this.previousEvt!.columnIndex];
+            const range = SelectionService.rangeBetween(evt.rowIndex, evt.columnIndex, ar, ac);
+            this.extent = [evt.rowIndex, evt.columnIndex];
             if (wholeRows) {
               range.c1 = 0;
               range.c2 = Number.MAX_SAFE_INTEGER;
@@ -159,6 +168,8 @@ export class SelectionService implements OnActionTriggeredIf {
           }
           this.anchorRanges = sm.getRanges().filter(r => !before.includes(r));
           this.previousEvt = evt.clone();
+          this.anchor = [evt.rowIndex, evt.columnIndex];
+          this.extent = undefined;
           this.tableScope.onSelectionChanged(sm);
         });
         dirty = true;
@@ -204,6 +215,113 @@ export class SelectionService implements OnActionTriggeredIf {
     return false;
   }
 
+
+  /**
+   * The cell a Shift+click or Shift+arrow range starts at: the last clicked cell or the active cell set by the
+   * keyboard ({@link collapseTo}).
+   *
+   * @returns {[number, number] | undefined} row and column, `undefined` before the first click/keyboard move
+   * @since 1.1.99
+   */
+  getAnchor(): [number, number] | undefined {
+    return this.anchor ? [this.anchor[0], this.anchor[1]] : undefined;
+  }
+
+  /**
+   * The moving corner of the range Shift+arrows grow (the anchor if there is none).
+   *
+   * @returns {[number, number] | undefined} row and column
+   * @since 1.1.99
+   */
+  getExtent(): [number, number] | undefined {
+    const fm = this.getFocusModel?.();
+    const [fr, fc] = fm ? fm.getFocus() : [-1, -1];
+    const e = this.extent ?? this.anchor;
+    const a = this.anchor;
+    if (fr >= 0 && fc >= 0 && !(a && a[0] === fr && a[1] === fc) && !(e && e[0] === fr && e[1] === fc)) {
+      return [fr, fc]; // the focus moved by code: a new range starts at it
+    }
+    return e ? [e[0], e[1]] : undefined;
+  }
+
+  /**
+   * Excel-style editing: the active cell moved (arrow keys, Tab, Enter) – the selection becomes this one cell and it
+   * is the new anchor. Selection types other than `"range"`/`"cell"` only get the anchor.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @since 1.1.99
+   */
+  collapseTo(rowIndex: number, columnIndex: number): void {
+    const sm = this.getSelectionModel?.();
+    this.anchor = [rowIndex, columnIndex];
+    this.extent = undefined;
+    this.anchorRanges = [];
+    const type = (sm as unknown as { selectionType?: string } | undefined)?.selectionType;
+    if (!sm || (type !== 'range' && type !== 'cell')) {
+      return;
+    }
+    this.batch(() => {
+      const ranges = sm.getRanges();
+      const single = ranges.length === 1 && ranges[0].r1 === rowIndex && ranges[0].r2 === rowIndex
+        && ranges[0].c1 === columnIndex && ranges[0].c2 === columnIndex && !sm.isAllSelected();
+      if (!single) {
+        sm.clear();
+        sm.addSelection(CellRange.singleCell(rowIndex, columnIndex));
+        this.tableScope.onSelectionChanged(sm);
+      }
+      this.anchorRanges = sm.getRanges().slice();
+    });
+  }
+
+  /**
+   * Excel-style editing (Shift+arrows): the last range is spanned from the anchor to `(rowIndex, columnIndex)`;
+   * other ranges (Ctrl/⌘-clicks) stay. Only for the selection type `"range"`.
+   *
+   * @param {number} rowIndex - the new moving corner (display row index)
+   * @param {number} columnIndex - model column index
+   * @returns {CellRange | undefined} the new range, `undefined` without a range selection
+   * @since 1.1.99
+   */
+  extendTo(rowIndex: number, columnIndex: number): CellRange | undefined {
+    const sm = this.getSelectionModel?.();
+    if (!sm || !SelectionService.isRangeSelection(sm)) {
+      return undefined;
+    }
+    // the anchor is the active cell: a focus set by code (or the API) starts a new range there – unless the focus is
+    // the moving corner itself (after a Shift+click)
+    const fm = this.getFocusModel?.();
+    const [fr, fc] = fm ? fm.getFocus() : [-1, -1];
+    const extent = this.extent ?? this.anchor;
+    const focusIsAnchorOrExtent = (this.anchor && this.anchor[0] === fr && this.anchor[1] === fc)
+      || (extent && extent[0] === fr && extent[1] === fc);
+    if ((!this.anchor || !focusIsAnchorOrExtent) && fr >= 0 && fc >= 0) {
+      this.anchor = [fr, fc];
+      this.extent = undefined;
+      this.anchorRanges = [];
+    }
+    if (!this.anchor) {
+      return undefined;
+    }
+    const range = SelectionService.rangeBetween(rowIndex, columnIndex, this.anchor[0], this.anchor[1]);
+    this.batch(() => {
+      if (SelectionService.hasSnapshots(sm)) {
+        const current = sm.createSnapshot();
+        sm.restoreSnapshot({ ...current, ranges: current.ranges.filter(r => !this.anchorRanges.includes(r)) });
+      } else {
+        sm.clear();
+      }
+      sm.addSelection(range);
+      this.anchorRanges = [range];
+      this.extent = [rowIndex, columnIndex];
+      this.tableScope.onSelectionChanged(sm);
+    });
+    return range;
+  }
+
+  private static rangeBetween(r: number, c: number, ar: number, ac: number): CellRange {
+    return new CellRange(Math.min(r, ar), Math.min(c, ac), Math.max(r, ar), Math.max(c, ac));
+  }
 
   /** True if the column is a row number column ({@link RowNumberColumnDef}). */
   private isRowNumberColumn(columnIndex: number): boolean {

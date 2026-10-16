@@ -908,6 +908,20 @@ export class MasterDetailService {
     return false;
   }
 
+  /**
+   * True if Tab on the master row `rowIndex` goes into its open detail row (a focusable element in it) – Excel-style
+   * editing then leaves Tab to this service.
+   *
+   * @param {number} rowIndex - display row index of the focused cell
+   * @returns {boolean} true with a tab target
+   * @since 1.1.99
+   */
+  hasTabTarget(rowIndex: number): boolean {
+    const content = this.byIndex.get(rowIndex)?.content;
+    const entry = this.byIndex.get(rowIndex);
+    return !!entry && !!content && !content.parked && this.visibleNow.has(entry) && !!this.findFocusable(content.cell);
+  }
+
   /** Tab on a master row with an open detail row: the focus moves to the first focusable element in it. */
   private onHostKeyDown(evt: KeyboardEvent): void {
     if (evt.key !== "Tab" || evt.shiftKey || evt.altKey || evt.ctrlKey || evt.metaKey || evt.defaultPrevented

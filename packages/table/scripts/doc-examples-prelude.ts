@@ -33,7 +33,10 @@ import {
   DetailRenderContextIf, DetailTableParamsIf, MasterDetailService, NestedTableScopeIf, NestedTableScopeFactory,
   GeDetailEvent, GeDetailEventSource,
   TableDirection, ResolvedTableDirection, resolveTableDirection, getLogicalScrollLeft, setLogicalScrollLeft,
-  toPhysicalScrollLeft, canScrollHorizontally, toLogicalX, mirrorArrowKeys, ExcelExportOptionsIf
+  toPhysicalScrollLeft, canScrollHorizontally, toLogicalX, mirrorArrowKeys, ExcelExportOptionsIf,
+  EditingOptionsIf, EditingOptions, CellEditMode, EditMove, CellEditorContextIf, CellEditorIf, CellEditorFactory,
+  ColumnEditorOption, TextCellEditor, NumberCellEditor, DateCellEditor, SelectCellEditor, findDataEdge,
+  editingShortcutLayer, CellEditorService, GeEditEvent, GeEditEventType, DEFAULT_GET_EDIT_RENDERER
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }

@@ -72,6 +72,11 @@
    * @type {((evt: import("@guiexpert/table").GeDetailEvent) => void) | undefined}
    */
   export let onDetailExpandedChanged = undefined;
+  /**
+   * Excel-style editing and the cell editor (since 1.1.99): opened, text changed, committed or cancelled.
+   * @type {((evt: import("@guiexpert/table").GeEditEvent) => void) | undefined}
+   */
+  export let onEditingChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -98,7 +103,8 @@
     onRowDragMove: (evt) => { dispatch("rowDragMove", evt); onRowDragMove?.(evt); },
     onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); },
     onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); },
-    onDetailExpandedChanged: (evt) => { dispatch("detailExpandedChanged", evt); onDetailExpandedChanged?.(evt); }
+    onDetailExpandedChanged: (evt) => { dispatch("detailExpandedChanged", evt); onDetailExpandedChanged?.(evt); },
+    onEditingChanged: (evt) => { dispatch("editingChanged", evt); onEditingChanged?.(evt); }
   };
 
   /**

@@ -99,6 +99,28 @@ describe('ShortcutService', () => {
       expect(mapping['f2']).toBe('START_EDITING'); // predefined entries stay
     });
 
+    it('a later spelling of the same key replaces the earlier one (1.1.99: harmonized when added)', () => {
+      stubPlatform('MacIntel');
+      const fake = fakeScope({ shortcutActionIdMapping: { 'meta+arrowleft': 'SELECT_ALL' } });
+      const service = new ShortcutService(fake.scope);
+      const mapping = service.getShortcutActionMapping();
+      expect(mapping['meta+left']).toBeUndefined();     // the system spelling of ⌘← is gone …
+      expect(mapping['meta+arrowleft']).toBe('SELECT_ALL'); // … the app's mapping wins (before: the first spelling)
+      const evt = keydownEvent({ key: 'ArrowLeft', code: 'ArrowLeft', metaKey: true });
+      fake.keydown()!(evt);
+      expect(fake.onActionTriggered).toHaveBeenCalledWith('SELECT_ALL');
+    });
+
+    it('adds the shortcut layers of switched-on features between system and app mapping (1.1.99)', () => {
+      const fake = fakeScope({ shortcutActionIdMapping: { 'delete': 'SELECT_ALL' } });
+      (fake.scope as unknown as { getShortcutLayers: () => ShortcutActionIdMapping[] }).getShortcutLayers =
+        () => [{ 'tab': 'NAVIGATE_NEXT_CELL', 'delete': 'CLEAR_CELLS' }];
+      const mapping = new ShortcutService(fake.scope).getShortcutActionMapping();
+      expect(mapping['tab']).toBe('NAVIGATE_NEXT_CELL');
+      expect(mapping['delete']).toBe('SELECT_ALL'); // the app's mapping still wins
+      expect(mapping['f2']).toBe('START_EDITING');
+    });
+
     it('registers one keydown listener on the host element, bound to the scope\'s abort signal', () => {
       const fake = fakeScope();
       new ShortcutService(fake.scope);

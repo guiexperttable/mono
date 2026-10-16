@@ -208,4 +208,75 @@ export interface AriaTextsIf {
    * @since 1.1.97
    */
   detailCollapsed?(): string;
+
+  /**
+   * Announced when the cell editor opens (Excel-style editing).
+   *
+   * @param {string} columnLabel - the column label
+   * @returns {string} default: `"Editing Price"`
+   * @since 1.1.99
+   */
+  editingStarted?(columnLabel: string): string;
+
+  /**
+   * Announced when a key is typed on a cell that cannot be edited (Excel-style editing).
+   *
+   * @returns {string} default: `"Read only"`
+   * @since 1.1.99
+   */
+  readOnlyCell?(): string;
+
+  /**
+   * Announced after Delete/Backspace cleared cells.
+   *
+   * @param {number} cellCount - the number of cleared cells
+   * @returns {string} default: `"8 cells cleared"`
+   * @since 1.1.99
+   */
+  cellsCleared?(cellCount: number): string;
+
+  /**
+   * Announced when more cells should be cleared than `EditingOptionsIf.maxClearCells` allows.
+   *
+   * @param {number} maxCells - the limit
+   * @returns {string} default: `"Too many cells to clear (at most 1000000)"`
+   * @since 1.1.99
+   */
+  clearTooLarge?(maxCells: number): string;
+
+  /**
+   * Announced when Shift+arrows change the selected range (the focus stays on the active cell).
+   *
+   * @param {number} rowCount - rows of the range
+   * @param {number} columnCount - shown columns of the range
+   * @returns {string} default: `"3 rows, 2 columns selected"`
+   * @since 1.1.99
+   */
+  rangeSelected?(rowCount: number, columnCount: number): string;
+
+  /**
+   * Announced after Shift+Space selected the rows of the active cell.
+   *
+   * @param {number} rowCount - number of selected rows
+   * @returns {string} default: `"Row selected"`
+   * @since 1.1.99
+   */
+  rowSelected?(rowCount: number): string;
+
+  /**
+   * Announced after Ctrl+Space selected the columns of the active cell.
+   *
+   * @param {number} columnCount - number of selected columns
+   * @returns {string} default: `"Column selected"`
+   * @since 1.1.99
+   */
+  columnSelected?(columnCount: number): string;
+
+  /**
+   * The description of the grid with Excel-style editing (`aria-description` of the host): how it is used.
+   *
+   * @returns {string} default: `"Type to edit a cell, Enter to edit or commit, Escape to cancel. Tab in the last column leaves the table."`
+   * @since 1.1.99
+   */
+  gridEditingHint?(): string;
 }

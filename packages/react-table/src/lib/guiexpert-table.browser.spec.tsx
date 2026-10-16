@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
+import type { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
 import type { DetailComponentProps } from './detail-component-renderer-wrapper';
@@ -156,6 +156,21 @@ describe('GuiexpertTable (React)', () => {
     expect(batch.rows.map(r => r.qty)).toEqual([1, 2, 0, 0, 0]);
     expect(batchEditChanged).toHaveBeenCalledTimes(1);
     expect(batchEditChanged.mock.calls[0][0]).toMatchObject({ type: 'change', pendingCount: 2 });
+  });
+
+  it('Excel-style editing: typing edits, Enter commits – editingChanged and modelChanged (since 1.1.99)', async () => {
+    const editingChanged = vi.fn<(evt: GeEditEvent) => void>();
+    const modelChanged = vi.fn<(evt: GeModelChangeEvent) => void>();
+    const { tableModel, tableOptions, rows } = createFillModelAndOptions();
+    const options = { ...tableOptions, fillHandle: false, editing: true };
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={options}
+                                       editingChanged={editingChanged} modelChanged={modelChanged} />);
+    await nextFrame();
+    await userEvent.click(bodyCell(host, 2, 1));
+    await userEvent.keyboard('7{Enter}');
+    expect(rows[2].qty).toBe(7);
+    expect(editingChanged.mock.calls.map(c => c[0].type)).toEqual(['start', 'commit']);
+    expect(modelChanged).toHaveBeenCalledTimes(1);
   });
 
   it('stateChanged is called (debounced) after the state changed (since 1.1.92)', async () => {

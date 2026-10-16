@@ -1,6 +1,7 @@
 import type { RowDragService } from "./row-drag/row-drag-service";
 import type { BatchEditService } from "./batch-edit/batch-edit-service";
 import type { FillHandleService } from "./fill/fill-handle-service";
+import type { CellEditorService } from "./sheet-editing/cell-editor-service";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { EleScope } from './ele-scope';
 import { TableModelIf } from './data/tablemodel/table-model.if';
@@ -160,6 +161,19 @@ export class RenderScope extends EleScope {
    * @since 1.1.96
    */
   fillHandleService?: FillHandleService;
+
+  /**
+   * Excel-style editing of this table (the editor above the cell) – created by {@link TableScope} with
+   * `tableOptions.editing`.
+   * @since 1.1.99
+   */
+  cellEditorService?: CellEditorService;
+
+  /**
+   * The text of the open in-cell editor (`getEditRenderer`): the cell is rebuilt on every repaint, the text and
+   * the caret are put back (before 1.1.99 the typed text was lost when the table scrolled or repainted).
+   */
+  private editorDraft?: { rowIndex: number; columnIndex: number; value: string; start: number | null; end: number | null };
 
   /**
    * Master/detail of this table (detail rows below master rows) – created by {@link TableScope} with
@@ -432,7 +446,41 @@ export class RenderScope extends EleScope {
   }
 
   isEditing() {
-    return this.editing;
+    return this.editing || !!this.cellEditorService?.isOpen();
+  }
+
+  /**
+   * The cell of the open editor inside a cell (`getEditRenderer`, the way before Excel-style editing).
+   *
+   * @returns {[number, number] | undefined} display row and model column, `undefined` without such an editor
+   * @since 1.1.99
+   */
+  getInCellEditorCell(): [number, number] | undefined {
+    return this.editing && this.editorRenderer && (this.editorRendererRow ?? -1) >= 0
+      ? [this.editorRendererRow!, this.editorRendererColumn!] : undefined;
+  }
+
+  /**
+   * Remembers the text of the open in-cell editor (called on every input, see {@link InputHandler}) so that a
+   * repaint keeps it.
+   *
+   * @param {number} rowIndex - display row index of the edited cell
+   * @param {number} columnIndex - model column index
+   * @param {HTMLInputElement | HTMLTextAreaElement} input - the editor element
+   * @since 1.1.99
+   */
+  setEditorDraft(rowIndex: number, columnIndex: number, input: HTMLInputElement | HTMLTextAreaElement): void {
+    if (this.editing && this.editorRendererRow === rowIndex && this.editorRendererColumn === columnIndex) {
+      let start: number | null = null;
+      let end: number | null = null;
+      try {
+        start = input.selectionStart;
+        end = input.selectionEnd;
+      } catch {
+        // input types without a selection
+      }
+      this.editorDraft = { rowIndex, columnIndex, value: input.value, start, end };
+    }
   }
 
 
@@ -449,6 +497,7 @@ export class RenderScope extends EleScope {
     this.editorRendererRow = -1;
     this.editorRendererColumn = -1;
     this.editing = false;
+    this.editorDraft = undefined;
   }
 
   /**
@@ -2097,7 +2146,21 @@ export class RenderScope extends EleScope {
         const input = cell.querySelector('input, select') as HTMLInputElement | HTMLSelectElement | null;
         if (input) {
           this.labelControl(input, this.getColumnAriaLabel(index)); // screen readers: "Total, edit text"
+          const draft = this.editorDraft;
+          if (draft && draft.rowIndex === rowIndex && draft.columnIndex === index && input instanceof HTMLInputElement) {
+            input.value = draft.value; // the text typed before this repaint (since 1.1.99)
+            // a value set by code fires no "change" – InputHandler commits it on Enter / leaving the field
+            this.dom.setAttribute(input as unknown as HTMLDivElement, 'data-ge-restored', 'true');
+          }
           if (!input.contains(document.activeElement)) input.focus();
+          if (draft && draft.rowIndex === rowIndex && draft.columnIndex === index && input instanceof HTMLInputElement
+            && draft.start !== null && draft.end !== null) {
+            try {
+              input.setSelectionRange(draft.start, draft.end);
+            } catch {
+              // input types without a selection
+            }
+          }
         }
       } else {
         this.labelRendererControls(cell, cellRenderer, areaIdent, rowIndex, index);
@@ -2107,6 +2170,16 @@ export class RenderScope extends EleScope {
     const classes = areaModel.getCustomClassesAt(rowIndex, index);
     if (classes.length) {
       this.dom.addClasses(classes, cell);
+    }
+    if (areaIdent === 'body' && this.cellEditorService && !rowNumberColumn) {
+      // Excel-style editing (since 1.1.99): read-only cells say so; the edited cell owns the editor above it
+      if (!areaModel.isEditable(rowIndex, index)) {
+        this.dom.setAttribute(cell, 'aria-readonly', 'true');
+      }
+      const editorId = this.cellEditorService.getOwnedEditorId(rowIndex, index);
+      if (editorId) {
+        this.dom.setAttribute(cell, 'aria-owns', editorId);
+      }
     }
 
     this.dom.addColumnBorderDivs(this.tableOptions, parent, geo, areaIdent, sideIdent);

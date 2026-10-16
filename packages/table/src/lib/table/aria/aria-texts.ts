@@ -127,4 +127,38 @@ export class AriaTexts implements AriaTextsIf {
   invalidValue(message: string): string {
     return message ? `Invalid value: ${message}` : "Invalid value";
   }
+
+  editingStarted(columnLabel: string): string {
+    return columnLabel ? `Editing ${columnLabel}` : "Editing";
+  }
+
+  readOnlyCell(): string {
+    return "Read only";
+  }
+
+  cellsCleared(cellCount: number): string {
+    return cellCount === 1 ? "1 cell cleared" : `${cellCount} cells cleared`;
+  }
+
+  clearTooLarge(maxCells: number): string {
+    return `Too many cells to clear (at most ${maxCells})`;
+  }
+
+  rangeSelected(rowCount: number, columnCount: number): string {
+    const rows = rowCount === 1 ? "1 row" : `${rowCount} rows`;
+    const columns = columnCount === 1 ? "1 column" : `${columnCount} columns`;
+    return `${rows}, ${columns} selected`;
+  }
+
+  rowSelected(rowCount: number): string {
+    return rowCount === 1 ? "Row selected" : `${rowCount} rows selected`;
+  }
+
+  columnSelected(columnCount: number): string {
+    return columnCount === 1 ? "Column selected" : `${columnCount} columns selected`;
+  }
+
+  gridEditingHint(): string {
+    return "Type to edit a cell, Enter to edit or commit, Escape to cancel. Tab in the last column leaves the table.";
+  }
 }

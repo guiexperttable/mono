@@ -1,7 +1,7 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
@@ -119,6 +119,20 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(batchEvents).toHaveLength(1);
     expect(batchEvents[0]).toBeInstanceOf(GeBatchEditEvent);
     expect(batch.rows[2].qty).toBe(0);
+  });
+
+  it('Excel-style editing: "editingChanged" (bubbling) – typing edits, Enter commits (since 1.1.99)', async () => {
+    const { host, el } = createTableElement();
+    const received: GeEditEvent[] = [];
+    host.addEventListener('editingChanged', e => received.push((e as CustomEvent<GeEditEvent>).detail));
+    const plain = createFillModelAndOptions();
+    el.data = data(plain.tableModel, { ...plain.tableOptions, fillHandle: false, editing: true });
+    await nextFrame();
+    await userEvent.click(bodyCell(el, 3, 1));
+    await userEvent.keyboard('9{Enter}');
+    expect(plain.rows[3].qty).toBe(9);
+    expect(received.map(e => e.type)).toEqual(['start', 'commit']);
+    expect(received[0]).toBeInstanceOf(GeEditEvent);
   });
 
   it('master/detail: "detailExpandedChanged" (bubbling), a nested table in the detail, removal destroys it (since 1.1.97)', async () => {

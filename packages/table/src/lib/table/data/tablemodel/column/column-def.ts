@@ -4,14 +4,17 @@ import { CellValidator, ColumnDefIf, RowDragColumnOption, ValueRowSortComparator
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { AreaObjectMapType } from "../../common/area-map.type";
 import { AreaObjectMap } from "../../common/area-map";
-import { BooleanFunction, FalseFn, TrueFn } from "../../common/boolean-function";
+import { BooleanFunction, TrueFn } from "../../common/boolean-function";
 import { SortState } from "../../common/sort-state.type";
 import { GetEditRenderer } from "../../../renderer/edit/edit-cell-renderer.type";
 import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
+import { DEFAULTED_EDITABLE } from "./default-editable";
+import type { ColumnEditorOption } from "../../../sheet-editing/cell-editor.if";
 import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
 import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
 import type { FormulaOptionsIf } from "../../../formula/formula-options.if";
 import { createFormulaValueGetter } from "../../../formula/compile-formula";
+
 
 
 /**
@@ -56,6 +59,10 @@ export class ColumnDef implements ColumnDefIf {
   public rowDrag?: RowDragColumnOption;
   /** Checks edited values, see {@link ColumnDefIf.validate} (since 1.1.96). */
   public validate?: CellValidator;
+  /** The editor of Excel-style editing, see {@link ColumnDefIf.editor} (since 1.1.99). */
+  public editor?: ColumnEditorOption;
+  /** The value of a cleared cell, see {@link ColumnDefIf.emptyValue} (since 1.1.99). */
+  public emptyValue?: unknown;
 
   constructor(
     public property: string,
@@ -160,6 +167,10 @@ export class ColumnDef implements ColumnDefIf {
     rowDrag?: RowDragColumnOption,
     /** Checks edited values: a message for an invalid value (since 1.1.96). */
     validate?: CellValidator,
+    /** The editor of Excel-style editing: `"text"`, `"number"`, `"date"` or a factory (since 1.1.99). */
+    editor?: ColumnEditorOption,
+    /** The value of a cleared cell (Delete) – default `EditingOptionsIf.emptyValue` (since 1.1.99). */
+    emptyValue?: unknown,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -176,7 +187,7 @@ export class ColumnDef implements ColumnDefIf {
 
     // undefined = icon follows sortState (like the constructor); a later `columnDef.sortable = TrueFn` then shows it too
     const sortIconVisible = param.sortIconVisible ?? param.sortable;
-    const editable = param.editable ?? param.editable ?? FalseFn;
+    const editable = param.editable ?? DEFAULTED_EDITABLE;
     const isVisible = param.isVisible ?? param.isVisible ?? TrueFn;
 
     const def = new ColumnDef(
@@ -207,6 +218,8 @@ export class ColumnDef implements ColumnDefIf {
     if (param.showValuesAs) def.showValuesAs = param.showValuesAs;
     if (param.rowDrag !== undefined) def.rowDrag = param.rowDrag;
     if (param.validate) def.validate = param.validate;
+    if (param.editor) def.editor = param.editor;
+    if (param.emptyValue !== undefined) def.emptyValue = param.emptyValue;
     return def;
   }
 

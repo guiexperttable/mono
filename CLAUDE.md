@@ -422,6 +422,31 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `ge-table-text-plaintext` (Latein mit Satzzeichen in RTL). Verschachtelte Master/Detail-Tabellen erben die Richtung.
   Browser-Specs: `rtl/rtl.browser.spec.ts` (R1–R15) + `describe.each(DIRECTIONS)` in `horizontal-scrolling`,
   `scroll-to-index`, `column-visibility`, `spans-and-header-groups` (Helfer `startPx`, `DIRECTIONS`).
+- **Excel-Bedienung (seit 1.1.99, `sheet-editing/`, Design `prompts/013-tabellenkalkulation.design.md` Teil 1)**:
+  `tableOptions.editing` (`EditingOptionsIf`: `startOnType`, `enterKey` edit|moveDown, `enterMoves`, `tabMoves`,
+  `arrowKeysCommit`, `textSelection`, `clearKeys`, `ctrlEnterFillsSelection`, `collapseSelectionOnNavigate`, `emptyValue`,
+  `defaultEditable`, `maxClearCells`). `CellEditorService` (`tableScope.cellEditorService`, nur mit Option): **ein**
+  Container `ge-table-cell-editor` im Host (wie Fill-Handle; Lage in `afterRenderPass()` aus `getBodyCellRectInHost`,
+  herausgescrollt per `clip-path` geschnitten, **nicht** versteckt – Fokus/IME bleiben), Editor folgt dem Zeilenobjekt
+  (Sortieren). `CellEditorIf` + `TextCellEditor`/`NumberCellEditor`/`DateCellEditor`/`SelectCellEditor`, `ColumnDef.editor`
+  (Name oder Fabrik), `ColumnDef.emptyValue`; Auswahl: `editor` → eigener `getEditRenderer` (alter Weg im Zell-DOM) →
+  `DEFAULT_GET_EDIT_RENDERER` (exportierte Konstante, per Identität erkannt) → neuer Editor. Lostippen: Capture-`keydown`
+  am Host (vor `ShortcutService`, `stopImmediatePropagation`), tote Tasten/IME öffnen leer ohne `preventDefault`; Commit
+  über `TableScope.commitCellEditor` → `writeCellsInternal` (neu: `deferRepaint` beim `pointerdown`-Commit, `message`).
+  `isEditing()` = alter Weg **oder** offener Dienst. **Tastatur-Schichten**: `ShortcutService` = System → `getShortcutLayers()`
+  (`editingShortcutLayer(mac)`) → `shortcutActionIdMapping`; Schlüssel werden beim Zusammenführen harmonisiert (gleiche Taste,
+  andere Schreibweise ersetzt – auch ohne Option). Neue `ActionId`s `NAVIGATE_NEXT/PREVIOUS_CELL`, `EXTEND_SELECTION_*`,
+  `NAVIGATE_DATA_EDGE_*`, `EXTEND_TO_DATA_EDGE_*` (DOM-frei `findDataEdge`), `SELECT_ROW/COLUMN`, `CLEAR_CELLS`,
+  `CLEAR_AND_EDIT`; Enter ohne Editor = `ACTIVATE_CELL` → sonst Editieren; Tab in der letzten Spalte nicht verbraucht.
+  `SelectionService`: Anker/Ende (`getAnchor`, `getExtent`, `collapseTo`, `extendTo`), Shift-Klick nutzt den Anker.
+  `CellChangeSource` + `"clear"`, `api.clearCells`, `startEditing`, `stopEditing`, `isEditing`, `getEditingCell`,
+  **`api.subscribe(listener)`** (Proxy `event-listener-hub.ts`: ohne Abonnenten bit-gleich), Event `onEditingChanged`
+  (`GeEditEvent` start/input/commit/cancel, auch alter Weg; Wrapper `editingChanged`). ARIA: Zelle `aria-owns` → Editor,
+  `aria-readonly`, Host `aria-description`; axe-Filter in `test-utils/axe.ts` für den besessenen Editor. Ohne Option
+  gelten nur: Mapping-Harmonisierung, CSP-Umbau von `InputCellRenderer`/`SelectCellRenderer` (DOM statt `innerHTML`,
+  Styles in `css/table-sheet-editing.css`) und `RenderScope.setEditorDraft` (Text des Zell-Editors bleibt über Repaints;
+  wiederhergestellt = `data-ge-restored`, `InputHandler` übernimmt per Enter/`focusout`). CSS `css/table-sheet-editing.css`,
+  `--ge-table-cell-editor-*`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -441,7 +466,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
-seit 1.1.98 `direction`.
+seit 1.1.98 `direction`, seit 1.1.99 `editing`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -462,7 +487,7 @@ Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Compone
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
-(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`) – und je Wrapper `DetailComponentRendererWrapper`
+(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`) – und je Wrapper `DetailComponentRendererWrapper`
 (Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`). `direction` (1.1.98) ist eine Option wie jede
 andere: kein Wrapper-Code, ein neues Options-Objekt baut neu auf (Smoke-Tests React + Web Component).
 
@@ -509,7 +534,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 583 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 603 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,

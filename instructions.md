@@ -1270,6 +1270,9 @@ reported via `modelChanged` (since 1.1.96 with old and new value in `evt.changes
 filling with the fill handle and collecting changes until "Save": 6.17). Since 1.1.89 this also works on cells with a renderer or a framework component, the
 editor keeps the focus, and table shortcuts are ignored while typing in it.
 
+For spreadsheet-like editing – type into a focused cell, Enter/Tab to commit and move on, Shift+arrows, Delete – switch
+on `tableOptions.editing` (6.20).
+
 ### 6.8 Rowspan and colspan
 
 Override `getRowspanAt` / `getColspanAt` in your area model:
@@ -1924,6 +1927,68 @@ console.info(tableApi.getDirection()); // "rtl"
   `left` stay physical.
 - **Nested tables** (master/detail `ctx.createTable()`) take the direction of the outer table unless their own
   `tableOptions` set one.
+
+### 6.20 Excel-style editing (since 1.1.99)
+
+One option makes editing work like in Excel or Google Sheets: select a cell and **type** – the editor opens with the
+typed character; **Enter** commits and moves down, **Tab** moves right, **Escape** discards. The editor sits **above**
+the cell (not inside it), so scrolling and live updates keep what was typed.
+
+```ts
+import { ColumnDef, SelectCellEditor, SelectionModel, TableFactory, TableOptions, TrueFn } from "@guiexpert/table";
+import type { TableOptionsIf } from "@guiexpert/table";
+
+const selectionModel = new SelectionModel("range", "multi");   // one model per table
+const tableModel = TableFactory.createTableModel({
+  rows: [{ product: "Laptop", price: 1299, status: "open" }],
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product", editable: TrueFn }),
+    ColumnDef.create({ property: "price", headerLabel: "Price", editable: TrueFn, emptyValue: 0 }),
+    ColumnDef.create({ property: "status", headerLabel: "Status", editable: TrueFn,
+      editor: () => SelectCellEditor.create(["open", "paid", "void"]) }),
+  ],
+});
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  getSelectionModel: () => selectionModel,
+  editing: true,            // or { enterKey: "moveDown", defaultEditable: true, … }
+};
+```
+
+| Key (Windows) | macOS | What happens |
+|---|---|---|
+| a letter, digit, … | same | opens the editor with that character ("enter" mode: arrow keys commit and move) |
+| F2, double click | same | edits the current value, caret at the end ("edit" mode: arrow keys move the caret); F2 switches the mode |
+| Enter / Shift+Enter | same | without editor: edit (option `enterKey: "moveDown"` = Excel); in the editor: commit, move down / up |
+| Tab / Shift+Tab | same | commit, move right / left; in the last (first) column Tab leaves the table |
+| Escape | same | discard |
+| Ctrl+Enter | ⌘+Enter | write the input into all selected cells |
+| Shift+arrows, Shift+Home/End, Shift+Page Up/Down | same | extend the selected range from the active cell |
+| Ctrl+arrows / Ctrl+Shift+arrows | ⌘+arrows / ⌘+Shift+arrows | jump to the edge of the data block / extend to it |
+| Shift+Space / Ctrl+Space | same | select the rows / columns of the active cell |
+| Delete | Fn+⌫ | clear the selected cells (one `modelChanged` with `source: "clear"`) |
+| Backspace | ⌫ | empty the active cell in the editor (a selected range: like Delete) |
+| Space on a `true`/`false` cell | same | toggle |
+
+- **Editors**: the table chooses by the value – numbers: `NumberCellEditor`, dates: `DateCellEditor`, otherwise
+  `TextCellEditor`; `ColumnDef.editor` sets one (`"text"`, `"number"`, `"date"`, `SelectCellEditor`, or your own
+  `CellEditorIf`). A column with an own `getEditRenderer` keeps that editor inside the cell (F2, Enter, double click –
+  typing does not open it).
+- **Writing**: as before through `editInputPipe` and `validate` – an invalid value keeps the editor open
+  (`aria-invalid`, the message as tooltip). In a batch edit (6.17) the value is marked instead.
+- **`emptyValue`** of a column is what Delete writes (default `editing.emptyValue`, `""`); `defaultEditable: true`
+  makes every data column without an own `editable` editable.
+- **Events and API**: `onEditingChanged` (`GeEditEvent`: `start`, `input`, `commit`, `cancel`; wrapper event
+  `editingChanged`), `tableApi.startEditing(row, column, typedText?)`, `stopEditing(cancel?)`, `isEditing()`,
+  `getEditingCell()`, `clearCells(ranges?)`, and `tableApi.subscribe(listener)` for listeners next to the main one
+  (e.g. a toolbar). Without the option the table behaves as before (F2/double click, Enter activates, Tab leaves).
+- **Accessibility**: the edited cell owns the editor (`aria-owns`), read-only cells get `aria-readonly`, the grid
+  describes the keys (`aria-description`), announcements (`AriaTextsIf.editingStarted`, `cellsCleared`,
+  `rangeSelected` …). Strict Content-Security-Policy: no inline handlers or inline styles (since 1.1.99 also in the
+  in-cell `InputCellRenderer`/`SelectCellRenderer`).
+- **Limits**: the editor has the width of the cell; touch devices open it with the browser's double tap. IME input
+  (Japanese, Chinese) and dead keys open the editor empty and let the browser compose into it – checked in Chrome;
+  Safari/Firefox with IME are still being verified.
 
 ---
 

@@ -6,6 +6,7 @@ import type {
   GeRowDragEvent,
   GeBatchEditEvent,
   GeDetailEvent,
+  GeEditEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -42,6 +43,8 @@ export interface GuiexpertTableProps {
   onBatchEditChanged?: (evt: GeBatchEditEvent) => void;
   /** Master/detail: a detail row was expanded or collapsed. @since 1.1.97 */
   onDetailExpandedChanged?: (evt: GeDetailEvent) => void;
+  /** The cell editor opened, its text changed, it committed or it was cancelled. @since 1.1.99 */
+  onEditingChanged?: (evt: GeEditEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -66,6 +69,8 @@ export interface GuiexpertTableEvents {
   batchEditChanged: CustomEvent<GeBatchEditEvent>;
   /** @since 1.1.97 */
   detailExpandedChanged: CustomEvent<GeDetailEvent>;
+  /** @since 1.1.99 */
+  editingChanged: CustomEvent<GeEditEvent>;
 }
 
 /**

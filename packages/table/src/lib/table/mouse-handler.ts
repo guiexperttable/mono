@@ -212,8 +212,8 @@ export class MouseHandler {
 
         if (area && areaIdent === "body") {
           if (areaModel.isEditable(rowIdx, colIdx)) {
-            this.tableScope.clearSelection();
-            this.tableScope.initRenderEditor(rowIdx, colIdx);
+            // the editor above the cell (Excel-style editing, since 1.1.99) or inside it (clears the selection)
+            this.tableScope.startEditing(rowIdx, colIdx, "edit");
           }
         }
 

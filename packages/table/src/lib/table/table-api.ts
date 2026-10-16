@@ -31,6 +31,7 @@ import type { CellValueChangeIf } from './batch-edit/cell-value-change.if';
 import type { FillDirection } from './fill/fill-direction.type';
 import type { FillMode } from './fill/fill-series';
 import { CellRange } from './data/common/cell-range';
+import type { EventListenerIf } from './event-listener.if';
 
 
 /**
@@ -1989,6 +1990,141 @@ export class TableApi {
    */
   cancelFill(): void {
     this.tableScope.fillHandleService?.cancel();
+  }
+
+  // ---------------------------------------------------------------------- Excel-style editing (since 1.1.99)
+
+  /**
+   * Adds an event listener next to the one the table was created with – e.g. for a toolbar or an own formula bar
+   * that lives outside the component that created the table. Every `on…` method you give is called after the main
+   * listener's; a listener that throws is logged and does not stop the others.
+   *
+   * @param {Partial<EventListenerIf>} listener - the events of interest
+   * @returns {() => void} call it to remove the listener (the table also removes all on `destroy()`)
+   *
+   * @example
+   * const unsubscribe = tableApi.subscribe({
+   *   onEditingChanged: (evt: GeEditEvent) => { hint.textContent = evt.type === "input" ? evt.input ?? "" : ""; },
+   *   onModelChanged: (evt: GeModelChangeEvent) => console.log(`${evt.changes?.length ?? 0} cells changed`),
+   * });
+   * // later
+   * unsubscribe();
+   *
+   * @since 1.1.99
+   */
+  subscribe(listener: Partial<EventListenerIf>): () => void {
+    return this.tableScope.subscribe(listener);
+  }
+
+  /**
+   * Opens the cell editor of a body cell – like F2 (caret at the end) or, with `typedText`, like typing that text.
+   * With Excel-style editing ({@link TableOptionsIf.editing}) the editor sits above the cell; otherwise (or for
+   * columns with an own `getEditRenderer`) it is rendered into the cell.
+   *
+   * @param {number} rowIndex - display row index of the body
+   * @param {number | string} column - model column index or property
+   * @param {string} [typedText] - starts in "enter" mode with this text (it replaces the content)
+   * @returns {boolean} true if an editor is open (`false` for a cell that cannot be edited)
+   *
+   * @example
+   * tableApi.startEditing(0, "price");          // edit the price of the first row
+   * tableApi.startEditing(4, "name", "Ad");     // as if "Ad" had been typed
+   *
+   * @since 1.1.99
+   */
+  startEditing(rowIndex: number, column: number | string, typedText?: string): boolean {
+    const columnIndex = typeof column === "number" ? column : this.getColumnIndex(column);
+    if (columnIndex < 0) {
+      return false;
+    }
+    if (typedText !== undefined && this.tableScope.cellEditorService?.handlesColumn(columnIndex)) {
+      return this.tableScope.cellEditorService.start(rowIndex, columnIndex, { mode: "enter", typedText });
+    }
+    return this.tableScope.startEditing(rowIndex, columnIndex, "edit", "end");
+  }
+
+  /**
+   * Closes an open cell editor: commits its input (like Enter without moving) or, with `cancel`, discards it (like
+   * Escape).
+   *
+   * @param {boolean} [cancel=false] - discard the input
+   * @returns {boolean} true if no editor is open afterwards (an invalid input keeps the editor open)
+   *
+   * @example
+   * saveButton.addEventListener("click", () => {
+   *   tableApi.stopEditing();   // the value being typed belongs to the data that is saved
+   * });
+   *
+   * @since 1.1.99
+   */
+  stopEditing(cancel = false): boolean {
+    const service = this.tableScope.cellEditorService;
+    if (service?.isOpen()) {
+      if (cancel) {
+        service.cancel();
+        return true;
+      }
+      return service.commit("none");
+    }
+    const cell = this.tableScope.getInCellEditorCell();
+    if (cell) {
+      const editor = this.tableScope.hostElement.querySelector<HTMLInputElement | HTMLSelectElement>(
+        ".ge-table-cell-editor-input, .ge-table-cell-editor-select");
+      if (cancel || !editor) {
+        this.tableScope.cancelEditing(editor ?? undefined);
+      } else {
+        this.tableScope.updateModelValueAfterEdit("body", cell[0], cell[1], editor.value);
+      }
+    }
+    return !this.tableScope.isEditing();
+  }
+
+  /**
+   * True while a cell editor is open.
+   *
+   * @returns {boolean} true while editing
+   *
+   * @example
+   * if (!tableApi.isEditing()) {
+   *   tableApi.updateCells([], true);   // live data: don't repaint under the user's input
+   * }
+   *
+   * @since 1.1.99
+   */
+  isEditing(): boolean {
+    return this.tableScope.isEditing();
+  }
+
+  /**
+   * The cell whose editor is open.
+   *
+   * @returns {[number, number] | undefined} display row and model column, `undefined` without editor
+   *
+   * @example
+   * const cell = tableApi.getEditingCell();
+   * if (cell) console.log(`editing row ${cell[0]}, column ${cell[1]}`);
+   *
+   * @since 1.1.99
+   */
+  getEditingCell(): [number, number] | undefined {
+    return this.tableScope.cellEditorService?.getCell() ?? this.tableScope.getInCellEditorCell();
+  }
+
+  /**
+   * Clears body cells like Delete in Excel-style editing: editable cells get their empty value
+   * ({@link ColumnDefIf.emptyValue}, default `""`), **one** `onModelChanged` with the source `"clear"` (batch edit:
+   * marked). Works without {@link TableOptionsIf.editing} too.
+   *
+   * @param {CellRange[]} [ranges] - body ranges; default: the selected cells, or the focused cell
+   * @returns {number} the number of cleared cells, `-1` if there were too many (`EditingOptionsIf.maxClearCells`)
+   *
+   * @example
+   * tableApi.clearCells([new CellRange(0, 2, 9, 2)]);   // rows 0–9 of column 2
+   *
+   * @since 1.1.99
+   */
+  clearCells(ranges?: CellRange[]): number {
+    return this.tableScope.clearCells(ranges);
   }
 
   // ------------------------------------------------------------------------------- master/detail (since 1.1.97)

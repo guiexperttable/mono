@@ -331,3 +331,16 @@ export * from './lib/table/service/excel-export-options.if';
 export * from './lib/table/rtl/table-direction.type';
 export * from './lib/table/rtl/rtl-util';
 export * from './lib/table/service/excel-export-options.if';
+
+// Excel-style editing (since 1.1.99, prompt 013 stage 1)
+export * from './lib/table/sheet-editing/editing-options.if';
+export * from './lib/table/sheet-editing/editing-options';
+export * from './lib/table/sheet-editing/cell-editor.if';
+export * from './lib/table/sheet-editing/editors/text-cell-editor';
+export * from './lib/table/sheet-editing/editors/number-cell-editor';
+export * from './lib/table/sheet-editing/editors/date-cell-editor';
+export * from './lib/table/sheet-editing/editors/select-cell-editor';
+export * from './lib/table/sheet-editing/sheet-navigation';
+export * from './lib/table/sheet-editing/editing-keymap';
+export * from './lib/table/sheet-editing/cell-editor-service';
+export * from './lib/table/data/common/event/ge-edit-event';

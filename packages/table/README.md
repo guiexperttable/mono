@@ -54,6 +54,10 @@ This is the UI-agnostic table component for your next web app. 😊
   dates, `Item 1` → `Item 2`; ⌥/Alt switches, Ctrl/⌘+D, Ctrl/⌘+R), batch edit collects changes (`ge-table-cell-pending`)
   until `tableApi.commitBatchEdit()` / `cancelBatchEdit()`, `ColumnDef.validate`, one `onModelChanged` per change with
   old and new values (`tableOptions.fillHandle`, `tableOptions.batchEdit`) – since 1.1.96
+- Master/detail: expandable rows with a detail row over the full width (nested table, form, framework component),
+  created lazily and kept while scrolling, fixed or measured height, keyboard (Enter, Tab) and screen readers
+  (`aria-expanded`), `tableApi.setDetailExpanded()` / `expandAllDetails()`, stored with the table state
+  (`tableOptions.masterDetail`) – since 1.1.97. Variable row heights use prefix sums (O(log n) per scroll frame)
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

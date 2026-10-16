@@ -29,7 +29,8 @@ export interface AxeViolationSummary {
 function isKnownScrollViewportFinding(ruleId: string, node: axe.NodeResult): boolean {
   const target = node.target.join(' ');
   if (ruleId === 'scrollable-region-focusable') {
-    return target.endsWith('.ge-table-scroll-viewport');
+    // with a nested table (master/detail) axe adds attribute selectors to keep the selector unique
+    return /\.ge-table-scroll-viewport(\[[^\]]*\])*$/.test(target);
   }
   if (ruleId === 'aria-required-children') {
     const messages = node.any.concat(node.all, node.none).map(c => c.message).join(' ');

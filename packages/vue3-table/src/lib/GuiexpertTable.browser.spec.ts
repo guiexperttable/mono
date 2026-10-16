@@ -2,13 +2,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { createApp, h, nextTick, shallowRef } from 'vue';
+import { createApp, defineComponent, h, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import type { App, ShallowRef } from 'vue';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeMouseEvent, TableModelIf, TableOptionsIf } from '@guiexpert/table';
+import type { GeDetailEvent, GeMouseEvent, TableModelIf, TableOptionsIf } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable.vue';
+import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 interface Mounted {
@@ -41,6 +42,45 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Vue 3)', () => {
+
+  it('master/detail: a Vue component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
+    const unmounted = vi.fn();
+    const Detail = defineComponent({
+      props: { row: { type: Object, required: true } },
+      setup(props) {
+        const clicks = ref(0);
+        onUnmounted(() => unmounted((props.row as { id: number }).id));
+        return () => h('button', { class: 'md-btn', onClick: () => clicks.value++ }, `clicks ${clicks.value} of ${(props.row as { id: number }).id}`);
+      },
+    });
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(Detail) } };
+    const detailEvents: GeDetailEvent[] = [];
+    const host = createHost();
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const app = createApp({
+      render: () => h(GuiexpertTable, { tableModel: createModel(300), tableOptions, onTableReady: tableReady,
+        onDetailExpandedChanged: (evt: GeDetailEvent) => detailEvents.push(evt) }),
+    });
+    app.mount(host);
+    apps.push(app);
+    await nextFrame();
+    clickDetailToggle(host, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 0 of 0');
+    host.querySelector<HTMLButtonElement>('.md-btn')!.click();
+    await nextTick();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    const api = tableReady.mock.calls[0][0];
+    api.scrollToIndex(0, 200);
+    await nextFrame();
+    api.scrollToIndex(0, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api.setDetailExpanded(0, false);
+    expect(unmounted).toHaveBeenCalledWith(0);
+    expect(detailRowsOf(host)).toHaveLength(0);
+    expect(detailEvents.map(e => e.expanded)).toEqual([true, false]);
+  });
 
   it('emits tableReady once with a TableApi and renders the rows', async () => {
     const { host, tableReady } = mount({ tableModel: createModel(5) });

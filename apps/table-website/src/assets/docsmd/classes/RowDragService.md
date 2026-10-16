@@ -70,7 +70,7 @@ The options of this table ([TableOptionsIf.rowDragOptions](../interfaces/TableOp
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L86)
+[src/lib/table/row-drag/row-drag-service.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L91)
 
 ## Methods
 
@@ -93,7 +93,7 @@ type `"cancel"`, nothing is moved.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:429](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L429)
+[src/lib/table/row-drag/row-drag-service.ts:435](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L435)
 
 ___
 
@@ -116,7 +116,7 @@ Adds the drag handle to a rendered body cell (called by the render pass for colu
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L152)
+[src/lib/table/row-drag/row-drag-service.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L157)
 
 ___
 
@@ -132,7 +132,7 @@ Releases everything (TableScope.destroy). A running drag is cancelled.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:459](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L459)
+[src/lib/table/row-drag/row-drag-service.ts:465](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L465)
 
 ___
 
@@ -149,7 +149,7 @@ Why a managed drag is not possible right now: `"sorted"` (a column has the sort 
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L104)
+[src/lib/table/row-drag/row-drag-service.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L109)
 
 ___
 
@@ -171,7 +171,7 @@ The dragged rows for a grabbed row: all rows with a selection if it is one of th
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:683](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L683)
+[src/lib/table/row-drag/row-drag-service.ts:691](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L691)
 
 ___
 
@@ -196,7 +196,7 @@ enabled or disabled (managed + sorted/filtered).
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L123)
+[src/lib/table/row-drag/row-drag-service.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L128)
 
 ___
 
@@ -218,7 +218,7 @@ true if the row is one of the dragged rows (it is painted dimmed).
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L96)
+[src/lib/table/row-drag/row-drag-service.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L101)
 
 ___
 
@@ -234,7 +234,7 @@ true while rows are dragged with the pointer.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L91)
+[src/lib/table/row-drag/row-drag-service.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L96)
 
 ___
 
@@ -259,7 +259,7 @@ true if the key was used (a row with a drag handle has the focus)
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:614](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L614)
+[src/lib/table/row-drag/row-drag-service.ts:622](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L622)
 
 ___
 
@@ -286,4 +286,4 @@ the new display index of the first moved row, -1 if nothing moved
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:543](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L543)
+[src/lib/table/row-drag/row-drag-service.ts:551](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L551)

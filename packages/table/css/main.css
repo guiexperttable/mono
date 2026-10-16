@@ -487,6 +487,12 @@
   --ge-table-cell-invalid-bg: #fde2e1;
   --ge-table-cell-invalid-text: #8a1c14;
   --ge-table-cell-invalid-border: #d93025;
+
+  /* Master/detail (since 1.1.97): the detail row below an expanded master row */
+  --ge-table-detail-bg: #f4f6f9;
+  --ge-table-detail-border: #c9d1db;
+  --ge-table-detail-toggle-color: #5f6368;
+  --ge-table-detail-toggle-hover-bg: rgba(128, 128, 128, 0.15);
 }
 
 
@@ -608,6 +614,12 @@ html[data-theme="dark"] {
   --ge-table-cell-invalid-bg: #5c1d1a;
   --ge-table-cell-invalid-text: #fecaca;
   --ge-table-cell-invalid-border: #f28b82;
+
+  /* Master/detail (since 1.1.97) */
+  --ge-table-detail-bg: #1b1f24;
+  --ge-table-detail-border: #3c434d;
+  --ge-table-detail-toggle-color: #bdc1c6;
+  --ge-table-detail-toggle-hover-bg: rgba(255, 255, 255, 0.12);
 }
 /* Fill handle and batch edit (since 1.1.96) – colors in table-color-vars.css (--ge-table-fill-*, --ge-table-cell-*) */
 
@@ -666,6 +678,101 @@ html[data-theme="dark"] {
 
 .ge-table-col-div.ge-table-cell-invalid {
   box-shadow: inset 0 0 0 2px var(--ge-table-cell-invalid-border);
+}
+/* Master/detail (since 1.1.97) – colors in table-color-vars.css (--ge-table-detail-*) */
+
+/* the layer over the visible body (full width, fixed columns included, without the scroll bars); positioned by the
+   table. Only the detail rows take pointer events – the body cells between them stay clickable. */
+.ge-table-detail-layer {
+  position: absolute;
+  z-index: 1000; /* above .ge-table-body-east (999), below the fill preview (8999), focus frame (9999), overlay (10000) */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ge-table-detail-row {
+  position: absolute;
+  inset-inline: 0;
+  box-sizing: border-box;
+  pointer-events: auto;
+  background: var(--ge-table-detail-bg);
+  border-top: 1px solid var(--ge-table-detail-border);
+  border-bottom: 1px solid var(--ge-table-detail-border);
+}
+
+/* scrolled out of view: hidden, not destroyed – the content keeps its state (inputs, scroll positions) */
+.ge-table-detail-row.ge-table-detail-row-parked {
+  visibility: hidden;
+  content-visibility: hidden;
+}
+
+.ge-table-detail-cell {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding-block: 8px;
+  padding-inline: 32px 12px;
+  overflow: auto;
+}
+
+/* detailHeight "auto": the row is as high as its content (measured) */
+.ge-table-detail-row-auto .ge-table-detail-cell {
+  height: auto;
+  overflow: visible;
+}
+
+/* a nested table (context.createTable) */
+.ge-table-detail-table {
+  width: 100%;
+  position: relative;
+}
+
+/* the cell with the expand icon: room for the icon at the start */
+.ge-table-detail-toggle-cell {
+  box-sizing: border-box;
+  padding-inline-start: 22px;
+}
+
+/* behind a row drag handle */
+.ge-table-row-drag-cell.ge-table-detail-toggle-cell {
+  padding-inline-start: 36px;
+}
+
+.ge-table-detail-toggle {
+  position: absolute;
+  inset-inline-start: 3px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.ge-table-row-drag-cell .ge-table-detail-toggle {
+  inset-inline-start: 17px;
+}
+
+.ge-table-detail-toggle:hover {
+  background-color: var(--ge-table-detail-toggle-hover-bg);
+}
+
+/* a chevron drawn with CSS: ▸ collapsed, ▾ expanded */
+.ge-table-detail-toggle::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 5px;
+  top: 4px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 4px 0 4px 6px;
+  border-color: transparent transparent transparent var(--ge-table-detail-toggle-color);
+  transition: transform 0.12s ease-out;
+}
+
+.ge-table-detail-toggle.ge-table-detail-toggle-expanded::before {
+  transform: rotate(90deg);
 }
 /* Pivot tables (PivotFactory / AreaModelPivot, since 1.1.94) */
 

@@ -6,9 +6,11 @@ import { flushSync, mount, tick, unmount } from 'svelte';
 import { createClassComponent } from 'svelte/legacy';
 import { GeMouseEvent, TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable.svelte';
+import DetailCounter from '../test/DetailCounter.svelte';
+import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
 import RunesHost from '../test/RunesHost.svelte';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 const cleanups: (() => void)[] = [];
@@ -20,6 +22,34 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Svelte 5)', () => {
+
+  it('master/detail: a Svelte component as detail keeps its state while scrolling, is destroyed on collapse (since 1.1.97)', async () => {
+    (window as { __mdDestroyed?: number[] }).__mdDestroyed = [];
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(DetailCounter) } };
+    let api: TableApi | undefined;
+    const host = (() => {
+      const h = createHost();
+      const instance = mount(GuiexpertTable, { target: h, props: { tableModel: createModel(300), tableOptions, onTableReady: (a: TableApi) => { api = a; } } });
+      cleanups.push(() => unmount(instance));
+      flushSync();
+      return h;
+    })();
+    await nextFrame();
+    clickDetailToggle(host, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.getAttribute('data-has-api')).toBe('true');
+    host.querySelector<HTMLButtonElement>('.md-btn')!.click();
+    await tick();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api!.scrollToIndex(0, 200);
+    await nextFrame();
+    api!.scrollToIndex(0, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api!.setDetailExpanded(0, false);
+    await vi.waitFor(() => expect((window as { __mdDestroyed?: number[] }).__mdDestroyed).toEqual([0]));
+    expect(detailRowsOf(host)).toHaveLength(0);
+  });
 
   it('calls onTableReady and dispatches tableReady once with a TableApi, renders the rows', async () => {
     const host = createHost();

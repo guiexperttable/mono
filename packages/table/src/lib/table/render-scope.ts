@@ -1,5 +1,4 @@
 import type { RowDragService } from "./row-drag/row-drag-service";
-import { findRowIndexAtY } from "./row-drag/move-rows";
 import type { BatchEditService } from "./batch-edit/batch-edit-service";
 import type { FillHandleService } from "./fill/fill-handle-service";
 import { TableOverlayChange } from "./overlay/table-overlay";
@@ -39,6 +38,8 @@ import { AriaGridInfo } from './aria/aria-grid-info';
 import { TreeAriaInfo, TreeAriaModel } from './aria/tree-aria-info';
 import { AriaTexts } from './aria/aria-texts';
 import { AriaTextsIf } from './aria/aria-texts.if';
+import { RowLayout } from './row-layout/row-layout';
+import type { MasterDetailService } from './master-detail/master-detail-service';
 
 
 /**
@@ -160,6 +161,18 @@ export class RenderScope extends EleScope {
    */
   fillHandleService?: FillHandleService;
 
+  /**
+   * Master/detail of this table (detail rows below master rows) – created by {@link TableScope} with
+   * `tableOptions.masterDetail`.
+   * @since 1.1.97
+   */
+  masterDetailService?: MasterDetailService;
+
+  /** Positions of the body rows (prefix sums of the heights + detail rows), see {@link getBodyRowLayout}. */
+  private readonly bodyRowLayout = new RowLayout();
+  private bodyRowLayoutDirty = true;
+  private bodyRowLayoutModel?: AreaModelIf;
+
   constructor(
     hostElement: HTMLDivElement,
     tableModel: TableModelIf,
@@ -247,7 +260,7 @@ export class RenderScope extends EleScope {
     const padding = tableModel.getPadding();
     const hostWidth = this.hostElement.clientWidth;
     const hostHeight = this.hostElement.clientHeight;
-    const top = padding.top + body.getYPosByRowIndex(rowIndex) - this.contentScrollTop;
+    const top = padding.top + this.getBodyRowTop(rowIndex) - this.contentScrollTop;
     const left = this.getColumnLeftInHost(columnIndex, tableModel.getXPosByColumnIndex(columnIndex));
     const columnCount = tableModel.getColumnCount();
     const fixedLeft = tableModel.getFixedLeftColumnCount();
@@ -292,7 +305,7 @@ export class RenderScope extends EleScope {
     const hostWidth = this.hostElement.clientWidth;
     const bodyHeight = this.hostElement.clientHeight - padding.top - padding.bottom;
     const contentY = Math.min(Math.max(y - padding.top, 0), Math.max(0, bodyHeight - 1)) + this.contentScrollTop;
-    const rowIndex = findRowIndexAtY(contentY, rowCount, i => body.getYPosByRowIndex(i), body.getConstantRowHeight?.());
+    const rowIndex = this.getBodyRowIndexAtY(contentY);
 
     const fixedLeft = tableModel.getFixedLeftColumnCount();
     const fixedRight = tableModel.getFixedRightColumnCount();
@@ -317,6 +330,90 @@ export class RenderScope extends EleScope {
       }
     }
     return [rowIndex, Math.min(columnCount - 1, Math.max(first, columnIndex))];
+  }
+
+  /**
+   * The positions of the body rows: prefix sums of the row heights (O(log n) lookups also for variable heights) plus
+   * the heights of open detail rows. Built lazily – again after {@link invalidateRowLayout}, a new body model or
+   * another row count.
+   *
+   * @returns {RowLayout} the layout of the body rows
+   * @since 1.1.97
+   */
+  getBodyRowLayout(): RowLayout {
+    const body = this.tableModel.getBodyModel();
+    const rowCount = body.getRowCount();
+    const layout = this.bodyRowLayout;
+    if (this.bodyRowLayoutDirty || this.bodyRowLayoutModel !== body || layout.getRowCount() !== rowCount) {
+      this.bodyRowLayoutDirty = false;
+      this.bodyRowLayoutModel = body;
+      const tableModel = this.tableModel;
+      layout.setRows(rowCount, i => tableModel.getRowHeight('body', i), body.getConstantRowHeight?.());
+      const extras = this.masterDetailService?.computeExtras();
+      layout.setExtras(extras?.rowIndices ?? [], extras?.heights ?? []);
+    }
+    return layout;
+  }
+
+  /**
+   * Marks the positions of the body rows as outdated (rows filtered, sorted, edited, added or removed, a detail row
+   * opened or closed) – they are computed again on the next access.
+   *
+   * @since 1.1.97
+   */
+  invalidateRowLayout(): void {
+    this.bodyRowLayoutDirty = true;
+  }
+
+  /**
+   * Sets the height of the detail row behind one body row in the current row layout without building it again
+   * (a detail row was expanded or collapsed). Does nothing if the layout is outdated anyway.
+   *
+   * @param {number} rowIndex - display index of the master row
+   * @param {number} height - the detail height, 0 = none
+   * @returns {boolean} true if the layout was updated, false if it is outdated (it is built again on the next access)
+   * @since 1.1.97
+   */
+  setBodyRowExtra(rowIndex: number, height: number): boolean {
+    const body = this.tableModel.getBodyModel();
+    if (this.bodyRowLayoutDirty || this.bodyRowLayoutModel !== body
+      || this.bodyRowLayout.getRowCount() !== body.getRowCount()) {
+      return false;
+    }
+    this.bodyRowLayout.setExtra(rowIndex, height);
+    return true;
+  }
+
+  /** True if open detail rows take space between the body rows. */
+  protected hasBodyRowExtras(): boolean {
+    return !!this.masterDetailService?.hasExpanded() && this.getBodyRowLayout().getExtraCount() > 0;
+  }
+
+  /**
+   * The top of a body row in content pixels: {@link AreaModelIf.getYPosByRowIndex} plus the heights of the open detail
+   * rows above it (master/detail).
+   *
+   * @param {number} rowIndex - display index
+   * @returns {number} px from the top of the first body row
+   * @since 1.1.97
+   */
+  getBodyRowTop(rowIndex: number): number {
+    // with open detail rows from the prefix sums (O(1), consistent with getBodyRowIndexAtY); without them unchanged
+    return this.hasBodyRowExtras()
+      ? this.getBodyRowLayout().getTop(rowIndex)
+      : this.tableModel.getBodyModel().getYPosByRowIndex(rowIndex);
+  }
+
+  /**
+   * The body row at a content position (a position in an open detail row belongs to its master row). Above the rows:
+   * 0, below: the last row, without rows: -1.
+   *
+   * @param {number} contentY - px from the top of the first body row
+   * @returns {number} display index
+   * @since 1.1.97
+   */
+  getBodyRowIndexAtY(contentY: number): number {
+    return this.getBodyRowLayout().findIndexAt(contentY);
   }
 
   /**
@@ -422,6 +519,11 @@ export class RenderScope extends EleScope {
    * @since 1.1.94
    */
   invalidateAggregates(change?: DerivedValuesChangeIf): void {
+    if (!change) {
+      // filtered, sorted, moved, rows replaced …: other rows (heights, open detail rows) at the indices. Value changes of
+      // known rows (an edit, updateCells – `change` given) keep the positions: no O(n) rebuild per live-data tick.
+      this.invalidateRowLayout();
+    }
     for (const areaIdent of ['header', 'body', 'footer'] as const) {
       this.tableModel.getAreaModel(areaIdent)?.invalidateDerivedValues?.(change);
     }
@@ -441,6 +543,7 @@ export class RenderScope extends EleScope {
       this.colAndRowspanModels[areaIdent]?.initIfRowCountChanged();
     }
     this.tableModel.recalcHeightAndPadding();
+    this.invalidateRowLayout();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
     this.adjustAfterScrolling();
@@ -905,12 +1008,28 @@ export class RenderScope extends EleScope {
    * scaled and scrollTop is no longer a content pixel position.
    */
   isScrollHeightCapped(): boolean {
-    return this.tableModel.getContentHeightInPixel() + 1 > EleScope.maxScrollHeightInPx;
+    return this.getBodyContentHeight() + 1 > EleScope.maxScrollHeightInPx;
+  }
+
+  /**
+   * The model's content height plus the heights of open detail rows (master/detail).
+   *
+   * @returns {number} px
+   * @since 1.1.97
+   */
+  /** The detail layer (master/detail) covers the visible body. @since 1.1.97 */
+  protected override adjustDetailLayerBounds(left: number, top: number, width: number, height: number): void {
+    this.masterDetailService?.setBounds(left, top, width, height);
+  }
+
+  protected override getBodyContentHeight(): number {
+    const height = this.tableModel.getContentHeightInPixel();
+    return this.masterDetailService?.hasExpanded() ? height + this.getBodyRowLayout().getExtraTotal() : height;
   }
 
   /** Scrollable range of the content in content pixels (content height minus visible body height). */
   protected getContentScrollRangeY(): number {
-    return this.tableModel.getContentHeightInPixel() - this.areaBodyCenterGeo.height;
+    return this.getBodyContentHeight() - this.areaBodyCenterGeo.height;
   }
 
   /** Scrollable range of the scroll viewport in scroll bar pixels. */
@@ -945,7 +1064,7 @@ export class RenderScope extends EleScope {
   }
 
   protected adjustBody() {
-    const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.tableModel.getContentHeightInPixel();
+    const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.getBodyContentHeight();
     const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);
     this.contentScrollTop = -virtualRowDivTop;
 
@@ -1041,23 +1160,39 @@ export class RenderScope extends EleScope {
     }
 
 
-    // Skip the rows above the viewport. With a constant row height the first visible row can be computed
-    // directly – otherwise we iterate the row heights (O(n), noticeable with millions of rows).
+    // Skip the rows above the viewport. Body: the first visible row from the prefix sums of the row heights
+    // (O(log n), also for variable heights and open detail rows – since 1.1.97). Header/footer: computed directly
+    // with a constant row height, otherwise by iterating the (few) rows.
     let startIndex = 0;
-    const constantRowHeight = areaModel.getConstantRowHeight?.();
-    if (constantRowHeight !== undefined && constantRowHeight > 0 && y < 0) {
-      startIndex = Math.min(rowCount, Math.floor(-y / constantRowHeight));
-      // floating point guard: the row before startIndex must not be visible
-      while (startIndex > 0 && y + startIndex * constantRowHeight > 0) {
-        startIndex--;
+    const layout = areaIdent === 'body' ? this.getBodyRowLayout() : undefined;
+    const withDetails = !!layout && layout.getExtraCount() > 0;
+    const visibleDetails: number[] = []; // rowIndex, top, height – triples of the open detail rows in view
+    if (layout) {
+      this.masterDetailService?.startRenderPass();
+      if (y < 0 && rowCount > 0) {
+        startIndex = layout.findIndexAt(-y);
+        y = y + layout.getTop(startIndex);
       }
-      y = y + startIndex * constantRowHeight;
+    } else {
+      const constantRowHeight = areaModel.getConstantRowHeight?.();
+      if (constantRowHeight !== undefined && constantRowHeight > 0 && y < 0) {
+        startIndex = Math.min(rowCount, Math.floor(-y / constantRowHeight));
+        // floating point guard: the row before startIndex must not be visible
+        while (startIndex > 0 && y + startIndex * constantRowHeight > 0) {
+          startIndex--;
+        }
+        y = y + startIndex * constantRowHeight;
+      }
     }
 
     for (let index = startIndex; index < rowCount; index++) {
       const top = y;
       const lastRowOfModel = index === rowCount - 1;
       const height = this.tableModel.getRowHeight(areaIdent, index);
+      const detailHeight = withDetails ? layout!.getExtraHeight(index) : 0;
+      if (detailHeight > 0 && top + height + detailHeight > 0) {
+        visibleDetails.push(index, top + height, detailHeight);
+      }
 
       if (top + height > 0) {
 
@@ -1155,17 +1290,27 @@ export class RenderScope extends EleScope {
         }
 
       }
-      y = y + height;
+      y = y + height + detailHeight;
 
       if (y > divHeight) {
         if (areaIdent === 'body') {
-          this.lastVisibleRowIndex = index;
-          this.lastFullVisibleRowIndex = ((divHeight - y) < -this.pixelLimitForFullVisible) ? index - 1 : index;
-          this.displayedRowCount = this.lastFullVisibleRowIndex - this.firstFullVisibleRowIndex + 1;
+          // the row itself (without its detail row) decides whether it is fully visible
+          const rowBottom = y - detailHeight;
+          if (rowBottom <= 0 && this.firstVisibleRowIndex === -1) {
+            // only the detail row of a master above the viewport is visible (it fills the body): no row is visible
+            this.displayedRowCount = 0;
+          } else {
+            this.lastVisibleRowIndex = index;
+            this.lastFullVisibleRowIndex = ((divHeight - rowBottom) < -this.pixelLimitForFullVisible) ? index - 1 : index;
+            this.displayedRowCount = this.lastFullVisibleRowIndex - this.firstFullVisibleRowIndex + 1;
+          }
         }
         break;
       }
     } // for
+    if (layout) {
+      this.masterDetailService?.layoutVisible(visibleDetails);
+    }
 
     // The loop ended without leaving the viewport (end of table reached or all rows fit):
     if (areaIdent === 'body' && this.firstVisibleRowIndex > -1 && this.lastVisibleRowIndex === -1) {
@@ -1254,6 +1399,14 @@ export class RenderScope extends EleScope {
         } else {
           ds.setAttribute(rowDiv, 'aria-expanded', `${info.expanded}`);
         }
+      }
+    }
+    if (this.masterDetailService?.isActive()) {
+      // master/detail (since 1.1.97): master rows are expandable
+      if (this.masterDetailService.isMasterAt(rowIndex)) {
+        ds.setAttribute(rowDiv, 'aria-expanded', `${this.masterDetailService.isExpandedAt(rowIndex)}`);
+      } else if (rowDiv.hasAttribute('aria-expanded')) {
+        this.dom.removeAttribute(rowDiv, 'aria-expanded'); // the row div is reused for another row
       }
     }
     if (this.ariaSelectionKind === 'row') {
@@ -1487,7 +1640,10 @@ export class RenderScope extends EleScope {
     parentDiv: HTMLDivElement,
     sideIdent: SideIdent) {
 
-    const y1 = yStart + this.getRowHeights(0, range.r1 - 1, areaModel).reduce((a, b) => a + b, 0);
+    // body: from the prefix sums (O(log n) – before 1.1.97 the heights of all rows above were summed for every span)
+    const y1 = yStart + (areaModel.areaIdent === 'body'
+      ? this.getBodyRowLayout().getTop(range.r1)
+      : this.getRowHeights(0, range.r1 - 1, areaModel).reduce((a, b) => a + b, 0));
 
     const columnCount = this.tableModel.getColumnCount();
     const fixedRightColumnCount = this.tableModel.getFixedRightColumnCount();
@@ -1976,6 +2132,9 @@ export class RenderScope extends EleScope {
     if (areaIdent === 'header' && !rowNumberColumn) {
       this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // the row numbers stay in front
     }
+    if (areaIdent === 'body' && this.masterDetailService?.isActive()) {
+      this.masterDetailService.decorateCell(cell, rowIndex, index); // the expand icon of a master row (since 1.1.97)
+    }
     if (areaIdent === 'body' && this.rowDragService && !editor) {
       if (columnDef?.rowDrag) {
         this.rowDragService.decorateCell(cell, this.rowDragService.getHandleState(rowIndex, columnDef, areaModel));
@@ -2084,6 +2243,16 @@ export class RenderScope extends EleScope {
    *
    * @returns {void}
    */
+  /**
+   * Hides the hover row and column – e.g. while the pointer is over a detail row (master/detail).
+   *
+   * @since 1.1.97
+   */
+  hideHover(): void {
+    this.hideHoverRow();
+    this.hideHoverColumn();
+  }
+
   protected hideHoverRow() {
     this.dom.applyStyle(this.hoverRow, {
       'display': 'none'
@@ -2248,7 +2417,7 @@ export class RenderScope extends EleScope {
     // millions of divs for a large table)
     const firstRow = Math.max(0, this.firstVisibleRowIndex);
     const bodyModel = this.tableModel.getAreaModel('body');
-    const firstRowTop = y + bodyModel.getYPosByRowIndex(firstRow) - this.contentScrollTop;
+    const firstRowTop = y + this.getBodyRowTop(firstRow) - this.contentScrollTop;
     this.renderContentOfDraggingColumnForArea(columnGeo, 'body', firstRowTop, firstRow, this.hostElement.clientHeight);
     // we refrain from rendering the footer:
     // y = this. renderContentOfDraggingColumnForArea(columnGeo, 'footer', y);

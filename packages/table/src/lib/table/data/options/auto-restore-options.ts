@@ -49,6 +49,8 @@ export class AutoRestoreOptions<T> implements AutoRestoreOptionsIf<T> {
   public autoRestoreHeaderGroupState = false;
   /** @since 1.1.92 */
   public autoRestoreCustomState = false;
+  /** @since 1.1.97 */
+  public autoRestoreDetailState = false;
 
 
   public getStorageKeyFn = undefined;

@@ -6,8 +6,11 @@ import type { VNode } from 'preact';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './GuiexpertTable';
+import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
+import type { DetailComponentProps } from './DetailComponentRendererWrapper';
+import { useEffect, useState } from 'preact/hooks';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 let host: HTMLDivElement | undefined;
@@ -35,6 +38,33 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Preact)', () => {
+
+  it('master/detail: a Preact component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
+    const unmounted = vi.fn();
+    function Detail({ row }: DetailComponentProps<{ id: number }>) {
+      const [clicks, setClicks] = useState(0);
+      useEffect(() => () => unmounted(row.id), []);
+      return <button className="md-btn" onClick={() => setClicks(c => c + 1)}>{`clicks ${clicks} of ${row.id}`}</button>;
+    }
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(Detail) } };
+    let api: TableApi | undefined;
+    const detailExpandedChanged = vi.fn();
+    const host = mount(<GuiexpertTable tableModel={createModel(300)} tableOptions={tableOptions} tableReady={a => { api = a; }} detailExpandedChanged={detailExpandedChanged} />);
+    await nextFrame();
+    clickDetailToggle(host, 0);
+    await nextFrame();
+    host.querySelector<HTMLButtonElement>('.md-btn')!.click();
+    await vi.waitFor(() => expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0'));
+    api!.scrollToIndex(0, 200);
+    await nextFrame();
+    api!.scrollToIndex(0, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api!.setDetailExpanded(0, false);
+    await vi.waitFor(() => expect(unmounted).toHaveBeenCalledWith(0));
+    expect(detailRowsOf(host)).toHaveLength(0);
+    expect(detailExpandedChanged).toHaveBeenCalledTimes(2);
+  });
 
   it('fires tableReady once with a TableApi and renders the rows', async () => {
     const tableReady = vi.fn<(api: TableApi) => void>();

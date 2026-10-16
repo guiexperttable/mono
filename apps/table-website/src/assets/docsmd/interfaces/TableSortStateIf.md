@@ -26,7 +26,7 @@ Only for tables without column definitions (and the format before 1.1.92): the c
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L111)
+[src/lib/table/state/table-state.if.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L114)
 
 ___
 
@@ -38,7 +38,7 @@ The property of the column.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L109)
+[src/lib/table/state/table-state.if.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L112)
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L113)
+[src/lib/table/state/table-state.if.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L116)

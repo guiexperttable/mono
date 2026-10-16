@@ -1,0 +1,116 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="master-detail">
+
+  <h2 id="idea">One row, more to say</h2>
+  <p>
+    An order has items, a customer has contacts, a ticket has a history. Showing all of it as columns makes the table
+    unreadable; a dialog hides the other rows. <strong>Master/detail</strong> opens a row: right below it, over the full width
+    of the table, a <em>detail row</em> shows whatever belongs to it – here a second GuiExpert table with the items.
+    Since <code>@guiexpert/table@1.1.97</code> this is one option – MIT-licensed; in ag-Grid master/detail is an Enterprise
+    feature.
+  </p>
+  <LiveDemo name="master-detail" title="100,000 orders with their items" height={460}
+            caption="Click ▸ or press Enter on a row. Scroll far down and back up: the open detail keeps its scroll position." />
+
+  <h2 id="option">One option, one renderer</h2>
+  <p>
+    <ApiLink name="TableOptionsIf.masterDetail" /> needs a <code>detailRenderer</code>: a function that gets an empty
+    container, the row and a context (<ApiLink name="DetailRenderContextIf" />). For a nested table,
+    <ApiLink name="DetailRenderContextIf.createTable" /> does the rest – including <code>destroy()</code> when the detail row
+    goes away:
+  </p>
+  <Snippet file="demos/master-detail.ts" region="items" title="src/order-items.ts" />
+  <Snippet file="demos/master-detail.ts" region="options" />
+  <ul>
+    <li>The ▸ icon sits in the first data column – behind row numbers and the checkbox column, where a tree has its arrow.
+      <code>toggleColumn: "city"</code> moves it; <code>isMaster: row =&gt; row.items.length &gt; 0</code> limits it to some rows.</li>
+    <li>The detail row spans the <strong>whole width</strong>, also the fixed column on the left, and does not move when you
+      scroll horizontally.</li>
+    <li>In code: <ApiLink name="TableApi.setDetailExpanded" /> (display index or row object), <ApiLink name="TableApi.toggleDetail" />,
+      <ApiLink name="TableApi.getExpandedDetailRows" />, <ApiLink name="TableApi.collapseAllDetails" />:</li>
+  </ul>
+  <Snippet file="demos/master-detail.ts" region="api" />
+
+  <h2 id="lifecycle">Why the detail survives scrolling</h2>
+  <p>
+    Virtual scrolling (<ChapterLink slug="virtual-scrolling" />) rebuilds the visible rows in every frame. A nested table
+    living inside such a row would be destroyed and created again all the time – with its scroll position, its selection
+    and every input. So the detail rows live on their own <strong>layer</strong> above the rows:
+  </p>
+  <ol>
+    <li>the content is created when the detail row becomes <strong>visible for the first time</strong> – opening 100,000 rows
+      costs nothing in advance;</li>
+    <li>scrolled out of view, it is only <strong>hidden</strong> (<code>content-visibility: hidden</code>) – back in view it is
+      the same DOM, with the same scroll position;</li>
+    <li>it is <strong>destroyed</strong> when the row is closed, when the table is destroyed (the wrappers do it on a new
+      model or unmount) and when more than <code>maxRenderedDetails</code> (50) contents exist – then the one out of view the
+      longest goes first and comes back as new (<code>context.recreated</code>).</li>
+  </ol>
+  <p>
+    The heights of the detail rows sit between the row heights. Since 1.1.97 the table keeps the row positions as
+    <strong>prefix sums</strong> (<ApiLink name="RowLayout" />): the first visible row is found by a binary search, so
+    scrolling stays fast with open details – and for variable row heights in general (2 million rows: as fast as with
+    one fixed height). Sorting and filtering keep each detail with its row (the row object, or <code>getRowId</code>).
+  </p>
+
+  <h2 id="height">Fixed or measured height</h2>
+  <ul>
+    <li><code>detailHeight: 220</code> – px; the container scrolls if the content is taller. Best for nested tables.</li>
+    <li><code>detailHeight: "auto"</code> (the default) – measured with a <code>ResizeObserver</code>; if the content grows
+      (a textarea is resized), the rows below move. Until the first measurement <code>estimatedDetailHeight</code> (200) is
+      used.</li>
+    <li>A function per row – e.g. the number of items × the row height.</li>
+  </ul>
+  <p>The form of the demo (switch “form instead of items”) has a measured height:</p>
+  <Snippet file="demos/master-detail.ts" region="form" />
+  <Callout type="note" title="Data into the DOM">
+    <p>The detail is your HTML. Write data with <code>textContent</code> or <code>value</code> – never unescaped into
+      <code>innerHTML</code>. Event listeners with <code>{"{ signal: ctx.signal }"}</code> are removed automatically.</p>
+  </Callout>
+
+  <h2 id="events">Events, keyboard, screen readers</h2>
+  <Snippet file="demos/master-detail.ts" region="events" />
+  <ul>
+    <li><ApiLink name="EventListenerIf.onDetailExpandedChanged" /> – <ApiLink name="GeDetailEvent" /> with row, index,
+      <code>expanded</code> and <code>source</code> (mouse, keyboard, api, state); in the wrappers <code>detailExpandedChanged</code>.</li>
+    <li>Clicks, keys and drags <strong>inside</strong> a detail belong to the detail: arrow keys in the item table do not
+      move the focus of the orders. The mouse wheel scrolls the item table first, then the orders.</li>
+    <li><strong>Enter</strong> opens and closes the focused row, <strong>Tab</strong> moves into its open detail,
+      <strong>Shift+Tab</strong> back. Screen readers hear “expanded” (<code>aria-expanded</code>, the grid becomes a
+      <code>treegrid</code>) and “Details expanded” (<ChapterLink slug="accessibility" />).</li>
+    <li>The open orders can be remembered: <code>autoRestoreDetailState</code> (<ChapterLink slug="persist-state" />).</li>
+    <li>Copy and Excel export the orders only.</li>
+  </ul>
+
+  <h2 id="frameworks">Framework components as detail</h2>
+  <p>Every wrapper has a <code>DetailComponentRendererWrapper</code> – the component gets <code>row</code>,
+    <code>rowIndex</code>, <code>tableApi</code> and <code>context</code>, and keeps its state while you scroll:</p>
+  <Code lang="tsx" code={`function OrderItems({ row }: DetailComponentProps<Order>) {
+  const model = useMemo(() => TableFactory.createTableModel({ rows: row.items, properties: ["sku", "qty"] }), [row]);
+  return <div style={{ height: 180 }}><GuiexpertTable tableModel={model} /></div>;
+}
+const tableOptions = { ...new TableOptions(),
+  masterDetail: { detailHeight: 200, detailRenderer: new DetailComponentRendererWrapper(OrderItems) } };`} />
+  <p>Vue, Svelte 4/5, Solid and Preact work the same way; in Angular a component implements
+    <code>DetailComponentRendererIf</code> and <code>inject(DetailRenderWrapperFactory).create(OrderItemsComponent)</code>
+    creates the renderer.</p>
+
+  <Callout type="note" title="Not included">
+    <p>Detail rows only below rows of a flat table – not below tree nodes, group rows or pivot rows. Touch swipes over a
+      detail row do not scroll the outer table. Compare with the alternatives: <ChapterLink slug="build-buy-or-guiexpert" />.</p>
+  </Callout>
+  <Callout type="version">
+    <p>Since 1.1.97. The tag <code>ep-038</code> of the demo repository follows after the release.</p>
+  </Callout>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview of all chapters, or the checklist for your own table: <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

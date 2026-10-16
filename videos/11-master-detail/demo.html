@@ -1,0 +1,85 @@
+<!doctype html>
+<!--
+  Recording page for episode 11 "Master/Detail ohne Enterprise-Lizenz".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/11-master-detail/demo.html
+  Runs the code of snippet.ts (plain JS) with 100,000 generated orders.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Master/Detail</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button { font: inherit; padding: 4px 14px; }
+    .log { font: 16px ui-monospace, monospace; opacity: 0.85; }
+    .table-div { height: calc(100vh - 130px); margin: 0 16px; font-size: 17px; max-width: 760px; }
+  </style>
+</head>
+<body>
+<h1>100.000 Bestellungen – mit Positionen</h1>
+<div class="bar">
+  <button id="alle">20 aufklappen</button>
+  <button id="zu">alle zuklappen</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+  <span class="log" id="log"></span>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import { ColumnDef, EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, px100, px120, px150, px200 } from "@guiexpert/table";
+
+  const KUNDEN = ["Müller GmbH", "Schmidt & Co", "Nordlicht AG", "Becker KG", "Hansen Logistik", "Rossi S.p.A.", "Dupont SA"];
+  const ARTIKEL = [["Schreibtischlampe", 39.9], ["Bürostuhl", 289], ["Monitorarm", 89.5], ["Notizblock A5", 4.2],
+    ["USB-C-Kabel", 12.9], ["Tastatur", 79], ["Maus", 39], ["Webcam", 99], ["Headset", 149]];
+  let seed = 4711;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const bestellungen = Array.from({ length: 100_000 }, (_, i) => {
+    const positionen = Array.from({ length: 1 + Math.floor(rnd() * 5) }, () => {
+      const [artikel, preis] = ARTIKEL[Math.floor(rnd() * ARTIKEL.length)];
+      return { artikel, menge: 1 + Math.floor(rnd() * 4), preis };
+    });
+    return {
+      nr: `B-${100001 + i}`, kunde: KUNDEN[i % KUNDEN.length],
+      summe: Math.round(positionen.reduce((s, p) => s + p.menge * p.preis, 0) * 100) / 100, positionen
+    };
+  });
+
+  // ---- der Code aus snippet.ts (Spaltenbreiten und Beschriftungen fürs Video ergänzt) ----
+  const tableModel = TableFactory.createTableModel({
+    rows: bestellungen, fixedLeftColumnCount: 1,
+    columnDefs: [ColumnDef.create({ property: "nr", headerLabel: "Bestellung", width: px150 }),
+      ColumnDef.create({ property: "kunde", headerLabel: "Kunde", width: px200 }),
+      ColumnDef.create({ property: "summe", headerLabel: "Summe", width: px120, bodyClasses: ["ge-table-text-align-right"] })]
+  });
+  const tableOptions = { ...new TableOptions(),
+    masterDetail: {                                        // ← eine Option
+      detailHeight: 200,
+      detailRenderer: (_div, bestellung, ctx) => {
+        ctx.createTable({                                  // ← zweite Tabelle, räumt sich selbst auf
+          tableModel: TableFactory.createTableModel({
+            rows: bestellung.positionen,
+            columnDefs: [ColumnDef.create({ property: "artikel", headerLabel: "Artikel", width: px200 }),
+              ColumnDef.create({ property: "menge", headerLabel: "Menge", width: px100 }),
+              ColumnDef.create({ property: "preis", headerLabel: "Preis", width: px100 })]
+          })
+        });
+      }
+    } };
+  const log = document.getElementById("log");
+  const listener = new EventAdapter();
+  listener.onDetailExpandedChanged = evt => { log.textContent = `${evt.row.nr} ${evt.expanded ? "auf" : "zu"}`; };
+  const host = document.querySelector(".table-div");
+  const api = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+  // ----
+
+  document.getElementById("alle").onclick = () => { for (let i = 0; i < 20; i++) api.setDetailExpanded(i, true); };
+  document.getElementById("zu").onclick = () => { log.textContent = `${api.collapseAllDetails()} zugeklappt`; };
+  document.getElementById("dark").onchange = e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light");
+</script>
+</body>
+</html>

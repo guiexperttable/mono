@@ -23,7 +23,7 @@ export class InputHandler {
 
   /** Escape in the cell editor cancels the editing: the old value stays, nothing is committed. */
   private onHostElementKeyDown(event: KeyboardEvent) {
-    if (event.key !== "Escape" || !this.tableScope.isEditing()) {
+    if (this.tableScope.isEventInDetail?.(event) || event.key !== "Escape" || !this.tableScope.isEditing()) {
       return;
     }
     const editor = event.target;
@@ -45,6 +45,9 @@ export class InputHandler {
    * @return {void}
    */
   private onHostElementChanged(event: Event) {
+    if (this.tableScope.isEventInDetail?.(event)) {
+      return; // an input in a detail row (master/detail) – not a cell editor of this table
+    }
     if (event.target instanceof HTMLInputElement
       || event.target instanceof HTMLSelectElement
       || event.target instanceof HTMLTextAreaElement

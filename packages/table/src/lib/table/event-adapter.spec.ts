@@ -6,6 +6,7 @@ const METHODS = [
   'onBatchEditChanged',
   'onCheckboxChanged',
   'onContextmenu',
+  'onDetailExpandedChanged',  // since 1.1.97
   'onFocusChanged',
   'onModelChanged',
   'onMouseClicked',

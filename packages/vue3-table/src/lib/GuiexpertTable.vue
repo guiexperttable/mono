@@ -16,7 +16,7 @@ import {
   TableOptions,
   TableScope,
   TableModelIf, TableOptionsIf,
-  GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent
+  GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent, GeDetailEvent
 } from '@guiexpert/table';
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -79,7 +79,8 @@ export default defineComponent({
     "rowDragStart",  // since 1.1.95 (row drag)
     "rowDragMove",
     "rowDragEnd",
-    "batchEditChanged" // since 1.1.96 (batch edit)
+    "batchEditChanged", // since 1.1.96 (batch edit)
+    "detailExpandedChanged" // since 1.1.97 (master/detail)
   ],
 
   setup(props, { emit }) {
@@ -174,6 +175,10 @@ export default defineComponent({
 
         onBatchEditChanged: (evt: GeBatchEditEvent) => {
           emit("batchEditChanged", evt);
+        },
+
+        onDetailExpandedChanged: (evt: GeDetailEvent) => {
+          emit("detailExpandedChanged", evt);
         },
       };
 

@@ -1,11 +1,11 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeBatchEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
-import type { TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
+import { GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -119,6 +119,34 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(batchEvents).toHaveLength(1);
     expect(batchEvents[0]).toBeInstanceOf(GeBatchEditEvent);
     expect(batch.rows[2].qty).toBe(0);
+  });
+
+  it('master/detail: "detailExpandedChanged" (bubbling), a nested table in the detail, removal destroys it (since 1.1.97)', async () => {
+    const { host, el, events } = createTableElement();
+    const received: GeDetailEvent[] = [];
+    host.addEventListener('detailExpandedChanged', e => received.push((e as CustomEvent<GeDetailEvent>).detail));
+    let nested: TableApi | undefined;
+    const tableOptions = {
+      ...new TableOptions(),
+      masterDetail: {
+        detailHeight: 120,
+        detailRenderer: (_el: HTMLDivElement, _row: unknown, ctx: DetailRenderContextIf) => {
+          nested = ctx.createTable({ tableModel: createModel(3, 'Item') });
+        },
+      },
+    };
+    el.data = data(createModel(20), tableOptions);
+    await nextFrame();
+    clickDetailToggle(el, 2);
+    await nextFrame();
+    expect(received).toHaveLength(1);
+    expect(received[0]).toBeInstanceOf(GeDetailEvent);
+    expect(received[0]).toMatchObject({ rowIndex: 2, expanded: true, source: 'mouse' });
+    expect(detailRowsOf(el)).toHaveLength(1);
+    expect(detailRowsOf(el)[0].textContent).toContain('Item 2');
+    expect(events.tableReady[0].isDetailExpanded(2)).toBe(true);
+    el.remove();
+    await vi.waitFor(() => expect(isDestroyed(nested!)).toBe(true)); // destroyed with the outer table (deferred)
   });
 
   it('"stateChanged" is dispatched (bubbling) after the state changed (since 1.1.92)', async () => {

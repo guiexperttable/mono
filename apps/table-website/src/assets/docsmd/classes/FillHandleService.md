@@ -60,7 +60,7 @@ Cancels a running fill (Escape, `pointercancel`, [TableApi.cancelFill](TableApi.
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L349)
+[src/lib/table/fill/fill-handle-service.ts:354](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L354)
 
 ___
 
@@ -76,7 +76,7 @@ Releases everything (TableScope.destroy).
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:372](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L372)
+[src/lib/table/fill/fill-handle-service.ts:377](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L377)
 
 ___
 
@@ -92,7 +92,7 @@ true while the handle is dragged.
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L65)
+[src/lib/table/fill/fill-handle-service.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L70)
 
 ___
 
@@ -109,4 +109,4 @@ hides it: no fill handle option, no range, the corner scrolled out, an open edit
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L73)
+[src/lib/table/fill/fill-handle-service.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L78)

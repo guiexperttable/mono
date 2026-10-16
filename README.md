@@ -13,6 +13,8 @@ Calculated columns, „Show values as“ and formulas – `ColumnDef.create({ pr
 Drag rows into order – a grip per row (`rowDrag: true`), mouse, touch and Ctrl+Alt+↑/↓, auto-scroll through millions of rows, trees, several rows at once; the table moves the rows or only reports the drop (since 1.1.95).
 Spreadsheet feeling: a fill handle at the corner of the selection (copy or continue series – 1, 2, 3 …, dates, `Item 1` → `Item 2`; Ctrl/⌘+D, Ctrl/⌘+R) and batch edit – changes are collected and marked until "Save" (`commitBatchEdit()`) or "Discard", with validation per column (`fillHandle: true`, `batchEdit: true`, since 1.1.96).
 
+Master/detail: expand a row and show any content over the full width below it – a second table (order → items), a form or a framework component (`DetailComponentRendererWrapper` for React, Vue, Svelte, Solid, Preact; Angular `DetailRenderWrapperFactory`). Works with virtual scrolling and millions of rows: the detail is created when it scrolls into view and keeps its state while scrolling; fixed or measured (`"auto"`) height, Enter/Tab keyboard support, detail rows survive sorting and filtering (`tableOptions.masterDetail`, since 1.1.97). Variable row heights scroll as fast as constant ones (prefix sums).
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside

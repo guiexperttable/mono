@@ -55,6 +55,8 @@ import { CellGroupExt } from './data/tablemodel/cellgroup/cell-group-ext';
 import { RowDragService } from './row-drag/row-drag-service';
 import { BatchEditService, PendingInputIf } from './batch-edit/batch-edit-service';
 import { FillHandleService } from './fill/fill-handle-service';
+import { MasterDetailService } from './master-detail/master-detail-service';
+import { GeDetailEvent, GeDetailEventSource } from './data/common/event/ge-detail-event';
 import { FillHandleOptions } from './fill/fill-handle-options';
 import type { FillHandleOptionsIf } from './fill/fill-handle-options.if';
 import type { CellChangeIf, CellChangeSource } from './batch-edit/cell-change.if';
@@ -175,6 +177,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.rowDragService = new RowDragService(this);
     this.batchEditService = new BatchEditService(this);
     this.fillHandleService = new FillHandleService(this);
+    if (tableOptions?.masterDetail) {
+      this.masterDetailService = new MasterDetailService(this,
+        (host, model, options, listener) => new TableScope(host, model, new SimpleDomService(), options ?? new TableOptions(), listener ?? new EventAdapter()));
+      if (this.masterDetailService.isActive()) {
+        // the detail rows are a row group between body and footer (screen readers)
+        const owned = (hostElement.getAttribute('aria-owns') ?? '').split(' ').filter(Boolean);
+        const footer = owned.findIndex(id => id.startsWith(this.ariaIds.rowGroup('footer', 'west')));
+        owned.splice(footer < 0 ? owned.length : footer, 0, this.ariaIds.detailRowGroup());
+        this.setHostAriaAttribute('aria-owns', owned.join(' '));
+        // expandable rows (aria-expanded) belong to a treegrid – a grid row must not have aria-expanded
+        this.setHostAriaAttribute('role', 'treegrid');
+      }
+    }
     this.shortcutService.addListener(this.selectionService);
 
     const sm = this.getSelectionModel ? this.getSelectionModel() : undefined;
@@ -213,7 +228,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const [row, col] = fm.getFocus();
     const rowCount = this.tableModel.getBodyModel().getRowCount();
     if ((row < 0 || col < 0) && rowCount > 0 && this.tableModel.getColumnCount() > 0) {
-      this.setFocusCell(Math.max(0, this.firstFullVisibleRowIndex), this.getFirstShownColumnIndex());
+      // a detail row (master/detail) may fill the body: then the row at the top of the view
+      const row = this.firstFullVisibleRowIndex >= 0 ? this.firstFullVisibleRowIndex
+        : Math.max(0, this.getBodyRowIndexAtY(this.contentScrollTop));
+      this.setFocusCell(row, this.getFirstShownColumnIndex());
     } else if (rowCount < 1 && this.getAriaGridInfo().headerRowCount > 0 && this.tableModel.getColumnCount() > 0) {
       // no rows (empty table, nothing matches the filter): the header is what keyboard users can reach
       this.setHeaderFocus(this.getAriaGridInfo().headerRowCount - 1, this.getFirstShownColumnIndex());
@@ -531,6 +549,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (checkboxCell) {
       this.toggleRowCheckbox(rowIndex, columnIndex, 'body');
       return true;
+    }
+    if (this.masterDetailService?.isMasterAt(rowIndex)) {
+      return this.toggleDetail(rowIndex, 'keyboard'); // master/detail (since 1.1.97)
     }
     const row = bodyModel.getRowByIndex(rowIndex);
     if (isTreeRow(row) && isAreaModelTree(bodyModel)
@@ -1100,6 +1121,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       console.error(e);
     }
     this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
+    try {
+      this.masterDetailService?.destroy(); // detail contents: renderer cleanups, nested tables destroyed
+    } catch (e) {
+      console.error(e);
+    }
 
     this.destroyed = true;
     this.listenerAbortController.abort();
@@ -1113,6 +1139,123 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.liveAnnouncer.destroy();
     this.removeHostAria();
     this.hostElement.innerText = "";
+  }
+
+  // ------------------------------------------------------------------------------- master/detail (since 1.1.97)
+
+  /**
+   * True if a DOM event comes from a detail row (master/detail) – e.g. from a nested table. The mouse, keyboard and
+   * pointer handlers of this table ignore such events.
+   *
+   * @param {Event} evt - an event while it is dispatched
+   * @returns {boolean} whether it comes from the detail layer
+   * @since 1.1.97
+   */
+  isEventInDetail(evt: Event): boolean {
+    return !!this.masterDetailService?.isInLayer(evt);
+  }
+
+  /**
+   * Expands or collapses the detail row of a master row (see {@link TableApi.setDetailExpanded}).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @param {boolean} expanded - the new state
+   * @param {GeDetailEventSource} [source] - what changed it
+   * @returns {boolean} false if nothing changed
+   * @since 1.1.97
+   */
+  setDetailExpanded(rowOrIndex: unknown, expanded: boolean, source: GeDetailEventSource = 'api'): boolean {
+    return !!this.masterDetailService?.setExpanded(rowOrIndex, expanded, source);
+  }
+
+  /**
+   * Toggles the detail row of a master row (see {@link TableApi.toggleDetail}).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @param {GeDetailEventSource} [source] - what changed it
+   * @returns {boolean} false if it is no master row
+   * @since 1.1.97
+   */
+  toggleDetail(rowOrIndex: unknown, source: GeDetailEventSource = 'api'): boolean {
+    const service = this.masterDetailService;
+    return !!service && service.setExpanded(rowOrIndex, !service.isExpanded(rowOrIndex), source);
+  }
+
+  /**
+   * Called by {@link MasterDetailService} after detail rows were expanded or collapsed: new row positions and scroll
+   * height, repaint, event, announcement, table state.
+   *
+   * @param {unknown} row - the master row (`undefined` for several rows)
+   * @param {number} rowIndex - its display index (-1 for several rows or a row that is not shown)
+   * @param {boolean} expanded - the new state
+   * @param {GeDetailEventSource} source - what changed it
+   * @param {boolean} [emit] - false: no event (several rows at once)
+   * @param {boolean} [layoutUpdated] - true: the row layout was already updated for this one row
+   * @since 1.1.97
+   */
+  onDetailToggled(row: unknown, rowIndex: number, expanded: boolean, source: GeDetailEventSource, emit = true,
+                  layoutUpdated = false): void {
+    if (!layoutUpdated) {
+      this.invalidateRowLayout();
+    }
+    this.resetSizeOfWrapperDiv();
+    this.repaint();
+    if (emit) {
+      this.eventListener.onDetailExpandedChanged?.(new GeDetailEvent(row, rowIndex, expanded, source));
+    }
+    if (source === 'mouse' || source === 'keyboard') {
+      const text = expanded ? this.ariaTexts.detailExpanded?.() : this.ariaTexts.detailCollapsed?.();
+      if (text) {
+        this.announce(text);
+      }
+    }
+    this.stateService.markDirty('details');
+  }
+
+  /**
+   * Called by {@link MasterDetailService} after a detail row with `detailHeight: "auto"` got a new height: new scroll
+   * height and repaint (the rows below move).
+   *
+   * @since 1.1.97
+   */
+  onDetailHeightChanged(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.resetSizeOfWrapperDiv();
+    this.adjustAfterScrolling();
+  }
+
+  /**
+   * The focus came back from a detail row (Shift+Tab): its master row gets the focus (same column).
+   *
+   * @param {number} rowIndex - display index of the master row
+   * @since 1.1.97
+   */
+  /**
+   * A detail row that holds the keyboard focus goes away (collapsed, destroyed, scrolled out of view): the host takes
+   * the focus and the master row becomes the focused row – without a repaint (the caller repaints).
+   *
+   * @param {number} rowIndex - display index of the master row (-1: only the host)
+   * @since 1.1.97
+   */
+  takeFocusFromDetail(rowIndex: number): void {
+    const fm = this.focusModel();
+    if (fm && rowIndex >= 0) {
+      const col = fm.getFocus()[1];
+      this.headerFocus = undefined;
+      fm.setFocus(rowIndex, col >= 0 ? col : this.getFirstShownColumnIndex());
+    }
+    this.hostElement.focus({ preventScroll: true });
+  }
+
+  focusDetailMaster(rowIndex: number): void {
+    const fm = this.focusModel();
+    if (!fm || rowIndex < 0) {
+      return;
+    }
+    const col = fm.getFocus()[1];
+    this.setFocusCell(rowIndex, col >= 0 ? col : this.getFirstShownColumnIndex());
   }
 
   /**
@@ -1141,7 +1284,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
       if (ret.areaIdent) {
         const am = this.tableModel.getAreaModel(ret.areaIdent);
-        ret.rowTop = am.getYPosByRowIndex(ret.rowIndex);
+        // body: with the heights of open detail rows above (master/detail)
+        ret.rowTop = ret.areaIdent === 'body' ? this.getBodyRowTop(ret.rowIndex) : am.getYPosByRowIndex(ret.rowIndex);
       }
       ret.columnLeft = this.tableModel.getXPosByColumnIndex(ret.columnIndex);
     }
@@ -1638,8 +1782,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   scrollToIndex(indexX: number, indexY: number) {
-    const bodyAreaModel = this.tableModel.getAreaModel('body');
-    const py = bodyAreaModel.getYPosByRowIndex(indexY);
+    const py = this.getBodyRowTop(indexY); // with the heights of open detail rows above (master/detail)
     this.scrollToPixel(this.getScrollLeftForColumnIndex(indexX), py);
   }
 
@@ -2116,6 +2259,22 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @see {@link getDisplayedRowCount} - Related method for getting visible row count
    */
   ensureRowIsVisible(rowIndex:number):boolean {
+    if (this.hasBodyRowExtras()) {
+      // open detail rows (master/detail): rows have no common height – compare pixels (a detail may fill the body)
+      const top = this.getBodyRowTop(rowIndex);
+      const bottom = top + this.tableModel.getRowHeight('body', rowIndex);
+      const viewTop = this.contentScrollTop;
+      const viewHeight = this.areaBodyCenterGeo.height;
+      if (top < viewTop) {
+        this.scrollToPixel(this.scrollViewport.scrollLeft, top);
+        return true;
+      }
+      if (bottom > viewTop + viewHeight) {
+        this.scrollToPixel(this.scrollViewport.scrollLeft, bottom - viewHeight);
+        return true;
+      }
+      return false;
+    }
     const firstVisibleRowIndex = this.getFirstFullVisibleRowIndex();
     const lastVisibleRowIndex = this.getLastFullVisibleRowIndex();
     const displayedRowCount = this.getDisplayedRowCount();

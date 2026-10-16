@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -115,6 +115,14 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   batchEditChanged: Subject<GeBatchEditEvent> = new Subject<GeBatchEditEvent>();
 
+  /**
+   * Master/detail: a detail row was expanded or collapsed.
+   *
+   * @since 1.1.97
+   */
+  @Output()
+  detailExpandedChanged: Subject<GeDetailEvent> = new Subject<GeDetailEvent>();
+
   @Input()
   tableModel?: TableModelIf;
 
@@ -183,6 +191,10 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onBatchEditChanged(evt: GeBatchEditEvent): void {
     this.batchEditChanged.next(evt);
+  }
+
+  onDetailExpandedChanged(evt: GeDetailEvent): void {
+    this.detailExpandedChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

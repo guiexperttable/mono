@@ -26,7 +26,7 @@ The property of the column ([ColumnDefIf.property](ColumnDefIf.md#property)).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L94)
+[src/lib/table/state/table-state.if.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L97)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L98)
+[src/lib/table/state/table-state.if.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L101)
 
 ___
 
@@ -50,4 +50,4 @@ Width in px – only set for columns the user (or `setColumnWidth`) resized; oth
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L96)
+[src/lib/table/state/table-state.if.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L99)

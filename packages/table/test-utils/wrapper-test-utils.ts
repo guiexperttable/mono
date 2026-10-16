@@ -190,3 +190,17 @@ export function dragFillHandle(container: Element, toRow: number): void {
   fire(document, 'pointermove', target.left + target.width / 2, target.top + target.height / 2);
   fire(document, 'pointerup', target.left + target.width / 2, target.top + target.height / 2);
 }
+
+/** Master/detail (since 1.1.97): the detail rows of a table (the layer of the outer table only). */
+export function detailRowsOf(container: Element): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('.ge-table-detail-layer > .ge-table-detail-row'));
+}
+
+/** Clicks the expand icon of a body row (master/detail). */
+export function clickDetailToggle(container: Element, rowIndex: number): void {
+  const toggle = container.querySelector<HTMLElement>(`.ge-table-detail-toggle[data-row-index="${rowIndex}"]`);
+  if (!toggle) {
+    throw new Error(`no detail toggle in row ${rowIndex}`);
+  }
+  toggle.click();
+}

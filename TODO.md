@@ -137,9 +137,10 @@
       (Viewport reicht über den Footer, Wrapper + 1 px, East-Spalten und vertikale Scrollleiste) – der Versatz wuchs mit
       der Scrollposition (Mitte ~34 px, Ende ~67 px). Jetzt mit dem gerenderten Versatz (`contentScrollTop`,
       neu `getContentScrollLeft()`); Browser-Test für oben links / Mitte / Ende.
-- [ ] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
-      Filter/Sortierung/Baum-Toggle beachten).
-      → Voraussetzung in Prompt 011 (Master/Detail).
+- [x] Performance, Teil 2: variable Zeilenhöhen weiterhin O(n) → Prefix-Summen + Binärsuche (Invalidierung bei
+      Filter/Sortierung/Baum-Toggle beachten). Erledigt mit Prompt 011: `RowLayout` (`row-layout/`), `RenderScope.getBodyRowLayout()`;
+      2 Mio. Zeilen mit variablen Höhen 28,2 → 19,5 ms je Frame (konstant: 20–22 ms, Container; `scripts/measure-render.mjs
+      --variable 1`). `drawBigCell` (Body) rechnet `y1` ebenfalls aus dem Layout statt O(r1) je Span und Frame.
 - [x] Performance, Teil 3a: `adjustColumnsToRowParent` las pro Zeile `scrollViewport.scrollLeft` (Wert wurde nie
       benutzt) → erzwungenes Layout je Zeile. Entfernt (Baum 30 → 19,5 ms, Objekt-Array 10,4 → 7 ms, gesamt mit
       Teil 1: 2 Mio. Zeilen Ø 16,5 → 6,0 ms, max 28,7 → 9,6 ms).
@@ -254,7 +255,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       #CIRC!`), CSS `ge-table-cell-error`; `api.getRowValue`, `setShowValuesAs`, `getShowValuesAs`, `setColumnFormula`;
       `AreaModelPivot.getShownValue`, `PivotValueIf.showValuesAs`; Excel: `ExcelFormattedValueIf` + `numFmt` (Prozent).
       Showcase `formulas`, `why.astro`. Selbständig umgesetzt.
-      Offen: Training (Abschnitt in `column-definitions` + Kapitel 38 `formulas`), Demo-Repo `ep-038`, Videos 29/30,
+      Offen: Training (Abschnitt in `column-definitions` + Kapitel 39 `formulas` – 38 ist seit 011 `master-detail`; die
+      Planung hatte noch keine Seite, keinen Tag und keinen Link), Demo-Repo `ep-039`, Videos 29/30,
       Demo-Modell + `apps/table-demo`, Angular-Demo nach dem Release, Bench auf dem Mac nachmessen.
 - [ ] Folgepunkte 008: Footer einer „Show values as“-Spalte zeigt Rohsummen (z. B. 100 % wäre schöner) · Pivot: laufende
       Summe/Rang/Differenz über Spalten (ag-Grid „Running total in“) · `valueGetter` für `AreaModelArrayOfArrays` (Spalten
@@ -302,8 +304,29 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       läuft je Schreiben zweimal (Prüfung + `setValue`; Ergebnis einmal gespeichert) · Reihen: `2026-11` (Jahr-Monat) und
       ISO-Datum mit Uhrzeit zählen als Text mit Endzahl · `aria-keyshortcuts` des Grids nennt Strg+D/R auch dann, wenn `shortcutActionIdMapping` andere Tasten belegt ·
       Auto-Scroll waagerecht ohne Zeitskalierung bei gekappter Breite (nur senkrecht kappt die Tabelle).
-- [ ] **011 Master/Detail** (`prompts/011-master-detail.md`); enthält „Performance, Teil 2“ (variable Zeilenhöhen) als
-      Voraussetzung.
+- [x] **011 Master/Detail** – Branch `feat/master-detail`, Design `prompts/011-master-detail.design.md`:
+      Prefix-Summen (`RowLayout`, Performance Teil 2), `tableOptions.masterDetail` (`MasterDetailService`, eine Detail-Ebene
+      im Host über die volle Breite, Inhalte lazy + geparkt mit `content-visibility`, LRU `maxRenderedDetails`, `"auto"`-Höhe
+      per `ResizeObserver`, `ctx.createTable()` für verschachtelte Tabellen), Ereignis-Isolation (`isEventInDetail`), Mausrad-
+      Weiterleitung, ARIA (`treegrid`, `aria-expanded`, Rowgroup), Enter/Tab, Zustandsteil `details`, API `setDetailExpanded`
+      … `getDetailElement`, `onDetailExpandedChanged` + Wrapper-Event `detailExpandedChanged` (alle 7) und
+      `DetailComponentRendererWrapper` (React, Preact, Vue, Svelte, Solid; Angular `DetailRenderWrapperFactory`). CSS
+      `table-master-detail.css`. Showcase `masterdetail`, Training-Kapitel 38 `master-detail`, `videos/11-master-detail/`,
+      `apps/table-demo/master-detail.html`, Demo-Modell `createMasterDetailModelAndOptions`. Selbständig umgesetzt.
+      Offen: Angular-Demo nach dem Release (npm-Pakete); Demo-Repo-Tag `ep-038` (Freigabe, nach dem Release); kein
+      Angular-Smoke-Test (wie bei allen Features, s. „Angular“).
+- [ ] Folgepunkte 011: Detailzeilen unter **Baumknoten/Gruppenzeilen** (heute nur flache Bodies) · **Touch-Wischen** über
+      einer Detailzeile scrollt die äußere Tabelle nicht (nur Mausrad wird weitergeleitet; Pointer-Events-Weiterleitung) ·
+      **Scroll-Anker**: wächst ein `"auto"`-Detail oberhalb des Sichtbereichs, verrutschen die sichtbaren Zeilen · Rowspan-Zelle
+      über eine Masterzeile mit offenem Detail wird hinter das Detail gezeichnet · Detailzeilen haben kein `aria-rowindex`
+      (zählen nicht in `aria-rowcount`) – Screenreader-Test (NVDA/VoiceOver) offen · Fokus in einem Detail, das aus dem
+      Sichtbereich gescrollt wird, geht verloren (`visibility: hidden`) · Copy/Excel optional mit Details · Animation beim
+      Auf-/Zuklappen · `expandAllDetails` bei Millionen Zeilen: eine Liste mit Millionen Einträgen (Speicher), besser
+      „alle offen“-Flag · Tab von einer Zeile **ohne** offenes Detail landet im ersten sichtbaren Detail (DOM-Reihenfolge),
+      jede innere Tabelle ist ein eigener Tab-Stopp · Screenreader lesen die Details nach allen Body-Zeilen (eigene Rowgroup
+      in `aria-owns`), nicht direkt nach dem Master · `ctx.rowIndex` bleibt der Index beim Erzeugen (nach Sortieren veraltet)
+      · Ändert sich `getRowHeight()` eines eigenen Modells durch ein Edit, braucht es `api.repaint()` (Werte-Änderungen
+      bauen die Prefix-Summen nicht neu).
 - [ ] **012 Rechts-nach-links-Sprachen (RTL)** (`prompts/012-rtl.md`), bewusst zuletzt.
 
 ## Mono-Repo / Build
@@ -534,6 +557,20 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.97 – Master/Detail (011) und Prefix-Summen**, nur additiv: neue optionale Member `TableOptionsIf.masterDetail`,
+  `EventListenerIf.onDetailExpandedChanged?`, `AriaTextsIf.detailExpanded?/detailCollapsed?`,
+  `AutoRestoreOptionsIf.autoRestoreDetailState?`, `TableStateIf.detailRowIds?`; `TableStatePart` kennt `"details"`,
+  `ALL_TABLE_STATE_PARTS` hat einen Eintrag mehr (vor `"scroll"`). `EventAdapter` hat eine neue leere Methode. Neue Exporte
+  `RowLayout`, `MasterDetailOptions`, `MasterDetailService`, `GeDetailEvent` (+ Typen). `RenderScope`/`TableScope`: neue
+  Methoden `getBodyRowLayout`, `getBodyRowTop`, `getBodyRowIndexAtY`, `invalidateRowLayout`, `setBodyRowExtra`,
+  `isEventInDetail`, `setDetailExpanded`, `toggleDetail` …; `EleScope.getBodyContentHeight()`/`adjustDetailLayerBounds()`.
+  **Verhalten ohne `masterDetail` gleich** – mit einer Ausnahme: Bodies mit **variablen** Zeilenhöhen speichern die
+  Prefix-Summen; ändert ein eigenes Modell `getRowHeight()` ohne Benachrichtigung, braucht es `api.repaint()` (für die
+  Scrollhöhe brauchte es schon immer `repaintHard()`). `api.setRows()` invalidiert das Layout selbst. Mit `masterDetail`
+  ist der Host `role="treegrid"`. Wrapper: Event `detailExpandedChanged`, Klasse `DetailComponentRendererWrapper` (Angular
+  `DetailRenderWrapperFactory`, `DetailComponentRendererIf`, `DetailRendererWrapper`). Neue CSS-Datei
+  `table-master-detail.css` (in `main.css` enthalten). `dist` 3,0 MB → 3,2 MB (`index.js` 770 → 818 kB).
 
 - **1.1.96 – Fill-Handle und Batch-Edit (010)**, nur additiv: neue optionale Member `TableOptionsIf.fillHandle`,
   `TableOptionsIf.batchEdit`, `ColumnDefIf.validate`, `EventListenerIf.onBatchEditChanged?`, `AriaTextsIf.cellsFilled?`

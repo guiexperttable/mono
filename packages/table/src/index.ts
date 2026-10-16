@@ -313,3 +313,11 @@ export * from './lib/table/batch-edit/batch-edit-options';
 export * from './lib/table/batch-edit/pending-cell-changes';
 export * from './lib/table/batch-edit/batch-edit-service';
 export * from './lib/table/data/common/event/ge-batch-edit-event';
+
+// Row layout (prefix sums of the row heights) and master/detail (since 1.1.97)
+export * from './lib/table/row-layout/row-layout';
+export * from './lib/table/master-detail/detail-renderer.if';
+export * from './lib/table/master-detail/master-detail-options.if';
+export * from './lib/table/master-detail/master-detail-options';
+export * from './lib/table/master-detail/master-detail-service';
+export * from './lib/table/data/common/event/ge-detail-event';

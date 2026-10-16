@@ -1,14 +1,16 @@
 // Smoke test of the Solid wrapper in Chromium: mount → tableReady → rows → click → new model → unmount.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { createSignal } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { render } from 'solid-js/web';
 import { GeMouseEvent, TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { TableModelIf } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable';
+import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
+import type { DetailComponentProps } from './DetailComponentRendererWrapper';
 import type { GeMouseEventFn } from './GuiexpertTableProps';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 const disposers: (() => void)[] = [];
@@ -34,6 +36,31 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Solid)', () => {
+
+  it('master/detail: a Solid component as detail keeps its state while scrolling, is disposed on collapse (since 1.1.97)', async () => {
+    const disposed = vi.fn();
+    function Detail(props: DetailComponentProps<{ id: number }>) {
+      const [clicks, setClicks] = createSignal(0);
+      onCleanup(() => disposed(props.row.id));
+      return <button class="md-btn" onClick={() => setClicks(c => c + 1)}>{`clicks ${clicks()} of ${props.row.id}`}</button>;
+    }
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(Detail) } };
+    const { host, tableReady } = mount(createModel(300), tableOptions);
+    await nextFrame();
+    clickDetailToggle(host, 0);
+    await nextFrame();
+    host.querySelector<HTMLButtonElement>('.md-btn')!.click();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    const api = tableReady.mock.calls[0][0];
+    api.scrollToIndex(0, 200);
+    await nextFrame();
+    api.scrollToIndex(0, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api.setDetailExpanded(0, false);
+    expect(disposed).toHaveBeenCalledWith(0);
+    expect(detailRowsOf(host)).toHaveLength(0);
+  });
 
   it('calls tableReady once with a TableApi and renders the rows', async () => {
     const { host, tableReady } = mount(createModel(5));

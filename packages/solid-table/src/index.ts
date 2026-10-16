@@ -1,4 +1,5 @@
 import { ComponentRendererWrapper } from "./ComponentRendererWrapper";
+import { DetailComponentRendererWrapper } from "./DetailComponentRendererWrapper";
 import GuiexpertTable from "./GuiexpertTable";
 
 // the props interface and the callback types (before: `GuiexpertTableProps` was a namespace object of this module)
@@ -6,5 +7,7 @@ export * from "./GuiexpertTableProps";
 
 export {
   GuiexpertTable,
-  ComponentRendererWrapper
+  ComponentRendererWrapper,
+  DetailComponentRendererWrapper
 };
+export type { DetailComponentProps } from "./DetailComponentRendererWrapper";

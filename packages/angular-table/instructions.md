@@ -45,10 +45,11 @@ The table fills its host element – give it a height:
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
 | Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.92: loading overlay, no re-creation) |
-| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92), `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`, since 1.1.95 – row drag, instructions.md 6.16) |
+| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92), `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`, since 1.1.95 – row drag, instructions.md 6.16), `batchEditChanged` (`GeBatchEditEvent`, since 1.1.96), `detailExpandedChanged` (`GeDetailEvent`, since 1.1.97 – master/detail, instructions.md 6.18) |
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
-`RendererWrapper`, `DomService`.
+`RendererWrapper`, `DomService`, since 1.1.97 `DetailRenderWrapperFactory`, `DetailComponentRendererIf<T>` and
+`DetailRendererWrapper` (Angular components as detail rows, section 11).
 
 > Since 1.1.86 (`@guiexpert/angular-table@NN.1.86`) a **new `tableModel` or `tableOptions` object** re-creates the table
 > (`ngOnChanges`; the previous table is released with `TableApi.destroy()`, also in `ngOnDestroy`), and `tableReady`
@@ -511,6 +512,54 @@ export class PivotComponent {
 
 ---
 
+### Master/detail (since 1.1.97)
+
+Expand a row and show an Angular component over the full width below it – e.g. the items of an order in a second
+`guiexpert-table`. The component implements `DetailComponentRendererIf` and is created once, when the detail row becomes
+visible; it keeps its state while scrolling and is destroyed when the row is collapsed (core guide 6.18).
+
+```ts
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { DetailComponentRendererIf, DetailRenderWrapperFactory, TableComponent } from "@guiexpert/angular-table";
+import { DetailRenderContextIf, TableFactory, TableModelIf, TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+interface Order { id: number; customer: string; items: { sku: string; qty: number }[] }
+
+@Component({
+  selector: "app-order-items",
+  standalone: true,
+  imports: [TableComponent],
+  template: `<guiexpert-table style="display:block; height:160px" [tableModel]="items" />`,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class OrderItemsComponent implements DetailComponentRendererIf<Order> {
+  items?: TableModelIf;
+
+  setDetail(order: Order, _context: DetailRenderContextIf<Order>): void {
+    this.items = TableFactory.createTableModel({ rows: order.items, properties: ["sku", "qty"] });
+  }
+}
+
+@Component({
+  selector: "app-orders",
+  standalone: true,
+  imports: [TableComponent],
+  template: `<guiexpert-table class="table-div" [tableModel]="tableModel" [tableOptions]="tableOptions"
+                              (detailExpandedChanged)="opened = $event.expanded" />`
+})
+export class OrdersComponent {
+  opened = false;
+  tableModel: TableModelIf = TableFactory.createTableModel({
+    rows: [{ id: 1, customer: "Ann", items: [{ sku: "A-1", qty: 2 }] }] as Order[],
+    properties: ["id", "customer"]
+  });
+  tableOptions: TableOptionsIf = {
+    ...new TableOptions(),
+    masterDetail: { detailHeight: 180, detailRenderer: inject(DetailRenderWrapperFactory).create(OrderItemsComponent) }
+  };
+}
+```
+
 ## 12. Inline editing
 
 ```ts
@@ -582,7 +631,8 @@ html {
 
 ## 14. Not available yet
 
-- No built-in filter UI, context menu, pagination or row drag & drop.
+- No built-in filter UI, context menu or pagination (row drag: core guide 6.16).
+- Master/detail only for flat tables (no detail rows below tree nodes, group rows or pivot rows).
 - No drag & drop group panel or pivot field list (row grouping and pivot tables themselves: section 11).
 
 ## License

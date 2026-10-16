@@ -6,7 +6,7 @@ import type { RowDragOptionsIf } from "./row-drag-options.if";
 import type { AriaTextsIf } from "../aria/aria-texts.if";
 import { RowDragOptions } from "./row-drag-options";
 import { GeRowDragEvent, GeRowDragEventType, GeRowDragSource } from "../data/common/event/ge-row-drag-event";
-import { calcMoveToIndex, findRowIndexAtY, normalizeRowIndices } from "./move-rows";
+import { calcMoveToIndex, normalizeRowIndices } from "./move-rows";
 import { isAreaModelPivot, isAreaModelRowGroups, isAreaModelTree, isGroupRow, isTreeRow } from "../instanceof-workaround";
 import { CellRange } from "../data/common/cell-range";
 import { AriaTexts } from "../aria/aria-texts";
@@ -71,12 +71,17 @@ export class RowDragService {
 
   constructor(private readonly tableScope: TableScope) {
     const signal = tableScope.listenerAbortController.signal;
-    tableScope.hostElement.addEventListener("pointerdown", (evt: PointerEvent) => this.onPointerDown(evt), { signal });
+    // events from a detail row (master/detail, e.g. a nested table) belong to the detail – not to this table
+    tableScope.hostElement.addEventListener("pointerdown", (evt: PointerEvent) => {
+      if (!tableScope.isEventInDetail?.(evt)) this.onPointerDown(evt);
+    }, { signal });
     // the click after a real drag: the mouse handler must not move focus and selection (capture phase, before it)
-    tableScope.hostElement.addEventListener("click", (evt: MouseEvent) => this.onClickCapture(evt), { capture: true, signal });
+    tableScope.hostElement.addEventListener("click", (evt: MouseEvent) => {
+      if (!tableScope.isEventInDetail?.(evt)) this.onClickCapture(evt);
+    }, { capture: true, signal });
     // a double click on a grip is no double click on the cell (it would open the editor of an editable column)
     tableScope.hostElement.addEventListener("dblclick", (evt: MouseEvent) => {
-      if (evt.target instanceof Element && evt.target.closest(`[data-ge-action="${DRAG_ROW_ACTION}"]`)) {
+      if (!tableScope.isEventInDetail?.(evt) && evt.target instanceof Element && evt.target.closest(`[data-ge-action="${DRAG_ROW_ACTION}"]`)) {
         evt.stopPropagation();
       }
     }, { capture: true, signal });
@@ -376,8 +381,9 @@ export class RowDragService {
     const viewport = this.tableScope.getBodyViewport();
     const y = Math.min(Math.max(clientY, viewport.top), viewport.top + Math.max(0, viewport.height - 1));
     const contentY = y - viewport.top + viewport.contentScrollTop;
-    const rowIndex = findRowIndexAtY(contentY, rowCount, i => body.getYPosByRowIndex(i), body.getConstantRowHeight?.());
-    const rowTop = body.getYPosByRowIndex(rowIndex);
+    // a position in an open detail row belongs to its master row (and is "after" it)
+    const rowIndex = this.tableScope.getBodyRowIndexAtY(contentY);
+    const rowTop = this.tableScope.getBodyRowTop(rowIndex);
     const height = Math.max(1, body.getRowHeight(rowIndex));
     const ratio = Math.min(1, Math.max(0, (contentY - rowTop) / height));
     let position: RowDropTargetIf["position"];
@@ -502,8 +508,10 @@ export class RowDragService {
       return;
     }
     const body = this.tableScope.tableModel.getBodyModel();
-    const rowTop = body.getYPosByRowIndex(target.rowIndex);
-    const height = body.getRowHeight(target.rowIndex);
+    const rowTop = this.tableScope.getBodyRowTop(target.rowIndex);
+    // "after" a master row with an open detail row = below the detail row
+    const height = body.getRowHeight(target.rowIndex)
+      + (target.position === "after" ? this.tableScope.getBodyRowLayout().getExtraHeight(target.rowIndex) : 0);
     const offsetTop = viewport.top - hostRect.top - host.clientTop; // body top inside the host
     const inside = target.position === "inside";
     const y = offsetTop + rowTop - viewport.contentScrollTop + (target.position === "after" ? height : 0);

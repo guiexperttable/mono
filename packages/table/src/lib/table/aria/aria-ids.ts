@@ -67,6 +67,16 @@ export class AriaIds {
   }
 
   /**
+   * The ID of the row group of the detail rows (master/detail), referenced by `aria-owns` of the host.
+   *
+   * @returns {string} e.g. `"ge-t1-rg-detail"`
+   * @since 1.1.97
+   */
+  detailRowGroup(): string {
+    return `${this.prefix}-rg-detail`;
+  }
+
+  /**
    * The ID of the live region (the element that speaks announcements, see {@link LiveAnnouncer}).
    *
    * @returns {string} e.g. `"ge-t1-live"`

@@ -437,7 +437,23 @@ export class EleScope {
       Math.min(w, padding.left + this.scrollViewport.clientWidth),
       h - padding.top - padding.bottom);
 
+    // Detail rows (master/detail): the visible body incl. the fixed columns, without the scroll bars
+    this.adjustDetailLayerBounds(
+      0,
+      padding.top,
+      Math.min(w, padding.left + this.scrollViewport.clientWidth),
+      Math.max(0, Math.min(h - padding.top - padding.bottom, this.scrollViewport.clientHeight)));
+
     this.adjustAfterScrolling();
+  }
+
+  /**
+   * Position and size of the detail layer (master/detail) in the host – overwritten in {@link RenderScope}.
+   *
+   * @since 1.1.97
+   */
+  protected adjustDetailLayerBounds(_left: number, _top: number, _width: number, _height: number): void {
+    // overwritten in RenderScope
   }
 
   /**
@@ -451,6 +467,17 @@ export class EleScope {
   }
 
   /**
+   * The height of all body rows in px – the model's content height plus, in {@link RenderScope}, the heights of open
+   * detail rows (master/detail).
+   *
+   * @returns {number} px
+   * @since 1.1.97
+   */
+  protected getBodyContentHeight(): number {
+    return this.tableModel.getContentHeightInPixel();
+  }
+
+  /**
    * Resets the size of the wrapper div based on the content dimensions.
    *
    * @protected
@@ -459,7 +486,7 @@ export class EleScope {
    */
   protected resetSizeOfWrapperDiv() {
     const w = `${this.tableModel.getContentWidthInPixel()}px`;
-    const contentHeight = this.tableModel.getContentHeightInPixel() + 1; // + 1, we want to see the last horizontal border
+    const contentHeight = this.getBodyContentHeight() + 1; // + 1, we want to see the last horizontal border
     const h = `${Math.min(contentHeight, EleScope.maxScrollHeightInPx)}px`;
     this.dom.setStyle(this.contentWrapperDiv, "width", w);
     this.dom.setStyle(this.contentWrapperDiv, "height", h);

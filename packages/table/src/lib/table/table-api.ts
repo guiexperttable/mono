@@ -1209,6 +1209,7 @@ export class TableApi {
       const am = bodyModel as unknown as AreaModelObjectArray<T>;
       am.setRows(rows); 
       this.tableScope.batchEditService?.pruneOrphans();   // pending values of replaced rows are dropped (since 1.1.96)
+      this.tableScope.invalidateRowLayout();               // other rows (heights, open detail rows) at the indices (since 1.1.97)
     } else {
       console.warn('setRows<T>(rows: T[]) only works with AreaModelObjectArray<T>, but this body area model is ', (typeof bodyModel), bodyModel)
     }
@@ -1961,6 +1962,133 @@ export class TableApi {
    */
   cancelFill(): void {
     this.tableScope.fillHandleService?.cancel();
+  }
+
+  // ------------------------------------------------------------------------------- master/detail (since 1.1.97)
+
+  /**
+   * Expands or collapses the detail row of a master row (master/detail, {@link TableOptionsIf.masterDetail}). The
+   * content is created when the detail row becomes visible; collapsing destroys it. Reports
+   * {@link EventListenerIf.onDetailExpandedChanged} (source `"api"`).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @param {boolean} expanded - `true` = expand, `false` = collapse
+   * @returns {boolean} false if nothing changed (no master row, already in that state, no master/detail)
+   *
+   * @example
+   * tableApi.setDetailExpanded(0, true);                  // the first shown row
+   * tableApi.setDetailExpanded(orders[42], true);         // a row object (also if it is filtered out)
+   *
+   * @since 1.1.97
+   */
+  setDetailExpanded(rowOrIndex: number | object, expanded: boolean): boolean {
+    return this.tableScope.setDetailExpanded(rowOrIndex, expanded, "api");
+  }
+
+  /**
+   * Expands a collapsed or collapses an expanded detail row (master/detail).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @returns {boolean} false if it is no master row (or no master/detail)
+   *
+   * @example
+   * tableApi.toggleDetail(3);   // e.g. from a button outside the table
+   *
+   * @since 1.1.97
+   */
+  toggleDetail(rowOrIndex: number | object): boolean {
+    return this.tableScope.toggleDetail(rowOrIndex, "api");
+  }
+
+  /**
+   * True if the detail row of a master row is expanded (master/detail).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @returns {boolean} whether it is expanded
+   *
+   * @example
+   * const open = tableApi.isDetailExpanded(3);
+   *
+   * @since 1.1.97
+   */
+  isDetailExpanded(rowOrIndex: number | object): boolean {
+    return !!this.tableScope.masterDetailService?.isExpanded(rowOrIndex);
+  }
+
+  /**
+   * The master rows whose detail rows are expanded, in the order they were expanded (also rows that are filtered out).
+   *
+   * @returns {T[]} the row objects
+   *
+   * @example
+   * const openOrders = tableApi.getExpandedDetailRows<Order>().map(order => order.id);
+   *
+   * @since 1.1.97
+   */
+  getExpandedDetailRows<T = any>(): T[] {
+    return (this.tableScope.masterDetailService?.getExpandedRows() ?? []) as T[];
+  }
+
+  /**
+   * Expands the detail rows of all shown master rows. The contents are created only when they scroll into view, so this
+   * is cheap also for many rows. No event per row.
+   *
+   * @returns {number} the number of rows that were expanded
+   *
+   * @example
+   * document.querySelector("#expand-all")!.addEventListener("click", () => tableApi.expandAllDetails());
+   *
+   * @since 1.1.97
+   */
+  expandAllDetails(): number {
+    return this.tableScope.masterDetailService?.expandAll() ?? 0;
+  }
+
+  /**
+   * Collapses all detail rows (their contents are destroyed). No event per row.
+   *
+   * @returns {number} the number of rows that were collapsed
+   *
+   * @example
+   * tableApi.collapseAllDetails();
+   *
+   * @since 1.1.97
+   */
+  collapseAllDetails(): number {
+    return this.tableScope.masterDetailService?.collapseAll() ?? 0;
+  }
+
+  /**
+   * Destroys the content of an expanded detail row and creates it again (`context.recreated` is `true`) – e.g. after
+   * the data it shows changed.
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @returns {boolean} false if the row is not expanded
+   *
+   * @example
+   * order.items.push(newItem);
+   * tableApi.refreshDetail(order);
+   *
+   * @since 1.1.97
+   */
+  refreshDetail(rowOrIndex: number | object): boolean {
+    return !!this.tableScope.masterDetailService?.refresh(rowOrIndex);
+  }
+
+  /**
+   * The container of a detail row (the element your `detailRenderer` renders into) – only while its content exists
+   * (it is created when the detail row becomes visible).
+   *
+   * @param {number | object} rowOrIndex - display index or row object
+   * @returns {HTMLDivElement | undefined} the container
+   *
+   * @example
+   * const notes = tableApi.getDetailElement(order)?.querySelector("textarea");
+   *
+   * @since 1.1.97
+   */
+  getDetailElement(rowOrIndex: number | object): HTMLDivElement | undefined {
+    return this.tableScope.masterDetailService?.getDetailElement(rowOrIndex);
   }
 
   /**

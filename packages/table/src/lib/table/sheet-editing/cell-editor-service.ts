@@ -8,6 +8,7 @@ import { GeEditEvent, type GeEditEventType } from "../data/common/event/ge-edit-
 import { isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
 import { DEFAULT_GET_EDIT_RENDERER } from "../data/options/table-options";
 import { editInputPipeForNumber } from "../renderer/edit/edit-input-pipe-for-number";
+import { FormulaAssist } from "./formula-assist";
 
 interface EditSession {
   rowIndex: number;
@@ -51,6 +52,8 @@ export class CellEditorService {
   private container?: HTMLDivElement;
   private editor?: CellEditorIf;
   private session?: EditSession;
+  /** Formula input of a formula column (pointing, colors, suggestions – since 1.1.99, `cellFormulas`). */
+  private assist?: FormulaAssist;
   /** The column the last Tab sequence started in (Enter goes back to it, like Excel). */
   private tabStartColumn = -1;
   private readonly editorId: string;
@@ -86,7 +89,7 @@ export class CellEditorService {
   }
 
   /**
-   * The id of the editor element if `(rowIndex, columnIndex)` is the edited cell – the cell gets `aria-owns` with it
+   * The id of the editor element (and of the formula popups) if `(rowIndex, columnIndex)` is the edited cell – the cell gets `aria-owns` with it
    * (screen readers find the editor in the cell, not as a stray child of the grid).
    *
    * @param {number} rowIndex - display row index
@@ -95,8 +98,11 @@ export class CellEditorService {
    */
   getOwnedEditorId(rowIndex: number, columnIndex: number): string | undefined {
     const s = this.session;
-    return s && s.rowIndex === rowIndex && s.columnIndex === columnIndex && this.editor?.getFocusElement()
-      ? this.editorId : undefined;
+    if (!s || s.rowIndex !== rowIndex || s.columnIndex !== columnIndex || !this.editor?.getFocusElement()) {
+      return undefined;
+    }
+    // a formula: the suggestion list and the hint belong to the cell too
+    return this.assist ? [this.editorId, ...this.assist.getOwnedIds()].join(" ") : this.editorId;
   }
 
   /**
@@ -182,6 +188,13 @@ export class CellEditorService {
     if (focusElement) {
       scope.getDomService().domService.setAttribute(focusElement, "id", this.editorId);
     }
+    const sheet = scope.tableSheet;
+    if (sheet?.isFormulaColumnIndex(columnIndex) && focusElement?.tagName === "INPUT"
+      && (focusElement as HTMLInputElement).type === "text") {
+      this.assist = new FormulaAssist(scope, sheet, focusElement as HTMLInputElement, container,
+        () => this.session ? [this.session.rowIndex, this.session.columnIndex] : [rowIndex, columnIndex],
+        () => ctx.inputChanged(), this.editorId);
+    }
     container.style.display = "block";
     this.update();
     editor.focus();
@@ -232,7 +245,13 @@ export class CellEditorService {
       }
     }
     const { rowIndex, columnIndex } = session;
+    // a stored formula with a syntax error shows #ERROR! – say why (Google Sheets)
+    const sheet = scope.tableSheet;
+    const formulaError = !unchanged && sheet?.isFormulaInput(columnIndex, text) ? sheet.syntaxError(text) : undefined;
     this.close("commit", text, !!opts.deferRepaint);
+    if (formulaError) {
+      scope.announce(scope.getFormulaErrorText(formulaError));
+    }
     this.moveAfterCommit(rowIndex, columnIndex, move, !!opts.tab);
     return true;
   }
@@ -274,6 +293,7 @@ export class CellEditorService {
     const [left, right] = scope.isRtl() ? [end, start] : [start, end];
     container.style.clipPath = hidden ? "inset(50%)" : (top || bottom || left || right)
       ? `inset(${top}px ${right}px ${bottom}px ${left}px)` : "";
+    this.assist?.update();
     const active = container.ownerDocument.activeElement;
     if (active === scope.hostElement) {
       this.editor?.focus(); // e.g. the scroll bar was clicked: keep typing into the editor
@@ -282,6 +302,8 @@ export class CellEditorService {
 
   /** Removes the editor (table destroyed). */
   destroy(): void {
+    this.assist?.destroy();
+    this.assist = undefined;
     this.editor?.close();
     this.editor = undefined;
     this.session = undefined;
@@ -364,6 +386,8 @@ export class CellEditorService {
     const session = this.session;
     const container = this.container;
     const hadFocus = !!container?.contains(container.ownerDocument.activeElement);
+    this.assist?.destroy();
+    this.assist = undefined;
     this.editor?.close();
     this.editor = undefined;
     if (container) {
@@ -417,6 +441,13 @@ export class CellEditorService {
       return; // the scroll bar: keep editing (Excel)
     }
     this.blockClick = false;
+    if (this.assist?.onPointerDown(evt)) {
+      // a formula: the click inserts the cell's reference (no commit, no selection change)
+      evt.preventDefault();
+      evt.stopPropagation();
+      this.blockClick = true;
+      return;
+    }
     if (!this.commit("none", { deferRepaint: true })) {
       // an invalid value: stay in the cell – the mouse events of this click must not move the focus or selection
       evt.preventDefault();
@@ -540,13 +571,17 @@ export class CellEditorService {
     if (evt.isComposing || evt.key === "Process" || evt.keyCode === 229 || editor.isComposing?.()) {
       return; // the IME needs Enter and the arrow keys
     }
-    if (editor.wantsKey?.(evt, session.mode)) {
-      return;
-    }
     const stop = () => {
       evt.preventDefault();
       evt.stopPropagation();
     };
+    if (this.assist?.onKeyDown(evt, session.mode)) {
+      stop(); // pointing, F4, the function list
+      return;
+    }
+    if (editor.wantsKey?.(evt, session.mode)) {
+      return;
+    }
     const rtl = this.tableScope.isRtl();
     switch (evt.key) {
       case "Escape":

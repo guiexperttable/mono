@@ -548,6 +548,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   /**
+   * The next shown column in a direction (hidden columns skipped; the same column at the edge).
+   *
+   * @param {number} columnIndex - model column index
+   * @param {number} direction - 1 or -1
+   * @returns {number} the column
+   * @since 1.1.99
+   */
+  nextShownColumn(columnIndex: number, direction: number): number {
+    return this.getNextShownColumnIndex(columnIndex, direction, this.tableModel.getColumnCount());
+  }
+
+  /**
    * True if there is a shown column (no row number column) next to `columnIndex` in that direction – Tab uses it:
    * in the last column it leaves the table.
    *
@@ -1534,6 +1546,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const shown = this.getShownCellValue(rowIndex, columnIndex);
     return this.tableSheet?.isFormulaInput(columnIndex, shown)
       ? this.tableModel.getBodyModel().getValueAt(rowIndex, columnIndex) : shown;
+  }
+
+  /**
+   * The announcement of a stored formula with a syntax error (`AriaTextsIf.formulaError`).
+   *
+   * @param {string} message - the parser's message
+   * @returns {string} the text
+   * @since 1.1.99
+   */
+  getFormulaErrorText(message: string): string {
+    const texts = (this.ariaTexts ?? {}) as Partial<AriaTextsIf>;
+    return (texts.formulaError ?? new AriaTexts().formulaError).call(texts, message);
   }
 
   /** A syntax error of a formula refuses it only with `rejectInvalidFormulas` (otherwise it is stored: `#ERROR!`). */

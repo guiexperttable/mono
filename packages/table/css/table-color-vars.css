@@ -145,6 +145,20 @@ html, html[data-theme="light"] {
   --ge-table-cell-editor-invalid-border: #d93025;
   --ge-table-cut-range-border: #0a6ebd;
   --ge-table-cut-range-border-alt: #9ec9ec;
+  /* formula input (since 1.1.99): colors of the references 0–7, function list and hint */
+  --ge-table-formula-ref-0: #1a73e8;
+  --ge-table-formula-ref-1: #d93025;
+  --ge-table-formula-ref-2: #7b1fa2;
+  --ge-table-formula-ref-3: #188038;
+  --ge-table-formula-ref-4: #c26401;
+  --ge-table-formula-ref-5: #00838f;
+  --ge-table-formula-ref-6: #c2185b;
+  --ge-table-formula-ref-7: #5d4037;
+  --ge-table-formula-popup-bg: #fff;
+  --ge-table-formula-popup-text: #111;
+  --ge-table-formula-popup-muted: #5f6368;
+  --ge-table-formula-popup-border: #c4c7c5;
+  --ge-table-formula-popup-active-bg: #e8f0fe;
 }
 
 
@@ -281,4 +295,18 @@ html[data-theme="dark"] {
   --ge-table-cell-editor-invalid-border: #f28b82;
   --ge-table-cut-range-border: #8ab4f8;
   --ge-table-cut-range-border-alt: #3c5a85;
+  /* formula input (since 1.1.99) */
+  --ge-table-formula-ref-0: #8ab4f8;
+  --ge-table-formula-ref-1: #f28b82;
+  --ge-table-formula-ref-2: #d7aefb;
+  --ge-table-formula-ref-3: #81c995;
+  --ge-table-formula-ref-4: #fcad70;
+  --ge-table-formula-ref-5: #78d9ec;
+  --ge-table-formula-ref-6: #ff8bcb;
+  --ge-table-formula-ref-7: #d7ccc8;
+  --ge-table-formula-popup-bg: #1f2937;
+  --ge-table-formula-popup-text: #f3f4f6;
+  --ge-table-formula-popup-muted: #9aa0a6;
+  --ge-table-formula-popup-border: #4b5563;
+  --ge-table-formula-popup-active-bg: #374151;
 }

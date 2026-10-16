@@ -81,6 +81,7 @@ exports[`public API (src/index.ts) > exports exactly the known set of runtime sy
   "FillHandleOptions",
   "FillHandleService",
   "FocusModel",
+  "FormulaAssist",
   "FormulaError",
   "FormulaRange",
   "GeBatchEditEvent",

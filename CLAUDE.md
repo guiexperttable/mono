@@ -508,6 +508,15 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Fehlerzellen über `AbstractAreaModel.getCustomClassesAt/getTooltipAt`. API: `hasCellFormulas`, `getCellAddress`,
   `getCellByAddress`, `getCellInput`, `getCellValue`, `setCellInput`, `evaluateFormula`, `getSheetValue`,
   `recalculate`, `getPrecedents`, `getDependents`, `getSheetEngine`. Demo `apps/table-demo/cell-formulas.html`.
+  **Formel-Eingabe (Etappe 6, `sheet-editing/formula-assist.ts`)**: `CellEditorService` hängt bei einem Text-Input in
+  einer Formelspalte einen `FormulaAssist` an (Tasten **vor** `wantsKey`, `pointerdown` vor dem Commit, `update()` in
+  `afterRenderPass`). Zeigemodus: Einfügestelle (`isInsertionPoint`, DOM-frei `formula-text.ts`) im Modus „enter“ oder
+  direkt hinter dem gezeigten Bezug; Pfeile/Shift/Klick/Ziehen setzen bzw. ersetzen den Bezug (physische Adressen über
+  `TableSheet`), jede andere Eingabe beendet ihn. F4 `toggleAbsolute`. Farben: Spiegel-Div `ge-table-formula-mirror`
+  hinter dem transparenten Input (`ge-table-formula-input`), Rahmen `ge-table-formula-ref-N` im Host (`aria-hidden`).
+  Vorschläge: Input `role="combobox"` + Listbox im Editor-Container, Hinweis `role="tooltip"` (`aria-describedby`);
+  beide stehen im `aria-owns` der Zelle (`getOwnedEditorId`, axe-Filter in `test-utils/axe.ts`). CSS in
+  `css/table-sheet-editing.css`, Variablen `--ge-table-formula-ref-0…7`, `--ge-table-formula-popup-*`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,

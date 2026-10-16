@@ -201,6 +201,12 @@ export class TableSheet implements SheetCellsIf {
     return this.engine.evaluate(source);
   }
 
+  /** @returns {number} the number of physical rows */
+  rowCount(): number {
+    this.sync();
+    return this.rows().length;
+  }
+
   /**
    * The physical row of a display row (`undefined` if there is none).
    *
@@ -224,6 +230,9 @@ export class TableSheet implements SheetCellsIf {
     const row = this.rows()[physicalRow];
     if (row === undefined) return -1;
     const n = this.body.getRowCount();
+    if (physicalRow < n && this.body.getRowByIndex(physicalRow) === row) {
+      return physicalRow; // unsorted and unfiltered: O(1)
+    }
     for (let i = 0; i < n; i++) {
       if (this.body.getRowByIndex(i) === row) return i;
     }

@@ -368,4 +368,30 @@ export interface AriaTextsIf {
    * @since 1.1.99
    */
   undoHistoryCleared?(maxCells: number): string;
+
+  /**
+   * Announced when a cell formula with a syntax error is stored (it shows `#ERROR!`, `tableOptions.cellFormulas`).
+   *
+   * @param {string} message - the parser's message
+   * @returns {string} default: `"Formula error: <message>"`
+   * @since 1.1.99
+   */
+  formulaError?(message: string): string;
+
+  /**
+   * The label of the list of function suggestions while a cell formula is typed.
+   *
+   * @returns {string} default: `"Functions"`
+   * @since 1.1.99
+   */
+  functionSuggestions?(): string;
+
+  /**
+   * Announced when a reference is inserted by pointing (arrow keys or a click while typing a formula).
+   *
+   * @param {string} reference - e.g. `"B2"` or `"B2:B4"`
+   * @returns {string} default: the reference
+   * @since 1.1.99
+   */
+  referenceInserted?(reference: string): string;
 }

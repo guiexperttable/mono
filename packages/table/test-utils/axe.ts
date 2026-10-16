@@ -42,9 +42,12 @@ function isKnownScrollViewportFinding(ruleId: string, node: axe.NodeResult): boo
     // looks at the DOM children only. Accepted only if the gridcell really owns it.
     const m = /children which are not allowed: (.*)$/.exec(messages.trim());
     if (m) {
-      const allowed = ['div[tabindex]', 'input[aria-label]', 'select[aria-label]'];
+      // formula input (since 1.1.99): the input is a combobox, its suggestion list and hint are owned as well
+      const allowed = ['div[tabindex]', 'input[aria-label]', 'select[aria-label]', '[role=combobox]', '[role=tooltip]', '[role=listbox]'];
       const editor = document.querySelector<HTMLElement>('.ge-table-cell-editor input, .ge-table-cell-editor select');
-      const owned = !!editor?.id && !!document.querySelector(`[role="gridcell"][aria-owns="${editor.id}"]`);
+      const popups = [...document.querySelectorAll<HTMLElement>('.ge-table-cell-editor [role="tooltip"], .ge-table-cell-editor [role="listbox"]')];
+      const ownedBy = (id: string) => !!document.querySelector(`[role="gridcell"][aria-owns~="${id}"]`);
+      const owned = !!editor?.id && ownedBy(editor.id) && popups.every(p => !!p.id && ownedBy(p.id));
       return owned && m[1].split(',').map(x => x.trim()).every(x => allowed.includes(x));
     }
   }

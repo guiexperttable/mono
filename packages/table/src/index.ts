@@ -343,6 +343,7 @@ export * from './lib/table/sheet-editing/editors/select-cell-editor';
 export * from './lib/table/sheet-editing/sheet-navigation';
 export * from './lib/table/sheet-editing/editing-keymap';
 export * from './lib/table/sheet-editing/cell-editor-service';
+export * from './lib/table/sheet-editing/formula-assist';
 
 // Copy, cut and paste (since 1.1.99, prompt 013 stage 2)
 export * from './lib/table/clipboard/clipboard-options.if';

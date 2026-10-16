@@ -206,4 +206,16 @@ export class AriaTexts implements AriaTextsIf {
   undoHistoryCleared(maxCells: number): string {
     return `This change cannot be undone (more than ${maxCells} cells)`;
   }
+
+  formulaError(message: string): string {
+    return `Formula error: ${message}`;
+  }
+
+  functionSuggestions(): string {
+    return "Functions";
+  }
+
+  referenceInserted(reference: string): string {
+    return reference;
+  }
 }

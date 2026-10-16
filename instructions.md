@@ -2170,6 +2170,15 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), editing: true, fil
 - **Limits**: flat bodies only (a tree, row grouping, pivot table or master/detail: a warning, no formulas); row drag
   is off; `addRows`/`removeRows` don't adjust references yet (inserting and deleting rows with adjusted references:
   spreadsheet mode). A pending formula of a batch edit is calculated after the commit.
+- **Typing formulas** (with `editing`): after `=`, `(`, `,` or an operator the arrow keys insert a reference instead of
+  leaving the cell (Shift+arrows: a range, `F2` switches between pointing and moving the caret), a click on a cell
+  inserts its reference, dragging spans a range; `F4` cycles `A1` → `$A$1` → `A$1` → `$A1`. References are colored in
+  the editor and framed in the table (`--ge-table-formula-ref-0` … `-7`). Typing a function name lists the matching
+  functions (also own ones; ↑/↓, Tab or Enter takes `SUM(`, Escape closes the list); inside a call a hint shows the
+  arguments, the current one bold. A formula with a syntax error is stored (`#ERROR!`) and announced; with
+  `rejectInvalidFormulas` the editor stays open (`aria-invalid`). Screen readers: the input is a combobox with the
+  list (`aria-activedescendant`), the hint is its description; texts `AriaTextsIf.functionSuggestions`,
+  `referenceInserted`, `formulaError`.
 - More API: `hasCellFormulas()`, `evaluateFormula("=SUM(D2:D4)")`, `getPrecedents(row, column)` (`["B2", "C2"]`),
   `getDependents(row, column)`, `getSheetEngine()`. Demo: `apps/table-demo/cell-formulas.html`.
 

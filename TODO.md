@@ -427,6 +427,18 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Kopieren Text, Zahl über Formel bleibt Zahl (`getTypedCellValue`), Excel: Feldbezüge/Syntaxfehler als Wert, ganze
       Spalten/Zeilen auf die Datenzeilen begrenzt, Excel-Grenzen, Datumsformat; Batch-Kopieren behält Formeln,
       `updateCells` schreibt Formeln roh, `getDependents` linear, JSDoc-Beispiele.
+      **Etappe 6 umgesetzt** (17.10.2026, Branch `feat/spreadsheet-6-formula-input`): Formel-Eingabe im Editor –
+      Zeigemodus (Pfeile, Shift, Klick, Ziehen), F4, farbige Bezüge + Rahmen, Funktionsvorschläge (Combobox/Listbox),
+      Argument-Hinweis (Tooltip), Ansage bei Syntaxfehlern. Offen aus Etappe 6: Prüfung mit echtem Screenreader
+      (NVDA/VoiceOver) steht aus (axe grün, Rollen nach APG) · Zeigen in den Spaltenkopf (ganze Spalte) und
+      Strg+Pfeil im Zeigemodus fehlen · Liste und Hinweis hängen am Editor-Container und werden mit ihm abgeschnitten,
+      wenn die Zelle halb herausgescrollt ist (eigene Ebene im Host, nach oben klappen) · Zeigen ersetzt
+      `input.value` (das Strg+Z des Eingabefelds kennt den eingefügten Bezug nicht). Review (unabhängiger Agent, 12
+      Befunde) eingearbeitet: Spiegel links-nach-rechts und linksbündig (auch Zahlenspalten, RTL), F2 beendet das
+      Zeigen, Bereiche nur aus zusammenhängenden Blattzeilen (sortiert/gefiltert), Rahmen gecacht je Text/Reihenfolge,
+      `%` keine Einfügestelle, Felder `[…]` als Literal, Options-Ids nach Namen, Combobox-Rolle die ganze Sitzung,
+      Ansage einmal nach dem Ziehen, `::selection`, nur die primäre Maustaste, verschachtelte Klammern im Hinweis,
+      `A0`/`XFE1` keine Bezüge.
 
 ## Mono-Repo / Build
 
@@ -712,6 +724,10 @@ Objekt-Tabelle hat `ge-focused-row`.
   `FormulaNode` `literal` darf `value: null` haben (leeres Argument in Zellformeln). Ohne Option keine
   Verhaltensänderung – bis auf eine: `ExcelService` schreibt eine Matrixzelle der Form `{ formula: string, value }`
   jetzt als Formel (vorher als Text `[object Object]`).
+  **Formel-Eingabe (013, Etappe 6)**, additiv: `FormulaAssist` (Internals), `AriaTextsIf.formulaError/
+  functionSuggestions/referenceInserted`, `TableScope.nextShownColumn/getTypedCellValue/getFormulaErrorText`,
+  `TableSheet.rowCount`, CSS-Variablen `--ge-table-formula-ref-0…7`, `--ge-table-formula-popup-*`. Ohne
+  `cellFormulas` keine Verhaltensänderung.
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

@@ -446,6 +446,32 @@ describe('R12 – mixed text', () => {
   });
 });
 
+describe('R12 – Latin text with punctuation (ge-table-text-plaintext)', () => {
+
+  it('the period stays at the end of "Rossi S.p.A." and the text stays right-aligned', async () => {
+    const model = TableFactory.createTableModel({
+      rows: [{ customer: 'Rossi S.p.A.' }, { customer: 'الرياض.' }],
+      columnDefs: [ColumnDef.create({ property: 'customer', headerLabel: 'Customer', width: px300, bodyClasses: ['ge-table-text-plaintext'] })],
+    });
+    const { host } = mountTable(model, { tableOptions: rtl });
+    await nextFrame();
+    const cell = getCellDiv(host, 'body', 'center', 0, 0);
+    const label = cell.querySelector<HTMLElement>('.ge-table-label')!;
+    expect(getComputedStyle(label).unicodeBidi).toBe('plaintext');
+    expect(getComputedStyle(label).textAlign).toBe('right');
+    // the visual order: the period is the rightmost glyph (Latin paragraph), the text hugs the right edge
+    const range = document.createRange();
+    const text = label.firstChild!;
+    range.setStart(text, 11);
+    range.setEnd(text, 12);
+    const period = range.getBoundingClientRect();
+    range.selectNodeContents(label);
+    const all = range.getBoundingClientRect();
+    expect(Math.abs(period.right - all.right)).toBeLessThan(1);
+    expect(rect(cell).right - all.right).toBeLessThan(15);
+  });
+});
+
 describe('R13 – features in right-to-left', () => {
 
   it('overlay covers the visible body', async () => {

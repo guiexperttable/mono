@@ -1,0 +1,76 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="rtl-bar">
+  <span>direction</span>
+  <button type="button" class={id + '-rtl'} aria-pressed="true">rtl</button>
+  <button type="button" class={id + '-ltr'} aria-pressed="false">ltr</button>
+  <button type="button" class={id + '-excel'}>Excel</button>
+  <span class:list={[id + '-log', 'rtl-log']} aria-live="off"></span>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'rtl-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createRtlCitiesModelAndOptions, generateRtlCitySales } from "/scripts/demo-table-models/index.js";
+
+  // Arabic sales data – one option mirrors the table: direction: "rtl"
+  const rows = generateRtlCitySales(2000);
+  const ele = document.querySelector('.' + id);
+  const log = document.querySelector('.' + id + '-log');
+  let tableApi;
+
+  function create(direction) {
+    tableApi?.destroy();
+    const {tableModel, tableOptions} = createRtlCitiesModelAndOptions(direction, rows);
+    const listener = new EventAdapter();
+    listener.onScroll = evt => { log.textContent = `scrollLeft from the start: ${Math.round(evt.scrollLeft)} px`; };
+    const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+    log.textContent = `direction: ${tableApi.getDirection()}`;
+    document.querySelector('.' + id + '-rtl').setAttribute('aria-pressed', String(direction === 'rtl'));
+    document.querySelector('.' + id + '-ltr').setAttribute('aria-pressed', String(direction === 'ltr'));
+  }
+
+  document.querySelector('.' + id + '-rtl').addEventListener('click', () => create('rtl'));
+  document.querySelector('.' + id + '-ltr').addEventListener('click', () => create('ltr'));
+  document.querySelector('.' + id + '-excel').addEventListener('click', () => tableApi.downloadExcel('sales.xlsx'));
+  create('rtl');
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .rtl-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .rtl-bar button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .rtl-bar button[aria-pressed="true"] {
+        font-weight: 600;
+        text-decoration: underline;
+    }
+    .rtl-log {
+        opacity: 0.8;
+    }
+</style>

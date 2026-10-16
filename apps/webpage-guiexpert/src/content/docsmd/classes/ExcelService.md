@@ -75,13 +75,13 @@ Understands cells `{ value, numberFormat }` ([ExcelFormattedValueIf](../interfac
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L76)
+[src/lib/table/service/excel-service.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L77)
 
 ## Methods
 
 ### createExcelBlob
 
-▸ **createExcelBlob**(`matrix`, `author?`): `Promise`\<`Blob`\>
+▸ **createExcelBlob**(`matrix`, `author?`, `options?`): `Promise`\<`Blob`\>
 
 Creates the .xlsx file as a Blob (compressed), e.g. to upload it instead of downloading it.
 
@@ -91,6 +91,7 @@ Creates the .xlsx file as a Blob (compressed), e.g. to upload it instead of down
 | :------ | :------ | :------ |
 | `matrix` | `any`[][] | `undefined` |
 | `author` | `string` | `''` |
+| `options` | [`ExcelExportOptionsIf`](../interfaces/ExcelExportOptionsIf.md) | `{}` |
 
 #### Returns
 
@@ -103,9 +104,16 @@ const blob = await new ExcelService().createExcelBlob([["Name", "City"], ["Ann",
 await fetch("/api/upload", { method: "POST", body: blob });
 ```
 
+**`Example`**
+
+```ts
+// a sheet from right to left (column A on the right), since 1.1.98
+const rtlBlob = await new ExcelService().createExcelBlob([["المدينة"], ["الرياض"]], "", { rightToLeft: true });
+```
+
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L124)
+[src/lib/table/service/excel-service.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L131)
 
 ___
 
@@ -128,7 +136,7 @@ downloads use [createZipCompressed](ExcelService.md#createzipcompressed).
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:274](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L274)
+[src/lib/table/service/excel-service.ts:281](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L281)
 
 ___
 
@@ -151,13 +159,13 @@ where that is not available. 100,000 rows × 7 columns: ~40 MB stored → a few 
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:287](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L287)
+[src/lib/table/service/excel-service.ts:294](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L294)
 
 ___
 
 ### downloadExcel
 
-▸ **downloadExcel**(`matrix`, `filename?`, `author?`): `Promise`\<`void`\>
+▸ **downloadExcel**(`matrix`, `filename?`, `author?`, `options?`): `Promise`\<`void`\>
 
 Downloads a matrix data as an Excel file.
 
@@ -168,6 +176,7 @@ Downloads a matrix data as an Excel file.
 | `matrix` | `any`[][] | `undefined` | A 2D array representing the data to be included in the Excel file. Each inner array corresponds to a row in the sheet. |
 | `filename?` | `string` | `'file.xlsx'` | The name of the Excel file to be downloaded. Defaults to 'file.xlsx'. |
 | `author?` | `string` | `''` | The author's name to include as metadata in the Excel file. Optional parameter. |
+| `options?` | [`ExcelExportOptionsIf`](../interfaces/ExcelExportOptionsIf.md) | `{}` | e.g. `{ rightToLeft: true }` for a sheet from right to left (since 1.1.98) |
 
 #### Returns
 
@@ -185,4 +194,4 @@ Throws an error if the input matrix is not a valid 2D array or if the filename i
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L87)
+[src/lib/table/service/excel-service.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L89)

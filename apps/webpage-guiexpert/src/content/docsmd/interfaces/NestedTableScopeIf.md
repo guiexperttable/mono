@@ -28,7 +28,7 @@ The part of a nested table the master/detail service needs (a [TableScope](../cl
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L23)
+[src/lib/table/master-detail/master-detail-service.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L24)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L21)
+[src/lib/table/master-detail/master-detail-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L22)
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L22)
+[src/lib/table/master-detail/master-detail-service.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L23)

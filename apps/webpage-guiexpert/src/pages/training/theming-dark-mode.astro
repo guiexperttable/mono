@@ -51,8 +51,35 @@ html[data-theme="dark"] {
       From code: <ApiLink name="CssVars" />.</p>
   </Callout>
 
+  <h2 id="rtl">Right-to-left: Arabic, Hebrew, Persian</h2>
+  <Callout type="version" title="Since 1.1.98">
+    <p>Right-to-left tables need <code>@guiexpert/table</code> 1.1.98 or later.</p>
+  </Callout>
+  <p>
+    One option mirrors the whole table: <ApiLink name="TableOptionsIf.direction" /> = <code>"rtl"</code>. The first column is on
+    the right, horizontal scrolling starts on the right, fixed columns, the tree indent, header groups, the sort icon and the
+    column resize handle (now on the left edge) follow – and so do the arrow keys: → moves to the previous column.
+    <code>"auto"</code> takes the direction of the page (<code>&lt;html dir="rtl"&gt;</code>).
+  </p>
+  <Snippet file="demos/rtl.ts" region="rtl" />
+  <LiveDemo name="rtl" title="100,000 orders from right to left" height={400}
+            caption="Untick “right-to-left” to compare – the same model and options, only <code>direction</code> changes." />
+  <p>
+    “Left” and “right” in option names mean <strong>start</strong> and <strong>end</strong>: <code>fixedLeftColumnCount</code> fixes
+    columns on the right, the class <code>ge-table-text-align-left</code> aligns text to the start (right) – numbers with
+    <code>ge-table-text-align-right</code> move to the left, like in a right-to-left Excel sheet (and the Excel export is one).
+    Positions of the API count from the start, too: <ApiLink name="TableApi.scrollToPixel" />, the <code>scrollLeft</code> of
+    <ApiLink name="EventListenerIf.onScroll" /> and the stored state.
+  </p>
+  <Callout type="tip" title="Your own CSS">
+    <p>Use logical properties – <code>padding-inline-start</code>, <code>margin-inline-end</code>, <code>text-align: start</code> – and
+      your styles follow the direction. Only for right-to-left: <code>.ge-table[dir="rtl"] …</code> (the table sets
+      <code>dir</code> on its host).</p>
+  </Callout>
+
   <h2 id="showcase">More</h2>
-  <p>The showcase <a href="/showcase/laf/run/">Look and feel</a> switches between several complete themes. The
+  <p>The showcase <a href="/showcase/laf/run/">Look and feel</a> switches between several complete themes,
+    <a href="/showcase/rtl/run/">Right-to-left</a> shows Arabic sales data. The
     <a href="/doc/#css-classes">documentation</a> lists all CSS classes and variables.</p>
 
   <h2 id="next">Next</h2>

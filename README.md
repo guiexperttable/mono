@@ -15,6 +15,8 @@ Spreadsheet feeling: a fill handle at the corner of the selection (copy or conti
 
 Master/detail: expand a row and show any content over the full width below it – a second table (order → items), a form or a framework component (`DetailComponentRendererWrapper` for React, Vue, Svelte, Solid, Preact; Angular `DetailRenderWrapperFactory`). Works with virtual scrolling and millions of rows: the detail is created when it scrolls into view and keeps its state while scrolling; fixed or measured (`"auto"`) height, Enter/Tab keyboard support, detail rows survive sorting and filtering (`tableOptions.masterDetail`, since 1.1.97). Variable row heights scroll as fast as constant ones (prefix sums).
 
+Right-to-left: `tableOptions.direction: "rtl"` (or `"auto"` from `<html dir="rtl">`) mirrors the whole table for Arabic, Hebrew, Persian and Urdu – first column on the right, horizontal scrolling from the right, fixed columns at the start, tree indent, resize handles, fill handle, row drag and master/detail mirrored, arrow keys in reading direction, Excel export as a right-to-left sheet (since 1.1.98). Left-to-right stays pixel for pixel as before.
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside

@@ -327,7 +327,24 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       in `aria-owns`), nicht direkt nach dem Master · `ctx.rowIndex` bleibt der Index beim Erzeugen (nach Sortieren veraltet)
       · Ändert sich `getRowHeight()` eines eigenen Modells durch ein Edit, braucht es `api.repaint()` (Werte-Änderungen
       bauen die Prefix-Summen nicht neu).
-- [ ] **012 Rechts-nach-links-Sprachen (RTL)** (`prompts/012-rtl.md`), bewusst zuletzt.
+- [x] **012 Rechts-nach-links-Sprachen (RTL)** – Branch `feat/rtl`, Design `prompts/012-rtl.design.md`:
+      `tableOptions.direction` (`"ltr"` | `"rtl"` | `"auto"`), `dir` am Host, logische Koordinaten – `ConvenienceDomService`
+      schreibt in RTL `right` statt `left` (ganzer DOM-Baum gespiegelt), `rtl/rtl-util.ts` (logisches `scrollLeft`,
+      `toLogicalX`, `canScrollHorizontally`, `mirrorArrowKeys`), Pfeiltasten in Leserichtung, Resize-Griff links,
+      Fill-Handle/Row Drag/Master-Detail/Overlay/Spalten-Geisterbild gespiegelt, CSS auf logische Eigenschaften (LTR
+      pixelgleich), Klassen `ge-table-text-align-start/-end`, `ge-table-text-plaintext`, Excel `rightToLeft`
+      (`ExcelExportOptionsIf`), `api.getDirection()`. Specs `rtl/rtl.browser.spec.ts` (R1–R15) + vier Browser-Specs in beiden
+      Richtungen, Wrapper-Smoke React + Web Component. Showcase `rtl`, Abschnitt im Training-Kapitel 28
+      `theming-dark-mode`, `videos/12-rechts-nach-links/`, `apps/table-demo/rtl.html`, Demo-Modell
+      `createRtlCitiesModelAndOptions`. Selbständig umgesetzt. Offen: **manuell in Firefox und Safari prüfen** (Lage der
+      senkrechten Scrollbar, `scrollLeft`, Resize-Griff) und das Ergebnis in die Browser-Matrix des Design-Dokuments
+      eintragen; Angular-Demo nach dem Release (npm-Pakete); Demo-Repo entfällt (kein neues Kapitel).
+- [ ] Folgepunkte 012: Umschalten der Richtung **zur Laufzeit** ohne Neuaufbau (heute: neues Options-Objekt) ·
+      Spalten-Geisterbild in **LTR** um den Abstand des Hosts vom Fensterrand versetzt (`RenderScope.adjustDraggingColumn`
+      nimmt `clientX` als Host-x; in RTL schon richtig, LTR wegen „pixelgleich“ unverändert) · Eingabe/Editor: die
+      Zahlen-Editoren übernehmen die Richtung (`dir` erbt) – Zahlen in RTL-Eingabefeldern prüfen · Copy (`copyToClipboard`)
+      bleibt in Spaltenreihenfolge (A zuerst) – wie Excel RTL, nur dokumentieren, falls gewünscht · Firefox/Safari in der
+      CI (Tests Phase 4) · eigene Renderer mit `left`-Positionen werden nicht gespiegelt (dokumentiert).
 
 ## Mono-Repo / Build
 
@@ -557,6 +574,22 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.98 – Rechts-nach-links (012)**, additiv: neue optionale Member `TableOptionsIf.direction` (Default `"ltr"`),
+  `ExcelServiceIf.downloadExcel(…, options?)` (4. Parameter, eigene Implementierungen mit drei Parametern bleiben
+  gültig), `ExcelService.createExcelBlob(matrix, author, options?)`; neue Exporte `TableDirection`,
+  `ResolvedTableDirection`, `ExcelExportOptionsIf`, `resolveTableDirection`, `getLogicalScrollLeft`,
+  `setLogicalScrollLeft`, `toPhysicalScrollLeft`, `canScrollHorizontally`, `toLogicalX`, `mirrorArrowKeys`;
+  `TableApi.getDirection()`; `EleScope.direction`, `isRtl()`, `getViewportScrollLeft()`, `setViewportScrollLeft()`,
+  `clientXToHostX()`; `ConvenienceDomService.setDirection/getDirection/toPhysicalStyleKey/getInlineStart`.
+  **Verhaltensänderungen in LTR (keine Pixel):** der Host bekommt `dir="ltr"` (vorher kein Attribut; `destroy()` stellt
+  den alten Wert her) – eine Tabelle auf einer RTL-Seite (`<html dir="rtl">`) ist damit eine saubere LTR-Tabelle (vorher
+  falsche Positionen, negatives `scrollLeft`); wer sie gespiegelt will: `direction: "rtl"`/`"auto"`. Das CSS nutzt
+  logische Eigenschaften: berechnete Werte heißen jetzt `start`/`end` bzw. `padding-inline-*` (z. B.
+  `getComputedStyle(cell).textAlign` = `"end"` statt `"right"` für `ge-table-text-align-right`), gezeichnet wird gleich.
+  Eigene Styles aus `AreaModelIf.getCustomStyleAt()` gehen direkt an den `DomServiceIf` (werden nie gespiegelt; vorher
+  über `ConvenienceDomService.setStyle` – gleiches Ergebnis in LTR). `main.css` hat die neuen RTL-Regeln (`[dir="rtl"]`).
+  `dist/index.js` 819 → 826 kB.
 
 - **1.1.97 – Master/Detail (011) und Prefix-Summen**, nur additiv: neue optionale Member `TableOptionsIf.masterDetail`,
   `EventListenerIf.onDetailExpandedChanged?`, `AriaTextsIf.detailExpanded?/detailCollapsed?`,

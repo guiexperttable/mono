@@ -185,16 +185,37 @@ html[data-theme= "dark"] {
 
 
 .ge-table-label-div .ge-table-label {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-inline-start: 10px;
+  padding-inline-end: 10px;
 }
 
+/* left/right = start/end – mirrored in right-to-left (since 1.1.98), as in packages/table/css/table-classes.css */
 .ge-table-text-align-left {
-  text-align: left;
+  text-align: start;
 }
 
 .ge-table-text-align-right {
+  text-align: end;
+}
+
+.ge-table-text-align-start {
+  text-align: start;
+}
+
+.ge-table-text-align-end {
+  text-align: end;
+}
+
+.ge-table-text-plaintext {
+  text-align: left;
+}
+
+.ge-table[dir="rtl"] .ge-table-text-plaintext {
   text-align: right;
+}
+
+.ge-table-text-plaintext .ge-table-label {
+  unicode-bidi: plaintext;
 }
 
 .ge-table-text-align-center {
@@ -203,7 +224,7 @@ html[data-theme= "dark"] {
 
 /* Row checkbox */
 .ge-table-row-checkbox-div {
-  padding-left: 14px;
+  padding-inline-start: 14px;
 }
 .ge-table-body-east {
   z-index: 999;
@@ -301,50 +322,50 @@ html[data-theme= "dark"] {
 /* Tree table */
 
 .ge-table-col-div.ge-table-col-div-0.ge-table-tree-cell {
-  text-align: left;
+  text-align: start;
 }
 
 .ge-table-tree-cell .ge-table-label-div {
-  padding-left: 0;
-  padding-right: 10px;
+  padding-inline-start: 0;
+  padding-inline-end: 10px;
   display: inline;
 }
 
 
 .ge-table-col-tree {
-  text-align: left;
+  text-align: start;
 }
 
 .ge-padding-property-checkbox {
-  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-0 {
-  padding-left: 16px;
+  padding-inline-start: 16px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-1 {
-  padding-left: 36px;
+  padding-inline-start: 36px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-2 {
-  padding-left: 56px;
+  padding-inline-start: 56px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-3 {
-  padding-left: 76px;
+  padding-inline-start: 76px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-4 {
-  padding-left: 96px;
+  padding-inline-start: 96px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-5 {
-  padding-left: 116px;
+  padding-inline-start: 116px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-5 {
-  padding-left: 136px;
+  padding-inline-start: 136px;
 }
 
 .ge-table-col-div.ge-table-col-tree.ge-table-tree-cell {
@@ -606,7 +627,9 @@ html[data-theme= "dark"] {
   z-index: 9000; /* above the cells, below the overlay (10000) */
   width: 7px;
   height: 7px;
-  margin: -4px 0 0 -4px;
+  margin: 0;
+  margin-block-start: -4px;
+  margin-inline-start: -4px;
   box-sizing: border-box;
   background: var(--ge-table-fill-handle-color);
   border: 1px solid var(--ge-table-fill-handle-border);
@@ -764,4 +787,23 @@ html[data-theme= "dark"] {
 
 .ge-table-detail-toggle.ge-table-detail-toggle-expanded::before {
   transform: rotate(90deg);
+}
+
+/* Right-to-left (since 1.1.98) – as in packages/table/css (table-master-detail.css, table-tree.css, table-fill-batch.css) */
+.ge-table[dir="rtl"] .ge-table-detail-toggle::before {
+  border-width: 4px 6px 4px 0;
+  border-color: transparent var(--ge-table-detail-toggle-color) transparent transparent;
+}
+
+.ge-table[dir="rtl"] .ge-table-detail-toggle.ge-table-detail-toggle-expanded::before {
+  transform: rotate(-90deg);
+}
+
+.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded {
+  transform: rotate(-90deg) translate(-66%, -66%) !important;
+  transform-origin: 100% 0 !important;
+}
+
+.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending {
+  background-image: linear-gradient(135deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
 }

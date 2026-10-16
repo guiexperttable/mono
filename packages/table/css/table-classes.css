@@ -85,6 +85,20 @@
   text-align: end;
 }
 
+/* Latin text with punctuation in a right-to-left table ("Rossi S.p.A." would show as ".Rossi S.p.A"): every label gets
+   the direction of its own text (unicode-bidi: plaintext) and stays aligned to the start of the table (since 1.1.98). */
+.ge-table-text-plaintext {
+  text-align: left;
+}
+
+.ge-table[dir="rtl"] .ge-table-text-plaintext {
+  text-align: right;
+}
+
+.ge-table-text-plaintext .ge-table-label {
+  unicode-bidi: plaintext;
+}
+
 .ge-table-text-align-center {
   text-align: center;
 }

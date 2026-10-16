@@ -73,7 +73,7 @@ life cycle of the detail contents. Created by [TableScope](TableScope.md) (`tabl
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L103)
+[src/lib/table/master-detail/master-detail-service.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L104)
 
 ## Properties
 
@@ -85,7 +85,7 @@ The complete options (defaults + `tableOptions.masterDetail`).
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L90)
+[src/lib/table/master-detail/master-detail-service.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L91)
 
 ## Methods
 
@@ -103,7 +103,7 @@ the number of rows that were collapsed
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:311](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L311)
+[src/lib/table/master-detail/master-detail-service.ts:312](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L312)
 
 ___
 
@@ -123,7 +123,7 @@ the extras, `undefined` without expanded rows
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:417](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L417)
+[src/lib/table/master-detail/master-detail-service.ts:418](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L418)
 
 ___
 
@@ -147,7 +147,7 @@ Decorates a body cell of the toggle column of a master row with the expand icon 
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:530](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L530)
+[src/lib/table/master-detail/master-detail-service.ts:531](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L531)
 
 ___
 
@@ -163,7 +163,7 @@ Called when the table is destroyed: destroys all detail contents and removes the
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:554](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L554)
+[src/lib/table/master-detail/master-detail-service.ts:555](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L555)
 
 ___
 
@@ -182,7 +182,7 @@ the number of rows that were expanded
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L282)
+[src/lib/table/master-detail/master-detail-service.ts:283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L283)
 
 ___
 
@@ -206,7 +206,7 @@ the container
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:385](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L385)
+[src/lib/table/master-detail/master-detail-service.ts:386](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L386)
 
 ___
 
@@ -222,7 +222,7 @@ The expanded master rows (row objects; for models without row objects: `undefine
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:322](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L322)
+[src/lib/table/master-detail/master-detail-service.ts:323](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L323)
 
 ___
 
@@ -238,7 +238,7 @@ The detail layer (`undefined` without master/detail).
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L133)
+[src/lib/table/master-detail/master-detail-service.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L134)
 
 ___
 
@@ -262,7 +262,7 @@ the display index, -1 if none
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:396](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L396)
+[src/lib/table/master-detail/master-detail-service.ts:397](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L397)
 
 ___
 
@@ -278,7 +278,7 @@ True if at least one master row is expanded.
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L128)
+[src/lib/table/master-detail/master-detail-service.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L129)
 
 ___
 
@@ -294,7 +294,7 @@ True if master/detail is configured (and the body is flat).
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L123)
+[src/lib/table/master-detail/master-detail-service.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L124)
 
 ___
 
@@ -318,7 +318,7 @@ whether its detail row is open
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:225](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L225)
+[src/lib/table/master-detail/master-detail-service.ts:226](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L226)
 
 ___
 
@@ -342,7 +342,7 @@ whether its detail row is open
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:212](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L212)
+[src/lib/table/master-detail/master-detail-service.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L213)
 
 ___
 
@@ -366,7 +366,7 @@ whether its path contains the detail layer
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L143)
+[src/lib/table/master-detail/master-detail-service.ts:144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L144)
 
 ___
 
@@ -390,7 +390,7 @@ whether it is a master row
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L186)
+[src/lib/table/master-detail/master-detail-service.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L187)
 
 ___
 
@@ -413,7 +413,7 @@ The id of a master row: `options.getRowId`, `autoRestoreOptions.getRowId`, the r
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L158)
+[src/lib/table/master-detail/master-detail-service.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L159)
 
 ___
 
@@ -437,7 +437,7 @@ contents, sets their positions, hides the ones that left the view and destroys t
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:470](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L470)
+[src/lib/table/master-detail/master-detail-service.ts:471](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L471)
 
 ___
 
@@ -461,7 +461,7 @@ false if the row is not expanded
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:368](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L368)
+[src/lib/table/master-detail/master-detail-service.ts:369](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L369)
 
 ___
 
@@ -486,7 +486,7 @@ Position and size of the layer: the visible body including the fixed columns, wi
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:511](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L511)
+[src/lib/table/master-detail/master-detail-service.ts:512](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L512)
 
 ___
 
@@ -512,7 +512,7 @@ false if nothing changed (no master row, already in that state, no master/detail
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:238](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L238)
+[src/lib/table/master-detail/master-detail-service.ts:239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L239)
 
 ___
 
@@ -538,7 +538,7 @@ true if something changed
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:334](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L334)
+[src/lib/table/master-detail/master-detail-service.ts:335](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L335)
 
 ___
 
@@ -554,4 +554,4 @@ Called at the start of the body render pass: the column of the expand icon.
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:459](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L459)
+[src/lib/table/master-detail/master-detail-service.ts:460](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L460)

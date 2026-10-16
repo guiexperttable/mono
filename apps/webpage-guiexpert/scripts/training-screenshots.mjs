@@ -40,6 +40,7 @@ const DEMOS = {
   "cell-renderers": { slug: "cell-renderers" },
   "heatmap": { slug: "heatmap" },
   "theming": { slug: "theming-dark-mode", drag: [[2, 1], [6, 4]] },
+  "rtl": { slug: "theming-dark-mode" },
   "rowspan-colspan": { slug: "rowspan-colspan" },
   "tree-table": { slug: "tree-table", expand: 3 },
   "inline-editing": { slug: "inline-editing", dblclick: [2, 7] },

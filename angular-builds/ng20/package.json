@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng20",
-  "version": "20.1.96",
+  "version": "20.1.97",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 20 -> @guiexpert/angular-table@20.x",
   "license": "MIT",

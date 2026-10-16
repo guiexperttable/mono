@@ -91,7 +91,7 @@
   text-align: left;
 }
 
-.ge-table[dir="rtl"] .ge-table-text-plaintext {
+.ge-table[dir="rtl"] .ge-table-text-plaintext:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-text-plaintext) {
   text-align: right;
 }
 

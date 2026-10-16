@@ -344,7 +344,9 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       nimmt `clientX` als Host-x; in RTL schon richtig, LTR wegen „pixelgleich“ unverändert) · Eingabe/Editor: die
       Zahlen-Editoren übernehmen die Richtung (`dir` erbt) – Zahlen in RTL-Eingabefeldern prüfen · Copy (`copyToClipboard`)
       bleibt in Spaltenreihenfolge (A zuerst) – wie Excel RTL, nur dokumentieren, falls gewünscht · Firefox/Safari in der
-      CI (Tests Phase 4) · eigene Renderer mit `left`-Positionen werden nicht gespiegelt (dokumentiert).
+      CI (Tests Phase 4) · eigene Renderer mit `left`-Positionen werden nicht gespiegelt (dokumentiert) · **Safari:** liegt die
+      senkrechte Scrollbar eines RTL-Containers rechts (macOS „Scrollbalken immer einblenden“), wäre die Mitte des Bodys um
+      die Scrollbar-Breite gegenüber Header/Footer verschoben – prüfen; Abhilfe s. `prompts/012-rtl.design.md` § 2.4.
 
 ## Mono-Repo / Build
 
@@ -589,6 +591,8 @@ Objekt-Tabelle hat `ge-focused-row`.
   `getComputedStyle(cell).textAlign` = `"end"` statt `"right"` für `ge-table-text-align-right`), gezeichnet wird gleich.
   Eigene Styles aus `AreaModelIf.getCustomStyleAt()` gehen direkt an den `DomServiceIf` (werden nie gespiegelt; vorher
   über `ConvenienceDomService.setStyle` – gleiches Ergebnis in LTR). `main.css` hat die neuen RTL-Regeln (`[dir="rtl"]`).
+  Eingabe-/Select-Editor: `padding-inline-start` statt `padding-left` (gleich in LTR). CRUD-Dialoge bekommen `dir` der
+  Tabelle (neues optionales Feld `direction` an `CrudObjectView`/`CrudObjectEdit`).
   `dist/index.js` 819 → 826 kB.
 
 - **1.1.97 – Master/Detail (011) und Prefix-Summen**, nur additiv: neue optionale Member `TableOptionsIf.masterDetail`,

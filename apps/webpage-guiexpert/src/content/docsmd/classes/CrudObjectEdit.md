@@ -33,6 +33,7 @@ new CrudObjectEdit('id', { id: 7, name: 'Ada', age: 36, vip: true }, 'Edit custo
 ### Properties
 
 - [dialogTitle](CrudObjectEdit.md#dialogtitle)
+- [direction](CrudObjectEdit.md#direction)
 
 ### Methods
 
@@ -64,7 +65,7 @@ new CrudObjectEdit('id', { id: 7, name: 'Ada', age: 36, vip: true }, 'Edit custo
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-edit.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L28)
+[src/lib/table/crud/crud-object-edit.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L32)
 
 ## Properties
 
@@ -74,7 +75,23 @@ new CrudObjectEdit('id', { id: 7, name: 'Ada', age: 36, vip: true }, 'Edit custo
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-edit.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L31)
+[src/lib/table/crud/crud-object-edit.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L35)
+
+___
+
+### direction
+
+• `Optional` **direction**: ``"ltr"`` \| ``"rtl"``
+
+Writing direction of the dialog (`dir`) – the CRUD factory sets the direction of the table.
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/crud/crud-object-edit.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L25)
 
 ## Methods
 
@@ -94,4 +111,4 @@ new CrudObjectEdit('id', { id: 7, name: 'Ada', age: 36, vip: true }, 'Edit custo
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-edit.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L36)
+[src/lib/table/crud/crud-object-edit.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-edit.ts#L40)

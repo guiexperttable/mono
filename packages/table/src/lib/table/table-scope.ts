@@ -181,8 +181,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
         (host, model, options, listener) => new TableScope(host, model, new SimpleDomService(),
-          // a nested table without an own direction takes the direction of this table (since 1.1.98)
-          { ...(options ?? new TableOptions()), direction: options?.direction ?? this.direction },
+          // a nested table without an own direction takes the direction of this table (since 1.1.98) – the app's
+          // options object itself stays the nested table's options (later changes, e.g. externalFilterFunction, count)
+          this.nestedTableOptions(options),
           listener ?? new EventAdapter()));
       if (this.masterDetailService.isActive()) {
         // the detail rows are a row group between body and footer (screen readers)
@@ -214,6 +215,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // A click on a body cell or the scroll bar would focus the scroll viewport (tabindex -1) – the grid (host)
     // must keep the focus, otherwise screen readers lose aria-activedescendant.
     this.scrollViewport.addEventListener('focus', () => this.hostElement.focus({ preventScroll: true }), { signal });
+  }
+
+  /**
+   * The options of a nested table (master/detail `ctx.createTable()`): as given; without an own `direction` in a
+   * right-to-left table an object that reads everything else from the given options (prototype) and adds `"rtl"`.
+   */
+  private nestedTableOptions(options?: TableOptionsIf): TableOptionsIf {
+    if (!options) {
+      return { ...new TableOptions(), direction: this.direction };
+    }
+    if (options.direction !== undefined || !this.isRtl()) {
+      return options;
+    }
+    return Object.assign(Object.create(options) as TableOptionsIf, { direction: this.direction });
   }
 
   /** Time of the last Tab key press on the page (the host is focused right after it). */

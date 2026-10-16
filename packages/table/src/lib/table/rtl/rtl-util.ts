@@ -115,12 +115,14 @@ export function canScrollHorizontally(
     return false;
   }
   const max = element.scrollWidth - element.clientWidth;
-  if (max <= 1) {
+  if (max <= 0) {
     return false;
   }
-  // physical position from the left edge: 0 … max (rtl: scrollLeft runs from 0 at the right to -max at the left)
-  const fromLeft = rtl ? max + element.scrollLeft : element.scrollLeft;
-  return dx > 0 ? fromLeft < max - 1 : fromLeft > 1;
+  if (!rtl) {
+    return dx > 0 ? element.scrollLeft + element.clientWidth < element.scrollWidth - 1 : element.scrollLeft > 0;
+  }
+  // right-to-left: scrollLeft runs from 0 at the right to -max at the left
+  return dx > 0 ? element.scrollLeft < 0 : element.scrollLeft > -max + 1;
 }
 
 /**

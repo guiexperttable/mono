@@ -51,7 +51,7 @@ export class SelectCellRenderer implements CellRendererIf {
                 data-row-index="${rowIndex}"
                 data-col-index="${columnIndex}"
                 data-input-type="text"
-                style="width:100%;height:100%;border:0;padding:0 0 0 8px;"
+                style="width:100%;height:100%;border:0;padding:0;padding-inline-start:8px;"
                 class="ge-table-cell-editor-select">${o}</select>`;
     }
     return undefined;

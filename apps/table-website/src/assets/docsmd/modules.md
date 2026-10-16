@@ -1764,7 +1764,7 @@ mirrorArrowKeys("cmd right");  // "cmd left"
 
 #### Defined in
 
-[src/lib/table/rtl/rtl-util.ts:163](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L163)
+[src/lib/table/rtl/rtl-util.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L165)
 
 ## Overlays
 
@@ -5087,7 +5087,7 @@ host.addEventListener("pointerdown", e => {
 
 #### Defined in
 
-[src/lib/table/rtl/rtl-util.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L145)
+[src/lib/table/rtl/rtl-util.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L147)
 
 ___
 

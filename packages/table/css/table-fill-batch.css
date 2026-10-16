@@ -44,7 +44,7 @@
 }
 
 /* right-to-left: the corner mark at the top end (left) */
-.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending {
+.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-col-div.ge-table-cell-pending) {
   background-image: linear-gradient(135deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
 }
 

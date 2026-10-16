@@ -35,7 +35,7 @@ export class InputCellRenderer implements CellRendererIf {
                 data-row-index="${rowIndex}"
                 data-col-index="${columnIndex}"
                 data-input-type="text"
-                style="width:calc(100% - 8px);height:100%;border:0;padding:0 0 0 8px;"
+                style="width:calc(100% - 8px);height:100%;border:0;padding:0;padding-inline-start:8px;"
                 class="ge-table-cell-editor-input">`;
     }
     return undefined;

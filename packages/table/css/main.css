@@ -98,7 +98,7 @@
   text-align: left;
 }
 
-.ge-table[dir="rtl"] .ge-table-text-plaintext {
+.ge-table[dir="rtl"] .ge-table-text-plaintext:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-text-plaintext) {
   text-align: right;
 }
 
@@ -691,7 +691,7 @@ html[data-theme="dark"] {
 }
 
 /* right-to-left: the corner mark at the top end (left) */
-.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending {
+.ge-table[dir="rtl"] .ge-table-col-div.ge-table-cell-pending:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-col-div.ge-table-cell-pending) {
   background-image: linear-gradient(135deg, var(--ge-table-cell-pending-marker) 6px, transparent 6px);
 }
 
@@ -807,12 +807,12 @@ html[data-theme="dark"] {
 }
 
 /* right-to-left (since 1.1.98): the triangle points to the left, expanded down */
-.ge-table[dir="rtl"] .ge-table-detail-toggle::before {
+.ge-table[dir="rtl"] .ge-table-detail-toggle:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-detail-toggle)::before {
   border-width: 4px 6px 4px 0;
   border-color: transparent var(--ge-table-detail-toggle-color) transparent transparent;
 }
 
-.ge-table[dir="rtl"] .ge-table-detail-toggle.ge-table-detail-toggle-expanded::before {
+.ge-table[dir="rtl"] .ge-table-detail-toggle.ge-table-detail-toggle-expanded:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-detail-toggle.ge-table-detail-toggle-expanded)::before {
   transform: rotate(-90deg);
 }
 /* Pivot tables (PivotFactory / AreaModelPivot, since 1.1.94) */
@@ -1044,7 +1044,7 @@ html[data-theme="dark"] {
 
 /* Right-to-left (direction: "rtl", since 1.1.98): the arrow ">" is mirrored by the browser ("<"), so the expanded
    arrow of the default icon turns the other way (its transform is an inline style: !important). */
-.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded {
+.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .gt-table-tree-arrow-expanded) {
   transform: rotate(-90deg) translate(-66%, -66%) !important;
   transform-origin: 100% 0 !important;
 }

@@ -163,6 +163,12 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
    * While a request runs, the table shows its loading overlay ({@link TableApi.showLoadingOverlay}, since 1.1.92).
    * A failed request is logged with `console.error`; the table stays unchanged.
    */
+  /** The dialogs live outside the host: they get the writing direction of the table (since 1.1.98). */
+  private withDirection<D extends { direction?: "ltr" | "rtl" }>(dialog: D): D {
+    dialog.direction = this.tableModel?.getTableScope()?.direction;
+    return dialog;
+  }
+
   onActionEvent(actionEvent: ActionEventIf): void {
     if (this.listenActionEvent) {
       this.listenActionEvent(actionEvent);
@@ -174,12 +180,12 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
 
     if (action === 'VIEW') {
       this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
-        .then(item => new CrudObjectView(item).openDialog())
+        .then(item => this.withDirection(new CrudObjectView(item)).openDialog())
         .catch(error => this.logError(action, error));
 
     } else if (action === 'EDIT') {
       this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
-        .then(item => new CrudObjectEdit(idKey, item).openDialog(updatedObject =>
+        .then(item => this.withDirection(new CrudObjectEdit(idKey, item)).openDialog(updatedObject =>
           this.whileLoading(() => options.updateItem(options, id, updatedObject))
             .then(response => this.updateRow(id, this.isItemWithId(response) ? response : updatedObject))
             .catch(error => this.logError(action, error))))
@@ -187,12 +193,12 @@ export class CrudTableModelFactory implements ActionEventListenerIf {
 
     } else if (action === 'CLONE') {
       this.whileLoading(() => options.fetchItem<Record<string, any>>(options, id))
-        .then(item => new CrudObjectEdit(idKey, item, 'Clone Item')
+        .then(item => this.withDirection(new CrudObjectEdit(idKey, item, 'Clone Item'))
           .openDialog(updatedObject => this.createItem(action, updatedObject)))
         .catch(error => this.logError(action, error));
 
     } else if (action === 'CREATE') {
-      new CrudObjectEdit(idKey, options.getEmptyItem() ?? {}, 'Create Item')
+      this.withDirection(new CrudObjectEdit(idKey, options.getEmptyItem() ?? {}, 'Create Item'))
         .openDialog(updatedObject => this.createItem(action, updatedObject));
 
     } else if (action === 'DELETE') {

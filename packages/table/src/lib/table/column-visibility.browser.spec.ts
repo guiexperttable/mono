@@ -230,7 +230,8 @@ describe.each(DIRECTIONS)('%s', dir => {
         expectFullyVisible(host, fm.getFocus()[1]);
       }
       expect(fm.getFocus()).toEqual([0, 12]);
-      expect(Math.abs(host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollLeft)).toBeGreaterThan(0);
+      const sl = host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollLeft;
+      expect(direction === 'rtl' ? -sl : sl).toBeGreaterThan(0); // right-to-left: negative
       fm.setFocus(0, 3);
       await userEvent.keyboard(prevKey());
       await nextFrame();

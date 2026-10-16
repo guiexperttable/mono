@@ -79,7 +79,7 @@
 
 /* Right-to-left (direction: "rtl", since 1.1.98): the arrow ">" is mirrored by the browser ("<"), so the expanded
    arrow of the default icon turns the other way (its transform is an inline style: !important). */
-.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded {
+.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .gt-table-tree-arrow-expanded) {
   transform: rotate(-90deg) translate(-66%, -66%) !important;
   transform-origin: 100% 0 !important;
 }

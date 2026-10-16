@@ -9,6 +9,7 @@ import {
   FocusModel,
   SelectionModel,
   TableFactory,
+  TableOptions,
   TreeFactory,
   px100,
   px200,
@@ -326,8 +327,11 @@ describe('R7 – tree', () => {
     const range = document.createRange();
     range.selectNodeContents(rootCell.querySelector<HTMLElement>('.ge-table-label-div')!);
     expect(range.getBoundingClientRect().right).toBeLessThan(rect(arrow).left + rect(arrow).width / 2);
-    // collapsed arrows are mirrored by the browser (">" in a right-to-left cell), the expanded one points down
-    expect(getComputedStyle(arrow).transform).not.toBe('none');
+    // collapsed arrows are mirrored by the browser (">" in a right-to-left cell); the expanded one turns by -90°
+    // (the mirrored "<" then points down) – the inline style of the default icon says +90°
+    const m = getComputedStyle(arrow).transform.match(/matrix\(([^)]+)\)/)![1].split(',').map(Number);
+    expect(m[1]).toBeCloseTo(-1, 5);
+    expect(m[2]).toBeCloseTo(1, 5);
   });
 });
 
@@ -565,6 +569,66 @@ describe('R13 – features in right-to-left', () => {
     near(rect(layer).right, rect(host).right);
     const nested = layer.querySelector<HTMLElement>('.ge-table')!;
     expect(nested.getAttribute('dir')).toBe('rtl');
+  });
+});
+
+describe('nested tables (master/detail) and dialogs', () => {
+
+  function mountWithNested(direction: 'ltr' | 'rtl', nestedOptions: () => Partial<TableOptionsIf> | undefined) {
+    const nested: { api?: import('@guiexpert/table').TableApi } = {};
+    const model = TableFactory.createTableModel({ rows: createRows(5), properties: ['id', 'name'] });
+    const table = mountTable(model, {
+      tableOptions: {
+        direction,
+        masterDetail: {
+          detailHeight: 160,
+          detailRenderer: (_c, row, ctx) => {
+            const rows = [{ name: 'A', children: [{ name: 'B' }] }];
+            nested.api = ctx.createTable({
+              tableModel: TableFactory.createTableModel({ rows: TreeFactory.buildTreeRows(rows, { expanded: true }), properties: ['name'] }),
+              tableOptions: nestedOptions() as TableOptionsIf | undefined,
+            });
+            void row;
+          },
+        },
+      },
+    });
+    return { ...table, nested };
+  }
+
+  it('the app keeps its options object: later changes reach the nested table (left-to-right: the same object)', async () => {
+    const opts = { ...new TableOptions() } as TableOptionsIf;
+    const t = mountWithNested('ltr', () => opts);
+    await nextFrame();
+    t.api.setDetailExpanded(0, true);
+    await nextFrame(); await nextFrame();
+    expect(t.nested.api!.getTableScope().tableOptions).toBe(opts);
+  });
+
+  it('right-to-left: a nested table without own direction is right-to-left and still sees later option changes', async () => {
+    const opts = { ...new TableOptions() } as TableOptionsIf;
+    const t = mountWithNested('rtl', () => opts);
+    await nextFrame();
+    t.api.setDetailExpanded(0, true);
+    await nextFrame(); await nextFrame();
+    const nestedOptions = t.nested.api!.getTableScope().tableOptions;
+    expect(t.nested.api!.getDirection()).toBe('rtl');
+    expect(opts.direction).toBeUndefined();               // the app's object is not changed
+    const filter = () => true;
+    opts.externalFilterFunction = filter;
+    expect(nestedOptions.externalFilterFunction).toBe(filter);
+  });
+
+  it('a left-to-right tree inside a right-to-left table keeps its left-to-right arrows (no CSS leak)', async () => {
+    const t = mountWithNested('rtl', () => ({ ...new TableOptions(), direction: 'ltr' }));
+    await nextFrame();
+    t.api.setDetailExpanded(0, true);
+    await nextFrame(); await nextFrame();
+    const nestedHost = t.host.querySelector<HTMLElement>('.ge-table-detail-layer .ge-table')!;
+    expect(nestedHost.getAttribute('dir')).toBe('ltr');
+    const arrow = nestedHost.querySelector<HTMLElement>('.gt-table-tree-arrow-expanded')!;
+    const m = getComputedStyle(arrow).transform.match(/matrix\(([^)]+)\)/)![1].split(',').map(Number);
+    expect(m[1]).toBeCloseTo(1, 5);                       // +90° as in every left-to-right table
   });
 });
 

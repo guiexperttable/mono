@@ -60,7 +60,10 @@ function bodyColumnLeft(host: HTMLElement, col: number, side = 'center'): number
 }
 
 function scrollLeft(host: HTMLElement): number {
-  return Math.abs(host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollLeft); // rtl: negative
+  const raw = host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!.scrollLeft;
+  // right-to-left: 0 at the start, negative to the left (CSSOM View) – a positive value would be a sign error
+  if (direction === 'rtl') expect(raw).toBeLessThanOrEqual(0);
+  return direction === 'rtl' ? (raw === 0 ? 0 : -raw) : raw;
 }
 
 afterEach(destroyAllTables);
@@ -86,7 +89,7 @@ describe.each(DIRECTIONS)('%s', dir => {
       api.scrollToIndex(59, 0);
       await nextFrame();
       const viewport = host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!;
-      expect(Math.abs(viewport.scrollLeft)).toBeCloseTo(viewport.scrollWidth - viewport.clientWidth, 0);
+      expect(direction === 'rtl' ? -viewport.scrollLeft : viewport.scrollLeft).toBeCloseTo(viewport.scrollWidth - viewport.clientWidth, 0);
       const left = bodyColumnLeft(host, 59)!;
       expect(left).toBeGreaterThan(600);
       expect(left).toBeLessThan(800);

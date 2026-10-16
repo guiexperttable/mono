@@ -266,6 +266,18 @@ describe('CrudTableModelFactory – actions open the dialogs', () => {
     expect(actionLink(host, 1, 'VIEW').getAttribute('data-id')).toBe('2');
   });
 
+  it('the dialogs get the writing direction of the table (they live outside the host, since 1.1.98)', async () => {
+    const spies = crudOptions();
+    const factory = new CrudTableModelFactory();
+    const mo = await new Promise<TableModelAndOptionsIf>(resolve => factory.createTableModel<Item>(spies.options, {}, resolve));
+    const { host } = mountTable(mo.tableModel, { tableOptions: { ...mo.tableOptions, direction: 'rtl' } });
+    await nextFrame();
+    await userEvent.click(actionLink(host, 1, 'VIEW'));
+    await vi.waitFor(() => expect(viewDialog()).not.toBeNull());
+    expect(viewDialog()!.getAttribute('dir')).toBe('rtl');
+    viewDialog()!.close();
+  });
+
   it('VIEW loads the item and opens the view dialog', async () => {
     const { host, fetchItem } = await createCrudTable();
     const info = vi.spyOn(console, 'info');

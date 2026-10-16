@@ -347,6 +347,16 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       CI (Tests Phase 4) · eigene Renderer mit `left`-Positionen werden nicht gespiegelt (dokumentiert) · **Safari:** liegt die
       senkrechte Scrollbar eines RTL-Containers rechts (macOS „Scrollbalken immer einblenden“), wäre die Mitte des Bodys um
       die Scrollbar-Breite gegenüber Header/Footer verschoben – prüfen; Abhilfe s. `prompts/012-rtl.design.md` § 2.4.
+- [ ] **013 Tabellenkalkulation** (angelegt 16.10.2026, `prompts/013-tabellenkalkulation.md`, ein Design, 9 Etappen):
+      Excel-ähnliches Grid für Anwender ohne Konfiguration. Teil 1 Excel-Bedienung (Lostippen, Enter/Tab übernehmen und
+      weiter, Shift/Strg+Pfeile, Entf, Strg+Enter; dauerhafter Editor im Host) · Teil 2 Zwischenablage (TSV mit Quoting
+      + HTML, Einfügen aus Excel/Sheets, Ausschneiden, Kacheln) · Teil 3 Undo/Redo (Änderungssätze aus 010) · Teil 4
+      Zellformeln mit A1-Bezügen (Engine DOM-frei, Abhängigkeitsgraph, relative/absolute Bezüge, Zeigemodus, Vorschläge)
+      · Teil 5 Spreadsheet-Modus (`SpreadsheetFactory`, Spaltenbuchstaben, Formelleiste, Zeilen/Spalten einfügen;
+      Showcase, Kapitel 40, Video 13). Befunde aus der Planung (in Etappe 1 mit rotem Test prüfen): Editor wird bei jedem
+      Repaint neu gebaut (getippter Text geht beim Scrollen vermutlich verloren) · `InputCellRenderer` nutzt ein
+      Inline-`onfocus` (bricht unter strikter CSP) · `ctrl+x` ist auf `DESELECT_ALL` gemappt (Konflikt mit
+      Ausschneiden) · `CopyService` quotet Tabs/Zeilenumbrüche/Anführungszeichen nicht.
 
 ## Mono-Repo / Build
 

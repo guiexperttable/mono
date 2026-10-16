@@ -26,6 +26,7 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 010 | [010-fill-handle-batch-edit.md](010-fill-handle-batch-edit.md) | Fill-Handle, Batch-Edit | Enterprise | 001 (005, 008) | M |
 | 011 | [011-master-detail.md](011-master-detail.md) | Master/Detail | Enterprise | 001, 003 | XL |
 | 012 | [012-rtl.md](012-rtl.md) | Rechts-nach-links-Sprachen (RTL) | Community | alle vorherigen | L |
+| 013 | [013-tabellenkalkulation.md](013-tabellenkalkulation.md) | Tabellenkalkulation: Excel-Bedienung, Zwischenablage, Undo/Redo, Zellformeln mit A1-Bezügen, Spreadsheet-Modus (5 Teile, 9 Etappen) | Enterprise (teils Community) | 001, 004, 008, 010, 012 | XL |
 
 Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern). Grobe Schätzung, nur zum Planen.
 
@@ -41,6 +42,11 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
 - **011:** greift tief ins Rendering ein (variable Höhen, dauerhafte Detail-Ebene), daher spät.
 - **012 zuletzt:** RTL spiegelt Layout, Scrollen, Maus und CSS **aller** Features. Einmal am Ende ist günstiger als
   jedes Feature zweimal. Die anderen Prompts bereiten das mit logischen CSS-Eigenschaften vor.
+- **013 Tabellenkalkulation:** ein Excel-ähnliches Grid, das Anwender ohne Konfiguration bedienen (Vorbilder:
+  Handsontable, HyperFormula, Google Sheets, Excel im Web). Die fünf Teile hängen eng zusammen (Editor ↔ Formel-Eingabe,
+  Änderungssätze ↔ Einfügen ↔ Undo), deshalb **ein** Design mit einem Haltepunkt; umgesetzt in Etappen mit je eigenem PR,
+  jede releasefähig; Website, Training und Video einmal am Ende. Sitzungswechsel laufen über den Abschnitt
+  „Fortschritt“ im Design-Dokument. RTL (012) und ARIA (001) gelten von Anfang an.
 
 ## Gemeinsame Konventionen
 
@@ -53,4 +59,4 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
 
 Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als Entscheidungsprotokoll liegen.
 
-- [x] 001 (Screenreader-Tests offen) · [x] 002 (Angular-Smoke-Test offen) · [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release) · [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release) · [x] 008 (Demo-Repo `ep-039`, Videos offen) · [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release) · [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt)
+- [x] 001 (Screenreader-Tests offen) · [x] 002 (Angular-Smoke-Test offen) · [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release) · [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release) · [x] 008 (Demo-Repo `ep-039`, Videos offen) · [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release) · [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt) · [ ] 013 (Etappen 0–8)

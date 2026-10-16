@@ -1,6 +1,10 @@
 // Measures the render time of one scroll frame (TableScope.adjustAfterScrolling) of a large table in Chromium.
 //
-//   node scripts/measure-render.mjs [distDir] [--rows 2000000] [--cols 30] [--frames 300]
+//   node scripts/measure-render.mjs [distDir] [--rows 2000000] [--cols 30] [--frames 300] [--variable 1] [--details 0]
+//
+// --variable 1: rows of 34 and 50 px (no getConstantRowHeight) – before 1.1.97 every frame summed the heights of all rows
+// above the viewport (O(n)), since 1.1.97 prefix sums (RowLayout). --details N: N expanded master/detail rows (1.1.97+,
+// spread over the table, 120 px each, a text as content).
 //
 // distDir defaults to ./dist (run `pnpm build:core` first). Compare two builds by passing a copy of an older dist.
 // Used for the performance budget of the ARIA feature (prompts/001-aria-screenreader.design.md, §Performance):
@@ -22,6 +26,8 @@ const rows = opt('rows', 2_000_000);
 const cols = opt('cols', 30);
 const frames = opt('frames', 300);
 const runs = opt('runs', 5);
+const variable = opt('variable', 0) > 0;
+const details = opt('details', 0);
 
 const page = `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="/dist/css/main.css">
@@ -32,15 +38,21 @@ import { AreaModel, ColumnDef, TableFactory, TableOptions, TableScope, SimpleDom
 class LargeBody extends AreaModel {
   constructor() { super(); this.areaIdent = 'body'; }
   getRowCount() { return ${rows}; }
-  getRowHeight() { return 34; }
-  getConstantRowHeight() { return 34; }
+  getRowHeight(r) { return ${variable ? "r % 3 ? 34 : 50" : "34"}; }
+  ${variable ? "" : "getConstantRowHeight() { return 34; }"}
+  getRowByIndex(r) { return r; }
   getValueAt(r, c) { return c === 0 ? r : 'R' + r + ' C' + c; }
 }
 const columnDefs = Array.from({ length: ${cols} }, (_, i) => new ColumnDef('c' + i, 'Column ' + i));
 const tableModel = TableFactory.createTableModel({ bodyAreaModel: new LargeBody(), columnDefs, fixedLeftColumnCount: 1 });
 const host = document.querySelector('.table-div');
-const scope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), new EventAdapter());
+const tableOptions = new TableOptions();
+if (${details} > 0) {
+  tableOptions.masterDetail = { detailHeight: 120, detailRenderer: (el, row) => { el.textContent = 'Detail ' + row; } };
+}
+const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
 scope.firstInit();
+for (let k = 0; k < ${details}; k++) scope.getApi().setDetailExpanded(Math.floor(k * ${rows} / ${details}), true);
 window.measure = (frames) => {
   const vp = scope.scrollViewport;
   const max = vp.scrollHeight - vp.clientHeight;
@@ -98,5 +110,5 @@ try {
 }
 const med = results.map(r => r.median).sort((a, b) => a - b)[Math.floor(runs / 2)];
 const p95 = results.map(r => r.p95).sort((a, b) => a - b)[Math.floor(runs / 2)];
-console.log(JSON.stringify({ distDir, rows, cols, frames, runs, cellsPerFrame: results[0].cells,
+console.log(JSON.stringify({ distDir, rows, cols, frames, runs, variable, details, cellsPerFrame: results[0].cells,
   medianMs: +med.toFixed(3), p95Ms: +p95.toFixed(3) }));

@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeBatchEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -14,6 +14,7 @@ export type GeScrollEventFn = (evt: GeScrollEvent) => void;
 export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
 export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
+export type GeDetailEventFn = (evt: GeDetailEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -41,6 +42,8 @@ export interface GuiexpertTableProps {
   rowDragEnd?: GeRowDragEventFn,
   /** Batch edit: values marked, set back, written or discarded (since 1.1.96). */
   batchEditChanged?: GeBatchEditEventFn,
+  /** Master/detail: a detail row was expanded or collapsed (since 1.1.97). */
+  detailExpandedChanged?: GeDetailEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

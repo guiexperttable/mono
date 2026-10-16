@@ -21,6 +21,7 @@ and the first visible row need row ids; tree, checked and selected rows are comp
 | [autoRestoreCheckedState](AutoRestoreOptionsIf.md#autorestorecheckedstate) | checked rows | 1.1.92 (declared before, without effect) |
 | [autoRestoreSelectedState](AutoRestoreOptionsIf.md#autorestoreselectedstate) | selection | 1.1.92 (declared before, without effect) |
 | [autoRestoreCustomState](AutoRestoreOptionsIf.md#autorestorecustomstate) | your data ([TableApi.setCustomState](../classes/TableApi.md#setcustomstate)) | 1.1.92 |
+| [autoRestoreDetailState](AutoRestoreOptionsIf.md#autorestoredetailstate) | expanded detail rows (master/detail) | 1.1.97 |
 
 Before 1.1.92 sorting, scroll position and tree were stored under three keys (`<key>sortingState`,
 `<key>scrollState`, `<key>collapsedExpandedState`); they are read once and removed with the next save.
@@ -67,6 +68,7 @@ Training: [Remember the state](https://gui.expert/training/persist-state/)
 - [autoRestoreCollapsedExpandedState](AutoRestoreOptionsIf.md#autorestorecollapsedexpandedstate)
 - [autoRestoreColumnLayout](AutoRestoreOptionsIf.md#autorestorecolumnlayout)
 - [autoRestoreCustomState](AutoRestoreOptionsIf.md#autorestorecustomstate)
+- [autoRestoreDetailState](AutoRestoreOptionsIf.md#autorestoredetailstate)
 - [autoRestoreHeaderGroupState](AutoRestoreOptionsIf.md#autorestoreheadergroupstate)
 - [autoRestoreScrollPosition](AutoRestoreOptionsIf.md#autorestorescrollposition)
 - [autoRestoreSelectedState](AutoRestoreOptionsIf.md#autorestoreselectedstate)
@@ -86,7 +88,7 @@ Remember the checked rows (by [getRowId](AutoRestoreOptionsIf.md#getrowid)). Sin
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L92)
+[src/lib/table/data/options/auto-restore-options.if.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L93)
 
 ___
 
@@ -98,7 +100,7 @@ Remember expanded and collapsed nodes of a tree table (by [getRowId](AutoRestore
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L87)
+[src/lib/table/data/options/auto-restore-options.if.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L88)
 
 ___
 
@@ -115,7 +117,7 @@ resized, so `%` and weight columns stay responsive.
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L104)
+[src/lib/table/data/options/auto-restore-options.if.ts:105](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L105)
 
 ___
 
@@ -131,7 +133,23 @@ Remember the data set with [TableApi.setCustomState](../classes/TableApi.md#setc
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L114)
+[src/lib/table/data/options/auto-restore-options.if.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L115)
+
+___
+
+### autoRestoreDetailState
+
+• `Optional` **autoRestoreDetailState**: `boolean`
+
+Remember the expanded detail rows of master/detail ([TableOptionsIf.masterDetail](TableOptionsIf.md#masterdetail), by [getRowId](AutoRestoreOptionsIf.md#getrowid)).
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/data/options/auto-restore-options.if.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L120)
 
 ___
 
@@ -147,7 +165,7 @@ Remember collapsed and expanded header groups ([CellGroupIf.toggle](CellGroupIf.
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L109)
+[src/lib/table/data/options/auto-restore-options.if.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L110)
 
 ___
 
@@ -159,7 +177,7 @@ Remember the scroll position (and the id of the first visible row).
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L89)
+[src/lib/table/data/options/auto-restore-options.if.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L90)
 
 ___
 
@@ -172,7 +190,7 @@ Since 1.1.92 (before: declared without effect).
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L97)
+[src/lib/table/data/options/auto-restore-options.if.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L98)
 
 ___
 
@@ -184,7 +202,7 @@ Remember the sorted columns (by property).
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L85)
+[src/lib/table/data/options/auto-restore-options.if.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L86)
 
 ___
 
@@ -198,7 +216,7 @@ personal data into the storage; the table warns once).
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L121)
+[src/lib/table/data/options/auto-restore-options.if.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L127)
 
 ___
 
@@ -210,7 +228,7 @@ The storage key of this table, e.g. `() => "orders"`. Without it nothing is stor
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L123)
+[src/lib/table/data/options/auto-restore-options.if.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L129)
 
 ___
 
@@ -224,7 +242,7 @@ since 1.1.92 – never used; rows are compared by [getRowId](AutoRestoreOptionsI
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L127)
+[src/lib/table/data/options/auto-restore-options.if.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L133)
 
 ___
 
@@ -240,4 +258,4 @@ Where the state is stored. Default: `localStorage`; `sessionStorage` or an own [
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.if.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L133)
+[src/lib/table/data/options/auto-restore-options.if.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L139)

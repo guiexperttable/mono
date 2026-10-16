@@ -53,7 +53,9 @@ Represents a store for HTML elements.
 
 - [adjustAfterScrolling](EleScope.md#adjustafterscrolling)
 - [adjustContainersAndRows](EleScope.md#adjustcontainersandrows)
+- [adjustDetailLayerBounds](EleScope.md#adjustdetaillayerbounds)
 - [getAreaChild](EleScope.md#getareachild)
+- [getBodyContentHeight](EleScope.md#getbodycontentheight)
 - [initHostAria](EleScope.md#inithostaria)
 - [removeHostAria](EleScope.md#removehostaria)
 - [resetSizeOfWrapperDiv](EleScope.md#resetsizeofwrapperdiv)
@@ -416,7 +418,7 @@ This method must be overwritten in child classes.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:449](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L449)
+[src/lib/table/ele-scope.ts:465](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L465)
 
 ___
 
@@ -433,6 +435,35 @@ Adjusts the containers and rows of the table based on the current state.
 #### Defined in
 
 [src/lib/table/ele-scope.ts:299](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L299)
+
+___
+
+### adjustDetailLayerBounds
+
+▸ **adjustDetailLayerBounds**(`_left`, `_top`, `_width`, `_height`): `void`
+
+Position and size of the detail layer (master/detail) in the host – overwritten in [RenderScope](RenderScope.md).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_left` | `number` |
+| `_top` | `number` |
+| `_width` | `number` |
+| `_height` | `number` |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:455](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L455)
 
 ___
 
@@ -456,6 +487,29 @@ The element that holds the rows of an area (`DivScope.child`).
 #### Defined in
 
 [src/lib/table/ele-scope.ts:284](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L284)
+
+___
+
+### getBodyContentHeight
+
+▸ **getBodyContentHeight**(): `number`
+
+The height of all body rows in px – the model's content height plus, in [RenderScope](RenderScope.md), the heights of open
+detail rows (master/detail).
+
+#### Returns
+
+`number`
+
+px
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:476](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L476)
 
 ___
 
@@ -514,7 +568,7 @@ Returns nothing.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:460](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L460)
+[src/lib/table/ele-scope.ts:487](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L487)
 
 ___
 

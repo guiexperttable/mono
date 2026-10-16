@@ -2,7 +2,7 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-037`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-038`), so every chapter can link to the exact code state of its episode.
  * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
@@ -407,6 +407,19 @@ export const CHAPTERS: Chapter[] = [
       "PivotResult.getValue", "pivotRows", "TableApi.setPivotConfig", "RowGroupFieldIf"],
     showcases: [{ name: "pivot", title: "Pivot table" }],
     since: "1.1.94"
+  },
+  {
+    slug: "master-detail", no: 38, part: "advanced", episode: 38, minutes: 5,
+    title: "Master/detail: an order and its items", nav: "Master/detail",
+    lead: "100,000 orders – open one and its items appear right below it as a second table, also while you scroll far away and back.",
+    learn: ["show a detail row with any content below a row", "nest a second GuiExpert table without leaks",
+      "choose a fixed or a measured height", "know why the detail survives scrolling and sorting",
+      "use the keyboard, events and framework components"],
+    api: ["TableOptionsIf.masterDetail", "MasterDetailOptionsIf", "DetailRenderContextIf", "DetailRenderContextIf.createTable",
+      "TableApi.setDetailExpanded", "TableApi.toggleDetail", "TableApi.collapseAllDetails", "TableApi.getExpandedDetailRows",
+      "EventListenerIf.onDetailExpandedChanged", "GeDetailEvent", "RowLayout"],
+    showcases: [{ name: "masterdetail", title: "Master/detail" }],
+    since: "1.1.97"
   }
 ];
 

@@ -121,6 +121,12 @@ export class MouseHandler {
       event.preventDefault();
       event.stopPropagation();
 
+    } else if (mouseTargetData.action === 'toggle-detail') {
+      // the expand icon of a master row (master/detail, since 1.1.97)
+      this.tableScope.toggleDetail(mouseTargetData.rowIdx, 'mouse');
+      event.preventDefault();
+      event.stopPropagation();
+
     } else if (mouseTargetData.action === 'toggleHeaderGroup'){
       this.tableScope.toggleHeaderGroup(mouseTargetData);
       event.preventDefault();
@@ -165,6 +171,7 @@ export class MouseHandler {
   private isClickAction(mouseTargetData: MouseTargetData): boolean {
     return mouseTargetData.action === 'toggleExpandCollapseAll'
       || mouseTargetData.action === 'toggleHeaderGroup'
+      || mouseTargetData.action === 'toggle-detail'
       || (mouseTargetData.inputType === 'checkbox' && !!mouseTargetData.areaIdent)
       || mouseTargetData.className.includes('ge-table-tree-arrow-div');
   }
@@ -297,6 +304,10 @@ export class MouseHandler {
 
 
   private onMouseMove(evt: MouseEvent) {
+    if (!this.mouseDown && this.tableScope.isEventInDetail?.(evt)) {
+      this.tableScope.hideHover?.(); // over a detail row (master/detail): no stale hover of the master row
+      return;
+    }
     if (!this.mouseDown && this.isBlocked(evt)) {
       return; // no hover under a loading overlay; a running drag (started in the header) keeps following the mouse
     }
@@ -314,6 +325,9 @@ export class MouseHandler {
 
 
   private onMouseUp(evt: MouseEvent) {
+    if (!this.mouseDown && this.tableScope.isEventInDetail?.(evt)) {
+      return; // a click in a detail row (master/detail)
+    }
     this.mouseEvent = evt;
     if (this.repaintAfterMouseUp) {
       // deferred: "click" and "dblclick" of this mouseup are dispatched first
@@ -363,6 +377,7 @@ export class MouseHandler {
 
   /** A mouse event on a blocking loading overlay ({@link TableOverlay.isEventBlocked}): the table ignores it. */
   private isBlocked(evt: Event): boolean {
-    return this.tableScope.tableOverlay?.isEventBlocked(evt) ?? false;
+    // also events from a detail row (master/detail, e.g. a nested table): they belong to the detail
+    return (this.tableScope.tableOverlay?.isEventBlocked(evt) ?? false) || !!this.tableScope.isEventInDetail?.(evt);
   }
 }

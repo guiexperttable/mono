@@ -25,7 +25,7 @@ Collapsed or expanded header group ([CellGroupIf](CellGroupIf.md) with `toggle: 
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L190)
+[src/lib/table/state/table-state.if.ts:193](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L193)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L188)
+[src/lib/table/state/table-state.if.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L191)

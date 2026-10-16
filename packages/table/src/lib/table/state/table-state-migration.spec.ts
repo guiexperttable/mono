@@ -69,6 +69,6 @@ describe('removeLegacyState()', () => {
 
 describe('ALL_TABLE_STATE_PARTS', () => {
   it('lists every part once, in the order they are applied', () => {
-    expect(ALL_TABLE_STATE_PARTS).toEqual(['headerGroups', 'columns', 'tree', 'sort', 'checked', 'selection', 'scroll', 'custom']);
+    expect(ALL_TABLE_STATE_PARTS).toEqual(['headerGroups', 'columns', 'tree', 'sort', 'checked', 'selection', 'details', 'scroll', 'custom']);
   });
 });

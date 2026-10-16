@@ -117,6 +117,12 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 ### 3.3 Virtual Scrolling (Kern des Performance-Versprechens)
 - Bei jedem Scroll: `scrollFactorY = scrollTop / (scrollHeight - clientHeight)` →
   `adjustBody()` → `adjustArea('body', yStart)` rendert **nur die sichtbaren Zeilen** (Abbruch, sobald `y > divHeight`).
+- Seit 1.1.97 **Prefix-Summen** der Body-Zeilenhöhen: `RowLayout` (`row-layout/`, DOM-frei; konstant → `i*h` ohne Array,
+  variabel → `Float64Array` lazy, Zusätze = Detailzeilen dünn besetzt) über `RenderScope.getBodyRowLayout()`; Startindex per
+  `findIndexAt` (O(log n), vorher O(n) je Frame bei variablen Höhen: 2 Mio. Zeilen 28 → 19,5 ms, wie konstant).
+  Invalidiert in `repaintHard()`, `invalidateAggregates()` (Filter, Sortieren, Edit, öffentliches `repaint`), `setRows`, Detail
+  auf/zu; zusätzlich Schlüssel Body-Modell + Zeilenzahl. Positionen im Body immer über `getBodyRowTop(i)` /
+  `getBodyRowIndexAtY(y)` (Modellwert + Detailhöhen), Scrollhöhe über `getBodyContentHeight()`.
 - Horizontal analog über `scrollFactorX` und `adjustColumnsToRowParent(...)` (nur sichtbare Spalten).
 - DOM wird pro Render neu aufgebaut (`innerText = ''`); Renderer können Cleanup-Funktionen zurückgeben
   (`RendererCleanupFnType`), die vor dem nächsten Render aufgerufen werden (`cleanupFunctions[area]`).
@@ -169,9 +175,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 ### 3.6 Interaktion
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
-  seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged` (optional). Event-Typen: `GeMouseEvent`,
+  seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged`, seit 1.1.97 `onDetailExpandedChanged` (optional). Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent` (seit 1.1.96 + `changes`/`source`), `GeScrollEvent`, `GeStateChangeEvent`,
-  `GeRowDragEvent`, `GeBatchEditEvent`.
+  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -371,6 +377,29 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `hasPendingChanges`, `isBatchEditing`, `commitBatchEdit` (`boolean`), `cancelBatchEdit`, `isFilling`, `cancelFill`.
   Wrapper-Event `batchEditChanged`. CSS `css/table-fill-batch.css`, `--ge-table-fill-*`, `--ge-table-cell-pending-*`,
   `--ge-table-cell-invalid-*`. Kein Einfügen, kein Undo (Folgepunkte in `TODO.md`).
+- **Master/Detail (seit 1.1.97, `master-detail/`, Design `prompts/011-master-detail.design.md`)**:
+  `tableOptions.masterDetail` (`MasterDetailOptionsIf`: `detailRenderer` (Fn oder `DetailRendererIf`), `detailHeight` number |
+  `"auto"` (Default, `ResizeObserver` auf der Detailzelle) | Fn, `estimatedDetailHeight` 200, `isMaster`, `toggleColumn`,
+  `maxRenderedDetails` 50, `getRowId`). Nur flache Bodies (Baum/Gruppen/Pivot → Warnung, inaktiv). `MasterDetailService`
+  (`tableScope.masterDetailService`, nur mit Option angelegt): **eine** Ebene `ge-table-detail-layer` im Host (z-index 1000,
+  `pointer-events: none`, Zeilen `auto`; Lage aus `EleScope.adjustDetailLayerBounds` = West + Viewport ohne Scrollbars) – wird
+  nie geleert, scrollt nicht horizontal. Detailhöhen = Zusätze im `RowLayout` hinter dem Master; `adjustArea('body')` meldet
+  sichtbare Details (`layoutVisible(rowIndex, top, height…)`), Inhalt lazy beim ersten Sichtbarwerden (an seiner Stelle, damit
+  eine innere Tabelle richtig misst), außer Sicht **geparkt** (`ge-table-detail-row-parked` = `visibility: hidden;
+  content-visibility: hidden` – Scrollpositionen bleiben, kein RO-Aufruf; Abhängen aus dem DOM würde `scrollTop` verlieren),
+  LRU über `maxRenderedDetails`, zerstört bei Zuklappen/`refreshDetail`/`destroy`/Zeile nicht mehr in `getAllRows()`
+  (Cleanup, `ctx.signal`, `ctx.createTable()`-Tabellen `destroy()`). Schlüssel: `getRowId` (Option bzw. eigene
+  `autoRestoreOptions.getRowId`, nicht der JSON-Default) sonst Zeilenobjekt sonst Index; Index-Zuordnung in `computeExtras()`
+  (ein Durchlauf bei Layout-Neuaufbau), Einzel-Toggle inkrementell (`RenderScope.setBodyRowExtra`). Ereignis-Isolation:
+  `TableScope.isEventInDetail(evt)` (`composedPath()`) in `MouseHandler.isBlocked`, `ShortcutService`, `InputHandler`,
+  Row-Drag/Fill-Listener – kein `stopPropagation`. Mausrad über Details → äußere Tabelle, wenn innen nichts scrollt. ARIA: Host
+  `treegrid`, Masterzeilen `aria-expanded`, Ebene = Rowgroup in `aria-owns` (vor Footer), Detail `row` + `gridcell`
+  `aria-colspan`; Enter (`activateBodyCell`) klappt, Tab springt ins offene Detail der Fokuszeile, Shift+Tab zurück
+  (`focusDetailMaster`). Zustand: Teil `details` (`detailRowIds`, `autoRestoreDetailState`). API `setDetailExpanded`,
+  `toggleDetail`, `isDetailExpanded`, `getExpandedDetailRows`, `expandAllDetails`/`collapseAllDetails` (kein Event je Zeile),
+  `refreshDetail`, `getDetailElement`; `ensureRowIsVisible` richtet mit Details pixelgenau aus. Wrapper:
+  `DetailComponentRendererWrapper` (React, Preact, Vue, Svelte, Solid), Angular `DetailRenderWrapperFactory` +
+  `DetailComponentRendererIf`; Event `detailExpandedChanged`. CSS `css/table-master-detail.css`, `--ge-table-detail-*`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -389,7 +418,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
-`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`.
+`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -410,7 +439,8 @@ Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Compone
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
-(`GeBatchEditEvent`).
+(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`) – und je Wrapper `DetailComponentRendererWrapper`
+(Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`).
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -455,7 +485,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 554 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 570 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -466,8 +496,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.140 Tests) |
-  | `test:browser` | echtes Chromium, ~780 Tests in 27 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.150 Tests) |
+  | `test:browser` | echtes Chromium, ~840 Tests in 29 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -490,7 +520,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch` …).
+    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch`, `master-detail/master-detail` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -505,7 +535,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 34 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 35 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -600,6 +630,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 30 | Formeln ohne Enterprise-Lizenz (`formula`, `#DIV/0!`, kein `eval`) – geplant | Showcase `formulas`, `instructions.md` 5.9 |
 | 31 | Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/09-zeilen-ziehen/`, Showcase `rowdrag`, Training-Kapitel `events-and-context-menu` (Abschnitt), `apps/table-demo/row-drag.html`, `instructions.md` 6.16 |
 | 32 | Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln, dann speichern | `videos/10-fill-handle-batch-edit/`, Showcase `batchedit`, Training-Kapitel `inline-editing` (Abschnitt), `apps/table-demo/fill-batch.html`, `instructions.md` 6.17 |
+| 33 | Master/Detail ohne Enterprise-Lizenz – Bestellung aufklappen, Positionen als zweite Tabelle, 100.000 Zeilen | `videos/11-master-detail/`, Showcase `masterdetail`, Training-Kapitel `master-detail`, `apps/table-demo/master-detail.html`, `instructions.md` 6.18 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
@@ -608,11 +639,12 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 37 Kapitel = 37 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 38 Kapitel = 38 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
 Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`,
 Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94;
-seit Prompt 007: Kapitel 37 `pivot-tables`, Tag `ep-037` erst nach dem Release 1.1.94).
+seit Prompt 007: Kapitel 37 `pivot-tables`, Tag `ep-037` erst nach dem Release 1.1.94; seit Prompt 011: Kapitel 38
+`master-detail`, Tag `ep-038` erst nach dem Release 1.1.97 – die Planung für `formulas` (008) rückt auf 39).
 
 ```
 apps/webpage-guiexpert/src/

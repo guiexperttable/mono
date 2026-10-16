@@ -1,3 +1,4 @@
+import type { GeDetailEvent } from './data/common/event/ge-detail-event';
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
@@ -110,4 +111,11 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.96
    */
   onBatchEditChanged?(evt: GeBatchEditEvent): void;
+
+  /**
+   * A detail row was expanded or collapsed (master/detail, {@link TableOptionsIf.masterDetail}).
+   *
+   * @since 1.1.97
+   */
+  onDetailExpandedChanged?(evt: GeDetailEvent): void;
 }

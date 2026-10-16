@@ -1,0 +1,68 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="masterdetail-bar">
+  <button type="button" class={id + '-expand'}>Expand first 20</button>
+  <button type="button" class={id + '-collapse'}>Collapse all</button>
+  <span class:list={[id + '-log', 'masterdetail-log']} aria-live="off"></span>
+</div>
+<div
+    style="height: calc(100vh - 176px)"
+    class:list={[ id, 'masterdetail-demo' ]}></div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createMasterDetailModelAndOptions, generateMasterOrders } from "/scripts/demo-table-models/index.js";
+
+  // 100,000 orders – expand one (▸ or Enter) and its items appear below as a second table over the full width
+  const {tableModel, tableOptions} = createMasterDetailModelAndOptions(generateMasterOrders(100000));
+  const ele = document.querySelector('.' + id);
+  const log = document.querySelector('.' + id + '-log');
+
+  const listener = new EventAdapter();
+  listener.onDetailExpandedChanged = evt => {
+    log.textContent = `${evt.row.orderNo} ${evt.expanded ? 'expanded' : 'collapsed'}`;
+  };
+
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+  tableApi.setDetailExpanded(1, true);   // one open order to start with
+
+  document.querySelector('.' + id + '-expand').addEventListener('click', () => {
+    for (let i = 0; i < 20; i++) tableApi.setDetailExpanded(i, true);
+  });
+  document.querySelector('.' + id + '-collapse').addEventListener('click', () => {
+    log.textContent = `${tableApi.collapseAllDetails()} collapsed`;
+  });
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .masterdetail-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .masterdetail-bar button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .masterdetail-log {
+        opacity: 0.8;
+    }
+</style>

@@ -57,6 +57,7 @@ export type GetStorageKeyFn = (() => string);
  * | {@link autoRestoreCheckedState} | checked rows | 1.1.92 (declared before, without effect) |
  * | {@link autoRestoreSelectedState} | selection | 1.1.92 (declared before, without effect) |
  * | {@link autoRestoreCustomState} | your data ({@link TableApi.setCustomState}) | 1.1.92 |
+ * | {@link autoRestoreDetailState} | expanded detail rows (master/detail) | 1.1.97 |
  *
  * Before 1.1.92 sorting, scroll position and tree were stored under three keys (`<key>sortingState`,
  * `<key>scrollState`, `<key>collapsedExpandedState`); they are read once and removed with the next save.
@@ -112,6 +113,11 @@ export interface AutoRestoreOptionsIf<T> {
    * @since 1.1.92
    */
   autoRestoreCustomState?: boolean;
+  /**
+   * Remember the expanded detail rows of master/detail ({@link TableOptionsIf.masterDetail}, by {@link getRowId}).
+   * @since 1.1.97
+   */
+  autoRestoreDetailState?: boolean;
 
   /**
    * A unique, stable id per row (tree: per node). With the default of {@link AutoRestoreOptions} the table uses the

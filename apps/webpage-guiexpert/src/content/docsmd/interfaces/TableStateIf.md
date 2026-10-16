@@ -47,6 +47,7 @@ Training: [Remember the state](https://gui.expert/training/persist-state/)
 - [checkedRowIds](TableStateIf.md#checkedrowids)
 - [columns](TableStateIf.md#columns)
 - [custom](TableStateIf.md#custom)
+- [detailRowIds](TableStateIf.md#detailrowids)
 - [headerGroups](TableStateIf.md#headergroups)
 - [scroll](TableStateIf.md#scroll)
 - [selection](TableStateIf.md#selection)
@@ -64,7 +65,7 @@ The ids of the checked rows.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L77)
+[src/lib/table/state/table-state.if.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L78)
 
 ___
 
@@ -77,7 +78,7 @@ place; unknown properties are ignored.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L69)
+[src/lib/table/state/table-state.if.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L70)
 
 ___
 
@@ -89,7 +90,23 @@ Data of your application, e.g. the text of a filter field (must be JSON).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L83)
+[src/lib/table/state/table-state.if.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L86)
+
+___
+
+### detailRowIds
+
+• `Optional` **detailRowIds**: [`TableStateRowId`](../modules.md#tablestaterowid)[]
+
+The ids of the master rows with an expanded detail row (master/detail).
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/state/table-state.if.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L80)
 
 ___
 
@@ -101,7 +118,7 @@ The state of the header groups with a toggle.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L81)
+[src/lib/table/state/table-state.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L84)
 
 ___
 
@@ -113,7 +130,7 @@ The scroll position.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L73)
+[src/lib/table/state/table-state.if.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L74)
 
 ___
 
@@ -125,7 +142,7 @@ The selection.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L79)
+[src/lib/table/state/table-state.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L82)
 
 ___
 
@@ -137,7 +154,7 @@ The sorted columns, the first one is the primary sort key. `[]` = unsorted.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L71)
+[src/lib/table/state/table-state.if.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L72)
 
 ___
 
@@ -149,7 +166,7 @@ Expanded / collapsed nodes of a tree table.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L75)
+[src/lib/table/state/table-state.if.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L76)
 
 ___
 
@@ -161,4 +178,4 @@ Format version, always `1`.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L64)
+[src/lib/table/state/table-state.if.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L65)

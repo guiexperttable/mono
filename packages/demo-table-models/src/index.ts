@@ -34,3 +34,5 @@ export * from "./model/pivot-order.if";
 export * from "./model/task.if";
 export * from "./lib/createPriceListModel";
 export * from "./model/price-item.if";
+export * from "./lib/createMasterDetailModel";
+export * from "./model/master-order.if";

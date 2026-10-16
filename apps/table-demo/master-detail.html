@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--
+  Master/detail (since 1.1.97) – also the recording page of video 11.
+  Start: pnpm serve:table-demo → http://localhost:4200/master-detail.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – master/detail</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 860px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button, .bar select { font: inherit; padding: 4px 12px; }
+    .table-div { height: 520px; width: 100%; max-width: 980px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+    .notes { display: grid; gap: 6px; max-width: 520px; }
+    .notes textarea { font: inherit; min-height: 48px; resize: vertical; }
+  </style>
+</head>
+<body>
+<h1>100,000 orders – master/detail</h1>
+<p>Click ▸ (or press Enter) to open an order: its items appear below as a second table over the full width – also over
+  the fixed column. Scroll away and back: the detail keeps its scroll position and selection.</p>
+<div class="bar">
+  <label>Detail <select id="kind">
+    <option value="table">items table (fixed height)</option>
+    <option value="notes">notes form (auto height)</option>
+  </select></label>
+  <button id="expand" type="button">Expand first 50</button>
+  <button id="collapse" type="button">Collapse all</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<pre id="log" aria-live="off"></pre>
+<script src="/src/master-detail/master-detail-demo.ts" type="module"></script>
+</body>
+</html>

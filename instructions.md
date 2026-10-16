@@ -718,6 +718,11 @@ Tips for very large models:
   end of the table drops from ~29 ms to ~15 ms). The built-in models do this automatically.
 - `scrollToIndex()` uses `getYPosByRowIndex()`. Since 1.1.85 the `AreaModel` default derives it from the row heights
   (O(1) with `getConstantRowHeight()`, otherwise O(n)); override it for huge models with variable row heights.
+- Variable row heights: since 1.1.97 the table keeps prefix sums of the heights (`RowLayout`), so a scroll frame finds
+  the first visible row by a binary search – 2 million rows with variable heights render as fast as with a constant
+  height (before, every frame summed the heights of all rows above the viewport). The sums are built again after
+  filtering, sorting, editing and `repaint()`/`repaintHard()`; if your `getRowHeight()` changes on its own, call
+  `tableApi.repaint()`.
 
 ### 5.6 Row grouping with aggregation (since 1.1.94)
 
@@ -1205,6 +1210,7 @@ listener.onSelectionChanged = () => {
 | `stateChanged` | `GeStateChangeEvent` | since 1.1.92, see 6.11 |
 | `rowDragStart`, `rowDragMove`, `rowDragEnd` | `GeRowDragEvent` | since 1.1.95, see 6.16 (core: `onRowDragStart/Move/End`) |
 | `batchEditChanged` | `GeBatchEditEvent` | since 1.1.96, pending changes of a batch edit, see 6.17 (core: `onBatchEditChanged`) |
+| `detailExpandedChanged` | `GeDetailEvent` | since 1.1.97, a detail row was expanded or collapsed, see 6.18 (core: `onDetailExpandedChanged`) |
 
 ### 6.6 Tree table and checkboxes
 
@@ -1477,6 +1483,7 @@ const tableOptions: TableOptionsIf = {
 | Editor | the input is named after the column; Escape closes it and the focus returns to the table |
 | Row drag (1.1.95) | the drag handle is `aria-hidden`; its cell has `aria-keyshortcuts` for the keyboard alternative Ctrl+Alt+↑/↓; announcements "Dragging 1 row…", "Row moved to position 7 of 20", "Drag cancelled" (6.16) |
 | Fill handle, batch edit (1.1.96) | the handle is `aria-hidden`; the grid has `aria-keyshortcuts` for Ctrl/⌘+D, Ctrl/⌘+R; invalid pending cells have `aria-invalid` and the message as `title`; announcements "3 cells filled", "2 changes not saved", "2 changes saved" (6.17) |
+| Master/detail (1.1.97) | the grid is a `treegrid`; master rows have `aria-expanded`; the detail rows are a row group with a `gridcell` over all columns; Tab enters the open detail of the focused row, Shift+Tab returns; announcements "Details expanded" / "Details collapsed" (6.18) |
 | Announcements | a polite live region (in `document.body`, removed by `destroy()`): sorting, filter result ("42 rows"), copy ("12 cells copied"), select all; own messages with `tableApi.announce("Orders loaded")`. Inside a modal dialog (`aria-modal="true"`) screen readers ignore it – use a live region of your own there |
 | Decoration | borders, hover, focus frame, drag ghost, resize handles, icons: `aria-hidden="true"` |
 
@@ -1789,6 +1796,84 @@ discardButton.onclick = () => tableApi.cancelBatchEdit();
   nothing saved" (texts in `ariaTexts`).
 - **CRUD:** `CrudTableModelFactory` saves single objects; for batch edits send `getPendingChanges()` yourself (see above).
 
+### 6.18 Master/detail: expandable detail rows (since 1.1.97)
+
+A row (master) can be expanded; below it a **detail row over the full width** of the table – fixed columns included –
+shows any content: a second GuiExpert table (order → items), a form, a chart or a framework component. It works with
+virtual scrolling and millions of rows: the content is created when the detail row becomes visible for the first time
+and lives until the row is collapsed – scrolling only hides and shows it, so inputs, selections and the scroll position
+of a nested table stay.
+
+```ts
+import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableOptionsIf, TableScope } from "@guiexpert/table";
+
+interface Item { sku: string; name: string; qty: number; price: number }
+interface Order { id: number; customer: string; total: number; items: Item[] }
+declare const orders: Order[];
+declare const host: HTMLDivElement;
+
+const tableModel = TableFactory.createTableModel({ rows: orders, properties: ["id", "customer", "total"], fixedLeftColumnCount: 1 });
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  masterDetail: {
+    detailHeight: 180,
+    detailRenderer: (_container, order: Order, ctx) => {
+      ctx.createTable({ tableModel: TableFactory.createTableModel({ rows: order.items, properties: ["sku", "name", "qty", "price"] }) });
+    }
+  }
+};
+new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter()).firstInit();
+```
+
+- **Opening:** a ▸ icon in the first data column (behind row numbers and the checkbox column – where a tree has its
+  arrow; another column with `toggleColumn: "city"` or an index). A click or **Enter** on the focused row toggles.
+  Code: `tableApi.setDetailExpanded(rowIndexOrRow, true)`, `toggleDetail()`, `isDetailExpanded()`,
+  `getExpandedDetailRows()`, `expandAllDetails()` / `collapseAllDetails()` (no event per row), `refreshDetail()`
+  (create the content again), `getDetailElement()`. A number is the display index, an object the row itself (also a
+  row that is filtered out).
+- **Which rows:** `isMaster: (row, rowIndex) => boolean` (default: every row).
+- **Height:** `detailHeight: 180` (px), `"auto"` (default – measured from the content with a `ResizeObserver`, a change
+  moves the rows below; `estimatedDetailHeight` (200) until the first measurement) or a function per row.
+- **Renderer:** `detailRenderer(container, row, context)` – a function or an object with `render()`
+  (`DetailRendererIf`). It may return a cleanup function. Write data with `textContent`/`value`, never into
+  `innerHTML` unescaped. The `context` has `row`, `rowIndex`, `tableApi` (the outer table), `recreated`, `signal`
+  (an `AbortSignal`, aborted when the detail row is destroyed – for `addEventListener(…, { signal })`) and
+  `createTable({ tableModel, tableOptions?, eventListener?, height? })`, which creates a nested table and destroys it
+  together with the detail row (height: 100 % of a fixed detail height, otherwise `estimatedDetailHeight`).
+- **Life cycle:** created when first visible (expanding 100,000 rows creates nothing in advance), hidden – not
+  destroyed – while scrolled out of view, destroyed on collapse, by `refreshDetail()`, by `tableApi.destroy()` (the
+  wrappers call it when the model changes or the component unmounts) and when more than `maxRenderedDetails` (50)
+  contents exist: the one out of view the longest is destroyed and created again when it scrolls back
+  (`context.recreated === true`).
+- **Sorting and filtering:** a detail row stays with its master row (identified by the row object, or by
+  `masterDetail.getRowId` / `autoRestoreOptions.getRowId` – then it also stays open when `setRows()` brings new objects
+  with the same ids; the content is created again). A filtered-out master stays expanded and comes back with its detail.
+  Rows removed from the model (`getAllRows()`) lose their detail.
+- **Events:** `onDetailExpandedChanged(GeDetailEvent)` – `row`, `rowIndex`, `expanded`, `source` (`"mouse"`,
+  `"keyboard"`, `"api"`, `"state"`); wrappers: `detailExpandedChanged`. Mouse, keyboard and pointer events inside a
+  detail row (e.g. clicks and arrow keys in a nested table) never reach the outer table. The mouse wheel over a detail
+  row scrolls the outer table when nothing inside the detail can scroll (a nested table scrolls first).
+- **Keyboard and screen readers:** the grid becomes a `treegrid`; master rows have `aria-expanded`, the detail rows are
+  a row group with one `gridcell` over all columns. **Tab** on a master row moves the focus into its open detail
+  (e.g. the nested table), **Shift+Tab** returns to the master row. Announcements "Details expanded" / "Details
+  collapsed" (`ariaTexts.detailExpanded` / `detailCollapsed`).
+- **State:** part `"details"` of `getState()` (`detailRowIds`), stored with `autoRestoreOptions.autoRestoreDetailState`
+  (needs row ids, like checked rows).
+- **Copy and Excel** export the master rows only – details are not part of the model.
+- **Look:** classes `.ge-table-detail-layer`, `.ge-table-detail-row` (`…-parked` while out of view), `.ge-table-detail-cell`
+  (padding, scrolls with a fixed height), `.ge-table-detail-table`, `.ge-table-detail-toggle` (`…-expanded`);
+  variables `--ge-table-detail-bg`, `--ge-table-detail-border`, `--ge-table-detail-toggle-color`,
+  `--ge-table-detail-toggle-hover-bg` (light and dark).
+- **Framework components** as detail: `new DetailComponentRendererWrapper(Component)` in React, Preact, Vue
+  (`new DetailComponentRendererWrapper(Component, appContext)`), Svelte 4/5 and Solid – the component gets the props
+  `row`, `rowIndex`, `tableApi` and `context`; Angular: `inject(DetailRenderWrapperFactory).create(MyDetailComponent)`
+  with a component that implements `DetailComponentRendererIf` (`setDetail(row, context)`). Inside, simply use the
+  table component of your framework for a nested table.
+- **Limits:** only flat body models (with a tree, row grouping or pivot table `masterDetail` is ignored with a warning);
+  a rowspan cell over a master row with an open detail is drawn behind the detail row; touch swipes over a detail row do
+  not scroll the outer table (use the area of the master rows); a detail row that grows above the viewport moves the
+  visible rows.
+
 ---
 
 ## 7. Not available yet
@@ -1804,6 +1889,7 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
   to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
 - No paste from the clipboard and no undo/redo yet – both can be built on `tableApi.applyCellChanges()` (6.17).
+- Master/detail (6.18) only for flat tables – no detail rows below tree nodes, group rows or pivot rows.
 
 ---
 

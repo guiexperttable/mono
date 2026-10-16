@@ -6,8 +6,10 @@ import * as svelte from 'svelte';
 import { tick } from 'svelte';
 import { GeMouseEvent, TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import GuiexpertTable from './GuiexpertTable.svelte';
+import DetailCounter from '../test/DetailCounter.svelte';
+import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
 import {
-  bodyCell, cellOf, createHost, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
 } from '../../table/test-utils/wrapper-test-utils';
 
 // Svelte 4 component API (the class the Svelte 4 compiler generates)
@@ -34,6 +36,28 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Svelte 4)', () => {
+
+  it('master/detail: a Svelte component as detail keeps its state while scrolling, is destroyed on collapse (since 1.1.97)', async () => {
+    (window as { __mdDestroyed?: number[] }).__mdDestroyed = [];
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(DetailCounter) } };
+    let api: TableApi | undefined;
+    const host = create({ tableModel: createModel(300), tableOptions, onTableReady: (a: TableApi) => { api = a; } }).host;
+    await nextFrame();
+    clickDetailToggle(host, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.getAttribute('data-has-api')).toBe('true');
+    host.querySelector<HTMLButtonElement>('.md-btn')!.click();
+    await tick();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api!.scrollToIndex(0, 200);
+    await nextFrame();
+    api!.scrollToIndex(0, 0);
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+    api!.setDetailExpanded(0, false);
+    await vi.waitFor(() => expect((window as { __mdDestroyed?: number[] }).__mdDestroyed).toEqual([0]));
+    expect(detailRowsOf(host)).toHaveLength(0);
+  });
 
   it('runs with Svelte 4', () => {
     // compiled components register their major version in window.__svelte.v ("svelte/internal/disclose-version")

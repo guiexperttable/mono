@@ -1,6 +1,6 @@
 # TODO-Prompt 011: Master/Detail (aufklappbare Detailzeile)
 
-> Status: **offen** · angelegt 14.10.2026 · Slug `master-detail` (Branch `feat/master-detail`, Design `prompts/011-master-detail.design.md`)
+> Status: **umgesetzt** (16.10.2026, Branch `feat/master-detail`, selbständig; Demo-Repo `ep-038` und Angular-Demo nach dem Release) · angelegt 14.10.2026 · Slug `master-detail` (Branch `feat/master-detail`, Design `prompts/011-master-detail.design.md`)
 > Abhängigkeiten: **001 (ARIA)**, **003 (Zustand)** für „aufgeklappte Details merken“. Technische Voraussetzung im
 > Prompt selbst: variable Zeilenhöhen schnell machen (`TODO.md` „Performance, Teil 2“).
 > ag-Grid: Master/Detail ist dort **Enterprise**.
@@ -114,6 +114,6 @@ unveränderte Ergebnisse für Tabellen ohne Details.
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Design-Dokument mit Ebenen-Konzept, Lebenszyklus, API, Ereignis-Isolation 🛑
-- [ ] Variable Zeilenhöhen mit Prefix-Summen, gemessen und getestet (`TODO.md` Teil 2 erledigt)
-- [ ] M1–M14 umgesetzt und getestet; keine Lecks (Lebenszyklus-Specs)
+- [x] Design-Dokument mit Ebenen-Konzept, Lebenszyklus, API, Ereignis-Isolation 🛑 (selbständig, Empfehlungen übernommen)
+- [x] Variable Zeilenhöhen mit Prefix-Summen, gemessen und getestet (`TODO.md` Teil 2 erledigt)
+- [x] M1–M14 umgesetzt und getestet; keine Lecks (Lebenszyklus-Specs)

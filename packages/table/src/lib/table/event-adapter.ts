@@ -1,3 +1,4 @@
+import { GeDetailEvent } from "./data/common/event/ge-detail-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
@@ -69,6 +70,10 @@ export class EventAdapter implements EventListenerIf {
 
   /** @since 1.1.96 */
   onBatchEditChanged(_evt: GeBatchEditEvent): void {
+  }
+
+  /** @since 1.1.97 */
+  onDetailExpandedChanged(_evt: GeDetailEvent): void {
   }
 
 }

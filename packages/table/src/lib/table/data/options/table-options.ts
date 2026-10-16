@@ -1,3 +1,4 @@
+import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TableOptionsIf } from "./table-options.if";
 import { TreeOptions } from "./tree-options";
@@ -111,5 +112,6 @@ export class TableOptions implements TableOptionsIf {
   overlayOptions?: Partial<OverlayOptionsIf> = undefined;
   rowDragOptions?: Partial<RowDragOptionsIf> = undefined;
   fillHandle?: boolean | Partial<FillHandleOptionsIf> = undefined;
+  masterDetail?: Partial<MasterDetailOptionsIf> = undefined;
   batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;
 }

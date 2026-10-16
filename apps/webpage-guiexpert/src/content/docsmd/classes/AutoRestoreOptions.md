@@ -61,6 +61,7 @@ Training: [Remember the state](https://gui.expert/training/persist-state/)
 - [autoRestoreCollapsedExpandedState](AutoRestoreOptions.md#autorestorecollapsedexpandedstate)
 - [autoRestoreColumnLayout](AutoRestoreOptions.md#autorestorecolumnlayout)
 - [autoRestoreCustomState](AutoRestoreOptions.md#autorestorecustomstate)
+- [autoRestoreDetailState](AutoRestoreOptions.md#autorestoredetailstate)
 - [autoRestoreHeaderGroupState](AutoRestoreOptions.md#autorestoreheadergroupstate)
 - [autoRestoreScrollPosition](AutoRestoreOptions.md#autorestorescrollposition)
 - [autoRestoreSelectedState](AutoRestoreOptions.md#autorestoreselectedstate)
@@ -155,6 +156,24 @@ ___
 #### Defined in
 
 [src/lib/table/data/options/auto-restore-options.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L51)
+
+___
+
+### autoRestoreDetailState
+
+• **autoRestoreDetailState**: `boolean` = `false`
+
+**`Since`**
+
+1.1.97
+
+#### Implementation of
+
+[AutoRestoreOptionsIf](../interfaces/AutoRestoreOptionsIf.md).[autoRestoreDetailState](../interfaces/AutoRestoreOptionsIf.md#autorestoredetailstate)
+
+#### Defined in
+
+[src/lib/table/data/options/auto-restore-options.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L53)
 
 ___
 
@@ -256,7 +275,7 @@ this default (since 1.1.92): rows without them are not stored – the JSON would
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L73)
+[src/lib/table/data/options/auto-restore-options.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L75)
 
 ___
 
@@ -272,7 +291,7 @@ The storage key of this table, e.g. `() => "orders"`. Without it nothing is stor
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L54)
+[src/lib/table/data/options/auto-restore-options.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L56)
 
 ## Methods
 
@@ -302,4 +321,4 @@ AutoRestoreOptionsIf.isSame
 
 #### Defined in
 
-[src/lib/table/data/options/auto-restore-options.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L58)
+[src/lib/table/data/options/auto-restore-options.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.ts#L60)

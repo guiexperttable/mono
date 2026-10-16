@@ -95,6 +95,14 @@ export class AriaTexts implements AriaTextsIf {
     return cellCount === 1 ? "1 cell filled" : `${cellCount} cells filled`;
   }
 
+  detailExpanded(): string {
+    return "Details expanded";
+  }
+
+  detailCollapsed(): string {
+    return "Details collapsed";
+  }
+
   fillTooLarge(maxCells: number): string {
     return `Too many cells to fill (at most ${maxCells})`;
   }

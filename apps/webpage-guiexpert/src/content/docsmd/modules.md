@@ -75,6 +75,7 @@
 - [GeBatchEditEvent](classes/GeBatchEditEvent.md)
 - [GeCellIndices](classes/GeCellIndices.md)
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
+- [GeDetailEvent](classes/GeDetailEvent.md)
 - [GeFilterService](classes/GeFilterService.md)
 - [GeKeyEvent](classes/GeKeyEvent.md)
 - [GeModelChangeEvent](classes/GeModelChangeEvent.md)
@@ -92,6 +93,8 @@
 - [LicenseManager](classes/LicenseManager.md)
 - [LiveAnnouncer](classes/LiveAnnouncer.md)
 - [MaleFemaleToIconCellRenderer](classes/MaleFemaleToIconCellRenderer.md)
+- [MasterDetailOptions](classes/MasterDetailOptions.md)
+- [MasterDetailService](classes/MasterDetailService.md)
 - [MouseHandler](classes/MouseHandler.md)
 - [MouseTargetData](classes/MouseTargetData.md)
 - [MultiRowsSelectionModel](classes/MultiRowsSelectionModel.md)
@@ -121,6 +124,7 @@
 - [RowGroup](classes/RowGroup.md)
 - [RowGroupColumnDef](classes/RowGroupColumnDef.md)
 - [RowGroupFactory](classes/RowGroupFactory.md)
+- [RowLayout](classes/RowLayout.md)
 - [RowNumberCellRenderer](classes/RowNumberCellRenderer.md)
 - [RowNumberColumnDef](classes/RowNumberColumnDef.md)
 - [RowNumberOptions](classes/RowNumberOptions.md)
@@ -194,6 +198,9 @@
 - [CrudOptionsIf](interfaces/CrudOptionsIf.md)
 - [DefaultRowHeightsIf](interfaces/DefaultRowHeightsIf.md)
 - [DerivedValuesChangeIf](interfaces/DerivedValuesChangeIf.md)
+- [DetailRenderContextIf](interfaces/DetailRenderContextIf.md)
+- [DetailRendererIf](interfaces/DetailRendererIf.md)
+- [DetailTableParamsIf](interfaces/DetailTableParamsIf.md)
 - [DomServiceIf](interfaces/DomServiceIf.md)
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
 - [EventListenerIf](interfaces/EventListenerIf.md)
@@ -209,6 +216,8 @@
 - [HasDefaultRowHeightIf](interfaces/HasDefaultRowHeightIf.md)
 - [HeaderGroupOptionsIf](interfaces/HeaderGroupOptionsIf.md)
 - [IconIf](interfaces/IconIf.md)
+- [MasterDetailOptionsIf](interfaces/MasterDetailOptionsIf.md)
+- [NestedTableScopeIf](interfaces/NestedTableScopeIf.md)
 - [ObjectArrayHolderIf](interfaces/ObjectArrayHolderIf.md)
 - [OnActionTriggeredIf](interfaces/OnActionTriggeredIf.md)
 - [OverlayKindInput](interfaces/OverlayKindInput.md)
@@ -277,6 +286,8 @@
 - [CellChangeSource](modules.md#cellchangesource)
 - [CellValidator](modules.md#cellvalidator)
 - [CheckedType](modules.md#checkedtype)
+- [DetailHeightType](modules.md#detailheighttype)
+- [DetailRenderFnType](modules.md#detailrenderfntype)
 - [DivScope](modules.md#divscope)
 - [ExtendedSelectionType](modules.md#extendedselectiontype)
 - [FillDirection](modules.md#filldirection)
@@ -289,6 +300,7 @@
 - [FormulaNode](modules.md#formulanode)
 - [FormulaValue](modules.md#formulavalue)
 - [GeBatchEditEventType](modules.md#gebatchediteventtype)
+- [GeDetailEventSource](modules.md#gedetaileventsource)
 - [GeOverlayKind](modules.md#geoverlaykind)
 - [GeRowDragEventType](modules.md#gerowdrageventtype)
 - [GeRowDragSource](modules.md#gerowdragsource)
@@ -298,6 +310,7 @@
 - [GetT](modules.md#gett)
 - [HtmlStyle](modules.md#htmlstyle)
 - [IsSameFn](modules.md#issamefn)
+- [NestedTableScopeFactory](modules.md#nestedtablescopefactory)
 - [PendingChangeResult](modules.md#pendingchangeresult)
 - [PivotValue](modules.md#pivotvalue)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
@@ -1696,7 +1709,7 @@ if (tableApi.getOverlayState() === "noMatches") {
 
 ### TableStatePart
 
-Ƭ **TableStatePart**: ``"columns"`` \| ``"sort"`` \| ``"scroll"`` \| ``"tree"`` \| ``"checked"`` \| ``"selection"`` \| ``"headerGroups"`` \| ``"custom"``
+Ƭ **TableStatePart**: ``"columns"`` \| ``"sort"`` \| ``"scroll"`` \| ``"tree"`` \| ``"checked"`` \| ``"selection"`` \| ``"headerGroups"`` \| ``"custom"`` \| ``"details"``
 
 One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or apply only some parts:
 `tableApi.getState(["columns", "sort"])`.
@@ -1711,6 +1724,7 @@ One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or appl
 | `selection` | selected rows, columns, cells or ranges | `autoRestoreSelectedState` |
 | `headerGroups` | collapsed header groups | `autoRestoreHeaderGroupState` |
 | `custom` | data of your application ([TableApi.setCustomState](classes/TableApi.md#setcustomstate)) | `autoRestoreCustomState` |
+| `details` | expanded detail rows of master/detail (since 1.1.97) | `autoRestoreDetailState` |
 
 **`Since`**
 
@@ -1718,7 +1732,7 @@ One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or appl
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L29)
+[src/lib/table/state/table-state.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L30)
 
 ___
 
@@ -4257,6 +4271,86 @@ isSameCellValue(undefined, "");                                 // true
 
 [src/lib/table/batch-edit/pending-cell-changes.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L47)
 
+## Master/detail
+
+### DetailHeightType
+
+Ƭ **DetailHeightType**: `number` \| ``"auto"``
+
+The height of a detail row: px, or `"auto"` = measured from its content (a `ResizeObserver` follows changes).
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/master-detail/master-detail-options.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-options.if.ts#L9)
+
+___
+
+### DetailRenderFnType
+
+Ƭ **DetailRenderFnType**\<`T`\>: (`container`: `HTMLDivElement`, `row`: `T`, `context`: [`DetailRenderContextIf`](interfaces/DetailRenderContextIf.md)\<`T`\>) => () => `void` \| `void`
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Type declaration
+
+▸ (`container`, `row`, `context`): () => `void` \| `void`
+
+Renders the content of a detail row – a function (see [DetailRendererIf](interfaces/DetailRendererIf.md)). It may return a cleanup function,
+called when the detail row is destroyed (collapsed, too many rendered details, new table model).
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `container` | `HTMLDivElement` |
+| `row` | `T` |
+| `context` | [`DetailRenderContextIf`](interfaces/DetailRenderContextIf.md)\<`T`\> |
+
+##### Returns
+
+() => `void` \| `void`
+
+**`Example`**
+
+```ts
+const renderDetail: DetailRenderFnType<Order> = (container, order) => {
+  container.textContent = `${order.items.length} items, ordered on ${order.date}`;  // textContent: no HTML injection
+};
+```
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/master-detail/detail-renderer.if.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/detail-renderer.if.ts#L79)
+
+___
+
+### GeDetailEventSource
+
+Ƭ **GeDetailEventSource**: ``"mouse"`` \| ``"keyboard"`` \| ``"api"`` \| ``"state"``
+
+What opened or closed a detail row: a click on the icon (`"mouse"`), Enter (`"keyboard"`), the [TableApi](classes/TableApi.md)
+(`"api"`) or a restored table state (`"state"`).
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-detail-event.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-detail-event.ts#L8)
+
 ## DOM
 
 ### HtmlStyle
@@ -4734,6 +4828,39 @@ The modified string with the suffix removed, or the original string if no suffix
 [src/lib/common/generator/string-util.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/string-util.ts#L31)
 
 ## Internals
+
+### NestedTableScopeFactory
+
+Ƭ **NestedTableScopeFactory**: (`host`: `HTMLDivElement`, `tableModel`: [`TableModelIf`](interfaces/TableModelIf.md), `tableOptions`: [`TableOptionsIf`](interfaces/TableOptionsIf.md) \| `undefined`, `eventListener`: [`EventListenerIf`](interfaces/EventListenerIf.md) \| `undefined`) => [`NestedTableScopeIf`](interfaces/NestedTableScopeIf.md)
+
+#### Type declaration
+
+▸ (`host`, `tableModel`, `tableOptions`, `eventListener`): [`NestedTableScopeIf`](interfaces/NestedTableScopeIf.md)
+
+Creates the [TableScope](classes/TableScope.md) of a nested table (given by `TableScope` – no import cycle).
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `host` | `HTMLDivElement` |
+| `tableModel` | [`TableModelIf`](interfaces/TableModelIf.md) |
+| `tableOptions` | [`TableOptionsIf`](interfaces/TableOptionsIf.md) \| `undefined` |
+| `eventListener` | [`EventListenerIf`](interfaces/EventListenerIf.md) \| `undefined` |
+
+##### Returns
+
+[`NestedTableScopeIf`](interfaces/NestedTableScopeIf.md)
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/master-detail/master-detail-service.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L32)
+
+___
 
 ### PendingChangeResult
 

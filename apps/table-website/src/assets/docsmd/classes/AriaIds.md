@@ -36,6 +36,7 @@ ids.liveRegion();                 // "ge-orders-live"
 ### Methods
 
 - [cell](AriaIds.md#cell)
+- [detailRowGroup](AriaIds.md#detailrowgroup)
 - [liveRegion](AriaIds.md#liveregion)
 - [rowGroup](AriaIds.md#rowgroup)
 - [createPrefix](AriaIds.md#createprefix)
@@ -98,6 +99,28 @@ e.g. `"ge-t1-body-r5-c2"`
 
 ___
 
+### detailRowGroup
+
+▸ **detailRowGroup**(): `string`
+
+The ID of the row group of the detail rows (master/detail), referenced by `aria-owns` of the host.
+
+#### Returns
+
+`string`
+
+e.g. `"ge-t1-rg-detail"`
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/aria/aria-ids.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L75)
+
+___
+
 ### liveRegion
 
 ▸ **liveRegion**(): `string`
@@ -112,7 +135,7 @@ e.g. `"ge-t1-live"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-ids.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L74)
+[src/lib/table/aria/aria-ids.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L84)
 
 ___
 

@@ -11,4 +11,4 @@ import { TableStatePart } from "./table-state.if";
  * @since 1.1.92
  */
 export const ALL_TABLE_STATE_PARTS: readonly TableStatePart[] = Object.freeze(
-  ["headerGroups", "columns", "tree", "sort", "checked", "selection", "scroll", "custom"] as TableStatePart[]);
+  ["headerGroups", "columns", "tree", "sort", "checked", "selection", "details", "scroll", "custom"] as TableStatePart[]);

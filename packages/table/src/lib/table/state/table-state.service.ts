@@ -38,11 +38,13 @@ const PART_FLAGS: Record<TableStatePart, keyof AutoRestoreOptionsIf<unknown>> = 
   checked: "autoRestoreCheckedState",
   selection: "autoRestoreSelectedState",
   scroll: "autoRestoreScrollPosition",
-  custom: "autoRestoreCustomState"
+  custom: "autoRestoreCustomState",
+  details: "autoRestoreDetailState"
 };
 
 /** The field of a {@link TableStateIf} that holds a part. */
-const fieldOf = (part: TableStatePart): keyof TableStateIf => part === "checked" ? "checkedRowIds" : part;
+const fieldOf = (part: TableStatePart): keyof TableStateIf =>
+  part === "checked" ? "checkedRowIds" : part === "details" ? "detailRowIds" : part;
 
 /** The header model of grouped headers (duck typing – `instanceof` fails across package copies). */
 interface ToggleGroupHeaderModel {
@@ -163,6 +165,7 @@ export class TableStateService {
     if (start.sort) this.applySort(start.sort);
     if (start.checkedRowIds) this.applyChecked(start.checkedRowIds);
     if (start.selection) this.applySelection(start.selection);
+    if (start.detailRowIds) this.applyDetails(start.detailRowIds);
     if ("custom" in start) this.custom = start.custom;
   }
 
@@ -232,6 +235,10 @@ export class TableStateService {
     if (has("selection")) {
       this.applySelection(state.selection!);
       applied.push("selection");
+    }
+    if (has("details")) {
+      this.applyDetails(state.detailRowIds!);
+      applied.push("details");
     }
     if (parts.includes("custom") && "custom" in state) {
       this.custom = state.custom;
@@ -534,6 +541,11 @@ export class TableStateService {
       case "custom":
         if (this.custom !== undefined) state.custom = this.custom;
         break;
+      case "details": {
+        const details = this.computeDetails();
+        if (details) state.detailRowIds = details;
+        break;
+      }
     }
   }
 
@@ -617,6 +629,39 @@ export class TableStateService {
       if (id !== undefined) ret.push(id);
     }
     return ret;
+  }
+
+  /** The ids of the expanded master rows (master/detail, since 1.1.97); `undefined` without master/detail. */
+  private computeDetails(): TableStateRowId[] | undefined {
+    const service = this.scope.masterDetailService;
+    if (!service?.isActive()) {
+      return undefined;
+    }
+    const warn = this.warns("details");
+    const ret: TableStateRowId[] = [];
+    for (const row of service.getExpandedRows()) {
+      const id = this.idOfRow(row, -1, warn);
+      if (id !== undefined) ret.push(id);
+    }
+    return ret;
+  }
+
+  /** Expands exactly the master rows with these ids (master/detail, since 1.1.97). */
+  private applyDetails(ids: TableStateRowId[]): void {
+    const service = this.scope.masterDetailService;
+    if (!service?.isActive() || !Array.isArray(ids)) {
+      return;
+    }
+    const wanted = new Set<TableStateRowId>(ids);
+    const body = this.body();
+    const holder = body as AreaModelIf & { getAllRows?: () => unknown[] };
+    const rows = holder.getAllRows
+      ? holder.getAllRows()
+      : Array.from({ length: body.getRowCount() }, (_, i) => body.getRowByIndex(i));
+    service.setExpandedRows(rows.filter((row, i) => {
+      const id = this.idOfRow(row, holder.getAllRows ? -1 : i, false);
+      return id !== undefined && wanted.has(id);
+    }), "state");
   }
 
   private computeSelection(): TableSelectionStateIf | undefined {

@@ -28,7 +28,10 @@ import {
   CellChangeIf, CellChangeSource, CellValueChangeIf, FillDirection, FillValueContextIf, FillHandleOptionsIf,
   FillHandleOptions, FillMode, computeFillValues, isFillSeries, FillRequestIf, computeFillChanges, getFillRange,
   FillHandleService, BatchEditOptionsIf, BatchEditOptions, PendingCellIf, PendingChangeResult, isSameCellValue,
-  PendingCellChanges, BatchEditService, GeBatchEditEvent, GeBatchEditEventType, CellValidator
+  PendingCellChanges, BatchEditService, GeBatchEditEvent, GeBatchEditEventType, CellValidator,
+  RowLayout, MasterDetailOptions, MasterDetailOptionsIf, DetailHeightType, DetailRendererIf, DetailRenderFnType,
+  DetailRenderContextIf, DetailTableParamsIf, MasterDetailService, NestedTableScopeIf, NestedTableScopeFactory,
+  GeDetailEvent, GeDetailEventSource
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -38,7 +41,9 @@ declare const select: HTMLSelectElement;
 declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, editButton: HTMLButtonElement;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
-  category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled"; }
+  category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled";
+  items: Item[]; notes?: string; }
+declare const newItem: Item;
 interface OrderNode { id: string; label: string; orders: number; total: number; children?: OrderNode[] }
 declare const tableApi: TableApi;
 declare const tableModel: TableModelIf;

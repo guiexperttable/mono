@@ -51,6 +51,7 @@ const DEMOS = {
   "row-drag": { slug: "events-and-context-menu", button: "move down" },
   "fill-batch": { slug: "inline-editing", fillDown: 4 },
   "pivot-tables": { slug: "pivot-tables", button: "expand all" },
+  "master-detail": { slug: "master-detail", wait: 900, toggleDetail: 3 },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
 
@@ -107,6 +108,10 @@ for (const theme of ["light", "dark"]) {
         await page.mouse.up();
         await page.waitForTimeout(300);
       }
+    }
+    if (step.toggleDetail !== undefined) {                // open the detail row of a master row (▸)
+      await demo.locator(`.td-host .ge-table-detail-toggle[data-row-index="${step.toggleDetail}"]`).first().click();
+      await page.waitForTimeout(400);
     }
     if (step.contextmenu) {
       const box = await demo.locator(cell(...step.contextmenu)).first().boundingBox();

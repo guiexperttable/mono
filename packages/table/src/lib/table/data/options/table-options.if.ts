@@ -1,3 +1,4 @@
+import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
@@ -389,6 +390,24 @@ export interface TableOptionsIf {
    * @since 1.1.96
    */
   batchEdit?: boolean | Partial<BatchEditOptionsIf>;
+
+  /**
+   * Master/detail: master rows get an expand icon; below an expanded row a detail row over the full width shows any
+   * content (a nested table, a form, a framework component – see {@link MasterDetailOptionsIf}). Only for flat body
+   * models. Fields you leave out keep their default ({@link MasterDetailOptions}); `detailRenderer` is required.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   masterDetail: {
+   *     detailHeight: "auto",
+   *     detailRenderer: (container, row) => { container.textContent = `Notes: ${row.notes}`; }
+   *   }
+   * };
+   *
+   * @since 1.1.97
+   */
+  masterDetail?: Partial<MasterDetailOptionsIf>;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

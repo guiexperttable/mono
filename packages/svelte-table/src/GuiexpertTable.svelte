@@ -67,6 +67,11 @@
    * @type {((evt: import("@guiexpert/table").GeBatchEditEvent) => void) | undefined}
    */
   export let onBatchEditChanged = undefined;
+  /**
+   * Master/detail (since 1.1.97): a detail row was expanded or collapsed.
+   * @type {((evt: import("@guiexpert/table").GeDetailEvent) => void) | undefined}
+   */
+  export let onDetailExpandedChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -92,7 +97,8 @@
     onRowDragStart: (evt) => { dispatch("rowDragStart", evt); onRowDragStart?.(evt); },
     onRowDragMove: (evt) => { dispatch("rowDragMove", evt); onRowDragMove?.(evt); },
     onRowDragEnd: (evt) => { dispatch("rowDragEnd", evt); onRowDragEnd?.(evt); },
-    onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); }
+    onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); },
+    onDetailExpandedChanged: (evt) => { dispatch("detailExpandedChanged", evt); onDetailExpandedChanged?.(evt); }
   };
 
   /**

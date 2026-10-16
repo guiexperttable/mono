@@ -192,4 +192,20 @@ export interface AriaTextsIf {
    * @since 1.1.96
    */
   invalidValue?(message: string): string;
+
+  /**
+   * Announced after a detail row was expanded (master/detail).
+   *
+   * @returns {string} default: `"Details expanded"`
+   * @since 1.1.97
+   */
+  detailExpanded?(): string;
+
+  /**
+   * Announced after a detail row was collapsed (master/detail).
+   *
+   * @returns {string} default: `"Details collapsed"`
+   * @since 1.1.97
+   */
+  detailCollapsed?(): string;
 }

@@ -22,12 +22,13 @@ export type TableStateRowId = string | number;
  * | `selection` | selected rows, columns, cells or ranges | `autoRestoreSelectedState` |
  * | `headerGroups` | collapsed header groups | `autoRestoreHeaderGroupState` |
  * | `custom` | data of your application ({@link TableApi.setCustomState}) | `autoRestoreCustomState` |
+ * | `details` | expanded detail rows of master/detail (since 1.1.97) | `autoRestoreDetailState` |
  *
  * @category State
  * @since 1.1.92
  */
 export type TableStatePart =
-  "columns" | "sort" | "scroll" | "tree" | "checked" | "selection" | "headerGroups" | "custom";
+  "columns" | "sort" | "scroll" | "tree" | "checked" | "selection" | "headerGroups" | "custom" | "details";
 
 /**
  * The state of a table as plain JSON: column layout, sorting, scroll position, tree, checked and selected rows,
@@ -75,6 +76,8 @@ export interface TableStateIf {
   tree?: TableTreeStateIf;
   /** The ids of the checked rows. */
   checkedRowIds?: TableStateRowId[];
+  /** The ids of the master rows with an expanded detail row (master/detail). @since 1.1.97 */
+  detailRowIds?: TableStateRowId[];
   /** The selection. */
   selection?: TableSelectionStateIf;
   /** The state of the header groups with a toggle. */

@@ -37,6 +37,8 @@ texts.filtered(42);    // "42 rows" (default)
 - [collapseGroup](AriaTexts.md#collapsegroup)
 - [commitBlocked](AriaTexts.md#commitblocked)
 - [copied](AriaTexts.md#copied)
+- [detailCollapsed](AriaTexts.md#detailcollapsed)
+- [detailExpanded](AriaTexts.md#detailexpanded)
 - [expandGroup](AriaTexts.md#expandgroup)
 - [fillTooLarge](AriaTexts.md#filltoolarge)
 - [filtered](AriaTexts.md#filtered)
@@ -146,7 +148,7 @@ default: `"3 changes saved"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L107)
+[src/lib/table/aria/aria-texts.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L115)
 
 ___
 
@@ -172,7 +174,7 @@ default: `"Changes discarded"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L111)
+[src/lib/table/aria/aria-texts.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L119)
 
 ___
 
@@ -232,7 +234,7 @@ default: `"2 invalid values – nothing saved"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L115)
+[src/lib/table/aria/aria-texts.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L123)
 
 ___
 
@@ -261,6 +263,58 @@ default: `"12 cells copied"`, `"1 cell copied"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L50)
+
+___
+
+### detailCollapsed
+
+▸ **detailCollapsed**(): `string`
+
+Announced after a detail row was collapsed (master/detail).
+
+#### Returns
+
+`string`
+
+default: `"Details collapsed"`
+
+**`Since`**
+
+1.1.97
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[detailCollapsed](../interfaces/AriaTextsIf.md#detailcollapsed)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L102)
+
+___
+
+### detailExpanded
+
+▸ **detailExpanded**(): `string`
+
+Announced after a detail row was expanded (master/detail).
+
+#### Returns
+
+`string`
+
+default: `"Details expanded"`
+
+**`Since`**
+
+1.1.97
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[detailExpanded](../interfaces/AriaTextsIf.md#detailexpanded)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L98)
 
 ___
 
@@ -320,7 +374,7 @@ default: `"Too many cells to fill (at most 100000)"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L98)
+[src/lib/table/aria/aria-texts.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L106)
 
 ___
 
@@ -380,7 +434,7 @@ default: `"Invalid value: <message>"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L119)
+[src/lib/table/aria/aria-texts.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L127)
 
 ___
 
@@ -412,7 +466,7 @@ default: `"3 changes not saved"`, `"No unsaved changes"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-texts.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L102)
+[src/lib/table/aria/aria-texts.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L110)
 
 ___
 

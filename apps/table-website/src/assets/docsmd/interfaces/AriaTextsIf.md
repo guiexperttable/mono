@@ -46,6 +46,8 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 - [collapseGroup](AriaTextsIf.md#collapsegroup)
 - [commitBlocked](AriaTextsIf.md#commitblocked)
 - [copied](AriaTextsIf.md#copied)
+- [detailCollapsed](AriaTextsIf.md#detailcollapsed)
+- [detailExpanded](AriaTextsIf.md#detailexpanded)
 - [expandGroup](AriaTextsIf.md#expandgroup)
 - [fillTooLarge](AriaTextsIf.md#filltoolarge)
 - [filtered](AriaTextsIf.md#filtered)
@@ -231,6 +233,50 @@ default: `"12 cells copied"`, `"1 cell copied"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L51)
+
+___
+
+### detailCollapsed
+
+▸ **detailCollapsed**(): `string`
+
+Announced after a detail row was collapsed (master/detail).
+
+#### Returns
+
+`string`
+
+default: `"Details collapsed"`
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L210)
+
+___
+
+### detailExpanded
+
+▸ **detailExpanded**(): `string`
+
+Announced after a detail row was expanded (master/detail).
+
+#### Returns
+
+`string`
+
+default: `"Details expanded"`
+
+**`Since`**
+
+1.1.97
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:202](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L202)
 
 ___
 

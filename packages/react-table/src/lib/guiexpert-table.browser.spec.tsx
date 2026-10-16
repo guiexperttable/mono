@@ -1,16 +1,18 @@
 // Smoke test of the React wrapper in Chromium: mount → tableReady → rows → click → new model → unmount.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
-import type { GeBatchEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
+import type { GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
+import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
+import type { DetailComponentProps } from './detail-component-renderer-wrapper';
 import {
-  bodyCell, cellOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -43,6 +45,57 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (React)', () => {
+
+  it('master/detail: a React component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
+    const unmounted = vi.fn();
+    function Detail({ row }: DetailComponentProps<{ id: number }>) {
+      const [clicks, setClicks] = useState(0);
+      useEffect(() => () => unmounted(row.id), [row]);
+      return <button className="md-btn" onClick={() => setClicks(c => c + 1)}>{`clicks ${clicks} of ${row.id}`}</button>;
+    }
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 60, detailRenderer: new DetailComponentRendererWrapper(Detail) } };
+    const tableModel = createModel(300);
+    const detailExpandedChanged = vi.fn<(evt: GeDetailEvent) => void>();
+    let api: TableApi | undefined;
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={a => { api = a; }}
+                                       detailExpandedChanged={detailExpandedChanged} />);
+    await nextFrame();
+    act(() => clickDetailToggle(host, 0));
+    await nextFrame();
+    await vi.waitFor(() => expect(host.querySelector('.md-btn')?.textContent).toBe('clicks 0 of 0'));
+    act(() => host.querySelector<HTMLButtonElement>('.md-btn')!.click());
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');
+
+    act(() => api!.scrollToIndex(0, 200));
+    await nextFrame();
+    expect(detailRowsOf(host)[0].classList).toContain('ge-table-detail-row-parked');
+    act(() => api!.scrollToIndex(0, 0));
+    await nextFrame();
+    expect(host.querySelector('.md-btn')!.textContent).toBe('clicks 1 of 0');  // the state survived scrolling
+    expect(unmounted).not.toHaveBeenCalled();
+
+    act(() => { api!.setDetailExpanded(0, false); });
+    await vi.waitFor(() => expect(unmounted).toHaveBeenCalledWith(0));
+    expect(detailRowsOf(host)).toHaveLength(0);
+    expect(detailExpandedChanged.mock.calls.map(c => [c[0].expanded, c[0].source])).toEqual([[true, 'mouse'], [false, 'api']]);
+  });
+
+  it('master/detail: unmounting the table unmounts the detail components', async () => {
+    const unmounted = vi.fn();
+    function Detail() {
+      useEffect(() => () => unmounted(), []);
+      return <span className="md-detail">detail</span>;
+    }
+    const tableOptions = { ...new TableOptions(), masterDetail: { detailHeight: 40, detailRenderer: new DetailComponentRendererWrapper(Detail) } };
+    let api: TableApi | undefined;
+    const host = mount(<GuiexpertTable tableModel={createModel(20)} tableOptions={tableOptions} tableReady={a => { api = a; }} />);
+    await nextFrame();
+    act(() => { api!.setDetailExpanded(1, true); });
+    await nextFrame();
+    await vi.waitFor(() => expect(host.querySelector('.md-detail')).not.toBeNull());
+    unmount();
+    await vi.waitFor(() => expect(unmounted).toHaveBeenCalledTimes(1));
+  });
 
   it('fires tableReady once with a TableApi and renders the rows', async () => {
     const tableReady = vi.fn<(api: TableApi) => void>();

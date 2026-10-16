@@ -497,7 +497,9 @@ export class RowDragService {
     const indicator = this.indicator!;
     const host = this.tableScope.hostElement;
     const hostRect = host.getBoundingClientRect();
-    ghost.style.left = `${evt.clientX - hostRect.left - host.clientLeft + 12}px`;
+    const dom = this.tableScope.getDomService();
+    // beside the pointer, towards the end of the row (right-to-left: left of the pointer)
+    dom.setStyle(ghost, "left", `${this.tableScope.clientXToHostX(evt.clientX) + 12}px`);
     ghost.style.top = `${evt.clientY - hostRect.top - host.clientTop + 8}px`;
     host.classList.toggle("ge-table-row-drag-invalid", !session.target && !session.outside);
 
@@ -520,9 +522,9 @@ export class RowDragService {
     // only inside the body (a marker over the header or footer would be confusing)
     const visible = top + lineHeight >= offsetTop && top <= offsetTop + viewport.height;
     indicator.classList.toggle("ge-table-row-drop-indicator-inside", inside);
-    Object.assign(indicator.style, {
+    dom.applyStyle(indicator, {
       display: visible ? "block" : "none",
-      left: `${viewport.left - hostRect.left - host.clientLeft}px`,
+      left: "0px", // the start of the body (right-to-left: written as "right")
       width: `${this.getMarkerWidth(viewport.width)}px`,
       top: `${top}px`,
       height: `${lineHeight}px`

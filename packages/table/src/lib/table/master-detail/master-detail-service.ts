@@ -1,3 +1,4 @@
+import { canScrollHorizontally } from "../rtl/rtl-util";
 import type { TableScope } from "../table-scope";
 import type { TableApi } from "../table-api";
 import type { TableModelIf } from "../data/tablemodel/table-model.if";
@@ -514,7 +515,7 @@ export class MasterDetailService {
       return;
     }
     const style = layer.style;
-    style.left = `${left}px`;
+    this.scope.getDomService().setStyle(layer, "left", `${left}px`); // from the start (right-to-left: "right")
     style.top = `${top}px`;
     style.width = `${Math.max(0, width)}px`;
     style.height = `${Math.max(0, height)}px`;
@@ -897,7 +898,7 @@ export class MasterDetailService {
           }
         }
         if (dx && /(auto|scroll)/.test(style.overflowX) && element.scrollWidth > element.clientWidth) {
-          if (dx > 0 ? element.scrollLeft + element.clientWidth < element.scrollWidth - 1 : element.scrollLeft > 0) {
+          if (canScrollHorizontally(element, dx, style.direction === "rtl")) { // also right-to-left (1.1.98)
             return true;
           }
         }

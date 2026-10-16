@@ -97,7 +97,7 @@ export class FillHandleService {
     }
     const handle = this.ensureHandle();
     handle.style.display = "block";
-    handle.style.left = `${rect.x}px`;
+    scope.getDomService().setStyle(handle, "left", `${rect.x}px`); // from the start (right-to-left: "right")
     handle.style.top = `${rect.y}px`;
     if (this.session) {
       this.renderPreview();
@@ -256,7 +256,7 @@ export class FillHandleService {
     const scope = this.tableScope;
     const host = scope.hostElement;
     const hostRect = host.getBoundingClientRect();
-    const x = evt.clientX - hostRect.left - host.clientLeft;
+    const x = scope.clientXToHostX(evt.clientX); // from the start of the row (right-to-left: from the right edge)
     const y = evt.clientY - hostRect.top - host.clientTop;
     const [row, column] = scope.getBodyCellAtHostPoint(x, y);
     const src = session.source;
@@ -287,9 +287,9 @@ export class FillHandleService {
     const bottom = Math.min(bottomRight.top + bottomRight.height, bottomRight.clipBottom);
     const left = Math.max(topLeft.left, topLeft.clipLeft);
     const right = Math.min(bottomRight.left + bottomRight.width, bottomRight.clipRight);
-    Object.assign(preview.style, {
+    scope.getDomService().applyStyle(preview, {
       display: bottom > top && right > left ? "block" : "none",
-      left: `${left}px`,
+      left: `${left}px`, // from the start (right-to-left: written as "right")
       top: `${top}px`,
       width: `${Math.max(0, right - left)}px`,
       height: `${Math.max(0, bottom - top)}px`
@@ -338,11 +338,12 @@ export class FillHandleService {
     const stepX = Math.trunc(dx);
     session.remainderY = dy - stepY;
     session.remainderX = dx - stepX;
+    const scope = this.tableScope;
     const beforeTop = viewport.scrollTop;
-    const beforeLeft = viewport.scrollLeft;
+    const beforeLeft = scope.getViewportScrollLeft(); // speedX is logical: > 0 = towards the end of the row
     viewport.scrollTop = beforeTop + stepY;
-    viewport.scrollLeft = beforeLeft + stepX;
-    if (viewport.scrollTop !== beforeTop || viewport.scrollLeft !== beforeLeft) {
+    scope.setViewportScrollLeft(beforeLeft + stepX);
+    if (viewport.scrollTop !== beforeTop || scope.getViewportScrollLeft() !== beforeLeft) {
       this.tableScope.adjustAfterScrolling(); // render now – the cells under the pointer changed
     }
     this.updateTarget(session.lastEvent!);

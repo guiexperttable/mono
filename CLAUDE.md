@@ -111,6 +111,11 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 ### 3.2 Layout: 3 × 3 Areas
 - `AreaIdent = "header" | "body" | "footer"` × `SideIdent = "west" | "center" | "east"` → 9 Areas.
 - West/East = fixierte Spalten (`fixedLeftColumnCount` / `fixedRightColumnCount` im **Model**, nicht in den Options).
+  Seit 1.1.98 heißt „west“ **Anfang** der Zeile, „east“ Ende: in RTL (`direction: "rtl"`) steht west rechts (§ 3.6 „RTL“).
+- **Alle x-Positionen sind logisch** (Abstand vom Zeilenanfang): `ConvenienceDomService` schreibt sie in LTR als `left`,
+  in RTL als `right` (`setDirection`, `toPhysicalStyleKey`). Neue Positionierungen immer über `dom.setStyle`/`applyStyle`/
+  `applyStyleInPx` mit `left`, nie `element.style.left`; `scrollLeft` nur über `getViewportScrollLeft()`/
+  `setViewportScrollLeft()`, Maus-x über `clientXToHostX()`.
 - Ein `scrollViewport` mit riesigem `contentWrapperDiv` (Höhe = Summe aller Zeilenhöhen) liefert die native Scrollbar;
   der sichtbare `contentDiv` wird mitgeschoben.
 
@@ -400,6 +405,23 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `refreshDetail`, `getDetailElement`; `ensureRowIsVisible` richtet mit Details pixelgenau aus. Wrapper:
   `DetailComponentRendererWrapper` (React, Preact, Vue, Svelte, Solid), Angular `DetailRenderWrapperFactory` +
   `DetailComponentRendererIf`; Event `detailExpandedChanged`. CSS `css/table-master-detail.css`, `--ge-table-detail-*`.
+- **Rechts-nach-links (seit 1.1.98, `rtl/`, Design `prompts/012-rtl.design.md`)**: `tableOptions.direction` `"ltr"`
+  (Default) | `"rtl"` | `"auto"` (`resolveTableDirection`: berechnetes `direction` des Hosts **vor** dem Setzen von `dir`,
+  ohne Dokument das nächste `[dir]`), einmal in `EleScope` ausgewertet (`scope.direction`, `isRtl()`, `api.getDirection()`);
+  der Host bekommt `dir` (auch `"ltr"`; `destroy()` stellt den alten Wert her). Strategie: Rechnungen bleiben logisch,
+  `ConvenienceDomService` tauscht beim Schreiben `left` ↔ `right` (Host → Area → Zeile → Zelle, also der ganze Baum; eigene
+  Styles der App über `getCustomStyleAt` gehen ungespiegelt an `domService`). Scroll-Container in RTL: Inhalt rechts, läuft
+  nach links über, `contentDiv` mit `right: <logisches scrollLeft>`. `rtl/rtl-util.ts` (DOM-frei, exportiert):
+  `getLogicalScrollLeft`/`setLogicalScrollLeft`/`toPhysicalScrollLeft` (RTL-`scrollLeft` 0 … negativ, CSSOM View),
+  `canScrollHorizontally` (Mausrad-Weitergabe Master/Detail), `toLogicalX`, `mirrorArrowKeys` (`ShortcutService` tauscht
+  ←/→ **vor** dem Mapping: `NAVIGATE_LEFT` = rückwärts). Spaltenbreite: `start − draggingX` (`GeMouseEvent.draggingX` bleibt
+  physisch). API-Positionen vom Anfang: `scrollToPixel`, `GeScrollEvent.scrollLeft`, Zustand `scroll.left`. Excel:
+  `ExcelExportOptionsIf.rightToLeft` (4. Parameter `downloadExcel`, `<sheetView rightToLeft="1">`), `api.downloadExcel` setzt
+  ihn. CSS logisch (`padding-inline-*`, `text-align: start/end`; `ge-table-text-align-left/-right` = Anfang/Ende, neu
+  `-start/-end`), RTL-Regeln `.ge-table[dir="rtl"]` (Baumpfeil aufgeklappt, Detail-Dreieck, Pending-Marke), Klasse
+  `ge-table-text-plaintext` (Latein mit Satzzeichen in RTL). Verschachtelte Master/Detail-Tabellen erben die Richtung.
+  Browser-Specs: `rtl/rtl.browser.spec.ts` (R1–R15) + `describe.each(DIRECTIONS)` in `horizontal-scrolling`,
+  `scroll-to-index`, `column-visibility`, `spans-and-header-groups` (Helfer `startPx`, `DIRECTIONS`).
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -418,7 +440,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `externalFilterFunction`, `sortedOptions`, `sortOrder`, `autoRestoreOptions`, `getEditRenderer`,
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
-`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`.
+`stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
+seit 1.1.98 `direction`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -440,7 +463,8 @@ ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
 (`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`) – und je Wrapper `DetailComponentRendererWrapper`
-(Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`).
+(Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`). `direction` (1.1.98) ist eine Option wie jede
+andere: kein Wrapper-Code, ein neues Options-Objekt baut neu auf (Smoke-Tests React + Web Component).
 
 Der Host-Container braucht immer eine **feste Höhe** (z. B. `.table-div { height: 500px }`), sonst ist nichts zu sehen.
 
@@ -485,7 +509,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 570 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 583 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -496,8 +520,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | Befehl (`pnpm --filter @guiexpert/table …`) | Was |
   |---|---|
   | `test` | Unit + Browser |
-  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.150 Tests) |
-  | `test:browser` | echtes Chromium, ~840 Tests in 29 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:unit` / `test:watch` | nur Node, ~3 s (~2.170 Tests) |
+  | `test:browser` | echtes Chromium, ~930 Tests in 30 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
@@ -520,7 +544,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `TableScope`, `TableApi`, `MouseHandler`, Renderer, CRUD) ~96 % durch die Browser-Specs (`horizontal-scrolling`,
     `mouse-handler`, `renderer/renderer`, `editing`, `spans-and-header-groups`, `lifecycle`, `theming`, `tree-rendering`,
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
-    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch`, `master-detail/master-detail` …).
+    `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch`, `master-detail/master-detail`,
+    `rtl/rtl` …).
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
@@ -535,7 +560,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 35 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 36 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -631,6 +656,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 31 | Zeilen per Drag & Drop sortieren – mit Maus, Touch und Tastatur (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/09-zeilen-ziehen/`, Showcase `rowdrag`, Training-Kapitel `events-and-context-menu` (Abschnitt), `apps/table-demo/row-drag.html`, `instructions.md` 6.16 |
 | 32 | Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln, dann speichern | `videos/10-fill-handle-batch-edit/`, Showcase `batchedit`, Training-Kapitel `inline-editing` (Abschnitt), `apps/table-demo/fill-batch.html`, `instructions.md` 6.17 |
 | 33 | Master/Detail ohne Enterprise-Lizenz – Bestellung aufklappen, Positionen als zweite Tabelle, 100.000 Zeilen | `videos/11-master-detail/`, Showcase `masterdetail`, Training-Kapitel `master-detail`, `apps/table-demo/master-detail.html`, `instructions.md` 6.18 |
+| 34 | Arabisch, Hebräisch: Tabelle von rechts nach links – eine Option (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/12-rechts-nach-links/`, Showcase `rtl`, Training-Kapitel `theming-dark-mode` (Abschnitt), `apps/table-demo/rtl.html`, `instructions.md` 6.19 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

@@ -171,7 +171,7 @@ The dragged rows for a grabbed row: all rows with a selection if it is one of th
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:691](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L691)
+[src/lib/table/row-drag/row-drag-service.ts:693](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L693)
 
 ___
 
@@ -259,7 +259,7 @@ true if the key was used (a row with a drag handle has the focus)
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:622](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L622)
+[src/lib/table/row-drag/row-drag-service.ts:624](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L624)
 
 ___
 
@@ -286,4 +286,4 @@ the new display index of the first moved row, -1 if nothing moved
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:551](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L551)
+[src/lib/table/row-drag/row-drag-service.ts:553](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L553)

@@ -1,3 +1,4 @@
+import type { ResolvedTableDirection } from "./rtl/table-direction.type";
 import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 import { TableStateIf, TableStatePart } from "./state/table-state.if";
 import { SortState } from "./data/common/sort-state.type";
@@ -61,6 +62,7 @@ import { CellRange } from './data/common/cell-range';
  * | columns | {@link autoResizeColumns}, {@link setColumnWidth}, {@link recalcColumnWidths}, {@link getColumnIndex} |
  * | tree | {@link expandAll}, {@link collapseAll}, {@link setRowExpanded} |
  * | state | {@link getState}, {@link applyState}, {@link resetState} (with {@link TableOptionsIf.autoRestoreOptions}) |
+ * | right-to-left | {@link getDirection} (with {@link TableOptionsIf.direction}) |
  * | lifecycle | {@link destroy} |
  *
  * @example
@@ -243,7 +245,8 @@ export class TableApi {
    * This method allows programmatic scrolling of the table viewport to exact pixel positions.
    * It delegates the scrolling operation to the underlying TableScope instance.
    *
-   * @param {number} px - The horizontal pixel coordinate to scroll to. Defaults to 0 (leftmost position).
+   * @param {number} px - The horizontal pixel coordinate to scroll to: px from the start of the row – 0 = the first
+   *   column (leftmost position; right-to-left the rightmost, see {@link TableOptionsIf.direction}). Defaults to 0.
    * @param {number} py - The vertical pixel coordinate to scroll to. Defaults to 0 (topmost position).
    * @returns {void}
    *
@@ -258,7 +261,7 @@ export class TableApi {
    * @example
    * // Scroll only vertically, keeping the current horizontal position
    * // (an omitted or undefined px means 0; for rows use scrollToIndex(-1, rowIndex))
-   * tableApi.scrollToPixel(tableApi.getTableScope().scrollViewport.scrollLeft, 300);
+   * tableApi.scrollToPixel(tableApi.getTableScope().getViewportScrollLeft(), 300);
    *
    * @example
    * // Example in a component that needs precise scrolling control
@@ -289,6 +292,26 @@ export class TableApi {
    */
   scrollToPixel(px: number = 0, py: number = 0) {
     this.tableScope.scrollToPixel(px, py);
+  }
+
+  /**
+   * The writing direction of the table – {@link TableOptionsIf.direction} with `"auto"` already decided (from the page
+   * when the table was built).
+   *
+   * In `"rtl"` the first column is on the right; positions of the API stay "from the start": {@link scrollToPixel},
+   * {@link GeScrollEvent.scrollLeft} and the scroll part of {@link getState} count from the right edge.
+   *
+   * @returns {ResolvedTableDirection} `"ltr"` or `"rtl"`
+   *
+   * @example
+   * if (tableApi.getDirection() === "rtl") {
+   *   console.info("first column on the right");
+   * }
+   *
+   * @since 1.1.98
+   */
+  getDirection(): ResolvedTableDirection {
+    return this.tableScope.direction;
   }
 
 
@@ -984,7 +1007,11 @@ export class TableApi {
       }
     }
     // a custom ExcelServiceIf may return void – the API always returns a Promise
-    return Promise.resolve(this.tableScope.excelService.downloadExcel(matrix, fileName, author));
+    // a right-to-left table becomes a right-to-left sheet (column A on the right, since 1.1.98)
+    const options = this.tableScope.isRtl() ? { rightToLeft: true } : undefined;
+    return Promise.resolve(options
+      ? this.tableScope.excelService.downloadExcel(matrix, fileName, author, options)
+      : this.tableScope.excelService.downloadExcel(matrix, fileName, author));
   }
 
 

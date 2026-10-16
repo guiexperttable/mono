@@ -1,4 +1,5 @@
 
+import type { ExcelExportOptionsIf } from "./excel-export-options.if";
 import { ExcelServiceIf, isExcelFormattedValue } from './excel-service.if';
 
 let crcTable: Uint32Array | undefined;
@@ -81,13 +82,15 @@ export class ExcelService implements ExcelServiceIf {
    * @param {Array<Array<any>>} matrix - A 2D array representing the data to be included in the Excel file. Each inner array corresponds to a row in the sheet.
    * @param {string} [filename='file.xlsx'] - The name of the Excel file to be downloaded. Defaults to 'file.xlsx'.
    * @param {string} [author=''] - The author's name to include as metadata in the Excel file. Optional parameter.
+   * @param {ExcelExportOptionsIf} [options] - e.g. `{ rightToLeft: true }` for a sheet from right to left (since 1.1.98)
    * @return {void} Does not return a value.
    * @throws {Error} Throws an error if the input matrix is not a valid 2D array or if the filename is an empty string.
    */
   downloadExcel(
     matrix: Array<Array<any>>,
     filename: string = 'file.xlsx',
-    author: string=''): Promise<void> {
+    author: string='',
+    options: ExcelExportOptionsIf = {}): Promise<void> {
 
     if (!Array.isArray(matrix) || matrix.some(row => !Array.isArray(row))) {
       throw new Error('Invalid matrix format. Expected a 2D array.');
@@ -97,7 +100,7 @@ export class ExcelService implements ExcelServiceIf {
       throw new Error('Invalid filename. Filename must be a non-empty string.');
     }
 
-    return this.createExcelBlob(matrix, author)
+    return this.createExcelBlob(matrix, author, options)
       .then(blob => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -120,16 +123,20 @@ export class ExcelService implements ExcelServiceIf {
    * @example
    * const blob = await new ExcelService().createExcelBlob([["Name", "City"], ["Ann", "Berlin"]]);
    * await fetch("/api/upload", { method: "POST", body: blob });
+   *
+   * @example
+   * // a sheet from right to left (column A on the right), since 1.1.98
+   * const rtlBlob = await new ExcelService().createExcelBlob([["المدينة"], ["الرياض"]], "", { rightToLeft: true });
    */
-  async createExcelBlob(matrix: Array<Array<any>>, author: string = ''): Promise<Blob> {
-    const bytes = await this.createZipCompressed(this.generateMap(matrix, author));
+  async createExcelBlob(matrix: Array<Array<any>>, author: string = '', options: ExcelExportOptionsIf = {}): Promise<Blob> {
+    const bytes = await this.createZipCompressed(this.generateMap(matrix, author, options));
     return new Blob([bytes as any], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
   }
 
 
-  private generateMap(data: Array<Array<any>>, author: string=''):  Map<string, string> {
+  private generateMap(data: Array<Array<any>>, author: string='', options: ExcelExportOptionsIf = {}):  Map<string, string> {
 
     const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
@@ -162,7 +169,7 @@ export class ExcelService implements ExcelServiceIf {
     zip.set('xl/_rels/workbook.xml.rels', x1WorkbookXmlRels);
     zip.set('xl/theme/theme1.xml', x1ThemeTheme1Xml);
     const stylesXml = this.withNumberFormats(x1StylesXml, data); // before the sheet: it needs the style indices
-    zip.set('xl/worksheets/sheet1.xml', this.getX1WorksheetsSheet1Xml(data));
+    zip.set('xl/worksheets/sheet1.xml', this.getX1WorksheetsSheet1Xml(data, options));
 
     zip.set('xl/sharedStrings.xml', x1SharedStringsXml);
     zip.set('xl/styles.xml', stylesXml);
@@ -173,7 +180,7 @@ export class ExcelService implements ExcelServiceIf {
     return zip;
   }
 
-  private getX1WorksheetsSheet1Xml(data: Array<Array<any>>): string {
+  private getX1WorksheetsSheet1Xml(data: Array<Array<any>>, options: ExcelExportOptionsIf = {}): string {
     const columnCount = data.reduce((max, row) => Math.max(max, row.length), 1); // no spread: data may have millions of rows
     const dimension = data.length
       ? `A1:${this.getCellAddress(data.length - 1, columnCount - 1)}`
@@ -185,7 +192,7 @@ export class ExcelService implements ExcelServiceIf {
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac xr xr2 xr3" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr2="http://schemas.microsoft.com/office/spreadsheetml/2015/revision2" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" xr:uid="{E15F8FC4-4D40-434C-921A-3D9CFAAA2865}">
   <dimension ref="${dimension}"/>
   <sheetViews>
-  <sheetView tabSelected="1" workbookViewId="0"/></sheetViews>
+  <sheetView${options.rightToLeft ? ' rightToLeft="1"' : ''} tabSelected="1" workbookViewId="0"/></sheetViews>
   <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0.2"/>
   <sheetData>`);
 

@@ -58,6 +58,9 @@ This is the UI-agnostic table component for your next web app. 😊
   created lazily and kept while scrolling, fixed or measured height, keyboard (Enter, Tab) and screen readers
   (`aria-expanded`), `tableApi.setDetailExpanded()` / `expandAllDetails()`, stored with the table state
   (`tableOptions.masterDetail`) – since 1.1.97. Variable row heights use prefix sums (O(log n) per scroll frame)
+- Right-to-left (Arabic, Hebrew, Persian, Urdu): `tableOptions.direction: "rtl"` (or `"auto"` from the page) mirrors
+  the whole table – first column on the right, horizontal scrolling, fixed columns, tree indent, resize handles, fill
+  handle, row drag, master/detail, arrow keys; right-to-left Excel sheet – since 1.1.98
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

@@ -31,13 +31,13 @@ otherwise a service gets plain numbers (since 1.1.95).
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L17)
+[src/lib/table/service/excel-service.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L19)
 
 ## Methods
 
 ### downloadExcel
 
-▸ **downloadExcel**(`matrix`, `filename`, `author?`): `void` \| `Promise`\<`void`\>
+▸ **downloadExcel**(`matrix`, `filename`, `author?`, `options?`): `void` \| `Promise`\<`void`\>
 
 Creates the file from `matrix` (rows of values) and hands it to the browser as download.
 
@@ -48,6 +48,7 @@ Creates the file from `matrix` (rows of values) and hands it to the browser as d
 | `matrix` | `any`[][] |
 | `filename` | `string` |
 | `author?` | `string` |
+| `options?` | [`ExcelExportOptionsIf`](ExcelExportOptionsIf.md) |
 
 #### Returns
 
@@ -55,4 +56,4 @@ Creates the file from `matrix` (rows of values) and hands it to the browser as d
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L10)
+[src/lib/table/service/excel-service.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L12)

@@ -17,6 +17,10 @@ are escaped – data is shown as text, never as markup.
 
 - [constructor](CrudObjectView.md#constructor)
 
+### Properties
+
+- [direction](CrudObjectView.md#direction)
+
 ### Methods
 
 - [getCombinedKey](CrudObjectView.md#getcombinedkey)
@@ -47,7 +51,23 @@ are escaped – data is shown as text, never as markup.
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L13)
+[src/lib/table/crud/crud-object-view.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L17)
+
+## Properties
+
+### direction
+
+• `Optional` **direction**: ``"ltr"`` \| ``"rtl"``
+
+Writing direction of the dialog (`dir`) – the CRUD factory sets the direction of the table.
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/crud/crud-object-view.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L12)
 
 ## Methods
 
@@ -68,7 +88,7 @@ are escaped – data is shown as text, never as markup.
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L38)
+[src/lib/table/crud/crud-object-view.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L45)
 
 ___
 
@@ -88,7 +108,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L42)
+[src/lib/table/crud/crud-object-view.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L49)
 
 ___
 
@@ -102,4 +122,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/crud/crud-object-view.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L17)
+[src/lib/table/crud/crud-object-view.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-object-view.ts#L21)

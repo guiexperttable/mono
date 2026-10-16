@@ -21,6 +21,10 @@ const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
  */
 export class CrudObjectEdit<T extends Record<string, any>> {
 
+  /** Writing direction of the dialog (`dir`) – the CRUD factory sets the direction of the table. @since 1.1.98 */
+  direction?: "ltr" | "rtl";
+
+
   private object: T;
   /** Property path of every input (index = `data-field-index`) – a key may contain a dot itself. */
   private fieldPaths: string[][] = [];
@@ -36,6 +40,9 @@ export class CrudObjectEdit<T extends Record<string, any>> {
   public openDialog(onSave: (updatedObject: T) => void): void {
     const dialog: HTMLDialogElement = document.createElement('dialog');
     dialog.classList.add('ge-table-crud-object-edit');
+    if (this.direction) {
+      dialog.setAttribute('dir', this.direction); // outside the host: the direction of the table (since 1.1.98)
+    }
     this.fieldPaths = [];
     dialog.innerHTML = `
       <div class="ge-table-dialog-header">${escapeHtml(this.dialogTitle)}</div>

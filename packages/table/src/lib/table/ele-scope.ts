@@ -8,6 +8,8 @@ import { AreaIdent } from "./data/tablemodel/area-ident.type";
 import { SideIdent } from "./data/side-ident.type";
 import { isAreaModelTree } from "./instanceof-workaround";
 import { TableOverlay } from "./overlay/table-overlay";
+import { ResolvedTableDirection } from "./rtl/table-direction.type";
+import { getLogicalScrollLeft, resolveTableDirection, setLogicalScrollLeft, toLogicalX } from "./rtl/rtl-util";
 
 
 /**
@@ -65,6 +67,12 @@ export class EleScope {
   /** The overlay layer over the body ("Loading…", "No rows to show"). @since 1.1.92 */
   readonly tableOverlay: TableOverlay;
 
+  /**
+   * The resolved writing direction of the table ({@link TableOptionsIf.direction}; `"auto"` is decided when the table
+   * is built). @since 1.1.98
+   */
+  readonly direction: ResolvedTableDirection;
+
 
   constructor(
     readonly hostElement: HTMLDivElement,
@@ -75,9 +83,15 @@ export class EleScope {
     const hostEle = this.hostElement;
 
     hostEle.innerText = ""; // clear
+    // Writing direction (since 1.1.98) – before anything is positioned: all positions are computed from the start of
+    // a row; in right-to-left the DOM service writes them as "right". "auto" reads the page before dir is set.
+    this.direction = resolveTableDirection(tableOptions?.direction, hostEle);
+    this.dom.setDirection(this.direction);
     this.dom.setAttribute(hostEle, "tabindex", "0"); // needed for getting key events
     this.ariaIds = new AriaIds(AriaIds.createPrefix(hostEle.id));
     this.initHostAria();
+    // the scroll container, the text of the cells and the logical CSS (padding-inline-start …) follow the host
+    this.setHostAriaAttribute("dir", this.direction);
 
     this.dom.setStyle(
       this.dom.addClass("ge-table", hostEle)
@@ -192,6 +206,51 @@ export class EleScope {
 
     // above everything else of the body (z-index in CSS), positioned in adjustContainersAndRows()
     this.tableOverlay = new TableOverlay(hostEle, dom, tableOptions?.overlayOptions, () => this.updateOverlay());
+  }
+
+  /**
+   * Whether the table runs from right to left ({@link TableOptionsIf.direction}).
+   *
+   * @returns {boolean} true for `"rtl"` (also a resolved `"auto"`)
+   * @since 1.1.98
+   */
+  isRtl(): boolean {
+    return this.direction === "rtl";
+  }
+
+  /**
+   * The horizontal scroll position of the body as distance from the **start** (≥ 0) – `scrollLeft`, in
+   * right-to-left `-scrollLeft`.
+   *
+   * @returns {number} px
+   * @since 1.1.98
+   */
+  getViewportScrollLeft(): number {
+    return getLogicalScrollLeft(this.scrollViewport, this.isRtl());
+  }
+
+  /**
+   * Sets the horizontal scroll position of the body as distance from the **start** (see {@link getViewportScrollLeft}).
+   *
+   * @param {number} x - px from the start
+   * @since 1.1.98
+   */
+  setViewportScrollLeft(x: number): void {
+    setLogicalScrollLeft(this.scrollViewport, x, this.isRtl());
+  }
+
+  /**
+   * A client x coordinate (e.g. `PointerEvent.clientX`) as x in the host from the start of its padding box – the
+   * coordinates in which the table positions everything (right-to-left: from the right edge).
+   *
+   * @param {number} clientX - x in client (viewport) coordinates
+   * @returns {number} px from the start
+   * @since 1.1.98
+   */
+  clientXToHostX(clientX: number): number {
+    const host = this.hostElement;
+    const rect = host.getBoundingClientRect();
+    return toLogicalX(clientX, rect.left + host.clientLeft, host.clientWidth, this.isRtl());
   }
 
   /**
@@ -314,7 +373,7 @@ export class EleScope {
       width: `${this.scrollViewport.clientWidth}px`,
       height: `${this.scrollViewport.clientHeight}px`,
       top: `${this.scrollTop}px`,
-      left: `${this.scrollViewport.scrollLeft}px`
+      left: `${this.getViewportScrollLeft()}px`
     });
 
     // Body:

@@ -165,19 +165,6 @@ ___
 
 ▸ **onActionEvent**(`actionEvent`): `void`
 
-Handles the actions of the action column (and `CREATE`): the listener of [createTableModel](CrudTableModelFactory.md#createtablemodel) is called first,
-then
-- `VIEW`: `fetchItem` → [CrudObjectView](CrudObjectView.md);
-- `EDIT`: `fetchItem` → [CrudObjectEdit](CrudObjectEdit.md) → Save: `updateItem(id, item)`, the row shows the saved values
-  (the response, if it is an item with id – otherwise the edited item);
-- `CLONE` / `CREATE`: `fetchItem` resp. `getEmptyItem()` → [CrudObjectEdit](CrudObjectEdit.md) → Save: `createItem(item)` – without
-  the id property, the server assigns it. If the response is an item with id, it is added as last row, otherwise the
-  list is loaded again (`fetchList`);
-- `DELETE`: `deleteItem(id)` → the row is removed.
-
-While a request runs, the table shows its loading overlay ([TableApi.showLoadingOverlay](TableApi.md#showloadingoverlay), since 1.1.92).
-A failed request is logged with `console.error`; the table stays unchanged.
-
 #### Parameters
 
 | Name | Type |
@@ -194,7 +181,7 @@ A failed request is logged with `console.error`; the table stays unchanged.
 
 #### Defined in
 
-[src/lib/table/crud/crud-table-model-factory.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L166)
+[src/lib/table/crud/crud-table-model-factory.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/crud/crud-table-model-factory.ts#L172)
 
 ___
 

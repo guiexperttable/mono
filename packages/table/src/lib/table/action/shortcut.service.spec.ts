@@ -291,3 +291,38 @@ describe('ShortcutService', () => {
     });
   });
 });
+
+describe('ShortcutService – right-to-left (since 1.1.98)', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function rtlScope(rtl: boolean) {
+    const fake = fakeScope();
+    (fake.scope as unknown as { isRtl: () => boolean }).isRtl = () => rtl;
+    new ShortcutService(fake.scope);
+    return fake;
+  }
+
+  it('swaps ← and → before the mapping is looked up', () => {
+    stubPlatform('Win32');
+    const fake = rtlScope(true);
+    fake.keydown()!(keydownEvent({ key: 'ArrowRight', code: 'ArrowRight' }));
+    fake.keydown()!(keydownEvent({ key: 'ArrowLeft', code: 'ArrowLeft' }));
+    fake.keydown()!(keydownEvent({ key: 'ArrowUp', code: 'ArrowUp' }));
+    expect(fake.onActionTriggered.mock.calls.map(c => c[0])).toEqual(['NAVIGATE_LEFT', 'NAVIGATE_RIGHT', 'NAVIGATE_UP']);
+  });
+
+  it('macOS ⌘← goes to the end of the row (left), ⌘→ to the start', () => {
+    stubPlatform('MacIntel');
+    const fake = rtlScope(true);
+    fake.keydown()!(keydownEvent({ key: 'ArrowLeft', code: 'ArrowLeft', metaKey: true }));
+    fake.keydown()!(keydownEvent({ key: 'ArrowRight', code: 'ArrowRight', metaKey: true }));
+    expect(fake.onActionTriggered.mock.calls.map(c => c[0])).toEqual(['NAVIGATE_ROW_END', 'NAVIGATE_ROW_START']);
+  });
+
+  it('left-to-right: unchanged', () => {
+    stubPlatform('Win32');
+    const fake = rtlScope(false);
+    fake.keydown()!(keydownEvent({ key: 'ArrowRight', code: 'ArrowRight' }));
+    expect(fake.onActionTriggered.mock.calls.map(c => c[0])).toEqual(['NAVIGATE_RIGHT']);
+  });
+});

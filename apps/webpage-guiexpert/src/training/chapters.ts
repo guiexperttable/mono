@@ -307,9 +307,10 @@ export const CHAPTERS: Chapter[] = [
     slug: "theming-dark-mode", no: 28, part: "look", episode: 28, minutes: 5,
     title: "Theming and dark mode with CSS variables", nav: "Theming & dark mode",
     lead: "Everything is a CSS variable – light and dark are built in, your brand is a few lines away.",
-    learn: ["override --ge-table-* variables", "switch light and dark", "scope a theme to one table"],
-    api: ["CssVars"],
-    showcases: [{ name: "laf", title: "Look and feel" }]
+    learn: ["override --ge-table-* variables", "switch light and dark", "scope a theme to one table",
+      "mirror the table for Arabic and Hebrew (since 1.1.98)"],
+    api: ["CssVars", "TableOptionsIf.direction", "TableApi.getDirection"],
+    showcases: [{ name: "laf", title: "Look and feel" }, { name: "rtl", title: "Right-to-left" }]
   },
   {
     slug: "rowspan-colspan", no: 29, part: "look", episode: 29, minutes: 5,

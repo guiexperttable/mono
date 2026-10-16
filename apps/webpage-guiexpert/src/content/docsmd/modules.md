@@ -205,6 +205,7 @@
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
 - [EventListenerIf](interfaces/EventListenerIf.md)
 - [EventSelectionChangedListenerIf](interfaces/EventSelectionChangedListenerIf.md)
+- [ExcelExportOptionsIf](interfaces/ExcelExportOptionsIf.md)
 - [ExcelFormattedValueIf](interfaces/ExcelFormattedValueIf.md)
 - [ExcelServiceIf](interfaces/ExcelServiceIf.md)
 - [FillHandleOptionsIf](interfaces/FillHandleOptionsIf.md)
@@ -314,6 +315,7 @@
 - [PendingChangeResult](modules.md#pendingchangeresult)
 - [PivotValue](modules.md#pivotvalue)
 - [RendererCleanupFnType](modules.md#renderercleanupfntype)
+- [ResolvedTableDirection](modules.md#resolvedtabledirection)
 - [RowDragColumnOption](modules.md#rowdragcolumnoption)
 - [RowDragHandleState](modules.md#rowdraghandlestate)
 - [RowDropPosition](modules.md#rowdropposition)
@@ -329,6 +331,7 @@
 - [SideIdent](modules.md#sideident)
 - [SizeUnitType](modules.md#sizeunittype)
 - [SortState](modules.md#sortstate)
+- [TableDirection](modules.md#tabledirection)
 - [TableStatePart](modules.md#tablestatepart)
 - [TableStateRowId](modules.md#tablestaterowid)
 - [TreeArrowType](modules.md#treearrowtype)
@@ -408,6 +411,7 @@
 - [calculateShowValuesAs](modules.md#calculateshowvaluesas)
 - [canMoveFlatRows](modules.md#canmoveflatrows)
 - [canMoveTreeRows](modules.md#canmovetreerows)
+- [canScrollHorizontally](modules.md#canscrollhorizontally)
 - [compileFormula](modules.md#compileformula)
 - [computeFillChanges](modules.md#computefillchanges)
 - [computeFillValues](modules.md#computefillvalues)
@@ -427,6 +431,7 @@
 - [getFillRange](modules.md#getfillrange)
 - [getInsertBeforeIndex](modules.md#getinsertbeforeindex)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
+- [getLogicalScrollLeft](modules.md#getlogicalscrollleft)
 - [getTopmostTreeRows](modules.md#gettopmosttreerows)
 - [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
@@ -448,6 +453,7 @@
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isSameCellValue](modules.md#issamecellvalue)
 - [isTreeRow](modules.md#istreerow)
+- [mirrorArrowKeys](modules.md#mirrorarrowkeys)
 - [moveArrayItems](modules.md#movearrayitems)
 - [moveFlatRows](modules.md#moveflatrows)
 - [moveTreeRows](modules.md#movetreerows)
@@ -456,8 +462,12 @@
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
 - [resolveShowValuesAs](modules.md#resolveshowvaluesas)
+- [resolveTableDirection](modules.md#resolvetabledirection)
+- [setLogicalScrollLeft](modules.md#setlogicalscrollleft)
 - [sumOfNumbers](modules.md#sumofnumbers)
 - [throttle](modules.md#throttle)
+- [toLogicalX](modules.md#tologicalx)
+- [toPhysicalScrollLeft](modules.md#tophysicalscrollleft)
 - [trimArraySuffixes](modules.md#trimarraysuffixes)
 
 ## Area models
@@ -1309,6 +1319,50 @@ T - The type of the rows.
 
 [src/lib/table/data/options/auto-restore-options.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/auto-restore-options.if.ts#L12)
 
+___
+
+### ResolvedTableDirection
+
+Ƭ **ResolvedTableDirection**: ``"ltr"`` \| ``"rtl"``
+
+A resolved writing direction – what [TableApi.getDirection](classes/TableApi.md#getdirection) returns (`"auto"` is already decided).
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/table-direction.type.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/table-direction.type.ts#L24)
+
+___
+
+### TableDirection
+
+Ƭ **TableDirection**: ``"ltr"`` \| ``"rtl"`` \| ``"auto"``
+
+The writing direction of a table ([TableOptionsIf.direction](interfaces/TableOptionsIf.md#direction)):
+
+- `"ltr"` (default): left to right – the first column on the left.
+- `"rtl"`: right to left (Arabic, Hebrew, Persian, Urdu …) – the first column on the right, horizontal scrolling,
+  fixed columns, tree indent, resize handles and arrow keys mirrored.
+- `"auto"`: the direction of the page where the table is created (`dir="rtl"` on `<html>`, a parent element or the
+  host itself → `"rtl"`).
+
+**`Example`**
+
+```ts
+const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" };
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/table-direction.type.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/table-direction.type.ts#L16)
+
 ## Tree &amp; checkboxes
 
 ### TreeArrowType
@@ -1575,7 +1629,7 @@ isExcelFormattedValue({ value: 0.5, numberFormat: "0%" });   // true
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L49)
+[src/lib/table/service/excel-service.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L51)
 
 ## Keyboard
 
@@ -1675,6 +1729,42 @@ harmonizeShortcut('arrowup');   // "up"
 #### Defined in
 
 [src/lib/table/action/shortcut-util.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut-util.ts#L23)
+
+___
+
+### mirrorArrowKeys
+
+▸ **mirrorArrowKeys**(`shortcut`): `string`
+
+Swaps the arrow keys "left" and "right" in a harmonized shortcut (e.g. `"cmd left"` → `"cmd right"`) – the
+keyboard handling of a right-to-left table, so that → moves backwards in reading direction.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `shortcut` | `string` | a harmonized shortcut (`harmonizeShortcut`) |
+
+#### Returns
+
+`string`
+
+the shortcut with swapped arrow keys
+
+**`Example`**
+
+```ts
+mirrorArrowKeys("left");       // "right"
+mirrorArrowKeys("cmd right");  // "cmd left"
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L165)
 
 ## Overlays
 
@@ -4532,6 +4622,49 @@ A decorator that prevents a method from being executed multiple times within a s
 
 ___
 
+### canScrollHorizontally
+
+▸ **canScrollHorizontally**(`element`, `dx`, `rtl`): `boolean`
+
+Whether a scroll container can still scroll horizontally by `dx` (physical: `dx > 0` = to the right) – for
+left-to-right and right-to-left containers alike.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `element` | `Object` | a scroll container |
+| `element.clientWidth` | `number` | - |
+| `element.scrollLeft` | `number` | - |
+| `element.scrollWidth` | `number` | - |
+| `dx` | `number` | physical delta (e.g. `WheelEvent.deltaX`) |
+| `rtl` | `boolean` | the container is right-to-left |
+
+#### Returns
+
+`boolean`
+
+true if a scroll by `dx` would move the content
+
+**`Example`**
+
+```ts
+host.addEventListener("wheel", e => {
+  const takesIt = canScrollHorizontally(host, e.deltaX, getComputedStyle(host).direction === "rtl");
+  console.info(takesIt ? "the element scrolls itself" : "pass it on");
+});
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L109)
+
+___
+
 ### debounce
 
 ▸ **debounce**\<`T`\>(`func`, `wait?`): (...`args`: `Parameters`\<`T`\>) => `void`
@@ -4662,6 +4795,44 @@ The formatted entity name with the appropriate suffix.
 
 ___
 
+### getLogicalScrollLeft
+
+▸ **getLogicalScrollLeft**(`element`, `rtl`): `number`
+
+The horizontal scroll position of an element as distance from the **start** (≥ 0): in left-to-right `scrollLeft`,
+in right-to-left `-scrollLeft` (browsers report 0 at the right start and negative values when scrolled to the left,
+CSSOM View).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `element` | `Object` | a scroll container |
+| `element.scrollLeft` | `number` | - |
+| `rtl` | `boolean` | the container is right-to-left |
+
+#### Returns
+
+`number`
+
+px from the start
+
+**`Example`**
+
+```ts
+const fromStart = getLogicalScrollLeft(tableApi.getTableScope().scrollViewport, tableApi.getDirection() === "rtl");
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L52)
+
+___
+
 ### isAreaModelTree
 
 ▸ **isAreaModelTree**(`model`): `boolean`
@@ -4766,6 +4937,80 @@ Checks if the given row is a tree row.
 
 ___
 
+### resolveTableDirection
+
+▸ **resolveTableDirection**(`direction`, `host?`): [`ResolvedTableDirection`](modules.md#resolvedtabledirection)
+
+Decides the direction of a table: `"rtl"` and `"ltr"` as given, `"auto"` from the computed `direction` of the host
+(inherited from `<html dir="rtl">` or any parent) – for a host that is not in the document yet from the nearest
+`dir` attribute of the host or a parent. Missing (`undefined`) = `"ltr"`.
+
+Must be called before the table sets the `dir` attribute of the host.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `direction` | `undefined` \| [`TableDirection`](modules.md#tabledirection) | the option ([TableOptionsIf.direction](interfaces/TableOptionsIf.md#direction)) |
+| `host?` | `HTMLElement` | the host element of the table (needed for `"auto"`) |
+
+#### Returns
+
+[`ResolvedTableDirection`](modules.md#resolvedtabledirection)
+
+`"ltr"` or `"rtl"`
+
+**`Example`**
+
+```ts
+resolveTableDirection("auto", document.getElementById("table")!); // "rtl" on a page with <html dir="rtl">
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L20)
+
+___
+
+### setLogicalScrollLeft
+
+▸ **setLogicalScrollLeft**(`element`, `x`, `rtl`): `void`
+
+Sets the horizontal scroll position of an element as distance from the **start** (see [getLogicalScrollLeft](modules.md#getlogicalscrollleft)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `element` | `Object` | a scroll container |
+| `element.scrollLeft` | `number` | - |
+| `x` | `number` | px from the start |
+| `rtl` | `boolean` | the container is right-to-left |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+setLogicalScrollLeft(tableApi.getTableScope().scrollViewport, 0, true); // back to the (right) start
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L70)
+
+___
+
 ### throttle
 
 ▸ **throttle**\<`T`\>(`func`, `wait?`): (...`args`: `Parameters`\<`T`\>) => `void`
@@ -4802,6 +5047,82 @@ ___
 #### Defined in
 
 [src/lib/common/throttle.ts:2](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/throttle.ts#L2)
+
+___
+
+### toLogicalX
+
+▸ **toLogicalX**(`clientX`, `boxLeft`, `boxWidth`, `rtl`): `number`
+
+A client x coordinate (e.g. `PointerEvent.clientX`) as position in a box measured from the box's **start**:
+left-to-right from its left edge, right-to-left from its right edge.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `clientX` | `number` | x in client (viewport) coordinates |
+| `boxLeft` | `number` | the left edge of the box in client coordinates |
+| `boxWidth` | `number` | the width of the box |
+| `rtl` | `boolean` | right-to-left |
+
+#### Returns
+
+`number`
+
+px from the start of the box
+
+**`Example`**
+
+```ts
+host.addEventListener("pointerdown", e => {
+  const r = host.getBoundingClientRect();
+  console.info(toLogicalX(e.clientX, r.left + host.clientLeft, host.clientWidth, true)); // px from the right edge
+});
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L147)
+
+___
+
+### toPhysicalScrollLeft
+
+▸ **toPhysicalScrollLeft**(`x`, `rtl`): `number`
+
+The horizontal scroll position for `element.scrollTo(…)` – physical, i.e. negative in right-to-left.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `x` | `number` | px from the start |
+| `rtl` | `boolean` | right-to-left |
+
+#### Returns
+
+`number`
+
+the value for `scrollLeft` / `scrollTo()`
+
+**`Example`**
+
+```ts
+tableApi.getTableScope().scrollViewport.scrollTo(toPhysicalScrollLeft(200, true), 0); // 200 px from the right start
+```
+
+**`Since`**
+
+1.1.98
+
+#### Defined in
+
+[src/lib/table/rtl/rtl-util.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L87)
 
 ___
 
@@ -4858,7 +5179,7 @@ Creates the [TableScope](classes/TableScope.md) of a nested table (given by `Tab
 
 #### Defined in
 
-[src/lib/table/master-detail/master-detail-service.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L32)
+[src/lib/table/master-detail/master-detail-service.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L33)
 
 ___
 

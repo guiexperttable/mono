@@ -381,4 +381,16 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(destroy).toHaveBeenCalledTimes(1);
     expect(events.tableReady).toHaveLength(2);
   });
+
+  it('direction "rtl" reaches the core: dir="rtl" on the table, the first column on the right (since 1.1.98)', async () => {
+    const { el, events } = createTableElement();
+    el.data = data(createModel(5), { ...new TableOptions(), direction: 'rtl' });
+    await nextFrame();
+    const table = el.querySelector<HTMLElement>('.ge-table') ?? el;
+    expect(table.getAttribute('dir')).toBe('rtl');
+    expect(events.tableReady[0].getDirection()).toBe('rtl');
+    const first = bodyCell(el, 0, 0)!;
+    expect(first.style.right).toBe('0px');
+    expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
 });

@@ -1,3 +1,4 @@
+import { toPhysicalScrollLeft } from "./rtl/rtl-util";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 /* eslint @typescript-eslint/no-explicit-any: "off" */
@@ -179,7 +180,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.fillHandleService = new FillHandleService(this);
     if (tableOptions?.masterDetail) {
       this.masterDetailService = new MasterDetailService(this,
-        (host, model, options, listener) => new TableScope(host, model, new SimpleDomService(), options ?? new TableOptions(), listener ?? new EventAdapter()));
+        (host, model, options, listener) => new TableScope(host, model, new SimpleDomService(),
+          // a nested table without an own direction takes the direction of this table (since 1.1.98) – the app's
+          // options object itself stays the nested table's options (later changes, e.g. externalFilterFunction, count)
+          this.nestedTableOptions(options),
+          listener ?? new EventAdapter()));
       if (this.masterDetailService.isActive()) {
         // the detail rows are a row group between body and footer (screen readers)
         const owned = (hostElement.getAttribute('aria-owns') ?? '').split(' ').filter(Boolean);
@@ -210,6 +215,20 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // A click on a body cell or the scroll bar would focus the scroll viewport (tabindex -1) – the grid (host)
     // must keep the focus, otherwise screen readers lose aria-activedescendant.
     this.scrollViewport.addEventListener('focus', () => this.hostElement.focus({ preventScroll: true }), { signal });
+  }
+
+  /**
+   * The options of a nested table (master/detail `ctx.createTable()`): as given; without an own `direction` in a
+   * right-to-left table an object that reads everything else from the given options (prototype) and adds `"rtl"`.
+   */
+  private nestedTableOptions(options?: TableOptionsIf): TableOptionsIf {
+    if (!options) {
+      return { ...new TableOptions(), direction: this.direction };
+    }
+    if (options.direction !== undefined || !this.isRtl()) {
+      return options;
+    }
+    return Object.assign(Object.create(options) as TableOptionsIf, { direction: this.direction });
   }
 
   /** Time of the last Tab key press on the page (the host is focused right after it). */
@@ -1305,8 +1324,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if ((target === this.scrollViewport || target === this.contentWrapperDiv || target === this.contentDiv)
       && this.tableModel.getPadding().bottom > 0) {
       const viewportRect = this.scrollViewport.getBoundingClientRect();
+      // clientLeft: a vertical scroll bar on the left (right-to-left) – 0 in left-to-right
+      const x = evt.clientX - viewportRect.left;
       const onScrollBar = evt.clientY - viewportRect.top >= this.scrollViewport.clientHeight
-        || evt.clientX - viewportRect.left >= this.scrollViewport.clientWidth;
+        || x < this.scrollViewport.clientLeft
+        || x >= this.scrollViewport.clientLeft + this.scrollViewport.clientWidth;
       const root = this.hostElement.getRootNode() as Document | ShadowRoot;
       if (!onScrollBar && root.elementsFromPoint) {
         const footerElement = root.elementsFromPoint(evt.clientX, evt.clientY)
@@ -1762,12 +1784,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (contentRange > 0 && scrollerRange > 0) {
       const contentTop = Math.min(contentRange, Math.max(0, py));
       const scrollTop = contentTop / contentRange * scrollerRange;
-      this.scrollViewport.scrollTo(px, scrollTop);
+      this.scrollViewport.scrollTo(toPhysicalScrollLeft(px, this.isRtl()), scrollTop);
       this.pendingContentScroll = { scrollTop: this.scrollViewport.scrollTop, contentTop };
       this.adjustAfterScrolling(); // render the exact position now (a scroll event may not fire)
       return;
     }
-    this.scrollViewport.scrollTo(px, py);
+    this.scrollViewport.scrollTo(toPhysicalScrollLeft(px, this.isRtl()), py);
   }
 
   /**
@@ -1802,7 +1824,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return 0; // fixed west column: back to the start – as scrollToIndex(0, y) always did
     }
     if (!(columnIndex >= firstCenterColumn && columnIndex <= lastCenterColumn)) {
-      return viewport.scrollLeft; // fixed east column (always visible), -1, NaN or out of range
+      return this.getViewportScrollLeft(); // fixed east column (always visible), -1, NaN or out of range
     }
     let contentLeft = 0; // hidden columns have width 0
     for (let c = firstCenterColumn; c < columnIndex; c++) {
@@ -2026,7 +2048,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @param {GeMouseEvent} mouseEvent - The mouse event that triggered the resize.
    */
   private resizeColumn(mouseEvent: GeMouseEvent) {
-    this.tableModel.setColumnWidth(this.mouseStartColumnIndex, this.mouseStartWidth + mouseEvent.draggingX);
+    // right-to-left: the handle is on the left edge – dragging to the left makes the column wider
+    const dx = this.isRtl() ? -mouseEvent.draggingX : mouseEvent.draggingX;
+    this.tableModel.setColumnWidth(this.mouseStartColumnIndex, this.mouseStartWidth + dx);
     this.tableModel.recalcPadding();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
@@ -2266,11 +2290,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const viewTop = this.contentScrollTop;
       const viewHeight = this.areaBodyCenterGeo.height;
       if (top < viewTop) {
-        this.scrollToPixel(this.scrollViewport.scrollLeft, top);
+        this.scrollToPixel(this.getViewportScrollLeft(), top);
         return true;
       }
       if (bottom > viewTop + viewHeight) {
-        this.scrollToPixel(this.scrollViewport.scrollLeft, bottom - viewHeight);
+        this.scrollToPixel(this.getViewportScrollLeft(), bottom - viewHeight);
         return true;
       }
       return false;
@@ -2323,7 +2347,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       left += this.tableModel.getColumnWidth(c);
     }
     // the same linear mapping as the rendering (scrollFactorX, see adjustColumnsToRowParent)
-    const offset = Math.min(1, Math.max(0, viewport.scrollLeft / scrollerRange)) * contentRange;
+    const offset = Math.min(1, Math.max(0, this.getViewportScrollLeft() / scrollerRange)) * contentRange;
     let target: number;
     if (left < offset - 0.5) {
       target = left;
@@ -2334,7 +2358,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     const scrollLeft = Math.min(1, Math.max(0, target / contentRange)) * scrollerRange;
     // scrollLeft is rounded by the browser – round towards the side that must be fully visible
-    viewport.scrollLeft = target === left ? Math.floor(scrollLeft) : Math.ceil(scrollLeft);
+    this.setViewportScrollLeft(target === left ? Math.floor(scrollLeft) : Math.ceil(scrollLeft));
     this.adjustAfterScrolling(); // render the new position now (a scroll event may not fire)
     return true;
   }

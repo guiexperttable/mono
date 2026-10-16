@@ -1,3 +1,5 @@
+import type { ExcelExportOptionsIf } from "./excel-export-options.if";
+
 /**
  * Writes an Excel file from a matrix of values. The default implementation is {@link ExcelService};
  * pass your own as last argument of the `TableScope` constructor to change how {@link TableApi.downloadExcel} exports.
@@ -7,7 +9,7 @@
 export interface ExcelServiceIf {
 
   /** Creates the file from `matrix` (rows of values) and hands it to the browser as download. */
-  downloadExcel(matrix: Array<Array<any>>, filename: string, author?: string): void | Promise<void>;
+  downloadExcel(matrix: Array<Array<any>>, filename: string, author?: string, options?: ExcelExportOptionsIf): void | Promise<void>;
 
   /**
    * True if the service understands cells of the form {@link ExcelFormattedValueIf} (`{ value, numberFormat }`).

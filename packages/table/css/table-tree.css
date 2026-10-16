@@ -1,23 +1,23 @@
 /* Tree table */
 
 .ge-table-col-div.ge-table-col-div-0.ge-table-tree-cell {
-  text-align: left;
+  text-align: start;
 }
 
 .ge-table-tree-cell .ge-table-label-div {
-  padding-left: 0;
-  padding-right: 10px;
+  padding-inline-start: 0;
+  padding-inline-end: 10px;
   display: inline;
 }
 
 
 .ge-table-col-tree {
-  text-align: left;
+  text-align: start;
 }
 
 /* Row numbers (RowNumberColumnDef) in a tree: no tree look – right aligned like in a flat table (since 1.1.93) */
 .ge-table-col-div.ge-table-row-number.ge-table-tree-cell {
-  text-align: right;
+  text-align: end;
 }
 .ge-table-row-number.ge-table-tree-cell .ge-table-label-div {
   display: block;
@@ -25,47 +25,47 @@
 }
 
 .ge-padding-property-checkbox {
-  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-0 {
-  padding-left: 16px;
+  padding-inline-start: 16px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-1 {
-  padding-left: 36px;
+  padding-inline-start: 36px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-2 {
-  padding-left: 56px;
+  padding-inline-start: 56px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-3 {
-  padding-left: 76px;
+  padding-inline-start: 76px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-4 {
-  padding-left: 96px;
+  padding-inline-start: 96px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-5 {
-  padding-left: 116px;
+  padding-inline-start: 116px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-6 {
-  padding-left: 136px;
+  padding-inline-start: 136px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-7 {
-  padding-left: 156px;
+  padding-inline-start: 156px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-8 {
-  padding-left: 176px;
+  padding-inline-start: 176px;
 }
 
 .ge-table-col-tree.ge-table-tree-deep-9 {
-  padding-left: 196px;
+  padding-inline-start: 196px;
 }
 
 .ge-table-col-div.ge-table-col-tree.ge-table-tree-cell {
@@ -75,4 +75,11 @@
 .ge-table-col-div.ge-table-col-tree.ge-table-tree-cell.ge-with-checkbox {
   display: grid;
   grid-template-columns: 16px 20px 1fr;
+}
+
+/* Right-to-left (direction: "rtl", since 1.1.98): the arrow ">" is mirrored by the browser ("<"), so the expanded
+   arrow of the default icon turns the other way (its transform is an inline style: !important). */
+.ge-table[dir="rtl"] .gt-table-tree-arrow-expanded:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .gt-table-tree-arrow-expanded) {
+  transform: rotate(-90deg) translate(-66%, -66%) !important;
+  transform-origin: 100% 0 !important;
 }

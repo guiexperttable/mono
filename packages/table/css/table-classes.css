@@ -42,8 +42,8 @@
 
 
 .ge-table-label-div .ge-table-label {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-inline-start: 10px;
+  padding-inline-end: 10px;
 }
 
 /* Total rows of AreaModelAggregateFooter (1.1.94) – before the align classes, so a column's footer class wins */
@@ -67,12 +67,36 @@
   overflow: visible;
 }
 
+/* "left" and "right" describe the left-to-right layout: start and end of the row – mirrored in right-to-left
+   (direction: "rtl", since 1.1.98). A column that must stay physically right needs its own class. */
 .ge-table-text-align-left {
-  text-align: left;
+  text-align: start;
 }
 
 .ge-table-text-align-right {
+  text-align: end;
+}
+
+.ge-table-text-align-start {
+  text-align: start;
+}
+
+.ge-table-text-align-end {
+  text-align: end;
+}
+
+/* Latin text with punctuation in a right-to-left table ("Rossi S.p.A." would show as ".Rossi S.p.A"): every label gets
+   the direction of its own text (unicode-bidi: plaintext) and stays aligned to the start of the table (since 1.1.98). */
+.ge-table-text-plaintext {
+  text-align: left;
+}
+
+.ge-table[dir="rtl"] .ge-table-text-plaintext:not(.ge-table[dir="rtl"] .ge-table[dir="ltr"] .ge-table-text-plaintext) {
   text-align: right;
+}
+
+.ge-table-text-plaintext .ge-table-label {
+  unicode-bidi: plaintext;
 }
 
 .ge-table-text-align-center {
@@ -81,7 +105,7 @@
 
 /* Row checkbox */
 .ge-table-row-checkbox-div {
-  padding-left: 14px;
+  padding-inline-start: 14px;
 }
 .ge-table-body-east {
   z-index: 999;
@@ -105,10 +129,10 @@
     overflow-y: auto;
     table th,
     table td {
-      text-align: left;
+      text-align: start;
 
       &:nth-child(2) {
-        padding-left: 12px;
+        padding-inline-start: 12px;
       }
       &.ge-table-crud-object-view-object-child {
         font-weight: bold;
@@ -145,7 +169,7 @@
       justify-items: stretch;
       label {
         align-self: end;
-        text-align: right;
+        text-align: end;
         line-height: 2;
       }
     }
@@ -169,9 +193,9 @@
 }
 
 
-/* room for the sort icon (20px, absolute, right) – otherwise it covers right-aligned header labels */
+/* room for the sort icon (20px, absolute, at the end) – otherwise it covers end-aligned header labels */
 .ge-table-col-div:has(> .ge-table-sorted-icon-div) .ge-table-label {
-  padding-right: 22px;
+  padding-inline-end: 22px;
 }
 
 

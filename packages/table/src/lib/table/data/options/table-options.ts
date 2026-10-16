@@ -1,3 +1,4 @@
+import type { TableDirection } from "../../rtl/table-direction.type";
 import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TableOptionsIf } from "./table-options.if";
@@ -114,4 +115,9 @@ export class TableOptions implements TableOptionsIf {
   fillHandle?: boolean | Partial<FillHandleOptionsIf> = undefined;
   masterDetail?: Partial<MasterDetailOptionsIf> = undefined;
   batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;
+  /**
+   * Writing direction (`"ltr"` | `"rtl"` | `"auto"`). Not set = `"ltr"`; a nested table (master/detail) without its
+   * own value takes the direction of the outer table. @since 1.1.98
+   */
+  direction?: TableDirection = undefined;
 }

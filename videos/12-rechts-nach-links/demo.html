@@ -1,0 +1,84 @@
+<!doctype html>
+<!--
+  Recording page for episode 12 "Arabisch, Hebräisch: Tabelle von rechts nach links – eine Option".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/12-rechts-nach-links/demo.html
+  Runs the code of snippet.ts (plain JS) with 2,000 generated branches and 12 month columns.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – von rechts nach links</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button { font: inherit; padding: 4px 14px; }
+    .log { font: 16px ui-monospace, monospace; opacity: 0.85; }
+    .table-div { height: calc(100vh - 130px); margin: 0 16px; font-size: 17px; max-width: 900px; }
+  </style>
+</head>
+<body>
+<h1>Umsatz je Stadt – von rechts nach links</h1>
+<div class="bar">
+  <button id="rtl">rtl</button>
+  <button id="ltr">ltr</button>
+  <button id="excel">Excel</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+  <span class="log" id="log"></span>
+</div>
+<div class="table-div"></div>
+<script type="module">
+  import { ColumnDef, EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope, px120, px140 } from "@guiexpert/table";
+
+  const STAEDTE = [["الرياض", "السعودية", "RUH"], ["جدة", "السعودية", "JED"], ["دبي", "الإمارات", "DXB"],
+    ["أبوظبي", "الإمارات", "AUH"], ["الدوحة", "قطر", "DOH"], ["الكويت", "الكويت", "KWI"], ["مسقط", "عُمان", "MCT"],
+    ["القاهرة", "مصر", "CAI"], ["عمّان", "الأردن", "AMM"], ["بيروت", "لبنان", "BEY"], ["تونس", "تونس", "TUN"],
+    ["الرباط", "المغرب", "RBA"]];
+  const MONATE = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  let seed = 4711;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const rows = Array.from({ length: 2_000 }, (_, i) => {
+    const [stadt, land, code] = STAEDTE[i % STAEDTE.length];
+    const basis = 5000 + Math.round(rnd() * 25000);
+    const row = { stadt, land, filiale: `فرع ${code}-${String(Math.floor(i / STAEDTE.length) + 1).padStart(2, "0")}` };
+    MONATE.forEach((_, m) => { row["m" + m] = Math.round(basis * (0.7 + rnd() * 0.6)); });
+    return row;
+  });
+  const zahl = ["ge-table-text-align-right"];             // „rechts“ = Ende → in RTL links
+  const host = document.querySelector(".table-div");
+  const log = document.getElementById("log");
+  let api;
+
+  function erzeugen(direction) {
+    api?.destroy();
+    const columnDefs = [
+      ColumnDef.create({ property: "stadt", headerLabel: "المدينة", width: px120, sortable: () => true }),
+      ColumnDef.create({ property: "land", headerLabel: "البلد", width: px120, sortable: () => true }),
+      ColumnDef.create({ property: "filiale", headerLabel: "الفرع", width: px140 }),
+      ...MONATE.map((m, i) => ColumnDef.create({ property: "m" + i, headerLabel: m, width: px120, bodyClasses: zahl, footerClasses: zahl, sortable: () => true })),
+    ];
+    const summen = Object.fromEntries(MONATE.map((_, i) => ["m" + i, "sum"]));
+    const tableModel = TableFactory.createTableModel({
+      rows, columnDefs, rowNumbersVisible: true,
+      fixedLeftColumnCount: 1,                            // „links“ = Anfang → steht RECHTS
+      footerAggregates: { rows: [{ label: "المجموع", aggregates: summen }], labelProperty: "filiale" }
+    });
+    const tableOptions = { ...new TableOptions(), direction };   // ← eine Option
+    const listener = new EventAdapter();
+    listener.onScroll = e => { log.textContent = `scrollLeft vom Anfang: ${Math.round(e.scrollLeft)} px`; };
+    api = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+    log.textContent = `direction: ${api.getDirection()}`;
+  }
+
+  document.getElementById("rtl").addEventListener("click", () => erzeugen("rtl"));
+  document.getElementById("ltr").addEventListener("click", () => erzeugen("ltr"));
+  document.getElementById("excel").addEventListener("click", () => api.downloadExcel("umsatz.xlsx"));
+  document.getElementById("dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+  erzeugen("rtl");
+</script>
+</body>
+</html>

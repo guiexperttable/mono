@@ -1874,6 +1874,57 @@ new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new Event
   not scroll the outer table (use the area of the master rows); a detail row that grows above the viewport moves the
   visible rows.
 
+### 6.19 Right-to-left: Arabic, Hebrew, Persian, Urdu (since 1.1.98)
+
+One option mirrors the whole table: the first column is on the **right**, horizontal scrolling starts at the right,
+fixed columns, tree indent, header groups, resize handles, the fill handle, row drag, master/detail and the arrow keys
+follow the reading direction.
+
+```ts
+import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableOptionsIf, TableScope } from "@guiexpert/table";
+
+declare const host: HTMLDivElement;
+const rows = [
+  { city: "الرياض", country: "السعودية", sales: 1250000 },
+  { city: "دبي", country: "الإمارات", sales: 980000 },
+];
+const tableModel = TableFactory.createTableModel({ rows, properties: ["city", "country", "sales"], fixedLeftColumnCount: 1 });
+const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" };
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter()).firstInit().getApi();
+console.info(tableApi.getDirection()); // "rtl"
+```
+
+- **Option:** `direction: "ltr"` (default), `"rtl"` or `"auto"` – `"auto"` takes the direction of the page
+  (`<html dir="rtl">`, a parent element or the host itself). It is read when the table is built; the wrappers rebuild
+  the table for a new options object, so a LTR/RTL switch is simply a new `tableOptions` object.
+- **The host gets `dir`** (`"rtl"`, and `"ltr"` for left-to-right – a left-to-right table on a right-to-left page stays
+  a clean left-to-right table). `destroy()` gives the host its own `dir` back.
+- **"Left" and "right" in names mean start and end:** `fixedLeftColumnCount` fixes columns at the **start** (right),
+  `fixedRightColumnCount` at the **end** (left); the classes `ge-table-text-align-left` / `-right` align to start / end
+  (text right, numbers left – like a right-to-left sheet in Excel; new: `ge-table-text-align-start` / `-end`). A column
+  that must stay physically right in both directions needs an own class, e.g. `.my-right { text-align: right; }`.
+- **Positions of the API count from the start:** `scrollToPixel(x, y)`, `GeScrollEvent.scrollLeft`, the `scroll` part
+  of `getState()` (≥ 0 in both directions, so a stored state works in both). The browser's own `scrollLeft` of the scroll
+  viewport is 0 at the right start and negative to the left – use `tableScope.getViewportScrollLeft()` /
+  `setViewportScrollLeft(x)` or the helpers `getLogicalScrollLeft()` / `setLogicalScrollLeft()`. Only values taken
+  directly from the browser event stay physical (`GeMouseEvent.originalEvent`, `draggingX`).
+- **Keyboard:** → moves to the previous column (on the right), ← to the next; Home/End, Ctrl+Home/End stay "first /
+  last column". Own `shortcutActionIdMapping`s are written in left-to-right terms: in right-to-left, ← and → are
+  swapped before the mapping is looked up (`"left"` = backwards in reading direction).
+- **Excel:** `tableApi.downloadExcel()` of a right-to-left table writes a right-to-left sheet (column A on the right).
+  Own exports: `new ExcelService().downloadExcel(matrix, "x.xlsx", "", { rightToLeft: true })`.
+- **Text:** the cells are right-to-left (inherited from the host); the browser's bidi algorithm shows mixed text
+  ("الرياض Riyadh 2026") and numbers correctly – nothing to configure. One effect of the algorithm: **Latin** text with a
+  final punctuation mark shows the mark on the wrong side (".Rossi S.p.A") – give such a column the class
+  `ge-table-text-plaintext` (each label gets the direction of its own text, the column stays aligned to the start):
+  `ColumnDef.create({ property: "customer", bodyClasses: ["ge-table-text-plaintext"] })`.
+- **Own CSS:** use logical properties (`padding-inline-start`, `margin-inline-end`, `text-align: start`,
+  `inset-inline-start`) – they follow the direction. To style only right-to-left: `.ge-table[dir="rtl"] …`.
+  Own cell renderers write into the cell and inherit the direction; positions in own renderers that are set with
+  `left` stay physical.
+- **Nested tables** (master/detail `ctx.createTable()`) take the direction of the outer table unless their own
+  `tableOptions` set one.
+
 ---
 
 ## 7. Not available yet

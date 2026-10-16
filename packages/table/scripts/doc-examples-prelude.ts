@@ -31,7 +31,9 @@ import {
   PendingCellChanges, BatchEditService, GeBatchEditEvent, GeBatchEditEventType, CellValidator,
   RowLayout, MasterDetailOptions, MasterDetailOptionsIf, DetailHeightType, DetailRendererIf, DetailRenderFnType,
   DetailRenderContextIf, DetailTableParamsIf, MasterDetailService, NestedTableScopeIf, NestedTableScopeFactory,
-  GeDetailEvent, GeDetailEventSource
+  GeDetailEvent, GeDetailEventSource,
+  TableDirection, ResolvedTableDirection, resolveTableDirection, getLogicalScrollLeft, setLogicalScrollLeft,
+  toPhysicalScrollLeft, canScrollHorizontally, toLogicalX, mirrorArrowKeys, ExcelExportOptionsIf
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }

@@ -8,6 +8,10 @@ import { escapeHtml } from '../../common/escape-html';
  */
 export class CrudObjectView<T extends Record<string, any>> {
 
+  /** Writing direction of the dialog (`dir`) – the CRUD factory sets the direction of the table. @since 1.1.98 */
+  direction?: "ltr" | "rtl";
+
+
   private object: T;
 
   constructor(obj: T) {
@@ -17,6 +21,9 @@ export class CrudObjectView<T extends Record<string, any>> {
   public openDialog(): void {
     const dialog: HTMLDialogElement = document.createElement('dialog');
     dialog.classList.add('ge-table-crud-object-view');
+    if (this.direction) {
+      dialog.setAttribute('dir', this.direction); // outside the host: the direction of the table (since 1.1.98)
+    }
     dialog.innerHTML = `
       <div class="ge-table-dialog-header">Item</div>
       <div class="ge-table-dialog-content">

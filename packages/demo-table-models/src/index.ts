@@ -36,3 +36,5 @@ export * from "./lib/createPriceListModel";
 export * from "./model/price-item.if";
 export * from "./lib/createMasterDetailModel";
 export * from "./model/master-order.if";
+export * from "./lib/createRtlCitiesModel";
+export * from "./model/rtl-city-sales.if";

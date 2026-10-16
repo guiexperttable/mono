@@ -1,3 +1,4 @@
+import { toPhysicalScrollLeft } from "../rtl/rtl-util";
 import type { TableScope } from "../table-scope";
 import { ColumnDefIf } from "../data/tablemodel/column/column-def.if";
 import { SizeIf } from "../data/common/size.if";
@@ -322,7 +323,7 @@ export class TableStateService {
     }
     const viewport = this.scope.scrollViewport;
     const last = this.reportedScroll;
-    if (!last || last.left !== viewport.scrollLeft || last.top !== viewport.scrollTop) {
+    if (!last || last.left !== this.scope.getViewportScrollLeft() || last.top !== viewport.scrollTop) {
       this.markDirty("scroll");
     }
   }
@@ -591,7 +592,8 @@ export class TableStateService {
 
   private computeScroll(): TableScrollStateIf {
     const viewport = this.scope.scrollViewport;
-    const scroll: TableScrollStateIf = { left: viewport.scrollLeft, top: viewport.scrollTop };
+    // left from the start of the row (right-to-left: ≥ 0 as well) – a state is independent of the direction
+    const scroll: TableScrollStateIf = { left: this.scope.getViewportScrollLeft(), top: viewport.scrollTop };
     const first = this.scope.getFirstVisibleRowIndex();
     if (first > -1 && this.body().getRowCount() > 0) {
       const id = this.idAt(first, this.warns("scroll"));
@@ -925,7 +927,7 @@ export class TableStateService {
     if (!scroll || typeof scroll.top !== "number" || typeof scroll.left !== "number") {
       return;
     }
-    this.scope.scrollViewport.scrollTo(scroll.left, scroll.top);
+    this.scope.scrollViewport.scrollTo(toPhysicalScrollLeft(scroll.left, this.scope.isRtl()), scroll.top);
     this.scope.adjustAfterScrolling(); // render now: the first visible row is known
     if (scroll.firstRowId === undefined) {
       return;

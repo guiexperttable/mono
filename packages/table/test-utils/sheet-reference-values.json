@@ -1,0 +1,895 @@
+{
+ "generator": "LibreOffice headless (scripts/sheet-reference-values.mjs)",
+ "data": [
+  [
+   "Product",
+   "Price",
+   "Qty",
+   "Date",
+   "Flag",
+   "Code"
+  ],
+  [
+   "Laptop",
+   1299,
+   2,
+   "2026-01-15",
+   "TRUE",
+   "A-100"
+  ],
+  [
+   "Monitor",
+   349,
+   3,
+   "2026-02-28",
+   "FALSE",
+   "B-200"
+  ],
+  [
+   "Mouse",
+   25,
+   10,
+   "2026-03-01",
+   "TRUE",
+   "C-300"
+  ],
+  [
+   "Keyboard",
+   79,
+   4,
+   "2026-12-31",
+   "FALSE",
+   "D-400"
+  ],
+  [
+   "Dock",
+   189.5,
+   1,
+   "2027-06-15",
+   "TRUE",
+   "E-500"
+  ],
+  [
+   "Headset",
+   99.99,
+   0,
+   "2024-02-29",
+   "FALSE",
+   "F-600"
+  ],
+  [
+   "",
+   -12.5,
+   7,
+   "",
+   "",
+   "mouse pad"
+  ]
+ ],
+ "cases": [
+  {
+   "formula": "=SUM(B2:B8)",
+   "expected": "2028.99"
+  },
+  {
+   "formula": "=SUM(B2:C3,10)",
+   "expected": "1663"
+  },
+  {
+   "formula": "=SUM(A2:A8)",
+   "expected": "0"
+  },
+  {
+   "formula": "=SUM(\"3\",2)",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=SUM(TRUE,1)",
+   "expected": "2"
+  },
+  {
+   "formula": "=PRODUCT(C2:C5)",
+   "expected": "240"
+  },
+  {
+   "formula": "=AVERAGE(B2:B8)",
+   "expected": "289.855714285714"
+  },
+  {
+   "formula": "=AVERAGE(C2:C8)",
+   "expected": "3.85714285714286"
+  },
+  {
+   "formula": "=MIN(B2:B8)",
+   "expected": "-12.5"
+  },
+  {
+   "formula": "=MAX(B2:B8)",
+   "expected": "1299"
+  },
+  {
+   "formula": "=MIN(A2:A3)",
+   "expected": "0"
+  },
+  {
+   "formula": "=COUNT(A1:F8)",
+   "expected": "26"
+  },
+  {
+   "formula": "=COUNT(B2:B8,\"5\",TRUE)",
+   "expected": "9"
+  },
+  {
+   "formula": "=COUNTA(A1:A8)",
+   "expected": "7"
+  },
+  {
+   "formula": "=COUNTBLANK(A1:F8)",
+   "expected": "3"
+  },
+  {
+   "formula": "=SUMPRODUCT(B2:B5,C2:C5)",
+   "expected": "4211"
+  },
+  {
+   "formula": "=ROUND(1.005,2)",
+   "expected": "1.01"
+  },
+  {
+   "formula": "=ROUND(-2.5,0)",
+   "expected": "-3"
+  },
+  {
+   "formula": "=ROUND(1234.567,-2)",
+   "expected": "1200"
+  },
+  {
+   "formula": "=ROUNDUP(3.2,0)",
+   "expected": "4"
+  },
+  {
+   "formula": "=ROUNDUP(-3.2,0)",
+   "expected": "-4"
+  },
+  {
+   "formula": "=ROUNDDOWN(3.789,1)",
+   "expected": "3.7"
+  },
+  {
+   "formula": "=ROUNDDOWN(-3.789,1)",
+   "expected": "-3.7"
+  },
+  {
+   "formula": "=INT(-3.5)",
+   "expected": "-4"
+  },
+  {
+   "formula": "=INT(3.999)",
+   "expected": "3"
+  },
+  {
+   "formula": "=ABS(-7)",
+   "expected": "7"
+  },
+  {
+   "formula": "=MOD(10,3)",
+   "expected": "1"
+  },
+  {
+   "formula": "=MOD(-10,3)",
+   "expected": "2"
+  },
+  {
+   "formula": "=MOD(10,-3)",
+   "expected": "-2"
+  },
+  {
+   "formula": "=MOD(5,0)",
+   "expected": "#DIV/0!"
+  },
+  {
+   "formula": "=POWER(2,10)",
+   "expected": "1024"
+  },
+  {
+   "formula": "=SQRT(16)",
+   "expected": "4"
+  },
+  {
+   "formula": "=SQRT(-1)",
+   "expected": "Err:502"
+  },
+  {
+   "formula": "=FLOOR(2.5,2)",
+   "expected": "2"
+  },
+  {
+   "formula": "=FLOOR(-2.5,-2)",
+   "expected": "-4"
+  },
+  {
+   "formula": "=FLOOR(0.3,0.1)",
+   "expected": "0.3"
+  },
+  {
+   "formula": "=CEILING(2.5,2)",
+   "expected": "4"
+  },
+  {
+   "formula": "=CEILING(-2.5,-2)",
+   "expected": "-2"
+  },
+  {
+   "formula": "=CEILING(1.01,0.05)",
+   "expected": "1.05"
+  },
+  {
+   "formula": "=2^10",
+   "expected": "1024"
+  },
+  {
+   "formula": "=-2^2",
+   "expected": "4"
+  },
+  {
+   "formula": "=2^-1",
+   "expected": "0.5"
+  },
+  {
+   "formula": "=10/4",
+   "expected": "2.5"
+  },
+  {
+   "formula": "=1/0",
+   "expected": "#DIV/0!"
+  },
+  {
+   "formula": "=0.1+0.2",
+   "expected": "0.3"
+  },
+  {
+   "formula": "=0.1+0.2=0.3",
+   "expected": "1"
+  },
+  {
+   "formula": "=50%",
+   "expected": "0.5"
+  },
+  {
+   "formula": "=B2*10%",
+   "expected": "129.9"
+  },
+  {
+   "formula": "=1E3+1",
+   "expected": "1001"
+  },
+  {
+   "formula": "=\"3\"+1",
+   "expected": "4"
+  },
+  {
+   "formula": "=TRUE+1",
+   "expected": "2"
+  },
+  {
+   "formula": "=\"abc\"*2",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=1+2*3-4/2",
+   "expected": "5"
+  },
+  {
+   "formula": "=\"3\"=3",
+   "expected": "0"
+  },
+  {
+   "formula": "=\"a\"<\"B\"",
+   "expected": "1"
+  },
+  {
+   "formula": "=\"a\"=\"A\"",
+   "expected": "0"
+  },
+  {
+   "formula": "=1<\"a\"",
+   "expected": "1"
+  },
+  {
+   "formula": "=\"z\"<TRUE",
+   "expected": "0"
+  },
+  {
+   "formula": "=A8=0",
+   "expected": "1"
+  },
+  {
+   "formula": "=A8=\"\"",
+   "expected": "1"
+  },
+  {
+   "formula": "=B2>=1299",
+   "expected": "1"
+  },
+  {
+   "formula": "=B8<0",
+   "expected": "1"
+  },
+  {
+   "formula": "=SUMIF(A2:A8,\"M*\",B2:B8)",
+   "expected": "374"
+  },
+  {
+   "formula": "=SUMIF(B2:B8,\">100\")",
+   "expected": "1837.5"
+  },
+  {
+   "formula": "=SUMIF(C2:C8,\"<>3\",B2:B8)",
+   "expected": "1679.99"
+  },
+  {
+   "formula": "=SUMIF(A2:A8,\"mouse\",C2:C8)",
+   "expected": "10"
+  },
+  {
+   "formula": "=SUMIF(F2:F8,\"?-?00\",C2:C8)",
+   "expected": "20"
+  },
+  {
+   "formula": "=SUMIFS(B2:B8,C2:C8,\">1\",B2:B8,\"<1000\")",
+   "expected": "440.5"
+  },
+  {
+   "formula": "=COUNTIF(B2:B8,\">=99.99\")",
+   "expected": "4"
+  },
+  {
+   "formula": "=COUNTIF(A2:A8,\"*o*\")",
+   "expected": "5"
+  },
+  {
+   "formula": "=COUNTIF(C2:C8,0)",
+   "expected": "1"
+  },
+  {
+   "formula": "=COUNTIF(A2:A8,\"\")",
+   "expected": "1"
+  },
+  {
+   "formula": "=COUNTIF(A2:A8,\"<>\")",
+   "expected": "6"
+  },
+  {
+   "formula": "=COUNTIF(C2:C8,\"3\")",
+   "expected": "1"
+  },
+  {
+   "formula": "=COUNTIFS(B2:B8,\">50\",C2:C8,\"<4\")",
+   "expected": "4"
+  },
+  {
+   "formula": "=AVERAGEIF(C2:C8,\">2\",B2:B8)",
+   "expected": "110.125"
+  },
+  {
+   "formula": "=AVERAGEIF(C2:C8,\">100\")",
+   "expected": "#DIV/0!"
+  },
+  {
+   "formula": "=AVERAGEIFS(B2:B8,C2:C8,\">0\",B2:B8,\">50\")",
+   "expected": "479.125"
+  },
+  {
+   "formula": "=COUNTIF(A2:A8,\"m~*\")",
+   "expected": "0"
+  },
+  {
+   "formula": "=IF(B2>1000,\"high\",\"low\")",
+   "expected": "high"
+  },
+  {
+   "formula": "=IF(B3>1000,\"high\")",
+   "expected": "0"
+  },
+  {
+   "formula": "=IF(1/0>1,1,2)",
+   "expected": "#DIV/0!"
+  },
+  {
+   "formula": "=IFS(B4>100,\"a\",B4>10,\"b\",TRUE,\"c\")",
+   "expected": "b"
+  },
+  {
+   "formula": "=IFS(FALSE,1)",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=IFERROR(1/0,\"x\")",
+   "expected": "x"
+  },
+  {
+   "formula": "=IFERROR(5,\"x\")",
+   "expected": "5"
+  },
+  {
+   "formula": "=IFNA(NA(),\"none\")",
+   "expected": "none"
+  },
+  {
+   "formula": "=IFNA(1/0,\"none\")",
+   "expected": "#DIV/0!"
+  },
+  {
+   "formula": "=AND(TRUE,1,B2>0)",
+   "expected": "1"
+  },
+  {
+   "formula": "=AND(B2:B5>0)",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=OR(FALSE,0)",
+   "expected": "0"
+  },
+  {
+   "formula": "=OR(A2:A3)",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=NOT(0)",
+   "expected": "1"
+  },
+  {
+   "formula": "=XOR(TRUE,TRUE,TRUE)",
+   "expected": "1"
+  },
+  {
+   "formula": "=SWITCH(C3,1,\"one\",3,\"three\",\"other\")",
+   "expected": "three"
+  },
+  {
+   "formula": "=SWITCH(C3,1,\"one\")",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=SWITCH(9,1,\"one\",\"default\")",
+   "expected": "default"
+  },
+  {
+   "formula": "=VLOOKUP(\"Mouse\",A2:C8,2,FALSE)",
+   "expected": "25"
+  },
+  {
+   "formula": "=VLOOKUP(\"mouse\",A2:C8,3,0)",
+   "expected": "10"
+  },
+  {
+   "formula": "=VLOOKUP(\"Nope\",A2:C8,2,FALSE)",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=VLOOKUP(\"M*\",A2:C8,2,FALSE)",
+   "expected": "349"
+  },
+  {
+   "formula": "=VLOOKUP(2,C2:C5,1,TRUE)",
+   "expected": "2"
+  },
+  {
+   "formula": "=VLOOKUP(\"Mouse\",A2:C8,5,FALSE)",
+   "expected": "Err:502"
+  },
+  {
+   "formula": "=HLOOKUP(\"Qty\",A1:F8,3,FALSE)",
+   "expected": "3"
+  },
+  {
+   "formula": "=HLOOKUP(\"Price\",A1:F2,2,FALSE)",
+   "expected": "1299"
+  },
+  {
+   "formula": "=INDEX(A1:F8,3,2)",
+   "expected": "349"
+  },
+  {
+   "formula": "=INDEX(B2:B8,4)",
+   "expected": "79"
+  },
+  {
+   "formula": "=INDEX(A2:F2,3)",
+   "expected": "2"
+  },
+  {
+   "formula": "=SUM(INDEX(B2:C8,0,2))",
+   "expected": "27"
+  },
+  {
+   "formula": "=INDEX(A1:F8,20,1)",
+   "expected": "#REF!"
+  },
+  {
+   "formula": "=MATCH(\"Dock\",A1:A8,0)",
+   "expected": "6"
+  },
+  {
+   "formula": "=MATCH(100,B2:B6,1)",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=MATCH(\"d*\",A1:A8,0)",
+   "expected": "6"
+  },
+  {
+   "formula": "=MATCH(5,C2:C3,1)",
+   "expected": "2"
+  },
+  {
+   "formula": "=MATCH(\"x\",A1:A8,0)",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=MATCH(1,C2:C2,-1)",
+   "expected": "1"
+  },
+  {
+   "formula": "=CONCAT(A2,\"-\",B2)",
+   "expected": "Laptop-1299"
+  },
+  {
+   "formula": "=CONCAT(A2:A4)",
+   "expected": "LaptopMonitorMouse"
+  },
+  {
+   "formula": "=TEXTJOIN(\", \",TRUE,A2:A8)",
+   "expected": "Laptop, Monitor, Mouse, Keyboard, Dock, Headset"
+  },
+  {
+   "formula": "=TEXTJOIN(\"/\",FALSE,A7:A8,\"x\")",
+   "expected": "Headset//x"
+  },
+  {
+   "formula": "=LEFT(\"Laptop\",3)",
+   "expected": "Lap"
+  },
+  {
+   "formula": "=LEFT(\"Laptop\")",
+   "expected": "L"
+  },
+  {
+   "formula": "=RIGHT(F2,3)",
+   "expected": "100"
+  },
+  {
+   "formula": "=MID(\"Laptop\",2,3)",
+   "expected": "apt"
+  },
+  {
+   "formula": "=MID(\"abc\",5,2)",
+   "expected": ""
+  },
+  {
+   "formula": "=LEN(A3)",
+   "expected": "7"
+  },
+  {
+   "formula": "=LEN(\"\")",
+   "expected": "0"
+  },
+  {
+   "formula": "=FIND(\"o\",\"Monitor\")",
+   "expected": "2"
+  },
+  {
+   "formula": "=FIND(\"O\",\"Monitor\")",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=FIND(\"o\",\"Monitor\",3)",
+   "expected": "6"
+  },
+  {
+   "formula": "=SEARCH(\"O\",\"Monitor\")",
+   "expected": "2"
+  },
+  {
+   "formula": "=SEARCH(\"m?n\",\"Monitor\")",
+   "expected": "1"
+  },
+  {
+   "formula": "=SEARCH(\"x\",\"abc\")",
+   "expected": "#VALUE!"
+  },
+  {
+   "formula": "=SUBSTITUTE(\"a-b-c\",\"-\",\"+\")",
+   "expected": "a+b+c"
+  },
+  {
+   "formula": "=SUBSTITUTE(\"a-b-c\",\"-\",\"+\",2)",
+   "expected": "a-b+c"
+  },
+  {
+   "formula": "=UPPER(\"Mouse\")",
+   "expected": "MOUSE"
+  },
+  {
+   "formula": "=LOWER(\"MoUSE\")",
+   "expected": "mouse"
+  },
+  {
+   "formula": "=TRIM(\"  a   b  \")",
+   "expected": "a b"
+  },
+  {
+   "formula": "=VALUE(\"42.5\")",
+   "expected": "42.5"
+  },
+  {
+   "formula": "=VALUE(\"abc\")",
+   "expected": "Err:502"
+  },
+  {
+   "formula": "=TEXT(1234.567,\"0.00\")",
+   "expected": "1234.57"
+  },
+  {
+   "formula": "=TEXT(1234.567,\"#,##0\")",
+   "expected": "1,235"
+  },
+  {
+   "formula": "=TEXT(0.256,\"0%\")",
+   "expected": "26%"
+  },
+  {
+   "formula": "=TEXT(0.256,\"0.0%\")",
+   "expected": "25.6%"
+  },
+  {
+   "formula": "=TEXT(-5.5,\"0\")",
+   "expected": "-6"
+  },
+  {
+   "formula": "=\"Total: \"&B2",
+   "expected": "Total: 1299"
+  },
+  {
+   "formula": "=B5&\"\"",
+   "expected": "79"
+  },
+  {
+   "formula": "=1/3&\"\"",
+   "expected": "0.333333333333333"
+  },
+  {
+   "formula": "=TRUE&\"x\"",
+   "expected": "1x"
+  },
+  {
+   "formula": "=DATE(2026,10,16)",
+   "expected": "46311"
+  },
+  {
+   "formula": "=DATE(2026,14,1)",
+   "expected": "46419"
+  },
+  {
+   "formula": "=DATE(2026,3,0)",
+   "expected": "46081"
+  },
+  {
+   "formula": "=YEAR(D2)",
+   "expected": "2026"
+  },
+  {
+   "formula": "=MONTH(D3)",
+   "expected": "2"
+  },
+  {
+   "formula": "=DAY(D4)",
+   "expected": "1"
+  },
+  {
+   "formula": "=D3+1",
+   "expected": "46082"
+  },
+  {
+   "formula": "=D4-D3",
+   "expected": "1"
+  },
+  {
+   "formula": "=WEEKDAY(D2)",
+   "expected": "5"
+  },
+  {
+   "formula": "=WEEKDAY(D2,2)",
+   "expected": "4"
+  },
+  {
+   "formula": "=WEEKDAY(D2,3)",
+   "expected": "3"
+  },
+  {
+   "formula": "=EOMONTH(D2,0)",
+   "expected": "46053"
+  },
+  {
+   "formula": "=EOMONTH(D2,1)",
+   "expected": "46081"
+  },
+  {
+   "formula": "=EOMONTH(D3,-2)",
+   "expected": "46022"
+  },
+  {
+   "formula": "=DATEDIF(D2,D5,\"d\")",
+   "expected": "350"
+  },
+  {
+   "formula": "=DATEDIF(D2,D5,\"m\")",
+   "expected": "11"
+  },
+  {
+   "formula": "=DATEDIF(D7,D6,\"y\")",
+   "expected": "3"
+  },
+  {
+   "formula": "=DATEDIF(D5,D2,\"d\")",
+   "expected": "Err:502"
+  },
+  {
+   "formula": "=YEAR(DATE(2024,2,29)+365)",
+   "expected": "2025"
+  },
+  {
+   "formula": "=D2>D3",
+   "expected": "0"
+  },
+  {
+   "formula": "=MAX(D2:D7)",
+   "expected": "46553"
+  },
+  {
+   "formula": "=TEXT(D2,\"yyyy-mm-dd\")",
+   "expected": "2026-01-15"
+  },
+  {
+   "formula": "=TEXT(D2,\"dd.mm.yyyy\")",
+   "expected": "15.01.2026"
+  },
+  {
+   "formula": "=ISBLANK(A8)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISBLANK(A9)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISNUMBER(B2)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISNUMBER(D2)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISNUMBER(\"5\")",
+   "expected": "0"
+  },
+  {
+   "formula": "=ISTEXT(A2)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISTEXT(B2)",
+   "expected": "0"
+  },
+  {
+   "formula": "=ISERROR(1/0)",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISERROR(1)",
+   "expected": "0"
+  },
+  {
+   "formula": "=ISNA(NA())",
+   "expected": "1"
+  },
+  {
+   "formula": "=ISNA(1/0)",
+   "expected": "0"
+  },
+  {
+   "formula": "=NA()",
+   "expected": "#N/A"
+  },
+  {
+   "formula": "=2^3^2",
+   "expected": "64"
+  },
+  {
+   "formula": "=-2^-2",
+   "expected": "0.25"
+  },
+  {
+   "formula": "=WEEKDAY(D2,11)",
+   "expected": "4"
+  },
+  {
+   "formula": "=WEEKDAY(D2,13)",
+   "expected": "2"
+  },
+  {
+   "formula": "=WEEKDAY(D2,17)",
+   "expected": "5"
+  },
+  {
+   "formula": "=WEEKDAY(D2,2.9)",
+   "expected": "4"
+  },
+  {
+   "formula": "=WEEKDAY(D2,10)",
+   "expected": "Err:502"
+  },
+  {
+   "formula": "=DATEDIF(D7,D6,\"ym\")",
+   "expected": "3"
+  },
+  {
+   "formula": "=DATEDIF(D7,D6,\"md\")",
+   "expected": "17"
+  },
+  {
+   "formula": "=DATEDIF(D7,D6,\"yd\")",
+   "expected": "106"
+  },
+  {
+   "formula": "=DATEDIF(D2,D5,\"md\")",
+   "expected": "16"
+  },
+  {
+   "formula": "=DATEDIF(D2,D5,\"ym\")",
+   "expected": "11"
+  },
+  {
+   "formula": "=DATEDIF(D3,D4,\"yd\")",
+   "expected": "1"
+  },
+  {
+   "formula": "=VLOOKUP(\"Mouse\",A2:C8,2,)",
+   "expected": "25"
+  },
+  {
+   "formula": "=VLOOKUP(2,C2:C5,1,)",
+   "expected": "2"
+  },
+  {
+   "formula": "=1E15&\"\"",
+   "expected": "1000000000000000"
+  },
+  {
+   "formula": "=123456789012345&\"\"",
+   "expected": "123456789012345"
+  },
+  {
+   "formula": "=TEXT(\"abc\",\"0.00\")",
+   "expected": "abc"
+  },
+  {
+   "formula": "=MATCH(5,E2:E7,1)",
+   "expected": "6"
+  },
+  {
+   "formula": "=SUMIF(C2:C8,\">2\",B2:B3)",
+   "expected": "440.5"
+  },
+  {
+   "formula": "=AVERAGEIF(C2:C8,\">2\",B2)",
+   "expected": "110.125"
+  },
+  {
+   "formula": "=SUMIF(C2:C8,\">2\",B2)",
+   "expected": "440.5"
+  }
+ ]
+}

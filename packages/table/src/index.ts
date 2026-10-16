@@ -364,4 +364,15 @@ export * from './lib/table/undo/pending-changes-undoable';
 export * from './lib/table/undo/undo-keymap';
 export * from './lib/table/undo/undo-service';
 export * from './lib/table/data/common/event/ge-undo-event';
+
+// Cell formulas – the engine (since 1.1.99, prompt 013 stage 4, DOM-free)
+export * from './lib/table/sheet/cell-address';
+export { SheetDate, isSheetDate, dateToSerial, serialToDate, FormulaRange, isFormulaRange } from './lib/table/sheet/sheet-values';
+export type { SheetValue } from './lib/table/sheet/sheet-values';
+export * from './lib/table/sheet/cell-formula-options.if';
+export * from './lib/table/sheet/cell-formula-options';
+export { formatFormula } from './lib/table/sheet/format-formula';
+export * from './lib/table/sheet/shift-formula';
+export * from './lib/table/sheet/sheet-engine';
+export * from './lib/table/sheet/sheet-function-info';
 export * from './lib/table/data/common/event/ge-edit-event';

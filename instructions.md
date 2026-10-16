@@ -2087,6 +2087,47 @@ export { tableOptions, listener, wire };
   sorting, filter, row drag. After undo the written cells are selected as one rectangle (after sorting it may span
   rows in between).
 
+### 6.23 Cell formulas – the engine (since 1.1.99)
+
+`SheetEngine` computes Excel formulas with cell references – DOM-free, also without a table. Formulas are texts in the
+data (`"=B2*C2"`); the engine keeps a dependency graph and recalculates **only the dependent cells** after a change.
+
+```ts
+import { SheetEngine } from "@guiexpert/table";
+
+const data: unknown[][] = [
+  ["Product", "Price", "Qty", "Total"],
+  ["Laptop", 1299, 2, "=B2*C2"],
+  ["Mouse", 25, 10, "=B3*C3"],
+  [null, null, null, "=SUM(D2:D3)"],
+];
+const engine = SheetEngine.fromArrays(data);
+engine.getValue(3, 3);                 // 2848
+data[2][2] = 20;
+engine.inputsChanged([[2, 2]]);        // recalculates D3 and D4 only
+engine.getValue(3, 3);                 // 3098
+```
+
+- **Syntax** like Excel: `A1`, `$B$3`, `B2:D10`, `A:A`, `3:3`, `50%`, `"text"` (`""` = quotation mark), `&`, `,` or
+  `;` between arguments, `=-2^2` = 4, `=2^3^2` = 64, empty arguments (`VLOOKUP(x,A:B,2,)` = exact match);
+  `[price]` = the cell of that data column in the same row. Errors are values:
+  `#DIV/0!`, `#NAME?`, `#VALUE!`, `#REF!`, `#N/A`, `#NUM!`, `#CIRC!` (cycles), `#ERROR!` (syntax). Numbers are rounded to
+  15 significant digits (`=0.1+0.2=0.3` is TRUE). Dates are Excel serial numbers inside (1900 system) and `Date` outside.
+- **Functions** (≈ 70, `FORMULA_FUNCTION_INFO`): SUM, SUMPRODUCT, PRODUCT, AVERAGE, MIN, MAX, COUNT, COUNTA,
+  COUNTBLANK, ROUND(UP/DOWN), INT, ABS, MOD, POWER, SQRT, FLOOR, CEILING, RAND, RANDBETWEEN, SUMIF(S), COUNTIF(S),
+  AVERAGEIF(S) (criteria `">5"`, `"<>x"`, `"M*"`), IF, IFS, IFERROR, IFNA, AND, OR, NOT, XOR, SWITCH, VLOOKUP, HLOOKUP,
+  XLOOKUP, INDEX, MATCH, CONCAT, TEXTJOIN, LEFT, RIGHT, MID, LEN, FIND, SEARCH, SUBSTITUTE, UPPER, LOWER, TRIM, VALUE,
+  TEXT (subset), TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, EOMONTH, DATEDIF, ISBLANK, ISNUMBER, ISTEXT, ISERROR, ISNA,
+  NA – checked against LibreOffice; own functions via `{ functions }` (a range argument is a `FormulaRange`).
+  `maxRangeCells` (default 10 million) counts the rows that hold data: `=SUM(A:A)` is fine, a range over 10 million
+  filled cells gives `#ERROR!`. A running sum `=SUM($B$2:B2)` copied down n rows costs O(n²) per change (as in Excel) –
+  `=C1+B2` is linear.
+- **Moving formulas**: `shiftFormula("B2*$F$1", 1, 0)` → `"B3*$F$1"`, `adjustFormula(text, { kind: "deleteRows", at, count })`
+  (Excel's rules, `#REF!`), `parseCellAddress`, `toCellAddress`, `columnLetter`.
+- **Limits**: no array/spill formulas, no sheet references or named ranges, English function names. A running sum
+  `=SUM($B$2:B2)` filled down is quadratic (10 000 rows ≈ 2 s per change in B2) – use `=C1+B2` instead.
+- The table itself uses the engine with the spreadsheet mode (next releases).
+
 ---
 
 ## 7. Not available yet

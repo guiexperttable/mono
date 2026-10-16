@@ -8,12 +8,14 @@
  * | `#VALUE!` | wrong type, e.g. `"abc" * 2` |
  * | `#DIV/0!` | division by zero |
  * | `#NUM!` | the result is not a finite number (`SQRT(-1)`, overflow) |
- * | `#CIRC!` | circular reference between calculated columns |
+ * | `#CIRC!` | circular reference between calculated columns (cell formulas: between cells) |
+ * | `#REF!` | cell formulas: a reference to a deleted or non-existing cell (since 1.1.99) |
+ * | `#N/A` | cell formulas: a lookup found nothing, `NA()` (since 1.1.99) |
  *
  * @since 1.1.95
  * @category Calculated columns & formulas
  */
-export type FormulaErrorCode = "#ERROR!" | "#NAME?" | "#VALUE!" | "#DIV/0!" | "#NUM!" | "#CIRC!";
+export type FormulaErrorCode = "#ERROR!" | "#NAME?" | "#VALUE!" | "#DIV/0!" | "#NUM!" | "#CIRC!" | "#REF!" | "#N/A";
 
 /**
  * An error value of a formula. Formulas never throw: a cell shows the {@link FormulaErrorCode} (`toString()`), the

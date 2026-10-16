@@ -400,6 +400,21 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `onModelChanged` gehört zum Schritt und löscht beim Undo kein Redo, Undo im gestarteten Batch merkt vor,
       ausgeblendete Zeilen in Gruppierung/Baum, Editierbarkeit ausgeblendeter Zeilen, `batchUndoable` bei Ausnahme bzw.
       `clear()`, alter Wert ausgeblendeter Zeilen, eine Ansage statt zwei.
+      **Etappe 4 umgesetzt** (16.10.2026, Branch `feat/spreadsheet-4-engine`): DOM-freie Formel-Engine `SheetEngine`.
+      Offen aus Etappe 4: Bench-Ziele teils verfehlt (Laden 20 000 Formeln ≈ 245 ms statt < 150 ms; `SUM(A:A)` über
+      1 Mio. Zeilen ≈ 61 ms statt < 50 ms; laufende Summe 10 000 Zeilen ≈ 2,3 s je Änderung) → Präfix-Summen für
+      Bereiche mit festem Anfang, schnelleres Laden (Parse-Cache für gleiche Formeltexte) · Speicher je Formelzelle im
+      Bench ohne `--expose-gc` nicht verlässlich messbar (≈ 6 KB gemessen inkl. Daten) · XLOOKUP nicht gegen
+      LibreOffice geprüft (erst ab 24.8) · Abweichungen LibreOffice ↔ Excel (Engine folgt Excel) in
+      `sheet-reference.spec.ts` · keine Matrix-/Spill-Formeln, keine Blattbezüge, keine benannten Bereiche ·
+      `MIN`/`MAX` über Daten liefern eine Zahl (Design: Datum) · `""` in den **Daten** ist leer (geleerte Zelle), `""`
+      als Formelergebnis zählt bei `COUNTA` (wie Excel). Review (unabhängiger Agent, 19 Befunde) eingearbeitet:
+      Wildcards ohne Regex (kein katastrophales Backtracking), `FormulaRange.get` begrenzt, SUMIF/AVERAGEIF-Summenbereich
+      beim Kompilieren auf die Kriteriengröße (Graph kennt die Zellen), XLOOKUP-Größenprüfung, unbekannte Namen behalten
+      ihren Text, `^` linksassoziativ (Zellformeln), Bereichslisten je Spalte nach Endzeile sortiert + Abhängige je
+      Neuberechnung einmal gesucht, Lookups ohne Kopie + Typrang, `maxRangeCells` zur Auswertungszeit, leeres Argument,
+      Exponent ab 16 Stellen, `TEXT` von Text, Einfügen am Blattende, `adjustForStructureChange` nur bei echter
+      Änderung (Schreibweise bleibt), `DATE(1900,2,29)` = 60, `WEEKDAY` 11–17, `DATEDIF` ym/md/yd, `isSheetDate`.
 
 ## Mono-Repo / Build
 
@@ -668,6 +683,14 @@ Objekt-Tabelle hat `ge-focused-row`.
   `BatchEditService.getPendingEntry/restorePending`, `PendingCellChanges.put`, `TableScope.writeUndoCells/
   getUndoOptions/getUndoTexts`. **Typ-Erweiterung:** `CellChangeSource` hat die neuen Werte `"undo"` und `"redo"`.
   Ohne Option keine Verhaltensänderung.
+  **Zellformel-Engine (013, Etappe 4)**, additiv: `SheetEngine`, `SheetDataSourceIf`, `SheetRecalcResultIf`,
+  `isFormulaText`, `CellFormulaOptionsIf`, `CellFormulaOptions`, `SheetDate`, `isSheetDate`, `dateToSerial`,
+  `serialToDate`, `FormulaRange`, `isFormulaRange`, `SheetValue`, `columnLetter`, `columnIndexOfLetter`, `toCellAddress`,
+  `parseCellAddress`, `parseRangeAddress`, `CellAddressIf`, `RangeAddressIf`, `SHEET_MAX_ROWS`, `SHEET_MAX_COLUMNS`,
+  `formatFormula`, `shiftFormula`, `offsetReferences`, `adjustFormula`, `SheetStructureEditIf`,
+  `FORMULA_FUNCTION_INFO`, `FormulaFunctionInfoIf`, `FormulaRefNode`. **Typ-Erweiterungen:** `FormulaNode` hat die
+  Knoten `ref`, `range`, `error` und den unären Operator `"%"` (Spaltenformeln 008 erzeugen sie nie; ein erschöpfendes
+  `switch` beim Anwender meldet sie), `FormulaErrorCode` hat `"#REF!"` und `"#N/A"`. Spaltenformeln (008) unverändert.
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

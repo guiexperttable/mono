@@ -186,6 +186,15 @@ npm-Pakete (`TODO.md`) – die Routen `rowgroup` und `pivot` kommen nach dem Rel
 `packages/angular-table/instructions.md` Abschnitt 11, lauffähige Demos im Mono-Repo: `pnpm serve:table-demo` →
 `/row-grouping.html` und `/pivot.html`.
 
+## Tabellenkalkulation (ab `@guiexpert/table` 1.1.99)
+
+Route `demo/spreadsheet` (`src/app/spreadsheet/`): ein Angebot als Tabellenblatt – `SpreadsheetFactory.create({ data })`
+mit Spaltenbuchstaben, Zeilennummern und Zellformeln (`=B2*C2*(1-D2)`, `=SUM(E2:E6)`), Bearbeiten wie in Excel (Tippen,
+F2, Enter/Tab, Entf), Kopieren und Einfügen mit Excel, Rückgängig/Wiederholen. Die Formelleiste ist `FormulaBar` (reines
+DOM über der Tabelle, angelegt in `(tableReady)`), die Knöpfe folgen `(undoStackChanged)`. Excel-Export mit echten
+Formeln: `downloadExcel("quote.xlsx", "", { cellFormulas: true })`. Bestehende Tabellen bekommen dasselbe mit
+`tableOptions.spreadsheet = true`. Details: `instructions.md` 6.20 – 6.25 im Repo-Root, Schulung Kapitel 40.
+
 ## Lizenz
 
 **Aktuelle Releases: MIT-Lizenz** – kostenlos nutzbar, auch kommerziell. **Künftige Releases: mögliche

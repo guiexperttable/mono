@@ -22,6 +22,32 @@ describe('stage 4 review', () => {
     expect(value('COUNTIF(A1:A3,"<>x")', [['x'], [null], ['y']])).toBe(2); // … but count for "<>x"
   });
 
+  it('#1b: SEARCH with wildcards is not quadratic in the text (every start position, leading star or not)', () => {
+    const long = 'a'.repeat(20_000);
+    const start = performance.now();
+    expect(value(`SEARCH("${'a*'.repeat(30)}b",A1)`, [[long]])).toBe('#VALUE!'); // matches at every start – but no "b"
+    expect(value(`SEARCH("${'*a'.repeat(30)}b",A1)`, [[long]])).toBe('#VALUE!');
+    expect(value(`SEARCH("a?a*b",A1)`, [[long + 'b']])).toBe(1);
+    expect(performance.now() - start).toBeLessThan(2000);
+  });
+
+  it('#1c: SEARCH with wildcards gives the same position as a regular expression (random texts and patterns)', () => {
+    let seed = 7;
+    const rnd = (n: number) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    const pick = (alphabet: string, max: number) => Array.from({ length: rnd(max + 1) }, () => alphabet[rnd(alphabet.length)]).join('');
+    for (let n = 0; n < 3000; n++) {
+      const text = pick('abcAB', 9);
+      const pattern = pick('ab*?', 6) || 'a';
+      const from = 1 + rnd(text.length + 1);
+      const re = new RegExp('^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.'), 'is');
+      let expected: unknown = '#VALUE!';
+      for (let i = from - 1; i <= text.length; i++) {
+        if (re.test(text.slice(i))) { expected = i + 1; break; }
+      }
+      expect(value(`SEARCH("${pattern}",A1,${from})`, [[text]]), `SEARCH("${pattern}","${text}",${from})`).toBe(expected);
+    }
+  });
+
   it('#2: a range is never read outside its rectangle; SUMIF resizes the sum range (and depends on it)', () => {
     const read: Array<[number, number]> = [];
     const range = new FormulaRange(1, 1, 2, 2, (r, c) => { read.push([r, c]); return 1; });

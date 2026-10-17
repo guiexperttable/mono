@@ -937,15 +937,40 @@ function findOrSearch(a: SheetValue[], o: ValueOptions, search: boolean): SheetV
     const i = within.indexOf(what, from - 1);
     return i < 0 ? VALUE(`"${what}" not found`) : i + 1;
   }
-  // the first position where the pattern matches the text from there on (pattern + "*")
-  const tokens = [...compileGlob(what), { kind: "star" } as GlobToken];
-  const first = tokens[0];
-  const lower = within.toLowerCase();
-  for (let i = from - 1; i <= within.length; i++) {
-    if (first.kind === "char" && lower[i] !== first.ch) continue;
-    if (globMatch(tokens, within, i)) return i + 1;
+  const i = searchGlob(compileGlob(what), within, from - 1);
+  return i < 0 ? VALUE(`"${what}" not found`) : i + 1;
+}
+
+/**
+ * The first position ≥ `from` where the pattern matches the text from there on (SEARCH: the pattern plus an implicit
+ * trailing `*`), or -1. Linear in the text, not quadratic: the pattern is split into its star-free head and the rest
+ * (from the first star on). Whether the rest matches from position k is monotone in k – a leading star absorbs any
+ * extra characters – so the last such k is found once by binary search; then only the head is compared per position.
+ */
+function searchGlob(pattern: GlobToken[], text: string, from: number): number {
+  const tokens: GlobToken[] = pattern.concat({ kind: "star" });
+  const headLength = tokens.findIndex(t => t.kind === "star");
+  const rest = tokens.slice(headLength);
+  let lo = from + headLength;
+  let hi = text.length;
+  if (lo > hi || !globMatch(rest, text, lo)) return -1;
+  while (lo < hi) { // the last k in [lo, hi] where the rest still matches
+    const mid = Math.ceil((lo + hi) / 2);
+    if (globMatch(rest, text, mid)) lo = mid;
+    else hi = mid - 1;
   }
-  return VALUE(`"${what}" not found`);
+  const lastRestStart = lo;
+  const lower = text.toLowerCase();
+  for (let i = from; i + headLength <= lastRestStart; i++) {
+    let k = 0;
+    while (k < headLength) {
+      const t = tokens[k] as { kind: "char"; ch: string } | { kind: "any" };
+      if (t.kind === "char" && t.ch !== lower[i + k]) break;
+      k++;
+    }
+    if (k === headLength) return i;
+  }
+  return -1;
 }
 
 /** The text of a number for messages and TEXT. */

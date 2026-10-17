@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import {
-  ColumnDef, EventAdapter, FormulaBar, SpreadsheetFactory, TableFactory, TableOptions, applySpreadsheetPreset, isFormulaError,
+  AreaModelSheet, ColumnDef, EventAdapter, FormulaBar, SpreadsheetFactory, TableFactory, TableOptions, applySpreadsheetPreset, isFormulaError,
   isSpreadsheetTableModel,
 } from '@guiexpert/table';
 import type { GeModelChangeEvent, SpreadsheetParamIf, TableOptionsIf } from '@guiexpert/table';
@@ -231,8 +231,18 @@ describe('spreadsheet', () => {
   });
 
   it('X7: a million empty rows stay sparse and quick', async () => {
+    // no per-cell work on mount: a sheet has no spans, so the span scan (rows × columns calls) is skipped
+    const original = AreaModelSheet.prototype.getColspanAt;
+    let spanCalls = 0;
+    AreaModelSheet.prototype.getColspanAt = function (this: AreaModelSheet, r: number, c: number) {
+      spanCalls++;
+      return original.call(this, r, c);
+    };
     const start = performance.now();
-    const t = await sheet({ rowCount: 1_000_000, data: [[1, '=A1*2']] });
+    const t = await sheet({ rowCount: 1_000_000, data: [[1, '=A1*2']] }).finally(() => {
+      AreaModelSheet.prototype.getColspanAt = original;
+    });
+    expect(spanCalls).toBeLessThan(10_000);
     expect(performance.now() - start).toBeLessThan(3000);
     expect(t.value(0, B)).toBe(2);
     t.api.scrollToIndex(1, 999_990);

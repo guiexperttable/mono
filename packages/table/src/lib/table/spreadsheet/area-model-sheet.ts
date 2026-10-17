@@ -231,6 +231,20 @@ export class AreaModelSheet extends AbstractAreaModel<unknown[]> {
     return this.defaultRowHeight > 0 ? this.defaultRowHeight : undefined;
   }
 
+  /**
+   * A sheet has no merged cells: the table skips the span scan (rows × columns calls on every init).
+   *
+   * @returns {number} 1
+   */
+  override getMaxColspan(): number {
+    return 1;
+  }
+
+  /** @returns {number} 1 – no merged cells (see {@link getMaxColspan}) */
+  override getMaxRowspan(): number {
+    return 1;
+  }
+
   /** A filter: the predicate gets the row as array of inputs (`[]` for an empty row). */
   externalFilterChanged(predictFn: FilterFunction<any>): void {
     const shown: number[] = [];

@@ -1,11 +1,11 @@
 import type { TableScope } from "../table-scope";
 import type { CellChangeIf } from "./cell-change.if";
 import type { BatchEditOptionsIf } from "./batch-edit-options.if";
-import type { ColumnDefIf } from "../data/tablemodel/column/column-def.if";
 import { BatchEditOptions } from "./batch-edit-options";
 import { PendingCellChanges, PendingCellIf } from "./pending-cell-changes";
 import { GeBatchEditEvent, GeBatchEditEventType } from "../data/common/event/ge-batch-edit-event";
 import { isAreaModelRowGroups, isAreaModelTree, isTreeRow } from "../instanceof-workaround";
+import { writeRowValue } from "./write-row-value";
 
 /** A value to mark as pending – prepared by {@link TableScope.applyCellChanges}. */
 export interface PendingInputIf {
@@ -146,6 +146,65 @@ export class BatchEditService {
   }
 
   /**
+   * The pending entry of a cell by row key and property (undo of a batch edit step).
+   *
+   * @param {unknown} rowKey - row object (index for models without objects)
+   * @param {string} property - the property of the column
+   * @returns {PendingCellIf | undefined} the entry
+   * @since 1.1.99
+   */
+  getPendingEntry(rowKey: unknown, property: string): PendingCellIf | undefined {
+    return this.pending.get(rowKey, property);
+  }
+
+  /**
+   * Puts pending entries back (undo/redo of a batch edit step): an entry is set as it was, none removes the cell's
+   * pending value. Reports `onBatchEditChanged` "change"; the caller repaints.
+   *
+   * @param {{ rowKey: unknown, property: string, entry?: PendingCellIf }[]} cells - the cells
+   * @returns {CellChangeIf[]} the cells with their display index (`-1` if not shown)
+   * @since 1.1.99
+   */
+  restorePending(cells: { rowKey: unknown; property: string; entry?: PendingCellIf }[], announce = true): CellChangeIf[] {
+    for (const cell of cells) {
+      if (cell.entry) {
+        this.pending.put(cell.entry);
+      } else {
+        this.pending.remove(cell.rowKey, cell.property);
+      }
+    }
+    if (!cells.length) {
+      return [];
+    }
+    const body = this.tableScope.tableModel.getBodyModel();
+    const keys = new Set(cells.map(c => c.rowKey));
+    const indexOfRow = new Map<unknown, number>();
+    const n = body.getRowCount();
+    for (let i = 0; i < n && indexOfRow.size < keys.size; i++) {
+      const key = this.rowKeyOf(i);
+      if (keys.has(key) && !indexOfRow.has(key)) indexOfRow.set(key, i);
+    }
+    const changes: CellChangeIf[] = cells.map(cell => {
+      const rowIndex = typeof cell.rowKey === "number" ? cell.rowKey : indexOfRow.get(cell.rowKey) ?? -1;
+      const columnIndex = this.findColumnIndex(cell.property);
+      const modelValue = rowIndex >= 0 && columnIndex >= 0 ? body.getValueAt(rowIndex, columnIndex) : undefined;
+      return {
+        row: typeof cell.rowKey === "number" ? undefined : cell.rowKey,
+        rowIndex,
+        columnIndex,
+        property: cell.property,
+        oldValue: cell.entry ? cell.entry.oldValue : modelValue,
+        newValue: cell.entry ? cell.entry.newValue : modelValue,
+      };
+    });
+    this.fire("change", changes);
+    if (announce) {
+      this.tableScope.announce(this.texts().pendingChanges(this.pending.size()));
+    }
+    return changes;
+  }
+
+  /**
    * All pending changes with the current display indices (one scan of the shown rows).
    *
    * @returns {CellChangeIf[]} the pending cells
@@ -196,6 +255,7 @@ export class BatchEditService {
     if (!this.isPermanent()) {
       this.started = false;
     }
+    scope.undoService?.clear(); // the pending steps no longer exist (since 1.1.99)
     const written = scope.writeCells(shown, "commit", { extraChanges: hidden, skipValidation: true });
     const body = tableModel.getBodyModel();
     if (hidden.length && isAreaModelRowGroups(body)) {
@@ -213,6 +273,7 @@ export class BatchEditService {
     const discarded = this.getPendingChanges();
     const wasActive = this.started;
     this.pending.clear();
+    this.tableScope.undoService?.clear(); // the pending steps no longer exist (since 1.1.99)
     if (!this.isPermanent()) {
       this.started = false;
     }
@@ -310,34 +371,4 @@ export class BatchEditService {
   private texts() {
     return this.tableScope.getEditTexts();
   }
-}
-
-/**
- * Writes a value directly into a row object – for a commit of a row that a filter hides (no display index, so no
- * `setValue`). The value has passed the `editInputPipe` already.
- */
-function writeRowValue(row: unknown, columnDef: ColumnDefIf | undefined, columnIndex: number, value: unknown): boolean {
-  if (row === null || typeof row !== "object") {
-    return false;
-  }
-  if (Array.isArray(row)) {
-    row[columnIndex] = value;
-    return true;
-  }
-  if (!columnDef?.property) {
-    return false;
-  }
-  if (columnDef.valueGetter) {
-    return !!columnDef.valueSetter && columnDef.valueSetter(row, value) !== false;
-  }
-  const path = columnDef.property.split(".");
-  let target: any = row;
-  for (let i = 0; i < path.length - 1; i++) {
-    target = target?.[path[i]];
-    if (target === null || typeof target !== "object") {
-      return false;
-    }
-  }
-  target[path[path.length - 1]] = value;
-  return true;
 }

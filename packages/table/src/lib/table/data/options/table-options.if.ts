@@ -2,6 +2,7 @@ import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-op
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
+import type { UndoOptionsIf } from "../../undo/undo-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
@@ -422,6 +423,25 @@ export interface TableOptionsIf {
    * @since 1.1.99
    */
   clipboard?: boolean | Partial<ClipboardOptionsIf>;
+
+  /**
+   * Undo and redo: Ctrl/⌘+Z undoes the last change – an edit, a fill, a paste, a cut, Delete – as **one** step,
+   * Ctrl+Y or Ctrl/⌘+Shift+Z redoes it (source `"undo"`/`"redo"` in `onModelChanged`). Cells are found by their row
+   * object (sorting and filtering in between don't matter). `true` = defaults ({@link UndoOptions}); without the option
+   * Ctrl/⌘+Z does nothing (as before). In a batch edit the marked values are undone; commit and cancel empty the
+   * history.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   editing: true,
+   *   clipboard: true,
+   *   undo: true,
+   * };
+   *
+   * @since 1.1.99
+   */
+  undo?: boolean | Partial<UndoOptionsIf>;
 
   /**
    * Batch edit always on: edited and filled values are collected (marked `ge-table-cell-pending`) and written with

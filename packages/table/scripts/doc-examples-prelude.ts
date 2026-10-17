@@ -39,7 +39,9 @@ import {
   editingShortcutLayer, CellEditorService, GeEditEvent, GeEditEventType, DEFAULT_GET_EDIT_RENDERER,
   ClipboardOptionsIf, ClipboardOptions, CopyContextIf, PasteContextIf, toTsv, parseTsv, HtmlTableCellIf, toHtmlTable,
   parseHtmlTable, PasteRequestIf, PastePlanIf, computePastePlan, getPasteSize, createNumberInputPipe, createDateInputPipe,
-  booleanInputPipe, sheetInputPipe, clipboardShortcutLayer, ClipboardService
+  booleanInputPipe, sheetInputPipe, clipboardShortcutLayer, ClipboardService,
+  UndoOptionsIf, UndoOptions, UndoableIf, UndoResultIf, UndoStack, CellChangesUndoable, PendingChangesUndoable,
+  PendingSnapshotIf, undoShortcutLayer, UndoService, GeUndoEvent
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -48,6 +50,9 @@ declare const hint: HTMLElement;
 declare const select: HTMLSelectElement;
 declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, editButton: HTMLButtonElement;
 declare const copyButton: HTMLButtonElement, cutButton: HTMLButtonElement;
+declare const undoButton: HTMLButtonElement, redoButton: HTMLButtonElement;
+declare const firstChanges: CellValueChangeIf[], secondChanges: CellValueChangeIf[];
+declare function save(rows: unknown): Promise<void>;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
   category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled";

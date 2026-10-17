@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -16,6 +16,7 @@ export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
 export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 export type GeDetailEventFn = (evt: GeDetailEvent) => void;
 export type GeEditEventFn = (evt: GeEditEvent) => void;
+export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -47,6 +48,8 @@ export interface GuiexpertTableProps {
   detailExpandedChanged?: GeDetailEventFn,
   /** The cell editor opened, its text changed, it committed or it was cancelled (since 1.1.99). */
   editingChanged?: GeEditEventFn,
+  /** The undo history changed (since 1.1.99). */
+  undoStackChanged?: GeUndoEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

@@ -62,6 +62,9 @@ export const actionIds = [
   // copy, cut and paste (tableOptions.clipboard, since 1.1.99)
   "CUT_2_CLIPBOARD",             // Ctrl/⌘+X: copy and mark the cells, they move on the next paste
   "PASTE_FROM_CLIPBOARD",        // Ctrl/⌘+V: paste from the anchor (tiled over a selected range)
+  // undo and redo (tableOptions.undo, since 1.1.99)
+  "UNDO",                        // Ctrl/⌘+Z: undo the last change
+  "REDO",                        // Ctrl+Y, Ctrl/⌘+Shift+Z: redo it
 ] as const;
 
 /**

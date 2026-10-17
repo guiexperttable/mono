@@ -27,6 +27,7 @@ import type { FormulaOptionsIf } from './formula/formula-options.if';
 import { FormulaError } from './formula/formula-error';
 import type { RowDropTargetIf } from './row-drag/row-drop-target.if';
 import type { CellChangeIf, CellChangeSource } from './batch-edit/cell-change.if';
+import type { GeUndoEvent } from './data/common/event/ge-undo-event';
 import type { CellValueChangeIf } from './batch-edit/cell-value-change.if';
 import type { FillDirection } from './fill/fill-direction.type';
 import type { FillMode } from './fill/fill-series';
@@ -1924,6 +1925,8 @@ export class TableApi {
    *
    * @param {CellValueChangeIf[]} changes - display row index, column (index or property) and value per cell
    * @param {CellChangeSource} [source="api"] - reported in {@link GeModelChangeEvent.source}
+   * @param {{ undoable?: boolean }} [opts] - `undoable`: record the change for undo ({@link TableOptionsIf.undo}) – default:
+   *        `UndoOptionsIf.recordApiChanges` for `"api"`, recorded for the other sources (since 1.1.99)
    * @returns {CellChangeIf[]} the written (batch edit: newly pending) cells
    *
    * @example
@@ -1939,8 +1942,8 @@ export class TableApi {
    *
    * @since 1.1.96
    */
-  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = "api"): CellChangeIf[] {
-    return this.tableScope.applyCellChanges(changes, source);
+  applyCellChanges(changes: CellValueChangeIf[], source: CellChangeSource = "api", opts: { undoable?: boolean } = {}): CellChangeIf[] {
+    return this.tableScope.applyCellChanges(changes, source, opts);
   }
 
   /**
@@ -2205,6 +2208,115 @@ export class TableApi {
    */
   cancelCut(): void {
     this.tableScope.clipboardService?.cancelCut();
+  }
+
+  // ---------------------------------------------------------------------------------- undo and redo (since 1.1.99)
+
+  /**
+   * Undoes the last change like Ctrl/⌘+Z ({@link TableOptionsIf.undo}): the old values are written back
+   * (`onModelChanged` with source `"undo"`), the cells are selected and scrolled into view. Not while the cell editor
+   * is open (it has its own text undo).
+   *
+   * @returns {boolean} true if a step was undone; false without the option or with nothing to undo
+   *
+   * @example
+   * undoButton.addEventListener("click", () => tableApi.undo());
+   *
+   * @since 1.1.99
+   */
+  undo(): boolean {
+    return !!this.tableScope.undoService?.undo();
+  }
+
+  /**
+   * Redoes the last undone change like Ctrl+Y / Ctrl/⌘+Shift+Z (source `"redo"`).
+   *
+   * @returns {boolean} true if a step was redone
+   *
+   * @example
+   * redoButton.addEventListener("click", () => tableApi.redo());
+   *
+   * @since 1.1.99
+   */
+  redo(): boolean {
+    return !!this.tableScope.undoService?.redo();
+  }
+
+  /**
+   * True if there is a change to undo – for buttons (or listen to `onUndoStackChanged`).
+   *
+   * @returns {boolean} true if {@link undo} would undo something
+   *
+   * @example
+   * undoButton.disabled = !tableApi.canUndo();
+   *
+   * @since 1.1.99
+   */
+  canUndo(): boolean {
+    return !!this.tableScope.undoService?.canUndo();
+  }
+
+  /**
+   * True if there is an undone change to redo.
+   *
+   * @returns {boolean} true if {@link redo} would redo something
+   *
+   * @example
+   * redoButton.disabled = !tableApi.canRedo();
+   *
+   * @since 1.1.99
+   */
+  canRedo(): boolean {
+    return !!this.tableScope.undoService?.canRedo();
+  }
+
+  /**
+   * Empties the undo history (e.g. after saving or loading new data).
+   *
+   * @example
+   * await save(rows);
+   * tableApi.clearUndoHistory();
+   *
+   * @since 1.1.99
+   */
+  clearUndoHistory(): void {
+    this.tableScope.undoService?.clear();
+  }
+
+  /**
+   * The state of the undo history (what `onUndoStackChanged` reports).
+   *
+   * @returns {GeUndoEvent | undefined} can undo/redo, labels, size; `undefined` without the option
+   *
+   * @example
+   * const state = tableApi.getUndoState();
+   * undoButton.title = state?.undoLabel ? `Undo ${state.undoLabel}` : "Undo";
+   *
+   * @since 1.1.99
+   */
+  getUndoState(): GeUndoEvent | undefined {
+    return this.tableScope.undoService?.getState();
+  }
+
+  /**
+   * Records all changes `fn` makes (several {@link applyCellChanges} calls, a fill and a paste …) as **one** undo step.
+   * Without the option `fn` just runs.
+   *
+   * @param {string} label - the label of the step ("Undo Import")
+   * @param {() => T} fn - the changes
+   * @returns {T} what `fn` returns
+   *
+   * @example
+   * tableApi.batchUndoable("Import", () => {
+   *   tableApi.applyCellChanges(firstChanges, "api", { undoable: true });
+   *   tableApi.applyCellChanges(secondChanges, "api", { undoable: true });
+   * });
+   *
+   * @since 1.1.99
+   */
+  batchUndoable<T>(label: string, fn: () => T): T {
+    const service = this.tableScope.undoService;
+    return service ? service.batch(label, fn) : fn();
   }
 
   // ------------------------------------------------------------------------------- master/detail (since 1.1.97)

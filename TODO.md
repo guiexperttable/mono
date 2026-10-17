@@ -293,7 +293,7 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `videos/10-fill-handle-batch-edit/`, `apps/table-demo/fill-batch.html`. Selbständig umgesetzt.
       Offen: Angular-Demo nach dem Release (die App nutzt npm-Pakete); Demo-Repo entfällt (kein neues Kapitel).
 - [ ] Folgepunkte 010: ~~Einfügen aus der Zwischenablage~~ – **erledigt in 1.1.99** (013 Etappe 2,
-      `tableOptions.clipboard`, `api.pasteText`) · **Undo/Redo** (Stapel aus `GeModelChangeEvent.changes`, Undo = `applyCellChanges` mit `oldValue`,
+      `tableOptions.clipboard`, `api.pasteText`) · ~~Undo/Redo~~ – **erledigt in 1.1.99** (013 Etappe 3, `tableOptions.undo`) (Stapel aus `GeModelChangeEvent.changes`, Undo = `applyCellChanges` mit `oldValue`,
       Strg/⌘+Z/Y; Batch: vorgemerkte Änderungen rückgängig) · Doppelklick auf das Handle = bis zum Ende der Nachbarspalte
       füllen (ag-Grid/Excel) · Ziehen in den Bereich hinein = leeren (Excel) · Copy/Excel zeigen im Batch-Modus die
       geschriebenen, nicht die vorgemerkten Werte (bewusst wie ag-Grid; ggf. Option) · vorgemerkte Werte werden bei
@@ -387,6 +387,19 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `pasteAddsRows` nicht im Batch-Modus, Kopfzeile nicht beim Ausschneiden, Locale-Pipes ohne Fehltreffer
       („SKU 123“, „+49 123“, „1.2.3“), leere letzte Zeile im TSV, abgewählte Zellen, Datum/`null` als Text, Unterklassen
       von `CopyService`, gefrorene Spaltendefinitionen, iOS-Zoom.
+      **Etappe 3 umgesetzt** (16.10.2026, Branch `feat/spreadsheet-3-undo`): Undo/Redo mit `tableOptions.undo`. Offen
+      aus Etappe 3: Row Drag (009) wird nicht aufgezeichnet (Design: bleibt außerhalb; Zellen-Undo danach funktioniert,
+      weil über Zeilenobjekte) · ausgefilterte Zeilen werden direkt ins Objekt zurückgesetzt – bei Arrays über den
+      Spaltenindex (verschobene Spalten bei Array-Modellen: siehe `changeColumnOrder`-Befund) · eigene `AreaModel` ohne
+      `getAllRows` können ausgefilterte Zeilen nicht zurücksetzen (übersprungen) · `updateCells`/Live-Daten werden nicht
+      aufgezeichnet, ein inzwischen geänderter Wert wird übersprungen (`onConflict`) · `api.addRows`/`removeRows`
+      leeren den Verlauf (neues Array), Einfügen mit `pasteAddsRows` nicht – Undo davon setzt Werte zurück, die neuen
+      Zeilen bleiben · Auswahl nach Undo = umschließendes Rechteck · nach `setRows` meldet erst der nächste Zugriff den
+      leeren Verlauf (kein Event beim Ersetzen) · Undo im laufenden Batch merkt alte Werte roh vor (Commit schickt sie
+      durch die `editInputPipe`). Review (unabhängiger Agent, 11 Befunde) eingearbeitet: Handler-Schreiben im
+      `onModelChanged` gehört zum Schritt und löscht beim Undo kein Redo, Undo im gestarteten Batch merkt vor,
+      ausgeblendete Zeilen in Gruppierung/Baum, Editierbarkeit ausgeblendeter Zeilen, `batchUndoable` bei Ausnahme bzw.
+      `clear()`, alter Wert ausgeblendeter Zeilen, eine Ansage statt zwei.
 
 ## Mono-Repo / Build
 
@@ -646,6 +659,15 @@ Objekt-Tabelle hat `ge-focused-row`.
   `TableScope.writePastedCells/selectBodyRange/getClipboardService`, CSS `table-clipboard.css`
   (`--ge-table-cut-range-border`, `--ge-table-cut-range-border-alt`). **Typ-Erweiterung:** `CellChangeSource` hat die
   neuen Werte `"paste"` und `"cut"`. Ohne Option keine Verhaltensänderung (Strg/⌘+X bleibt `DESELECT_ALL`).
+  **Undo/Redo (013, Etappe 3)**, additiv: `TableOptionsIf.undo` (`UndoOptionsIf`, `UndoOptions`), `UndoableIf`,
+  `UndoResultIf`, `UndoStack`, `CellChangesUndoable`, `PendingChangesUndoable`, `PendingSnapshotIf`, `UndoService`
+  (Internals), `undoShortcutLayer`, `GeUndoEvent` + `EventListenerIf.onUndoStackChanged?` (Wrapper-Event
+  `undoStackChanged` in allen sieben Wrappern), `TableApi.undo/redo/canUndo/canRedo/clearUndoHistory/getUndoState/
+  batchUndoable`, `TableApi.applyCellChanges(changes, source, opts?)` (3. Parameter `{ undoable }`), `ActionId`s `UNDO`,
+  `REDO`, `AriaTextsIf.undone/redone/nothingToUndo/nothingToRedo/undoSkipped/undoHistoryCleared`,
+  `BatchEditService.getPendingEntry/restorePending`, `PendingCellChanges.put`, `TableScope.writeUndoCells/
+  getUndoOptions/getUndoTexts`. **Typ-Erweiterung:** `CellChangeSource` hat die neuen Werte `"undo"` und `"redo"`.
+  Ohne Option keine Verhaltensänderung.
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

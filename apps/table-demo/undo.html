@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+  Undo and redo (since 1.1.99, prompt 013 stage 3).
+  Start: pnpm serve:table-demo → http://localhost:4200/undo.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – Undo and redo</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 900px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .table-div { height: 420px; width: 100%; max-width: 900px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+    kbd { font: 12px ui-monospace, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+<h1>Orders – undo and redo</h1>
+<p>Type, paste, fill (drag the handle), cut or <kbd>Delete</kbd> – then <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd>. Redo with
+  <kbd>Ctrl</kbd>+<kbd>Y</kbd> or <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>. Sort in between: undo still finds
+  the right rows.</p>
+<div class="bar">
+  <button id="undo" type="button" disabled>Undo</button>
+  <button id="redo" type="button" disabled>Redo</button>
+  <label><input id="batch" type="checkbox"> batch edit</label>
+  <button id="commit" type="button">Commit</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="table-div"></div>
+<pre id="log" aria-live="off"></pre>
+<script src="/src/undo/undo-demo.ts" type="module"></script>
+</body>
+</html>

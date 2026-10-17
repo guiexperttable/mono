@@ -51,6 +51,8 @@ describe('actionIds', () => {
       'CLEAR_AND_EDIT',
       'CUT_2_CLIPBOARD',
       'PASTE_FROM_CLIPBOARD',
+      'UNDO',
+      'REDO',
     ]);
   });
 

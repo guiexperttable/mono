@@ -477,6 +477,18 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   fasst zusammen (`GroupUndoable`). Tasten `undoShortcutLayer(mac)` (`UNDO`, `REDO`), im Editor nicht (INPUT-Ziel).
   Event `onUndoStackChanged` (`GeUndoEvent`, Wrapper `undoStackChanged`), API `undo`, `redo`, `canUndo`, `canRedo`,
   `clearUndoHistory`, `getUndoState`, `batchUndoable`. `CellChangeSource` + `"undo"`, `"redo"`.
+- **Zellformel-Engine (seit 1.1.99, `sheet/`, DOM-frei, Design 013 Teil 4A)**: `SheetEngine(source: SheetDataSourceIf,
+  options)` bzw. `SheetEngine.fromArrays(data)`; Formeln = Text mit `=` in den Daten, `'=` = Text, `""` = leer.
+  Parser: `parseFormula(source, true)` (Referenzmodus; ohne Flag 008 bit-gleich) – Tokenizer `tokenizeSheet` (`$`, `:`,
+  `%`, `;`, Fehlerliterale, nur `"…"`), AST + `ref`/`range`/`error`, unäres Minus bindet stärker als `^`, `^` linksassoziativ, leere Argumente = blank. Auswertung
+  `sheet-compiler.ts` (Closures, Bezüge sammeln, `[feld]` → Spalte über `getFieldColumn`, `SUM([x])` → `#NAME?`),
+  Werte `sheet-values.ts` (`SheetDate` = Excel-Seriennummer, `FormulaRange`, Vergleich wie Excel, 15 Stellen),
+  Funktionen `sheet-functions.ts` (Excel-Semantik, getrennt von 008), Metadaten `FORMULA_FUNCTION_INFO`. Graph:
+  Einzelbezüge `Map<key, Set>` + Bereichsknoten (dedupliziert, Index je Spalte, breite Bereiche > 64 Spalten extra);
+  Neuberechnung BFS → Kahn → Tarjan (`#CIRC!`) → zweiter Kahn, iterativ. `shift-formula.ts`: `shiftFormula`,
+  `offsetReferences`, `adjustFormula` (Einfügen/Löschen/`moveCells`; ohne geänderten Bezug bleibt der Text). Erwartungswerte aus LibreOffice:
+  `scripts/sheet-reference-values.mjs` → `test-utils/sheet-reference-values.json` (eingecheckt; Excel-Abweichungen von
+  LibreOffice in `sheet-reference.spec.ts`). Bench `bench/sheet.bench.ts`. Die Tabelle nutzt die Engine ab Etappe 5.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -564,7 +576,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 635 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 658 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,

@@ -81,6 +81,8 @@ function check(node: FormulaNode, functions: Map<string, FormulaFunction>, field
       }
       return undefined;
     }
+    default:
+      return new FormulaError("#ERROR!", "Cell references are not allowed in column formulas"); // only cell formulas
   }
 }
 

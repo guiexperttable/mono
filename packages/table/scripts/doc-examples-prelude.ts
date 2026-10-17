@@ -41,7 +41,12 @@ import {
   parseHtmlTable, PasteRequestIf, PastePlanIf, computePastePlan, getPasteSize, createNumberInputPipe, createDateInputPipe,
   booleanInputPipe, sheetInputPipe, clipboardShortcutLayer, ClipboardService,
   UndoOptionsIf, UndoOptions, UndoableIf, UndoResultIf, UndoStack, CellChangesUndoable, PendingChangesUndoable,
-  PendingSnapshotIf, undoShortcutLayer, UndoService, GeUndoEvent
+  PendingSnapshotIf, undoShortcutLayer, UndoService, GeUndoEvent,
+  FormulaRefNode, SHEET_MAX_ROWS, SHEET_MAX_COLUMNS, columnLetter, columnIndexOfLetter, CellAddressIf, toCellAddress,
+  parseCellAddress, RangeAddressIf, parseRangeAddress, SheetDate, isSheetDate, dateToSerial, serialToDate, FormulaRange,
+  isFormulaRange, SheetValue, CellFormulaOptionsIf, CellFormulaOptions, formatFormula, SheetStructureEditIf,
+  shiftFormula, offsetReferences, adjustFormula, SheetDataSourceIf, SheetRecalcResultIf, isFormulaText, SheetEngine,
+  FormulaFunctionInfoIf, FORMULA_FUNCTION_INFO
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -52,6 +57,8 @@ declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, e
 declare const copyButton: HTMLButtonElement, cutButton: HTMLButtonElement;
 declare const undoButton: HTMLButtonElement, redoButton: HTMLButtonElement;
 declare const firstChanges: CellValueChangeIf[], secondChanges: CellValueChangeIf[];
+declare const engine: SheetEngine;
+declare const arg: unknown;
 declare function save(rows: unknown): Promise<void>;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;

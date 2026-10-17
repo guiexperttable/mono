@@ -160,6 +160,10 @@ export class FormulaEvaluator {
       }
       case "call":
         return this.call(node.name, node.args);
+      default: {
+        const error = new FormulaError("#ERROR!", "Cell references are not allowed in column formulas");
+        return () => error;
+      }
     }
   }
 

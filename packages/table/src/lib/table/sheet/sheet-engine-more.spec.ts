@@ -87,3 +87,22 @@ describe('sheet values', () => {
     expect(toNum(' 25 % ', { isoDatesAsDates: false })).toBe(0.25);
   });
 });
+
+describe('SheetEngine – sparse sources', () => {
+  it('forEachInput: rebuild reads only the given cells', () => {
+    const cells = new Map<string, unknown>([['0:0', 2], ['999999:1', '=A1*3'], ['5:2', '=1+1'], ['7:9', '=1']]);
+    let reads = 0;
+    const e = new SheetEngine({
+      getRowCount: () => 1_000_000,
+      getColumnCount: () => 3,
+      getInput: (r, c) => { reads++; return cells.get(`${r}:${c}`); },
+      isFormulaColumn: c => c !== 2,
+      forEachInput: fn => cells.forEach((v, k) => { const [r, c] = k.split(':').map(Number); fn(r, c, v); }),
+    });
+    e.rebuild();
+    expect(e.getValue(999999, 1)).toBe(6);
+    expect(e.getValue(5, 2)).toBe('=1+1'); // no formula column
+    expect(e.getFormulaCount()).toBe(1);   // column 9 is outside
+    expect(reads).toBeLessThan(10);
+  });
+});

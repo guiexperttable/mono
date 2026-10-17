@@ -1,0 +1,50 @@
+/* Spreadsheet mode (since 1.1.99): the formula bar (FormulaBar) */
+.ge-table-formula-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  box-sizing: border-box;
+  height: 30px;
+  border: 1px solid var(--ge-table-formula-bar-border);
+  background: var(--ge-table-formula-bar-bg);
+  color: var(--ge-table-formula-bar-text);
+  font: inherit;
+}
+.ge-table-formula-bar-address,
+.ge-table-formula-bar-input {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+.ge-table-formula-bar-address {
+  flex: 0 0 96px;
+  width: 96px;
+  border-inline-end: 1px solid var(--ge-table-formula-bar-border);
+  font-variant-numeric: tabular-nums;
+}
+.ge-table-formula-bar-address[aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px var(--ge-table-cell-editor-invalid-border);
+}
+.ge-table-formula-bar-fx {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-style: italic;
+  color: var(--ge-table-formula-bar-muted);
+  border-inline-end: 1px solid var(--ge-table-formula-bar-border);
+}
+.ge-table-formula-bar-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  direction: ltr; /* formulas read left to right */
+  text-align: left;
+}
+.ge-table-formula-bar-address:focus-visible,
+.ge-table-formula-bar-input:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ge-table-cell-editor-border);
+}

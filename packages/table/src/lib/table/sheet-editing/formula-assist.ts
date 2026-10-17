@@ -53,7 +53,7 @@ export class FormulaAssist {
     private readonly scope: TableScope,
     private readonly sheet: TableSheet,
     private readonly input: HTMLInputElement,
-    private readonly container: HTMLDivElement,
+    container: HTMLDivElement,
     private readonly editedCell: () => [number, number],
     private readonly changed: () => void,
     idPrefix: string,

@@ -31,6 +31,11 @@ export interface SheetDataSourceIf {
   isFormulaColumn?(col: number): boolean;
   /** The column of a data field for `[field]` in a cell formula, -1 if it is none. */
   getFieldColumn?(field: string): number;
+  /**
+   * Optional, for sparse data (a sheet with a million empty rows): calls `fn` for every cell that may hold an input –
+   * `rebuild()` then reads only these instead of rows × columns.
+   */
+  forEachInput?(fn: (row: number, col: number, input: unknown) => void): void;
 }
 
 /**
@@ -175,10 +180,20 @@ export class SheetEngine {
     const rows = Math.min(this.source.getRowCount(), SHEET_MAX_ROWS);
     const cols = Math.min(this.source.getColumnCount(), SHEET_MAX_COLUMNS);
     const seeds: number[] = [];
+    const source = this.source;
+    if (source.forEachInput) {
+      source.forEachInput((r, c, input) => {
+        if (r < rows && c < cols && isFormulaText(input) && (!source.isFormulaColumn || source.isFormulaColumn(c))) {
+          this.add(r, c, input, null);
+          seeds.push(cellKey(r, c));
+        }
+      });
+      return this.recalc(seeds, true);
+    }
     for (let c = 0; c < cols; c++) {
-      if (this.source.isFormulaColumn && !this.source.isFormulaColumn(c)) continue;
+      if (source.isFormulaColumn && !source.isFormulaColumn(c)) continue;
       for (let r = 0; r < rows; r++) {
-        const input = this.source.getInput(r, c);
+        const input = source.getInput(r, c);
         if (isFormulaText(input)) {
           this.add(r, c, input, null);
           seeds.push(cellKey(r, c));

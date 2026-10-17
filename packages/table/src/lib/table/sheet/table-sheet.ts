@@ -3,6 +3,7 @@ import type { ColumnDefIf } from "../data/tablemodel/column/column-def.if";
 import type { CellChangeIf } from "../batch-edit/cell-change.if";
 import { AreaModelObjectArray } from "../data/tablemodel/areamodel/area-model-object-array";
 import { AreaModelArrayOfArrays } from "../data/tablemodel/areamodel/area-model-array-of-arrays";
+import { AreaModelSheet } from "../spreadsheet/area-model-sheet";
 import { isCheckboxColumnDef, isRowNumberColumnDef } from "../instanceof-workaround";
 import { parseFormula } from "../formula/parser";
 import type { SheetCellsIf } from "./sheet-cells.if";
@@ -11,7 +12,7 @@ import { isFormulaText, SheetEngine } from "./sheet-engine";
 import { shiftFormula } from "./shift-formula";
 import { columnLetter, parseCellAddress, SHEET_MAX_COLUMNS, SHEET_MAX_ROWS, toCellAddress } from "./cell-address";
 
-type FlatBody = AreaModelObjectArray<any> | AreaModelArrayOfArrays<any>;
+type FlatBody = AreaModelObjectArray<any> | AreaModelArrayOfArrays<any> | AreaModelSheet;
 
 /**
  * A formula copied inside the table (copy and paste): the input and where it came from – pasted, its relative
@@ -48,6 +49,8 @@ export class TableSheet implements SheetCellsIf {
   private rowIndex = new Map<unknown, number>();
   private rowsRef?: unknown;
   private rowsLength = -1;
+  /** A spreadsheet body (sparse, positional columns) – otherwise objects or arrays. */
+  private readonly sheetBody?: AreaModelSheet;
   private columnDefsRef?: unknown;
   private columnCount = -1;
   private syncing = false;
@@ -57,12 +60,16 @@ export class TableSheet implements SheetCellsIf {
     private readonly body: FlatBody,
     readonly options: CellFormulaOptionsIf,
   ) {
+    const sheetBody = body instanceof AreaModelSheet ? body : undefined;
+    this.sheetBody = sheetBody;
     this.engine = new SheetEngine({
-      getRowCount: () => this.rows().length,
+      getRowCount: () => this.rowCountOf(),
       getColumnCount: () => this.dataColumns.length,
       getInput: (r, c) => this.readInput(r, c),
       isFormulaColumn: c => this.formulaColumns[c],
       getFieldColumn: f => this.propertyColumns.get(f) ?? -1,
+      // a sheet: only the stored cells (a million empty rows are not read)
+      ...(sheetBody ? { forEachInput: (fn: (r: number, c: number, v: unknown) => void) => sheetBody.forEachCell(fn) } : {}),
     }, options);
   }
 
@@ -75,7 +82,7 @@ export class TableSheet implements SheetCellsIf {
    */
   static create(tableModel: TableModelIf, options: CellFormulaOptionsIf): TableSheet | undefined {
     const body = tableModel.getBodyModel();
-    if (!(body instanceof AreaModelObjectArray) && !(body instanceof AreaModelArrayOfArrays)) {
+    if (!(body instanceof AreaModelObjectArray) && !(body instanceof AreaModelArrayOfArrays) && !(body instanceof AreaModelSheet)) {
       console.warn("GuiExpert Table – cellFormulas: only a flat body (an object array or an array of arrays) "
         + "has cell formulas; a tree, a row grouping or a pivot table has none.");
       return undefined;
@@ -156,7 +163,7 @@ export class TableSheet implements SheetCellsIf {
     for (const change of changes) {
       const c = this.columnOf(change.columnIndex);
       const r = change.row !== undefined && change.row !== null && typeof change.row === "object"
-        ? this.rowIndex.get(change.row) : this.physicalRow(change.rowIndex);
+        ? this.physicalOfRow(change.row) : this.physicalRow(change.rowIndex);
       if (c !== undefined && r !== undefined) cells.push([r, c]);
       if (r !== undefined) rows.add(r);
     }
@@ -201,10 +208,55 @@ export class TableSheet implements SheetCellsIf {
     return this.engine.evaluate(source);
   }
 
+  /**
+   * The input of a cell by physical row and engine column (also of a row a filter hides).
+   *
+   * @param {number} row - physical row
+   * @param {number} col - engine column
+   * @returns {unknown} the input
+   */
+  inputAt(row: number, col: number): unknown {
+    return this.readInput(row, col);
+  }
+
+  /**
+   * Writes an input directly into the data (no events, no recalculation) – formulas adjusted after inserting or
+   * deleting rows. `row` is a physical row or the row itself (object or array).
+   *
+   * @param {number | object} row - physical row or row
+   * @param {number} col - engine column
+   * @param {unknown} value - the input
+   */
+  writeInput(row: number | object, col: number, value: unknown): void {
+    if (this.sheetBody) {
+      const r = typeof row === "number" ? row : this.sheetBody.getPhysicalRowOfArray(row);
+      if (r !== undefined) this.sheetBody.setCell(r, col, value);
+      return;
+    }
+    const target = typeof row === "number" ? this.rows()[row] : row;
+    if (target === undefined || target === null) return;
+    if (!(this.body instanceof AreaModelObjectArray)) {
+      (target as unknown[])[this.dataColumns[col]] = value;
+      return;
+    }
+    const path = this.properties[col].split(".");
+    let o: any = target;
+    for (let i = 0; i < path.length - 1; i++) {
+      if (o[path[i]] === null || o[path[i]] === undefined) return;
+      o = o[path[i]];
+    }
+    o[path[path.length - 1]] = value;
+  }
+
+  /** @returns {unknown[] | undefined} the rows array of an object or array body (not of a sheet) */
+  rowsArray(): unknown[] | undefined {
+    return this.sheetBody ? undefined : this.rows();
+  }
+
   /** @returns {number} the number of physical rows */
   rowCount(): number {
     this.sync();
-    return this.rows().length;
+    return this.rowCountOf();
   }
 
   /**
@@ -216,6 +268,7 @@ export class TableSheet implements SheetCellsIf {
   physicalRow(displayRow: number): number | undefined {
     this.sync();
     if (displayRow < 0 || displayRow >= this.body.getRowCount()) return undefined;
+    if (this.sheetBody) return this.sheetBody.getPhysicalRowIndex(displayRow);
     return this.rowIndex.get(this.body.getRowByIndex(displayRow));
   }
 
@@ -227,6 +280,7 @@ export class TableSheet implements SheetCellsIf {
    */
   displayRow(physicalRow: number): number {
     this.sync();
+    if (this.sheetBody) return this.sheetBody.getDisplayRowIndex(physicalRow);
     const row = this.rows()[physicalRow];
     if (row === undefined) return -1;
     const n = this.body.getRowCount();
@@ -248,7 +302,7 @@ export class TableSheet implements SheetCellsIf {
   /** @returns {number} the model column of an engine column, `-1` if there is none */
   modelColumn(engineColumn: number): number {
     this.sync();
-    if (this.body instanceof AreaModelArrayOfArrays) {
+    if (!(this.body instanceof AreaModelObjectArray)) {
       return this.dataColumns[engineColumn] ?? -1;
     }
     const property = this.properties[engineColumn];
@@ -283,7 +337,7 @@ export class TableSheet implements SheetCellsIf {
     const a = parseCellAddress(address);
     if (!a) return undefined;
     const col = this.modelColumn(a.col);
-    if (col < 0 || a.row >= this.rows().length) return undefined;
+    if (col < 0 || a.row >= this.rowCountOf()) return undefined;
     return [this.displayRow(a.row), col];
   }
 
@@ -355,6 +409,10 @@ export class TableSheet implements SheetCellsIf {
     if (r === undefined || c === undefined) return [];
     const dependents = this.engine.getDependents(r, c);
     if (!dependents.length) return [];
+    if (this.sheetBody) {
+      return dependents.map(([dr, dc]) => [this.sheetBody!.getDisplayRowIndex(dr), this.modelColumn(dc)] as [number, number])
+        .filter(([d, mc]) => d >= 0 && mc >= 0);
+    }
     // one lookup each (not O(rows) per dependent)
     const display = new Map<unknown, number>();
     const n = this.body.getRowCount();
@@ -385,8 +443,8 @@ export class TableSheet implements SheetCellsIf {
 
   /** The engine column of a model column: arrays by position, objects by the property (dragged columns keep it). */
   private columnOf(columnIndex: number): number | undefined {
-    if (this.body instanceof AreaModelArrayOfArrays) {
-      return this.engineColumns.get(columnIndex);
+    if (!(this.body instanceof AreaModelObjectArray)) {
+      return this.engineColumns.get(columnIndex); // arrays and sheets: by position
     }
     const def = this.tableModel.getColumnDef(columnIndex);
     if (!def || isRowNumberColumnDef(def) || isCheckboxColumnDef(def)) return undefined;
@@ -398,18 +456,28 @@ export class TableSheet implements SheetCellsIf {
     if (input.startsWith("'=")) return input.slice(1); // '= is text
     if (!isFormulaText(input) || this.syncing) return input;
     this.sync();
-    const r = this.rowIndex.get(row);
+    const r = this.physicalOfRow(row);
     return r === undefined ? input : this.engine.getValue(r, c);
   }
 
+  private physicalOfRow(row: unknown): number | undefined {
+    return this.sheetBody ? this.sheetBody.getPhysicalRowOfArray(row) : this.rowIndex.get(row);
+  }
+
+  private rowCountOf(): number {
+    return this.sheetBody ? this.sheetBody.getUnfilteredRowCount() : this.rows().length;
+  }
+
   private rows(): unknown[] {
-    return this.body instanceof AreaModelObjectArray ? this.body.getAllRows() : this.body.arr;
+    if (this.body instanceof AreaModelObjectArray) return this.body.getAllRows();
+    return this.body instanceof AreaModelArrayOfArrays ? this.body.arr : [];
   }
 
   private readInput(r: number, c: number): unknown {
+    if (this.sheetBody) return this.sheetBody.getCell(r, c);
     const row = this.rows()[r];
     if (row === undefined || row === null) return undefined;
-    if (this.body instanceof AreaModelArrayOfArrays) {
+    if (!(this.body instanceof AreaModelObjectArray)) {
       return (row as unknown[])[this.dataColumns[c]];
     }
     const property = this.properties[c];
@@ -427,10 +495,12 @@ export class TableSheet implements SheetCellsIf {
   /** Rebuilds rows, columns and the engine if the rows array, its length or the columns changed. */
   private sync(): boolean {
     if (this.syncing) return false;
-    const rows = this.rows();
+    // a sheet: its version counts structural changes (the rows are no array)
+    const rows: unknown = this.sheetBody ? this.sheetBody.version : this.rows();
+    const length = this.rowCountOf();
     const defs = this.tableModel.getColumnDefs?.() ?? [];
     const columnCount = this.tableModel.getColumnCount();
-    if (rows === this.rowsRef && rows.length === this.rowsLength && defs === this.columnDefsRef
+    if (rows === this.rowsRef && length === this.rowsLength && defs === this.columnDefsRef
       && columnCount === this.columnCount) {
       return false;
     }
@@ -440,9 +510,10 @@ export class TableSheet implements SheetCellsIf {
         this.buildColumns(defs, columnCount);
       }
       this.rowsRef = rows;
-      this.rowsLength = rows.length;
+      this.rowsLength = length;
       this.rowIndex = new Map();
-      for (let i = rows.length - 1; i >= 0; i--) this.rowIndex.set(rows[i], i); // the first occurrence wins
+      const all = this.rows();
+      for (let i = all.length - 1; i >= 0; i--) this.rowIndex.set(all[i], i); // the first occurrence wins
       this.engine.rebuild();
     } finally {
       this.syncing = false;

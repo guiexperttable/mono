@@ -517,6 +517,25 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Vorschläge: Input `role="combobox"` + Listbox im Editor-Container, Hinweis `role="tooltip"` (`aria-describedby`);
   beide stehen im `aria-owns` der Zelle (`getOwnedEditorId`, axe-Filter in `test-utils/axe.ts`). CSS in
   `css/table-sheet-editing.css`, Variablen `--ge-table-formula-ref-0…7`, `--ge-table-formula-popup-*`.
+- **Spreadsheet-Modus (seit 1.1.99, `spreadsheet/`, Design 013 Teil 5)**: `SpreadsheetFactory.create({ data, rowCount,
+  columnCount, columnWidth, rowHeight, rowNumbers, tableOptions, functions })` → `SpreadsheetTableModel`
+  (`setDataColumns`, `getDataColumnWidths`) mit `AreaModelSheetHeader` (Buchstabenzeile, `isColumnLetterRow`) und
+  `AreaModelSheet` (dünn: `Map<physischeZeile, unknown[]>` + `Map<Array, Zeile>`, Daten je Datenspalte, `columnOffset`
+  für die Zeilennummern, Sortieren/Filtern als `Int32Array`-Permutation nur solange aktiv, `version` je Strukturänderung,
+  `getPhysicalRowIndex`/`getDisplayRowIndex` – Zeilennummern `original` und `TableSheet` nutzen sie, `forEachCell` →
+  `SheetDataSourceIf.forEachInput` (Neuaufbau liest nur gefüllte Zellen), `getContentExtent` (Excel-Export schneidet
+  darauf zu), `deleteRows`/`restoreRows`, `deleteColumns`/`restoreColumns` behalten die Zeilen-Arrays). Preset
+  `tableOptions.spreadsheet`: die Options werden **nie** geändert – `spreadsheetOption(options, key)` liefert je Teil
+  den wirksamen Wert (`TableScope`, `getFillHandleOptions`, `cellFormulas`), `applySpreadsheetPreset` gibt eine Kopie;
+  eigenes Selektionsmodell dann `range`. Eingaben über `sheetInputPipe(locale)` (Zahl, Datum, TRUE/FALSE). `TableFactory` `columnLetters: true` = Buchstabenzeile
+  über den Labels. Klick auf Buchstaben = Spalte (`SelectionService.clickColumnLetter`), Doppelklick sortiert dort nicht,
+  Excel-Export lässt Buchstabenzeilen weg. Struktur: `applyStructureEdit` (`spreadsheet/structure-edit.ts`):
+  `engine.adjustForStructureChange` **vor** der Änderung, danach roh schreiben (`TableSheet.writeInput`), ein
+  `StructureUndoable` (Delta: gelöschte Zeilen/Zellen + alte Formeltexte an der Position vor der Änderung, zuerst Struktur
+  zurück, dann Texte; Redo = noch einmal), Event-Quelle `"structure"`, nicht während Batch-Edit,
+  `TableScope.refreshAfterStructureChange` (Fokus bleibt in der Tabelle). `FormulaBar` (plain DOM, `api.subscribe`, schreibt mit Quelle `"edit"` = ein Undo-Schritt). API `getActiveCell`,
+  `goToAddress`, `insertRows`, `deleteRows`, `insertColumns`, `deleteColumns`, `getSheetData`. Demo
+  `apps/table-demo/spreadsheet.html` (Formelleiste, Kontextmenü-Beispiel, +100 Zeilen, JSON). CSS `css/table-spreadsheet.css`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -536,7 +555,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
-seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`.
+seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`, `spreadsheet`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---

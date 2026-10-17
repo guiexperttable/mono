@@ -78,6 +78,18 @@ export class UndoService {
   }
 
   /**
+   * Records an own step (e.g. inserting rows) – not while an undo or redo runs.
+   *
+   * @param {UndoableIf} step - the step
+   * @since 1.1.99
+   */
+  addStep(step: UndoableIf): void {
+    if (!this.running) {
+      this.add(step);
+    }
+  }
+
+  /**
    * Records written cells as a step (called by the table's write path).
    *
    * @param {CellChangeIf[]} changes - the written cells

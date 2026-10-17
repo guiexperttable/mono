@@ -394,4 +394,40 @@ export interface AriaTextsIf {
    * @since 1.1.99
    */
   referenceInserted?(reference: string): string;
+
+  /**
+   * Announced after rows were inserted (`TableApi.insertRows`).
+   *
+   * @param {number} count - the rows
+   * @returns {string} default: `"3 rows inserted"`
+   * @since 1.1.99
+   */
+  rowsInserted?(count: number): string;
+
+  /**
+   * Announced after rows were deleted (`TableApi.deleteRows`).
+   *
+   * @param {number} count - the rows
+   * @returns {string} default: `"3 rows deleted"`
+   * @since 1.1.99
+   */
+  rowsDeleted?(count: number): string;
+
+  /**
+   * Announced after columns were inserted (`TableApi.insertColumns`).
+   *
+   * @param {number} count - the columns
+   * @returns {string} default: `"2 columns inserted"`
+   * @since 1.1.99
+   */
+  columnsInserted?(count: number): string;
+
+  /**
+   * Announced after columns were deleted (`TableApi.deleteColumns`).
+   *
+   * @param {number} count - the columns
+   * @returns {string} default: `"2 columns deleted"`
+   * @since 1.1.99
+   */
+  columnsDeleted?(count: number): string;
 }

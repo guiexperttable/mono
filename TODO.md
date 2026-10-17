@@ -439,6 +439,18 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `%` keine Einfügestelle, Felder `[…]` als Literal, Options-Ids nach Namen, Combobox-Rolle die ganze Sitzung,
       Ansage einmal nach dem Ziehen, `::selection`, nur die primäre Maustaste, verschachtelte Klammern im Hinweis,
       `A0`/`XFE1` keine Bezüge.
+      **Etappe 7 umgesetzt** (17.10.2026, Branch `feat/spreadsheet-7-mode`): `SpreadsheetFactory`, `AreaModelSheet`
+      (dünn), Preset `tableOptions.spreadsheet`, `columnLetters`, Spaltenauswahl per Buchstabe, `FormulaBar`,
+      Zeilen/Spalten einfügen/löschen mit Bezugsanpassung und Undo, `getSheetData`, Demo `spreadsheet.html`. Offen aus
+      Etappe 7: Ziehen über Buchstaben (mehrere Spalten) fehlt (Shift-Klick geht) · Doppelklick auf den Spaltengriff
+      passt die Breite nicht an · kein automatisches Wachsen am Blattende (Knopf „+100 rows“) · `addRows`/`removeRows`
+      passen Bezüge weiter nicht an (`insertRows`/`deleteRows` nutzen) · Ausschneiden passt Bezüge auf die verschobenen
+      Zellen nicht an · Vorschlag Prompt 014 Kontextmenü (`prompts/README.md`).
+      Review Etappe 7 (separater Agent, 15 Funde behoben): Preset ändert die Options nicht mehr (`spreadsheetOption`),
+      Undo als Delta (Zeilen-Arrays bleiben, alte Formeltexte an der Position vor der Änderung), getippte Zahlen sind Zahlen
+      (`sheetInputPipe`), Formelleiste = Undo-Schritt, keine Strukturänderung im Batch-Edit, Fokus nach Löschen geklemmt,
+      Excel-Export bis zum Inhaltsende, `cellFormulas` nur mit `functions` explizit. Offen: Tasten für Einfügen/Löschen
+      (Strg++ / Strg+-) fehlen.
 
 ## Mono-Repo / Build
 
@@ -728,6 +740,15 @@ Objekt-Tabelle hat `ge-focused-row`.
   functionSuggestions/referenceInserted`, `TableScope.nextShownColumn/getTypedCellValue/getFormulaErrorText`,
   `TableSheet.rowCount`, CSS-Variablen `--ge-table-formula-ref-0…7`, `--ge-table-formula-popup-*`. Ohne
   `cellFormulas` keine Verhaltensänderung.
+  **Spreadsheet-Modus (013, Etappe 7)**, additiv: `SpreadsheetFactory`, `SpreadsheetParamIf`, `SpreadsheetTableModel`,
+  `isSpreadsheetTableModel`, `AreaModelSheet`, `AreaModelSheetSnapshotIf`, `AreaModelSheetHeader`, `SpreadsheetOptionsIf`,
+  `applySpreadsheetPreset`, `TableOptionsIf.spreadsheet`, `CreateTableModelPara.columnLetters`, `FormulaBar`,
+  `FormulaBarOptionsIf`, `StructureEditIf`, `applyStructureEdit` (Internals), `TableApi.getActiveCell/goToAddress/
+  insertRows/deleteRows/insertColumns/deleteColumns/getSheetData`, `SheetDataSourceIf.forEachInput?`,
+  `UndoService.addStep`, `TableSheet.inputAt/writeInput/rowsArray`, `TableScope.refreshAfterStructureChange`,
+  `AriaTextsIf.rowsInserted/rowsDeleted/columnsInserted/columnsDeleted`, CSS `css/table-spreadsheet.css`,
+  `--ge-table-formula-bar-*`. **Typ-Erweiterung:** `CellChangeSource` hat `"structure"`. Zeilennummern `original`
+  fragen `getPhysicalRowIndex` des Modells, wenn es eins hat. Ohne Option keine Verhaltensänderung.
   (7) `ColumnDef.create()` ohne `editable` setzt eine eigene „nicht editierbar“-Funktion statt `FalseFn` (gleiches
   Ergebnis `false`; nur ein Vergleich `def.editable === FalseFn` beim Anwender ändert sich).
 

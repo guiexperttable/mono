@@ -48,6 +48,10 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
   jede releasefähig; Website, Training und Video einmal am Ende. Sitzungswechsel laufen über den Abschnitt
   „Fortschritt“ im Design-Dokument. RTL (012) und ARIA (001) gelten von Anfang an.
 
+**Vorschlag (noch kein Prompt):** 014 Kontextmenü – ein eingebautes, barrierefreies Kontextmenü für alle Tabellen
+(Ausschneiden/Kopieren/Einfügen, Zeilen/Spalten einfügen/löschen, eigene Einträge). 013 zeigt es nur als Beispiel
+(`apps/table-demo/spreadsheet.html`, plain HTML über `onContextmenu`).
+
 ## Gemeinsame Konventionen
 
 - Branch `feat/<slug>`, Design-Dokument `prompts/NNN-<slug>.design.md` (Slug steht im Kopf jedes Prompts).

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+  Spreadsheet mode (since 1.1.99, prompt 013 stage 7).
+  Start: pnpm serve:table-demo → http://localhost:4200/spreadsheet.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – Spreadsheet</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 960px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .formula-bar { max-width: 960px; margin-bottom: 4px; }
+    .table-div { height: 460px; width: 100%; max-width: 960px; }
+    .menu { position: fixed; z-index: 20000; display: none; flex-direction: column; min-width: 180px; padding: 4px 0;
+      background: var(--ge-table-formula-popup-bg, #fff); color: var(--ge-table-formula-popup-text, #111);
+      border: 1px solid var(--ge-table-formula-popup-border, #ccc); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .menu button { all: unset; padding: 4px 12px; cursor: pointer; }
+    .menu button:hover, .menu button:focus-visible { background: var(--ge-table-formula-popup-active-bg, #e8f0fe); }
+    kbd { font: 12px ui-monospace, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+<h1>Budget – a spreadsheet in the table</h1>
+<p>Type values and formulas (<kbd>=SUM(B2:B6)</kbd>), point with the arrow keys, copy and paste with Excel, undo with
+  <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd>. Click a letter to select a column; right-click a cell for the context menu.</p>
+<div class="bar">
+  <button id="rows" type="button">+100 rows</button>
+  <button id="save" type="button">Save (JSON)</button>
+  <button id="load" type="button">Load</button>
+  <button id="excel" type="button">Excel with formulas</button>
+  <button id="undo" type="button">Undo</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+  <label><input id="rtl" type="checkbox"> right to left</label>
+</div>
+<div class="formula-bar"></div>
+<div class="table-div"></div>
+<div class="menu" role="menu" aria-label="Cell">
+  <button role="menuitem" data-action="cut">Cut</button>
+  <button role="menuitem" data-action="copy">Copy</button>
+  <button role="menuitem" data-action="paste">Paste</button>
+  <button role="menuitem" data-action="insertRow">Insert row above</button>
+  <button role="menuitem" data-action="deleteRow">Delete row</button>
+  <button role="menuitem" data-action="insertColumn">Insert column left</button>
+  <button role="menuitem" data-action="deleteColumn">Delete column</button>
+</div>
+<script src="/src/spreadsheet/spreadsheet-demo.ts" type="module"></script>
+</body>
+</html>

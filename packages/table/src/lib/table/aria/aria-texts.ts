@@ -218,4 +218,20 @@ export class AriaTexts implements AriaTextsIf {
   referenceInserted(reference: string): string {
     return reference;
   }
+
+  rowsInserted(count: number): string {
+    return count === 1 ? "1 row inserted" : `${count} rows inserted`;
+  }
+
+  rowsDeleted(count: number): string {
+    return count === 1 ? "1 row deleted" : `${count} rows deleted`;
+  }
+
+  columnsInserted(count: number): string {
+    return count === 1 ? "1 column inserted" : `${count} columns inserted`;
+  }
+
+  columnsDeleted(count: number): string {
+    return count === 1 ? "1 column deleted" : `${count} columns deleted`;
+  }
 }

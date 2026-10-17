@@ -210,7 +210,8 @@ export class RenderScope extends EleScope {
     } else if (this.tableOptions?.getSelectionModel) {
       this.getSelectionModel = this.tableOptions.getSelectionModel;
     } else {
-      const ownSelectionModel = new SelectionModel();
+      // the spreadsheet preset (since 1.1.99): a range selection like in a spreadsheet
+      const ownSelectionModel = this.tableOptions?.spreadsheet ? new SelectionModel("range", "multi") : new SelectionModel();
       this.getSelectionModel = () => ownSelectionModel;
     }
 

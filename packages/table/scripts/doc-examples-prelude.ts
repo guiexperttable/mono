@@ -47,7 +47,9 @@ import {
   parseCellAddress, RangeAddressIf, parseRangeAddress, SheetDate, isSheetDate, dateToSerial, serialToDate, FormulaRange,
   isFormulaRange, SheetValue, CellFormulaOptionsIf, CellFormulaOptions, formatFormula, SheetStructureEditIf,
   shiftFormula, offsetReferences, adjustFormula, SheetDataSourceIf, SheetRecalcResultIf, isFormulaText, SheetEngine,
-  FormulaFunctionInfoIf, FORMULA_FUNCTION_INFO
+  FormulaFunctionInfoIf, FORMULA_FUNCTION_INFO, TableSheet, FormulaAssist, ExcelFormulaCellIf,
+  SpreadsheetFactory, SpreadsheetParamIf, SpreadsheetTableModel, AreaModelSheet, AreaModelSheetHeader,
+  SpreadsheetOptionsIf, applySpreadsheetPreset, spreadsheetOption, FormulaBar, FormulaBarOptionsIf, StructureEditIf, applyStructureEdit
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }

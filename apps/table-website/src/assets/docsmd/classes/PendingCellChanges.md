@@ -33,6 +33,7 @@ pending.set(row, "price", 12, 10, "10");   // "removed" – the old value again
 - [hasRow](PendingCellChanges.md#hasrow)
 - [invalidCount](PendingCellChanges.md#invalidcount)
 - [isEmpty](PendingCellChanges.md#isempty)
+- [put](PendingCellChanges.md#put)
 - [remove](PendingCellChanges.md#remove)
 - [set](PendingCellChanges.md#set)
 - [size](PendingCellChanges.md#size)
@@ -61,7 +62,7 @@ Forgets all entries.
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:182](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L182)
+[src/lib/table/batch-edit/pending-cell-changes.ts:200](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L200)
 
 ___
 
@@ -77,7 +78,7 @@ all entries, in the order they were first changed
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L175)
+[src/lib/table/batch-edit/pending-cell-changes.ts:193](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L193)
 
 ___
 
@@ -102,7 +103,7 @@ the entry, `undefined` if the cell is unchanged
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L129)
+[src/lib/table/batch-edit/pending-cell-changes.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L147)
 
 ___
 
@@ -124,7 +125,7 @@ true if the row has pending values
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L153)
+[src/lib/table/batch-edit/pending-cell-changes.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L171)
 
 ___
 
@@ -140,7 +141,7 @@ the number of pending cells with a validation message
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L168)
+[src/lib/table/batch-edit/pending-cell-changes.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L186)
 
 ___
 
@@ -156,7 +157,33 @@ true if nothing is pending
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:163](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L163)
+[src/lib/table/batch-edit/pending-cell-changes.ts:181](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L181)
+
+___
+
+### put
+
+▸ **put**(`entry`): `void`
+
+Puts an entry back as it was (undo/redo of a batch edit step) – without comparing it with the old value.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `entry` | [`PendingCellIf`](../interfaces/PendingCellIf.md) | the entry |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/batch-edit/pending-cell-changes.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L128)
 
 ___
 
@@ -181,7 +208,7 @@ true if there was an entry
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L140)
+[src/lib/table/batch-edit/pending-cell-changes.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L158)
 
 ___
 
@@ -227,4 +254,4 @@ the number of pending cells
 
 #### Defined in
 
-[src/lib/table/batch-edit/pending-cell-changes.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L158)
+[src/lib/table/batch-edit/pending-cell-changes.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L176)

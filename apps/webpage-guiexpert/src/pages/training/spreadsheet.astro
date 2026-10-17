@@ -1,0 +1,128 @@
+---
+import TrainingLayout from "../../layouts/TrainingLayout.astro";
+import Snippet from "../../components/training/Snippet.astro";
+import LiveDemo from "../../components/training/LiveDemo.astro";
+import ApiLink from "../../components/training/ApiLink.astro";
+import ChapterLink from "../../components/training/ChapterLink.astro";
+import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
+---
+<TrainingLayout slug="spreadsheet">
+
+  <h2 id="idea">Excel, but in your app</h2>
+  <p>
+    A budget, a quote, a price calculation: your users know how this works in Excel. They type over a cell, paste a block
+    they copied from a workbook, write <code>=SUM(B2:B9)</code> and press <kbd>Ctrl</kbd>+<kbd>Z</kbd> when they got it
+    wrong. Since <code>@guiexpert/table@1.1.99</code> the table can do all of that – MIT-licensed, without a dependency, in
+    every framework. One call builds the sheet:
+  </p>
+  <Snippet file="demos/spreadsheet.ts" region="data" title="src/budget.ts" />
+  <Snippet file="demos/spreadsheet.ts" region="sheet" title="src/main.ts" />
+  <LiveDemo name="spreadsheet" title="A budget with formulas – 1,000 rows × A–Z" height={420}
+            caption="Select B3, type 500 and press Enter: the totals follow. Type =B2*2 in F2 – arrow keys point at cells while you type. Copy B2:D5 and paste it into a workbook, or the other way round." />
+
+  <h2 id="what-you-get">What one call switches on</h2>
+  <p>
+    <ApiLink name="SpreadsheetFactory.create" /> returns a model and the options for a table or a wrapper – exactly like
+    <code>TableFactory</code>. The model has column letters, row numbers and a <strong>sparse</strong> body: a million
+    empty rows cost nothing, only filled cells take memory. The options contain the preset
+    <ApiLink name="TableOptionsIf.spreadsheet" label="spreadsheet: true" />, which stands for five parts you can also use
+    one by one:
+  </p>
+  <ul>
+    <li><code>editing</code> – type to overwrite, <kbd>F2</kbd> to edit, <kbd>Enter</kbd>/<kbd>Tab</kbd> move,
+      <kbd>Delete</kbd> clears, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> fills the selection, <kbd>Ctrl</kbd>+arrow jumps to the edge
+      of the data (<ChapterLink slug="inline-editing" />);</li>
+    <li><code>clipboard</code> – copy, cut and paste with Excel and Google Sheets (<ChapterLink slug="selection-and-copy" />);</li>
+    <li><code>undo</code> – <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> for edits, paste, fill and structure changes;</li>
+    <li><code>cellFormulas</code> – formulas with A1 references;</li>
+    <li><code>fillHandle</code> – drag the square at the corner of the selection.</li>
+  </ul>
+  <Code lang="ts" code={`// an existing table: the same preset – or the parts you want
+const tableOptions: TableOptionsIf = { ...new TableOptions(), spreadsheet: true };
+const onlySome: TableOptionsIf = { ...new TableOptions(), spreadsheet: { cellFormulas: false, fillHandle: false } };`} />
+  <p>
+    In an existing table with object rows the formulas address the data columns by letters <code>A, B, C …</code>; to
+    show them above your labels, build the model with <code>TableFactory.createTableModel({"{ …, columnLetters: true }"})</code>. Columns that must not take formulas (an id, a free text) get
+    <code>cellFormulas: false</code> in their <code>ColumnDef</code>.
+  </p>
+
+  <h2 id="formulas">Formulas with A1 references</h2>
+  <p>
+    A formula is a text that starts with <code>=</code> – in your data, typed by a user or pasted. References are
+    <code>B2</code>, <code>$B$2</code> (absolute) and ranges <code>B2:D5</code>; 70 Excel functions are built in
+    (<ApiLink name="FORMULA_FUNCTION_INFO" />): <code>SUM</code>, <code>AVERAGE</code>, <code>IF</code>, <code>ROUND</code>,
+    <code>VLOOKUP</code>, <code>XLOOKUP</code>, <code>SUMIFS</code>, <code>TEXT</code>, <code>DATE</code> and more. The
+    sheet keeps a dependency graph: a changed cell recalculates only what depends on it. Errors look like in Excel:
+    <code>#DIV/0!</code>, <code>#REF!</code>, <code>#NAME?</code>, a circular reference is <code>#CIRC!</code>.
+  </p>
+  <Code lang="ts" code={`tableApi.setCellInput(1, 5, "=B2*2");      // row 2, column E (column 0 = row numbers)
+tableApi.getCellInput(1, 5);                // "=B2*2"
+tableApi.getCellValue(1, 5);                // 1900
+tableApi.getCellAddress(1, 5);              // "E2"
+tableApi.evaluateFormula("=SUM(B2:D2)");    // 2850 – without writing a cell`} />
+  <p>
+    While a user types a formula the references are colored and framed in the table, arrow keys or a click
+    <strong>point</strong> at cells (<kbd>F4</kbd> toggles <code>$</code>) and a list suggests functions with a short
+    description – also for screen readers.
+  </p>
+  <Callout type="note" title="Formulas never run as code">
+    <p>Every formula is parsed by an own parser into a syntax tree and evaluated by closures – no <code>eval</code>, no
+      <code>new Function</code>, no access to JavaScript objects. A pasted <code>=constructor</code> is <code>#NAME?</code>,
+      not an attack. The column formulas of chapter 39 (<code>[price] * [quantity]</code>, <ChapterLink slug="formulas" />)
+      use the same safety rules and stay unchanged.</p>
+  </Callout>
+
+  <h2 id="formula-bar">A formula bar</h2>
+  <p>
+    The cell shows the result, the <ApiLink name="FormulaBar" /> the formula of the active cell – and its address. Typing
+    there writes the cell (one undo step), <kbd>Escape</kbd> restores it, an address like <code>D10</code> or
+    <code>B2:C5</code> in the address box goes there. It is plain DOM, so it works with every wrapper: pass the
+    <code>TableApi</code> of <code>tableReady</code>.
+  </p>
+  <Snippet file="demos/spreadsheet.ts" region="formula-bar" />
+
+  <h2 id="structure">Insert and delete rows and columns</h2>
+  <p>
+    <ApiLink name="TableApi.insertRows" />, <ApiLink name="TableApi.deleteRows" />,
+    <ApiLink name="TableApi.insertColumns" /> and <ApiLink name="TableApi.deleteColumns" /> take the <strong>row number −
+    1</strong> and the letter index – the position in the sheet, also while it is sorted. Every formula follows:
+    <code>=SUM(B2:B5)</code> becomes <code>=SUM(B2:B6)</code> after a row inside, a deleted reference becomes
+    <code>#REF!</code>. Each change is one undo step.
+  </p>
+  <Snippet file="demos/spreadsheet.ts" region="structure" />
+  <p>
+    The table has no context menu of its own – a right-click arrives as <code>onContextmenu</code>
+    (<ChapterLink slug="events-and-context-menu" />); the <a href="/showcase/spreadsheet/run">showcase</a> builds a small
+    menu with cut, copy, insert and delete in about 40 lines of HTML and JavaScript.
+  </p>
+
+  <h2 id="save">Save and export</h2>
+  <p>
+    <ApiLink name="TableApi.getSheetData" /> returns rows × columns of <strong>inputs</strong> – the formulas, not their
+    results – ready for <code>JSON.stringify</code> and your server; pass them back as <code>data</code> to load the sheet.
+    The Excel export with <code>{"{ cellFormulas: true }"}</code> writes real formulas, Excel calculates them when it opens
+    the file.
+  </p>
+  <Code lang="ts" code={`localStorage.setItem("budget", JSON.stringify(tableApi.getSheetData()));
+const saved = JSON.parse(localStorage.getItem("budget") ?? "[]") as unknown[][];
+const { tableModel, tableOptions } = SpreadsheetFactory.create({ data: saved });
+await tableApi.downloadExcel("budget.xlsx", "", { cellFormulas: true });`} />
+  <Callout type="tip" title="The engine without a table">
+    <p><ApiLink name="SheetEngine" /> is DOM-free: <code>SheetEngine.fromArrays(data)</code> calculates the same
+      formulas on a server or in a worker – useful to check what users send. All options and the list of functions:
+      instructions.md 6.20 – 6.25.</p>
+  </Callout>
+
+  <h2 id="differences">What is different from Excel</h2>
+  <ul>
+    <li>Function names are English, the separator is <code>,</code> (<code>;</code> is accepted), decimals use
+      <code>.</code> in formulas; typed and pasted values follow the locale (<code>"1,5"</code> is 1.5 in German).</li>
+    <li>No cell formatting toolbar, no charts, no several sheets per table, no array formulas that spill.</li>
+    <li>Dates are Excel serial numbers inside formulas (<code>=DATE(2026,10,17)+1</code> works), shown as dates.</li>
+  </ul>
+
+  <h2 id="next">Next</h2>
+  <p>Back to the overview of everything new: <a href="/whats-new/">What's new</a> – or the checklist of the course:
+    <ChapterLink slug="checklist" />.</p>
+</TrainingLayout>

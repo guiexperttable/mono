@@ -50,16 +50,26 @@ const NUM = (message: string) => new FormulaError("#NUM!", message);
 const DIV0 = (message: string) => new FormulaError("#DIV/0!", message);
 
 /** Every value of the arguments: ranges cell by cell (with a flag), scalars as they are. */
-function* each(args: SheetValue[]): Generator<[SheetValue, boolean]> {
+/**
+ * Visits every value of the arguments (ranges cell by cell, `inRange` = from a range) until `fn` returns something
+ * other than `undefined` – that value is returned (an early error). A callback, not a generator: the core compiles
+ * without `downlevelIteration`.
+ */
+function each<T>(args: SheetValue[], fn: (v: SheetValue, inRange: boolean) => T | undefined): T | undefined {
   for (const a of args) {
     if (isFormulaRange(a)) {
       for (let r = 0; r < a.rows; r++) {
-        for (let c = 0; c < a.cols; c++) yield [a.get(r, c), true];
+        for (let c = 0; c < a.cols; c++) {
+          const ret = fn(a.get(r, c), true);
+          if (ret !== undefined) return ret;
+        }
       }
     } else {
-      yield [a, false];
+      const ret = fn(a, false);
+      if (ret !== undefined) return ret;
     }
   }
+  return undefined;
 }
 
 /**
@@ -453,21 +463,21 @@ export const SHEET_FUNCTIONS: Record<string, SheetFunctionSpec> = {
   COUNT: {
     min: 1, max: 255, fn: (a, o) => {
       let n = 0;
-      for (const [v, inRange] of each(a)) {
+      each(a, (v, inRange) => {
         if (typeof v === "number" || isSheetDate(v)) n++;
         else if (!inRange && (typeof v === "boolean" || (typeof v === "string" && !isFormulaError(toNum(v, o))))) n++;
-      }
+      });
       return n;
     },
   },
   COUNTA: {
     min: 1, max: 255, fn: a => {
       let n = 0;
-      for (const [v] of each(a)) if (v !== null) n++; // "" from a formula counts (like Excel)
+      each(a, v => { if (v !== null) n++; }); // "" from a formula counts (like Excel)
       return n;
     },
   },
-  COUNTBLANK: { min: 1, max: 1, fn: a => { let n = 0; for (const [v] of each(a)) if (isEmpty(v)) n++; return n; } },
+  COUNTBLANK: { min: 1, max: 1, fn: a => { let n = 0; each(a, v => { if (isEmpty(v)) n++; }); return n; } },
   SUMPRODUCT: {
     min: 1, max: 255, fn: a => {
       const ranges = a.map(asRange);
@@ -722,12 +732,13 @@ export const SHEET_FUNCTIONS: Record<string, SheetFunctionSpec> = {
   CONCAT: {
     min: 1, max: 255, fn: a => {
       let s = "";
-      for (const [v] of each(a)) {
+      const error = each(a, v => {
         const t = toStr(v);
         if (isFormulaError(t)) return t;
         s += t;
-      }
-      return s;
+        return undefined;
+      });
+      return error ?? s;
     },
   },
   TEXTJOIN: {
@@ -737,12 +748,13 @@ export const SHEET_FUNCTIONS: Record<string, SheetFunctionSpec> = {
       const ignore = toBool(a[1]);
       if (isFormulaError(ignore)) return ignore;
       const parts: string[] = [];
-      for (const [v] of each(a.slice(2))) {
+      const error = each(a.slice(2), v => {
         const t = toStr(v);
         if (isFormulaError(t)) return t;
         if (!ignore || t !== "") parts.push(t);
-      }
-      return parts.join(delimiter);
+        return undefined;
+      });
+      return error ?? parts.join(delimiter);
     },
   },
   LEFT: { min: 1, max: 2, fn: (a, o) => leftRight(a, o, true) },
@@ -868,7 +880,7 @@ export const SHEET_FUNCTIONS: Record<string, SheetFunctionSpec> = {
 /** AND/OR/XOR: booleans and numbers; text and blanks in ranges are skipped; no logical value at all → #VALUE!. */
 function logical(args: SheetValue[], f: (bs: boolean[]) => boolean): SheetValue {
   const bs: boolean[] = [];
-  for (const [v, inRange] of each(args)) {
+  const error = each<FormulaError>(args, (v, inRange) => {
     if (isFormulaError(v)) return v;
     if (typeof v === "boolean") bs.push(v);
     else if (typeof v === "number") bs.push(v !== 0);
@@ -878,7 +890,9 @@ function logical(args: SheetValue[], f: (bs: boolean[]) => boolean): SheetValue 
       if (isFormulaError(b)) return b;
       bs.push(b);
     }
-  }
+    return undefined;
+  });
+  if (error) return error;
   return bs.length ? f(bs) : VALUE("No logical values");
 }
 

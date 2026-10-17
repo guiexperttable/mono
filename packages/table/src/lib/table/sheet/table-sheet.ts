@@ -168,9 +168,9 @@ export class TableSheet implements SheetCellsIf {
       if (r !== undefined) rows.add(r);
     }
     // a calculated column (valueGetter) of a written row may have a new value – formulas reading it recalculate
-    for (const r of rows) {
+    rows.forEach(r => {
       for (const c of this.calculatedColumns) cells.push([r, c]);
-    }
+    });
     if (cells.length) {
       this.engine.inputsChanged(cells);
     }

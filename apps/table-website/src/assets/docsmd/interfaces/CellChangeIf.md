@@ -48,7 +48,7 @@ Model index of the column when the change was reported, `-1` if the column no lo
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L31)
+[src/lib/table/batch-edit/cell-change.if.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L36)
 
 ___
 
@@ -60,7 +60,7 @@ Batch edit: the message of [ColumnDefIf.validate](ColumnDefIf.md#validate) if th
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L39)
+[src/lib/table/batch-edit/cell-change.if.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L44)
 
 ___
 
@@ -72,7 +72,7 @@ The new value (after the column's `editInputPipe`).
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L37)
+[src/lib/table/batch-edit/cell-change.if.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L42)
 
 ___
 
@@ -84,7 +84,7 @@ The value before the change (batch edit: before the first change of the cell).
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L35)
+[src/lib/table/batch-edit/cell-change.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L40)
 
 ___
 
@@ -96,7 +96,7 @@ The property of the column (`"#3"` for a column without property).
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L33)
+[src/lib/table/batch-edit/cell-change.if.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L38)
 
 ___
 
@@ -108,7 +108,7 @@ The row object (tree: the data of the `TreeRow`); `undefined` for own area model
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L27)
+[src/lib/table/batch-edit/cell-change.if.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L32)
 
 ___
 
@@ -120,4 +120,4 @@ Display index of the row when the change was reported, `-1` if a filter hides th
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L29)
+[src/lib/table/batch-edit/cell-change.if.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L34)

@@ -61,6 +61,15 @@ This is the UI-agnostic table component for your next web app. 😊
 - Right-to-left (Arabic, Hebrew, Persian, Urdu): `tableOptions.direction: "rtl"` (or `"auto"` from the page) mirrors
   the whole table – first column on the right, horizontal scrolling, fixed columns, tree indent, resize handles, fill
   handle, row drag, master/detail, arrow keys; right-to-left Excel sheet – since 1.1.98
+- Excel-style editing (`tableOptions.editing`): type to overwrite, F2, Enter/Tab, Delete, Ctrl+Enter, Ctrl+arrow to
+  the data edge, IME; copy, cut and paste with Excel and Google Sheets (`clipboard`); undo and redo of every change
+  (`undo`, `tableApi.undo()`) – since 1.1.99
+- Spreadsheet cell formulas (`tableOptions.cellFormulas`): `=B2*C2`, `$A$1`, ranges, 70 Excel functions, a dependency
+  graph that recalculates only dependent cells, colored references and pointing while typing, Excel export with real
+  formulas – own parser, no `eval`. `SheetEngine` works without a table – since 1.1.99
+- Spreadsheet mode: `SpreadsheetFactory.create({ data })` builds column letters, row numbers, a sparse body (a million
+  empty rows cost nothing) and all of the above; `FormulaBar`, insert/delete rows and columns with adjusted references;
+  `spreadsheet: true` for an existing table – since 1.1.99
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events

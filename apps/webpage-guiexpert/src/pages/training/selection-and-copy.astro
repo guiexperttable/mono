@@ -5,6 +5,7 @@ import LiveDemo from "../../components/training/LiveDemo.astro";
 import ApiLink from "../../components/training/ApiLink.astro";
 import ChapterLink from "../../components/training/ChapterLink.astro";
 import Callout from "../../components/training/Callout.astro";
+import { Code } from "astro-expressive-code/components";
 ---
 <TrainingLayout slug="selection-and-copy">
 
@@ -57,6 +58,32 @@ import Callout from "../../components/training/Callout.astro";
     <p>Since 1.1.88 hidden columns (here “Category”) are not copied and copying with nothing selected resolves instead of waiting
       forever. Since 1.1.90 every table gets its own selection model – before, tables without <code>getSelectionModel</code> shared one.</p>
   </Callout>
+
+  <h2 id="paste">Cut and paste – with Excel</h2>
+  <Callout type="version">
+    <p>Cut and paste are new in 1.1.99.</p>
+  </Callout>
+  <p>
+    With <ApiLink name="TableOptionsIf.clipboard" label="clipboard: true" /> the table answers the browser's own copy, cut
+    and paste events: <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>C</kbd>, <kbd>X</kbd> and <kbd>V</kbd> – also from the browser menu.
+    Excel and Google Sheets understand what it copies (text and an HTML table), and a block copied there lands in the
+    table cell by cell: numbers become numbers, quotes and line breaks inside cells survive, a single value fills the whole
+    selection. Only editable cells are written; text from outside runs through <code>editInputPipe</code>,
+    <code>validate</code> always runs.
+  </p>
+  <Code lang="ts" code={`const selectionModel = new SelectionModel("range", "multi");
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  getSelectionModel: () => selectionModel,
+  editing: true,
+  clipboard: { pasteAddsRows: true, createRow: () => ({ id: nextId(), quantity: 0 }) },
+  undo: true                                  // a paste is one undo step
+};
+tableApi.pasteText("1\t2\n3\t4");             // the same from code`} />
+  <p>
+    Cut marks the cells with a dashed frame; they are cleared when you paste – one step, one undo. <ApiLink name="TableApi.cutSelection" />
+    and <ApiLink name="TableApi.pasteText" /> do the same from your own buttons or menu.
+  </p>
 
   <h2 id="next">Next</h2>
   <p>Clicks, double-clicks and a context menu of your own: <ChapterLink slug="events-and-context-menu" />.</p>

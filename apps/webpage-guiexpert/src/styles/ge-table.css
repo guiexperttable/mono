@@ -1041,3 +1041,197 @@ html[data-theme= "dark"] {
     animation: none; /* the dashed frame alone */
   }
 }
+
+/* Formula input and formula bar (since 1.1.99) – as in packages/table/css/table-sheet-editing.css,
+   table-spreadsheet.css + table-color-vars.css */
+html[data-theme= "light"] {
+  /* formula input (since 1.1.99): colors of the references 0–7, function list and hint */
+  --ge-table-formula-ref-0: #1a73e8;
+  --ge-table-formula-ref-1: #d93025;
+  --ge-table-formula-ref-2: #7b1fa2;
+  --ge-table-formula-ref-3: #188038;
+  --ge-table-formula-ref-4: #c26401;
+  --ge-table-formula-ref-5: #00838f;
+  --ge-table-formula-ref-6: #c2185b;
+  --ge-table-formula-ref-7: #5d4037;
+  --ge-table-formula-popup-bg: #fff;
+  --ge-table-formula-popup-text: #111;
+  --ge-table-formula-popup-muted: #5f6368;
+  --ge-table-formula-popup-border: #c4c7c5;
+  --ge-table-formula-popup-active-bg: #e8f0fe;
+  /* formula bar (since 1.1.99) */
+  --ge-table-formula-bar-bg: #fff;
+  --ge-table-formula-bar-text: #111;
+  --ge-table-formula-bar-muted: #5f6368;
+  --ge-table-formula-bar-border: #c4c7c5;
+}
+html[data-theme= "dark"] {
+  /* formula input (since 1.1.99) */
+  --ge-table-formula-ref-0: #8ab4f8;
+  --ge-table-formula-ref-1: #f28b82;
+  --ge-table-formula-ref-2: #d7aefb;
+  --ge-table-formula-ref-3: #81c995;
+  --ge-table-formula-ref-4: #fcad70;
+  --ge-table-formula-ref-5: #78d9ec;
+  --ge-table-formula-ref-6: #ff8bcb;
+  --ge-table-formula-ref-7: #d7ccc8;
+  --ge-table-formula-popup-bg: #1f2937;
+  --ge-table-formula-popup-text: #f3f4f6;
+  --ge-table-formula-popup-muted: #9aa0a6;
+  --ge-table-formula-popup-border: #4b5563;
+  --ge-table-formula-popup-active-bg: #374151;
+  /* formula bar (since 1.1.99) */
+  --ge-table-formula-bar-bg: #1f2937;
+  --ge-table-formula-bar-text: #f3f4f6;
+  --ge-table-formula-bar-muted: #9aa0a6;
+  --ge-table-formula-bar-border: #4b5563;
+}
+/* Formula input (since 1.1.99, tableOptions.cellFormulas): colored references in the editor (a mirror behind the
+   transparent text of the input), frames around the referenced cells, function suggestions and the argument hint */
+.ge-table-formula-mirror {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  white-space: pre;
+  pointer-events: none;
+  font: inherit;
+  color: var(--ge-table-cell-editor-text);
+  direction: ltr;
+  text-align: left;
+}
+.ge-table-cell-editor-field.ge-table-formula-input {
+  position: relative;
+  color: transparent;
+  caret-color: var(--ge-table-cell-editor-text);
+  background: transparent;
+  text-align: left; /* formulas read left to right (Excel), also in number columns and right-to-left tables */
+  direction: ltr;
+}
+.ge-table-cell-editor-field.ge-table-formula-input::selection {
+  color: transparent;
+  background: rgba(10, 110, 189, 0.3); /* the mirror's text stays readable under the selection */
+}
+.ge-table-formula-ref {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--ge-table-formula-ref-0);
+  pointer-events: none;
+  z-index: 9400; /* above the cells, below the editor (9500) */
+}
+.ge-table-formula-ref-text-0 { color: var(--ge-table-formula-ref-0); }
+.ge-table-formula-ref-text-1 { color: var(--ge-table-formula-ref-1); }
+.ge-table-formula-ref-text-2 { color: var(--ge-table-formula-ref-2); }
+.ge-table-formula-ref-text-3 { color: var(--ge-table-formula-ref-3); }
+.ge-table-formula-ref-text-4 { color: var(--ge-table-formula-ref-4); }
+.ge-table-formula-ref-text-5 { color: var(--ge-table-formula-ref-5); }
+.ge-table-formula-ref-text-6 { color: var(--ge-table-formula-ref-6); }
+.ge-table-formula-ref-text-7 { color: var(--ge-table-formula-ref-7); }
+.ge-table-formula-ref.ge-table-formula-ref-1 { border-color: var(--ge-table-formula-ref-1); }
+.ge-table-formula-ref.ge-table-formula-ref-2 { border-color: var(--ge-table-formula-ref-2); }
+.ge-table-formula-ref.ge-table-formula-ref-3 { border-color: var(--ge-table-formula-ref-3); }
+.ge-table-formula-ref.ge-table-formula-ref-4 { border-color: var(--ge-table-formula-ref-4); }
+.ge-table-formula-ref.ge-table-formula-ref-5 { border-color: var(--ge-table-formula-ref-5); }
+.ge-table-formula-ref.ge-table-formula-ref-6 { border-color: var(--ge-table-formula-ref-6); }
+.ge-table-formula-ref.ge-table-formula-ref-7 { border-color: var(--ge-table-formula-ref-7); }
+.ge-table-formula-list,
+.ge-table-formula-hint {
+  position: absolute;
+  top: 100%;
+  inset-inline-start: 0;
+  margin-top: 2px;
+  box-sizing: border-box;
+  background: var(--ge-table-formula-popup-bg);
+  color: var(--ge-table-formula-popup-text);
+  border: 1px solid var(--ge-table-formula-popup-border);
+  box-shadow: var(--ge-table-cell-editor-shadow);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ge-table-formula-list {
+  min-width: 260px;
+  max-width: 420px;
+  max-height: 216px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+.ge-table-formula-option {
+  display: flex;
+  gap: 8px;
+  padding: 1px 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ge-table-formula-option[aria-selected="true"] {
+  background: var(--ge-table-formula-popup-active-bg);
+}
+.ge-table-formula-option-name {
+  font-weight: 600;
+}
+.ge-table-formula-option-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ge-table-formula-popup-muted);
+}
+.ge-table-formula-hint {
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.ge-table-formula-hint b {
+  font-weight: 700;
+}
+
+/* Spreadsheet mode (since 1.1.99): the formula bar (FormulaBar) */
+.ge-table-formula-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  box-sizing: border-box;
+  height: 30px;
+  border: 1px solid var(--ge-table-formula-bar-border);
+  background: var(--ge-table-formula-bar-bg);
+  color: var(--ge-table-formula-bar-text);
+  font: inherit;
+}
+.ge-table-formula-bar-address,
+.ge-table-formula-bar-input {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+.ge-table-formula-bar-address {
+  flex: 0 0 96px;
+  width: 96px;
+  border-inline-end: 1px solid var(--ge-table-formula-bar-border);
+  font-variant-numeric: tabular-nums;
+}
+.ge-table-formula-bar-address[aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px var(--ge-table-cell-editor-invalid-border);
+}
+.ge-table-formula-bar-fx {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-style: italic;
+  color: var(--ge-table-formula-bar-muted);
+  border-inline-end: 1px solid var(--ge-table-formula-bar-border);
+}
+.ge-table-formula-bar-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  direction: ltr; /* formulas read left to right */
+  text-align: left;
+}
+.ge-table-formula-bar-address:focus-visible,
+.ge-table-formula-bar-input:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ge-table-cell-editor-border);
+}

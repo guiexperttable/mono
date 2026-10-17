@@ -1042,8 +1042,9 @@ input.addEventListener("change", () => {
 });
 ```
 
-No cell references like `=B2*C2`: positions change with sorting, filter and virtual scrolling – a formula refers to
-fields of the same row and to column aggregates. 1,000,000 rows with a formula column: compiled once, ~0.5 µs per row
+No cell references like `=B2*C2` in column formulas: positions change with sorting, filter and virtual scrolling – a
+column formula refers to fields of the same row and to column aggregates. Spreadsheet formulas with A1 references in
+the cells themselves: 6.23 – 6.25 (since 1.1.99). 1,000,000 rows with a formula column: compiled once, ~0.5 µs per row
 and evaluated only for the visible cells (`bench/formula.bench.ts`).
 
 ## 6. Features
@@ -1928,6 +1929,16 @@ console.info(tableApi.getDirection()); // "rtl"
 - **Nested tables** (master/detail `ctx.createTable()`) take the direction of the outer table unless their own
   `tableOptions` set one.
 
+**Spreadsheet features (6.20 – 6.25, since 1.1.99).** Five options that work alone or together, plus a preset:
+
+| Option | What it does | Section |
+|---|---|---|
+| `editing` | type to overwrite, F2, Enter/Tab, Delete, Ctrl+Enter, Ctrl+arrow | 6.20 |
+| `clipboard` | copy, cut and paste with Excel and Google Sheets | 6.21 |
+| `undo` | Ctrl+Z / Ctrl+Y for edits, paste, fill, clear, structure changes | 6.22 |
+| `cellFormulas` | `=B2*C2`, `=SUM(D2:D9)` in the data, formula input with colored references | 6.23, 6.24 |
+| `spreadsheet` | the preset of all of the above + fill handle; `SpreadsheetFactory` builds a sheet | 6.25 |
+
 ### 6.20 Excel-style editing (since 1.1.99)
 
 One option makes editing work like in Excel or Google Sheets: select a cell and **type** – the editor opens with the
@@ -2125,6 +2136,10 @@ engine.getValue(3, 3);                 // 3098
   (Excel's rules, `#REF!`), `parseCellAddress`, `toCellAddress`, `columnLetter`.
 - **Limits**: no array/spill formulas, no sheet references or named ranges, English function names. A running sum
   `=SUM($B$2:B2)` filled down is quadratic (10 000 rows ≈ 2 s per change in B2) – use `=C1+B2` instead.
+- **Security**: like column formulas (5.9) the formulas are parsed into a syntax tree and evaluated by closures –
+  **no `eval`, no `new Function`**, no access to JavaScript objects or globals (`=constructor` is `#NAME?`), formula
+  length ≤ 10 000 characters and nesting ≤ 64 levels. Text results are displayed as text, never as HTML. Own functions
+  get values (a range as `FormulaRange`), never the DOM or the row objects.
 - The table uses the engine with `tableOptions.cellFormulas` (6.24).
 
 ### 6.24 Cell formulas in the table (since 1.1.99)
@@ -2239,9 +2254,9 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No drag & drop group panel or pivot field list – row grouping (5.6) and pivot tables (5.7) themselves are built in;
   change them with `tableApi.setRowGroupBy()` / `tableApi.setPivotConfig()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
-- No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
-  to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
-- Paste: 6.21, undo and redo: 6.22.
+- No several sheets per table, no charts, no cell formatting UI, no array (spill) formulas or named ranges; formula
+  function names are English (6.23). The spreadsheet has no toolbar or context menu of its own – `tableApi.undo()`,
+  `insertRows()` … for your buttons (6.25).
 - Master/detail (6.18) only for flat tables – no detail rows below tree nodes, group rows or pivot rows.
 
 ---

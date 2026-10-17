@@ -93,7 +93,7 @@ type `"cancel"`, nothing is moved.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:435](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L435)
+[src/lib/table/row-drag/row-drag-service.ts:439](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L439)
 
 ___
 
@@ -116,7 +116,7 @@ Adds the drag handle to a rendered body cell (called by the render pass for colu
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L157)
+[src/lib/table/row-drag/row-drag-service.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L161)
 
 ___
 
@@ -132,24 +132,25 @@ Releases everything (TableScope.destroy). A running drag is cancelled.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:465](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L465)
+[src/lib/table/row-drag/row-drag-service.ts:469](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L469)
 
 ___
 
 ### getBlockReason
 
-▸ **getBlockReason**(): `undefined` \| ``"filtered"`` \| ``"sorted"``
+▸ **getBlockReason**(): `undefined` \| ``"filtered"`` \| ``"cellFormulas"`` \| ``"sorted"``
 
 Why a managed drag is not possible right now: `"sorted"` (a column has the sort state asc/desc), `"filtered"`
-(a filter hides rows) – `undefined` if it is possible or the drag is unmanaged.
+(a filter hides rows), `"cellFormulas"` (moved rows would change the references of cell formulas, since 1.1.99)
+– `undefined` if it is possible or the drag is unmanaged.
 
 #### Returns
 
-`undefined` \| ``"filtered"`` \| ``"sorted"``
+`undefined` \| ``"filtered"`` \| ``"cellFormulas"`` \| ``"sorted"``
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L109)
+[src/lib/table/row-drag/row-drag-service.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L110)
 
 ___
 
@@ -171,7 +172,7 @@ The dragged rows for a grabbed row: all rows with a selection if it is one of th
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:693](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L693)
+[src/lib/table/row-drag/row-drag-service.ts:698](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L698)
 
 ___
 
@@ -196,7 +197,7 @@ enabled or disabled (managed + sorted/filtered).
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L128)
+[src/lib/table/row-drag/row-drag-service.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L132)
 
 ___
 
@@ -259,7 +260,7 @@ true if the key was used (a row with a drag handle has the focus)
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:624](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L624)
+[src/lib/table/row-drag/row-drag-service.ts:629](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L629)
 
 ___
 
@@ -286,4 +287,4 @@ the new display index of the first moved row, -1 if nothing moved
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:553](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L553)
+[src/lib/table/row-drag/row-drag-service.ts:557](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L557)

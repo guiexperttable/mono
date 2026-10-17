@@ -30,12 +30,14 @@ sorting, filtering, totals, copy and the Excel export use the written data (like
 - [commit](BatchEditService.md#commit)
 - [getPendingAt](BatchEditService.md#getpendingat)
 - [getPendingChanges](BatchEditService.md#getpendingchanges)
+- [getPendingEntry](BatchEditService.md#getpendingentry)
 - [getShownValue](BatchEditService.md#getshownvalue)
 - [hasPending](BatchEditService.md#haspending)
 - [isActive](BatchEditService.md#isactive)
 - [isPermanent](BatchEditService.md#ispermanent)
 - [propertyOf](BatchEditService.md#propertyof)
 - [pruneOrphans](BatchEditService.md#pruneorphans)
+- [restorePending](BatchEditService.md#restorepending)
 - [rowKeyOf](BatchEditService.md#rowkeyof)
 - [start](BatchEditService.md#start)
 
@@ -113,7 +115,7 @@ Discards the pending values (B4) and ends a started batch edit.
 
 #### Defined in
 
-[src/lib/table/batch-edit/batch-edit-service.ts:212](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L212)
+[src/lib/table/batch-edit/batch-edit-service.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L271)
 
 ___
 
@@ -132,7 +134,7 @@ false if invalid values block the commit ([BatchEditOptionsIf.blockCommitOnInval
 
 #### Defined in
 
-[src/lib/table/batch-edit/batch-edit-service.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L168)
+[src/lib/table/batch-edit/batch-edit-service.ts:226](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L226)
 
 ___
 
@@ -175,7 +177,36 @@ the pending cells
 
 #### Defined in
 
-[src/lib/table/batch-edit/batch-edit-service.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L153)
+[src/lib/table/batch-edit/batch-edit-service.ts:211](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L211)
+
+___
+
+### getPendingEntry
+
+▸ **getPendingEntry**(`rowKey`, `property`): `undefined` \| [`PendingCellIf`](../interfaces/PendingCellIf.md)
+
+The pending entry of a cell by row key and property (undo of a batch edit step).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowKey` | `unknown` | row object (index for models without objects) |
+| `property` | `string` | the property of the column |
+
+#### Returns
+
+`undefined` \| [`PendingCellIf`](../interfaces/PendingCellIf.md)
+
+the entry
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/batch-edit/batch-edit-service.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L155)
 
 ___
 
@@ -290,7 +321,37 @@ the number of removed entries
 
 #### Defined in
 
-[src/lib/table/batch-edit/batch-edit-service.ts:233](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L233)
+[src/lib/table/batch-edit/batch-edit-service.ts:293](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L293)
+
+___
+
+### restorePending
+
+▸ **restorePending**(`cells`, `announce?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+Puts pending entries back (undo/redo of a batch edit step): an entry is set as it was, none removes the cell's
+pending value. Reports `onBatchEditChanged` "change"; the caller repaints.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `cells` | \{ `entry?`: [`PendingCellIf`](../interfaces/PendingCellIf.md) ; `property`: `string` ; `rowKey`: `unknown`  }[] | `undefined` | the cells |
+| `announce` | `boolean` | `true` | - |
+
+#### Returns
+
+[`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+the cells with their display index (`-1` if not shown)
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/batch-edit/batch-edit-service.ts:167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/batch-edit-service.ts#L167)
 
 ___
 

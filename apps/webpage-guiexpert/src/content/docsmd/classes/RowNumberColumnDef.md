@@ -320,7 +320,7 @@ const text = columnDef.getRowNumberText(1999, tableModel.getBodyModel()); // "2,
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L111)
+[src/lib/table/data/common/row-number-column-def.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L116)
 
 ___
 
@@ -351,7 +351,7 @@ const widest = new RowNumberColumnDef().getWidestText(tableModel.getBodyModel())
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L125)
+[src/lib/table/data/common/row-number-column-def.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L130)
 
 ___
 
@@ -375,4 +375,4 @@ const plain = new RowNumberColumnDef().hasDefaultFormat(); // true
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L141)
+[src/lib/table/data/common/row-number-column-def.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L148)

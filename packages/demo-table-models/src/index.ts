@@ -40,3 +40,4 @@ export * from "./lib/createRtlCitiesModel";
 export * from "./model/rtl-city-sales.if";
 export * from "./lib/createRtlCitiesModel";
 export * from "./model/rtl-city-sales.if";
+export * from "./lib/createSpreadsheetQuoteModel";

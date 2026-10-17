@@ -13,7 +13,7 @@ const core = resolve(site, "../../packages/table");
 const out = join(site, "node_modules/.feature-snippets");
 
 const prelude = `import * as GE from "@guiexpert/table";
-import { AutoRestoreOptions, ColumnDef, PivotFactory, RowGroupFactory, SelectionModel, TableFactory, TableOptions } from "@guiexpert/table";
+import { AutoRestoreOptions, ColumnDef, PivotFactory, RowGroupFactory, SelectionModel, SpreadsheetFactory, TableFactory, TableOptions } from "@guiexpert/table";
 import type { GeRowDragEvent, TableApi, TableOptionsIf } from "@guiexpert/table";
 interface OrderItem { sku: string; qty: number }
 interface Order { id: number; country: string; city: string; category: string; year: number; quantity: number; total: number; items: OrderItem[] }
@@ -26,7 +26,7 @@ declare const listener: GE.EventAdapter;
 declare const saveButton: HTMLButtonElement;
 declare function save(rows: unknown[]): void;
 declare function sendToServer(changes: unknown): Promise<void>;
-void GE; void AutoRestoreOptions; void ColumnDef; void PivotFactory; void RowGroupFactory; void SelectionModel; void TableFactory; void TableOptions;
+void GE; void AutoRestoreOptions; void ColumnDef; void PivotFactory; void RowGroupFactory; void SelectionModel; void TableFactory; void TableOptions; void SpreadsheetFactory;
 `;
 
 rmSync(out, { recursive: true, force: true });

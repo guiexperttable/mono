@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  Recording page for episode 13 "Excel im Browser: Formeln, Copy & Paste, Undo – MIT-lizenziert".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/13-excel-im-browser/demo.html
+  Runs the code of snippet.ts (plain JS) – a household budget with formulas, the formula bar and an undo button.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Excel im Browser</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button { font: inherit; padding: 4px 14px; }
+    .formula-bar { margin: 0 16px 6px; max-width: 900px; font-size: 17px; }
+    .table-div { height: calc(100vh - 170px); margin: 0 16px; font-size: 17px; max-width: 900px; }
+  </style>
+</head>
+<body>
+<h1>Haushaltsbuch – Excel im Browser</h1>
+<div class="bar">
+  <button id="undo" disabled>↶ Rückgängig</button>
+  <button id="redo" disabled>↷ Wiederholen</button>
+  <button id="excel">Excel</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+</div>
+<div class="formula-bar"></div>
+<div class="table-div"></div>
+<script type="module">
+  import { EventAdapter, FormulaBar, SimpleDomService, SpreadsheetFactory, TableScope } from "@guiexpert/table";
+
+  const { tableModel, tableOptions } = SpreadsheetFactory.create({
+    data: [
+      ["Posten", "Jan", "Feb", "Mär", "Summe"],
+      ["Miete", 950, 950, 950, "=SUM(B2:D2)"],
+      ["Essen", 410, 385, 432, "=SUM(B3:D3)"],
+      ["Mobilität", 89, 89, 120, "=SUM(B4:D4)"],
+      ["Freizeit", 120, 60, 210, "=SUM(B5:D5)"],
+      ["Summe", "=SUM(B2:B5)", "=SUM(C2:C5)", "=SUM(D2:D5)", "=SUM(E2:E5)"],
+    ],
+    rowCount: 200,
+    columnWidth: 120,
+    locale: "de-DE",                                         // „1,5“ getippt = 1.5
+  });
+  const undo = document.querySelector("#undo");
+  const redo = document.querySelector("#redo");
+  const listener = new EventAdapter();
+  listener.onUndoStackChanged = evt => { undo.disabled = !evt.canUndo; redo.disabled = !evt.canRedo; };
+  const host = document.querySelector(".table-div");
+  const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener);
+  scope.firstInit();
+  const api = scope.getApi();
+  new FormulaBar(document.querySelector(".formula-bar"), api);
+  host.focus();
+
+  undo.addEventListener("click", () => api.undo());
+  redo.addEventListener("click", () => api.redo());
+  document.querySelector("#excel").addEventListener("click", () => api.downloadExcel("haushalt.xlsx", "", { cellFormulas: true }));
+  document.querySelector("#dark").addEventListener("change", e =>
+    document.documentElement.setAttribute("data-theme", e.target.checked ? "dark" : "light"));
+</script>
+</body>
+</html>

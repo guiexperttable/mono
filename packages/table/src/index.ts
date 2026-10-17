@@ -377,6 +377,7 @@ export * from './lib/table/sheet/shift-formula';
 export * from './lib/table/sheet/sheet-engine';
 export * from './lib/table/sheet/sheet-function-info';
 export { TableSheet } from './lib/table/sheet/table-sheet';
+export type { SheetCellsIf } from './lib/table/sheet/sheet-cells.if';
 export * from './lib/table/data/common/event/ge-edit-event';
 export * from './lib/table/spreadsheet/spreadsheet-options.if';
 export * from './lib/table/spreadsheet/spreadsheet-preset';

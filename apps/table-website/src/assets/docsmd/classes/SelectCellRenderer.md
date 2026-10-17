@@ -39,7 +39,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/edit/select-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L14)
+[src/lib/table/renderer/edit/select-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L13)
 
 ## Properties
 
@@ -49,7 +49,7 @@
 
 #### Defined in
 
-[src/lib/table/renderer/edit/select-cell-renderer.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L15)
+[src/lib/table/renderer/edit/select-cell-renderer.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L14)
 
 ## Methods
 
@@ -83,7 +83,7 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/edit/select-cell-renderer.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L24)
+[src/lib/table/renderer/edit/select-cell-renderer.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L23)
 
 ___
 
@@ -103,4 +103,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/renderer/edit/select-cell-renderer.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L18)
+[src/lib/table/renderer/edit/select-cell-renderer.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/select-cell-renderer.ts#L17)

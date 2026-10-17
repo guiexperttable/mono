@@ -26,6 +26,8 @@ will result in the presence of an east area.
 
   ↳ [`PivotTableModel`](PivotTableModel.md)
 
+  ↳ [`SpreadsheetTableModel`](SpreadsheetTableModel.md)
+
 ## Implements
 
 - [`TableModelIf`](../interfaces/TableModelIf.md)

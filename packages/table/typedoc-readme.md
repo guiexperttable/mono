@@ -38,9 +38,9 @@ const tableApi = tableScope.getApi();
 | update cells live | [TableApi.updateCells](classes/TableApi.html#updateCells), [TableCellUpdateEvent](classes/TableCellUpdateEvent.html) | [Live data](https://gui.expert/training/live-data/) |
 | remember layout, sorting, scroll position, selection | [AutoRestoreOptions](classes/AutoRestoreOptions.html), [TableApi.getState](classes/TableApi.html#getState), [TableApi.applyState](classes/TableApi.html#applyState) | [Persist state](https://gui.expert/training/persist-state/) |
 
-## New in October 2026 (1.1.91 – 1.1.98)
+## New in October 2026 (1.1.91 – 1.1.99)
 
-Twelve features, all MIT-licensed – overview with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/).
+Thirteen features, all MIT-licensed – overview with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/).
 
 | Feature | Start here | Since | Training |
 |---|---|---|---|
@@ -56,6 +56,8 @@ Twelve features, all MIT-licensed – overview with code and live demos: [gui.ex
 | Fill handle & batch edit | [TableOptionsIf.fillHandle](interfaces/TableOptionsIf.html#fillHandle), [TableOptionsIf.batchEdit](interfaces/TableOptionsIf.html#batchEdit), [TableApi.commitBatchEdit](classes/TableApi.html#commitBatchEdit) | 1.1.96 | [Inline editing](https://gui.expert/training/inline-editing/#fill-batch) |
 | Master/detail | [TableOptionsIf.masterDetail](interfaces/TableOptionsIf.html#masterDetail), [DetailRenderContextIf](interfaces/DetailRenderContextIf.html) | 1.1.97 | [Master/detail](https://gui.expert/training/master-detail/) |
 | Right-to-left | [TableOptionsIf.direction](interfaces/TableOptionsIf.html#direction), [TableApi.getDirection](classes/TableApi.html#getDirection) | 1.1.98 | [Theming](https://gui.expert/training/theming-dark-mode/#rtl) |
+| Excel-style editing, clipboard, undo | [TableOptionsIf.editing](interfaces/TableOptionsIf.html#editing), [TableOptionsIf.clipboard](interfaces/TableOptionsIf.html#clipboard), [TableOptionsIf.undo](interfaces/TableOptionsIf.html#undo), [TableApi.undo](classes/TableApi.html#undo) | 1.1.99 | [Inline editing](https://gui.expert/training/inline-editing/#excel-style) |
+| Spreadsheet: cell formulas, formula bar | [SpreadsheetFactory](classes/SpreadsheetFactory.html), [TableOptionsIf.cellFormulas](interfaces/TableOptionsIf.html#cellFormulas), [FormulaBar](classes/FormulaBar.html), [SheetEngine](classes/SheetEngine.html) | 1.1.99 | [Spreadsheet](https://gui.expert/training/spreadsheet/) |
 
 The index is grouped by topic: **Table & API**, **Table model**, **Area models**, **Columns**, **Options**,
 **Header groups**, **Tree & checkboxes**, **Renderers & editing**, **Events**, **Selection & focus**,

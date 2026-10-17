@@ -91,18 +91,29 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [applyCellChanges](TableApi.md#applycellchanges)
 - [applyState](TableApi.md#applystate)
 - [autoResizeColumns](TableApi.md#autoresizecolumns)
+- [batchUndoable](TableApi.md#batchundoable)
+- [canRedo](TableApi.md#canredo)
+- [canUndo](TableApi.md#canundo)
 - [cancelBatchEdit](TableApi.md#cancelbatchedit)
+- [cancelCut](TableApi.md#cancelcut)
 - [cancelFill](TableApi.md#cancelfill)
 - [cancelRowDrag](TableApi.md#cancelrowdrag)
+- [clearCells](TableApi.md#clearcells)
 - [clearSelection](TableApi.md#clearselection)
+- [clearUndoHistory](TableApi.md#clearundohistory)
 - [collapseAll](TableApi.md#collapseall)
 - [collapseAllDetails](TableApi.md#collapsealldetails)
 - [commitBatchEdit](TableApi.md#commitbatchedit)
+- [copySelection](TableApi.md#copyselection)
 - [copyToClipboard](TableApi.md#copytoclipboard)
+- [cutSelection](TableApi.md#cutselection)
+- [deleteColumns](TableApi.md#deletecolumns)
+- [deleteRows](TableApi.md#deleterows)
 - [destroy](TableApi.md#destroy)
 - [downloadExcel](TableApi.md#downloadexcel)
 - [ensureColumnIsVisible](TableApi.md#ensurecolumnisvisible)
 - [ensureRowIsVisible](TableApi.md#ensurerowisvisible)
+- [evaluateFormula](TableApi.md#evaluateformula)
 - [expandAll](TableApi.md#expandall)
 - [expandAllDetails](TableApi.md#expandalldetails)
 - [externalFilterChanged](TableApi.md#externalfilterchanged)
@@ -110,11 +121,18 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [findRowFromAllRowsByAllCriteria](TableApi.md#findrowfromallrowsbyallcriteria)
 - [findRowFromFilteredRowsByAllCriteria](TableApi.md#findrowfromfilteredrowsbyallcriteria)
 - [findRows](TableApi.md#findrows)
+- [getActiveCell](TableApi.md#getactivecell)
 - [getBodyModel](TableApi.md#getbodymodel)
+- [getCellAddress](TableApi.md#getcelladdress)
+- [getCellByAddress](TableApi.md#getcellbyaddress)
+- [getCellInput](TableApi.md#getcellinput)
+- [getCellValue](TableApi.md#getcellvalue)
 - [getColumnIndex](TableApi.md#getcolumnindex)
+- [getDependents](TableApi.md#getdependents)
 - [getDetailElement](TableApi.md#getdetailelement)
 - [getDirection](TableApi.md#getdirection)
 - [getDisplayedRowCount](TableApi.md#getdisplayedrowcount)
+- [getEditingCell](TableApi.md#geteditingcell)
 - [getExpandedDetailRows](TableApi.md#getexpandeddetailrows)
 - [getFirstFullVisibleRowIndex](TableApi.md#getfirstfullvisiblerowindex)
 - [getFirstVisibleRowIndex](TableApi.md#getfirstvisiblerowindex)
@@ -124,29 +142,43 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [getOverlayState](TableApi.md#getoverlaystate)
 - [getPendingChanges](TableApi.md#getpendingchanges)
 - [getPivotConfig](TableApi.md#getpivotconfig)
+- [getPrecedents](TableApi.md#getprecedents)
 - [getRowGroupBy](TableApi.md#getrowgroupby)
 - [getRowValue](TableApi.md#getrowvalue)
 - [getSelectionAggregates](TableApi.md#getselectionaggregates)
+- [getSelectionAsText](TableApi.md#getselectionastext)
 - [getSelectionModel](TableApi.md#getselectionmodel)
+- [getSheetData](TableApi.md#getsheetdata)
+- [getSheetEngine](TableApi.md#getsheetengine)
+- [getSheetValue](TableApi.md#getsheetvalue)
 - [getShortcutActionMapping](TableApi.md#getshortcutactionmapping)
 - [getShowValuesAs](TableApi.md#getshowvaluesas)
 - [getState](TableApi.md#getstate)
 - [getTableModel](TableApi.md#gettablemodel)
 - [getTableScope](TableApi.md#gettablescope)
+- [getUndoState](TableApi.md#getundostate)
+- [goToAddress](TableApi.md#gotoaddress)
+- [hasCellFormulas](TableApi.md#hascellformulas)
 - [hasPendingChanges](TableApi.md#haspendingchanges)
 - [hideOverlay](TableApi.md#hideoverlay)
+- [insertColumns](TableApi.md#insertcolumns)
+- [insertRows](TableApi.md#insertrows)
 - [isBatchEditing](TableApi.md#isbatchediting)
 - [isColumnVisible](TableApi.md#iscolumnvisible)
 - [isDetailExpanded](TableApi.md#isdetailexpanded)
+- [isEditing](TableApi.md#isediting)
 - [isFilling](TableApi.md#isfilling)
 - [isFooterVisible](TableApi.md#isfootervisible)
 - [isHeaderVisible](TableApi.md#isheadervisible)
 - [isLoggingActive](TableApi.md#isloggingactive)
 - [isRowDragging](TableApi.md#isrowdragging)
 - [moveRows](TableApi.md#moverows)
+- [pasteText](TableApi.md#pastetext)
 - [reSort](TableApi.md#resort)
 - [recalcColumnWidths](TableApi.md#recalccolumnwidths)
 - [recalcWrappers](TableApi.md#recalcwrappers)
+- [recalculate](TableApi.md#recalculate)
+- [redo](TableApi.md#redo)
 - [refreshDetail](TableApi.md#refreshdetail)
 - [removeRows](TableApi.md#removerows)
 - [repaint](TableApi.md#repaint)
@@ -154,6 +186,7 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [resetState](TableApi.md#resetstate)
 - [scrollToIndex](TableApi.md#scrolltoindex)
 - [scrollToPixel](TableApi.md#scrolltopixel)
+- [setCellInput](TableApi.md#setcellinput)
 - [setColumnFormula](TableApi.md#setcolumnformula)
 - [setColumnVisible](TableApi.md#setcolumnvisible)
 - [setColumnWidth](TableApi.md#setcolumnwidth)
@@ -174,8 +207,12 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 - [sort](TableApi.md#sort)
 - [sortByColumn](TableApi.md#sortbycolumn)
 - [startBatchEdit](TableApi.md#startbatchedit)
+- [startEditing](TableApi.md#startediting)
+- [stopEditing](TableApi.md#stopediting)
+- [subscribe](TableApi.md#subscribe)
 - [toggleDetail](TableApi.md#toggledetail)
 - [triggerAction](TableApi.md#triggeraction)
+- [undo](TableApi.md#undo)
 - [updateCells](TableApi.md#updatecells)
 - [updateRows](TableApi.md#updaterows)
 
@@ -197,7 +234,7 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 
 #### Defined in
 
-[src/lib/table/table-api.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L102)
+[src/lib/table/table-api.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L113)
 
 ## Properties
 
@@ -207,7 +244,7 @@ Training: [Your first table](https://gui.expert/training/first-table/),
 
 #### Defined in
 
-[src/lib/table/table-api.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L103)
+[src/lib/table/table-api.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L114)
 
 ## Methods
 
@@ -254,7 +291,7 @@ tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1267](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1267)
+[src/lib/table/table-api.ts:1355](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1355)
 
 ___
 
@@ -295,7 +332,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1296](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1296)
+[src/lib/table/table-api.ts:1384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1384)
 
 ___
 
@@ -336,13 +373,13 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 
 #### Defined in
 
-[src/lib/table/table-api.ts:757](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L757)
+[src/lib/table/table-api.ts:768](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L768)
 
 ___
 
 ### applyCellChanges
 
-▸ **applyCellChanges**(`changes`, `source?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+▸ **applyCellChanges**(`changes`, `source?`, `opts?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
 
 Writes values into body cells like the cell editor does – the one way the table changes cells (editor, fill
 handle and batch commit use it too): cells that are not editable are skipped (`editable`, calculated columns
@@ -358,6 +395,8 @@ Paste from the clipboard and undo/redo can be built on it: a [CellChangeIf](../i
 | :------ | :------ | :------ | :------ |
 | `changes` | [`CellValueChangeIf`](../interfaces/CellValueChangeIf.md)[] | `undefined` | display row index, column (index or property) and value per cell |
 | `source?` | [`CellChangeSource`](../modules.md#cellchangesource) | `"api"` | reported in [GeModelChangeEvent.source](GeModelChangeEvent.md#source) |
+| `opts?` | `Object` | `{}` | `undoable`: record the change for undo ([TableOptionsIf.undo](../interfaces/TableOptionsIf.md#undo)) – default: `UndoOptionsIf.recordApiChanges` for `"api"`, recorded for the other sources (since 1.1.99) |
+| `opts.undoable?` | `boolean` | `undefined` | - |
 
 #### Returns
 
@@ -388,7 +427,7 @@ const undo = (changes: CellChangeIf[]) => tableApi.applyCellChanges(
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1941](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1941)
+[src/lib/table/table-api.ts:2031](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2031)
 
 ___
 
@@ -433,7 +472,7 @@ tableApi.applyState({ sort: [{ property: "total", sortState: "desc" }] });
 
 #### Defined in
 
-[src/lib/table/table-api.ts:881](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L881)
+[src/lib/table/table-api.ts:892](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L892)
 
 ___
 
@@ -457,7 +496,108 @@ Automatically resizes all columns to fit their content.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1167)
+[src/lib/table/table-api.ts:1255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1255)
+
+___
+
+### batchUndoable
+
+▸ **batchUndoable**\<`T`\>(`label`, `fn`): `T`
+
+Records all changes `fn` makes (several [applyCellChanges](TableApi.md#applycellchanges) calls, a fill and a paste …) as **one** undo step.
+Without the option `fn` just runs.
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `label` | `string` | the label of the step ("Undo Import") |
+| `fn` | () => `T` | the changes |
+
+#### Returns
+
+`T`
+
+what `fn` returns
+
+**`Example`**
+
+```ts
+tableApi.batchUndoable("Import", () => {
+  tableApi.applyCellChanges(firstChanges, "api", { undoable: true });
+  tableApi.applyCellChanges(secondChanges, "api", { undoable: true });
+});
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2403](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2403)
+
+___
+
+### canRedo
+
+▸ **canRedo**(): `boolean`
+
+True if there is an undone change to redo.
+
+#### Returns
+
+`boolean`
+
+true if [redo](TableApi.md#redo) would redo something
+
+**`Example`**
+
+```ts
+redoButton.disabled = !tableApi.canRedo();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2355](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2355)
+
+___
+
+### canUndo
+
+▸ **canUndo**(): `boolean`
+
+True if there is a change to undo – for buttons (or listen to `onUndoStackChanged`).
+
+#### Returns
+
+`boolean`
+
+true if [undo](TableApi.md#undo) would undo something
+
+**`Example`**
+
+```ts
+undoButton.disabled = !tableApi.canUndo();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2341](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2341)
 
 ___
 
@@ -484,7 +624,33 @@ discardButton.onclick = () => tableApi.cancelBatchEdit();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2224](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2224)
+[src/lib/table/table-api.ts:2976](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2976)
+
+___
+
+### cancelCut
+
+▸ **cancelCut**(): `void`
+
+Removes the mark of cut cells (like Escape): the next paste copies instead of moving.
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+tableApi.cancelCut();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2295](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2295)
 
 ___
 
@@ -510,7 +676,7 @@ tableApi.cancelFill();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1990](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1990)
+[src/lib/table/table-api.ts:2080](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2080)
 
 ___
 
@@ -536,7 +702,43 @@ tableApi.cancelRowDrag();   // e.g. new data arrived from the server
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1909](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1909)
+[src/lib/table/table-api.ts:1997](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1997)
+
+___
+
+### clearCells
+
+▸ **clearCells**(`ranges?`): `number`
+
+Clears body cells like Delete in Excel-style editing: editable cells get their empty value
+([ColumnDefIf.emptyValue](../interfaces/ColumnDefIf.md#emptyvalue), default `""`), **one** `onModelChanged` with the source `"clear"` (batch edit:
+marked). Works without [TableOptionsIf.editing](../interfaces/TableOptionsIf.md#editing) too.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ranges?` | [`CellRange`](CellRange.md)[] | body ranges; default: the selected cells, or the focused cell |
+
+#### Returns
+
+`number`
+
+the number of cleared cells, `-1` if there were too many (`EditingOptionsIf.maxClearCells`)
+
+**`Example`**
+
+```ts
+tableApi.clearCells([new CellRange(0, 2, 9, 2)]);   // rows 0–9 of column 2
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2215](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2215)
 
 ___
 
@@ -567,7 +769,34 @@ tableApi.clearSelection();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:610](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L610)
+[src/lib/table/table-api.ts:621](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L621)
+
+___
+
+### clearUndoHistory
+
+▸ **clearUndoHistory**(): `void`
+
+Empties the undo history (e.g. after saving or loading new data).
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+await save(rows);
+tableApi.clearUndoHistory();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2368](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2368)
 
 ___
 
@@ -589,7 +818,7 @@ tableApi.collapseAll();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1585](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1585)
+[src/lib/table/table-api.ts:1673](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1673)
 
 ___
 
@@ -617,7 +846,7 @@ tableApi.collapseAllDetails();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2084](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2084)
+[src/lib/table/table-api.ts:2836](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2836)
 
 ___
 
@@ -650,7 +879,38 @@ if (!tableApi.commitBatchEdit()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2211](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2211)
+[src/lib/table/table-api.ts:2963](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2963)
+
+___
+
+### copySelection
+
+▸ **copySelection**(): `Promise`\<`void`\>
+
+Copies the selected cells (the last selected range, everything after Ctrl/⌘+A, otherwise the focused cell) with
+the asynchronous clipboard API – for an own button or menu. Tab-separated text with Excel's quoting plus an HTML
+table (`ClipboardOptionsIf.html`); pasting it into this table pastes the values. The browser may ask for
+permission; Ctrl/⌘+C needs none ([TableOptionsIf.clipboard](../interfaces/TableOptionsIf.md#clipboard)). Works without the option (defaults).
+
+#### Returns
+
+`Promise`\<`void`\>
+
+resolves when the clipboard was written
+
+**`Example`**
+
+```ts
+copyButton.addEventListener("click", () => tableApi.copySelection());
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2234](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2234)
 
 ___
 
@@ -700,7 +960,107 @@ function onCopyButtonClick() {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:731](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L731)
+[src/lib/table/table-api.ts:742](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L742)
+
+___
+
+### cutSelection
+
+▸ **cutSelection**(): `Promise`\<`void`\>
+
+Like [copySelection](TableApi.md#copyselection), and the cells are marked (dashed frame): the next paste of this content moves them –
+the cut cells are emptied in the same change (`source: "cut"`). Escape or another change removes the mark.
+
+#### Returns
+
+`Promise`\<`void`\>
+
+resolves when the clipboard was written
+
+**`Example`**
+
+```ts
+cutButton.addEventListener("click", () => tableApi.cutSelection());
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2249](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2249)
+
+___
+
+### deleteColumns
+
+▸ **deleteColumns**(`at`, `count?`): `boolean`
+
+Deletes columns of a spreadsheet (`at` = letter index, A = 0) and adjusts the cell formulas. One undo step.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `at` | `number` | `undefined` | the first data column |
+| `count?` | `number` | `1` | columns |
+
+#### Returns
+
+`boolean`
+
+true if deleted (`false` for other models)
+
+**`Example`**
+
+```ts
+tableApi.deleteColumns(2);   // column C
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2720](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2720)
+
+___
+
+### deleteRows
+
+▸ **deleteRows**(`at`, `count?`): `boolean`
+
+Deletes rows of the sheet (`at` = row number − 1) and adjusts the cell formulas (a deleted reference becomes
+`#REF!`). One undo step.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `at` | `number` | `undefined` | the first physical row |
+| `count?` | `number` | `1` | rows |
+
+#### Returns
+
+`boolean`
+
+true if deleted
+
+**`Example`**
+
+```ts
+tableApi.deleteRows(2);   // row 3
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2687](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2687)
 
 ___
 
@@ -727,13 +1087,13 @@ scope.firstInit();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:529](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L529)
+[src/lib/table/table-api.ts:540](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L540)
 
 ___
 
 ### downloadExcel
 
-▸ **downloadExcel**(`fileName?`, `author?`): `Promise`\<`void`\>
+▸ **downloadExcel**(`fileName?`, `author?`, `exportOptions?`): `Promise`\<`void`\>
 
 Downloads the current table data as an Excel file.
 
@@ -752,6 +1112,7 @@ The method works by:
 | :------ | :------ | :------ | :------ |
 | `fileName` | `string` | `'table.xlsx'` | The name of the Excel file to be downloaded (default: 'table.xlsx') |
 | `author` | `string` | `''` | Optional metadata for the Excel file to specify the author (default: '') |
+| `exportOptions` | `Partial`\<[`ExcelExportOptionsIf`](../interfaces/ExcelExportOptionsIf.md)\> | `{}` | - |
 
 #### Returns
 
@@ -780,9 +1141,16 @@ tableApi.downloadExcel('sales-report.xlsx', 'John Doe');
 tableApi.downloadExcel('quarterly-data.xlsx');
 ```
 
+**`Example`**
+
+```ts
+// cell formulas as Excel formulas (since 1.1.99, tableOptions.cellFormulas)
+tableApi.downloadExcel('budget.xlsx', '', { cellFormulas: true });
+```
+
 #### Defined in
 
-[src/lib/table/table-api.ts:987](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L987)
+[src/lib/table/table-api.ts:1002](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1002)
 
 ___
 
@@ -824,7 +1192,7 @@ tableApi.ensureRowIsVisible(rowIndex);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2274](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2274)
+[src/lib/table/table-api.ts:3026](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3026)
 
 ___
 
@@ -871,7 +1239,42 @@ Implicitly may throw if rowIndex is not a number or if required properties are u
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2251](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2251)
+[src/lib/table/table-api.ts:3003](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3003)
+
+___
+
+### evaluateFormula
+
+▸ **evaluateFormula**(`source`): `unknown`
+
+Calculates a formula once against the sheet (not stored), e.g. for a preview: `"=SUM(D2:D4)"`.
+`undefined` without cell formulas.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | `string` | the formula (the `=` is optional) |
+
+#### Returns
+
+`unknown`
+
+the result (a [FormulaError](FormulaError.md) for an error)
+
+**`Example`**
+
+```ts
+tableApi.evaluateFormula("=SUM(D2:D4)");   // 3895
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2526](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2526)
 
 ___
 
@@ -894,7 +1297,7 @@ document.querySelector("#expand")!.addEventListener("click", () => tableApi.expa
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1575](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1575)
+[src/lib/table/table-api.ts:1663](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1663)
 
 ___
 
@@ -923,7 +1326,7 @@ document.querySelector("#expand-all")!.addEventListener("click", () => tableApi.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2070](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2070)
+[src/lib/table/table-api.ts:2822](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2822)
 
 ___
 
@@ -979,7 +1382,7 @@ TableScope.externalFilterChanged
 
 #### Defined in
 
-[src/lib/table/table-api.ts:238](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L238)
+[src/lib/table/table-api.ts:249](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L249)
 
 ___
 
@@ -1019,7 +1422,7 @@ tableApi.fillRange(new CellRange(0, 2, 1, 2), "down", 8);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1962](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1962)
+[src/lib/table/table-api.ts:2052](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2052)
 
 ___
 
@@ -1088,7 +1491,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1481](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1481)
+[src/lib/table/table-api.ts:1569](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1569)
 
 ___
 
@@ -1157,7 +1560,7 @@ Logs a warning to console if the body model is not an instance of AreaModelObjec
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1428](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1428)
+[src/lib/table/table-api.ts:1516](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1516)
 
 ___
 
@@ -1213,7 +1616,36 @@ const matchingRows = tableApi.findRows<Order>([{ ...orders[0] }], (a, b) => a.id
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1370](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1370)
+[src/lib/table/table-api.ts:1458](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1458)
+
+___
+
+### getActiveCell
+
+▸ **getActiveCell**(): `undefined` \| [`number`, `number`]
+
+The active body cell (the focused cell), `undefined` if there is none or the header has the focus.
+
+#### Returns
+
+`undefined` \| [`number`, `number`]
+
+display row and model column
+
+**`Example`**
+
+```ts
+const cell = tableApi.getActiveCell();
+if (cell) console.log(tableApi.getCellAddress(cell[0], cell[1]));   // "B3"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2624](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2624)
 
 ___
 
@@ -1232,7 +1664,150 @@ The area model interface that provides access to the table's body data,
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1212](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1212)
+[src/lib/table/table-api.ts:1300](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1300)
+
+___
+
+### getCellAddress
+
+▸ **getCellAddress**(`rowIndex`, `column`): `undefined` \| `string`
+
+The address of a body cell in cell formulas: `"B3"` = second data column, third row of `getAllRows()` (the
+physical row – sorting and filtering don't change it). `undefined` without cell formulas or for a row number or
+checkbox column.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+
+#### Returns
+
+`undefined` \| `string`
+
+the address
+
+**`Example`**
+
+```ts
+tableApi.getCellAddress(1, "total");   // "D2" – the second row of getAllRows()
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2438](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2438)
+
+___
+
+### getCellByAddress
+
+▸ **getCellByAddress**(`address`): `undefined` \| [`number`, `number`]
+
+The body cell of an address (`"B3"`, `"$B$3"`): display row (`-1` if a filter hides it) and model column;
+`undefined` without cell formulas or for an address outside the data.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | the address |
+
+#### Returns
+
+`undefined` \| [`number`, `number`]
+
+display row and model column
+
+**`Example`**
+
+```ts
+const cell = tableApi.getCellByAddress("D5");
+if (cell && cell[0] >= 0) tableApi.scrollToIndex(cell[1], cell[0]);
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2455](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2455)
+
+___
+
+### getCellInput
+
+▸ **getCellInput**(`rowIndex`, `column`): `unknown`
+
+The input of a body cell – what was typed: the formula text of a cell formula (`"=B2*C2"`), otherwise the value.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+
+#### Returns
+
+`unknown`
+
+the input
+
+**`Example`**
+
+```ts
+tableApi.getCellInput(1, "total");   // "=B2*C2"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2471](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2471)
+
+___
+
+### getCellValue
+
+▸ **getCellValue**(`rowIndex`, `column`): `unknown`
+
+The value of a body cell – the result of a cell formula (`2598`), otherwise the value (= `getValueAt`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+
+#### Returns
+
+`unknown`
+
+the value
+
+**`Example`**
+
+```ts
+tableApi.getCellValue(1, "total");   // 2598
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2490](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2490)
 
 ___
 
@@ -1271,7 +1846,42 @@ tableApi.scrollToIndex(totalColumn, 0);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1056](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1056)
+[src/lib/table/table-api.ts:1144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1144)
+
+___
+
+### getDependents
+
+▸ **getDependents**(`rowIndex`, `column`): [`number`, `number`][]
+
+The cells whose formulas read a cell directly (display row, model column; rows a filter hides are left out).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+
+#### Returns
+
+[`number`, `number`][]
+
+the dependent cells
+
+**`Example`**
+
+```ts
+tableApi.getDependents(1, "price");   // [[1, 3]] – D2 reads B2
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2595](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2595)
 
 ___
 
@@ -1306,7 +1916,7 @@ const notes = tableApi.getDetailElement(order)?.querySelector("textarea");
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2117](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2117)
+[src/lib/table/table-api.ts:2869](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2869)
 
 ___
 
@@ -1340,7 +1950,7 @@ if (tableApi.getDirection() === "rtl") {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:313](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L313)
+[src/lib/table/table-api.ts:324](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L324)
 
 ___
 
@@ -1363,7 +1973,36 @@ applying any filtering, pagination, or other visibility constraints.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2287](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2287)
+[src/lib/table/table-api.ts:3039](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3039)
+
+___
+
+### getEditingCell
+
+▸ **getEditingCell**(): `undefined` \| [`number`, `number`]
+
+The cell whose editor is open.
+
+#### Returns
+
+`undefined` \| [`number`, `number`]
+
+display row and model column, `undefined` without editor
+
+**`Example`**
+
+```ts
+const cell = tableApi.getEditingCell();
+if (cell) console.log(`editing row ${cell[0]}, column ${cell[1]}`);
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2198](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2198)
 
 ___
 
@@ -1397,7 +2036,7 @@ const openOrders = tableApi.getExpandedDetailRows<Order>().map(order => order.id
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2055](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2055)
+[src/lib/table/table-api.ts:2807](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2807)
 
 ___
 
@@ -1437,7 +2076,7 @@ const isRowFullyVisible = (rowIndex: number) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2350](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2350)
+[src/lib/table/table-api.ts:3102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3102)
 
 ___
 
@@ -1481,7 +2120,7 @@ if (firstVisibleIndex >= 0) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2322](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2322)
+[src/lib/table/table-api.ts:3074](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3074)
 
 ___
 
@@ -1515,7 +2154,7 @@ if (headerFocus) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:954](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L954)
+[src/lib/table/table-api.ts:965](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L965)
 
 ___
 
@@ -1557,7 +2196,7 @@ if (rowIndex > lastVisibleRowIndex) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2414](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2414)
+[src/lib/table/table-api.ts:3166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3166)
 
 ___
 
@@ -1603,7 +2242,7 @@ console.log(`Visible rows: ${visibleRowsRange.first} to ${visibleRowsRange.last}
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2382](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2382)
+[src/lib/table/table-api.ts:3134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3134)
 
 ___
 
@@ -1635,7 +2274,7 @@ if (tableApi.getOverlayState() === "noMatches") {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:831](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L831)
+[src/lib/table/table-api.ts:842](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L842)
 
 ___
 
@@ -1670,7 +2309,7 @@ saveButton.onclick = async () => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2192)
+[src/lib/table/table-api.ts:2944](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2944)
 
 ___
 
@@ -1698,7 +2337,42 @@ const columnFields = tableApi.getPivotConfig()?.columnFields;   // ["monat"]
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1678](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1678)
+[src/lib/table/table-api.ts:1766](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1766)
+
+___
+
+### getPrecedents
+
+▸ **getPrecedents**(`rowIndex`, `column`): `string`[]
+
+The cells and ranges a cell formula reads, as addresses.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+
+#### Returns
+
+`string`[]
+
+e.g. `["B2", "C2"]` (empty for a value cell or without cell formulas)
+
+**`Example`**
+
+```ts
+tableApi.getPrecedents(1, "total");   // ["B2", "C2"]
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2579](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2579)
 
 ___
 
@@ -1726,7 +2400,7 @@ const levels = tableApi.getRowGroupBy();   // ["region", "produkt"]
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1637](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1637)
+[src/lib/table/table-api.ts:1725](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1725)
 
 ___
 
@@ -1763,7 +2437,7 @@ tableApi.externalFilterChanged();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1697](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1697)
+[src/lib/table/table-api.ts:1785](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1785)
 
 ___
 
@@ -1802,7 +2476,36 @@ listener.onSelectionChanged = () => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1153)
+[src/lib/table/table-api.ts:1241](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1241)
+
+___
+
+### getSelectionAsText
+
+▸ **getSelectionAsText**(): `string`
+
+The selected cells as tab-separated text, exactly as Ctrl/⌘+C copies them (Excel's quoting, `copyHeaders`,
+`copyValue`). `""` without cells or with more than `CopyService.maxCopyCells`.
+
+#### Returns
+
+`string`
+
+the text
+
+**`Example`**
+
+```ts
+console.log(tableApi.getSelectionAsText());   // "a\tb\n1\t2"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2283)
 
 ___
 
@@ -1856,7 +2559,99 @@ selectionModel?.addEventSelectionChangedListener({
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1128)
+[src/lib/table/table-api.ts:1216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1216)
+
+___
+
+### getSheetData
+
+▸ **getSheetData**(): `undefined` \| `unknown`[][]
+
+The inputs of a spreadsheet ([SpreadsheetFactory](SpreadsheetFactory.md)) as rows × columns – formulas as text, up to the last
+filled row and column (empty cells `""`). Save them; `SpreadsheetFactory.create({ data })` loads them again.
+`undefined` for other models (their data are the app's rows).
+
+#### Returns
+
+`undefined` \| `unknown`[][]
+
+the data
+
+**`Example`**
+
+```ts
+localStorage.setItem("sheet", JSON.stringify(tableApi.getSheetData()));
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2736](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2736)
+
+___
+
+### getSheetEngine
+
+▸ **getSheetEngine**(): `undefined` \| [`SheetEngine`](SheetEngine.md)
+
+The formula engine of the cell formulas (`undefined` without them) – physical rows, data columns.
+
+#### Returns
+
+`undefined` \| [`SheetEngine`](SheetEngine.md)
+
+the engine
+
+**`Example`**
+
+```ts
+tableApi.getSheetEngine()?.getFormulaCount();   // 4
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2609](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2609)
+
+___
+
+### getSheetValue
+
+▸ **getSheetValue**(`address`): `unknown`
+
+The value of a cell by its address – also of a row a filter hides. `undefined` without cell formulas.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | e.g. `"D5"` |
+
+#### Returns
+
+`unknown`
+
+the value
+
+**`Example`**
+
+```ts
+tableApi.getSheetValue("D5");   // 3895
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2541](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2541)
 
 ___
 
@@ -1904,7 +2699,7 @@ Object.entries(shortcuts).forEach(([key, actionId]) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:691](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L691)
+[src/lib/table/table-api.ts:702](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L702)
 
 ___
 
@@ -1938,7 +2733,7 @@ const mode = tableApi.getShowValuesAs("total");   // "percentOfColumnTotal"
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1747](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1747)
+[src/lib/table/table-api.ts:1835](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1835)
 
 ___
 
@@ -1989,7 +2784,7 @@ Training: [Remember the state](https://gui.expert/training/persist-state/)
 
 #### Defined in
 
-[src/lib/table/table-api.ts:857](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L857)
+[src/lib/table/table-api.ts:868](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L868)
 
 ___
 
@@ -2008,7 +2803,7 @@ The table model interface that provides access to the table's data structure,
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1202](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1202)
+[src/lib/table/table-api.ts:1290](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1290)
 
 ___
 
@@ -2045,7 +2840,100 @@ tableScope.contextmenu(geMouseEvent);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1085](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1085)
+[src/lib/table/table-api.ts:1173](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1173)
+
+___
+
+### getUndoState
+
+▸ **getUndoState**(): `undefined` \| [`GeUndoEvent`](GeUndoEvent.md)
+
+The state of the undo history (what `onUndoStackChanged` reports).
+
+#### Returns
+
+`undefined` \| [`GeUndoEvent`](GeUndoEvent.md)
+
+can undo/redo, labels, size; `undefined` without the option
+
+**`Example`**
+
+```ts
+const state = tableApi.getUndoState();
+undoButton.title = state?.undoLabel ? `Undo ${state.undoLabel}` : "Undo";
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2383](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2383)
+
+___
+
+### goToAddress
+
+▸ **goToAddress**(`address`): `boolean`
+
+Goes to a cell or range of the sheet by its address (cell formulas): `"D10"` makes it the active cell, `"B2:C5"`
+selects the range (its first cell becomes active); the view scrolls to it. `false` for an invalid address, one
+outside the data or a row a filter hides.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | e.g. `"D10"`, `"$B$2:C5"` |
+
+#### Returns
+
+`boolean`
+
+true if it went there
+
+**`Example`**
+
+```ts
+tableApi.goToAddress("B2:C5");
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2641](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2641)
+
+___
+
+### hasCellFormulas
+
+▸ **hasCellFormulas**(): `boolean`
+
+True if the table calculates cell formulas ([TableOptionsIf.cellFormulas](../interfaces/TableOptionsIf.md#cellformulas), flat body).
+
+#### Returns
+
+`boolean`
+
+whether cell formulas are on
+
+**`Example`**
+
+```ts
+const showAddresses = tableApi.hasCellFormulas();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2420](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2420)
 
 ___
 
@@ -2075,7 +2963,7 @@ window.addEventListener("beforeunload", evt => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2170](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2170)
+[src/lib/table/table-api.ts:2922](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2922)
 
 ___
 
@@ -2104,7 +2992,81 @@ save(order).finally(() => tableApi.hideOverlay());
 
 #### Defined in
 
-[src/lib/table/table-api.ts:814](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L814)
+[src/lib/table/table-api.ts:825](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L825)
+
+___
+
+### insertColumns
+
+▸ **insertColumns**(`at`, `count?`): `boolean`
+
+Inserts empty columns before a column of a spreadsheet ([SpreadsheetFactory](SpreadsheetFactory.md); `at` = letter index, A = 0)
+and adjusts the cell formulas. One undo step.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `at` | `number` | `undefined` | the data column the new columns come before |
+| `count?` | `number` | `1` | columns |
+
+#### Returns
+
+`boolean`
+
+true if inserted (`false` for other models)
+
+**`Example`**
+
+```ts
+tableApi.insertColumns(1);   // a new column B
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2704](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2704)
+
+___
+
+### insertRows
+
+▸ **insertRows**(`at`, `count?`): `boolean`
+
+Inserts empty rows before a row of the sheet (`at` = row number − 1, the physical row: also when sorted or
+filtered) and adjusts the cell formulas (`=SUM(D2:D4)` grows when rows are inserted inside). One undo step, one
+`onModelChanged` (source `"structure"`). Works for a spreadsheet ([SpreadsheetFactory](SpreadsheetFactory.md)), object rows (new
+objects from `clipboard.createRow`, otherwise `{}` – the app's array changes in place) and arrays.
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `at` | `number` | `undefined` | the physical row the new rows come before (row count = append) |
+| `count?` | `number` | `1` | rows |
+
+#### Returns
+
+`boolean`
+
+true if inserted
+
+**`Example`**
+
+```ts
+tableApi.insertRows(4, 2);   // two empty rows before row 5
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2670](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2670)
 
 ___
 
@@ -2132,7 +3094,7 @@ saveButton.hidden = !tableApi.isBatchEditing();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2154)
+[src/lib/table/table-api.ts:2906](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2906)
 
 ___
 
@@ -2165,7 +3127,7 @@ if (!tableApi.isColumnVisible("category")) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:423](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L423)
+[src/lib/table/table-api.ts:434](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L434)
 
 ___
 
@@ -2199,7 +3161,37 @@ const open = tableApi.isDetailExpanded(3);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2041](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2041)
+[src/lib/table/table-api.ts:2793](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2793)
+
+___
+
+### isEditing
+
+▸ **isEditing**(): `boolean`
+
+True while a cell editor is open.
+
+#### Returns
+
+`boolean`
+
+true while editing
+
+**`Example`**
+
+```ts
+if (!tableApi.isEditing()) {
+  tableApi.updateCells([], true);   // live data: don't repaint under the user's input
+}
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2183](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2183)
 
 ___
 
@@ -2229,7 +3221,7 @@ if (!tableApi.isFilling()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1978](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1978)
+[src/lib/table/table-api.ts:2068](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2068)
 
 ___
 
@@ -2253,7 +3245,7 @@ const footerShown = tableApi.isFooterVisible();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:474](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L474)
+[src/lib/table/table-api.ts:485](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L485)
 
 ___
 
@@ -2277,7 +3269,7 @@ const headerShown = tableApi.isHeaderVisible();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:444](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L444)
+[src/lib/table/table-api.ts:455](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L455)
 
 ___
 
@@ -2335,7 +3327,7 @@ if (!tableApi.isLoggingActive()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2507](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2507)
+[src/lib/table/table-api.ts:3259](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3259)
 
 ___
 
@@ -2365,7 +3357,7 @@ if (!tableApi.isRowDragging()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1897](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1897)
+[src/lib/table/table-api.ts:1985](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1985)
 
 ___
 
@@ -2418,7 +3410,45 @@ listener.onRowDragEnd = async (evt: GeRowDragEvent) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1867](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1867)
+[src/lib/table/table-api.ts:1955](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1955)
+
+___
+
+### pasteText
+
+▸ **pasteText**(`text`, `target?`): [`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+Pastes tab-separated text like Ctrl/⌘+V – without clipboard permissions: from `target` (once), otherwise from the
+selection (tiled over a selected range that is an integer multiple, one value into every selected cell) or the
+focused cell. Hidden columns are skipped, read-only cells left out, the rest is cut off at the last column;
+**one** `onModelChanged` with `source: "paste"` (batch edit: marked). Works without [TableOptionsIf.clipboard](../interfaces/TableOptionsIf.md#clipboard).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `text` | `string` | rows separated by line breaks, cells by tabs (quoted cells like Excel) |
+| `target?` | [`number`, `number`] | display row and model column of the first cell |
+
+#### Returns
+
+[`CellChangeIf`](../interfaces/CellChangeIf.md)\<`any`\>[]
+
+the written (batch edit: newly pending) cells
+
+**`Example`**
+
+```ts
+tableApi.pasteText("a\tb\n1\t2", [0, 1]);   // A 2×2 block from row 0, column 1
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2268](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2268)
 
 ___
 
@@ -2450,7 +3480,7 @@ tableApi.reSort();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1564](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1564)
+[src/lib/table/table-api.ts:1652](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1652)
 
 ___
 
@@ -2472,7 +3502,7 @@ Recalculates the column widths of the table.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:587](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L587)
+[src/lib/table/table-api.ts:598](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L598)
 
 ___
 
@@ -2494,7 +3524,64 @@ It ensures that all wrapper elements are properly sized to match their content.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1180)
+[src/lib/table/table-api.ts:1268](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1268)
+
+___
+
+### recalculate
+
+▸ **recalculate**(): `void`
+
+Calculates all cell formulas again – after the app changed the data without the table ([updateCells](TableApi.md#updatecells),
+[applyCellChanges](TableApi.md#applycellchanges) and the editor recalculate by themselves; [repaint](TableApi.md#repaint) does not). Also renews
+`TODAY()`, `NOW()` and `RAND()`.
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+rows[3].price = 30;          // changed outside the table
+tableApi.recalculate();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2559](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2559)
+
+___
+
+### redo
+
+▸ **redo**(): `boolean`
+
+Redoes the last undone change like Ctrl+Y / Ctrl/⌘+Shift+Z (source `"redo"`).
+
+#### Returns
+
+`boolean`
+
+true if a step was redone
+
+**`Example`**
+
+```ts
+redoButton.addEventListener("click", () => tableApi.redo());
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2327)
 
 ___
 
@@ -2530,7 +3617,7 @@ tableApi.refreshDetail(order);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2101)
+[src/lib/table/table-api.ts:2853](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2853)
 
 ___
 
@@ -2570,7 +3657,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1326](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1326)
+[src/lib/table/table-api.ts:1414](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1414)
 
 ___
 
@@ -2622,7 +3709,7 @@ tableApi.repaint();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:511](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L511)
+[src/lib/table/table-api.ts:522](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L522)
 
 ___
 
@@ -2685,7 +3772,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:574](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L574)
+[src/lib/table/table-api.ts:585](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L585)
 
 ___
 
@@ -2715,7 +3802,7 @@ document.querySelector("#reset-layout")!.addEventListener("click", () => tableAp
 
 #### Defined in
 
-[src/lib/table/table-api.ts:897](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L897)
+[src/lib/table/table-api.ts:908](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L908)
 
 ___
 
@@ -2771,7 +3858,7 @@ tableApi.scrollToIndex(3, tableApi.getFirstVisibleRowIndex());
 
 #### Defined in
 
-[src/lib/table/table-api.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L349)
+[src/lib/table/table-api.ts:360](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L360)
 
 ___
 
@@ -2851,7 +3938,43 @@ class TableScroller {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:293](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L293)
+[src/lib/table/table-api.ts:304](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L304)
+
+___
+
+### setCellInput
+
+▸ **setCellInput**(`rowIndex`, `column`, `input`): `boolean`
+
+Writes the input of a body cell (a value or a formula `"=B2*C2"`) like the editor: one [applyCellChanges](TableApi.md#applycellchanges).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row |
+| `column` | `string` \| `number` | model column index or property |
+| `input` | `unknown` | the input |
+
+#### Returns
+
+`boolean`
+
+true if written (or marked in a batch edit)
+
+**`Example`**
+
+```ts
+tableApi.setCellInput(4, "total", "=SUM(D2:D4)");
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2510](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2510)
 
 ___
 
@@ -2894,7 +4017,7 @@ input.addEventListener("change", () => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1771](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1771)
+[src/lib/table/table-api.ts:1859](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1859)
 
 ___
 
@@ -2948,7 +4071,7 @@ tableApi.getTableModel().getColumnDefs()?.forEach((columnDef, index) => {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:407](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L407)
+[src/lib/table/table-api.ts:418](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L418)
 
 ___
 
@@ -2973,7 +4096,7 @@ Sets the width of a specific column in the table.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1192)
+[src/lib/table/table-api.ts:1280](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1280)
 
 ___
 
@@ -3013,7 +4136,7 @@ filterInput.value = custom?.filter ?? "";
 
 #### Defined in
 
-[src/lib/table/table-api.ts:919](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L919)
+[src/lib/table/table-api.ts:930](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L930)
 
 ___
 
@@ -3051,7 +4174,7 @@ tableApi.setDetailExpanded(orders[42], true);         // a row object (also if i
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2011](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2011)
+[src/lib/table/table-api.ts:2763](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2763)
 
 ___
 
@@ -3084,7 +4207,7 @@ tableApi.setFooterVisible(!!tableOptions.externalFilterFunction);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:462](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L462)
+[src/lib/table/table-api.ts:473](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L473)
 
 ___
 
@@ -3119,7 +4242,7 @@ tableApi.setHeaderGroupCollapsed("Customer", true);
 
 #### Defined in
 
-[src/lib/table/table-api.ts:935](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L935)
+[src/lib/table/table-api.ts:946](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L946)
 
 ___
 
@@ -3160,7 +4283,7 @@ document.querySelector("#toggle-header")!.addEventListener("click", () =>
 
 #### Defined in
 
-[src/lib/table/table-api.ts:372](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L372)
+[src/lib/table/table-api.ts:383](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L383)
 
 ___
 
@@ -3224,7 +4347,7 @@ if (!tableApi.isLoggingActive()) {
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2461](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2461)
+[src/lib/table/table-api.ts:3213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L3213)
 
 ___
 
@@ -3271,7 +4394,7 @@ tableApi.setPivotConfig({}, await loadSales());                                 
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1664](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1664)
+[src/lib/table/table-api.ts:1752](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1752)
 
 ___
 
@@ -3303,7 +4426,7 @@ tableApi.setRowExpanded(0, true);   // expand the first row
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1600](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1600)
+[src/lib/table/table-api.ts:1688](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1688)
 
 ___
 
@@ -3347,7 +4470,7 @@ tableApi.setRowGroupBy([]);   // flat again (with the total row)
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1623](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1623)
+[src/lib/table/table-api.ts:1711](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1711)
 
 ___
 
@@ -3386,7 +4509,7 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1232](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1232)
+[src/lib/table/table-api.ts:1320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1320)
 
 ___
 
@@ -3427,7 +4550,7 @@ tableApi.repaint(); // Now repaint once
 
 #### Defined in
 
-[src/lib/table/table-api.ts:642](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L642)
+[src/lib/table/table-api.ts:653](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L653)
 
 ___
 
@@ -3464,7 +4587,7 @@ select.addEventListener("change", () =>
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1726](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1726)
+[src/lib/table/table-api.ts:1814](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1814)
 
 ___
 
@@ -3513,7 +4636,7 @@ Training: [Live data](https://gui.expert/training/live-data/)
 
 #### Defined in
 
-[src/lib/table/table-api.ts:784](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L784)
+[src/lib/table/table-api.ts:795](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L795)
 
 ___
 
@@ -3547,7 +4670,7 @@ tableApi.showNoRowsOverlay("You may not see these orders");
 
 #### Defined in
 
-[src/lib/table/table-api.ts:799](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L799)
+[src/lib/table/table-api.ts:810](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L810)
 
 ___
 
@@ -3624,7 +4747,7 @@ tableApi.sort((a: TreeRowIf<OrderNode>, b: TreeRowIf<OrderNode>) => b.data.total
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1835](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1835)
+[src/lib/table/table-api.ts:1923](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1923)
 
 ___
 
@@ -3656,7 +4779,7 @@ document.querySelector("#by-total")!.addEventListener("click", () => tableApi.so
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1545](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1545)
+[src/lib/table/table-api.ts:1633](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1633)
 
 ___
 
@@ -3689,7 +4812,151 @@ discardButton.onclick = () => tableApi.cancelBatchEdit();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2136)
+[src/lib/table/table-api.ts:2888](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2888)
+
+___
+
+### startEditing
+
+▸ **startEditing**(`rowIndex`, `column`, `typedText?`): `boolean`
+
+Opens the cell editor of a body cell – like F2 (caret at the end) or, with `typedText`, like typing that text.
+With Excel-style editing ([TableOptionsIf.editing](../interfaces/TableOptionsIf.md#editing)) the editor sits above the cell; otherwise (or for
+columns with an own `getEditRenderer`) it is rendered into the cell.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row index of the body |
+| `column` | `string` \| `number` | model column index or property |
+| `typedText?` | `string` | starts in "enter" mode with this text (it replaces the content) |
+
+#### Returns
+
+`boolean`
+
+true if an editor is open (`false` for a cell that cannot be edited)
+
+**`Example`**
+
+```ts
+tableApi.startEditing(0, "price");          // edit the price of the first row
+tableApi.startEditing(4, "name", "Ad");     // as if "Ad" had been typed
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2124)
+
+___
+
+### stopEditing
+
+▸ **stopEditing**(`cancel?`): `boolean`
+
+Closes an open cell editor: commits its input (like Enter without moving) or, with `cancel`, discards it (like
+Escape).
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `cancel?` | `boolean` | `false` | discard the input |
+
+#### Returns
+
+`boolean`
+
+true if no editor is open afterwards (an invalid input keeps the editor open)
+
+**`Example`**
+
+```ts
+saveButton.addEventListener("click", () => {
+  tableApi.stopEditing();   // the value being typed belongs to the data that is saved
+});
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2149)
+
+___
+
+### subscribe
+
+▸ **subscribe**(`listener`): () => `void`
+
+Adds an event listener next to the one the table was created with – e.g. for a toolbar or an own formula bar
+that lives outside the component that created the table. Every `on…` method you give is called after the main
+listener's; a listener that throws is logged and does not stop the others.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `listener` | `Partial`\<[`EventListenerIf`](../interfaces/EventListenerIf.md)\> | the events of interest |
+
+#### Returns
+
+`fn`
+
+call it to remove the listener (the table also removes all on `destroy()`)
+
+▸ (): `void`
+
+Adds an event listener next to the one the table was created with – e.g. for a toolbar or an own formula bar
+that lives outside the component that created the table. Every `on…` method you give is called after the main
+listener's; a listener that throws is logged and does not stop the others.
+
+##### Returns
+
+`void`
+
+call it to remove the listener (the table also removes all on `destroy()`)
+
+**`Example`**
+
+```ts
+const unsubscribe = tableApi.subscribe({
+  onEditingChanged: (evt: GeEditEvent) => { hint.textContent = evt.type === "input" ? evt.input ?? "" : ""; },
+  onModelChanged: (evt: GeModelChangeEvent) => console.log(`${evt.changes?.length ?? 0} cells changed`),
+});
+// later
+unsubscribe();
+```
+
+**`Since`**
+
+1.1.99
+
+**`Example`**
+
+```ts
+const unsubscribe = tableApi.subscribe({
+  onEditingChanged: (evt: GeEditEvent) => { hint.textContent = evt.type === "input" ? evt.input ?? "" : ""; },
+  onModelChanged: (evt: GeModelChangeEvent) => console.log(`${evt.changes?.length ?? 0} cells changed`),
+});
+// later
+unsubscribe();
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2104)
 
 ___
 
@@ -3723,7 +4990,7 @@ tableApi.toggleDetail(3);   // e.g. from a button outside the table
 
 #### Defined in
 
-[src/lib/table/table-api.ts:2026](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2026)
+[src/lib/table/table-api.ts:2778](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2778)
 
 ___
 
@@ -3738,7 +5005,7 @@ This function can be invoked programmatically.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"`` | The ID of the action to trigger. |
+| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"`` \| ``"NAVIGATE_NEXT_CELL"`` \| ``"NAVIGATE_PREVIOUS_CELL"`` \| ``"EXTEND_SELECTION_UP"`` \| ``"EXTEND_SELECTION_DOWN"`` \| ``"EXTEND_SELECTION_LEFT"`` \| ``"EXTEND_SELECTION_RIGHT"`` \| ``"EXTEND_SELECTION_ROW_START"`` \| ``"EXTEND_SELECTION_ROW_END"`` \| ``"EXTEND_SELECTION_PAGE_UP"`` \| ``"EXTEND_SELECTION_PAGE_DOWN"`` \| ``"NAVIGATE_DATA_EDGE_UP"`` \| ``"NAVIGATE_DATA_EDGE_DOWN"`` \| ``"NAVIGATE_DATA_EDGE_LEFT"`` \| ``"NAVIGATE_DATA_EDGE_RIGHT"`` \| ``"EXTEND_TO_DATA_EDGE_UP"`` \| ``"EXTEND_TO_DATA_EDGE_DOWN"`` \| ``"EXTEND_TO_DATA_EDGE_LEFT"`` \| ``"EXTEND_TO_DATA_EDGE_RIGHT"`` \| ``"SELECT_ROW"`` \| ``"SELECT_COLUMN"`` \| ``"CLEAR_CELLS"`` \| ``"CLEAR_AND_EDIT"`` \| ``"CUT_2_CLIPBOARD"`` \| ``"PASTE_FROM_CLIPBOARD"`` \| ``"UNDO"`` \| ``"REDO"`` | The ID of the action to trigger. |
 
 #### Returns
 
@@ -3746,7 +5013,37 @@ This function can be invoked programmatically.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:654](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L654)
+[src/lib/table/table-api.ts:665](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L665)
+
+___
+
+### undo
+
+▸ **undo**(): `boolean`
+
+Undoes the last change like Ctrl/⌘+Z ([TableOptionsIf.undo](../interfaces/TableOptionsIf.md#undo)): the old values are written back
+(`onModelChanged` with source `"undo"`), the cells are selected and scrolled into view. Not while the cell editor
+is open (it has its own text undo).
+
+#### Returns
+
+`boolean`
+
+true if a step was undone; false without the option or with nothing to undo
+
+**`Example`**
+
+```ts
+undoButton.addEventListener("click", () => tableApi.undo());
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/table-api.ts:2313](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L2313)
 
 ___
 
@@ -3844,7 +5141,7 @@ animateCell();
 
 #### Defined in
 
-[src/lib/table/table-api.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L190)
+[src/lib/table/table-api.ts:201](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L201)
 
 ___
 
@@ -3885,4 +5182,4 @@ It only works with tables that use AreaModelObjectArray as their body model.
 
 #### Defined in
 
-[src/lib/table/table-api.ts:1514](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1514)
+[src/lib/table/table-api.ts:1602](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/table-api.ts#L1602)

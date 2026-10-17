@@ -22,6 +22,8 @@
 - [AreaModelPivot](classes/AreaModelPivot.md)
 - [AreaModelPivotFooter](classes/AreaModelPivotFooter.md)
 - [AreaModelRowGroups](classes/AreaModelRowGroups.md)
+- [AreaModelSheet](classes/AreaModelSheet.md)
+- [AreaModelSheetHeader](classes/AreaModelSheetHeader.md)
 - [AreaModelTree](classes/AreaModelTree.md)
 - [AreaObjectMap](classes/AreaObjectMap.md)
 - [AriaGridInfo](classes/AriaGridInfo.md)
@@ -32,6 +34,9 @@
 - [BatchEditOptions](classes/BatchEditOptions.md)
 - [BatchEditService](classes/BatchEditService.md)
 - [BooleanPropertyType](classes/BooleanPropertyType.md)
+- [CellChangesUndoable](classes/CellChangesUndoable.md)
+- [CellEditorService](classes/CellEditorService.md)
+- [CellFormulaOptions](classes/CellFormulaOptions.md)
 - [CellGroup](classes/CellGroup.md)
 - [CellGroupExt](classes/CellGroupExt.md)
 - [CellGroupExtCellRenderer](classes/CellGroupExtCellRenderer.md)
@@ -42,6 +47,8 @@
 - [CheckboxColumnDef](classes/CheckboxColumnDef.md)
 - [CheckboxModel](classes/CheckboxModel.md)
 - [ChunkData](classes/ChunkData.md)
+- [ClipboardOptions](classes/ClipboardOptions.md)
+- [ClipboardService](classes/ClipboardService.md)
 - [ColAndRowspanModel](classes/ColAndRowspanModel.md)
 - [CollapsedExpandedData](classes/CollapsedExpandedData.md)
 - [ColorRgb](classes/ColorRgb.md)
@@ -59,11 +66,13 @@
 - [CrudOptions](classes/CrudOptions.md)
 - [CrudTableModelFactory](classes/CrudTableModelFactory.md)
 - [CssVars](classes/CssVars.md)
+- [DateCellEditor](classes/DateCellEditor.md)
 - [DateToIntlDDMMYYYYCellRenderer](classes/DateToIntlDDMMYYYYCellRenderer.md)
 - [DateToIsoCellRenderer](classes/DateToIsoCellRenderer.md)
 - [DateToLocaleDateCellRenderer](classes/DateToLocaleDateCellRenderer.md)
 - [DateToTecCellRenderer](classes/DateToTecCellRenderer.md)
 - [DefaultRowHeights](classes/DefaultRowHeights.md)
+- [EditingOptions](classes/EditingOptions.md)
 - [EleScope](classes/EleScope.md)
 - [EventAdapter](classes/EventAdapter.md)
 - [EventCheckboxChangedHandler](classes/EventCheckboxChangedHandler.md)
@@ -71,11 +80,15 @@
 - [FillHandleOptions](classes/FillHandleOptions.md)
 - [FillHandleService](classes/FillHandleService.md)
 - [FocusModel](classes/FocusModel.md)
+- [FormulaAssist](classes/FormulaAssist.md)
+- [FormulaBar](classes/FormulaBar.md)
 - [FormulaError](classes/FormulaError.md)
+- [FormulaRange](classes/FormulaRange.md)
 - [GeBatchEditEvent](classes/GeBatchEditEvent.md)
 - [GeCellIndices](classes/GeCellIndices.md)
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
 - [GeDetailEvent](classes/GeDetailEvent.md)
+- [GeEditEvent](classes/GeEditEvent.md)
 - [GeFilterService](classes/GeFilterService.md)
 - [GeKeyEvent](classes/GeKeyEvent.md)
 - [GeModelChangeEvent](classes/GeModelChangeEvent.md)
@@ -83,6 +96,7 @@
 - [GeRowDragEvent](classes/GeRowDragEvent.md)
 - [GeScrollEvent](classes/GeScrollEvent.md)
 - [GeStateChangeEvent](classes/GeStateChangeEvent.md)
+- [GeUndoEvent](classes/GeUndoEvent.md)
 - [GeoData](classes/GeoData.md)
 - [HeaderGroupOptions](classes/HeaderGroupOptions.md)
 - [Icon](classes/Icon.md)
@@ -99,6 +113,7 @@
 - [MouseTargetData](classes/MouseTargetData.md)
 - [MultiRowsSelectionModel](classes/MultiRowsSelectionModel.md)
 - [NullPropertyType](classes/NullPropertyType.md)
+- [NumberCellEditor](classes/NumberCellEditor.md)
 - [NumberCellProgressBarCellRenderer](classes/NumberCellProgressBarCellRenderer.md)
 - [NumberCellRenderer](classes/NumberCellRenderer.md)
 - [NumberPropertyType](classes/NumberPropertyType.md)
@@ -107,6 +122,7 @@
 - [OverlayOptions](classes/OverlayOptions.md)
 - [Padding](classes/Padding.md)
 - [PendingCellChanges](classes/PendingCellChanges.md)
+- [PendingChangesUndoable](classes/PendingChangesUndoable.md)
 - [PivotColumnDef](classes/PivotColumnDef.md)
 - [PivotFactory](classes/PivotFactory.md)
 - [PivotResult](classes/PivotResult.md)
@@ -129,16 +145,21 @@
 - [RowNumberColumnDef](classes/RowNumberColumnDef.md)
 - [RowNumberOptions](classes/RowNumberOptions.md)
 - [SchemeGenerator](classes/SchemeGenerator.md)
+- [SelectCellEditor](classes/SelectCellEditor.md)
 - [SelectCellRenderer](classes/SelectCellRenderer.md)
 - [SelectionAggregator](classes/SelectionAggregator.md)
 - [SelectionModel](classes/SelectionModel.md)
 - [SelectionService](classes/SelectionService.md)
+- [SheetDate](classes/SheetDate.md)
+- [SheetEngine](classes/SheetEngine.md)
 - [ShortcutService](classes/ShortcutService.md)
 - [SimpleArrayCellRenderer](classes/SimpleArrayCellRenderer.md)
 - [SimpleDomService](classes/SimpleDomService.md)
 - [Size](classes/Size.md)
 - [SortItem](classes/SortItem.md)
 - [SortedOptions](classes/SortedOptions.md)
+- [SpreadsheetFactory](classes/SpreadsheetFactory.md)
+- [SpreadsheetTableModel](classes/SpreadsheetTableModel.md)
 - [StarRatingCellRenderer](classes/StarRatingCellRenderer.md)
 - [StoreStateCollapsedExpandService](classes/StoreStateCollapsedExpandService.md)
 - [StoreStateScrollPosService](classes/StoreStateScrollPosService.md)
@@ -152,7 +173,9 @@
 - [TableOptions](classes/TableOptions.md)
 - [TableOverlay](classes/TableOverlay.md)
 - [TableScope](classes/TableScope.md)
+- [TableSheet](classes/TableSheet.md)
 - [TableStateService](classes/TableStateService.md)
+- [TextCellEditor](classes/TextCellEditor.md)
 - [ThreeColorGradientArg](classes/ThreeColorGradientArg.md)
 - [TreeAriaInfo](classes/TreeAriaInfo.md)
 - [TreeCheckboxModel](classes/TreeCheckboxModel.md)
@@ -163,6 +186,9 @@
 - [TrueFalseCellRenderer](classes/TrueFalseCellRenderer.md)
 - [TwoColorGradientArg](classes/TwoColorGradientArg.md)
 - [UndefinedPropertyType](classes/UndefinedPropertyType.md)
+- [UndoOptions](classes/UndoOptions.md)
+- [UndoService](classes/UndoService.md)
+- [UndoStack](classes/UndoStack.md)
 - [UrlInfo](classes/UrlInfo.md)
 - [ValueInfo](classes/ValueInfo.md)
 - [ValueLabel](classes/ValueLabel.md)
@@ -183,16 +209,22 @@
 - [AriaTextsIf](interfaces/AriaTextsIf.md)
 - [AutoRestoreOptionsIf](interfaces/AutoRestoreOptionsIf.md)
 - [BatchEditOptionsIf](interfaces/BatchEditOptionsIf.md)
+- [CellAddressIf](interfaces/CellAddressIf.md)
 - [CellChangeIf](interfaces/CellChangeIf.md)
+- [CellEditorContextIf](interfaces/CellEditorContextIf.md)
+- [CellEditorIf](interfaces/CellEditorIf.md)
+- [CellFormulaOptionsIf](interfaces/CellFormulaOptionsIf.md)
 - [CellGroupIf](interfaces/CellGroupIf.md)
 - [CellRendererIf](interfaces/CellRendererIf.md)
 - [CellValueChangeIf](interfaces/CellValueChangeIf.md)
 - [CheckboxModelIf](interfaces/CheckboxModelIf.md)
 - [ChunkDataIf](interfaces/ChunkDataIf.md)
+- [ClipboardOptionsIf](interfaces/ClipboardOptionsIf.md)
 - [ColorRgbIf](interfaces/ColorRgbIf.md)
 - [ColumnDefIf](interfaces/ColumnDefIf.md)
 - [ColumnWidthsIf](interfaces/ColumnWidthsIf.md)
 - [CompiledFormula](interfaces/CompiledFormula.md)
+- [CopyContextIf](interfaces/CopyContextIf.md)
 - [CopyServiceIf](interfaces/CopyServiceIf.md)
 - [CreateTableModelPara](interfaces/CreateTableModelPara.md)
 - [CrudOptionsIf](interfaces/CrudOptionsIf.md)
@@ -202,20 +234,26 @@
 - [DetailRendererIf](interfaces/DetailRendererIf.md)
 - [DetailTableParamsIf](interfaces/DetailTableParamsIf.md)
 - [DomServiceIf](interfaces/DomServiceIf.md)
+- [EditingOptionsIf](interfaces/EditingOptionsIf.md)
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
 - [EventListenerIf](interfaces/EventListenerIf.md)
 - [EventSelectionChangedListenerIf](interfaces/EventSelectionChangedListenerIf.md)
 - [ExcelExportOptionsIf](interfaces/ExcelExportOptionsIf.md)
 - [ExcelFormattedValueIf](interfaces/ExcelFormattedValueIf.md)
+- [ExcelFormulaCellIf](interfaces/ExcelFormulaCellIf.md)
 - [ExcelServiceIf](interfaces/ExcelServiceIf.md)
 - [FillHandleOptionsIf](interfaces/FillHandleOptionsIf.md)
 - [FillRequestIf](interfaces/FillRequestIf.md)
 - [FillValueContextIf](interfaces/FillValueContextIf.md)
 - [FocusModelIf](interfaces/FocusModelIf.md)
+- [FormulaBarOptionsIf](interfaces/FormulaBarOptionsIf.md)
+- [FormulaFunctionInfoIf](interfaces/FormulaFunctionInfoIf.md)
 - [FormulaOptionsIf](interfaces/FormulaOptionsIf.md)
+- [FormulaRefNode](interfaces/FormulaRefNode.md)
 - [GroupRowsOptionsIf](interfaces/GroupRowsOptionsIf.md)
 - [HasDefaultRowHeightIf](interfaces/HasDefaultRowHeightIf.md)
 - [HeaderGroupOptionsIf](interfaces/HeaderGroupOptionsIf.md)
+- [HtmlTableCellIf](interfaces/HtmlTableCellIf.md)
 - [IconIf](interfaces/IconIf.md)
 - [MasterDetailOptionsIf](interfaces/MasterDetailOptionsIf.md)
 - [NestedTableScopeIf](interfaces/NestedTableScopeIf.md)
@@ -223,14 +261,19 @@
 - [OnActionTriggeredIf](interfaces/OnActionTriggeredIf.md)
 - [OverlayKindInput](interfaces/OverlayKindInput.md)
 - [OverlayOptionsIf](interfaces/OverlayOptionsIf.md)
+- [PasteContextIf](interfaces/PasteContextIf.md)
+- [PastePlanIf](interfaces/PastePlanIf.md)
+- [PasteRequestIf](interfaces/PasteRequestIf.md)
 - [PendingCellIf](interfaces/PendingCellIf.md)
 - [PendingInputIf](interfaces/PendingInputIf.md)
+- [PendingSnapshotIf](interfaces/PendingSnapshotIf.md)
 - [PivotColumnInfoIf](interfaces/PivotColumnInfoIf.md)
 - [PivotConfigIf](interfaces/PivotConfigIf.md)
 - [PivotTableModelParaIf](interfaces/PivotTableModelParaIf.md)
 - [PivotValueIf](interfaces/PivotValueIf.md)
 - [PivotValueInfoIf](interfaces/PivotValueInfoIf.md)
 - [PropertyType](interfaces/PropertyType.md)
+- [RangeAddressIf](interfaces/RangeAddressIf.md)
 - [RequestChunkIf](interfaces/RequestChunkIf.md)
 - [RowDragOptionsIf](interfaces/RowDragOptionsIf.md)
 - [RowDropTargetIf](interfaces/RowDropTargetIf.md)
@@ -243,10 +286,16 @@
 - [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
+- [SheetCellsIf](interfaces/SheetCellsIf.md)
+- [SheetDataSourceIf](interfaces/SheetDataSourceIf.md)
+- [SheetRecalcResultIf](interfaces/SheetRecalcResultIf.md)
 - [ShowValuesAsIf](interfaces/ShowValuesAsIf.md)
 - [SizeIf](interfaces/SizeIf.md)
 - [SortedOptionsIf](interfaces/SortedOptionsIf.md)
+- [SpreadsheetOptionsIf](interfaces/SpreadsheetOptionsIf.md)
+- [SpreadsheetParamIf](interfaces/SpreadsheetParamIf.md)
 - [StateStorageIf](interfaces/StateStorageIf.md)
+- [StructureEditIf](interfaces/StructureEditIf.md)
 - [TableCellUpdateEventIf](interfaces/TableCellUpdateEventIf.md)
 - [TableColumnStateIf](interfaces/TableColumnStateIf.md)
 - [TableHeaderGroupStateIf](interfaces/TableHeaderGroupStateIf.md)
@@ -267,6 +316,9 @@
 - [TreeOptionsIf](interfaces/TreeOptionsIf.md)
 - [TreeRowIf](interfaces/TreeRowIf.md)
 - [TwoColorGradientArgIf](interfaces/TwoColorGradientArgIf.md)
+- [UndoOptionsIf](interfaces/UndoOptionsIf.md)
+- [UndoResultIf](interfaces/UndoResultIf.md)
+- [UndoableIf](interfaces/UndoableIf.md)
 - [UrlInfoIf](interfaces/UrlInfoIf.md)
 - [UrlsIf](interfaces/UrlsIf.md)
 - [ValueGetterContextIf](interfaces/ValueGetterContextIf.md)
@@ -285,11 +337,16 @@
 - [AreaObjectMapType](modules.md#areaobjectmaptype)
 - [BooleanFunction](modules.md#booleanfunction)
 - [CellChangeSource](modules.md#cellchangesource)
+- [CellEditMode](modules.md#celleditmode)
+- [CellEditorFactory](modules.md#celleditorfactory)
 - [CellValidator](modules.md#cellvalidator)
 - [CheckedType](modules.md#checkedtype)
+- [ClipboardKind](modules.md#clipboardkind)
+- [ColumnEditorOption](modules.md#columneditoroption)
 - [DetailHeightType](modules.md#detailheighttype)
 - [DetailRenderFnType](modules.md#detailrenderfntype)
 - [DivScope](modules.md#divscope)
+- [EditMove](modules.md#editmove)
 - [ExtendedSelectionType](modules.md#extendedselectiontype)
 - [FillDirection](modules.md#filldirection)
 - [FillMode](modules.md#fillmode)
@@ -302,6 +359,7 @@
 - [FormulaValue](modules.md#formulavalue)
 - [GeBatchEditEventType](modules.md#gebatchediteventtype)
 - [GeDetailEventSource](modules.md#gedetaileventsource)
+- [GeEditEventType](modules.md#geediteventtype)
 - [GeOverlayKind](modules.md#geoverlaykind)
 - [GeRowDragEventType](modules.md#gerowdrageventtype)
 - [GeRowDragSource](modules.md#gerowdragsource)
@@ -325,6 +383,8 @@
 - [RowNumberMode](modules.md#rownumbermode)
 - [SelectionMode](modules.md#selectionmode)
 - [SelectionType](modules.md#selectiontype)
+- [SheetStructureEditIf](modules.md#sheetstructureeditif)
+- [SheetValue](modules.md#sheetvalue)
 - [ShortcutActionIdMapping](modules.md#shortcutactionidmapping)
 - [ShowValuesAs](modules.md#showvaluesas)
 - [ShowValuesAsConfig](modules.md#showvaluesasconfig)
@@ -345,6 +405,7 @@
 
 - [ALL\_TABLE\_STATE\_PARTS](modules.md#all_table_state_parts)
 - [Aggregators](modules.md#aggregators)
+- [FORMULA\_FUNCTION\_INFO](modules.md#formula_function_info)
 - [FORMULA\_FUNCTION\_NAMES](modules.md#formula_function_names)
 - [PROPERTY\_TYPE\_KEY\_ANY](modules.md#property_type_key_any)
 - [PROPERTY\_TYPE\_KEY\_ARRAY](modules.md#property_type_key_array)
@@ -354,6 +415,8 @@
 - [PROPERTY\_TYPE\_KEY\_OBJECT](modules.md#property_type_key_object)
 - [PROPERTY\_TYPE\_KEY\_STRING](modules.md#property_type_key_string)
 - [PROPERTY\_TYPE\_KEY\_UNDEFINED](modules.md#property_type_key_undefined)
+- [SHEET\_MAX\_COLUMNS](modules.md#sheet_max_columns)
+- [SHEET\_MAX\_ROWS](modules.md#sheet_max_rows)
 - [SHOW\_VALUES\_AS\_MODES](modules.md#show_values_as_modes)
 - [UNIMPORTANT\_TYPES](modules.md#unimportant_types)
 - [actionIds](modules.md#actionids)
@@ -401,29 +464,44 @@
 ### Functions
 
 - [AvoidDoubleExecution](modules.md#avoiddoubleexecution)
+- [DEFAULT\_GET\_EDIT\_RENDERER](modules.md#default_get_edit_renderer)
 - [FalseFn](modules.md#falsefn)
 - [TrueFn](modules.md#truefn)
+- [adjustFormula](modules.md#adjustformula)
 - [aggregate](modules.md#aggregate)
 - [aggregateColumns](modules.md#aggregatecolumns)
 - [aggregateRowGroups](modules.md#aggregaterowgroups)
+- [applySpreadsheetPreset](modules.md#applyspreadsheetpreset)
+- [applyStructureEdit](modules.md#applystructureedit)
+- [booleanInputPipe](modules.md#booleaninputpipe)
 - [calcMoveToIndex](modules.md#calcmovetoindex)
 - [calcOverlayKind](modules.md#calcoverlaykind)
 - [calculateShowValuesAs](modules.md#calculateshowvaluesas)
 - [canMoveFlatRows](modules.md#canmoveflatrows)
 - [canMoveTreeRows](modules.md#canmovetreerows)
 - [canScrollHorizontally](modules.md#canscrollhorizontally)
+- [clipboardShortcutLayer](modules.md#clipboardshortcutlayer)
+- [columnIndexOfLetter](modules.md#columnindexofletter)
+- [columnLetter](modules.md#columnletter)
 - [compileFormula](modules.md#compileformula)
 - [computeFillChanges](modules.md#computefillchanges)
 - [computeFillValues](modules.md#computefillvalues)
+- [computePastePlan](modules.md#computepasteplan)
+- [createDateInputPipe](modules.md#createdateinputpipe)
 - [createFormulaValueGetter](modules.md#createformulavaluegetter)
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
+- [createNumberInputPipe](modules.md#createnumberinputpipe)
 - [createValueGetter](modules.md#createvaluegetter)
+- [dateToSerial](modules.md#datetoserial)
 - [debounce](modules.md#debounce)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
+- [editingShortcutLayer](modules.md#editingshortcutlayer)
 - [escapeHtml](modules.md#escapehtml)
+- [findDataEdge](modules.md#finddataedge)
 - [findRowIndexAtY](modules.md#findrowindexaty)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [formatAggregateValue](modules.md#formataggregatevalue)
+- [formatFormula](modules.md#formatformula)
 - [formatShowValuesAs](modules.md#formatshowvaluesas)
 - [getAggregator](modules.md#getaggregator)
 - [getAreaIdentByString](modules.md#getareaidentbystring)
@@ -432,6 +510,7 @@
 - [getInsertBeforeIndex](modules.md#getinsertbeforeindex)
 - [getLeadingRowNumberColumnCount](modules.md#getleadingrownumbercolumncount)
 - [getLogicalScrollLeft](modules.md#getlogicalscrollleft)
+- [getPasteSize](modules.md#getpastesize)
 - [getTopmostTreeRows](modules.md#gettopmosttreerows)
 - [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
@@ -442,8 +521,11 @@
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isExcelFormattedValue](modules.md#isexcelformattedvalue)
+- [isExcelFormulaCell](modules.md#isexcelformulacell)
 - [isFillSeries](modules.md#isfillseries)
 - [isFormulaError](modules.md#isformulaerror)
+- [isFormulaRange](modules.md#isformularange)
+- [isFormulaText](modules.md#isformulatext)
 - [isGroupRow](modules.md#isgrouprow)
 - [isPercentShowValuesAs](modules.md#ispercentshowvaluesas)
 - [isPivotColumnDef](modules.md#ispivotcolumndef)
@@ -452,23 +534,38 @@
 - [isRowGroupColumnDef](modules.md#isrowgroupcolumndef)
 - [isRowNumberColumnDef](modules.md#isrownumbercolumndef)
 - [isSameCellValue](modules.md#issamecellvalue)
+- [isSheetDate](modules.md#issheetdate)
+- [isSpreadsheetTableModel](modules.md#isspreadsheettablemodel)
 - [isTreeRow](modules.md#istreerow)
 - [mirrorArrowKeys](modules.md#mirrorarrowkeys)
 - [moveArrayItems](modules.md#movearrayitems)
 - [moveFlatRows](modules.md#moveflatrows)
 - [moveTreeRows](modules.md#movetreerows)
 - [normalizeRowIndices](modules.md#normalizerowindices)
+- [offsetReferences](modules.md#offsetreferences)
+- [parseCellAddress](modules.md#parsecelladdress)
+- [parseHtmlTable](modules.md#parsehtmltable)
+- [parseRangeAddress](modules.md#parserangeaddress)
+- [parseTsv](modules.md#parsetsv)
 - [pivotRows](modules.md#pivotrows)
 - [readLegacyState](modules.md#readlegacystate)
 - [removeLegacyState](modules.md#removelegacystate)
 - [resolveShowValuesAs](modules.md#resolveshowvaluesas)
 - [resolveTableDirection](modules.md#resolvetabledirection)
+- [serialToDate](modules.md#serialtodate)
 - [setLogicalScrollLeft](modules.md#setlogicalscrollleft)
+- [sheetInputPipe](modules.md#sheetinputpipe)
+- [shiftFormula](modules.md#shiftformula)
+- [spreadsheetOption](modules.md#spreadsheetoption)
 - [sumOfNumbers](modules.md#sumofnumbers)
 - [throttle](modules.md#throttle)
+- [toCellAddress](modules.md#tocelladdress)
+- [toHtmlTable](modules.md#tohtmltable)
 - [toLogicalX](modules.md#tologicalx)
 - [toPhysicalScrollLeft](modules.md#tophysicalscrollleft)
+- [toTsv](modules.md#totsv)
 - [trimArraySuffixes](modules.md#trimarraysuffixes)
+- [undoShortcutLayer](modules.md#undoshortcutlayer)
 
 ## Area models
 
@@ -656,7 +753,7 @@ A number indicating the relative order of 'valueA' and 'valueB'.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L29)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L30)
 
 ___
 
@@ -1629,7 +1726,41 @@ isExcelFormattedValue({ value: 0.5, numberFormat: "0%" });   // true
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L51)
+[src/lib/table/service/excel-service.if.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L92)
+
+___
+
+### isExcelFormulaCell
+
+▸ **isExcelFormulaCell**(`cell`): cell is ExcelFormulaCellIf
+
+True for a cell of the form [ExcelFormulaCellIf](interfaces/ExcelFormulaCellIf.md).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cell` | `unknown` | a cell of an Excel matrix |
+
+#### Returns
+
+cell is ExcelFormulaCellIf
+
+whether it is a formula cell
+
+**`Example`**
+
+```ts
+isExcelFormulaCell({ formula: "A1*2", value: 4 });   // true
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/service/excel-service.if.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L59)
 
 ## Keyboard
 
@@ -1649,7 +1780,7 @@ module:myModule.actionIds
 
 #### Defined in
 
-[src/lib/table/action/action-id.type.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L49)
+[src/lib/table/action/action-id.type.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L79)
 
 ___
 
@@ -1671,7 +1802,7 @@ ___
 
 ### actionIds
 
-• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``]
+• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``, ``"NAVIGATE_NEXT_CELL"``, ``"NAVIGATE_PREVIOUS_CELL"``, ``"EXTEND_SELECTION_UP"``, ``"EXTEND_SELECTION_DOWN"``, ``"EXTEND_SELECTION_LEFT"``, ``"EXTEND_SELECTION_RIGHT"``, ``"EXTEND_SELECTION_ROW_START"``, ``"EXTEND_SELECTION_ROW_END"``, ``"EXTEND_SELECTION_PAGE_UP"``, ``"EXTEND_SELECTION_PAGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_UP"``, ``"NAVIGATE_DATA_EDGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_LEFT"``, ``"NAVIGATE_DATA_EDGE_RIGHT"``, ``"EXTEND_TO_DATA_EDGE_UP"``, ``"EXTEND_TO_DATA_EDGE_DOWN"``, ``"EXTEND_TO_DATA_EDGE_LEFT"``, ``"EXTEND_TO_DATA_EDGE_RIGHT"``, ``"SELECT_ROW"``, ``"SELECT_COLUMN"``, ``"CLEAR_CELLS"``, ``"CLEAR_AND_EDIT"``, ``"CUT_2_CLIPBOARD"``, ``"PASTE_FROM_CLIPBOARD"``, ``"UNDO"``, ``"REDO"``]
 
 An array of action identifiers.
 
@@ -2962,13 +3093,13 @@ const op: FormulaBinaryOperator = "&";   // "Total: " & [total]
 
 #### Defined in
 
-[src/lib/table/formula/formula-ast.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L29)
+[src/lib/table/formula/formula-ast.if.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L54)
 
 ___
 
 ### FormulaErrorCode
 
-Ƭ **FormulaErrorCode**: ``"#ERROR!"`` \| ``"#NAME?"`` \| ``"#VALUE!"`` \| ``"#DIV/0!"`` \| ``"#NUM!"`` \| ``"#CIRC!"``
+Ƭ **FormulaErrorCode**: ``"#ERROR!"`` \| ``"#NAME?"`` \| ``"#VALUE!"`` \| ``"#DIV/0!"`` \| ``"#NUM!"`` \| ``"#CIRC!"`` \| ``"#REF!"`` \| ``"#N/A"``
 
 The error codes of a formula – like in a spreadsheet:
 
@@ -2979,7 +3110,9 @@ The error codes of a formula – like in a spreadsheet:
 | `#VALUE!` | wrong type, e.g. `"abc" * 2` |
 | `#DIV/0!` | division by zero |
 | `#NUM!` | the result is not a finite number (`SQRT(-1)`, overflow) |
-| `#CIRC!` | circular reference between calculated columns |
+| `#CIRC!` | circular reference between calculated columns (cell formulas: between cells) |
+| `#REF!` | cell formulas: a reference to a deleted or non-existing cell (since 1.1.99) |
+| `#N/A` | cell formulas: a lookup found nothing, `NA()` (since 1.1.99) |
 
 **`Since`**
 
@@ -2987,7 +3120,7 @@ The error codes of a formula – like in a spreadsheet:
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L16)
+[src/lib/table/formula/formula-error.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L18)
 
 ___
 
@@ -3032,10 +3165,14 @@ ___
 
 ### FormulaNode
 
-Ƭ **FormulaNode**: \{ `kind`: ``"literal"`` ; `value`: `number` \| `string` \| `boolean`  } \| \{ `kind`: ``"field"`` ; `name`: `string`  } \| \{ `kind`: ``"unary"`` ; `op`: ``"-"`` \| ``"+"`` ; `operand`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `kind`: ``"binary"`` ; `left`: [`FormulaNode`](modules.md#formulanode) ; `op`: [`FormulaBinaryOperator`](modules.md#formulabinaryoperator) ; `right`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `args`: readonly [`FormulaNode`](modules.md#formulanode)[] ; `kind`: ``"call"`` ; `name`: `string`  }
+Ƭ **FormulaNode**: \{ `kind`: ``"literal"`` ; `value`: `number` \| `string` \| `boolean` \| ``null``  } \| \{ `kind`: ``"field"`` ; `name`: `string`  } \| \{ `kind`: ``"unary"`` ; `op`: ``"-"`` \| ``"+"`` \| ``"%"`` ; `operand`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `kind`: ``"binary"`` ; `left`: [`FormulaNode`](modules.md#formulanode) ; `op`: [`FormulaBinaryOperator`](modules.md#formulabinaryoperator) ; `right`: [`FormulaNode`](modules.md#formulanode)  } \| \{ `args`: readonly [`FormulaNode`](modules.md#formulanode)[] ; `kind`: ``"call"`` ; `name`: `string`  } \| [`FormulaRefNode`](interfaces/FormulaRefNode.md) \| \{ `from`: [`FormulaRefNode`](interfaces/FormulaRefNode.md) ; `kind`: ``"range"`` ; `to`: [`FormulaRefNode`](interfaces/FormulaRefNode.md)  } \| \{ `code`: `string` ; `kind`: ``"error"`` ; `message?`: `string` ; `text?`: `string`  }
 
 A node of a compiled formula (abstract syntax tree). Read-only; the evaluator walks it – no code is generated
 (no `eval`, no `new Function`).
+
+Cell formulas (since 1.1.99, spreadsheet mode) add cell references (`ref`), ranges (`range`), error literals
+(`error`, e.g. `#REF!` after deleting rows) and the percent operator (`unary` with `"%"`); the formulas of
+calculated columns never contain them.
 
 **`Example`**
 
@@ -3050,7 +3187,7 @@ const ast = compileFormula("[price] * 2").ast;
 
 #### Defined in
 
-[src/lib/table/formula/formula-ast.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L12)
+[src/lib/table/formula/formula-ast.if.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-ast.if.ts#L16)
 
 ___
 
@@ -3360,7 +3497,7 @@ compileFormula("[price] *").error?.code;             // "#ERROR!"
 
 #### Defined in
 
-[src/lib/table/formula/compile-formula.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L112)
+[src/lib/table/formula/compile-formula.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L114)
 
 ___
 
@@ -3396,7 +3533,7 @@ column.valueGetter = createFormulaValueGetter("[net] * 1.19");
 
 #### Defined in
 
-[src/lib/table/formula/compile-formula.ts:162](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L162)
+[src/lib/table/formula/compile-formula.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/compile-formula.ts#L164)
 
 ___
 
@@ -3468,7 +3605,7 @@ if (!isFormulaError(value)) console.log(value);
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L68)
+[src/lib/table/formula/formula-error.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L70)
 
 ___
 
@@ -3622,7 +3759,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:212](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L212)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L245)
 
 ___
 
@@ -4053,10 +4190,14 @@ normalizeRowIndices([5, 2, 2, 99, -1], 10);   // [2, 5]
 
 ### CellChangeSource
 
-Ƭ **CellChangeSource**: ``"edit"`` \| ``"fill"`` \| ``"commit"`` \| ``"api"``
+Ƭ **CellChangeSource**: ``"edit"`` \| ``"fill"`` \| ``"commit"`` \| ``"api"`` \| ``"clear"`` \| ``"paste"`` \| ``"cut"`` \| ``"undo"`` \| ``"redo"`` \| ``"structure"``
 
 What started a change of cells: `"edit"` (cell editor), `"fill"` (fill handle, Ctrl/⌘+D, Ctrl/⌘+R),
-`"commit"` ([TableApi.commitBatchEdit](classes/TableApi.md#commitbatchedit)) or `"api"` ([TableApi.applyCellChanges](classes/TableApi.md#applycellchanges)).
+`"commit"` ([TableApi.commitBatchEdit](classes/TableApi.md#commitbatchedit)), `"api"` ([TableApi.applyCellChanges](classes/TableApi.md#applycellchanges)) or – since 1.1.99 –
+`"clear"` (Delete/Backspace in Excel-style editing, [TableApi.clearCells](classes/TableApi.md#clearcells)), `"paste"` (Ctrl/⌘+V,
+[TableApi.pasteText](classes/TableApi.md#pastetext)), `"cut"` (pasting cut cells: target and emptied source in one change set), `"undo"` and
+`"redo"` ([TableApi.undo](classes/TableApi.md#undo), [TableApi.redo](classes/TableApi.md#redo)), `"structure"` (rows or columns inserted or deleted,
+[TableApi.insertRows](classes/TableApi.md#insertrows) – the changes are the formulas whose references were adjusted).
 
 **`Since`**
 
@@ -4064,7 +4205,7 @@ What started a change of cells: `"edit"` (cell editor), `"fill"` (fill handle, C
 
 #### Defined in
 
-[src/lib/table/batch-edit/cell-change.if.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L8)
+[src/lib/table/batch-edit/cell-change.if.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/cell-change.if.ts#L12)
 
 ___
 
@@ -4101,7 +4242,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L203)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L236)
 
 ___
 
@@ -4441,6 +4582,1304 @@ What opened or closed a detail row: a click on the icon (`"mouse"`), Enter (`"ke
 
 [src/lib/table/data/common/event/ge-detail-event.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-detail-event.ts#L8)
 
+## Spreadsheet
+
+### CellEditMode
+
+Ƭ **CellEditMode**: ``"enter"`` \| ``"edit"``
+
+How the cell editor was opened: `"enter"` by typing (arrow keys commit and move, like Excel's "Enter" mode) or
+`"edit"` by F2, Enter or a double click (arrow keys move the caret). F2 switches between the two.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/cell-editor.if.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor.if.ts#L11)
+
+___
+
+### CellEditorFactory
+
+Ƭ **CellEditorFactory**: (`ctx`: [`CellEditorContextIf`](interfaces/CellEditorContextIf.md)) => [`CellEditorIf`](interfaces/CellEditorIf.md)
+
+#### Type declaration
+
+▸ (`ctx`): [`CellEditorIf`](interfaces/CellEditorIf.md)
+
+Creates the editor of a column for one edit (see [ColumnDefIf.editor](interfaces/ColumnDefIf.md#editor)).
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ctx` | [`CellEditorContextIf`](interfaces/CellEditorContextIf.md) |
+
+##### Returns
+
+[`CellEditorIf`](interfaces/CellEditorIf.md)
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/cell-editor.if.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor.if.ts#L106)
+
+___
+
+### ColumnEditorOption
+
+Ƭ **ColumnEditorOption**: [`CellEditorFactory`](modules.md#celleditorfactory) \| ``"text"`` \| ``"number"`` \| ``"date"``
+
+The editor of a column in Excel-style editing: a factory or the name of a built-in editor. Without it the
+table chooses by the value: numbers → `"number"`, dates → `"date"`, otherwise `"text"`.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/cell-editor.if.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor.if.ts#L115)
+
+___
+
+### EditMove
+
+Ƭ **EditMove**: ``"down"`` \| ``"up"`` \| ``"right"`` \| ``"left"`` \| ``"none"``
+
+Where the focus goes after the editor committed: one cell down, up, right, left – or nowhere.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/cell-editor.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor.if.ts#L19)
+
+___
+
+### GeEditEventType
+
+Ƭ **GeEditEventType**: ``"start"`` \| ``"input"`` \| ``"commit"`` \| ``"cancel"``
+
+What happened to the cell editor: `"start"` (opened), `"input"` (its text changed – Excel-style editing only),
+`"commit"` (closed with the input written or – batch edit – marked), `"cancel"` (closed without writing).
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-edit-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-edit-event.ts#L10)
+
+___
+
+### SheetStructureEditIf
+
+Ƭ **SheetStructureEditIf**: \{ `at`: `number` ; `count`: `number` ; `kind`: ``"insertRows"`` \| ``"deleteRows"`` \| ``"insertColumns"`` \| ``"deleteColumns"``  } \| \{ `from`: \{ `c1`: `number` ; `c2`: `number` ; `r1`: `number` ; `r2`: `number`  } ; `kind`: ``"moveCells"`` ; `to`: readonly [`number`, `number`]  }
+
+A change of the sheet's structure that formulas must follow ([adjustFormula](modules.md#adjustformula)): rows or columns inserted or
+deleted at `at` (0-based, `count` of them), or cells moved (cut + paste).
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/shift-formula.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/shift-formula.ts#L13)
+
+___
+
+### SheetValue
+
+Ƭ **SheetValue**: `number` \| `string` \| `boolean` \| ``null`` \| [`FormulaError`](classes/FormulaError.md) \| [`SheetDate`](classes/SheetDate.md) \| [`FormulaRange`](classes/FormulaRange.md)
+
+A value inside a cell formula: number, text, boolean, blank (`null`), error, date or – only as argument – a range.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-values.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-values.ts#L176)
+
+___
+
+### FORMULA\_FUNCTION\_INFO
+
+• `Const` **FORMULA\_FUNCTION\_INFO**: readonly [`FormulaFunctionInfoIf`](interfaces/FormulaFunctionInfoIf.md)[]
+
+The built-in functions of cell formulas (Excel signatures and semantics), sorted by name.
+
+**`Example`**
+
+```ts
+FORMULA_FUNCTION_INFO.filter(i => i.name.startsWith("SU")).map(i => i.signature);
+// ["SUBSTITUTE(text, old_text, new_text, [instance])", "SUM(number1, [number2], …)", …]
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-function-info.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-function-info.ts#L29)
+
+___
+
+### DEFAULT\_GET\_EDIT\_RENDERER
+
+▸ **DEFAULT_GET_EDIT_RENDERER**(`rowIndex`, `columnIndex`): `undefined` \| [`CellRendererIf`](interfaces/CellRendererIf.md)
+
+The default editor of [TableOptions.getEditRenderer](classes/TableOptions.md#geteditrenderer): a text input in the cell ([InputCellRenderer](classes/InputCellRenderer.md)).
+With Excel-style editing ([TableOptionsIf.editing](interfaces/TableOptionsIf.md#editing)) the table recognises this default and uses its own
+editor above the cell instead – an own `getEditRenderer` is kept.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rowIndex` | `number` |
+| `columnIndex` | `number` |
+
+#### Returns
+
+`undefined` \| [`CellRendererIf`](interfaces/CellRendererIf.md)
+
+**`Example`**
+
+```ts
+const tableOptions: TableOptionsIf = { ...new TableOptions() };
+tableOptions.getEditRenderer === DEFAULT_GET_EDIT_RENDERER;   // true
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/renderer/edit/edit-cell-renderer.type.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/edit-cell-renderer.type.ts#L4)
+
+___
+
+### adjustFormula
+
+▸ **adjustFormula**(`source`, `edit`): `string`
+
+A formula after rows or columns were inserted or deleted, or cells moved (Excel's rules): references behind the
+edit move, a range grows when rows are inserted inside it and shrinks when some of its rows are deleted; a deleted
+reference (or a fully deleted range) becomes `#REF!`, as does one pushed off the sheet (a range ending at the last
+row stays there). `moveCells`: references and ranges completely inside the moved cells follow them. Formula text
+without `=`; unparsable text and formulas without a changed reference are returned unchanged (same spelling).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | `string` | the formula (without `=`) |
+| `edit` | [`SheetStructureEditIf`](modules.md#sheetstructureeditif) | the change |
+
+#### Returns
+
+`string`
+
+the adjusted formula
+
+**`Example`**
+
+```ts
+adjustFormula("SUM(D2:D4)+B3", { kind: "deleteRows", at: 2, count: 1 });   // "SUM(D2:D3)+#REF!"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/shift-formula.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/shift-formula.ts#L169)
+
+___
+
+### applySpreadsheetPreset
+
+▸ **applySpreadsheetPreset**(`tableOptions`): [`TableOptionsIf`](interfaces/TableOptionsIf.md)
+
+The options a table uses with the preset `tableOptions.spreadsheet`: a **copy** with every part of
+[SpreadsheetOptionsIf](interfaces/SpreadsheetOptionsIf.md) the options don't set themselves (`editing`, `clipboard`, `undo`, `cellFormulas`,
+`fillHandle`). The table resolves the preset itself; use this to see the result.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `tableOptions` | [`TableOptionsIf`](interfaces/TableOptionsIf.md) | the options of a table |
+
+#### Returns
+
+[`TableOptionsIf`](interfaces/TableOptionsIf.md)
+
+a copy (the same object without the preset)
+
+**`Example`**
+
+```ts
+const options = applySpreadsheetPreset({ ...new TableOptions(), spreadsheet: true });
+options.undo;   // true
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-preset.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-preset.ts#L53)
+
+___
+
+### booleanInputPipe
+
+▸ **booleanInputPipe**(`input`, `rowIndex`, `columnIndex`): `any`
+
+An `editInputPipe` for `true`/`false`: `"TRUE"`, `"yes"`, `"1"`, `"x"` (also German `WAHR`, `ja`) → `true`; `"FALSE"`,
+`"no"`, `"0"` (`FALSCH`, `nein`) → `false`, ignoring case; empty text stays `""`, other text as it is.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `input` | `any` |
+| `rowIndex` | `number` |
+| `columnIndex` | `number` |
+
+#### Returns
+
+`any`
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "paid", editable: TrueFn, editInputPipe: booleanInputPipe });
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/renderer/edit/edit-input-pipe.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L14)
+
+___
+
+### clipboardShortcutLayer
+
+▸ **clipboardShortcutLayer**(`mac`): [`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+The keys of copy, cut and paste ([TableOptionsIf.clipboard](interfaces/TableOptionsIf.md#clipboard)) – a layer over the system mapping that the table
+only uses with the option; `tableOptions.shortcutActionIdMapping` still overrides it. Ctrl/⌘+X cuts (in the system
+mapping it is `DESELECT_ALL`, which stays on Ctrl/⌘+Shift+A); Windows also knows Ctrl+Insert, Shift+Delete and
+Shift+Insert.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mac` | `boolean` | macOS keys (⌘) |
+
+#### Returns
+
+[`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+the layer
+
+**`Example`**
+
+```ts
+clipboardShortcutLayer(false)["ctrl+v"];   // "PASTE_FROM_CLIPBOARD"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/clipboard-keymap.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/clipboard-keymap.ts#L18)
+
+___
+
+### columnIndexOfLetter
+
+▸ **columnIndexOfLetter**(`letters`): `number`
+
+The 0-based column of letters: `"A"` → 0, `"ab"` → 27 (case does not matter).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `letters` | `string` | column letters |
+
+#### Returns
+
+`number`
+
+the column, `-1` if invalid or beyond `XFD`
+
+**`Example`**
+
+```ts
+columnIndexOfLetter("XFD");   // 16383
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L45)
+
+___
+
+### columnLetter
+
+▸ **columnLetter**(`columnIndex`): `string`
+
+The letters of a column (0-based): 0 → `"A"`, 25 → `"Z"`, 26 → `"AA"`, 16 383 → `"XFD"`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnIndex` | `number` | 0-based column |
+
+#### Returns
+
+`string`
+
+the letters (`""` for an index outside 0 … 16 383)
+
+**`Example`**
+
+```ts
+columnLetter(27);   // "AB"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L19)
+
+___
+
+### computePastePlan
+
+▸ **computePastePlan**\<`V`\>(`req`): [`PastePlanIf`](interfaces/PastePlanIf.md)\<`V`\>
+
+Where pasted cells go, like Excel: from the anchor, once – or tiled over a selected range that is an integer
+multiple of the matrix, a single value into every cell of the selected range; cut off at the last column (and at
+the last row unless rows may be added); cells that are not writable are skipped. DOM-free.
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `V` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `req` | [`PasteRequestIf`](interfaces/PasteRequestIf.md)\<`V`\> | matrix, target and table size |
+
+#### Returns
+
+[`PastePlanIf`](interfaces/PastePlanIf.md)\<`V`\>
+
+the cells to write
+
+**`Example`**
+
+```ts
+const plan = computePastePlan({ matrix: [["x"]], anchorRow: 1, anchorColumn: 2, shownColumns: [0, 1, 2, 3],
+  rowCount: 10, selection: { rows: 3, columns: 1 } });
+plan.cells.length;   // 3 – rows 1…3 of column 2
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/paste-plan.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/paste-plan.ts#L68)
+
+___
+
+### createDateInputPipe
+
+▸ **createDateInputPipe**(`locale?`): [`editInputPipe`](interfaces/editInputPipe.md)
+
+An `editInputPipe` for dates: ISO text (`"2026-10-16"`, with time `"2026-10-16T08:30"`) or the short date of the
+locale (`"16.10.2026"` in de-DE, `"10/16/2026"` in en-US) → `Date` (local time). Empty text stays `""`, other text as
+it is; a `Date` passes unchanged.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale?` | `string` | BCP 47 tag for the order of day and month, default: the browser's locale |
+
+#### Returns
+
+[`editInputPipe`](interfaces/editInputPipe.md)
+
+the pipe
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "due", editable: TrueFn, editInputPipe: createDateInputPipe("de-DE") });
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/input-pipes.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L171)
+
+___
+
+### createNumberInputPipe
+
+▸ **createNumberInputPipe**(`locale?`): [`editInputPipe`](interfaces/editInputPipe.md)
+
+An `editInputPipe` for numbers in the format of a locale, for the editor and for pasting: `"1.234,56"` (de-DE) and
+`"1,234.56"` (en-US) → `1234.56`, `"12 %"` → `0.12`, `"€ 9,90"` → `9.9`, `"(5)"` → `-5`. Empty text stays `""`,
+text that is no number stays as it is (a `validate` of the column can refuse it); numbers pass unchanged.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale?` | `string` | BCP 47 tag, default: the browser's locale |
+
+#### Returns
+
+[`editInputPipe`](interfaces/editInputPipe.md)
+
+the pipe
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "price", editable: TrueFn, editInputPipe: createNumberInputPipe("de-DE") });
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/input-pipes.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L103)
+
+___
+
+### dateToSerial
+
+▸ **dateToSerial**(`date`): `number`
+
+The Excel serial number of a date (local calendar date and time, no time zone shift – like Excel).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `date` | `Date` | a date |
+
+#### Returns
+
+`number`
+
+the serial number (`NaN` for an invalid date)
+
+**`Example`**
+
+```ts
+dateToSerial(new Date(1900, 0, 1));   // 1
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-values.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-values.ts#L62)
+
+___
+
+### editingShortcutLayer
+
+▸ **editingShortcutLayer**(`mac`): [`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+The keys of Excel-style editing ([TableOptionsIf.editing](interfaces/TableOptionsIf.md#editing)) – a layer over the system mapping that the
+table only uses with the option; `tableOptions.shortcutActionIdMapping` still overrides it. Typing, F2, Enter,
+Escape and Ctrl/⌘+Enter are handled by the editor itself.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mac` | `boolean` | macOS keys (⌘ instead of Ctrl for the data edge – ⌃+arrows belong to macOS Spaces) |
+
+#### Returns
+
+[`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+the layer
+
+**`Example`**
+
+```ts
+editingShortcutLayer(false)["ctrl+down"];   // "NAVIGATE_DATA_EDGE_DOWN"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/editing-keymap.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editing-keymap.ts#L17)
+
+___
+
+### findDataEdge
+
+▸ **findDataEdge**(`isEmpty`, `rowCount`, `columnCount`, `row`, `column`, `dRow`, `dColumn`, `isShownColumn?`): [`number`, `number`]
+
+The target of Ctrl+arrow (⌘+arrow on macOS) in Excel-style editing – Excel's rule for jumping to the edge of the
+data: if the cell next to the start is empty, the next filled cell in that direction (or the last cell); if it is
+filled, the last filled cell of that block. Empty = `null`, `undefined` or `""` (not `0`, not `false`).
+DOM-free; hidden columns (`isShownColumn` → `false`) are skipped.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `isEmpty` | (`row`: `number`, `column`: `number`) => `boolean` | true for an empty cell |
+| `rowCount` | `number` | rows (display order) |
+| `columnCount` | `number` | columns (model indices) |
+| `row` | `number` | start row |
+| `column` | `number` | start column |
+| `dRow` | `number` | 1, 0 or 1 |
+| `dColumn` | `number` | 1, 0 or 1 |
+| `isShownColumn?` | (`column`: `number`) => `boolean` | false for a hidden column |
+
+#### Returns
+
+[`number`, `number`]
+
+the target cell (the start if there is nothing to move to)
+
+**`Example`**
+
+```ts
+const data = [[1], [2], [""], [""], [5]];
+const isEmpty = (r: number, c: number) => data[r][c] === "";
+findDataEdge(isEmpty, 5, 1, 0, 0, 1, 0);   // [1, 0] – end of the block 1, 2
+findDataEdge(isEmpty, 5, 1, 1, 0, 1, 0);   // [4, 0] – next filled cell
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet-editing/sheet-navigation.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/sheet-navigation.ts#L26)
+
+___
+
+### formatFormula
+
+▸ **formatFormula**(`ast`): `string`
+
+The canonical text of a formula AST (without `=`): functions and references in capitals, `,` between arguments,
+texts with `""` for a quotation mark, parentheses only where needed. Used for moving formulas and the Excel export.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ast` | [`FormulaNode`](modules.md#formulanode) | the syntax tree |
+
+#### Returns
+
+`string`
+
+the formula text
+
+**`Example`**
+
+```ts
+formatFormula({ kind: "binary", op: "*", left: { kind: "ref", row: 1, col: 1, absRow: false, absCol: false },
+  right: { kind: "literal", value: 2 } });   // "B2*2"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/format-formula.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/format-formula.ts#L75)
+
+___
+
+### getPasteSize
+
+▸ **getPasteSize**(`matrixRows`, `matrixColumns`, `selection?`): `Object`
+
+The size a paste covers before cutting off: the matrix – or the selected range if the matrix is a single value or
+fits into it an integer number of times (tiling, Excel).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `matrixRows` | `number` | rows of the pasted cells |
+| `matrixColumns` | `number` | columns of the pasted cells |
+| `selection?` | `Object` | the selected range (rows × shown columns) |
+| `selection.columns` | `number` | - |
+| `selection.rows` | `number` | - |
+
+#### Returns
+
+`Object`
+
+the covered size
+
+| Name | Type |
+| :------ | :------ |
+| `columns` | `number` |
+| `rows` | `number` |
+
+**`Example`**
+
+```ts
+getPasteSize(2, 1, { rows: 6, columns: 1 });   // { rows: 6, columns: 1 } – three times
+getPasteSize(2, 1, { rows: 5, columns: 1 });   // { rows: 2, columns: 1 } – once
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/paste-plan.ts:138](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/paste-plan.ts#L138)
+
+___
+
+### isFormulaRange
+
+▸ **isFormulaRange**(`v`): v is FormulaRange
+
+True for a [FormulaRange](classes/FormulaRange.md).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `v` | `unknown` | any value |
+
+#### Returns
+
+v is FormulaRange
+
+true for a range
+
+**`Example`**
+
+```ts
+if (isFormulaRange(arg)) console.log(arg.rows, arg.cols);
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-values.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-values.ts#L166)
+
+___
+
+### isFormulaText
+
+▸ **isFormulaText**(`input`): input is string
+
+True for a formula input: text starting with `=` (more than `=`). `'=…` is text.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `input` | `unknown` | a cell input |
+
+#### Returns
+
+input is string
+
+true for a formula text
+
+**`Example`**
+
+```ts
+isFormulaText("=B2*C2");   // true
+isFormulaText("'=1+1");    // false – text "=1+1"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-engine.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-engine.ts#L86)
+
+___
+
+### isSheetDate
+
+▸ **isSheetDate**(`v`): v is SheetDate
+
+True for a [SheetDate](classes/SheetDate.md).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `v` | `unknown` | any value |
+
+#### Returns
+
+v is SheetDate
+
+true for a sheet date
+
+**`Example`**
+
+```ts
+isSheetDate(new SheetDate(1));   // true
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-values.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-values.ts#L41)
+
+___
+
+### offsetReferences
+
+▸ **offsetReferences**(`source`, `dRow`, `dCol`): `string`
+
+All references moved, also absolute ones – e.g. for an export whose cells start elsewhere (a header row above).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | `string` | the formula (without `=`) |
+| `dRow` | `number` | rows |
+| `dCol` | `number` | columns |
+
+#### Returns
+
+`string`
+
+the formula
+
+**`Example`**
+
+```ts
+offsetReferences("$F$1*B2", 1, 0);   // "$F$2*B3"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/shift-formula.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/shift-formula.ts#L119)
+
+___
+
+### parseCellAddress
+
+▸ **parseCellAddress**(`address`): [`CellAddressIf`](interfaces/CellAddressIf.md) \| `undefined`
+
+Parses a cell address like `"B3"`, `"$B$3"`, `"b$3"`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | the address |
+
+#### Returns
+
+[`CellAddressIf`](interfaces/CellAddressIf.md) \| `undefined`
+
+row, column (0-based) and the absolute parts; `undefined` if invalid
+
+**`Example`**
+
+```ts
+parseCellAddress("$B3");   // { row: 2, col: 1, absRow: false, absCol: true }
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L103)
+
+___
+
+### parseHtmlTable
+
+▸ **parseHtmlTable**(`html`): `string`[][]
+
+The cell texts of the first `<table>` in clipboard HTML (Excel, Google Sheets). Parsed with `DOMParser` into an
+inert document – no element of it is ever put into the page, no script runs, images do not load; only the text
+of the cells is read (`<br>` = line break, `colspan` = empty cells, scripts and styles left out). Without a table or without `DOMParser`: `[]`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `html` | `string` | the `text/html` content |
+
+#### Returns
+
+`string`[][]
+
+rows of cell texts, all of the same length
+
+**`Example`**
+
+```ts
+parseHtmlTable("<table><tr><td>a</td><td>1</td></tr></table>");   // [["a", "1"]]
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/clipboard-html.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/clipboard-html.ts#L51)
+
+___
+
+### parseRangeAddress
+
+▸ **parseRangeAddress**(`address`): [`RangeAddressIf`](interfaces/RangeAddressIf.md) \| `undefined`
+
+Parses a range like `"A1:B5"`, `"$A$1:B5"`, `"A:A"`, `"B:D"`, `"3:3"` or a single cell `"C7"`. The corners are
+sorted (`"B5:A1"` = `"A1:B5"`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | the range |
+
+#### Returns
+
+[`RangeAddressIf`](interfaces/RangeAddressIf.md) \| `undefined`
+
+the range; `undefined` if invalid
+
+**`Example`**
+
+```ts
+parseRangeAddress("A:A")?.to.row;   // 1048575
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L143)
+
+___
+
+### parseTsv
+
+▸ **parseTsv**(`text`): `string`[][]
+
+Cell matrix of a TSV text from the clipboard (Excel, Google Sheets, LibreOffice, a text editor): line breaks
+`\r\n`, `\n` or `\r`; a cell that starts with a quotation mark is quoted (`""` inside = one quotation mark, line
+breaks and tabs inside belong to the cell); one line break at the end is ignored; a byte order mark is removed;
+shorter rows are filled with `""`. DOM-free.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `text` | `string` | the clipboard text |
+
+#### Returns
+
+`string`[][]
+
+rows of cell texts, all of the same length; `[]` for `""`
+
+**`Example`**
+
+```ts
+parseTsv('a\t"x\ny"\r\n1\t2\r\n');   // [["a", "x\ny"], ["1", "2"]]
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/tsv.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/tsv.ts#L42)
+
+___
+
+### serialToDate
+
+▸ **serialToDate**(`serial`): `Date`
+
+The date of an Excel serial number (local time); serial 60 (Excel's 1900-02-29) becomes 1900-03-01.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `serial` | `number` | the serial number |
+
+#### Returns
+
+`Date`
+
+the date
+
+**`Example`**
+
+```ts
+serialToDate(46311);   // 2026-10-16 00:00 local
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/sheet-values.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/sheet-values.ts#L88)
+
+___
+
+### sheetInputPipe
+
+▸ **sheetInputPipe**(`locale?`): [`editInputPipe`](interfaces/editInputPipe.md)
+
+An `editInputPipe` that recognizes values like Excel: a number in the format of the locale (also `%` and currency
+signs), a date (ISO or the short date of the locale), `TRUE`/`FALSE` (ignoring case) – otherwise text. Text that
+starts with `=` or `'=` (formulas, see the spreadsheet mode) stays unchanged; so does a leading `'` (Excel: "keep
+this as text") minus the quote.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale?` | `string` | BCP 47 tag, default: the browser's locale |
+
+#### Returns
+
+[`editInputPipe`](interfaces/editInputPipe.md)
+
+the pipe
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "b", editable: TrueFn, editInputPipe: sheetInputPipe("en-US") });
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/input-pipes.ts:222](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L222)
+
+___
+
+### shiftFormula
+
+▸ **shiftFormula**(`source`, `dRow`, `dCol`): `string`
+
+A formula copied by `dRow` rows and `dCol` columns (fill handle, copy and paste): relative references move, `$`
+parts stay; a reference that leaves the sheet becomes `#REF!`. Formula text without `=`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `source` | `string` | the formula (without `=`) |
+| `dRow` | `number` | rows moved |
+| `dCol` | `number` | columns moved |
+
+#### Returns
+
+`string`
+
+the moved formula (canonical text)
+
+**`Example`**
+
+```ts
+shiftFormula("B2*C2+$F$1", 1, 0);   // "B3*C3+$F$1"
+shiftFormula("A1", -1, 0);          // "#REF!"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/shift-formula.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/shift-formula.ts#L101)
+
+___
+
+### spreadsheetOption
+
+▸ **spreadsheetOption**\<`K`\>(`tableOptions`, `key`): [`TableOptionsIf`](interfaces/TableOptionsIf.md)[`K`]
+
+The value of one part of the preset `tableOptions.spreadsheet` for a table: the option itself if the options set it,
+otherwise the preset's part (`true` by default, `editing` with `defaultEditable: true`). Without the preset: the
+option. The options object is never changed (it may be shared by several tables or frozen).
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `K` | extends keyof [`SpreadsheetOptionsIf`](interfaces/SpreadsheetOptionsIf.md) |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `tableOptions` | `undefined` \| [`TableOptionsIf`](interfaces/TableOptionsIf.md) | the options of a table |
+| `key` | `K` | `editing`, `clipboard`, `undo`, `cellFormulas` or `fillHandle` |
+
+#### Returns
+
+[`TableOptionsIf`](interfaces/TableOptionsIf.md)[`K`]
+
+the effective value
+
+**`Example`**
+
+```ts
+spreadsheetOption({ ...new TableOptions(), spreadsheet: true }, "undo");   // true
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-preset.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-preset.ts#L21)
+
+___
+
+### toCellAddress
+
+▸ **toCellAddress**(`row`, `col`, `abs?`): `string`
+
+The address of a cell: `toCellAddress(2, 1)` → `"B3"`, with `$` for absolute parts.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | `number` | 0-based row |
+| `col` | `number` | 0-based column |
+| `abs?` | `Object` | `$` before the row / column |
+| `abs.absCol?` | `boolean` | - |
+| `abs.absRow?` | `boolean` | - |
+
+#### Returns
+
+`string`
+
+the address, `"#REF!"` outside the sheet
+
+**`Example`**
+
+```ts
+toCellAddress(0, 5, { absRow: true, absCol: true });   // "$F$1"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L83)
+
+___
+
+### toHtmlTable
+
+▸ **toHtmlTable**(`matrix`): `string`
+
+A cell matrix as HTML `<table>` for the clipboard (`text/html`): every text escaped, line breaks as `<br>`,
+numbers with `x:num` (Excel keeps the number although the cell shows formatted text). DOM-free.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `matrix` | readonly readonly HtmlTableCellIf[][] | rows of cells |
+
+#### Returns
+
+`string`
+
+the HTML
+
+**`Example`**
+
+```ts
+toHtmlTable([[{ text: "1,234.50 €", num: 1234.5 }]]);
+// '<meta charset="utf-8"><table><tbody><tr><td x:num="1234.5">1,234.50 €</td></tr></tbody></table>'
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/clipboard-html.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/clipboard-html.ts#L29)
+
+___
+
+### toTsv
+
+▸ **toTsv**(`matrix`): `string`
+
+Text of a cell matrix as tab-separated values (TSV) the way Excel and Google Sheets read it: cells separated by a
+tab, rows by a line break; a cell with a tab, a line break or a quotation mark is put in quotation marks
+(`"…"`), a quotation mark inside is doubled. DOM-free.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `matrix` | readonly readonly string[][] | rows of cell texts |
+
+#### Returns
+
+`string`
+
+the TSV text (a line break at the end only if the last row is empty)
+
+**`Example`**
+
+```ts
+toTsv([["a", "b"], ["1", 'say "hi"']]);   // 'a\tb\n1\t"say ""hi"""'
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/tsv.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/tsv.ts#L15)
+
+___
+
+### undoShortcutLayer
+
+▸ **undoShortcutLayer**(`mac`): [`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+The keys of undo and redo ([TableOptionsIf.undo](interfaces/TableOptionsIf.md#undo)) – a layer over the system mapping that the table only uses
+with the option; `tableOptions.shortcutActionIdMapping` still overrides it. In an open editor the keys belong to
+the editor (the browser's text undo).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mac` | `boolean` | macOS keys (⌘+Z, ⌘+Shift+Z) |
+
+#### Returns
+
+[`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+the layer
+
+**`Example`**
+
+```ts
+undoShortcutLayer(false)["ctrl+y"];   // "REDO"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/undo/undo-keymap.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/undo/undo-keymap.ts#L17)
+
 ## DOM
 
 ### HtmlStyle
@@ -4561,6 +6000,30 @@ ___
 #### Defined in
 
 [src/lib/common/generator/domain/property-type.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/common/generator/domain/property-type.ts#L4)
+
+___
+
+### SHEET\_MAX\_COLUMNS
+
+• `Const` **SHEET\_MAX\_COLUMNS**: ``16384``
+
+Columns of a sheet (like Excel): A … XFD = 16 384.
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:5](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L5)
+
+___
+
+### SHEET\_MAX\_ROWS
+
+• `Const` **SHEET\_MAX\_ROWS**: ``1048576``
+
+Rows of a sheet (like Excel): 1 … 1 048 576.
+
+#### Defined in
+
+[src/lib/table/sheet/cell-address.ts:2](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet/cell-address.ts#L2)
 
 ___
 
@@ -4913,6 +6376,28 @@ Checks if the given object is a CheckboxColumnDef.
 
 ___
 
+### isSpreadsheetTableModel
+
+▸ **isSpreadsheetTableModel**(`model`): model is SpreadsheetTableModel
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `model` | [`TableModelIf`](interfaces/TableModelIf.md) |
+
+#### Returns
+
+model is SpreadsheetTableModel
+
+true for the model of a [SpreadsheetFactory](classes/SpreadsheetFactory.md) sheet
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-factory.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-factory.ts#L194)
+
+___
+
 ### isTreeRow
 
 ▸ **isTreeRow**(`row`): `boolean`
@@ -5150,6 +6635,22 @@ The modified string with the suffix removed, or the original string if no suffix
 
 ## Internals
 
+### ClipboardKind
+
+Ƭ **ClipboardKind**: ``"copy"`` \| ``"cut"`` \| ``"paste"``
+
+A clipboard action of the keyboard.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/clipboard/clipboard-service.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/clipboard-service.ts#L49)
+
+___
+
 ### NestedTableScopeFactory
 
 Ƭ **NestedTableScopeFactory**: (`host`: `HTMLDivElement`, `tableModel`: [`TableModelIf`](interfaces/TableModelIf.md), `tableOptions`: [`TableOptionsIf`](interfaces/TableOptionsIf.md) \| `undefined`, `eventListener`: [`EventListenerIf`](interfaces/EventListenerIf.md) \| `undefined`) => [`NestedTableScopeIf`](interfaces/NestedTableScopeIf.md)
@@ -5197,6 +6698,43 @@ old one again (B8), or nothing (the value equals the old one and there was no en
 #### Defined in
 
 [src/lib/table/batch-edit/pending-cell-changes.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/batch-edit/pending-cell-changes.ts#L29)
+
+___
+
+### applyStructureEdit
+
+▸ **applyStructureEdit**(`scope`, `edit`, `opts?`): `boolean`
+
+Inserts or deletes rows or columns with adjusted cell formulas (`=SUM(D2:D4)` → `=SUM(D2:D5)` after inserting a row
+inside, a deleted reference → `#REF!`), as **one** undo step and one `onModelChanged` (source `"structure"`).
+Rows: a spreadsheet, object rows (new objects from `clipboard.createRow`, otherwise `{}`; the app's array changes
+**in place**) and arrays; columns: a spreadsheet only. Not while a batch edit collects changes. Sorting and filters
+stay (the view is built again); the active cell stays inside the table.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `scope` | [`TableScope`](classes/TableScope.md) | the table |
+| `edit` | [`StructureEditIf`](interfaces/StructureEditIf.md) | what to change |
+| `opts?` | `Object` | `record: false` = no undo step; `rows`: the rows to insert (redo); `source` of the event |
+| `opts.record?` | `boolean` | - |
+| `opts.rows?` | `unknown`[] | - |
+| `opts.source?` | [`CellChangeSource`](modules.md#cellchangesource) | - |
+
+#### Returns
+
+`boolean`
+
+true if changed
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/spreadsheet/structure-edit.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/structure-edit.ts#L58)
 
 ___
 

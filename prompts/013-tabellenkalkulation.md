@@ -644,14 +644,14 @@ new FormulaBar(document.querySelector('#bar')!, api);   // optional, nach tableR
 
 ## Definition of Done (zusätzlich zu 000)
 
-- [ ] Etappe 0: Design mit gemeinsamen Entscheidungen, allen Teilen und Abschnitt „Fortschritt“ 🛑
-- [ ] Etappe 1: E1–E22; roter Test + Fix für den Textverlust; CSP-Fix im `InputCellRenderer`; bestehende Specs
+- [x] Etappe 0: Design mit gemeinsamen Entscheidungen, allen Teilen und Abschnitt „Fortschritt“ 🛑
+- [x] Etappe 1: E1–E22; roter Test + Fix für den Textverlust; CSP-Fix im `InputCellRenderer`; bestehende Specs
       unverändert grün; `TODO.md` „Excel-artig Enter bzw. Tippen startet das Editieren“ abgehakt
-- [ ] Etappe 2: P1–P19; manuelle Rundreise Excel/Sheets (Chrome, Firefox, Safari) protokolliert; `TODO.md` Folgepunkt
+- [x] Etappe 2 (manuelle Rundreise Excel/Sheets in Firefox/Safari offen): P1–P19; manuelle Rundreise Excel/Sheets (Chrome, Firefox, Safari) protokolliert; `TODO.md` Folgepunkt
       010 „Einfügen aus der Zwischenablage“ abgehakt
-- [ ] Etappe 3: U1–U15; `TODO.md` Folgepunkt 010 „Undo/Redo“ abgehakt
-- [ ] Etappe 4: S1–S5, S17–S19, S21, S25, S26 inkl. Property-Test, Fuzzing, Bench
-- [ ] Etappe 5: S3, S6–S13, S20, S22–S24
-- [ ] Etappe 6: S13–S16 mit Screenreader-Prüfung der Vorschlagsliste
-- [ ] Etappe 7: X1–X13
-- [ ] Etappe 8: Showcase, Kapitel 40, Video-Ordner, `why.astro` ehrlich angepasst, Abschlussprüfung, Release-Befehle
+- [x] Etappe 3: U1–U15; `TODO.md` Folgepunkt 010 „Undo/Redo“ abgehakt
+- [x] Etappe 4: S1–S5, S17–S19, S21, S25, S26 inkl. Property-Test, Fuzzing, Bench
+- [x] Etappe 5: S3, S6–S13, S20, S22–S24
+- [x] Etappe 6 (echter Screenreader offen): S13–S16 mit Screenreader-Prüfung der Vorschlagsliste
+- [x] Etappe 7: X1–X13
+- [x] Etappe 8: Showcase, Kapitel 40, Video-Ordner, `why.astro` ehrlich angepasst, Abschlussprüfung, Release-Befehle

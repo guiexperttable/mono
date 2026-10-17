@@ -1,6 +1,6 @@
 ---
 /**
- * /whats-new/ – the twelve features of October 2026 (releases 1.1.91 – 1.1.98) on one page:
+ * /whats-new/ – the thirteen features of October 2026 (releases 1.1.91 – 1.1.99) on one page:
  * problem, code (checked: pnpm --filter webpage-guiexpert check:features), live showcase, training chapter, API.
  * Data: src/features/new-features.ts (also used by the home page and the training index).
  */
@@ -39,20 +39,20 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
 ---
 <IndexLayout
   title="What's new · GuiExpert Table"
-  description="Twelve new features in one month: accessibility, overlays, state, row numbers, totals, row grouping, pivot tables, formulas, row drag, fill handle, master/detail and right-to-left – MIT-licensed.">
+  description="Thirteen new features in one month: accessibility, overlays, state, row numbers, totals, row grouping, pivot tables, formulas, row drag, fill handle, master/detail, right-to-left and a spreadsheet with cell formulas – MIT-licensed.">
   <Header splashMode={false} smallGap={true} />
 
   <div class="whats-new">
     <section class="training-hero">
       <p class="chapter-no">Releases {versions} · October 2026</p>
-      <h1><span class="gradient-text">Twelve new features.</span><br />One month. Still MIT.</h1>
+      <h1><span class="gradient-text">Thirteen new features.</span><br />One month. Still MIT.</h1>
       <p class="lead">
         From screen readers to pivot tables: everything you see on this page is part of the free core – in Angular, React,
-        Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. {enterprise} of the twelve are Enterprise features
+        Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. {enterprise} of the thirteen are Enterprise features
         at ag-Grid.
       </p>
       <div class="training-cta">
-        <a class="btn-gradient" href="#features">See all twelve ↓</a>
+        <a class="btn-gradient" href="#features">See all thirteen ↓</a>
         <a class="btn-outline" href="/showcase/">Live showcases</a>
         <a class="btn-outline" href="/training/#new">In the training</a>
       </div>
@@ -61,7 +61,7 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
       </div>
     </section>
 
-    <nav class="wn-index training-section" id="features" aria-label="The twelve features">
+    <nav class="wn-index training-section" id="features" aria-label="The thirteen features">
       {NEW_FEATURES.map(f => (
         <a href={`#${f.id}`} class="wn-chip">
           <span class="wn-chip-icon"><Icon name={f.icon} /></span>
@@ -105,8 +105,8 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
     <section class="training-section wn-end">
       <h2>What is still missing</h2>
       <p class="sub">
-        Honest list: a drag &amp; drop group panel and pivot field list, spreadsheet cell references with an in-cell formula
-        editor, paste from the clipboard, undo/redo and a server-side row model are not built in. The comparison with
+        Honest list: a drag &amp; drop group panel and pivot field list, a filter UI, a context menu, charts and a
+        server-side row model are not built in. The comparison with
         ag-Grid Community and Enterprise is on the <a href="/#why">home page</a> and in
         <a href="/training/build-buy-or-guiexpert/">chapter 3 of the training</a>.
       </p>

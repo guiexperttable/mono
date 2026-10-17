@@ -403,7 +403,7 @@ export class AreaModelSheet extends AbstractAreaModel<unknown[]> {
   }
 
   private shiftRows(from: number, delta: number): void {
-    const moved = [...this.rows].filter(([r]) => r >= from).sort((a, b) => (delta > 0 ? b[0] - a[0] : a[0] - b[0]));
+    const moved = Array.from(this.rows).filter(([r]) => r >= from).sort((a, b) => (delta > 0 ? b[0] - a[0] : a[0] - b[0]));
     for (const [r] of moved) this.rows.delete(r);
     for (const [r, row] of moved) {
       this.rows.set(r + delta, row);

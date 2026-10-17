@@ -228,7 +228,7 @@ export class SheetEngine {
       }
       seeds.push(key);
     }
-    for (const key of this.volatileCells) seeds.push(key);
+    this.volatileCells.forEach(key => seeds.push(key));
     return this.recalc(seeds, false);
   }
 
@@ -238,7 +238,7 @@ export class SheetEngine {
    * @returns {SheetRecalcResultIf} what was recalculated
    */
   recalculate(): SheetRecalcResultIf {
-    return this.recalc([...this.volatileCells], false);
+    return this.recalc(Array.from(this.volatileCells), false);
   }
 
   /**
@@ -309,7 +309,7 @@ export class SheetEngine {
   getDependents(row: number, col: number): Array<[number, number]> {
     const seen = new Set<number>();
     this.forEachDependent(cellKey(row, col), row, col, d => seen.add(d));
-    return [...seen].map(k => [Math.floor(k / SHEET_MAX_COLUMNS), k % SHEET_MAX_COLUMNS]);
+    return Array.from(seen, (k): [number, number] => [Math.floor(k / SHEET_MAX_COLUMNS), k % SHEET_MAX_COLUMNS]);
   }
 
   /**
@@ -321,7 +321,7 @@ export class SheetEngine {
    */
   adjustForStructureChange(edit: SheetStructureEditIf): Array<{ row: number; col: number; input: string }> {
     const ret: Array<{ row: number; col: number; input: string }> = [];
-    for (const cell of this.formulas.values()) {
+    for (const cell of Array.from(this.formulas.values())) {
       const position = newPosition(cell.row, cell.col, edit);
       if (!position) continue; // the cell itself was deleted
       const adjusted = "=" + adjustFormula(cell.source.slice(1), edit);
@@ -435,20 +435,20 @@ export class SheetEngine {
   private forEachDependent(key: number, row: number, col: number, fn: (dependent: number) => void): void {
     const singles = this.singleDependents.get(key);
     if (singles) {
-      for (const d of singles) fn(d);
+      singles.forEach(fn);
     }
     const list = this.rangesByColumn.get(col);
     if (list) {
       for (const node of list) { // sorted by r2 descending: stop at the first range that ends above the row
         if (node.r2 < row) break;
         if (row >= node.r1) {
-          for (const d of node.dependents) fn(d);
+          node.dependents.forEach(fn);
         }
       }
     }
     for (const node of this.wideRanges) {
       if (row >= node.r1 && row <= node.r2 && col >= node.c1 && col <= node.c2) {
-        for (const d of node.dependents) fn(d);
+        node.dependents.forEach(fn);
       }
     }
   }
@@ -502,14 +502,14 @@ export class SheetEngine {
     const done = new Set<number>();
     const kahn = (nodes: Set<number>) => {
       const indegree = new Map<number, number>();
-      for (const k of nodes) indegree.set(k, 0);
-      for (const k of nodes) {
+      nodes.forEach(k => indegree.set(k, 0));
+      nodes.forEach(k => {
         for (const d of dependentsOf(k)) {
           if (nodes.has(d)) indegree.set(d, indegree.get(d)! + 1);
         }
-      }
+      });
       const ready: number[] = [];
-      for (const [k, n] of indegree) if (n === 0) ready.push(k);
+      indegree.forEach((n, k) => { if (n === 0) ready.push(k); });
       for (let i = 0; i < ready.length; i++) {
         const k = ready[i];
         evaluate(k);
@@ -524,7 +524,7 @@ export class SheetEngine {
     };
     kahn(dirty);
     if (done.size < dirty.size) {
-      const rest = new Set([...dirty].filter(k => !done.has(k)));
+      const rest = new Set(Array.from(dirty).filter(k => !done.has(k)));
       const circ = new FormulaError("#CIRC!", "Circular reference");
       for (const k of this.cycles(rest, dependentsOf)) {
         const cell = this.formulas.get(k)!;
@@ -549,7 +549,7 @@ export class SheetEngine {
     const ret: number[] = [];
     let counter = 0;
     const successors = (k: number): number[] => dependentsOf(k).filter(d => nodes.has(d));
-    for (const start of nodes) {
+    for (const start of Array.from(nodes)) {
       if (index.has(start)) continue;
       const work: Array<{ k: number; next: number[]; i: number }> = [];
       const visit = (k: number) => {

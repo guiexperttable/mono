@@ -82,6 +82,35 @@ import Callout from "../../components/training/Callout.astro";
       their rows; totals, copy and Excel use the saved data. All options: instructions.md 6.17.</p>
   </Callout>
 
+  <h2 id="excel-style">Excel-style editing, paste and undo</h2>
+  <Callout type="version">
+    <p>Excel-style editing, the clipboard and undo/redo are new in 1.1.99.</p>
+  </Callout>
+  <p>
+    Double-click to edit is fine for a status now and then. People who enter data all day expect Excel: select a cell and
+    <strong>type</strong> – the text replaces the value; <kbd>F2</kbd> edits it; <kbd>Enter</kbd> and <kbd>Tab</kbd> write
+    and move on; <kbd>Escape</kbd> drops the change; <kbd>Delete</kbd> clears the selection. And they expect
+    <kbd>Ctrl</kbd>+<kbd>Z</kbd>. Three options switch it on:
+    <ApiLink name="TableOptionsIf.editing" label="editing" />, <ApiLink name="TableOptionsIf.clipboard" label="clipboard" />
+    and <ApiLink name="TableOptionsIf.undo" label="undo" />.
+  </p>
+  <Snippet file="demos/sheet-editing.ts" region="options" title="src/main.ts" />
+  <p>
+    Every change – typed, pasted, cut, filled or cleared – is one undo step and one <code>onModelChanged</code> with all
+    cells. <ApiLink name="EventListenerIf.onUndoStackChanged" label="onUndoStackChanged" /> tells you when to enable your
+    buttons; <ApiLink name="TableApi.undo" /> and <ApiLink name="TableApi.redo" /> do the rest. Undo finds the right rows
+    also after sorting or filtering – it remembers the row objects, not the positions.
+  </p>
+  <Snippet file="demos/sheet-editing.ts" region="undo" title="src/undo-buttons.ts" />
+  <LiveDemo name="sheet-editing" title="Excel-style editing with undo" height={400}
+            caption="Click a quantity and type 7, Enter. Select two cells, Delete, then undo. Copy a block in Excel and paste it here." />
+  <Callout type="tip" title="Keys and editors">
+    <p>The other keys of Excel are there too: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> writes into every selected cell,
+      <kbd>Ctrl</kbd>+arrow jumps to the edge of the data, <kbd>Shift</kbd>+arrow extends the selection. Columns choose an
+      editor with <code>editor: "text" | "number" | "date"</code> or a factory of your own (a select, say); IME input (Japanese, Chinese) works.
+      A whole spreadsheet with formulas: <ChapterLink slug="spreadsheet" />. All keys and options: instructions.md 6.20 – 6.22.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>Not the user changes the values, the market does: <ChapterLink slug="live-data" />.</p>
 </TrainingLayout>

@@ -17,8 +17,24 @@ import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
+import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
+import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 
+
+/**
+ * The default editor of {@link TableOptions.getEditRenderer}: a text input in the cell ({@link InputCellRenderer}).
+ * With Excel-style editing ({@link TableOptionsIf.editing}) the table recognises this default and uses its own
+ * editor above the cell instead – an own `getEditRenderer` is kept.
+ *
+ * @example
+ * const tableOptions: TableOptionsIf = { ...new TableOptions() };
+ * tableOptions.getEditRenderer === DEFAULT_GET_EDIT_RENDERER;   // true
+ *
+ * @category Spreadsheet
+ * @since 1.1.99
+ */
+export const DEFAULT_GET_EDIT_RENDERER: GetEditRenderer = (_rowIndex: number, _columnIndex: number) => new InputCellRenderer();
 
 /**
  * All default options of a table – see {@link TableOptionsIf} for the meaning of each field.
@@ -84,7 +100,7 @@ export class TableOptions implements TableOptionsIf {
 
   resizeEventDebounceDelay = 500;
 
-  getEditRenderer?: GetEditRenderer = (_rowIndex: number, _columnIndex: number) => new InputCellRenderer();
+  getEditRenderer?: GetEditRenderer = DEFAULT_GET_EDIT_RENDERER;
 
   /**
    * Selection model of the table. Not set (default): every table creates its own model
@@ -115,6 +131,10 @@ export class TableOptions implements TableOptionsIf {
   fillHandle?: boolean | Partial<FillHandleOptionsIf> = undefined;
   masterDetail?: Partial<MasterDetailOptionsIf> = undefined;
   batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;
+  /** Excel-style editing ({@link TableOptionsIf.editing}). Not set = off. @since 1.1.99 */
+  editing?: boolean | Partial<EditingOptionsIf> = undefined;
+  /** Copy, cut and paste ({@link TableOptionsIf.clipboard}). Not set = off. @since 1.1.99 */
+  clipboard?: boolean | Partial<ClipboardOptionsIf> = undefined;
   /**
    * Writing direction (`"ltr"` | `"rtl"` | `"auto"`). Not set = `"ltr"`; a nested table (master/detail) without its
    * own value takes the direction of the outer table. @since 1.1.98

@@ -1,11 +1,13 @@
 /**
  * What started a change of cells: `"edit"` (cell editor), `"fill"` (fill handle, Ctrl/⌘+D, Ctrl/⌘+R),
- * `"commit"` ({@link TableApi.commitBatchEdit}) or `"api"` ({@link TableApi.applyCellChanges}).
+ * `"commit"` ({@link TableApi.commitBatchEdit}), `"api"` ({@link TableApi.applyCellChanges}) or – since 1.1.99 –
+ * `"clear"` (Delete/Backspace in Excel-style editing, {@link TableApi.clearCells}), `"paste"` (Ctrl/⌘+V,
+ * {@link TableApi.pasteText}) and `"cut"` (pasting cut cells: target and emptied source in one change set).
  *
  * @category Fill handle & batch edit
  * @since 1.1.96
  */
-export type CellChangeSource = "edit" | "fill" | "commit" | "api";
+export type CellChangeSource = "edit" | "fill" | "commit" | "api" | "clear" | "paste" | "cut";
 
 /**
  * One changed cell: row, column, old and new value – the unit of a change set ({@link GeModelChangeEvent.changes},

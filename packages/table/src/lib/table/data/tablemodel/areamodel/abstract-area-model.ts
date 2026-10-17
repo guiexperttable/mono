@@ -2,6 +2,7 @@ import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { AreaModelIf } from "./area-model.if";
 import { CheckedType } from "../../common/checked-type";
 import { ColumnDefIf } from "../column/column-def.if";
+import { hasDefaultEditable } from "../column/default-editable";
 import { AreaIdent } from "../area-ident.type";
 import { CheckboxModelIf } from "../../../checkbox/checkbox-model.if";
 import { FilterFunction } from "../../common/filter-function";
@@ -11,7 +12,7 @@ import { ColumnValues } from "../../../calc/column-values";
 import { AggregateCellRenderer } from "../../../renderer/aggregate-cell-renderer";
 import { formatShowValuesAs } from "../../../calc/show-values-as";
 import { isFormulaError } from "../../../formula/formula-error";
-import { isTreeRow } from "../../../instanceof-workaround";
+import { isCheckboxColumnDef, isRowGroupColumnDef, isRowNumberColumnDef, isTreeRow } from "../../../instanceof-workaround";
 
 
 /** @category Area models */
@@ -131,10 +132,21 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
   }
 
 
+  /**
+   * Columns without an own `editable` are editable (Excel-style editing, `EditingOptionsIf.defaultEditable`; set by
+   * the table). Row number, checkbox and group columns stay read only.
+   * @since 1.1.99
+   */
+  defaultEditable = false;
+
   isEditable(_rowIndex: number, columnIndex: number): boolean {
     const columnDef = this.columnDefs?.[columnIndex];
     if (this.areaIdent === "body" && columnDef?.valueGetter && !columnDef.valueSetter) {
       return false; // a calculated column without a setter (since 1.1.95)
+    }
+    if (this.defaultEditable && this.areaIdent === "body" && columnDef
+      && hasDefaultEditable(columnDef)) {
+      return !isCheckboxColumnDef(columnDef) && !isRowNumberColumnDef(columnDef) && !isRowGroupColumnDef(columnDef);
     }
     return columnDef?.editable?.() ?? false;
   }

@@ -280,6 +280,47 @@
     animation: none; /* a still ring segment and the text */
   }
 }
+/* Copy, cut and paste (since 1.1.99, tableOptions.clipboard) */
+
+/* the hidden text field that gets the focus for the moment of Ctrl/⌘+C, X, V (the browser fires its clipboard event there) */
+.ge-table-clipboard-proxy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  resize: none;
+  pointer-events: none;
+  font-size: 16px; /* iOS zooms into a focused field with a smaller font */
+}
+
+/* cut cells: a dashed frame ("marching ants") until they are pasted, Escape or another change */
+.ge-table-cut-range {
+  position: absolute;
+  display: none;
+  z-index: 8998; /* below the fill preview (8999) and the editor (9500) */
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 2px dashed var(--ge-table-cut-range-border);
+  animation: ge-table-cut-range-ants 0.8s linear infinite;
+}
+
+@keyframes ge-table-cut-range-ants {
+  50% {
+    border-color: var(--ge-table-cut-range-border-alt);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ge-table-cut-range {
+    animation: none; /* the dashed frame alone */
+  }
+}
 
 
 .ge-table { background-color: var(--ge-table-bg); }
@@ -517,6 +558,15 @@
   --ge-table-detail-border: #c9d1db;
   --ge-table-detail-toggle-color: #5f6368;
   --ge-table-detail-toggle-hover-bg: rgba(128, 128, 128, 0.15);
+
+  /* Excel-style editing (since 1.1.99): the editor above the cell */
+  --ge-table-cell-editor-bg: #fff;
+  --ge-table-cell-editor-text: #111;
+  --ge-table-cell-editor-border: #0a6ebd;
+  --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --ge-table-cell-editor-invalid-border: #d93025;
+  --ge-table-cut-range-border: #0a6ebd;
+  --ge-table-cut-range-border-alt: #9ec9ec;
 }
 
 
@@ -644,6 +694,15 @@ html[data-theme="dark"] {
   --ge-table-detail-border: #3c434d;
   --ge-table-detail-toggle-color: #bdc1c6;
   --ge-table-detail-toggle-hover-bg: rgba(255, 255, 255, 0.12);
+
+  /* Excel-style editing (since 1.1.99) */
+  --ge-table-cell-editor-bg: #1f2937;
+  --ge-table-cell-editor-text: #f3f4f6;
+  --ge-table-cell-editor-border: #8ab4f8;
+  --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  --ge-table-cell-editor-invalid-border: #f28b82;
+  --ge-table-cut-range-border: #8ab4f8;
+  --ge-table-cut-range-border-alt: #3c5a85;
 }
 /* Fill handle and batch edit (since 1.1.96) – colors in table-color-vars.css (--ge-table-fill-*, --ge-table-cell-*) */
 
@@ -972,6 +1031,56 @@ html[data-theme="dark"] {
   text-align: end;
   font-variant-numeric: tabular-nums;
   font-weight: var(--ge-table-row-group-label-font-weight);
+}
+/* Excel-style editing (since 1.1.99): one editor element above the edited cell (tableOptions.editing) */
+.ge-table-cell-editor {
+  position: absolute;
+  display: none;
+  box-sizing: border-box;
+  z-index: 9500; /* above the cells, the detail layer (1000) and the fill preview (8999), below the focus frame (9999) and overlay (10000) */
+  background: var(--ge-table-cell-editor-bg);
+  box-shadow: var(--ge-table-cell-editor-shadow);
+}
+.ge-table-cell-editor.ge-table-cell-editor-clipped {
+  pointer-events: none; /* scrolled out of view: invisible, but still focused */
+  box-shadow: none;
+}
+.ge-table-cell-editor-field {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 6px;
+  border: 2px solid var(--ge-table-cell-editor-border);
+  border-radius: 0;
+  outline: none;
+  font: inherit;
+  color: var(--ge-table-cell-editor-text);
+  background: var(--ge-table-cell-editor-bg);
+}
+.ge-table-cell-editor-field[aria-invalid="true"] {
+  border-color: var(--ge-table-cell-editor-invalid-border);
+}
+.ge-table-cell-editor-number {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The editors inside the cell (InputCellRenderer, SelectCellRenderer) – before 1.1.99 these were inline styles,
+   which a strict Content-Security-Policy (style-src without 'unsafe-inline') blocks */
+input.ge-table-cell-editor-input {
+  width: calc(100% - 8px);
+  height: 100%;
+  border: 0;
+  padding: 0;
+  padding-inline-start: 8px;
+}
+select.ge-table-cell-editor-select {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  padding-inline-start: 8px;
 }
 /* Tree table */
 

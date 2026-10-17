@@ -1270,6 +1270,9 @@ reported via `modelChanged` (since 1.1.96 with old and new value in `evt.changes
 filling with the fill handle and collecting changes until "Save": 6.17). Since 1.1.89 this also works on cells with a renderer or a framework component, the
 editor keeps the focus, and table shortcuts are ignored while typing in it.
 
+For spreadsheet-like editing – type into a focused cell, Enter/Tab to commit and move on, Shift+arrows, Delete – switch
+on `tableOptions.editing` (6.20).
+
 ### 6.8 Rowspan and colspan
 
 Override `getRowspanAt` / `getColspanAt` in your area model:
@@ -1925,6 +1928,122 @@ console.info(tableApi.getDirection()); // "rtl"
 - **Nested tables** (master/detail `ctx.createTable()`) take the direction of the outer table unless their own
   `tableOptions` set one.
 
+### 6.20 Excel-style editing (since 1.1.99)
+
+One option makes editing work like in Excel or Google Sheets: select a cell and **type** – the editor opens with the
+typed character; **Enter** commits and moves down, **Tab** moves right, **Escape** discards. The editor sits **above**
+the cell (not inside it), so scrolling and live updates keep what was typed.
+
+```ts
+import { ColumnDef, SelectCellEditor, SelectionModel, TableFactory, TableOptions, TrueFn } from "@guiexpert/table";
+import type { TableOptionsIf } from "@guiexpert/table";
+
+const selectionModel = new SelectionModel("range", "multi");   // one model per table
+const tableModel = TableFactory.createTableModel({
+  rows: [{ product: "Laptop", price: 1299, status: "open" }],
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product", editable: TrueFn }),
+    ColumnDef.create({ property: "price", headerLabel: "Price", editable: TrueFn, emptyValue: 0 }),
+    ColumnDef.create({ property: "status", headerLabel: "Status", editable: TrueFn,
+      editor: () => SelectCellEditor.create(["open", "paid", "void"]) }),
+  ],
+});
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  getSelectionModel: () => selectionModel,
+  editing: true,            // or { enterKey: "moveDown", defaultEditable: true, … }
+};
+```
+
+| Key (Windows) | macOS | What happens |
+|---|---|---|
+| a letter, digit, … | same | opens the editor with that character ("enter" mode: arrow keys commit and move) |
+| F2, double click | same | edits the current value, caret at the end ("edit" mode: arrow keys move the caret); F2 switches the mode |
+| Enter / Shift+Enter | same | without editor: edit (option `enterKey: "moveDown"` = Excel); in the editor: commit, move down / up |
+| Tab / Shift+Tab | same | commit, move right / left; in the last (first) column Tab leaves the table |
+| Escape | same | discard |
+| Ctrl+Enter | ⌘+Enter | write the input into all selected cells |
+| Shift+arrows, Shift+Home/End, Shift+Page Up/Down | same | extend the selected range from the active cell |
+| Ctrl+arrows / Ctrl+Shift+arrows | ⌘+arrows / ⌘+Shift+arrows | jump to the edge of the data block / extend to it |
+| Shift+Space / Ctrl+Space | same | select the rows / columns of the active cell |
+| Delete | Fn+⌫ | clear the selected cells (one `modelChanged` with `source: "clear"`) |
+| Backspace | ⌫ | empty the active cell in the editor (a selected range: like Delete) |
+| Space on a `true`/`false` cell | same | toggle |
+
+- **Editors**: the table chooses by the value – numbers: `NumberCellEditor`, dates: `DateCellEditor`, otherwise
+  `TextCellEditor`; `ColumnDef.editor` sets one (`"text"`, `"number"`, `"date"`, `SelectCellEditor`, or your own
+  `CellEditorIf`). A column with an own `getEditRenderer` keeps that editor inside the cell (F2, Enter, double click –
+  typing does not open it).
+- **Writing**: as before through `editInputPipe` and `validate` – an invalid value keeps the editor open
+  (`aria-invalid`, the message as tooltip). In a batch edit (6.17) the value is marked instead.
+- **`emptyValue`** of a column is what Delete writes (default `editing.emptyValue`, `""`); `defaultEditable: true`
+  makes every data column without an own `editable` editable.
+- **Events and API**: `onEditingChanged` (`GeEditEvent`: `start`, `input`, `commit`, `cancel`; wrapper event
+  `editingChanged`), `tableApi.startEditing(row, column, typedText?)`, `stopEditing(cancel?)`, `isEditing()`,
+  `getEditingCell()`, `clearCells(ranges?)`, and `tableApi.subscribe(listener)` for listeners next to the main one
+  (e.g. a toolbar). Without the option the table behaves as before (F2/double click, Enter activates, Tab leaves).
+- **Accessibility**: the edited cell owns the editor (`aria-owns`), read-only cells get `aria-readonly`, the grid
+  describes the keys (`aria-description`), announcements (`AriaTextsIf.editingStarted`, `cellsCleared`,
+  `rangeSelected` …). Strict Content-Security-Policy: no inline handlers or inline styles (since 1.1.99 also in the
+  in-cell `InputCellRenderer`/`SelectCellRenderer`).
+- **Limits**: the editor has the width of the cell; touch devices open it with the browser's double tap. IME input
+  (Japanese, Chinese) and dead keys open the editor empty and let the browser compose into it – checked in Chrome;
+  Safari/Firefox with IME are still being verified.
+
+### 6.21 Copy, cut and paste like Excel (since 1.1.99)
+
+With `clipboard: true` the table exchanges cells with Excel, Google Sheets, LibreOffice and text editors:
+**Ctrl/⌘+C** copies the selected range as tab-separated text (Excel's quoting: a cell with a tab, a line break or `"`
+stays one cell) plus an HTML table, **Ctrl/⌘+V** pastes from the active cell, **Ctrl/⌘+X** marks the range with a
+dashed frame – the next paste moves it. No permission prompt: the table uses the browser's `copy`/`paste` events.
+
+```ts
+import { ColumnDef, SelectionModel, TableFactory, TableOptions, TrueFn, createNumberInputPipe } from "@guiexpert/table";
+import type { TableOptionsIf } from "@guiexpert/table";
+
+const selectionModel = new SelectionModel("range", "multi");
+const tableModel = TableFactory.createTableModel({
+  rows: [{ product: "Laptop", price: 1299 }],
+  columnDefs: [
+    ColumnDef.create({ property: "product", headerLabel: "Product", editable: TrueFn }),
+    ColumnDef.create({ property: "price", headerLabel: "Price", editable: TrueFn, editInputPipe: createNumberInputPipe() }),
+  ],
+});
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  getSelectionModel: () => selectionModel,
+  editing: true,
+  clipboard: { pasteAddsRows: true, createRow: () => ({ product: "", price: 0 }) },
+};
+```
+
+- **Where it goes**: from the active cell (the first cell of the selected range). One copied value fills every
+  selected cell; a block is **tiled** over a selected range that is an integer multiple of it (Excel). Displayed rows
+  in display order (sorting, filter), hidden columns are skipped and not counted, read-only cells are left out, the
+  rest is cut off at the last column – and at the last row unless `pasteAddsRows` + `createRow` add rows (arrays of
+  objects or arrays, no tree/grouping). **One** `modelChanged` with `source: "paste"` (cut: `"cut"`, target and emptied
+  source together); in a batch edit (6.17) the values are marked. The pasted range is selected, a screen reader hears
+  “6 cells pasted” (`AriaTextsIf.cellsPasted`).
+- **Cut** moves only what arrives: a target that is read only, cut off or refused by `validate` keeps its source cell;
+  a cut is pasted once (no tiling) and never has a header row.
+- **Values**: copied inside the same table, the values are pasted (numbers stay numbers, no `editInputPipe` on them;
+  in a batch edit the texts, so that the commit converts them).
+  Text from outside goes through the column's `editInputPipe` – `createNumberInputPipe(locale?)` reads “1.234,56”
+  (de-DE) and “1,234.56” (en-US), `createDateInputPipe(locale?)`, `booleanInputPipe`, `sheetInputPipe(locale?)`
+  recognizes numbers, dates and TRUE/FALSE like Excel. Without a pipe a number goes into a number cell
+  (`editor: "number"`), TRUE/FALSE into a `true`/`false` cell, an ISO date into a `Date` cell – otherwise it stays text.
+- **Options** (`ClipboardOptionsIf`): `copyHeaders`, `copyValue: "raw"` (the value instead of the shown text),
+  `html: false`, `maxPasteCells` (default 1,000,000), `processCopy(ctx)` and `processPaste(ctx)` to change or refuse.
+- **API** (also without the option): `copySelection()`, `cutSelection()` (async clipboard API – for own buttons;
+  `triggerAction("PASTE_FROM_CLIPBOARD")` from a menu reads it with permission),
+  `pasteText(text, [row, column]?)`, `getSelectionAsText()`, `cancelCut()`. DOM-free helpers: `parseTsv`, `toTsv`,
+  `computePastePlan`.
+- **Without the option** Ctrl/⌘+C copies as before (`copyToClipboard`), Ctrl/⌘+X still deselects all (Windows), and
+  Ctrl/⌘+V does nothing. With an own `CopyServiceIf` Ctrl/⌘+C keeps using it; pasting works.
+- **Limits**: with several selected ranges only the last one is copied (like Google Sheets, announced). HTML from the
+  clipboard is only read when there is no text, and only its cell texts (no markup ever reaches the page). Safari and
+  Firefox are still being checked by hand with Excel and Google Sheets.
+
 ---
 
 ## 7. Not available yet
@@ -1939,7 +2058,7 @@ To avoid surprises – these are **not** implemented in the current releases:
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).
 - No formula editor UI and no spreadsheet cell references (`=B2*C2`) – formulas (5.9) refer to fields of the row and
   to column aggregates; the input field belongs to your app (`tableApi.setColumnFormula()`).
-- No paste from the clipboard and no undo/redo yet – both can be built on `tableApi.applyCellChanges()` (6.17).
+- No undo/redo yet – it can be built on `tableApi.applyCellChanges()` (6.17). Paste: 6.21.
 - Master/detail (6.18) only for flat tables – no detail rows below tree nodes, group rows or pivot rows.
 
 ---

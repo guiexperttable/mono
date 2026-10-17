@@ -34,7 +34,19 @@ function isKnownScrollViewportFinding(ruleId: string, node: axe.NodeResult): boo
   }
   if (ruleId === 'aria-required-children') {
     const messages = node.any.concat(node.all, node.none).map(c => c.message).join(' ');
-    return /children which are not allowed: div\[tabindex\]$/.test(messages.trim());
+    if (/children which are not allowed: div\[tabindex\]$/.test(messages.trim())) {
+      return true;
+    }
+    // Excel-style editing (since 1.1.99): the editor above the cell (input/select in .ge-table-cell-editor) is owned
+    // by the edited gridcell (aria-owns) – browsers put it into the cell in the accessibility tree, axe's rule
+    // looks at the DOM children only. Accepted only if the gridcell really owns it.
+    const m = /children which are not allowed: (.*)$/.exec(messages.trim());
+    if (m) {
+      const allowed = ['div[tabindex]', 'input[aria-label]', 'select[aria-label]'];
+      const editor = document.querySelector<HTMLElement>('.ge-table-cell-editor input, .ge-table-cell-editor select');
+      const owned = !!editor?.id && !!document.querySelector(`[role="gridcell"][aria-owns="${editor.id}"]`);
+      return owned && m[1].split(',').map(x => x.trim()).every(x => allowed.includes(x));
+    }
   }
   return false;
 }

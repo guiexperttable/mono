@@ -33,7 +33,13 @@ import {
   DetailRenderContextIf, DetailTableParamsIf, MasterDetailService, NestedTableScopeIf, NestedTableScopeFactory,
   GeDetailEvent, GeDetailEventSource,
   TableDirection, ResolvedTableDirection, resolveTableDirection, getLogicalScrollLeft, setLogicalScrollLeft,
-  toPhysicalScrollLeft, canScrollHorizontally, toLogicalX, mirrorArrowKeys, ExcelExportOptionsIf
+  toPhysicalScrollLeft, canScrollHorizontally, toLogicalX, mirrorArrowKeys, ExcelExportOptionsIf,
+  EditingOptionsIf, EditingOptions, CellEditMode, EditMove, CellEditorContextIf, CellEditorIf, CellEditorFactory,
+  ColumnEditorOption, TextCellEditor, NumberCellEditor, DateCellEditor, SelectCellEditor, findDataEdge,
+  editingShortcutLayer, CellEditorService, GeEditEvent, GeEditEventType, DEFAULT_GET_EDIT_RENDERER,
+  ClipboardOptionsIf, ClipboardOptions, CopyContextIf, PasteContextIf, toTsv, parseTsv, HtmlTableCellIf, toHtmlTable,
+  parseHtmlTable, PasteRequestIf, PastePlanIf, computePastePlan, getPasteSize, createNumberInputPipe, createDateInputPipe,
+  booleanInputPipe, sheetInputPipe, clipboardShortcutLayer, ClipboardService
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -41,6 +47,7 @@ declare const input: HTMLInputElement;
 declare const hint: HTMLElement;
 declare const select: HTMLSelectElement;
 declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, editButton: HTMLButtonElement;
+declare const copyButton: HTMLButtonElement, cutButton: HTMLButtonElement;
 
 interface Order { id: number; date: string; customer: string; country: string; city: string; product: string;
   category: string; quantity: number; price: number; total: number; status: "open" | "paid" | "shipped" | "cancelled";

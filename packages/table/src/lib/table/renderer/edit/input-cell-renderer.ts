@@ -3,7 +3,6 @@ import { AreaIdent } from "../../data/tablemodel/area-ident.type";
 import { AreaModelIf } from "../../data/tablemodel/areamodel/area-model.if";
 import { DomServiceIf } from "../../service/dom-service.if";
 import { RendererCleanupFnType } from "../renderer-cleanup-fn.type";
-import { escapeHtml } from '../../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -24,19 +23,22 @@ export class InputCellRenderer implements CellRendererIf {
 
       // the shown value: a pending value of a batch edit (since 1.1.96), otherwise the model value
       const val = cellValue !== undefined ? cellValue : areaModel.getValueAt(rowIndex, columnIndex);
-      cellDiv.innerHTML = `
-            <input
-                type="text"
-                value="${escapeHtml(val)}"
-                autofocus
-                onfocus="this.setSelectionRange(0, this.value.length)"
-                data-listen="change"
-                data-area="${areaIdent}"
-                data-row-index="${rowIndex}"
-                data-col-index="${columnIndex}"
-                data-input-type="text"
-                style="width:calc(100% - 8px);height:100%;border:0;padding:0;padding-inline-start:8px;"
-                class="ge-table-cell-editor-input">`;
+      // built with DOM APIs – no inline event handler and no inline style: works under a strict
+      // Content-Security-Policy (before 1.1.99: innerHTML with onfocus="…" and style="…")
+      const input = domService.createElement<HTMLInputElement>("input");
+      domService.setAttribute(input, "type", "text");
+      domService.setAttribute(input, "autofocus", "");
+      domService.setAttribute(input, "data-listen", "change");
+      domService.setAttribute(input, "data-area", areaIdent);
+      domService.setAttribute(input, "data-row-index", String(rowIndex));
+      domService.setAttribute(input, "data-col-index", String(columnIndex));
+      domService.setAttribute(input, "data-input-type", "text");
+      domService.addClass(input, "ge-table-cell-editor-input");
+      input.value = val === undefined || val === null ? "" : String(val);
+      input.defaultValue = input.value; // Escape restores it (TableScope.cancelEditing)
+      input.addEventListener("focus", () => input.setSelectionRange(0, input.value.length), { once: true });
+      cellDiv.textContent = "";
+      domService.appendChild(cellDiv, input);
     }
     return undefined;
   }

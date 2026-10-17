@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -123,6 +123,14 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   detailExpandedChanged: Subject<GeDetailEvent> = new Subject<GeDetailEvent>();
 
+  /**
+   * The cell editor opened, its text changed (Excel-style editing), it committed or it was cancelled.
+   *
+   * @since 1.1.99
+   */
+  @Output()
+  editingChanged: Subject<GeEditEvent> = new Subject<GeEditEvent>();
+
   @Input()
   tableModel?: TableModelIf;
 
@@ -195,6 +203,10 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onDetailExpandedChanged(evt: GeDetailEvent): void {
     this.detailExpandedChanged.next(evt);
+  }
+
+  onEditingChanged(evt: GeEditEvent): void {
+    this.editingChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

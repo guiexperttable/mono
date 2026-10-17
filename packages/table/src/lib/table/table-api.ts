@@ -31,6 +31,7 @@ import type { CellValueChangeIf } from './batch-edit/cell-value-change.if';
 import type { FillDirection } from './fill/fill-direction.type';
 import type { FillMode } from './fill/fill-series';
 import { CellRange } from './data/common/cell-range';
+import type { EventListenerIf } from './event-listener.if';
 
 
 /**
@@ -1989,6 +1990,221 @@ export class TableApi {
    */
   cancelFill(): void {
     this.tableScope.fillHandleService?.cancel();
+  }
+
+  // ---------------------------------------------------------------------- Excel-style editing (since 1.1.99)
+
+  /**
+   * Adds an event listener next to the one the table was created with – e.g. for a toolbar or an own formula bar
+   * that lives outside the component that created the table. Every `on…` method you give is called after the main
+   * listener's; a listener that throws is logged and does not stop the others.
+   *
+   * @param {Partial<EventListenerIf>} listener - the events of interest
+   * @returns {() => void} call it to remove the listener (the table also removes all on `destroy()`)
+   *
+   * @example
+   * const unsubscribe = tableApi.subscribe({
+   *   onEditingChanged: (evt: GeEditEvent) => { hint.textContent = evt.type === "input" ? evt.input ?? "" : ""; },
+   *   onModelChanged: (evt: GeModelChangeEvent) => console.log(`${evt.changes?.length ?? 0} cells changed`),
+   * });
+   * // later
+   * unsubscribe();
+   *
+   * @since 1.1.99
+   */
+  subscribe(listener: Partial<EventListenerIf>): () => void {
+    return this.tableScope.subscribe(listener);
+  }
+
+  /**
+   * Opens the cell editor of a body cell – like F2 (caret at the end) or, with `typedText`, like typing that text.
+   * With Excel-style editing ({@link TableOptionsIf.editing}) the editor sits above the cell; otherwise (or for
+   * columns with an own `getEditRenderer`) it is rendered into the cell.
+   *
+   * @param {number} rowIndex - display row index of the body
+   * @param {number | string} column - model column index or property
+   * @param {string} [typedText] - starts in "enter" mode with this text (it replaces the content)
+   * @returns {boolean} true if an editor is open (`false` for a cell that cannot be edited)
+   *
+   * @example
+   * tableApi.startEditing(0, "price");          // edit the price of the first row
+   * tableApi.startEditing(4, "name", "Ad");     // as if "Ad" had been typed
+   *
+   * @since 1.1.99
+   */
+  startEditing(rowIndex: number, column: number | string, typedText?: string): boolean {
+    const columnIndex = typeof column === "number" ? column : this.getColumnIndex(column);
+    if (columnIndex < 0) {
+      return false;
+    }
+    if (typedText !== undefined && this.tableScope.cellEditorService?.handlesColumn(columnIndex)) {
+      return this.tableScope.cellEditorService.start(rowIndex, columnIndex, { mode: "enter", typedText });
+    }
+    return this.tableScope.startEditing(rowIndex, columnIndex, "edit", "end");
+  }
+
+  /**
+   * Closes an open cell editor: commits its input (like Enter without moving) or, with `cancel`, discards it (like
+   * Escape).
+   *
+   * @param {boolean} [cancel=false] - discard the input
+   * @returns {boolean} true if no editor is open afterwards (an invalid input keeps the editor open)
+   *
+   * @example
+   * saveButton.addEventListener("click", () => {
+   *   tableApi.stopEditing();   // the value being typed belongs to the data that is saved
+   * });
+   *
+   * @since 1.1.99
+   */
+  stopEditing(cancel = false): boolean {
+    const service = this.tableScope.cellEditorService;
+    if (service?.isOpen()) {
+      if (cancel) {
+        service.cancel();
+        return true;
+      }
+      return service.commit("none");
+    }
+    const cell = this.tableScope.getInCellEditorCell();
+    if (cell) {
+      const editor = this.tableScope.hostElement.querySelector<HTMLInputElement | HTMLSelectElement>(
+        ".ge-table-cell-editor-input, .ge-table-cell-editor-select");
+      if (cancel || !editor) {
+        this.tableScope.cancelEditing(editor ?? undefined);
+      } else {
+        this.tableScope.updateModelValueAfterEdit("body", cell[0], cell[1], editor.value);
+      }
+    }
+    return !this.tableScope.isEditing();
+  }
+
+  /**
+   * True while a cell editor is open.
+   *
+   * @returns {boolean} true while editing
+   *
+   * @example
+   * if (!tableApi.isEditing()) {
+   *   tableApi.updateCells([], true);   // live data: don't repaint under the user's input
+   * }
+   *
+   * @since 1.1.99
+   */
+  isEditing(): boolean {
+    return this.tableScope.isEditing();
+  }
+
+  /**
+   * The cell whose editor is open.
+   *
+   * @returns {[number, number] | undefined} display row and model column, `undefined` without editor
+   *
+   * @example
+   * const cell = tableApi.getEditingCell();
+   * if (cell) console.log(`editing row ${cell[0]}, column ${cell[1]}`);
+   *
+   * @since 1.1.99
+   */
+  getEditingCell(): [number, number] | undefined {
+    return this.tableScope.cellEditorService?.getCell() ?? this.tableScope.getInCellEditorCell();
+  }
+
+  /**
+   * Clears body cells like Delete in Excel-style editing: editable cells get their empty value
+   * ({@link ColumnDefIf.emptyValue}, default `""`), **one** `onModelChanged` with the source `"clear"` (batch edit:
+   * marked). Works without {@link TableOptionsIf.editing} too.
+   *
+   * @param {CellRange[]} [ranges] - body ranges; default: the selected cells, or the focused cell
+   * @returns {number} the number of cleared cells, `-1` if there were too many (`EditingOptionsIf.maxClearCells`)
+   *
+   * @example
+   * tableApi.clearCells([new CellRange(0, 2, 9, 2)]);   // rows 0–9 of column 2
+   *
+   * @since 1.1.99
+   */
+  clearCells(ranges?: CellRange[]): number {
+    return this.tableScope.clearCells(ranges);
+  }
+
+  // ---------------------------------------------------------------------- copy, cut and paste (since 1.1.99)
+
+  /**
+   * Copies the selected cells (the last selected range, everything after Ctrl/⌘+A, otherwise the focused cell) with
+   * the asynchronous clipboard API – for an own button or menu. Tab-separated text with Excel's quoting plus an HTML
+   * table (`ClipboardOptionsIf.html`); pasting it into this table pastes the values. The browser may ask for
+   * permission; Ctrl/⌘+C needs none ({@link TableOptionsIf.clipboard}). Works without the option (defaults).
+   *
+   * @returns {Promise<void>} resolves when the clipboard was written
+   *
+   * @example
+   * copyButton.addEventListener("click", () => tableApi.copySelection());
+   *
+   * @since 1.1.99
+   */
+  copySelection(): Promise<void> {
+    return this.tableScope.getClipboardService().writeSelection(false);
+  }
+
+  /**
+   * Like {@link copySelection}, and the cells are marked (dashed frame): the next paste of this content moves them –
+   * the cut cells are emptied in the same change (`source: "cut"`). Escape or another change removes the mark.
+   *
+   * @returns {Promise<void>} resolves when the clipboard was written
+   *
+   * @example
+   * cutButton.addEventListener("click", () => tableApi.cutSelection());
+   *
+   * @since 1.1.99
+   */
+  cutSelection(): Promise<void> {
+    return this.tableScope.getClipboardService().writeSelection(true);
+  }
+
+  /**
+   * Pastes tab-separated text like Ctrl/⌘+V – without clipboard permissions: from `target` (once), otherwise from the
+   * selection (tiled over a selected range that is an integer multiple, one value into every selected cell) or the
+   * focused cell. Hidden columns are skipped, read-only cells left out, the rest is cut off at the last column;
+   * **one** `onModelChanged` with `source: "paste"` (batch edit: marked). Works without {@link TableOptionsIf.clipboard}.
+   *
+   * @param {string} text - rows separated by line breaks, cells by tabs (quoted cells like Excel)
+   * @param {[number, number] | undefined} [target] - display row and model column of the first cell
+   * @returns {CellChangeIf[]} the written (batch edit: newly pending) cells
+   *
+   * @example
+   * tableApi.pasteText("a\tb\n1\t2", [0, 1]);   // A 2×2 block from row 0, column 1
+   *
+   * @since 1.1.99
+   */
+  pasteText(text: string, target?: [number, number]): CellChangeIf[] {
+    return this.tableScope.getClipboardService().paste(text, undefined, target);
+  }
+
+  /**
+   * The selected cells as tab-separated text, exactly as Ctrl/⌘+C copies them (Excel's quoting, `copyHeaders`,
+   * `copyValue`). `""` without cells or with more than `CopyService.maxCopyCells`.
+   *
+   * @returns {string} the text
+   *
+   * @example
+   * console.log(tableApi.getSelectionAsText());   // "a\tb\n1\t2"
+   *
+   * @since 1.1.99
+   */
+  getSelectionAsText(): string {
+    return this.tableScope.getClipboardService().getSelectionAsText();
+  }
+
+  /**
+   * Removes the mark of cut cells (like Escape): the next paste copies instead of moving.
+   *
+   * @example
+   * tableApi.cancelCut();
+   *
+   * @since 1.1.99
+   */
+  cancelCut(): void {
+    this.tableScope.clipboardService?.cancelCut();
   }
 
   // ------------------------------------------------------------------------------- master/detail (since 1.1.97)

@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -20,6 +20,7 @@ export type GeStateChangeEventFn = (evt: GeStateChangeEvent) => void;
 export type GeRowDragEventFn = (evt: GeRowDragEvent) => void;
 export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 export type GeDetailEventFn = (evt: GeDetailEvent) => void;
+export type GeEditEventFn = (evt: GeEditEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -50,6 +51,8 @@ export interface GuiexpertTableProps {
   batchEditChanged?: GeBatchEditEventFn;
   /** Master/detail: a detail row was expanded or collapsed (since 1.1.97). */
   detailExpandedChanged?: GeDetailEventFn;
+  /** The cell editor opened, its text changed, it committed or it was cancelled (since 1.1.99). */
+  editingChanged?: GeEditEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -129,7 +132,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onRowDragMove: (evt: GeRowDragEvent) => current().rowDragMove?.(evt),
       onRowDragEnd: (evt: GeRowDragEvent) => current().rowDragEnd?.(evt),
       onBatchEditChanged: (evt: GeBatchEditEvent) => current().batchEditChanged?.(evt),
-      onDetailExpandedChanged: (evt: GeDetailEvent) => current().detailExpandedChanged?.(evt)
+      onDetailExpandedChanged: (evt: GeDetailEvent) => current().detailExpandedChanged?.(evt),
+      onEditingChanged: (evt: GeEditEvent) => current().editingChanged?.(evt)
     };
 
     const tableScope = new TableScope(

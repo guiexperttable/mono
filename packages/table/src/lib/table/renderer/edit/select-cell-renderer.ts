@@ -5,7 +5,6 @@ import { DomServiceIf } from "../../service/dom-service.if";
 import { RendererCleanupFnType } from "../renderer-cleanup-fn.type";
 import { ValueLabelIf } from "../../data/common/value-label.if";
 import { ValueLabel } from "../../data/common/value-label";
-import { escapeHtml } from '../../../common/escape-html';
 
 
 /** @category Renderers & editing */
@@ -35,24 +34,27 @@ export class SelectCellRenderer implements CellRendererIf {
 
       // the shown value: a pending value of a batch edit (since 1.1.96), otherwise the model value
       const val = cellValue !== undefined ? cellValue : areaModel.getValueAt(rowIndex, columnIndex);
-
-      let opts = [];
-      for (let option of this.options) {
-        const selected = (option.value === val) ? " selected " : "";
-        opts.push(`<option value="${escapeHtml(option.value)}" ${selected}>${escapeHtml(option.label)}</option>`);
+      // built with DOM APIs – no inline style: works under a strict Content-Security-Policy (since 1.1.99)
+      const select = domService.createElement<HTMLSelectElement>("select");
+      domService.setAttribute(select, "autofocus", "");
+      domService.setAttribute(select, "data-listen", "change");
+      domService.setAttribute(select, "data-area", areaIdent);
+      domService.setAttribute(select, "data-row-index", String(rowIndex));
+      domService.setAttribute(select, "data-col-index", String(columnIndex));
+      domService.setAttribute(select, "data-input-type", "text");
+      domService.addClass(select, "ge-table-cell-editor-select");
+      for (const option of this.options) {
+        const el = domService.createElement<HTMLOptionElement>("option");
+        el.value = String(option.value);
+        el.textContent = String(option.label);
+        if (option.value === val) {
+          el.selected = true;
+          el.defaultSelected = true; // Escape restores it (TableScope.cancelEditing)
+        }
+        domService.appendChild(select, el);
       }
-      const o = opts.join("");
-
-      cellDiv.innerHTML = `
-            <select
-                autofocus
-                data-listen="change"
-                data-area="${areaIdent}"
-                data-row-index="${rowIndex}"
-                data-col-index="${columnIndex}"
-                data-input-type="text"
-                style="width:100%;height:100%;border:0;padding:0;padding-inline-start:8px;"
-                class="ge-table-cell-editor-select">${o}</select>`;
+      cellDiv.textContent = "";
+      domService.appendChild(cellDiv, select);
     }
     return undefined;
   }

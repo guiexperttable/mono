@@ -136,6 +136,15 @@ html, html[data-theme="light"] {
   --ge-table-detail-border: #c9d1db;
   --ge-table-detail-toggle-color: #5f6368;
   --ge-table-detail-toggle-hover-bg: rgba(128, 128, 128, 0.15);
+
+  /* Excel-style editing (since 1.1.99): the editor above the cell */
+  --ge-table-cell-editor-bg: #fff;
+  --ge-table-cell-editor-text: #111;
+  --ge-table-cell-editor-border: #0a6ebd;
+  --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --ge-table-cell-editor-invalid-border: #d93025;
+  --ge-table-cut-range-border: #0a6ebd;
+  --ge-table-cut-range-border-alt: #9ec9ec;
 }
 
 
@@ -263,4 +272,13 @@ html[data-theme="dark"] {
   --ge-table-detail-border: #3c434d;
   --ge-table-detail-toggle-color: #bdc1c6;
   --ge-table-detail-toggle-hover-bg: rgba(255, 255, 255, 0.12);
+
+  /* Excel-style editing (since 1.1.99) */
+  --ge-table-cell-editor-bg: #1f2937;
+  --ge-table-cell-editor-text: #f3f4f6;
+  --ge-table-cell-editor-border: #8ab4f8;
+  --ge-table-cell-editor-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  --ge-table-cell-editor-invalid-border: #f28b82;
+  --ge-table-cut-range-border: #8ab4f8;
+  --ge-table-cut-range-border-alt: #3c5a85;
 }

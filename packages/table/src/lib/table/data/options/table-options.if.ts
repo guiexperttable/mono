@@ -1,6 +1,8 @@
 import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
+import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
+import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TreeOptionsIf } from "./tree-options.if";
@@ -382,6 +384,44 @@ export interface TableOptionsIf {
    * @see [Live demo: fill handle & batch edit](https://gui.expert/showcase/batchedit/run/) · Training: [Fill handle and batch edit](https://gui.expert/training/inline-editing/#fill-batch)
    */
   fillHandle?: boolean | Partial<FillHandleOptionsIf>;
+
+  /**
+   * Excel-style editing: typing on a focused cell opens the editor (the text is replaced), Enter edits, Enter/Tab
+   * commit and move on, Shift+arrows extend the selection, Ctrl/⌘+arrows jump to the edge of the data, Delete
+   * clears the selected cells, Ctrl/⌘+Enter writes into all selected cells. The editor lives above the cell and
+   * survives scrolling. `true` = defaults ({@link EditingOptions}); without the option the table behaves as before
+   * (F2/double click edit, Enter activates, Tab leaves the table).
+   *
+   * @example
+   * const selectionModel = new SelectionModel("range", "multi");
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   getSelectionModel: () => selectionModel,
+   *   editing: { defaultEditable: true },   // every data column can be edited
+   * };
+   *
+   * @since 1.1.99
+   */
+  editing?: boolean | Partial<EditingOptionsIf>;
+
+  /**
+   * Copy, cut and paste like Excel and Google Sheets: Ctrl/⌘+C puts tab-separated text (with Excel's quoting) and an
+   * HTML table into the clipboard, Ctrl/⌘+X marks the range (dashed frame) and moves it on paste, Ctrl/⌘+V pastes
+   * from the anchor – tiled over a selected range, cut off at the last column, skipping read-only cells; **one**
+   * `onModelChanged` with `source: "paste"` (or `"cut"`). `true` = defaults ({@link ClipboardOptions}); without the
+   * option Ctrl/⌘+C copies as before and Ctrl/⌘+X/V do nothing.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   getSelectionModel: () => new SelectionModel("range", "multi"),
+   *   editing: true,
+   *   clipboard: true,
+   * };
+   *
+   * @since 1.1.99
+   */
+  clipboard?: boolean | Partial<ClipboardOptionsIf>;
 
   /**
    * Batch edit always on: edited and filled values are collected (marked `ge-table-cell-pending`) and written with

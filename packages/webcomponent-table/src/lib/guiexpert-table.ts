@@ -1,7 +1,7 @@
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableModelAndOptionsIf,
   TableOptions,
@@ -18,7 +18,7 @@ import {
  * - Events are dispatched on the element as bubbling `CustomEvent`s (payload in `detail`): `tableReady`,
  *   `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
  *   `modelChanged`, `selectionChanged`, `focusChanged`, `stateChanged` (since 1.1.92), `rowDragStart`, `rowDragMove`,
- *   `rowDragEnd` (since 1.1.95), `batchEditChanged` (since 1.1.96), `detailExpandedChanged` (since 1.1.97) – and `scroll` and
+ *   `rowDragEnd` (since 1.1.95), `batchEditChanged` (since 1.1.96), `detailExpandedChanged` (since 1.1.97), `editingChanged` (since 1.1.99) – and `scroll` and
  *   `contextmenu`, which do **not** bubble
  *   (the browser's own `contextmenu` MouseEvent reaches a listener on the element, too: check
  *   `e instanceof CustomEvent`).
@@ -150,7 +150,8 @@ export class GuiexpertTable extends HTMLElement {
         onRowDragMove: (evt: GeRowDragEvent) => dispatch("rowDragMove", evt),
         onRowDragEnd: (evt: GeRowDragEvent) => dispatch("rowDragEnd", evt),
         onBatchEditChanged: (evt: GeBatchEditEvent) => dispatch("batchEditChanged", evt),
-        onDetailExpandedChanged: (evt: GeDetailEvent) => dispatch("detailExpandedChanged", evt)
+        onDetailExpandedChanged: (evt: GeDetailEvent) => dispatch("detailExpandedChanged", evt),
+        onEditingChanged: (evt: GeEditEvent) => dispatch("editingChanged", evt)
       };
 
       const tableScope = new TableScope(

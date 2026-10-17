@@ -5,6 +5,7 @@ import { BooleanFunction } from "../../common/boolean-function";
 import { SortState } from "../../common/sort-state.type";
 import { GetEditRenderer } from "../../../renderer/edit/edit-cell-renderer.type";
 import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
+import type { ColumnEditorOption } from "../../../sheet-editing/cell-editor.if";
 import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
 import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
 
@@ -191,7 +192,29 @@ export interface ColumnDefIf {
    *
    * @since 1.1.96
    */
-  validate?: CellValidator
+  validate?: CellValidator,
+  /**
+   * The editor of this column in Excel-style editing ({@link TableOptionsIf.editing}): `"text"`, `"number"`,
+   * `"date"` or a factory for an own {@link CellEditorIf}. Without it the table chooses by the value (numbers →
+   * number editor, dates → date editor, otherwise text). A column with an own {@link getEditRenderer} keeps that
+   * editor (inside the cell, as before).
+   *
+   * @example
+   * ColumnDef.create({ property: "status", editable: TrueFn, editor: () => SelectCellEditor.create(["open", "paid"]) })
+   *
+   * @since 1.1.99
+   */
+  editor?: ColumnEditorOption,
+  /**
+   * The value a cleared cell gets (Delete/Backspace in Excel-style editing), e.g. `null` or `0`. Default:
+   * {@link EditingOptionsIf.emptyValue} (`""`).
+   *
+   * @example
+   * ColumnDef.create({ property: "quantity", editable: TrueFn, emptyValue: 0 })
+   *
+   * @since 1.1.99
+   */
+  emptyValue?: unknown
 }
 
 /**

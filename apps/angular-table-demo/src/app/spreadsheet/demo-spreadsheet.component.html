@@ -1,0 +1,15 @@
+<div class="sheet-bar">
+  <button mat-stroked-button [disabled]="!canUndo" (click)="undo()">Undo</button>
+  <button mat-stroked-button [disabled]="!canRedo" (click)="redo()">Redo</button>
+  <button mat-stroked-button (click)="insertRow()">Insert row</button>
+  <button mat-stroked-button (click)="downloadExcel()">Excel (with formulas)</button>
+  <span class="sheet-hint">Type over a cell, F2, =SUM(…), Ctrl+C / Ctrl+V with Excel, Ctrl+Z</span>
+</div>
+<div #formulaBar class="sheet-formula-bar"></div>
+<guiexpert-table
+  [tableModel]="sheet.tableModel"
+  [tableOptions]="sheet.tableOptions"
+  (undoStackChanged)="onUndoStackChanged($event)"
+  (tableReady)="onTableReady($event)"
+  class="table-div"
+></guiexpert-table>

@@ -40,27 +40,53 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 ### Methods
 
 - [allSelected](AriaTextsIf.md#allselected)
+- [cellsCleared](AriaTextsIf.md#cellscleared)
 - [cellsFilled](AriaTextsIf.md#cellsfilled)
+- [cellsPasted](AriaTextsIf.md#cellspasted)
 - [changesCommitted](AriaTextsIf.md#changescommitted)
 - [changesDiscarded](AriaTextsIf.md#changesdiscarded)
+- [clearTooLarge](AriaTextsIf.md#cleartoolarge)
 - [collapseGroup](AriaTextsIf.md#collapsegroup)
+- [columnSelected](AriaTextsIf.md#columnselected)
+- [columnsDeleted](AriaTextsIf.md#columnsdeleted)
+- [columnsInserted](AriaTextsIf.md#columnsinserted)
 - [commitBlocked](AriaTextsIf.md#commitblocked)
 - [copied](AriaTextsIf.md#copied)
+- [copiedLastRangeOnly](AriaTextsIf.md#copiedlastrangeonly)
+- [copyTooLarge](AriaTextsIf.md#copytoolarge)
+- [cutMarked](AriaTextsIf.md#cutmarked)
 - [detailCollapsed](AriaTextsIf.md#detailcollapsed)
 - [detailExpanded](AriaTextsIf.md#detailexpanded)
+- [editingStarted](AriaTextsIf.md#editingstarted)
 - [expandGroup](AriaTextsIf.md#expandgroup)
 - [fillTooLarge](AriaTextsIf.md#filltoolarge)
 - [filtered](AriaTextsIf.md#filtered)
+- [formulaError](AriaTextsIf.md#formulaerror)
+- [functionSuggestions](AriaTextsIf.md#functionsuggestions)
+- [gridEditingHint](AriaTextsIf.md#grideditinghint)
 - [invalidValue](AriaTextsIf.md#invalidvalue)
+- [nothingToRedo](AriaTextsIf.md#nothingtoredo)
+- [nothingToUndo](AriaTextsIf.md#nothingtoundo)
+- [pasteTooLarge](AriaTextsIf.md#pastetoolarge)
 - [pendingChanges](AriaTextsIf.md#pendingchanges)
+- [rangeSelected](AriaTextsIf.md#rangeselected)
+- [readOnlyCell](AriaTextsIf.md#readonlycell)
+- [redone](AriaTextsIf.md#redone)
+- [referenceInserted](AriaTextsIf.md#referenceinserted)
 - [rowDragCancelled](AriaTextsIf.md#rowdragcancelled)
 - [rowDragStarted](AriaTextsIf.md#rowdragstarted)
 - [rowMoveNotPossible](AriaTextsIf.md#rowmovenotpossible)
 - [rowMoved](AriaTextsIf.md#rowmoved)
+- [rowSelected](AriaTextsIf.md#rowselected)
+- [rowsDeleted](AriaTextsIf.md#rowsdeleted)
+- [rowsInserted](AriaTextsIf.md#rowsinserted)
 - [selectAllRows](AriaTextsIf.md#selectallrows)
 - [selectRow](AriaTextsIf.md#selectrow)
 - [selectionCleared](AriaTextsIf.md#selectioncleared)
 - [sorted](AriaTextsIf.md#sorted)
+- [undoHistoryCleared](AriaTextsIf.md#undohistorycleared)
+- [undoSkipped](AriaTextsIf.md#undoskipped)
+- [undone](AriaTextsIf.md#undone)
 
 ## Methods
 
@@ -79,6 +105,34 @@ default: `"All cells selected"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L58)
+
+___
+
+### cellsCleared
+
+▸ **cellsCleared**(`cellCount`): `string`
+
+Announced after Delete/Backspace cleared cells.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of cleared cells |
+
+#### Returns
+
+`string`
+
+default: `"8 cells cleared"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L236)
 
 ___
 
@@ -107,6 +161,35 @@ default: `"3 cells filled"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L141)
+
+___
+
+### cellsPasted
+
+▸ **cellsPasted**(`cellCount`, `skippedCount`): `string`
+
+Announced after Ctrl/⌘+V (copy, cut and paste, `tableOptions.clipboard`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of pasted cells |
+| `skippedCount` | `number` | cells left out (read only, invalid, cut off at the last column) |
+
+#### Returns
+
+`string`
+
+default: `"6 cells pasted"`, `"4 cells pasted, 2 skipped"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:291](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L291)
 
 ___
 
@@ -160,6 +243,34 @@ default: `"Changes discarded"`
 
 ___
 
+### clearTooLarge
+
+▸ **clearTooLarge**(`maxCells`): `string`
+
+Announced when more cells should be cleared than `EditingOptionsIf.maxClearCells` allows.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"Too many cells to clear (at most 1000000)"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L245)
+
+___
+
 ### collapseGroup
 
 ▸ **collapseGroup**(`groupLabel`): `string`
@@ -181,6 +292,90 @@ default: `"Collapse group Q1"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L96)
+
+___
+
+### columnSelected
+
+▸ **columnSelected**(`columnCount`): `string`
+
+Announced after Ctrl+Space selected the columns of the active cell.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnCount` | `number` | number of selected columns |
+
+#### Returns
+
+`string`
+
+default: `"Column selected"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:273](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L273)
+
+___
+
+### columnsDeleted
+
+▸ **columnsDeleted**(`count`): `string`
+
+Announced after columns were deleted (`TableApi.deleteColumns`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `count` | `number` | the columns |
+
+#### Returns
+
+`string`
+
+default: `"2 columns deleted"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:432](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L432)
+
+___
+
+### columnsInserted
+
+▸ **columnsInserted**(`count`): `string`
+
+Announced after columns were inserted (`TableApi.insertColumns`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `count` | `number` | the columns |
+
+#### Returns
+
+`string`
+
+default: `"2 columns inserted"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:423](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L423)
 
 ___
 
@@ -236,6 +431,84 @@ default: `"12 cells copied"`, `"1 cell copied"`
 
 ___
 
+### copiedLastRangeOnly
+
+▸ **copiedLastRangeOnly**(): `string`
+
+Announced when several ranges are selected and only the last one is copied (like Google Sheets).
+
+#### Returns
+
+`string`
+
+default: `"Only the last selected range was copied"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:326](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L326)
+
+___
+
+### copyTooLarge
+
+▸ **copyTooLarge**(`maxCells`): `string`
+
+Announced when more cells should be copied than `CopyService.maxCopyCells` allows.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"Too many cells to copy (at most 1000000)"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:309](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L309)
+
+___
+
+### cutMarked
+
+▸ **cutMarked**(`cellCount`): `string`
+
+Announced after Ctrl/⌘+X: the cells are marked and move on the next paste.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | the number of cut cells |
+
+#### Returns
+
+`string`
+
+default: `"6 cells cut, paste to move them"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:318](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L318)
+
+___
+
 ### detailCollapsed
 
 ▸ **detailCollapsed**(): `string`
@@ -277,6 +550,34 @@ default: `"Details expanded"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:202](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L202)
+
+___
+
+### editingStarted
+
+▸ **editingStarted**(`columnLabel`): `string`
+
+Announced when the cell editor opens (Excel-style editing).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the column label |
+
+#### Returns
+
+`string`
+
+default: `"Editing Price"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L219)
 
 ___
 
@@ -356,6 +657,78 @@ default: `"42 rows"`, `"1 row"`, `"No rows"`
 
 ___
 
+### formulaError
+
+▸ **formulaError**(`message`): `string`
+
+Announced when a cell formula with a syntax error is stored (it shows `#ERROR!`, `tableOptions.cellFormulas`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | the parser's message |
+
+#### Returns
+
+`string`
+
+default: `"Formula error: <message>"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:379](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L379)
+
+___
+
+### functionSuggestions
+
+▸ **functionSuggestions**(): `string`
+
+The label of the list of function suggestions while a cell formula is typed.
+
+#### Returns
+
+`string`
+
+default: `"Functions"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:387](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L387)
+
+___
+
+### gridEditingHint
+
+▸ **gridEditingHint**(): `string`
+
+The description of the grid with Excel-style editing (`aria-description` of the host): how it is used.
+
+#### Returns
+
+`string`
+
+default: `"Type to edit a cell, Enter to edit or commit, Escape to cancel. Tab in the last column leaves the table."`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:281](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L281)
+
+___
+
 ### invalidValue
 
 ▸ **invalidValue**(`message`): `string`
@@ -384,6 +757,74 @@ default: `"Invalid value: <message>"`
 
 ___
 
+### nothingToRedo
+
+▸ **nothingToRedo**(): `string`
+
+#### Returns
+
+`string`
+
+default: `"Nothing to redo"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:352](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L352)
+
+___
+
+### nothingToUndo
+
+▸ **nothingToUndo**(): `string`
+
+#### Returns
+
+`string`
+
+default: `"Nothing to undo"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L349)
+
+___
+
+### pasteTooLarge
+
+▸ **pasteTooLarge**(`maxCells`): `string`
+
+Announced when more cells should be pasted than `ClipboardOptionsIf.maxPasteCells` allows.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"Too many cells to paste (at most 1000000)"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:300](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L300)
+
+___
+
 ### pendingChanges
 
 ▸ **pendingChanges**(`pendingCount`): `string`
@@ -409,6 +850,114 @@ default: `"3 changes not saved"`, `"No unsaved changes"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L159)
+
+___
+
+### rangeSelected
+
+▸ **rangeSelected**(`rowCount`, `columnCount`): `string`
+
+Announced when Shift+arrows change the selected range (the focus stays on the active cell).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowCount` | `number` | rows of the range |
+| `columnCount` | `number` | shown columns of the range |
+
+#### Returns
+
+`string`
+
+default: `"3 rows, 2 columns selected"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L255)
+
+___
+
+### readOnlyCell
+
+▸ **readOnlyCell**(): `string`
+
+Announced when a key is typed on a cell that cannot be edited (Excel-style editing).
+
+#### Returns
+
+`string`
+
+default: `"Read only"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:227](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L227)
+
+___
+
+### redone
+
+▸ **redone**(`label`, `cellCount`): `string`
+
+Announced after Ctrl+Y / Ctrl/⌘+Shift+Z.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `label` | `string` | the step |
+| `cellCount` | `number` | cells written again |
+
+#### Returns
+
+`string`
+
+default: `"Redo Paste, 6 cells"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:346](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L346)
+
+___
+
+### referenceInserted
+
+▸ **referenceInserted**(`reference`): `string`
+
+Announced when a reference is inserted by pointing (arrow keys or a click while typing a formula).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `reference` | `string` | e.g. `"B2"` or `"B2:B4"` |
+
+#### Returns
+
+`string`
+
+default: the reference
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:396](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L396)
 
 ___
 
@@ -514,6 +1063,90 @@ default: `"Row moved to position 7 of 20"`
 
 ___
 
+### rowSelected
+
+▸ **rowSelected**(`rowCount`): `string`
+
+Announced after Shift+Space selected the rows of the active cell.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowCount` | `number` | number of selected rows |
+
+#### Returns
+
+`string`
+
+default: `"Row selected"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:264](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L264)
+
+___
+
+### rowsDeleted
+
+▸ **rowsDeleted**(`count`): `string`
+
+Announced after rows were deleted (`TableApi.deleteRows`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `count` | `number` | the rows |
+
+#### Returns
+
+`string`
+
+default: `"3 rows deleted"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:414](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L414)
+
+___
+
+### rowsInserted
+
+▸ **rowsInserted**(`count`): `string`
+
+Announced after rows were inserted (`TableApi.insertRows`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `count` | `number` | the rows |
+
+#### Returns
+
+`string`
+
+default: `"3 rows inserted"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:405](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L405)
+
+___
+
 ### selectAllRows
 
 ▸ **selectAllRows**(): `string`
@@ -596,3 +1229,88 @@ default: `"Sorted by Total, descending"`, `"Sorting of Total removed"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L35)
+
+___
+
+### undoHistoryCleared
+
+▸ **undoHistoryCleared**(`maxCells`): `string`
+
+Announced when one change has more cells than `UndoOptionsIf.maxCells`: the history is emptied.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maxCells` | `number` | the limit |
+
+#### Returns
+
+`string`
+
+default: `"This change cannot be undone (more than 1000000 cells)"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:370](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L370)
+
+___
+
+### undoSkipped
+
+▸ **undoSkipped**(`cellCount`): `string`
+
+Added to the undo/redo announcement when cells were left out (changed meanwhile, row gone, read only).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cellCount` | `number` | cells left out |
+
+#### Returns
+
+`string`
+
+default: `"2 cells skipped"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:361](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L361)
+
+___
+
+### undone
+
+▸ **undone**(`label`, `cellCount`): `string`
+
+Announced after Ctrl/⌘+Z (undo and redo, `tableOptions.undo`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `label` | `string` | the step: `"Edit"`, `"Paste"`, `"Fill"` … |
+| `cellCount` | `number` | cells written back |
+
+#### Returns
+
+`string`
+
+default: `"Undo Paste, 6 cells"`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L336)

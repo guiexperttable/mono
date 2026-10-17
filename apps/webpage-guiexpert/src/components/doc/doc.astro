@@ -71,6 +71,7 @@ const AREA_MODELS = [
   { name: "AreaModelAggregateFooter", text: "a footer with totals of the filtered rows (footerAggregates)", slug: "footer-totals" },
   { name: "AreaModelRowGroups", text: "rows grouped by fields, with subtotals (RowGroupFactory)", slug: "row-grouping" },
   { name: "AreaModelPivot", text: "pivot rows with values per column group (PivotFactory)", slug: "pivot-tables" },
+  { name: "AreaModelSheet", text: "a sparse spreadsheet body – only filled cells cost memory (SpreadsheetFactory)", slug: "spreadsheet" },
   { name: "AreaModel", text: "base class for your own models: computed values, totals, server data", slug: "custom-area-model" }
 ];
 
@@ -85,7 +86,8 @@ const OPTION_GROUPS = [
   { title: "State", names: ["autoRestoreOptions", "initialState"] },
   { title: "Accessibility and overlays", names: ["ariaLabel", "ariaLabelledBy", "ariaTexts", "overlayOptions"] },
   { title: "Editing and rows", names: ["fillHandle", "batchEdit", "rowDragOptions", "masterDetail"] },
-  { title: "Direction", names: ["direction"] }
+  { title: "Direction", names: ["direction"] },
+  { title: "Spreadsheet", names: ["editing", "clipboard", "undo", "cellFormulas", "spreadsheet"] }
 ];
 
 // ── TableApi ──────────────────────────────────────────────────────────────
@@ -99,6 +101,7 @@ const API_GROUPS = [
   { title: "Editing, rows and details", names: ["applyCellChanges", "commitBatchEdit", "cancelBatchEdit", "moveRows", "setDetailExpanded"] },
   { title: "State, overlays, announcements", names: ["getState", "applyState", "resetState", "showLoadingOverlay", "hideOverlay", "announce"] },
   { title: "Selection and keyboard", names: ["getSelectionModel", "setSelectionModel", "clearSelection", "copyToClipboard", "triggerAction"] },
+  { title: "Spreadsheet", names: ["undo", "redo", "pasteText", "setCellInput", "getCellInput", "insertRows", "deleteRows", "insertColumns", "deleteColumns", "goToAddress", "subscribe"] },
   { title: "Export and lifecycle", names: ["downloadExcel", "destroy"] }
 ];
 
@@ -117,7 +120,9 @@ const EVENTS = [
   { event: "stateChanged", listener: "onStateChanged", payload: "GeStateChangeEvent", note: "layout, sorting, selection … changed (debounced)" },
   { event: "rowDragEnd", listener: "onRowDragEnd", payload: "GeRowDragEvent", note: "also rowDragStart, rowDragMove" },
   { event: "batchEditChanged", listener: "onBatchEditChanged", payload: "GeBatchEditEvent", note: "start, change, commit, cancel" },
-  { event: "detailExpandedChanged", listener: "onDetailExpandedChanged", payload: "GeDetailEvent", note: "a detail row opened or closed" }
+  { event: "detailExpandedChanged", listener: "onDetailExpandedChanged", payload: "GeDetailEvent", note: "a detail row opened or closed" },
+  { event: "editingChanged", listener: "onEditingChanged", payload: "GeEditEvent", note: "the cell editor: start, input, commit, cancel" },
+  { event: "undoStackChanged", listener: "onUndoStackChanged", payload: "GeUndoEvent", note: "canUndo, canRedo and the labels – for undo buttons" }
 ];
 
 // ── features ──────────────────────────────────────────────────────────────
@@ -133,7 +138,7 @@ const FEATURES = [
   { feature: "Column resizing and reordering", text: "drag handles and drag & drop", api: ["TableOptionsIf.columnsResizable", "TableOptionsIf.columnsDraggable", "TableApi.autoResizeColumns"], slug: "table-options" },
   { feature: "Sorting", text: "header double-click, own comparators, from code", api: ["ColumnDefIf.sortComparator", "TableApi.sortByColumn"], slug: "sorting" },
   { feature: "Filtering", text: "your filter UI – the table asks per row", api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged"], slug: "filtering" },
-  { feature: "Selection and clipboard", text: "cells, rows, columns or ranges; keyboard shortcuts", api: ["SelectionModel", "TableApi.copyToClipboard"], slug: "selection-and-copy" },
+  { feature: "Selection and clipboard", text: "cells, rows, columns or ranges; copy, cut and paste with Excel", api: ["SelectionModel", "TableOptionsIf.clipboard", "TableApi.pasteText"], slug: "selection-and-copy" },
   { feature: "Events and context menu", text: "override only the events you need", api: ["EventAdapter", "EventListenerIf.onContextmenu"], slug: "events-and-context-menu" },
   { feature: "Excel export", text: "real .xlsx files without a library", api: ["TableApi.downloadExcel", "ExcelService"], slug: "excel-export" },
   { feature: "Cell renderers", text: "built-in renderers or one method of your own", api: ["CellRendererIf", "StarRatingCellRenderer"], slug: "cell-renderers" },
@@ -142,13 +147,14 @@ const FEATURES = [
   { feature: "Theming and dark mode", text: "CSS variables, light and dark built in", api: ["CssVars"], slug: "theming-dark-mode" },
   { feature: "Rowspan and colspan", text: "merged cells, defined by the model", api: ["AreaModelIf.getRowspanAt", "AreaModelIf.getColspanAt"], slug: "rowspan-colspan" },
   { feature: "Tree table with checkboxes", text: "hierarchical data, expanded or collapsed", api: ["TreeFactory.buildTreeRows", "EventListenerIf.onCheckboxChanged"], slug: "tree-table" },
-  { feature: "Inline editing", text: "text and select editors, input conversion", api: ["ColumnDefIf.editable", "ColumnDefIf.getEditRenderer"], slug: "inline-editing" },
+  { feature: "Inline editing", text: "Excel-style: type to overwrite, F2, Enter/Tab; undo and redo", api: ["TableOptionsIf.editing", "TableOptionsIf.undo", "ColumnDefIf.editable"], slug: "inline-editing" },
   { feature: "Fill handle and batch edit", text: "continue series, collect changes, then save", api: ["TableOptionsIf.fillHandle", "TableOptionsIf.batchEdit"], slug: "inline-editing" },
   { feature: "Row drag", text: "drag rows into order – mouse, touch, keyboard", api: ["CreateTableModelPara.rowDrag", "TableApi.moveRows"], slug: "events-and-context-menu" },
   { feature: "Master/detail", text: "expandable detail rows with any content", api: ["TableOptionsIf.masterDetail"], slug: "master-detail" },
   { feature: "Accessibility", text: "WAI-ARIA grid, keyboard, screen reader announcements", api: ["TableOptionsIf.ariaLabel", "TableApi.announce"], slug: "accessibility" },
   { feature: "Loading and empty overlays", text: "CSS spinner, “No rows”, “No matching rows”", api: ["TableApi.showLoadingOverlay", "TableOptionsIf.overlayOptions"], slug: "live-data" },
   { feature: "Right-to-left", text: "Arabic, Hebrew, Persian – one option", api: ["TableOptionsIf.direction"], slug: "theming-dark-mode" },
+  { feature: "Spreadsheet", text: "A1 cell formulas, copy & paste with Excel, undo, formula bar – one call", api: ["SpreadsheetFactory.create", "TableOptionsIf.cellFormulas", "FormulaBar"], slug: "spreadsheet" },
   { feature: "Live data", text: "update single cells – only visible ones are redrawn", api: ["TableApi.updateCells"], slug: "live-data" },
   { feature: "Persisted state", text: "column layout, sorting, scroll position, tree, checked and selected rows – automatically or as JSON for your server", api: ["TableOptionsIf.autoRestoreOptions", "TableApi.getState"], slug: "persist-state" }
 ];
@@ -835,8 +841,8 @@ html[data-theme="dark"] .brand-table {
           <tr><td>Pagination</td><td class="wrap">not needed for display thanks to virtual scrolling; to load data page by page, use an own area model (<ChapterLink slug="custom-area-model" />)</td></tr>
           <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend</td></tr>
           <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> (also <code>setHeaderVisible()</code> / <code>setFooterVisible()</code>)</td></tr>
-          <tr><td>Paste from the clipboard, undo / redo</td><td class="wrap">not built in yet – every edit, fill and commit arrives as one <code>modelChanged</code> event with old and new values, a base for your own undo stack</td></tr>
-          <tr><td>Group panel, pivot field list, formula editor</td><td class="wrap">your UI around <ApiLink name="TableApi.setRowGroupBy" label="setRowGroupBy()" />, <ApiLink name="TableApi.setPivotConfig" label="setPivotConfig()" /> and <ApiLink name="TableApi.setColumnFormula" label="setColumnFormula()" /></td></tr>
+          <tr><td>Group panel, pivot field list</td><td class="wrap">your UI around <ApiLink name="TableApi.setRowGroupBy" label="setRowGroupBy()" /> and <ApiLink name="TableApi.setPivotConfig" label="setPivotConfig()" /></td></tr>
+          <tr><td>Toolbar for undo, insert rows …</td><td class="wrap">your buttons calling <ApiLink name="TableApi.undo" label="undo()" />, <ApiLink name="TableApi.insertRows" label="insertRows()" /> – paste, undo/redo and the formula editor are built in since 1.1.99 (<ChapterLink slug="spreadsheet" />)</td></tr>
         </tbody>
       </table>
       <p>A checklist for planning your own table – and for deciding when another product fits better:

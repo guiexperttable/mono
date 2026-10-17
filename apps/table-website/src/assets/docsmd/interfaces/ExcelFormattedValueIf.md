@@ -32,7 +32,7 @@ An Excel number format code, e.g. `"0.0%"`, `"#,##0.00"`.
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L36)
+[src/lib/table/service/excel-service.if.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L77)
 
 ___
 
@@ -44,4 +44,4 @@ The number.
 
 #### Defined in
 
-[src/lib/table/service/excel-service.if.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L34)
+[src/lib/table/service/excel-service.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L75)

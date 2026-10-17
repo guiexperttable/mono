@@ -110,7 +110,7 @@ class Compiler {
         return new FormulaError("#VALUE!", e instanceof Error ? e.message.slice(0, 200) : "Evaluation failed");
       }
     };
-    return { evaluate, singles: [...this.singles], ranges: this.ranges, volatile: this.volatile };
+    return { evaluate, singles: Array.from(this.singles), ranges: this.ranges, volatile: this.volatile };
   }
 
   private ref(r: number, c: number): Thunk {

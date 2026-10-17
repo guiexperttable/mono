@@ -13,7 +13,7 @@
 .wn-install code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92rem; }
 .wn-install code span { opacity: 0.6; margin-right: 0.35rem; }
 
-/* ── index of the twelve ─────────────────────────────────────────────── */
+/* ── index of the thirteen ─────────────────────────────────────────────── */
 .wn-index {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

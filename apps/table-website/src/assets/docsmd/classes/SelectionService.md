@@ -14,8 +14,10 @@
 
 ### Properties
 
+- [anchor](SelectionService.md#anchor)
 - [anchorRanges](SelectionService.md#anchorranges)
 - [dragSnapshot](SelectionService.md#dragsnapshot)
+- [extent](SelectionService.md#extent)
 - [getFocusModel](SelectionService.md#getfocusmodel)
 - [getSelectionModel](SelectionService.md#getselectionmodel)
 - [ignoreNextClick](SelectionService.md#ignorenextclick)
@@ -24,6 +26,10 @@
 
 ### Methods
 
+- [collapseTo](SelectionService.md#collapseto)
+- [extendTo](SelectionService.md#extendto)
+- [getAnchor](SelectionService.md#getanchor)
+- [getExtent](SelectionService.md#getextent)
 - [onActionTriggered](SelectionService.md#onactiontriggered)
 - [onMouseClicked](SelectionService.md#onmouseclicked)
 - [onMouseDown](SelectionService.md#onmousedown)
@@ -47,9 +53,25 @@
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L28)
+[src/lib/table/selection/selection-service.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L32)
 
 ## Properties
+
+### anchor
+
+• `Protected` `Optional` **anchor**: [`number`, `number`]
+
+The cell a Shift+click or Shift+arrow range starts at (the last click, or the active cell).
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L27)
+
+___
 
 ### anchorRanges
 
@@ -72,6 +94,22 @@ The selection before a Ctrl/⌘-drag – each drag frame replaces only the dragg
 #### Defined in
 
 [src/lib/table/selection/selection-service.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L25)
+
+___
+
+### extent
+
+• `Protected` `Optional` **extent**: [`number`, `number`]
+
+The moving corner of the range of Shift+arrows (Excel); `undefined` = the anchor.
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L29)
 
 ___
 
@@ -123,9 +161,112 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L29)
+[src/lib/table/selection/selection-service.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L33)
 
 ## Methods
+
+### collapseTo
+
+▸ **collapseTo**(`rowIndex`, `columnIndex`): `void`
+
+Excel-style editing: the active cell moved (arrow keys, Tab, Enter) – the selection becomes this one cell and it
+is the new anchor. Selection types other than `"range"`/`"cell"` only get the anchor.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row index |
+| `columnIndex` | `number` | model column index |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:259](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L259)
+
+___
+
+### extendTo
+
+▸ **extendTo**(`rowIndex`, `columnIndex`): `undefined` \| [`CellRange`](CellRange.md)
+
+Excel-style editing (Shift+arrows): the last range is spanned from the anchor to `(rowIndex, columnIndex)`;
+other ranges (Ctrl/⌘-clicks) stay. Only for the selection type `"range"`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | the new moving corner (display row index) |
+| `columnIndex` | `number` | model column index |
+
+#### Returns
+
+`undefined` \| [`CellRange`](CellRange.md)
+
+the new range, `undefined` without a range selection
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:290](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L290)
+
+___
+
+### getAnchor
+
+▸ **getAnchor**(): `undefined` \| [`number`, `number`]
+
+The cell a Shift+click or Shift+arrow range starts at: the last clicked cell or the active cell set by the
+keyboard ([collapseTo](SelectionService.md#collapseto)).
+
+#### Returns
+
+`undefined` \| [`number`, `number`]
+
+row and column, `undefined` before the first click/keyboard move
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:230](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L230)
+
+___
+
+### getExtent
+
+▸ **getExtent**(): `undefined` \| [`number`, `number`]
+
+The moving corner of the range Shift+arrows grow (the anchor if there is none).
+
+#### Returns
+
+`undefined` \| [`number`, `number`]
+
+row and column
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/selection/selection-service.ts:240](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L240)
+
+___
 
 ### onActionTriggered
 
@@ -137,7 +278,7 @@ Triggers an action based on the provided action ID.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"`` | The ID of the action to be triggered. |
+| `actionId` | ``"COPY_2_CLIPBOARD"`` \| ``"START_EDITING"`` \| ``"TOGGLE_SELECTION"`` \| ``"SELECT_ALL"`` \| ``"DESELECT_ALL"`` \| ``"NAVIGATE_LEFT"`` \| ``"NAVIGATE_RIGHT"`` \| ``"NAVIGATE_UP"`` \| ``"NAVIGATE_DOWN"`` \| ``"NAVIGATE_ROW_START"`` \| ``"NAVIGATE_ROW_END"`` \| ``"NAVIGATE_FIRST_CELL"`` \| ``"NAVIGATE_LAST_CELL"`` \| ``"NAVIGATE_PAGE_UP"`` \| ``"NAVIGATE_PAGE_DOWN"`` \| ``"ACTIVATE_CELL"`` \| ``"MOVE_ROW_UP"`` \| ``"MOVE_ROW_DOWN"`` \| ``"FILL_DOWN"`` \| ``"FILL_RIGHT"`` \| ``"NAVIGATE_NEXT_CELL"`` \| ``"NAVIGATE_PREVIOUS_CELL"`` \| ``"EXTEND_SELECTION_UP"`` \| ``"EXTEND_SELECTION_DOWN"`` \| ``"EXTEND_SELECTION_LEFT"`` \| ``"EXTEND_SELECTION_RIGHT"`` \| ``"EXTEND_SELECTION_ROW_START"`` \| ``"EXTEND_SELECTION_ROW_END"`` \| ``"EXTEND_SELECTION_PAGE_UP"`` \| ``"EXTEND_SELECTION_PAGE_DOWN"`` \| ``"NAVIGATE_DATA_EDGE_UP"`` \| ``"NAVIGATE_DATA_EDGE_DOWN"`` \| ``"NAVIGATE_DATA_EDGE_LEFT"`` \| ``"NAVIGATE_DATA_EDGE_RIGHT"`` \| ``"EXTEND_TO_DATA_EDGE_UP"`` \| ``"EXTEND_TO_DATA_EDGE_DOWN"`` \| ``"EXTEND_TO_DATA_EDGE_LEFT"`` \| ``"EXTEND_TO_DATA_EDGE_RIGHT"`` \| ``"SELECT_ROW"`` \| ``"SELECT_COLUMN"`` \| ``"CLEAR_CELLS"`` \| ``"CLEAR_AND_EDIT"`` \| ``"CUT_2_CLIPBOARD"`` \| ``"PASTE_FROM_CLIPBOARD"`` \| ``"UNDO"`` \| ``"REDO"`` | The ID of the action to be triggered. |
 
 #### Returns
 
@@ -151,7 +292,7 @@ Triggers an action based on the provided action ID.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:170](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L170)
+[src/lib/table/selection/selection-service.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L185)
 
 ___
 
@@ -183,7 +324,7 @@ true if focus or selection changed (repaint needed)
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L96)
+[src/lib/table/selection/selection-service.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L102)
 
 ___
 
@@ -199,7 +340,7 @@ Called on mouse down: a new gesture starts.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L40)
+[src/lib/table/selection/selection-service.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L44)
 
 ___
 
@@ -226,4 +367,4 @@ true if the selection changed (repaint needed)
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L54)
+[src/lib/table/selection/selection-service.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L58)

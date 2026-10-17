@@ -41,7 +41,8 @@ const features: Feature[] = [
     title: "Data tools built in",
     description: "Sorting with own comparators, filtering with your own UI, cell, row, column and range selection, " +
       "row grouping with totals per group, pivot tables with subtotals and totals, calculated columns and formulas " +
-      "(\"[price] * [quantity]\", shares of the total, running totals, ranks), master/detail with nested tables, the sum of the selected cells for a status bar, clipboard and Excel " +
+      "(\"[price] * [quantity]\", shares of the total, running totals, ranks), master/detail with nested tables, the sum of the selected cells for a status bar, a spreadsheet with A1 " +
+      "cell formulas, copy and paste with Excel and Excel " +
       "export, loading and \"no rows\" overlays – " +
       "without an extra library.",
     icon: "mdi:filter-variant",
@@ -50,8 +51,8 @@ const features: Feature[] = [
   },
   {
     title: "Accessible and editable",
-    description: "A WAI-ARIA grid for screen readers and full keyboard navigation, inline editing with text and select " +
-      "editors, a fill handle and batch edit (collect changes, then save), resizable and movable columns, rows dragged into order (mouse, touch or Ctrl+Alt+↑/↓), live updates – " +
+    description: "A WAI-ARIA grid for screen readers and full keyboard navigation, Excel-style editing (type to overwrite, " +
+      "F2, Enter/Tab) with undo and redo, a fill handle and batch edit (collect changes, then save), resizable and movable columns, rows dragged into order (mouse, touch or Ctrl+Alt+↑/↓), live updates – " +
       "and a table that remembers its layout, sorting and selection, in localStorage or on your server.",
     icon: "mdi:account-voice",
     url: "/training/accessibility/",
@@ -71,7 +72,7 @@ const features: Feature[] = [
 <ContentSection title="Everything included" id="features">
   <Fragment slot="lead">
     Every feature is part of the <span class="text-primary">MIT-licensed</span> core – in every framework.
-    <a class="block mt-2 text-base font-semibold text-secondary hover:underline" href="/whats-new/">New in October: twelve features with code →</a>
+    <a class="block mt-2 text-base font-semibold text-secondary hover:underline" href="/whats-new/">New in October: thirteen features with code →</a>
   </Fragment>
   <div class="home-features">
     {

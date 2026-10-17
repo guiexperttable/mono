@@ -327,7 +327,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Properties (`[constructor]` → `#NAME?`), `SUM/AVG/MIN/MAX/COUNT([x])` = Spalten-Aggregat, Fehlerwerte `FormulaError`
   (nie geworfen; CSS `ge-table-cell-error`, Tooltip = Meldung). `ColumnDef.create({ formula })` /
   `createFormulaValueGetter` / `api.setColumnFormula(property, source)` (gibt Compile-Fehler zurück). Keine Zellbezüge,
-  keine Formel-UI. Bench `bench/formula.bench.ts` (1 Mio. Zeilen ~0,5 µs/Zeile im Container).
+  keine Formel-UI (Zellbezüge: Zellformeln 1.1.99, unten). Bench `bench/formula.bench.ts` (1 Mio. Zeilen ~0,5 µs/Zeile im Container).
 - **Row Drag (seit 1.1.95, `row-drag/`, Design `prompts/009-row-drag.design.md`)**: Griff über `ColumnDef.rowDrag`
   (`true` | `(row, rowIndex) => boolean`) bzw. Fabrik-Flag `rowDrag: true` (erste Datenspalte). `RowDragService`
   (`tableScope.rowDragService`, `@category Internals`): **Pointer Events** nur am Griff (`data-ge-action="drag-row"`,
@@ -381,7 +381,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `pendingCount`, `invalidCount`, `pendingChanges` lazy). `blockCommitOnInvalid` (Default `true`). API `getPendingChanges`,
   `hasPendingChanges`, `isBatchEditing`, `commitBatchEdit` (`boolean`), `cancelBatchEdit`, `isFilling`, `cancelFill`.
   Wrapper-Event `batchEditChanged`. CSS `css/table-fill-batch.css`, `--ge-table-fill-*`, `--ge-table-cell-pending-*`,
-  `--ge-table-cell-invalid-*`. Kein Einfügen, kein Undo (Folgepunkte in `TODO.md`).
+  `--ge-table-cell-invalid-*`. Einfügen und Undo seit 1.1.99 (Zwischenablage, Undo/Redo unten).
 - **Master/Detail (seit 1.1.97, `master-detail/`, Design `prompts/011-master-detail.design.md`)**:
   `tableOptions.masterDetail` (`MasterDetailOptionsIf`: `detailRenderer` (Fn oder `DetailRendererIf`), `detailHeight` number |
   `"auto"` (Default, `ResizeObserver` auf der Detailzelle) | Fn, `estimatedDetailHeight` 200, `isMaster`, `toggleColumn`,
@@ -535,7 +535,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   zurück, dann Texte; Redo = noch einmal), Event-Quelle `"structure"`, nicht während Batch-Edit,
   `TableScope.refreshAfterStructureChange` (Fokus bleibt in der Tabelle). `FormulaBar` (plain DOM, `api.subscribe`, schreibt mit Quelle `"edit"` = ein Undo-Schritt). API `getActiveCell`,
   `goToAddress`, `insertRows`, `deleteRows`, `insertColumns`, `deleteColumns`, `getSheetData`. Demo
-  `apps/table-demo/spreadsheet.html` (Formelleiste, Kontextmenü-Beispiel, +100 Zeilen, JSON). CSS `css/table-spreadsheet.css`.
+  `apps/table-demo/spreadsheet.html` (Formelleiste, Kontextmenü-Beispiel, +100 Zeilen, JSON), Fabrik
+  `createSpreadsheetQuoteModelAndOptions` (`demo-table-models`), Showcase `spreadsheet`, Training-Kapitel 40. CSS
+  `css/table-spreadsheet.css`. Iteration über `Set`/`Map` im Core ohne `for…of`/Spread (`forEach`, `Array.from`):
+  TypeDoc und `tsconfig.lib.json` kompilieren ohne `downlevelIteration`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -623,7 +626,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 658 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Okt. 2026: 693 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -674,7 +677,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
-  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 37 Live-Demos der Schulung (§11).
+  (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 39 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**
   („Simple demo“, Inhalt „Dies ist ein Test“) – nicht verlinken, bis sie echte Inhalte haben.
 
@@ -771,6 +774,9 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 32 | Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln, dann speichern | `videos/10-fill-handle-batch-edit/`, Showcase `batchedit`, Training-Kapitel `inline-editing` (Abschnitt), `apps/table-demo/fill-batch.html`, `instructions.md` 6.17 |
 | 33 | Master/Detail ohne Enterprise-Lizenz – Bestellung aufklappen, Positionen als zweite Tabelle, 100.000 Zeilen | `videos/11-master-detail/`, Showcase `masterdetail`, Training-Kapitel `master-detail`, `apps/table-demo/master-detail.html`, `instructions.md` 6.18 |
 | 34 | Arabisch, Hebräisch: Tabelle von rechts nach links – eine Option (kein „ohne Enterprise“: bei ag-Grid Community) | `videos/12-rechts-nach-links/`, Showcase `rtl`, Training-Kapitel `theming-dark-mode` (Abschnitt), `apps/table-demo/rtl.html`, `instructions.md` 6.19 |
+| 35 | Excel im Browser: Formeln, Copy & Paste, Undo – MIT-lizenziert (Clipboard, Fill-Handle, A1-Formeln bei ag-Grid Enterprise, Undo Community) | `videos/13-excel-im-browser/`, Showcase `spreadsheet`, Training-Kapitel `spreadsheet` (40), `apps/table-demo/spreadsheet.html`, `instructions.md` 6.20 – 6.25 |
+| 36 | Copy & Paste mit Excel – ohne Enterprise-Lizenz (optional) | Training-Kapitel `selection-and-copy` (`#paste`), `instructions.md` 6.21 |
+| 37 | Excel-Formeln mit Zellbezügen – Zeigemodus, F4, Zeilen einfügen (optional) | Training-Kapitel `spreadsheet`, `instructions.md` 6.23 – 6.25 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
@@ -779,12 +785,13 @@ zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).
 
 ## 11. Schulung „GuiExpert Table – step by step“ (https://gui.expert/training/)
 
-Englisch, 39 Kapitel = 39 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
+Englisch, 40 Kapitel = 40 Folgen der Step-by-Step-Videoreihe (Demo-Repo `krocon/guiexpert-table-step-by-step-demo`,
 ein Git-Tag `ep-NNN` pro Folge – die Tags müssen gepusht sein, sonst laufen die „git tag“-Links ins Leere).
 Teil 8 „Beyond the basics“ (`PartId` `"advanced"`) nimmt neue Kapitel auf (seit Prompt 001: Kapitel 35 `accessibility`,
 Tag `ep-035` erst nach dem Release 1.1.91; seit Prompt 006: Kapitel 36 `row-grouping`, Tag `ep-036` erst nach dem Release 1.1.94;
 seit Prompt 007: Kapitel 37 `pivot-tables`, Tag `ep-037` erst nach dem Release 1.1.94; seit Prompt 011: Kapitel 38
-`master-detail`, Tag `ep-038` erst nach dem Release 1.1.97; Kapitel 39 `formulas` (008, nachgeholt), Tag `ep-039` offen).
+`master-detail`, Tag `ep-038` erst nach dem Release 1.1.97; Kapitel 39 `formulas` (008, nachgeholt), Tag `ep-039` offen; seit Prompt 013: Kapitel 40 `spreadsheet`, Tag `ep-040` erst nach
+dem Release 1.1.99, dazu Abschnitte in Kapitel 31 `inline-editing` (`#excel-style`) und 22 `selection-and-copy` (`#paste`)).
 
 **Neue Features sichtbar machen** (Seite `/whats-new/`, Home „What's new“, Training-Index „New since the course“ `#new`,
 Showcase-Übersicht „New“): eine Liste `src/features/new-features.ts` (je Feature Problem, Snippet ≤ 15 Zeilen, Showcase,

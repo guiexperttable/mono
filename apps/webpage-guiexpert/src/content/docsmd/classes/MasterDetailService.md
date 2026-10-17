@@ -41,6 +41,7 @@ life cycle of the detail contents. Created by [TableScope](TableScope.md) (`tabl
 - [getLayer](MasterDetailService.md#getlayer)
 - [getMasterRowIndexOf](MasterDetailService.md#getmasterrowindexof)
 - [hasExpanded](MasterDetailService.md#hasexpanded)
+- [hasTabTarget](MasterDetailService.md#hastabtarget)
 - [isActive](MasterDetailService.md#isactive)
 - [isExpanded](MasterDetailService.md#isexpanded)
 - [isExpandedAt](MasterDetailService.md#isexpandedat)
@@ -279,6 +280,35 @@ True if at least one master row is expanded.
 #### Defined in
 
 [src/lib/table/master-detail/master-detail-service.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L129)
+
+___
+
+### hasTabTarget
+
+▸ **hasTabTarget**(`rowIndex`): `boolean`
+
+True if Tab on the master row `rowIndex` goes into its open detail row (a focusable element in it) – Excel-style
+editing then leaves Tab to this service.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display row index of the focused cell |
+
+#### Returns
+
+`boolean`
+
+true with a tab target
+
+**`Since`**
+
+1.1.99
+
+#### Defined in
+
+[src/lib/table/master-detail/master-detail-service.ts:919](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/master-detail/master-detail-service.ts#L919)
 
 ___
 

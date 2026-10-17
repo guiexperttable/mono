@@ -37,7 +37,7 @@ This is the UI-agnostic table component for your next web app. 😊
 - Full control over the HTML structure and style
 
 
-### New in October 2026 (1.1.91 – 1.1.98) – all MIT-licensed
+### New in October 2026 (1.1.91 – 1.1.99) – all MIT-licensed
 
 - Screen readers and keyboard: WAI-ARIA grid, announcements, full keyboard navigation (1.1.91)
 - “Loading…” and “No rows” overlays with a CSS spinner, `loading` prop (1.1.92)
@@ -51,8 +51,9 @@ This is the UI-agnostic table component for your next web app. 😊
 - Fill handle and batch edit: `fillHandle`, `batchEdit` (1.1.96)
 - Master/detail with nested tables or components: `masterDetail` (1.1.97)
 - Right-to-left for Arabic, Hebrew, Persian: `direction: "rtl"` (1.1.98)
+- A spreadsheet: A1 cell formulas, copy & paste with Excel, undo/redo, formula bar – `SpreadsheetFactory`, or `spreadsheet: true` for your table (1.1.99)
 
-All twelve with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/) ·
+All thirteen with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/) ·
 training: [gui.expert/training](https://gui.expert/training/)
 
 ## Links

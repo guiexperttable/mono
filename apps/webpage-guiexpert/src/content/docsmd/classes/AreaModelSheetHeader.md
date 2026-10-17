@@ -1,0 +1,2246 @@
+[GuiExpert Table API](../README.md) / [Exports](../modules.md) / AreaModelSheetHeader
+
+# Class: AreaModelSheetHeader
+
+The header of a spreadsheet: one row with the column letters `A, B, …` (`isColumnLetterRow(0)` – a click selects the
+column).
+
+**`Since`**
+
+1.1.99
+
+## Hierarchy
+
+- [`AreaModelArrayOfArrays`](AreaModelArrayOfArrays.md)\<`string`\>
+
+  ↳ **`AreaModelSheetHeader`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](AreaModelSheetHeader.md#constructor)
+
+### Properties
+
+- [areaIdent](AreaModelSheetHeader.md#areaident)
+- [arr](AreaModelSheetHeader.md#arr)
+- [cellRenderers](AreaModelSheetHeader.md#cellrenderers)
+- [columnDefs](AreaModelSheetHeader.md#columndefs)
+- [columnLetterRows](AreaModelSheetHeader.md#columnletterrows)
+- [defaultEditable](AreaModelSheetHeader.md#defaulteditable)
+- [defaultRowHeight](AreaModelSheetHeader.md#defaultrowheight)
+- [filteredArr](AreaModelSheetHeader.md#filteredarr)
+- [rowSelectionModel](AreaModelSheetHeader.md#rowselectionmodel)
+- [yPositions](AreaModelSheetHeader.md#ypositions)
+
+### Methods
+
+- [addCalculatedClasses](AreaModelSheetHeader.md#addcalculatedclasses)
+- [arrayMove](AreaModelSheetHeader.md#arraymove)
+- [canMoveRows](AreaModelSheetHeader.md#canmoverows)
+- [changeColumnOrder](AreaModelSheetHeader.md#changecolumnorder)
+- [doSort](AreaModelSheetHeader.md#dosort)
+- [externalFilterChanged](AreaModelSheetHeader.md#externalfilterchanged)
+- [getAggregationSourceForValues](AreaModelSheetHeader.md#getaggregationsourceforvalues)
+- [getCalculatedRenderer](AreaModelSheetHeader.md#getcalculatedrenderer)
+- [getCalculatedText](AreaModelSheetHeader.md#getcalculatedtext)
+- [getCellRenderer](AreaModelSheetHeader.md#getcellrenderer)
+- [getColspanAt](AreaModelSheetHeader.md#getcolspanat)
+- [getConstantRowHeight](AreaModelSheetHeader.md#getconstantrowheight)
+- [getCustomClassesAt](AreaModelSheetHeader.md#getcustomclassesat)
+- [getCustomStyleAt](AreaModelSheetHeader.md#getcustomstyleat)
+- [getInputValueAt](AreaModelSheetHeader.md#getinputvalueat)
+- [getMaxColspan](AreaModelSheetHeader.md#getmaxcolspan)
+- [getMaxRowspan](AreaModelSheetHeader.md#getmaxrowspan)
+- [getRowByIndex](AreaModelSheetHeader.md#getrowbyindex)
+- [getRowCount](AreaModelSheetHeader.md#getrowcount)
+- [getRowHeight](AreaModelSheetHeader.md#getrowheight)
+- [getRowValue](AreaModelSheetHeader.md#getrowvalue)
+- [getRowspanAt](AreaModelSheetHeader.md#getrowspanat)
+- [getTextValueAt](AreaModelSheetHeader.md#gettextvalueat)
+- [getTooltipAt](AreaModelSheetHeader.md#gettooltipat)
+- [getUnfilteredRowCount](AreaModelSheetHeader.md#getunfilteredrowcount)
+- [getValueAt](AreaModelSheetHeader.md#getvalueat)
+- [getYPosByRowIndex](AreaModelSheetHeader.md#getyposbyrowindex)
+- [hasDerivedColumns](AreaModelSheetHeader.md#hasderivedcolumns)
+- [init](AreaModelSheetHeader.md#init)
+- [invalidateColumnValues](AreaModelSheetHeader.md#invalidatecolumnvalues)
+- [isCalculatedProperty](AreaModelSheetHeader.md#iscalculatedproperty)
+- [isColumnLetterRow](AreaModelSheetHeader.md#iscolumnletterrow)
+- [isDerivedProperty](AreaModelSheetHeader.md#isderivedproperty)
+- [isEditable](AreaModelSheetHeader.md#iseditable)
+- [isFilterable](AreaModelSheetHeader.md#isfilterable)
+- [isRowCheckable](AreaModelSheetHeader.md#isrowcheckable)
+- [isRowChecked](AreaModelSheetHeader.md#isrowchecked)
+- [isSelectable](AreaModelSheetHeader.md#isselectable)
+- [moveRows](AreaModelSheetHeader.md#moverows)
+- [readPropertyPath](AreaModelSheetHeader.md#readpropertypath)
+- [setCalculatedValue](AreaModelSheetHeader.md#setcalculatedvalue)
+- [setColumns](AreaModelSheetHeader.md#setcolumns)
+- [setPropertyValue](AreaModelSheetHeader.md#setpropertyvalue)
+- [setRowChecked](AreaModelSheetHeader.md#setrowchecked)
+- [setValue](AreaModelSheetHeader.md#setvalue)
+- [sort](AreaModelSheetHeader.md#sort)
+
+## Constructors
+
+### constructor
+
+• **new AreaModelSheetHeader**(`areaIdent`, `arr`, `defaultRowHeight`, `columnDefs?`): [`AreaModelSheetHeader`](AreaModelSheetHeader.md)
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `areaIdent` | [`AreaIdent`](../modules.md#areaident) | `undefined` |
+| `arr` | `string`[][] | `undefined` |
+| `defaultRowHeight` | `number` | `undefined` |
+| `columnDefs` | [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[] | `[]` |
+
+#### Returns
+
+[`AreaModelSheetHeader`](AreaModelSheetHeader.md)
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[constructor](AreaModelArrayOfArrays.md#constructor)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L18)
+
+## Properties
+
+### areaIdent
+
+• **areaIdent**: [`AreaIdent`](../modules.md#areaident)
+
+The identifier for one of the areas: header, body, footer.
+This property determines which area of the table this model represents.
+
+**`Example`**
+
+```ts
+// Creating an area model for the header
+const headerModel = new AreaModel();
+headerModel.areaIdent = "header";
+```
+
+**`Example`**
+
+```ts
+// Checking which area a model represents
+if (areaModel.areaIdent === "body") {
+  // This is a body area model
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[areaIdent](AreaModelArrayOfArrays.md#areaident)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L19)
+
+___
+
+### arr
+
+• `Readonly` **arr**: `string`[][]
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[arr](AreaModelArrayOfArrays.md#arr)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L20)
+
+___
+
+### cellRenderers
+
+• `Protected` **cellRenderers**: (`undefined` \| [`CellRendererIf`](../interfaces/CellRendererIf.md))[]
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[cellRenderers](AreaModelArrayOfArrays.md#cellrenderers)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L25)
+
+___
+
+### columnDefs
+
+• `Protected` **columnDefs**: [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[] = `[]`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[columnDefs](AreaModelArrayOfArrays.md#columndefs)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L22)
+
+___
+
+### columnLetterRows
+
+• `Readonly` **columnLetterRows**: ``1``
+
+The number of header rows with column letters (from the top).
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-factory.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-factory.ts#L60)
+
+___
+
+### defaultEditable
+
+• **defaultEditable**: `boolean` = `false`
+
+Columns without an own `editable` are editable (Excel-style editing, `EditingOptionsIf.defaultEditable`; set by
+the table). Row number, checkbox and group columns stay read only.
+
+**`Since`**
+
+1.1.99
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[defaultEditable](AreaModelArrayOfArrays.md#defaulteditable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L150)
+
+___
+
+### defaultRowHeight
+
+• **defaultRowHeight**: `number`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[defaultRowHeight](AreaModelArrayOfArrays.md#defaultrowheight)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L21)
+
+___
+
+### filteredArr
+
+• **filteredArr**: `string`[][]
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[filteredArr](AreaModelArrayOfArrays.md#filteredarr)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L16)
+
+___
+
+### rowSelectionModel
+
+• **rowSelectionModel**: `undefined` \| [`CheckboxModelIf`](../interfaces/CheckboxModelIf.md)\<`any`\> = `undefined`
+
+A model and controller for row checkbox selection.
+This property allows the area to support row selection via checkboxes.
+
+**`Example`**
+
+```ts
+// Creating a checkbox model for row selection
+import { CheckboxModel } from "@guiexpert/table";
+
+const bodyModel = new AreaModel();
+bodyModel.areaIdent = "body";
+bodyModel.rowSelectionModel = new CheckboxModel();
+
+// Later, check if a row is selected
+const isSelected = bodyModel.isRowChecked(5);
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[rowSelectionModel](AreaModelArrayOfArrays.md#rowselectionmodel)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L22)
+
+___
+
+### yPositions
+
+• `Protected` **yPositions**: `number`[] = `[]`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[yPositions](AreaModelArrayOfArrays.md#ypositions)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L26)
+
+## Methods
+
+### addCalculatedClasses
+
+▸ **addCalculatedClasses**(`classes`, `property`, `value`): `string`[]
+
+The CSS class and tooltip of an error value of a formula.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `classes` | `string`[] |
+| `property` | `undefined` \| `string` |
+| `value` | () => `unknown` |
+
+#### Returns
+
+`string`[]
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[addCalculatedClasses](AreaModelArrayOfArrays.md#addcalculatedclasses)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:356](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L356)
+
+___
+
+### arrayMove
+
+▸ **arrayMove**(`arr`, `fromIndex`, `toIndex`): `any`[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arr` | `any`[] |
+| `fromIndex` | `number` |
+| `toIndex` | `number` |
+
+#### Returns
+
+`any`[]
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[arrayMove](AreaModelArrayOfArrays.md#arraymove)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L208)
+
+___
+
+### canMoveRows
+
+▸ **canMoveRows**(`rowIndices`, `target`): `boolean`
+
+Row drag: true if the rows can be moved (no filter hides a row, target `"before"` / `"after"` a row).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndices` | `number`[] | display indices of the dragged rows |
+| `target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) | the drop target |
+
+#### Returns
+
+`boolean`
+
+true if [moveRows](AreaModelArrayOfArrays.md#moverows) would move them
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[canMoveRows](AreaModelArrayOfArrays.md#canmoverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L57)
+
+___
+
+### changeColumnOrder
+
+▸ **changeColumnOrder**(`sourceColumnIndex`, `targetColumnIndex`): `void`
+
+Changes the order of columns by moving a column from one position to another.
+This method is called when the user drags a column to a new position.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `sourceColumnIndex` | `number` | The index of the column to move |
+| `targetColumnIndex` | `number` | The index where the column should be moved to |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+// Move the second column (index 1) to the fourth position (index 3)
+areaModel.changeColumnOrder(1, 3);
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
+  // Move the column in the internal data structure
+  this.arrayMove(this.columns, sourceColumnIndex, targetColumnIndex);
+  
+  // Update any dependent data structures
+  this.arrayMove(this.cellRenderers, sourceColumnIndex, targetColumnIndex);
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[changeColumnOrder](AreaModelArrayOfArrays.md#changecolumnorder)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L135)
+
+___
+
+### doSort
+
+▸ **doSort**(`_sortItems`): `boolean`
+
+Sorts the rows in this area based on the provided sort items.
+This method is called when the user clicks on a sortable column header.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_sortItems` | [`SortItem`](SortItem.md)[] | An array of sort items, each containing a column index and sort direction |
+
+#### Returns
+
+`boolean`
+
+True if sorting was performed, false otherwise
+
+**`Example`**
+
+```ts
+// Sort by the second column in ascending order
+bodyAreaModel.doSort([{ columnIndex: 1, sortState: 'asc' }]);
+
+// Sort by the first column in descending order, then by the second column in ascending order
+bodyAreaModel.doSort([
+  { columnIndex: 0, sortState: 'desc' },
+  { columnIndex: 1, sortState: 'asc' }
+]);
+```
+
+**`Example`**
+
+```ts
+// Implementation example: a body model that sorts its own rows
+class MyBodyModel extends AreaModelObjectArray<any> {
+  override doSort(sortItems: SortItem[]): boolean {
+    if (!sortItems.length) return false;
+    
+    // Apply sorting to the rows
+    for (const sortItem of sortItems) {
+      const { columnIndex, sortState } = sortItem;
+      const property = this.columnDefs[columnIndex].property;
+      const direction = sortState === 'asc' ? 1 : -1;
+      
+      this.rows.sort((a, b) => {
+        const valueA = a[property];
+        const valueB = b[property];
+        
+        if (valueA < valueB) return -1 * direction;
+        if (valueA > valueB) return 1 * direction;
+        return 0;
+      });
+    }
+    
+    return true;
+  }
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[doSort](AreaModelArrayOfArrays.md#dosort)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L135)
+
+___
+
+### externalFilterChanged
+
+▸ **externalFilterChanged**(`predictFn`): `void`
+
+Applies a filter function to the rows in this area.
+This method is called when a filter is applied to the table.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `predictFn` | [`FilterFunction`](../modules.md#filterfunction)\<`any`\> | A function that takes a row and returns true if the row should be visible |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+// Filter rows where age > 30
+bodyAreaModel.externalFilterChanged(row => row.age > 30);
+
+// Clear all filters
+bodyAreaModel.externalFilterChanged(() => true);
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
+  // Apply the filter to the rows
+  this.filteredRows = this.rows.filter(predictFn);
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[externalFilterChanged](AreaModelArrayOfArrays.md#externalfilterchanged)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L28)
+
+___
+
+### getAggregationSourceForValues
+
+▸ **getAggregationSourceForValues**(): `Object`
+
+The rows of column aggregates in formulas (`SUM([total])`): the filtered row objects.
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `length` | `number` |
+| `rows` | () => `ArrayLike`\<`unknown`\> |
+| `signal` | `unknown` |
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getAggregationSourceForValues](AreaModelArrayOfArrays.md#getaggregationsourceforvalues)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:319](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L319)
+
+___
+
+### getCalculatedRenderer
+
+▸ **getCalculatedRenderer**(`property`): `undefined` \| [`CellRendererIf`](../interfaces/CellRendererIf.md)
+
+The renderer of a „Show values as“ column without an own renderer: the text of `getTextValueAt`.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `property` | `undefined` \| `string` |
+
+#### Returns
+
+`undefined` \| [`CellRendererIf`](../interfaces/CellRendererIf.md)
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getCalculatedRenderer](AreaModelArrayOfArrays.md#getcalculatedrenderer)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:348](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L348)
+
+___
+
+### getCalculatedText
+
+▸ **getCalculatedText**(`property`, `value`): `undefined` \| `string`
+
+The text of a cell of a calculated / „Show values as“ column; `undefined` for a normal column.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `property` | `undefined` \| `string` |
+| `value` | `unknown` |
+
+#### Returns
+
+`undefined` \| `string`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getCalculatedText](AreaModelArrayOfArrays.md#getcalculatedtext)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L336)
+
+___
+
+### getCellRenderer
+
+▸ **getCellRenderer**(`_rowIndex`, `columnIndex`): `undefined` \| [`CellRendererIf`](../interfaces/CellRendererIf.md)
+
+Returns a cell renderer for the cell at the specified row and column indices.
+A cell renderer is responsible for rendering the cell content in a custom way.
+If undefined is returned, the cell value will be rendered directly.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`undefined` \| [`CellRendererIf`](../interfaces/CellRendererIf.md)
+
+A cell renderer instance, or undefined for default rendering
+
+**`Example`**
+
+```ts
+// Get a custom renderer for a cell
+const renderer = bodyAreaModel.getCellRenderer(1, 2);
+```
+
+**`Example`**
+
+```ts
+// Implementation example using column definitions
+getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefined {
+  // Get renderer from column definition
+  const columnDef = this.columnDefs[columnIndex];
+  return columnDef?.rendererMap?.[this.areaIdent];
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getCellRenderer](AreaModelArrayOfArrays.md#getcellrenderer)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L58)
+
+___
+
+### getColspanAt
+
+▸ **getColspanAt**(`_rowIndex`, `_columnIndex`): `number`
+
+Returns the column span value for the cell at the specified row and column indices.
+A colspan value of N means the cell spans N columns horizontally.
+Values less than 2 are ignored (no spanning).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `_columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`number`
+
+The colspan value (number of columns the cell spans)
+
+**`Example`**
+
+```ts
+// Check if a cell spans multiple columns
+const colspan = headerAreaModel.getColspanAt(0, 0);
+if (colspan > 1) {
+  console.log(`This header cell spans ${colspan} columns`);
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example for a model with column spanning
+getColspanAt(rowIndex: number, columnIndex: number): number {
+  // Special case: first row, first column spans 3 columns
+  if (rowIndex === 0 && columnIndex === 0) return 3;
+  
+  // No spanning for other cells
+  return 1;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getColspanAt](AreaModelArrayOfArrays.md#getcolspanat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L65)
+
+___
+
+### getConstantRowHeight
+
+▸ **getConstantRowHeight**(): `undefined` \| `number`
+
+All rows share `defaultRowHeight` – unless a subclass overrides `getRowHeight()`, then row heights may
+vary and `undefined` is returned.
+
+#### Returns
+
+`undefined` \| `number`
+
+The constant row height or `undefined`.
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getConstantRowHeight](AreaModelArrayOfArrays.md#getconstantrowheight)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L130)
+
+___
+
+### getCustomClassesAt
+
+▸ **getCustomClassesAt**(`rowIndex`, `columnIndex`): `string`[]
+
+Returns an array of CSS class names to apply to the cell at the specified row and column indices.
+This method allows for custom styling of individual cells.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`string`[]
+
+An array of CSS class names
+
+**`Example`**
+
+```ts
+// Apply custom classes to cells
+const classes = bodyAreaModel.getCustomClassesAt(1, 2);
+console.log(`Cell classes: ${classes.join(', ')}`);
+```
+
+**`Example`**
+
+```ts
+// Implementation example with conditional styling
+getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
+  const classes: string[] = [];
+  
+  // Add classes based on row index
+  if (rowIndex % 2 === 0) {
+    classes.push('even-row');
+  } else {
+    classes.push('odd-row');
+  }
+  
+  // Add classes based on cell value
+  const value = this.getValueAt(rowIndex, columnIndex);
+  if (typeof value === 'number' && value < 0) {
+    classes.push('negative-value');
+  }
+  
+  // Add classes for selected rows
+  if (this.isRowChecked(rowIndex)) {
+    classes.push('selected-row');
+  }
+  
+  return classes;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getCustomClassesAt](AreaModelArrayOfArrays.md#getcustomclassesat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L69)
+
+___
+
+### getCustomStyleAt
+
+▸ **getCustomStyleAt**(`_rowIndex`, `_columnIndex`): `undefined` \| \{ `[key: string]`: `string`;  }
+
+Returns an object containing CSS style properties to apply to the cell at the specified row and column indices.
+This method allows for inline styling of individual cells.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `_columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`undefined` \| \{ `[key: string]`: `string`;  }
+
+An object with CSS style properties, or undefined if no custom styles
+
+**`Example`**
+
+```ts
+// Apply custom styles to cells
+const styles = bodyAreaModel.getCustomStyleAt(1, 2);
+console.log('Cell styles:', styles);
+```
+
+**`Example`**
+
+```ts
+// Implementation example with conditional styling
+getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string } | undefined {
+  // Apply background color based on value
+  const value = this.getValueAt(rowIndex, columnIndex);
+  
+  if (typeof value === 'number') {
+    // Color gradient based on value
+    if (value < 0) {
+      return { 'background-color': `rgba(255, 0, 0, ${Math.min(Math.abs(value) / 100, 0.5)})` };
+    } else if (value > 0) {
+      return { 'background-color': `rgba(0, 255, 0, ${Math.min(value / 100, 0.5)})` };
+    }
+  }
+  
+  return undefined; // No custom styles
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getCustomStyleAt](AreaModelArrayOfArrays.md#getcustomstyleat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L76)
+
+___
+
+### getInputValueAt
+
+▸ **getInputValueAt**(`rowIndex`, `columnIndex`): `unknown`
+
+The input of a cell – the formula text of a cell formula (`"=B2*C2"`), otherwise the value (since 1.1.99,
+[TableOptionsIf.cellFormulas](../interfaces/TableOptionsIf.md#cellformulas)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | display index |
+| `columnIndex` | `number` | column |
+
+#### Returns
+
+`unknown`
+
+the input
+
+**`Example`**
+
+```ts
+new AreaModelArrayOfArrays("body", [[2, "=A1*2"]], 30).getInputValueAt(0, 1);   // "=A1*2"
+```
+
+**`Since`**
+
+1.1.99
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getInputValueAt](AreaModelArrayOfArrays.md#getinputvalueat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L98)
+
+___
+
+### getMaxColspan
+
+▸ **getMaxColspan**(): `number`
+
+Returns the maximum colspan value that can occur in this area model.
+This value is used to optimize rendering performance.
+
+#### Returns
+
+`number`
+
+The maximum possible colspan value in this area
+
+**`Example`**
+
+```ts
+// Get the maximum colspan for optimization
+const maxColspan = headerAreaModel.getMaxColspan();
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+getMaxColspan(): number {
+  // If the model has no colspans, return 0 for optimization
+  return 0;
+  
+  // If the model has colspans, return the maximum possible value
+  // return 3; // If some cells span up to 3 columns
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getMaxColspan](AreaModelArrayOfArrays.md#getmaxcolspan)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L104)
+
+___
+
+### getMaxRowspan
+
+▸ **getMaxRowspan**(): `number`
+
+Returns the maximum rowspan value that can occur in this area model.
+This value is used to optimize rendering performance.
+
+#### Returns
+
+`number`
+
+The maximum possible rowspan value in this area
+
+**`Example`**
+
+```ts
+// Get the maximum rowspan for optimization
+const maxRowspan = bodyAreaModel.getMaxRowspan();
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+getMaxRowspan(): number {
+  // If the model has no rowspans, return 0 for optimization
+  return 0;
+  
+  // If the model has rowspans, return the maximum possible value
+  // return 2; // If some cells span up to 2 rows
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getMaxRowspan](AreaModelArrayOfArrays.md#getmaxrowspan)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L108)
+
+___
+
+### getRowByIndex
+
+▸ **getRowByIndex**(`rowIndex`): `any`
+
+Returns the row object at the specified index.
+This method provides access to the underlying data structure.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+
+#### Returns
+
+`any`
+
+The row object
+
+**`Example`**
+
+```ts
+// Get a row object
+const row = bodyAreaModel.getRowByIndex(1);
+console.log('Row data:', row);
+```
+
+**`Example`**
+
+```ts
+// Implementation example for an array-based model
+getRowByIndex(rowIndex: number): any {
+  if (rowIndex < 0 || rowIndex >= this.data.length) return undefined;
+  return this.data[rowIndex];
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getRowByIndex](AreaModelArrayOfArrays.md#getrowbyindex)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L116)
+
+___
+
+### getRowCount
+
+▸ **getRowCount**(): `number`
+
+Returns the number of rows in this area.
+This is a fundamental method that determines the vertical size of the area.
+
+#### Returns
+
+`number`
+
+The number of rows in the area
+
+**`Example`**
+
+```ts
+// Get the number of rows in the body area
+const rowCount = bodyAreaModel.getRowCount();
+console.log(`The body has ${rowCount} rows`);
+```
+
+**`Example`**
+
+```ts
+// Implementation example for an array-based model
+getRowCount(): number {
+  return this.data.length;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getRowCount](AreaModelArrayOfArrays.md#getrowcount)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L32)
+
+___
+
+### getRowHeight
+
+▸ **getRowHeight**(`_rowIndex`): `number`
+
+Returns the height of the row at the specified index, in pixels.
+This method allows for variable row heights in the table.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+
+#### Returns
+
+`number`
+
+The height of the row in pixels
+
+**`Example`**
+
+```ts
+// Get the height of a row
+const height = bodyAreaModel.getRowHeight(1);
+console.log(`Row 1 height: ${height}px`);
+```
+
+**`Example`**
+
+```ts
+// Implementation example with fixed row height
+getRowHeight(rowIndex: number): number {
+  return this.defaultRowHeight; // e.g., 30px
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example with variable row heights
+getRowHeight(rowIndex: number): number {
+  // First row is taller
+  if (rowIndex === 0) return 50;
+  
+  // Rows with more content are taller
+  const row = this.getRowByIndex(rowIndex);
+  if (row && row.hasLongContent) return 60;
+  
+  // Default height for other rows
+  return 30;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getRowHeight](AreaModelArrayOfArrays.md#getrowheight)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L120)
+
+___
+
+### getRowValue
+
+▸ **getRowValue**(`row`, `property`): `unknown`
+
+The value of a column for a row object – the computed value of a calculated column, otherwise the property
+(path). A `TreeRow` is unwrapped. The table API offers it as [TableApi.getRowValue](TableApi.md#getrowvalue).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | `any` | a row object (or `TreeRow`) |
+| `property` | `string` | the property of the column |
+
+#### Returns
+
+`unknown`
+
+the value
+
+**`Example`**
+
+```ts
+const body = tableModel.getBodyModel() as AreaModelObjectArray<Item>;
+body.getRowValue({ price: 25, quantity: 10 }, "total");   // 250
+```
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getRowValue](AreaModelArrayOfArrays.md#getrowvalue)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L255)
+
+___
+
+### getRowspanAt
+
+▸ **getRowspanAt**(`_rowIndex`, `_columnIndex`): `number`
+
+Returns the row span value for the cell at the specified row and column indices.
+A rowspan value of N means the cell spans N rows vertically.
+Values less than 2 are ignored (no spanning).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `_columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`number`
+
+The rowspan value (number of rows the cell spans)
+
+**`Example`**
+
+```ts
+// Check if a cell spans multiple rows
+const rowspan = bodyAreaModel.getRowspanAt(0, 0);
+if (rowspan > 1) {
+  console.log(`This cell spans ${rowspan} rows`);
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example for a model with row spanning
+getRowspanAt(rowIndex: number, columnIndex: number): number {
+  // Special case: first column spans 2 rows at the beginning
+  if (columnIndex === 0 && rowIndex % 2 === 0) return 2;
+  
+  // No spanning for other cells
+  return 1;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getRowspanAt](AreaModelArrayOfArrays.md#getrowspanat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L80)
+
+___
+
+### getTextValueAt
+
+▸ **getTextValueAt**(`rowIndex`, `columnIndex`): `string`
+
+Returns a string representation of the cell value at the specified row and column indices.
+This method is used when exporting the table data or copying to clipboard.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`string`
+
+The text value of the specified cell
+
+**`Example`**
+
+```ts
+// Get the text value of a cell for export
+const textValue = bodyAreaModel.getTextValueAt(1, 2);
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+getTextValueAt(rowIndex: number, columnIndex: number): string {
+  const value = this.getValueAt(rowIndex, columnIndex);
+  
+  // Handle different data types appropriately
+  if (value === null || value === undefined) return '';
+  if (value instanceof Date) return value.toISOString();
+  return String(value);
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getTextValueAt](AreaModelArrayOfArrays.md#gettextvalueat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L43)
+
+___
+
+### getTooltipAt
+
+▸ **getTooltipAt**(`rowIndex`, `columnIndex`): `any`
+
+Returns the tooltip text for the cell at the specified row and column indices.
+This tooltip will be displayed when the user hovers over the cell.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`any`
+
+The tooltip content (usually a string)
+
+**`Example`**
+
+```ts
+// Get the tooltip for a cell
+const tooltip = bodyAreaModel.getTooltipAt(1, 2);
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+getTooltipAt(rowIndex: number, columnIndex: number): any {
+  // Use the cell value as the tooltip
+  return this.getValueAt(rowIndex, columnIndex);
+  
+  // Or provide a more detailed tooltip
+  // const value = this.getValueAt(rowIndex, columnIndex);
+  // return `Value: ${value}\nRow: ${rowIndex}\nColumn: ${columnIndex}`;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getTooltipAt](AreaModelArrayOfArrays.md#gettooltipat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L48)
+
+___
+
+### getUnfilteredRowCount
+
+▸ **getUnfilteredRowCount**(): `number`
+
+The number of all rows, without the external filter.
+
+#### Returns
+
+`number`
+
+the length of the array
+
+**`Since`**
+
+1.1.92
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getUnfilteredRowCount](AreaModelArrayOfArrays.md#getunfilteredrowcount)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L45)
+
+___
+
+### getValueAt
+
+▸ **getValueAt**(`rowIndex`, `columnIndex`): `any`
+
+Returns the value of the cell at the specified row and column indices.
+This is one of the most important methods in the area model, as it provides
+the actual data to be displayed in each cell.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`any`
+
+The value at the specified cell
+
+**`Example`**
+
+```ts
+// Get the value of a cell
+const value = bodyAreaModel.getValueAt(1, 2);
+console.log(`Cell (1,2) contains: ${value}`);
+```
+
+**`Example`**
+
+```ts
+// Implementation example for a 2D array model
+getValueAt(rowIndex: number, columnIndex: number): any {
+  if (rowIndex < 0 || rowIndex >= this.data.length) return undefined;
+  const row = this.data[rowIndex];
+  if (columnIndex < 0 || columnIndex >= row.length) return undefined;
+  return row[columnIndex];
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example for an object array model
+getValueAt(rowIndex: number, columnIndex: number): any {
+  const row = this.getRowByIndex(rowIndex);
+  if (!row) return undefined;
+  
+  const property = this.columnDefs[columnIndex].property;
+  return row[property];
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getValueAt](AreaModelArrayOfArrays.md#getvalueat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L78)
+
+___
+
+### getYPosByRowIndex
+
+▸ **getYPosByRowIndex**(`rowIndex`): `number`
+
+Returns the Y-coordinate (in pixels) of the top of the row at the specified index.
+This method is used for scrolling and positioning rows in the viewport.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+
+#### Returns
+
+`number`
+
+The Y-coordinate of the top of the row, in pixels
+
+**`Example`**
+
+```ts
+// Get the Y-position of a row
+const yPos = bodyAreaModel.getYPosByRowIndex(10);
+console.log(`Row 10 starts at Y-position: ${yPos}px`);
+```
+
+**`Example`**
+
+```ts
+// Implementation example with fixed row heights
+getYPosByRowIndex(rowIndex: number): number {
+  return rowIndex * this.defaultRowHeight;
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example with variable row heights
+getYPosByRowIndex(rowIndex: number): number {
+  // Use a pre-calculated array of Y-positions
+  return this.yPositions[rowIndex];
+  
+  // Or calculate on-the-fly
+  // let yPos = 0;
+  // for (let i = 0; i < rowIndex; i++) {
+  //   yPos += this.getRowHeight(i);
+  // }
+  // return yPos;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[getYPosByRowIndex](AreaModelArrayOfArrays.md#getyposbyrowindex)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L113)
+
+___
+
+### hasDerivedColumns
+
+▸ **hasDerivedColumns**(): `boolean`
+
+True if the model has calculated or „Show values as“ columns – their cells depend on other cells
+(the table redraws them after `updateCells`).
+
+#### Returns
+
+`boolean`
+
+whether derived columns exist
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[hasDerivedColumns](AreaModelArrayOfArrays.md#hasderivedcolumns)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L270)
+
+___
+
+### init
+
+▸ **init**(): `void`
+
+Initializes the area model.
+This method is called internally by the TableModel during initialization.
+It can be used to perform any necessary setup, such as calculating row positions.
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+// Implementation example
+init(): void {
+  // Calculate y-positions for all rows
+  this.calculateYPositions();
+  
+  // Initialize any other internal state
+  this.initialized = true;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[init](AreaModelArrayOfArrays.md#init)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L121)
+
+___
+
+### invalidateColumnValues
+
+▸ **invalidateColumnValues**(): `void`
+
+Drops the cached aggregates and the getter lookup of calculated columns.
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[invalidateColumnValues](AreaModelArrayOfArrays.md#invalidatecolumnvalues)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:303](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L303)
+
+___
+
+### isCalculatedProperty
+
+▸ **isCalculatedProperty**(`property`): `boolean`
+
+True if a column of this model with this property is calculated (`valueGetter` or `formula`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `property` | `string` | the property of the column |
+
+#### Returns
+
+`boolean`
+
+whether its values are computed
+
+**`Example`**
+
+```ts
+tableModel.getBodyModel().isCalculatedProperty?.("total");   // true
+```
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isCalculatedProperty](AreaModelArrayOfArrays.md#iscalculatedproperty)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:237](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L237)
+
+___
+
+### isColumnLetterRow
+
+▸ **isColumnLetterRow**(`rowIndex`): `boolean`
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | a header row |
+
+#### Returns
+
+`boolean`
+
+true for the row of column letters
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-factory.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-factory.ts#L66)
+
+___
+
+### isDerivedProperty
+
+▸ **isDerivedProperty**(`property`): `boolean`
+
+True if the cells of a column depend on other cells (calculated or „Show values as“).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `property` | `string` | the property of the column |
+
+#### Returns
+
+`boolean`
+
+whether the column is derived
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isDerivedProperty](AreaModelArrayOfArrays.md#isderivedproperty)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L282)
+
+___
+
+### isEditable
+
+▸ **isEditable**(`_rowIndex`, `columnIndex`): `boolean`
+
+Determines whether the cell at the specified row and column indices is editable.
+If true, the user can edit the cell content.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`boolean`
+
+True if the cell is editable, false otherwise
+
+**`Example`**
+
+```ts
+// Check if a cell is editable
+const editable = bodyAreaModel.isEditable(1, 2);
+if (editable) {
+  console.log('This cell can be edited by the user');
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example using column definitions
+isEditable(rowIndex: number, columnIndex: number): boolean {
+  // Get editability from column definition
+  const columnDef = this.columnDefs[columnIndex];
+  return columnDef?.editable?.() ?? false;
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example with conditional editability
+isEditable(rowIndex: number, columnIndex: number): boolean {
+  // Header cells are not editable
+  if (this.areaIdent === 'header') return false;
+  
+  // First column is not editable (e.g., ID column)
+  if (columnIndex === 0) return false;
+  
+  // Other cells in the body are editable
+  return this.areaIdent === 'body';
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isEditable](AreaModelArrayOfArrays.md#iseditable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L152)
+
+___
+
+### isFilterable
+
+▸ **isFilterable**(): `boolean`
+
+Determines whether this area supports filtering.
+If true, the area can be filtered using the externalFilterChanged method.
+
+#### Returns
+
+`boolean`
+
+True if the area is filterable, false otherwise
+
+**`Example`**
+
+```ts
+// Check if an area is filterable
+const filterable = bodyAreaModel.isFilterable();
+if (filterable) {
+  console.log('This area supports filtering');
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+isFilterable(): boolean {
+  // Only the body area is filterable
+  return this.areaIdent === 'body';
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isFilterable](AreaModelArrayOfArrays.md#isfilterable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L131)
+
+___
+
+### isRowCheckable
+
+▸ **isRowCheckable**(`_rowIndex`): `boolean`
+
+Determines whether the row at the specified index is checkable.
+If true, a checkbox will be rendered at the beginning of the row.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+
+#### Returns
+
+`boolean`
+
+True if the row is checkable, false otherwise
+
+**`Example`**
+
+```ts
+// Check if a row is checkable
+const checkable = bodyAreaModel.isRowCheckable(1);
+if (checkable) {
+  console.log('This row can be checked by the user');
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+isRowCheckable(rowIndex: number): boolean {
+  // All rows are checkable by default
+  return true;
+  
+  // Or implement custom logic
+  // const row = this.getRowByIndex(rowIndex);
+  // return row && !row.locked; // Only unlocked rows are checkable
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isRowCheckable](AreaModelArrayOfArrays.md#isrowcheckable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L88)
+
+___
+
+### isRowChecked
+
+▸ **isRowChecked**(`rowIndex`): `undefined` \| [`CheckedType`](../modules.md#checkedtype)
+
+Returns the checked state of the row at the specified index.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+
+#### Returns
+
+`undefined` \| [`CheckedType`](../modules.md#checkedtype)
+
+The checked state of the row (true, false, or 'indeterminate'),
+                                  or undefined if the row is not checkable
+
+**`Example`**
+
+```ts
+// Check if a row is checked
+const checkedState = bodyAreaModel.isRowChecked(1);
+if (checkedState === "full") {
+  console.log('This row is checked');
+} else if (checkedState === "semi") {
+  console.log('This row is partially checked');
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example using a row selection model
+isRowChecked(rowIndex: number): CheckedType | undefined {
+  if (!this.rowSelectionModel) return undefined;
+  
+  const row = this.getRowByIndex(rowIndex);
+  return this.rowSelectionModel.isRowChecked(row);
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isRowChecked](AreaModelArrayOfArrays.md#isrowchecked)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L92)
+
+___
+
+### isSelectable
+
+▸ **isSelectable**(`_rowIndex`, `_columnIndex`): `boolean`
+
+Determines whether the cell at the specified row and column indices is selectable.
+If true, the user can select the cell: the table draws the selection only on selectable body cells.
+All built-in models and [AreaModel](AreaModel.md) return `true` (except the hidden and cover-grid models).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_rowIndex` | `number` | The index of the row |
+| `_columnIndex` | `number` | The index of the column |
+
+#### Returns
+
+`boolean`
+
+True if the cell is selectable, false otherwise
+
+**`Example`**
+
+```ts
+// Check if a cell is selectable
+const selectable = bodyAreaModel.isSelectable(1, 2);
+if (selectable) {
+  console.log('This cell can be selected by the user');
+}
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+isSelectable(rowIndex: number, columnIndex: number): boolean {
+  // All cells are selectable by default
+  return true;
+  
+  // Or implement custom logic
+  // return this.areaIdent === 'body'; // Only body cells are selectable
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[isSelectable](AreaModelArrayOfArrays.md#isselectable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L184)
+
+___
+
+### moveRows
+
+▸ **moveRows**(`rowIndices`, `target`): `boolean`
+
+Row drag: moves the rows – in place in the displayed rows and in [arr](AreaModelArrayOfArrays.md#arr).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndices` | `number`[] | display indices of the dragged rows |
+| `target` | [`RowDropTargetIf`](../interfaces/RowDropTargetIf.md) | the drop target (display index before the move) |
+
+#### Returns
+
+`boolean`
+
+true if moved
+
+**`Example`**
+
+```ts
+const model = new AreaModelArrayOfArrays("body", [["a"], ["b"], ["c"]], 30);
+model.moveRows([0], { rowIndex: 2, position: "after" });   // b, c, a
+```
+
+**`Since`**
+
+1.1.95
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[moveRows](AreaModelArrayOfArrays.md#moverows)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L74)
+
+___
+
+### readPropertyPath
+
+▸ **readPropertyPath**(`row`, `property`): `unknown`
+
+The value of a property path – overridden by the models with their own path semantics.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `any` |
+| `property` | `string` |
+
+#### Returns
+
+`unknown`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[readPropertyPath](AreaModelArrayOfArrays.md#readpropertypath)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:308](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L308)
+
+___
+
+### setCalculatedValue
+
+▸ **setCalculatedValue**(`row`, `columnDef`, `value`): `boolean`
+
+Writes an edited value of a calculated column through its `valueSetter`; without one: rejected.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | `any` |
+| `columnDef` | [`ColumnDefIf`](../interfaces/ColumnDefIf.md) |
+| `value` | `any` |
+
+#### Returns
+
+`boolean`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[setCalculatedValue](AreaModelArrayOfArrays.md#setcalculatedvalue)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:325](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L325)
+
+___
+
+### setColumns
+
+▸ **setColumns**(`columnDefs`): `void`
+
+New columns (insert/delete columns).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnDefs` | [`ColumnDefIf`](../interfaces/ColumnDefIf.md)[] | all columns |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/spreadsheet/spreadsheet-factory.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/spreadsheet/spreadsheet-factory.ts#L75)
+
+___
+
+### setPropertyValue
+
+▸ **setPropertyValue**(`o`, `props`, `value`): `boolean`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `o` | `any` |
+| `props` | `string`[] |
+| `value` | `any` |
+
+#### Returns
+
+`boolean`
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[setPropertyValue](AreaModelArrayOfArrays.md#setpropertyvalue)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:193](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L193)
+
+___
+
+### setRowChecked
+
+▸ **setRowChecked**(`rowIndex`, `checked`): `void`
+
+Sets the checked state of the row at the specified index.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row |
+| `checked` | `boolean` | The new checked state |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+// Check a row
+bodyAreaModel.setRowChecked(1, true);
+
+// Uncheck a row
+bodyAreaModel.setRowChecked(2, false);
+```
+
+**`Example`**
+
+```ts
+// Implementation example using a row selection model
+setRowChecked(rowIndex: number, checked: boolean): void {
+  if (!this.rowSelectionModel) return;
+  
+  const row = this.getRowByIndex(rowIndex);
+  if (row) {
+    this.rowSelectionModel.checkRow(row, checked);
+  }
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[setRowChecked](AreaModelArrayOfArrays.md#setrowchecked)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L97)
+
+___
+
+### setValue
+
+▸ **setValue**(`rowIndex`, `columnIndex`, `value`): `boolean`
+
+Sets the value of a cell at the specified row and column indices.
+This method is called when a cell is edited by the user or programmatically.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | The index of the row containing the cell |
+| `columnIndex` | `number` | The index of the column containing the cell |
+| `value` | `any` | The new value to set |
+
+#### Returns
+
+`boolean`
+
+- True if the value was successfully set, false otherwise
+
+**`Example`**
+
+```ts
+// Set the value of a cell
+areaModel.setValue(1, 2, "New Value");
+```
+
+**`Example`**
+
+```ts
+// Implementation example for an object-based model
+setValue(rowIndex: number, columnIndex: number, value: any): boolean {
+  const row = this.getRowByIndex(rowIndex);
+  if (!row) return false;
+  
+  const property = this.columnDefs[columnIndex].property;
+  row[property] = value;
+  return true;
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[setValue](AreaModelArrayOfArrays.md#setvalue)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/area-model-array-of-arrays.ts#L102)
+
+___
+
+### sort
+
+▸ **sort**(`_compareFn?`): `void`
+
+Sorts the rows in this area using a custom comparator function.
+This method provides more flexibility than doSort for complex sorting logic.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `_compareFn?` | (`a`: `any`, `b`: `any`) => `number` | A function that compares two rows and returns a number: - Negative if a should come before b - Positive if a should come after b - Zero if they are equivalent for sorting purposes |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+// Sort rows by name length
+bodyAreaModel.sort((a, b) => a.name.length - b.name.length);
+
+// Sort rows by a computed value
+bodyAreaModel.sort((a, b) => {
+  const scoreA = a.wins * 3 + a.draws;
+  const scoreB = b.wins * 3 + b.draws;
+  return scoreB - scoreA; // Descending order
+});
+```
+
+**`Example`**
+
+```ts
+// Implementation example
+sort(compareFn?: (a: any, b: any) => number): void {
+  if (!compareFn) return;
+  
+  // Apply the custom sort function
+  this.rows.sort(compareFn);
+}
+```
+
+#### Inherited from
+
+[AreaModelArrayOfArrays](AreaModelArrayOfArrays.md).[sort](AreaModelArrayOfArrays.md#sort)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L140)

@@ -56,7 +56,7 @@ if (isFormulaError(result)) {
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L42)
+[src/lib/table/formula/formula-error.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L44)
 
 ## Properties
 
@@ -68,7 +68,7 @@ the code shown in the cell
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L43)
+[src/lib/table/formula/formula-error.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L45)
 
 ___
 
@@ -80,7 +80,7 @@ a short English explanation (tooltip); never contains HTML
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L44)
+[src/lib/table/formula/formula-error.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L46)
 
 ___
 
@@ -92,7 +92,7 @@ for syntax errors: the position in the formula text (0-based)
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L45)
+[src/lib/table/formula/formula-error.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L47)
 
 ___
 
@@ -104,7 +104,7 @@ Marker (works across copies of the core): [isFormulaError](../modules.md#isformu
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L35)
+[src/lib/table/formula/formula-error.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L37)
 
 ## Methods
 
@@ -120,4 +120,4 @@ The code, e.g. `"#DIV/0!"` – what a cell shows.
 
 #### Defined in
 
-[src/lib/table/formula/formula-error.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L50)
+[src/lib/table/formula/formula-error.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/formula/formula-error.ts#L52)

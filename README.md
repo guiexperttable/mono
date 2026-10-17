@@ -17,6 +17,8 @@ Master/detail: expand a row and show any content over the full width below it �
 
 Right-to-left: `tableOptions.direction: "rtl"` (or `"auto"` from `<html dir="rtl">`) mirrors the whole table for Arabic, Hebrew, Persian and Urdu – first column on the right, horizontal scrolling from the right, fixed columns at the start, tree indent, resize handles, fill handle, row drag and master/detail mirrored, arrow keys in reading direction, Excel export as a right-to-left sheet (since 1.1.98). Left-to-right stays pixel for pixel as before.
 
+Spreadsheet: `SpreadsheetFactory.create({ data })` builds a sheet in one call – column letters, row numbers, cell formulas with A1 references (`=SUM(B2:B9)`, 70 Excel functions, colored references while typing, own parser, no `eval`), copy & paste with Excel and Google Sheets, undo/redo, a formula bar, insert/delete rows and columns with adjusted references, Excel export with real formulas. Existing tables get the same with `spreadsheet: true` or the single options `editing`, `clipboard`, `undo`, `cellFormulas` (since 1.1.99).
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside

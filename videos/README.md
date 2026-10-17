@@ -19,4 +19,4 @@ Regeln und Episoden-Backlog: siehe `CLAUDE.md` § 10.
 | 10 | [Excel-Feeling ohne Enterprise-Lizenz: Fill-Handle und Änderungen sammeln](10-fill-handle-batch-edit/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.96 (Branch `feat/fill-batch`) |
 | 11 | [Master/Detail ohne Enterprise-Lizenz](11-master-detail/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.97 (Branch `feat/master-detail`) |
 | 12 | [Arabisch, Hebräisch: Tabelle von rechts nach links – eine Option](12-rechts-nach-links/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.98 (Branch `feat/rtl`) |
-| 12 | [Arabisch, Hebräisch: Tabelle von rechts nach links – eine Option](12-rechts-nach-links/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.98 (Branch `feat/rtl`) |
+| 13 | [Excel im Browser: Formeln, Copy & Paste, Undo – MIT-lizenziert](13-excel-im-browser/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.99 (Branches `feat/spreadsheet-*`) |

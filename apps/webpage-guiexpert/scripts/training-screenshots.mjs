@@ -54,6 +54,8 @@ const DEMOS = {
   "pivot-tables": { slug: "pivot-tables", button: "expand all" },
   "master-detail": { slug: "master-detail", wait: 900, toggleDetail: 3 },
   "formulas": { slug: "formulas", wait: 800, search: "ROUND([gross] - [net], 2)" },
+  "spreadsheet": { slug: "spreadsheet", wait: 800 },
+  "sheet-editing": { slug: "inline-editing", drag: [[2, 3], [5, 4]] },
   "accessibility": { slug: "accessibility", button: "focus table", keys: ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Enter"] }
 };
 

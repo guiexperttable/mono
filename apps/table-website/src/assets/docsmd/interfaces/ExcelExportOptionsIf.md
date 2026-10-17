@@ -19,9 +19,24 @@ await new ExcelService().downloadExcel(matrix, "sales.xlsx", "", { rightToLeft: 
 
 ### Properties
 
+- [cellFormulas](ExcelExportOptionsIf.md#cellformulas)
 - [rightToLeft](ExcelExportOptionsIf.md#righttoleft)
 
 ## Properties
+
+### cellFormulas
+
+• `Optional` **cellFormulas**: `boolean`
+
+[TableApi.downloadExcel](../classes/TableApi.md#downloadexcel): cell formulas ([TableOptionsIf.cellFormulas](TableOptionsIf.md#cellformulas)) become Excel formulas with their
+calculated values (otherwise: values). Only if the export is the sheet itself – no filter hides rows, no sorting,
+every data column visible; otherwise values and a warning. Since 1.1.99.
+
+#### Defined in
+
+[src/lib/table/service/excel-export-options.if.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-export-options.if.ts#L24)
+
+___
 
 ### rightToLeft
 

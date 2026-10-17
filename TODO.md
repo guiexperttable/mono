@@ -451,6 +451,10 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       (`sheetInputPipe`), Formelleiste = Undo-Schritt, keine Strukturänderung im Batch-Edit, Fokus nach Löschen geklemmt,
       Excel-Export bis zum Inhaltsende, `cellFormulas` nur mit `functions` explizit. Offen: Tasten für Einfügen/Löschen
       (Strg++ / Strg+-) fehlen.
+      **Etappe 8 umgesetzt** (17.10.2026, Branch `feat/spreadsheet-8-website`): Showcase `spreadsheet`, Training-Kapitel 40
+      + Abschnitte 31/22, What's new (13 Features), Vergleichsseiten, Video 13, Doku. Vor dem Release manuell: Screenreader
+      über die Vorschlagsliste (NVDA/VoiceOver), Einfügen aus Excel in Firefox und Safari. Nach dem Release: Tag `ep-040`
+      im Demo-Repo, Angular-Demo, Website-Deploy (nur mit Freigabe).
 
 ## Mono-Repo / Build
 

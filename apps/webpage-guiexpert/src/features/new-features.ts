@@ -1,5 +1,5 @@
 /**
- * The features added in October 2026 (prompts 001 – 012, releases 1.1.91 – 1.1.98) – one list for
+ * The features added in October 2026 (prompts 001 – 013, releases 1.1.91 – 1.1.99) – one list for
  * the page /whats-new/, the "What's new" section of the home page and the feature finder of the training.
  *
  * Every snippet is checked against the real API (see `snippets` in scripts/check-feature-snippets.mjs):
@@ -301,6 +301,32 @@ tableApi.setDetailExpanded(0, true);`,
     training: { slug: "theming-dark-mode", hash: "rtl", label: "Chapter 28 · Right-to-left" },
     api: ["TableOptionsIf.direction", "TableApi.getDirection"],
     agGrid: "community"
+  },
+  {
+    id: "spreadsheet", prompt: "013", since: "1.1.99", icon: "mdi:table-edit",
+    title: "Spreadsheet: formulas, copy & paste with Excel, undo",
+    problem: "Users want Excel in the browser: type over a cell, paste a block from Excel, write =SUM(B2:B9), press Ctrl+Z.",
+    points: [
+      "Excel-style editing: type to overwrite, F2, Enter/Tab, Delete, Ctrl+Enter, Ctrl+arrow to the data edge",
+      "copy, cut and paste with Excel and Google Sheets; undo and redo of every change",
+      "cell formulas with A1 references, 70 Excel functions, colored references while typing – never run as code",
+      "one call builds a sheet: letters, row numbers, formula bar, insert/delete rows and columns, Excel export with formulas"
+    ],
+    snippet: `const { tableModel, tableOptions } = SpreadsheetFactory.create({
+  data: [
+    ["Item", "Qty", "Price", "Net"],
+    ["Laptop", 4, 1299, "=B2*C2"],
+    ["Monitor", 8, 349, "=B3*C3"],
+    ["Total", "", "", "=SUM(D2:D3)"]
+  ]
+});
+// existing tables: spreadsheet: true in the options`,
+    showcase: { name: "spreadsheet", title: "Spreadsheet" },
+    training: { slug: "spreadsheet", label: "Chapter 40 · Spreadsheet" },
+    api: ["SpreadsheetFactory.create", "TableOptionsIf.spreadsheet", "TableOptionsIf.cellFormulas", "FormulaBar",
+      "TableApi.undo", "TableApi.insertRows"],
+    agGrid: "partly",
+    agGridNote: "undo: Community · clipboard, fill handle, A1 formulas: Enterprise"
   }
 ];
 

@@ -58,4 +58,4 @@ optionally a cleanup function, called before the cell is drawn again
 
 #### Defined in
 
-[src/lib/table/renderer/edit/input-cell-renderer.ts:13](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/input-cell-renderer.ts#L13)
+[src/lib/table/renderer/edit/input-cell-renderer.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/input-cell-renderer.ts#L12)

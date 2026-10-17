@@ -42,6 +42,7 @@ Training: [Excel export without a library](https://gui.expert/training/excel-exp
 
 ### Properties
 
+- [supportsFormulas](ExcelService.md#supportsformulas)
 - [supportsNumberFormats](ExcelService.md#supportsnumberformats)
 
 ### Methods
@@ -63,6 +64,22 @@ Training: [Excel export without a library](https://gui.expert/training/excel-exp
 
 ## Properties
 
+### supportsFormulas
+
+• `Readonly` **supportsFormulas**: ``true``
+
+Understands cells `{ formula, value }` ([ExcelFormulaCellIf](../interfaces/ExcelFormulaCellIf.md)), since 1.1.99.
+
+#### Implementation of
+
+[ExcelServiceIf](../interfaces/ExcelServiceIf.md).[supportsFormulas](../interfaces/ExcelServiceIf.md#supportsformulas)
+
+#### Defined in
+
+[src/lib/table/service/excel-service.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L85)
+
+___
+
 ### supportsNumberFormats
 
 • `Readonly` **supportsNumberFormats**: ``true``
@@ -75,7 +92,7 @@ Understands cells `{ value, numberFormat }` ([ExcelFormattedValueIf](../interfac
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L77)
+[src/lib/table/service/excel-service.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L82)
 
 ## Methods
 
@@ -113,7 +130,7 @@ const rtlBlob = await new ExcelService().createExcelBlob([["المدينة"], ["
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L131)
+[src/lib/table/service/excel-service.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L139)
 
 ___
 
@@ -136,7 +153,7 @@ downloads use [createZipCompressed](ExcelService.md#createzipcompressed).
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:281](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L281)
+[src/lib/table/service/excel-service.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L314)
 
 ___
 
@@ -159,7 +176,7 @@ where that is not available. 100,000 rows × 7 columns: ~40 MB stored → a few 
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:294](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L294)
+[src/lib/table/service/excel-service.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L327)
 
 ___
 
@@ -194,4 +211,4 @@ Throws an error if the input matrix is not a valid 2D array or if the filename i
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L89)
+[src/lib/table/service/excel-service.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L97)

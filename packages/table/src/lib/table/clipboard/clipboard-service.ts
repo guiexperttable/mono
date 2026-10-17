@@ -40,7 +40,13 @@ interface ClipboardMemory {
   };
 }
 
-type ClipboardKind = "copy" | "cut" | "paste";
+/**
+ * A clipboard action of the keyboard.
+ *
+ * @category Internals
+ * @since 1.1.99
+ */
+export type ClipboardKind = "copy" | "cut" | "paste";
 
 const normalize = (text: string) => text.replace(/\r\n?/g, "\n").replace(/\n$/, "");
 

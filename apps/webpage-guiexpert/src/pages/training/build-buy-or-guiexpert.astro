@@ -27,7 +27,7 @@ import Callout from "../../components/training/Callout.astro";
       <tr><th>Licence</th><td>yours</td><td>MIT, free</td><td>commercial, per developer; watermark without key</td><td>MIT, free – also commercially</td></tr>
       <tr><th>Virtual scrolling</th><td>yourself (<ChapterLink slug="virtual-scrolling" label="ch. 2" />)</td><td>✔</td><td>✔</td><td>✔ rows <strong>and</strong> columns</td></tr>
       <tr><th>Excel export</th><td>yourself</td><td>–</td><td>✔</td><td>✔ without extra library (<ChapterLink slug="excel-export" label="ch. 24" />)</td></tr>
-      <tr><th>Range selection &amp; clipboard</th><td>yourself</td><td>–</td><td>✔</td><td>✔ (<ChapterLink slug="selection-and-copy" label="ch. 22" />)</td></tr>
+      <tr><th>Range selection &amp; clipboard</th><td>yourself</td><td>–</td><td>✔</td><td>✔ copy, cut and paste with Excel since 1.1.99 (<ChapterLink slug="selection-and-copy" label="ch. 22" />, <ChapterLink slug="spreadsheet" label="ch. 40" />)</td></tr>
       <tr><th>Server-side row model</th><td>yourself</td><td>–</td><td>✔</td><td>– own area model (<ChapterLink slug="custom-area-model" label="ch. 17" />)</td></tr>
       <tr><th>Row grouping with aggregation</th><td>yourself</td><td>–</td><td>✔</td><td>✔ since 1.1.94, no group panel (<ChapterLink slug="row-grouping" label="ch. 36" />)</td></tr>
       <tr><th>Pivot tables</th><td>yourself</td><td>–</td><td>✔</td><td>✔ since 1.1.94, no drag &amp; drop field list (<ChapterLink slug="pivot-tables" label="ch. 37" />)</td></tr>
@@ -37,12 +37,12 @@ import Callout from "../../components/training/Callout.astro";
       <tr><th>Fill handle &amp; batch edit</th><td>yourself (series rules, pending values per row)</td><td>–</td><td>✔</td><td>✔ <code>fillHandle</code> and <code>batchEdit</code>, since 1.1.96 (<ChapterLink slug="inline-editing" label="ch. 31" />)</td></tr>
       <tr><th>Master/detail (detail rows, nested tables)</th><td>yourself (a layer outside the virtual rows, life cycle, events)</td><td>–</td><td>✔</td><td>✔ <code>masterDetail</code>, flat tables, since 1.1.97 (<ChapterLink slug="master-detail" label="ch. 38" />)</td></tr>
       <tr><th>Right-to-left (Arabic, Hebrew)</th><td>yourself (mirror every position, negative <code>scrollLeft</code>, keyboard)</td><td>✔</td><td>✔</td><td>✔ <code>direction: "rtl"</code>, since 1.1.98 (<ChapterLink slug="theming-dark-mode" label="ch. 28" />)</td></tr>
-      <tr><th>Undo / redo, paste from the clipboard</th><td>yourself</td><td>undo ✔, paste –</td><td>✔</td><td>– not yet (one write path with old and new values to build on)</td></tr>
+      <tr><th>Undo / redo, paste from the clipboard</th><td>yourself</td><td>undo ✔, paste –</td><td>✔</td><td>✔ <code>undo</code>, <code>clipboard</code> since 1.1.99 – edits, paste, fill, rows and columns (<ChapterLink slug="spreadsheet" label="ch. 40" />)</td></tr>
       <tr><th>Total rows (sum, average …)</th><td>yourself (a footer model)</td><td>–</td><td>✔</td><td>✔ one option, since 1.1.94 (<ChapterLink slug="footer-totals" label="ch. 16" />)</td></tr>
       <tr><th>Calculated columns (<code>valueGetter</code>)</th><td>yourself</td><td>✔</td><td>✔</td><td>✔ sorting, filter, totals and Excel use the computed value, since 1.1.95</td></tr>
       <tr><th>Formulas typed by users</th><td>yourself (and a parser)</td><td>–</td><td>✔</td><td>✔ <code>formula</code>, own parser, no <code>eval</code>, since 1.1.95 (<a href="/showcase/formulas/run">showcase</a>, <ChapterLink slug="formulas" />)</td></tr>
       <tr><th>Show values as (% of total, running total, rank)</th><td>yourself</td><td>–</td><td>✔</td><td>✔ one option, since 1.1.95</td></tr>
-      <tr><th>Spreadsheet cell references (A1) &amp; formula editor</th><td>yourself</td><td>–</td><td>✔</td><td>– formulas use fields of the row; the input field is yours</td></tr>
+      <tr><th>Spreadsheet cell references (A1) &amp; formula editor</th><td>yourself</td><td>–</td><td>✔</td><td>✔ <code>cellFormulas</code>, 70 Excel functions, colored references and pointing while typing, own parser, no <code>eval</code>, since 1.1.99 (<a href="/showcase/spreadsheet/run">showcase</a>, <ChapterLink slug="spreadsheet" label="ch. 40" />)</td></tr>
       <tr><th>Filter UI</th><td>yourself</td><td>✔</td><td>✔</td><td>– filter function, the UI is yours (<ChapterLink slug="filtering" label="ch. 21" />)</td></tr>
       <tr><th>Frameworks</th><td>–</td><td>React, Angular, Vue, JS</td><td>React, Angular, Vue, JS</td><td>Angular 14–22, React, Vue, Svelte 4/5, Solid, Preact, Web Component, JS</td></tr>
       <tr><th>Runtime dependencies</th><td>–</td><td>–</td><td>–</td><td>none</td></tr>
@@ -52,10 +52,10 @@ import Callout from "../../components/training/Callout.astro";
   <h2 id="rule">Rule of thumb</h2>
   <Callout type="note" title="Which one?">
     <p>
-      If you need <strong>a drag &amp; drop group panel or pivot field list, spreadsheet-style cell formulas with an in-cell
-      formula editor, or a server-side row model off the shelf</strong>, ag-Grid Enterprise is further today. Row grouping
+      If you need <strong>a drag &amp; drop group panel or pivot field list or a server-side row model off the shelf</strong>
+      (a filter UI is already in ag-Grid Community), ag-Grid Enterprise is further today. Row grouping
       with totals and pivot tables are built in since 1.1.94 (<ChapterLink slug="row-grouping" />,
-      <ChapterLink slug="pivot-tables" />), calculated columns, „Show values as“ and formulas since 1.1.95.
+      <ChapterLink slug="pivot-tables" />), calculated columns, „Show values as“ and formulas since 1.1.95, a spreadsheet with cell formulas, copy &amp; paste and undo since 1.1.99 (<ChapterLink slug="spreadsheet" />).
     </p>
     <p>
       If you need <strong>large data sets, export, selection and full control over HTML and CSS</strong> – without licence

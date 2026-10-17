@@ -2,7 +2,7 @@
  * The training "GuiExpert Table – step by step" (https://gui.expert/training/).
  *
  * One chapter per episode of the 60-second video series. The demo repository has one git tag per
- * episode (`ep-001` … `ep-039`), so every chapter can link to the exact code state of its episode.
+ * episode (`ep-001` … `ep-040`), so every chapter can link to the exact code state of its episode.
  * New chapters are appended in part 8 ("advanced") – inserting them would shift all later numbers, tags and links.
  *
  * `api` entries are checked against the typedoc index at build time (see ApiLink.astro):
@@ -250,9 +250,11 @@ export const CHAPTERS: Chapter[] = [
     slug: "selection-and-copy", no: 22, part: "data", episode: 22, minutes: 5,
     title: "Select cells, rows and ranges – and copy them", nav: "Selection & copy",
     lead: "One selection model per table: cells, rows, columns or ranges, with mouse and keyboard.",
-    learn: ["choose a selection type", "react to selection changes", "copy the selection to the clipboard"],
+    learn: ["choose a selection type", "react to selection changes", "copy the selection to the clipboard",
+      "copy, cut and paste with Excel and Google Sheets (since 1.1.99)"],
     api: ["SelectionModel", "SelectionType", "SelectionMode", "TableOptionsIf.getSelectionModel",
-      "EventListenerIf.onSelectionChanged", "SelectionModelIf.getRanges", "TableApi.copyToClipboard"],
+      "EventListenerIf.onSelectionChanged", "SelectionModelIf.getRanges", "TableApi.copyToClipboard",
+      "TableOptionsIf.clipboard", "ClipboardOptionsIf", "TableApi.pasteText", "TableApi.cutSelection"],
     since: "1.1.88"
   },
   {
@@ -336,12 +338,14 @@ export const CHAPTERS: Chapter[] = [
     title: "Inline editing", nav: "Inline editing",
     lead: "Change quantity and status right in the table – and recalculate what depends on them.",
     learn: ["make a column editable", "convert input with editInputPipe", "use a select editor", "react to changes",
-      "fill cells with the fill handle and collect changes until saving (since 1.1.96)"],
+      "fill cells with the fill handle and collect changes until saving (since 1.1.96)",
+      "edit like in Excel: type to overwrite, Enter/Tab, Delete – with undo and redo (since 1.1.99)"],
     api: ["ColumnDefIf.editable", "ColumnDefIf.editInputPipe", "ColumnDefIf.getEditRenderer", "SelectCellRenderer",
       "ValueLabel", "EventListenerIf.onModelChanged", "GeModelChangeEvent", "TableApi.repaint",
       "TableOptionsIf.fillHandle", "TableOptionsIf.batchEdit", "ColumnDefIf.validate", "TableApi.commitBatchEdit",
-      "TableApi.getPendingChanges"],
-    showcases: [{ name: "batchedit", title: "Fill handle & batch edit" }],
+      "TableApi.getPendingChanges", "TableOptionsIf.editing", "EditingOptionsIf", "TableOptionsIf.undo",
+      "EventListenerIf.onUndoStackChanged", "TableApi.undo", "TableApi.redo"],
+    showcases: [{ name: "batchedit", title: "Fill handle & batch edit" }, { name: "spreadsheet", title: "Spreadsheet" }],
     since: "1.1.89"
   },
   {
@@ -434,6 +438,21 @@ export const CHAPTERS: Chapter[] = [
       "compileFormula", "FormulaError", "isFormulaError", "FORMULA_FUNCTION_NAMES", "TableApi.getRowValue", "ColumnDefIf.valueSetter"],
     showcases: [{ name: "formulas", title: "Formulas & calculated columns" }],
     since: "1.1.95"
+  },
+  {
+    slug: "spreadsheet", no: 40, part: "advanced", episode: 40, minutes: 7,
+    title: "A spreadsheet in the browser: cell formulas, copy & paste, undo", nav: "Spreadsheet",
+    lead: "Column letters, row numbers, =SUM(B2:B9), paste from Excel and Ctrl+Z – one call, MIT-licensed, formulas never run as code.",
+    learn: ["build a sheet with SpreadsheetFactory", "write formulas with A1 references and 70 Excel functions",
+      "add a formula bar", "insert and delete rows and columns – references follow",
+      "switch the parts on in an existing table: editing, clipboard, undo, cellFormulas",
+      "save the sheet as JSON and export it to Excel with formulas"],
+    api: ["SpreadsheetFactory.create", "SpreadsheetParamIf", "TableOptionsIf.spreadsheet", "TableOptionsIf.cellFormulas",
+      "FormulaBar", "TableApi.getActiveCell", "TableApi.getCellAddress", "TableApi.setCellInput", "TableApi.getCellInput",
+      "TableApi.getCellValue", "TableApi.insertRows", "TableApi.deleteRows", "TableApi.insertColumns", "TableApi.deleteColumns",
+      "TableApi.getSheetData", "TableApi.undo", "TableApi.goToAddress", "FORMULA_FUNCTION_INFO", "SheetEngine"],
+    showcases: [{ name: "spreadsheet", title: "Spreadsheet" }],
+    since: "1.1.99"
   }
 ];
 

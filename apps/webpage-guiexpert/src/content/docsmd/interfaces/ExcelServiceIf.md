@@ -13,6 +13,7 @@ pass your own as last argument of the `TableScope` constructor to change how [Ta
 
 ### Properties
 
+- [supportsFormulas](ExcelServiceIf.md#supportsformulas)
 - [supportsNumberFormats](ExcelServiceIf.md#supportsnumberformats)
 
 ### Methods
@@ -20,6 +21,19 @@ pass your own as last argument of the `TableScope` constructor to change how [Ta
 - [downloadExcel](ExcelServiceIf.md#downloadexcel)
 
 ## Properties
+
+### supportsFormulas
+
+• `Optional` `Readonly` **supportsFormulas**: `boolean`
+
+True if the service understands cells of the form [ExcelFormulaCellIf](ExcelFormulaCellIf.md) (`{ formula, value }`). Only then
+[TableApi.downloadExcel](../classes/TableApi.md#downloadexcel) with `{ cellFormulas: true }` exports cell formulas as formulas (since 1.1.99).
+
+#### Defined in
+
+[src/lib/table/service/excel-service.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.if.ts#L25)
+
+___
 
 ### supportsNumberFormats
 

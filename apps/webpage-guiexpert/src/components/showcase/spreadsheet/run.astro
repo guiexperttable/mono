@@ -1,0 +1,157 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="sheet-bar">
+  <button type="button" class={id + '-undo'} disabled>Undo</button>
+  <button type="button" class={id + '-redo'} disabled>Redo</button>
+  <button type="button" class={id + '-excel'}>Excel (with formulas)</button>
+  <button type="button" class={id + '-reset'}>Reset</button>
+  <span class:list={[id + '-log', 'sheet-log']} aria-live="off">Right-click a cell: insert or delete rows and columns</span>
+</div>
+<div class:list={[id + '-formula-bar', 'sheet-formula-bar']}></div>
+<div
+    style="height: calc(100vh - 214px)"
+    class:list={[ id, 'sheet-demo' ]}></div>
+<div class:list={[id + '-menu', 'sheet-menu']} role="menu" aria-label="Cell" hidden>
+  <button type="button" role="menuitem" data-action="cut">Cut</button>
+  <button type="button" role="menuitem" data-action="copy">Copy</button>
+  <button type="button" role="menuitem" data-action="insertRow">Insert row above</button>
+  <button type="button" role="menuitem" data-action="deleteRow">Delete row</button>
+  <button type="button" role="menuitem" data-action="insertColumn">Insert column left</button>
+  <button type="button" role="menuitem" data-action="deleteColumn">Delete column</button>
+</div>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService, FormulaBar, CellRange } from '/scripts/table/index.js'
+  import { createSpreadsheetQuoteModelAndOptions } from "/scripts/demo-table-models/index.js";
+
+  // A quote with formulas: =B2*C2*(1-D2), =SUM(E2:E6), =IF(E8>=1000,0,49) – type, paste from Excel, undo
+  const ele = document.querySelector('.' + id);
+  const barHost = document.querySelector('.' + id + '-formula-bar');
+  const menu = document.querySelector('.' + id + '-menu');
+  const log = document.querySelector('.' + id + '-log');
+  const undoButton = document.querySelector('.' + id + '-undo');
+  const redoButton = document.querySelector('.' + id + '-redo');
+  let tableApi, bar, menuCell;
+
+  function create() {
+    bar?.destroy();
+    tableApi?.destroy();
+    const {tableModel, tableOptions} = createSpreadsheetQuoteModelAndOptions();
+    const listener = new EventAdapter();
+    listener.onContextmenu = evt => openMenu(evt);
+    listener.onUndoStackChanged = evt => {
+      undoButton.disabled = !evt.canUndo;
+      redoButton.disabled = !evt.canRedo;
+      undoButton.title = evt.undoLabel ?? '';
+    };
+    const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+    bar = new FormulaBar(barHost, tableApi);
+    undoButton.disabled = redoButton.disabled = true;
+  }
+
+  function openMenu(evt) {
+    if (evt.areaIdent !== 'body' || evt.columnIndex < 1 || !evt.originalEvent) return;
+    evt.originalEvent.preventDefault();
+    menuCell = [evt.rowIndex, evt.columnIndex];
+    tableApi.getTableScope().selectBodyRange(CellRange.singleCell(evt.rowIndex, evt.columnIndex));
+    menu.style.left = evt.originalEvent.clientX + 'px';
+    menu.style.top = evt.originalEvent.clientY + 'px';
+    menu.hidden = false;
+    menu.querySelector('button').focus();
+  }
+
+  function closeMenu() {
+    menu.hidden = true;
+    ele.focus();
+  }
+
+  menu.addEventListener('click', async e => {
+    const action = e.target.dataset.action;
+    const cell = menuCell;
+    closeMenu();
+    if (!cell || !action) return;
+    const address = tableApi.getCellAddress(cell[0], cell[1]);       // e.g. "C5"
+    const row = Number(address.replace(/^[A-Z]+/, '')) - 1;           // the row of the sheet (also when sorted)
+    const col = cell[1] - 1;                                            // the letter (behind the row numbers)
+    if (action === 'cut') await tableApi.cutSelection();
+    if (action === 'copy') await tableApi.copySelection();
+    if (action === 'insertRow') tableApi.insertRows(row, 1);
+    if (action === 'deleteRow') tableApi.deleteRows(row, 1);
+    if (action === 'insertColumn') tableApi.insertColumns(col, 1);
+    if (action === 'deleteColumn') tableApi.deleteColumns(col, 1);
+    log.textContent = action + ' at ' + address + ' – the formulas follow (Ctrl+Z takes it back)';
+  });
+  menu.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  document.addEventListener('pointerdown', e => { if (!menu.contains(e.target)) menu.hidden = true; });
+
+  undoButton.addEventListener('click', () => tableApi.undo());
+  redoButton.addEventListener('click', () => tableApi.redo());
+  document.querySelector('.' + id + '-excel').addEventListener('click',
+    () => tableApi.downloadExcel('quote.xlsx', '', { cellFormulas: true }));
+  document.querySelector('.' + id + '-reset').addEventListener('click', create);
+  create();
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .sheet-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .sheet-bar button,
+    .sheet-menu button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .sheet-bar button:disabled {
+        opacity: 0.4;
+    }
+    .sheet-log {
+        opacity: 0.8;
+    }
+    .sheet-formula-bar {
+        margin-bottom: 6px;
+    }
+    .sheet-menu {
+        position: fixed;
+        z-index: 20000;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 4px;
+        border: 1px solid var(--ge-table-formula-popup-border);
+        border-radius: 4px;
+        background: var(--ge-table-formula-popup-bg);
+        color: var(--ge-table-formula-popup-text);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .sheet-menu[hidden] {
+        display: none;
+    }
+    .sheet-menu button {
+        border: 0;
+        text-align: start;
+    }
+    .sheet-menu button:hover,
+    .sheet-menu button:focus-visible {
+        background: var(--ge-table-formula-popup-active-bg);
+    }
+</style>

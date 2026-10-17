@@ -2120,13 +2120,67 @@ engine.getValue(3, 3);                 // 3098
   TEXT (subset), TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, EOMONTH, DATEDIF, ISBLANK, ISNUMBER, ISTEXT, ISERROR, ISNA,
   NA – checked against LibreOffice; own functions via `{ functions }` (a range argument is a `FormulaRange`).
   `maxRangeCells` (default 10 million) counts the rows that hold data: `=SUM(A:A)` is fine, a range over 10 million
-  filled cells gives `#ERROR!`. A running sum `=SUM($B$2:B2)` copied down n rows costs O(n²) per change (as in Excel) –
-  `=C1+B2` is linear.
+  filled cells gives `#ERROR!`.
 - **Moving formulas**: `shiftFormula("B2*$F$1", 1, 0)` → `"B3*$F$1"`, `adjustFormula(text, { kind: "deleteRows", at, count })`
   (Excel's rules, `#REF!`), `parseCellAddress`, `toCellAddress`, `columnLetter`.
 - **Limits**: no array/spill formulas, no sheet references or named ranges, English function names. A running sum
   `=SUM($B$2:B2)` filled down is quadratic (10 000 rows ≈ 2 s per change in B2) – use `=C1+B2` instead.
-- The table itself uses the engine with the spreadsheet mode (next releases).
+- The table uses the engine with `tableOptions.cellFormulas` (6.24).
+
+### 6.24 Cell formulas in the table (since 1.1.99)
+
+`tableOptions.cellFormulas: true` calculates every text with a leading `=` in the data – the data keep the formula
+text (save the rows, load the rows), the table shows the result:
+
+```ts
+import { ColumnDef, TableFactory, TableOptions, TrueFn } from "@guiexpert/table";
+import type { TableOptionsIf } from "@guiexpert/table";
+
+const rows = [
+  { product: "Laptop", price: 1299, qty: 2, total: "=B1*C1" },
+  { product: "Mouse", price: 25, qty: 10, total: "=B2*C2" },
+  { product: "Sum", price: null, qty: null, total: "=SUM(D1:D2)" },
+];
+const tableModel = TableFactory.createTableModel({
+  rows,
+  rowNumbersVisible: { mode: "original" },   // the row numbers of the references
+  columnDefs: ["product", "price", "qty", "total"].map(property => ColumnDef.create({ property, editable: TrueFn })),
+});
+const tableOptions: TableOptionsIf = { ...new TableOptions(), editing: true, fillHandle: true, cellFormulas: true };
+```
+
+- **Addresses**: row n = the n-th row of `getAllRows()` (the array of an array body) – sorting and filtering keep the
+  references at their rows (Excel); column A = the first data column (row numbers and checkboxes don't count). Object
+  rows: the letter belongs to the property (a dragged column takes it along); arrays: column drag is off.
+  `api.getCellAddress(rowIndex, column)`, `getCellByAddress("B3")`, `getSheetValue("D3")` (also a hidden row).
+- **Writing**: editor, paste, fill, Delete, `applyCellChanges`, `setCellInput(row, column, "=B2*C2")` and `updateCells`
+  recalculate the dependent cells before the repaint. A formula skips `editInputPipe` and `validate`; a syntax error is
+  stored and shows `#ERROR!` (`rejectInvalidFormulas: true` refuses it). `'=1+1` is the text `=1+1`. Data changed
+  outside the table: `api.recalculate()` (`repaint()` does not recalculate). `setRows` and other row counts rebuild.
+- **Input and value**: `api.getCellInput()` = the formula text (editor, `F2`), `api.getCellValue()` = the result;
+  sorting, filters (`api.getRowValue`), `footerAggregates`, copy to other apps and the Excel export use results.
+  `onModelChanged` reports formula texts in `oldValue`/`newValue` – undo puts them back.
+- **Moving**: the fill handle and copy + paste inside the table move relative references (`=B2*C2` → `=B3*C3`,
+  `$B$1` stays, off the sheet `#REF!`); a cut formula moves unchanged.
+- **Excel**: `api.downloadExcel("offer.xlsx", "", { cellFormulas: true })` writes real formulas with their values
+  (`_xlfn.` for XLOOKUP & co., recalculated on opening) – only if the export is the sheet (no filter, no sorting, every
+  data column visible); otherwise values and a warning.
+- **Errors** show their code (`#DIV/0!`, `#REF!`, `#CIRC!` …), class `ge-table-cell-error`, the message as tooltip.
+- **Per column**: `cellFormulas: { columns: ["total"] }` or `ColumnDef.create({ …, cellFormulas: false })` (free text).
+- **Limits**: flat bodies only (a tree, row grouping, pivot table or master/detail: a warning, no formulas); row drag
+  is off; `addRows`/`removeRows` don't adjust references yet (inserting and deleting rows with adjusted references:
+  spreadsheet mode). A pending formula of a batch edit is calculated after the commit.
+- **Typing formulas** (with `editing`): after `=`, `(`, `,` or an operator the arrow keys insert a reference instead of
+  leaving the cell (Shift+arrows: a range, `F2` switches between pointing and moving the caret), a click on a cell
+  inserts its reference, dragging spans a range; `F4` cycles `A1` → `$A$1` → `A$1` → `$A1`. References are colored in
+  the editor and framed in the table (`--ge-table-formula-ref-0` … `-7`). Typing a function name lists the matching
+  functions (also own ones; ↑/↓, Tab or Enter takes `SUM(`, Escape closes the list); inside a call a hint shows the
+  arguments, the current one bold. A formula with a syntax error is stored (`#ERROR!`) and announced; with
+  `rejectInvalidFormulas` the editor stays open (`aria-invalid`). Screen readers: the input is a combobox with the
+  list (`aria-activedescendant`), the hint is its description; texts `AriaTextsIf.functionSuggestions`,
+  `referenceInserted`, `formulaError`.
+- More API: `hasCellFormulas()`, `evaluateFormula("=SUM(D2:D4)")`, `getPrecedents(row, column)` (`["B2", "C2"]`),
+  `getDependents(row, column)`, `getSheetEngine()`. Demo: `apps/table-demo/cell-formulas.html`.
 
 ---
 

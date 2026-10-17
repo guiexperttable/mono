@@ -343,6 +343,7 @@ export * from './lib/table/sheet-editing/editors/select-cell-editor';
 export * from './lib/table/sheet-editing/sheet-navigation';
 export * from './lib/table/sheet-editing/editing-keymap';
 export * from './lib/table/sheet-editing/cell-editor-service';
+export * from './lib/table/sheet-editing/formula-assist';
 
 // Copy, cut and paste (since 1.1.99, prompt 013 stage 2)
 export * from './lib/table/clipboard/clipboard-options.if';
@@ -375,4 +376,5 @@ export { formatFormula } from './lib/table/sheet/format-formula';
 export * from './lib/table/sheet/shift-formula';
 export * from './lib/table/sheet/sheet-engine';
 export * from './lib/table/sheet/sheet-function-info';
+export { TableSheet } from './lib/table/sheet/table-sheet';
 export * from './lib/table/data/common/event/ge-edit-event';

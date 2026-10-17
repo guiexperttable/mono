@@ -18,6 +18,47 @@ export interface ExcelServiceIf {
    */
   readonly supportsNumberFormats?: boolean;
 
+  /**
+   * True if the service understands cells of the form {@link ExcelFormulaCellIf} (`{ formula, value }`). Only then
+   * {@link TableApi.downloadExcel} with `{ cellFormulas: true }` exports cell formulas as formulas (since 1.1.99).
+   */
+  readonly supportsFormulas?: boolean;
+
+}
+
+/**
+ * A cell of an Excel matrix with a formula (`<f>`) and its calculated value (`<v>`, shown until Excel recalculates).
+ * Understood by {@link ExcelService}; {@link TableApi.downloadExcel} writes them for cell formulas with
+ * `{ cellFormulas: true }`.
+ *
+ * @example
+ * await new ExcelService().downloadExcel([[2, 3, { formula: "A1*B1", value: 6 }]], "sheet.xlsx");
+ *
+ * @since 1.1.99
+ * @category Export & clipboard
+ */
+export interface ExcelFormulaCellIf {
+  /** The formula without `=`, with Excel's function names (`"SUM(D2:D4)"`, `"_xlfn.XLOOKUP(…)"`). */
+  formula: string;
+  /** The calculated value: a number, text, boolean, `Date` or an error value. */
+  value: unknown;
+}
+
+/**
+ * True for a cell of the form {@link ExcelFormulaCellIf}.
+ *
+ * @param {unknown} cell - a cell of an Excel matrix
+ * @returns {boolean} whether it is a formula cell
+ *
+ * @example
+ * isExcelFormulaCell({ formula: "A1*2", value: 4 });   // true
+ *
+ * @since 1.1.99
+ * @category Export & clipboard
+ */
+export function isExcelFormulaCell(cell: unknown): cell is ExcelFormulaCellIf {
+  return !!cell && typeof cell === "object" && typeof (cell as ExcelFormulaCellIf).formula === "string"
+    && "value" in (cell as object);
 }
 /**
  * A cell of an Excel matrix with a number format, e.g. a share shown as percentage. Understood by

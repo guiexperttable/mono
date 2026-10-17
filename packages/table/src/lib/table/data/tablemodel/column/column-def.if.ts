@@ -214,7 +214,17 @@ export interface ColumnDefIf {
    *
    * @since 1.1.99
    */
-  emptyValue?: unknown
+  emptyValue?: unknown,
+  /**
+   * `false`: this column never holds cell formulas ({@link TableOptionsIf.cellFormulas}) – `"=…"` stays text (free
+   * text, notes). Default: every data column of a table with `cellFormulas`.
+   *
+   * @example
+   * ColumnDef.create({ property: "note", editable: TrueFn, cellFormulas: false })
+   *
+   * @since 1.1.99
+   */
+  cellFormulas?: boolean
 }
 
 /**

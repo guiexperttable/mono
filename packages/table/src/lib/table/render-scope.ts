@@ -41,6 +41,7 @@ import { AriaTexts } from './aria/aria-texts';
 import { AriaTextsIf } from './aria/aria-texts.if';
 import { RowLayout } from './row-layout/row-layout';
 import type { MasterDetailService } from './master-detail/master-detail-service';
+import type { TableSheet } from './sheet/table-sheet';
 
 
 /**
@@ -181,6 +182,12 @@ export class RenderScope extends EleScope {
    * @since 1.1.97
    */
   masterDetailService?: MasterDetailService;
+
+  /**
+   * Cell formulas of this table – created by {@link TableScope} with `tableOptions.cellFormulas` (flat bodies).
+   * @since 1.1.99
+   */
+  tableSheet?: TableSheet;
 
   /** Positions of the body rows (prefix sums of the heights + detail rows), see {@link getBodyRowLayout}. */
   private readonly bodyRowLayout = new RowLayout();
@@ -813,17 +820,31 @@ export class RenderScope extends EleScope {
 
     const bodyModel = this.tableModel.getBodyModel();
     const rowCountBefore = bodyModel.getRowCount();
+    const sheet = this.tableSheet;
     const apply = () => events.forEach(evt => {
-        this.tableModel
-          .getAreaModel(evt.area)
-          .setValue(evt.rowIndex, evt.columnIndex, evt.value);
-        if (!repaintAll) {
-          this.rerenderCellContent(evt);
+        if (sheet && evt.area === 'body' && sheet.isFormulaInput(evt.columnIndex, evt.value)) {
+          this.setRawValue(evt.rowIndex, evt.columnIndex, evt.value); // a cell formula: as typed (since 1.1.99)
+        } else {
+          this.tableModel
+            .getAreaModel(evt.area)
+            .setValue(evt.rowIndex, evt.columnIndex, evt.value);
+        }
+        if (!repaintAll && !(sheet && evt.area === 'body')) {
+          this.rerenderCellContent(evt); // cell formulas: one repaint afterwards (other cells change too)
         }
       }
     );
     // a row grouping moves rows with a changed grouped value only after the last event (the indices stay valid)
     const regrouped = isAreaModelRowGroups(bodyModel) ? bodyModel.batch(apply) : (apply(), false);
+    const sheetEvents = this.tableSheet ? events.filter(evt => evt.area === 'body') : [];
+    if (sheetEvents.length) {
+      // cell formulas (since 1.1.99): recalculate the dependents, then repaint (other cells changed too)
+      this.tableSheet!.cellsWritten(sheetEvents.map(evt => ({
+        row: undefined, rowIndex: evt.rowIndex, columnIndex: evt.columnIndex, property: '', oldValue: undefined,
+        newValue: evt.value
+      })));
+      repaintAll = true;
+    }
     if (regrouped) {
       this.invalidateAggregates();
       this.repaintHard();             // rows moved to other groups: labels, counts and positions changed
@@ -844,6 +865,25 @@ export class RenderScope extends EleScope {
       this.rerenderDerivedFooterCells(events);
       this.rerenderGroupRowCells();
       this.rerenderCalculatedCells();
+    }
+  }
+
+  /**
+   * Writes a value without the column's `editInputPipe` (values copied inside the table are already converted – a pipe
+   * that expects text could break them). All area models apply the pipe in `setValue`, so it is left out for the call.
+   */
+  protected setRawValue(rowIndex: number, columnIndex: number, value: unknown): boolean {
+    const body = this.tableModel.getBodyModel();
+    const def = this.tableModel.getColumnDef(columnIndex);
+    const pipe = def?.editInputPipe;
+    if (!def || !pipe || Object.isFrozen(def)) {
+      return body.setValue(rowIndex, columnIndex, value); // a frozen column definition: with its pipe
+    }
+    def.editInputPipe = undefined;
+    try {
+      return body.setValue(rowIndex, columnIndex, value);
+    } finally {
+      def.editInputPipe = pipe;
     }
   }
 

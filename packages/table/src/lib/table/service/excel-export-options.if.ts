@@ -15,4 +15,11 @@ export interface ExcelExportOptionsIf {
    * {@link TableApi.downloadExcel} sets it for a right-to-left table ({@link TableOptionsIf.direction}).
    */
   rightToLeft?: boolean;
+
+  /**
+   * {@link TableApi.downloadExcel}: cell formulas ({@link TableOptionsIf.cellFormulas}) become Excel formulas with their
+   * calculated values (otherwise: values). Only if the export is the sheet itself – no filter hides rows, no sorting,
+   * every data column visible; otherwise values and a warning. Since 1.1.99.
+   */
+  cellFormulas?: boolean;
 }

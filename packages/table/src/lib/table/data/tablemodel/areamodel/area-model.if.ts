@@ -379,6 +379,18 @@ export interface AreaModelIf {
   isCalculatedProperty?(property: string): boolean;
 
   /**
+   * Optional: the input of a cell – what was typed, e.g. the formula text of a cell formula (`"=B2*C2"`), while
+   * {@link getValueAt} gives its result ({@link TableOptionsIf.cellFormulas}). Editor, copy inside the table and undo
+   * use it. Without it the input is the value. Implemented by the object-array and array models.
+   *
+   * @example
+   * tableModel.getBodyModel().getInputValueAt?.(0, 3);   // "=B2*C2"
+   *
+   * @since 1.1.99
+   */
+  getInputValueAt?(rowIndex: number, columnIndex: number): unknown;
+
+  /**
    * Optional: the value of a column for a row object – computed for a calculated column, otherwise the property
    * path ({@link TableApi.getRowValue}). Implemented by the object-array, tree, row-group and pivot models.
    *

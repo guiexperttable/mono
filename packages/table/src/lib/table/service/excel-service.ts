@@ -1,6 +1,11 @@
 
 import type { ExcelExportOptionsIf } from "./excel-export-options.if";
-import { ExcelServiceIf, isExcelFormattedValue } from './excel-service.if';
+import { ExcelServiceIf, isExcelFormattedValue, isExcelFormulaCell } from './excel-service.if';
+import { isFormulaError } from '../formula/formula-error';
+import { dateToSerial } from '../sheet/sheet-values';
+
+/** The number format of date results of formulas. */
+const DATE_FORMAT = 'yyyy-mm-dd';
 
 let crcTable: Uint32Array | undefined;
 
@@ -75,6 +80,9 @@ export class ExcelService implements ExcelServiceIf {
 
   /** Understands cells `{ value, numberFormat }` ({@link ExcelFormattedValueIf}), since 1.1.95. */
   readonly supportsNumberFormats = true;
+
+  /** Understands cells `{ formula, value }` ({@link ExcelFormulaCellIf}), since 1.1.99. */
+  readonly supportsFormulas = true;
 
   /**
    * Downloads a matrix data as an Excel file.
@@ -173,7 +181,10 @@ export class ExcelService implements ExcelServiceIf {
 
     zip.set('xl/sharedStrings.xml', x1SharedStringsXml);
     zip.set('xl/styles.xml', stylesXml);
-    zip.set('xl/workbook.xml', x1WorksheetXml);
+    // formulas: Excel and LibreOffice recalculate when opening (the cached values are the table's)
+    const hasFormulas = data.some(row => row.some(cell => isExcelFormulaCell(cell)));
+    zip.set('xl/workbook.xml', hasFormulas ? x1WorksheetXml.replace('<calcPr calcId="181029"/>',
+      '<calcPr calcId="181029" fullCalcOnLoad="1"/>') : x1WorksheetXml);
 
     zip.set('[Content_Types].xml', contentTypesXml);
 
@@ -205,6 +216,9 @@ export class ExcelService implements ExcelServiceIf {
         if (typeof cell === 'number') {
           sb.push(`<c r="${cellAddress}"><v>${cell}</v></c>`);
 
+        } else if (isExcelFormulaCell(cell)) {
+          sb.push(this.formulaCellXml(cellAddress, cell.formula, cell.value));
+
         } else if (isExcelFormattedValue(cell) && Number.isFinite(cell.value)) {
           // a number with format: style index 1… (see withNumberFormats)
           sb.push(`<c r="${cellAddress}" s="${this.numberFormatStyles.get(cell.numberFormat) ?? 0}"><v>${cell.value}</v></c>`);
@@ -226,6 +240,23 @@ export class ExcelService implements ExcelServiceIf {
     return sb.join('\n');
   }
 
+  /** A formula cell: `<f>` plus the cached value with its type (`str`, `b`, `e`; numbers and dates without). */
+  private formulaCellXml(address: string, formula: string, value: unknown): string {
+    const f = `<f>${this.escapeXml(formula)}</f>`;
+    if (typeof value === 'number' && Number.isFinite(value)) return `<c r="${address}">${f}<v>${value}</v></c>`;
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      return `<c r="${address}" s="${this.numberFormatStyles.get(DATE_FORMAT) ?? 0}">${f}<v>${dateToSerial(value)}</v></c>`;
+    }
+    if (typeof value === 'boolean') return `<c r="${address}" t="b">${f}<v>${value ? 1 : 0}</v></c>`;
+    if (isFormulaError(value)) {
+      // own codes without an Excel counterpart (#CIRC!, #ERROR!) as #VALUE!
+      const code = ['#DIV/0!', '#NAME?', '#VALUE!', '#REF!', '#N/A', '#NUM!', '#NULL!'].includes(value.code) ? value.code : '#VALUE!';
+      return `<c r="${address}" t="e">${f}<v>${code}</v></c>`;
+    }
+    const text = value === null || value === undefined ? '' : this.escapeXml(String(value));
+    return `<c r="${address}" t="str">${f}<v>${text}</v></c>`;
+  }
+
   /** Number format → cell style index (1-based; 0 = default), filled by withNumberFormats() before the sheet is written. */
   private numberFormatStyles = new Map<string, number>();
 
@@ -235,6 +266,8 @@ export class ExcelService implements ExcelServiceIf {
     for (const row of data) {
       for (const cell of row) {
         if (isExcelFormattedValue(cell) && !formats.includes(cell.numberFormat)) formats.push(cell.numberFormat);
+        // a formula with a date result (since 1.1.99): a date format, otherwise Excel shows the serial number
+        if (isExcelFormulaCell(cell) && cell.value instanceof Date && !formats.includes(DATE_FORMAT)) formats.push(DATE_FORMAT);
       }
     }
     this.numberFormatStyles = new Map(formats.map((format, i) => [format, i + 1]));

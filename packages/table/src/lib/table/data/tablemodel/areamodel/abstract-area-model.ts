@@ -13,6 +13,7 @@ import { AggregateCellRenderer } from "../../../renderer/aggregate-cell-renderer
 import { formatShowValuesAs } from "../../../calc/show-values-as";
 import { isFormulaError } from "../../../formula/formula-error";
 import { isCheckboxColumnDef, isRowGroupColumnDef, isRowNumberColumnDef, isTreeRow } from "../../../instanceof-workaround";
+import type { SheetCellsIf } from "../../../sheet/sheet-cells.if";
 
 
 /** @category Area models */
@@ -23,6 +24,8 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
   private calcTextRenderer?: AggregateCellRenderer;
   protected cellRenderers: (CellRendererIf | undefined)[];
   protected yPositions: number[] = [];
+  /** Cell formulas of the table (since 1.1.99, set by the table for a flat body). @internal */
+  sheetCells?: SheetCellsIf;
 
   constructor(
     public areaIdent: AreaIdent,
@@ -42,7 +45,11 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
     return '' + this.getValueAt(rowIndex, columnIndex);
   }
 
-  getTooltipAt(_rowIndex: number, _columnIndex: number): any {
+  getTooltipAt(rowIndex: number, columnIndex: number): any {
+    if (this.sheetCells?.isFormulaColumnIndex(columnIndex)) {
+      const value = this.getValueAt(rowIndex, columnIndex);
+      if (isFormulaError(value)) return value.message; // a cell formula (since 1.1.99)
+    }
     return "";
   };
 
@@ -59,7 +66,10 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
     return 0;
   }
 
-  getCustomClassesAt(_rowIndex: number, _columnIndex: number): string[] {
+  getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
+    if (this.sheetCells?.isFormulaColumnIndex(columnIndex) && isFormulaError(this.getValueAt(rowIndex, columnIndex))) {
+      return ["ge-table-cell-error"]; // a cell formula (since 1.1.99)
+    }
     return [];
   }
 
@@ -225,7 +235,7 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
    * @since 1.1.95
    */
   isCalculatedProperty(property: string): boolean {
-    return this.getColumnValues().isCalculated(property);
+    return this.getColumnValues().isCalculated(property) || !!this.sheetCells?.isFormulaProperty(property);
   }
 
   /**
@@ -246,7 +256,8 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
     if (isTreeRow(row)) {
       row = row.data; // a TreeRow
     }
-    return this.getColumnValues().get(row, property);
+    const value = this.getColumnValues().get(row, property);
+    return this.sheetCells && typeof value === "string" ? this.sheetCells.valueOfProperty(row, property, value) : value;
   }
 
   /**
@@ -278,8 +289,13 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
     return this.columnValuesInstance ??= new ColumnValues({
       // calculated columns and „Show values as“ apply to the body only (header and footer show their own data)
       getColumnDefsForValues: () => this.areaIdent === "body" ? this.columnDefs : [],
-      readPath: (row: any, property: string) => this.readPropertyPath(row, property),
+      readPath: (row: any, property: string) => {
+        const value = this.readPropertyPath(row, property);
+        // cell formulas (since 1.1.99): a calculated column reads the result, not the formula text
+        return this.sheetCells && typeof value === "string" ? this.sheetCells.valueOfProperty(row, property, value) : value;
+      },
       getAggregationSource: () => this.getAggregationSourceForValues(),
+      isSheetFormula: (property: string) => !!this.sheetCells?.isFormulaProperty(property),
     });
   }
 

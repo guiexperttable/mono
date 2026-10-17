@@ -17,6 +17,8 @@ export interface ColumnValuesOwner {
   readPath(row: any, property: string): unknown;
   /** The rows of column aggregates (filtered, data objects) and a cheap signal that changes with them. */
   getAggregationSource(): { signal: unknown; length: number; rows: () => ArrayLike<unknown> };
+  /** True if the property holds cell formulas (since 1.1.99): formulas read it through `readPath`, not the object. */
+  isSheetFormula?(property: string): boolean;
 }
 
 /**
@@ -132,7 +134,7 @@ export class ColumnValues {
         property,
         getValue: (row: any, p: string) => this.get(row, p),
         hasColumn: (p: string) => this.hasColumn(p),
-        isCalculated: (p: string) => this.isCalculated(p),
+        isCalculated: (p: string) => this.isCalculated(p) || !!this.owner.isSheetFormula?.(p),
         aggregate: (p: string, aggregator: AggregatorRef) => this.aggregate(p, aggregator),
       };
       this.contexts.set(property, ctx);

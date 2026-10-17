@@ -89,6 +89,11 @@ export class RowNumberColumnDef implements ColumnDefIf {
    */
   getRowNumber(rowIndex: number, bodyModel: AreaModelIf): number {
     if (this.options.mode === "original") {
+      // a sheet (since 1.1.99): the model knows the physical row without an array of all rows
+      const physical = (bodyModel as { getPhysicalRowIndex?: (i: number) => number }).getPhysicalRowIndex?.(rowIndex);
+      if (physical !== undefined) {
+        return physical + 1;
+      }
       const position = this.getOriginalPosition(bodyModel.getRowByIndex(rowIndex), bodyModel);
       if (position !== undefined) {
         return position + 1;
@@ -126,6 +131,8 @@ export class RowNumberColumnDef implements ColumnDefIf {
     let max = bodyModel.getRowCount();
     if (this.options.mode === "original" && this.hasAllRows(bodyModel)) {
       max = bodyModel.getUnfilteredRowCount?.() ?? bodyModel.getAllRows().length;
+    } else if (this.options.mode === "original" && "getPhysicalRowIndex" in bodyModel) {
+      max = bodyModel.getUnfilteredRowCount?.() ?? max; // a sheet (since 1.1.99)
     }
     return this.options.format(Math.max(1, max));
   }

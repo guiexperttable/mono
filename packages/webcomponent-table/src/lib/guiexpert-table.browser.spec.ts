@@ -1,7 +1,7 @@
 // Smoke test of the Web Component in Chromium: data → tableReady → rows → click → new data → disconnect/re-connect.
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
+import { FormulaBar, SpreadsheetFactory, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent, TableApi, TableModelAndOptions, TableOptions, TableScope } from '@guiexpert/table';
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
@@ -150,6 +150,24 @@ describe('GuiexpertTable (Web Component)', () => {
     expect([plain.rows[1].qty, plain.rows[2].qty]).toEqual([4, 5]);
     expect(changes).toHaveLength(1);
     expect(changes[0].source).toBe('paste');
+  });
+
+  it('spreadsheet: SpreadsheetFactory + FormulaBar without wrapper code – typing a formula, "modelChanged" (since 1.1.99)', async () => {
+    const { host, el, events } = createTableElement();
+    const changes: GeModelChangeEvent[] = [];
+    host.addEventListener('modelChanged', e => changes.push((e as CustomEvent<GeModelChangeEvent>).detail));
+    const { tableModel, tableOptions } = SpreadsheetFactory.create({ data: [[2, 3]] });
+    el.data = data(tableModel, tableOptions);
+    await nextFrame();
+    const api = events.tableReady[0];
+    const bar = new FormulaBar(host, api);
+    await userEvent.click(bodyCell(el, 0, 3));
+    await userEvent.keyboard('=A1*B1{Enter}');
+    expect(api.getCellValue(0, 3)).toBe(6);
+    expect(changes).toHaveLength(1);
+    api.goToAddress('C1');
+    expect(bar.input.value).toBe('=A1*B1');
+    bar.destroy();
   });
 
   it('undo and redo: "undoStackChanged" (bubbling) (since 1.1.99)', async () => {

@@ -8,7 +8,7 @@ import { CellRange } from "../data/common/cell-range";
 import { OnActionTriggeredIf } from "../action/on-action-triggered.if";
 import { ActionId } from "../action/action-id.type";
 import type { SelectionModel, SelectionSnapshot } from "./selection-model";
-import { isRowNumberColumnDef } from "../instanceof-workaround";
+import { isCheckboxColumnDef, isRowNumberColumnDef } from "../instanceof-workaround";
 
 
 /** @category Internals */
@@ -108,6 +108,9 @@ export class SelectionService implements OnActionTriggeredIf {
       && evt.rowIndex === this.tableScope.tableModel.getAreaModel('header').getRowCount() - 1) {
       return this.selectAllByRowNumberHeader(); // the "#" corner, like in a spreadsheet
     }
+    if (evt.areaIdent === 'header' && evt.clickCount === 1 && evt.columnIndex > -1 && this.isColumnLetterCell(evt)) {
+      return this.clickColumnLetter(evt); // a column letter (since 1.1.99): the whole column
+    }
     if (evt.areaIdent !== 'body' || evt.rowIndex < 0 || evt.columnIndex < 0 || evt.clickCount > 1) {
       return false; // header/footer (before: cleared the selection, focused a body cell), double click
     }
@@ -169,6 +172,7 @@ export class SelectionService implements OnActionTriggeredIf {
           this.anchorRanges = sm.getRanges().filter(r => !before.includes(r));
           this.previousEvt = evt.clone();
           this.anchor = [evt.rowIndex, evt.columnIndex];
+          this.letterAnchor = undefined; // Shift+click on a letter spans from the active cell's column again
           this.extent = undefined;
           this.tableScope.onSelectionChanged(sm);
         });
@@ -327,6 +331,50 @@ export class SelectionService implements OnActionTriggeredIf {
   private isRowNumberColumn(columnIndex: number): boolean {
     return columnIndex > -1 && isRowNumberColumnDef(this.tableScope.tableModel?.getColumnDef(columnIndex));
   }
+
+  /** True for a cell of a header row with column letters (spreadsheet) – not over row numbers. */
+  private isColumnLetterCell(evt: GeMouseEvent): boolean {
+    const header = this.tableScope.tableModel.getAreaModel('header') as { isColumnLetterRow?: (r: number) => boolean };
+    return !!header.isColumnLetterRow?.(evt.rowIndex) && !this.isRowNumberColumn(evt.columnIndex)
+      && !isCheckboxColumnDef(this.tableScope.tableModel.getColumnDef(evt.columnIndex));
+  }
+
+  /**
+   * A click on a column letter (selection type "range"): the whole column – Shift: the columns from the last letter
+   * (or the active cell), Ctrl/⌘: added. The active cell goes into the column.
+   */
+  private clickColumnLetter(evt: GeMouseEvent): boolean {
+    const sm = this.getSelectionModel?.();
+    const fm = this.getFocusModel?.();
+    if (!sm || !SelectionService.isRangeSelection(sm)) {
+      return false;
+    }
+    const col = evt.columnIndex;
+    const shiftKey = !!evt.originalEvent?.shiftKey;
+    const ctrlKey = !!(evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey);
+    this.batch(() => {
+      const from = shiftKey ? (this.letterAnchor ?? fm?.getFocus()[1] ?? col) : col;
+      const range = new CellRange(0, Math.min(from, col), Number.MAX_SAFE_INTEGER, Math.max(from, col));
+      if (!ctrlKey && sm.hasSelection()) {
+        sm.clear();
+      }
+      sm.addSelection(range);
+      if (!shiftKey) {
+        this.letterAnchor = col;
+      }
+      if (fm) {
+        const row = Math.max(0, fm.getFocus()[0]);
+        fm.setFocus(row, col);
+      }
+      this.anchor = [0, col];
+      this.extent = undefined;
+      this.tableScope.onSelectionChanged(sm);
+    });
+    return true;
+  }
+
+  /** The column of the last click on a letter (Shift+click spans from it). */
+  private letterAnchor?: number;
 
   /** A click on the header cell of the row numbers: everything (selection types "row" and "range"). */
   private selectAllByRowNumberHeader(): boolean {

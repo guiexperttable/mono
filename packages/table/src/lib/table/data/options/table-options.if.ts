@@ -4,6 +4,7 @@ import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
 import type { UndoOptionsIf } from "../../undo/undo-options.if";
 import type { CellFormulaOptionsIf } from "../../sheet/cell-formula-options.if";
+import type { SpreadsheetOptionsIf } from "../../spreadsheet/spreadsheet-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
@@ -463,6 +464,20 @@ export interface TableOptionsIf {
    * @since 1.1.99
    */
   cellFormulas?: boolean | Partial<CellFormulaOptionsIf>;
+
+  /**
+   * Preset „like a spreadsheet“ for existing models: switches on `editing` (with `defaultEditable`), `clipboard`,
+   * `undo`, `cellFormulas` and `fillHandle` – unless the options set them themselves – and a range selection.
+   * An object switches single parts off (`false`) or configures them ({@link SpreadsheetOptionsIf}). For a new, empty
+   * sheet use {@link SpreadsheetFactory}; column letters above existing headers: `TableFactory.createTableModel({ …,
+   * columnLetters: true })`.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), spreadsheet: true };
+   *
+   * @since 1.1.99
+   */
+  spreadsheet?: boolean | Partial<SpreadsheetOptionsIf>;
 
   /**
    * Batch edit always on: edited and filled values are collected (marked `ge-table-cell-pending`) and written with

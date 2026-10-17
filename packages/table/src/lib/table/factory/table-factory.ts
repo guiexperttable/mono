@@ -1,3 +1,5 @@
+import { AreaModelSheetHeader } from "../spreadsheet/spreadsheet-factory";
+import { columnLetter } from "../sheet/cell-address";
 import { AreaModelIf } from "../data/tablemodel/areamodel/area-model.if";
 import { DefaultRowHeightsIf } from "../data/options/default-row-heights.if";
 import { ColumnDefIf } from "../data/tablemodel/column/column-def.if";
@@ -109,6 +111,17 @@ export interface CreateTableModelPara {
    * @since 1.1.95
    */
   rowDrag: boolean;
+  /**
+   * Column letters `A, B, …` as an extra header row above the header labels (like a spreadsheet; for cell formulas,
+   * {@link TableOptionsIf.cellFormulas}). A click on a letter selects the column (selection type `"range"`).
+   * Row number and checkbox columns get no letter. Only with the default header (labels or `headerData`).
+   *
+   * @example
+   * const tableModel = TableFactory.createTableModel({ rows, columnDefs, rowNumbersVisible: { mode: "original" }, columnLetters: true });
+   *
+   * @since 1.1.99
+   */
+  columnLetters: boolean;
   /** Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34. */
   defaultRowHeights: DefaultRowHeightsIf;
   /** The columns: property, header label, width, classes, renderers, sorting, editing. See {@link ColumnDef}. */
@@ -265,6 +278,15 @@ export class TableFactory {
       } else {
         p.headerAreaModel = new AreaModelHidden("header");
       }
+      if (p.columnLetters && p.headerAreaModel instanceof AreaModelArrayOfArrays) {
+        // a letter row above the labels (since 1.1.99): data columns only
+        let letter = 0;
+        const letters = (p.columnDefs ?? []).map(def => isRowNumberColumnDef(def) || isCheckboxColumnDef(def) ? "" : columnLetter(letter++));
+        p.headerAreaModel = new AreaModelSheetHeader("header", [letters, ...p.headerAreaModel.arr as string[][]],
+          p.defaultRowHeights.header, p.columnDefs);
+      }
+    } else if (p.columnLetters) {
+      console.warn("columnLetters: only with the default header (labels or headerData), not with an own headerAreaModel.");
     }
     const footerAggregates = TableFactory.checkFooterAggregates(p);
     if (!p.footerAreaModel && !footerAggregates) {

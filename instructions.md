@@ -2182,6 +2182,51 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), editing: true, fil
 - More API: `hasCellFormulas()`, `evaluateFormula("=SUM(D2:D4)")`, `getPrecedents(row, column)` (`["B2", "C2"]`),
   `getDependents(row, column)`, `getSheetEngine()`. Demo: `apps/table-demo/cell-formulas.html`.
 
+### 6.25 Spreadsheet mode (since 1.1.99)
+
+A sheet in one call – column letters, row numbers, Excel-style editing, copy and paste, undo, cell formulas, the fill
+handle and a range selection, active cell A1:
+
+```ts
+import { EventAdapter, FormulaBar, SimpleDomService, SpreadsheetFactory, TableScope } from "@guiexpert/table";
+
+const { tableModel, tableOptions } = SpreadsheetFactory.create({
+  data: [["Item", "Jan", "Feb", "Total"], ["Rent", 950, 950, "=SUM(B2:C2)"]],
+  rowCount: 1000,
+});
+const host = document.querySelector<HTMLDivElement>(".table-div")!;
+const scope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+scope.firstInit();
+const api = scope.getApi();
+new FormulaBar(document.querySelector<HTMLElement>(".formula-bar")!, api);
+```
+
+- **Wrappers** need no code of their own: pass `tableModel` and `tableOptions` (React `<GuiexpertTable … />`, Vue,
+  Svelte, Solid, Preact, Angular, Web Component); build the `FormulaBar` in `tableReady` with the `TableApi`.
+- **Sparse**: a sheet keeps only filled cells (1 000 000 empty rows cost nothing). `api.getSheetData()` returns the
+  inputs (formulas as text) up to the last filled cell – save them as JSON, `SpreadsheetFactory.create({ data })`
+  loads them; widths and scroll position: the table state (`getState`/`applyState`).
+- **Header**: a click on a letter selects the column (Shift: from the last letter, Ctrl/⌘: added), on a row number the
+  row, on the corner everything. Letters don't sort.
+- **Formula bar** (`FormulaBar(container, api, { addressBox, ariaLabel, addressAriaLabel })`): address box (`B3`;
+  typing `D10` or `B2:C5` + Enter goes there, invalid → `aria-invalid`) and the input of the active cell (the formula,
+  live while the editor is open; Enter/Tab writes and moves, Escape restores). Colors `--ge-table-formula-bar-*`.
+  Own bar: `api.subscribe({ onFocusChanged, onEditingChanged, onModelChanged })` + `getActiveCell`,
+  `getCellAddress`, `getCellInput`, `setCellInput`, `goToAddress`.
+- **Rows and columns**: `api.insertRows(at, count)`, `deleteRows`, `insertColumns`, `deleteColumns` (`at` = row number
+  − 1 / letter index, also when sorted) adjust the formulas (`=SUM(D2:D4)` grows, a deleted reference → `#REF!`), one
+  undo step, `onModelChanged` with source `"structure"`. Rows also for object rows (new objects from
+  `clipboard.createRow`, otherwise `{}`; the app's array changes in place) and arrays; columns only in a sheet.
+- **Existing data**: `tableOptions.spreadsheet: true` switches on `editing` (`defaultEditable`), `clipboard`, `undo`,
+  `cellFormulas` and `fillHandle` unless the options set them (`{ undo: false, cellFormulas: { columns: ["total"] } }`
+  configures parts) and a range selection; letters above the labels: `TableFactory.createTableModel({ …, columnLetters:
+  true, rowNumbersVisible: { mode: "original" } })`.
+- **Excel**: `api.downloadExcel("sheet.xlsx", "", { cellFormulas: true })` – real formulas, the letter row is left out.
+- **Context menu**: an example in `apps/table-demo/spreadsheet.html` (plain HTML over `onContextmenu`: cut, copy, paste,
+  insert/delete rows and columns through the API) – no built-in menu.
+- **Not included**: several sheets, named ranges, cell formatting, merged cells, conditional formatting, charts,
+  array formulas, collaborative editing, XLSX import, localized function names, row drag in a sheet.
+
 ---
 
 ## 7. Not available yet

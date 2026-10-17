@@ -3,12 +3,14 @@
  * `"commit"` ({@link TableApi.commitBatchEdit}), `"api"` ({@link TableApi.applyCellChanges}) or – since 1.1.99 –
  * `"clear"` (Delete/Backspace in Excel-style editing, {@link TableApi.clearCells}), `"paste"` (Ctrl/⌘+V,
  * {@link TableApi.pasteText}), `"cut"` (pasting cut cells: target and emptied source in one change set), `"undo"` and
- * `"redo"` ({@link TableApi.undo}, {@link TableApi.redo}).
+ * `"redo"` ({@link TableApi.undo}, {@link TableApi.redo}), `"structure"` (rows or columns inserted or deleted,
+ * {@link TableApi.insertRows} – the changes are the formulas whose references were adjusted).
  *
  * @category Fill handle & batch edit
  * @since 1.1.96
  */
-export type CellChangeSource = "edit" | "fill" | "commit" | "api" | "clear" | "paste" | "cut" | "undo" | "redo";
+export type CellChangeSource = "edit" | "fill" | "commit" | "api" | "clear" | "paste" | "cut" | "undo" | "redo"
+  | "structure";
 
 /**
  * One changed cell: row, column, old and new value – the unit of a change set ({@link GeModelChangeEvent.changes},

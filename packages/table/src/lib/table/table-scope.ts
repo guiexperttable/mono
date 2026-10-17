@@ -88,6 +88,7 @@ import type { ShortcutActionIdMapping } from './action/shortcut-actionid-mapping
 import { GeEditEvent } from './data/common/event/ge-edit-event';
 import { createEventListenerHub } from './event-listener-hub';
 import { CellFormulaOptions } from './sheet/cell-formula-options';
+import { spreadsheetOption } from './spreadsheet/spreadsheet-preset';
 import { CopiedFormula, TableSheet } from './sheet/table-sheet';
 
 
@@ -174,15 +175,15 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   /** Last comparator passed to `sort()`; re-applied after filtering. Cleared by a header sort. */
   private lastSortCompareFn?: (a: any, b: any) => number;
   /** Excel-style editing (`tableOptions.editing`), `undefined` = off. @since 1.1.99 */
-  private readonly editingOptions?: EditingOptionsIf = EditingOptions.create(this.tableOptions?.editing);
+  private readonly editingOptions?: EditingOptionsIf = EditingOptions.create(spreadsheetOption(this.tableOptions, 'editing'));
   /** Listeners of {@link TableApi.subscribe}. @since 1.1.99 */
   private readonly subscribers = new Set<Partial<EventListenerIf>>();
   /** Copy, cut and paste (`tableOptions.clipboard`), `undefined` = off. @since 1.1.99 */
-  private readonly clipboardOptions?: ClipboardOptionsIf = ClipboardOptions.create(this.tableOptions?.clipboard);
+  private readonly clipboardOptions?: ClipboardOptionsIf = ClipboardOptions.create(spreadsheetOption(this.tableOptions, 'clipboard'));
   /** Copy, cut and paste: with the option keys and events, otherwise created for the API. @since 1.1.99 */
   clipboardService?: ClipboardService;
   /** Undo and redo (`tableOptions.undo`), `undefined` = off. @since 1.1.99 */
-  private readonly undoOptions?: UndoOptionsIf = UndoOptions.create(this.tableOptions?.undo);
+  private readonly undoOptions?: UndoOptionsIf = UndoOptions.create(spreadsheetOption(this.tableOptions, 'undo'));
   /** Undo and redo: records the changes of the write path (only with the option). @since 1.1.99 */
   undoService?: UndoService;
   /** The key event the {@link ShortcutService} is handling right now (`undefined` for `triggerAction`). @since 1.1.99 */
@@ -227,7 +228,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (this.undoOptions) {
       this.undoService = new UndoService(this, this.undoOptions); // since 1.1.99
     }
-    const formulaOptions = CellFormulaOptions.create(tableOptions?.cellFormulas);
+    const formulaOptions = CellFormulaOptions.create(spreadsheetOption(tableOptions, 'cellFormulas'));
     if (formulaOptions) {
       // cell formulas (since 1.1.99): flat bodies only
       if (tableOptions.masterDetail) {
@@ -545,6 +546,44 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const [row, col] = fm.getFocus();
     const rowCount = this.tableModel.getBodyModel().getRowCount();
     return row >= 0 && col >= 0 && row < rowCount && col < this.tableModel.getColumnCount() ? [row, col] : undefined;
+  }
+
+  /**
+   * Builds the view again after rows or columns were inserted or deleted (filter and sorting applied again, new
+   * columns measured).
+   *
+   * @param {boolean} columns - true: the columns changed
+   * @since 1.1.99
+   */
+  refreshAfterStructureChange(columns: boolean): void {
+    const filter = this.tableOptions.externalFilterFunction;
+    if (filter) {
+      this.tableModel.externalFilterChanged(filter);
+    }
+    this.reapplySorting();
+    this.batchEditService?.pruneOrphans();
+    if (columns) {
+      for (const areaIdent of ['header', 'body', 'footer'] as const) {
+        this.colAndRowspanModels[areaIdent]?.init();
+      }
+      this.firstInit();
+      this.stateService.markDirty('columns');
+    }
+    this.invalidateAggregates();
+    // the active cell stays inside the table (a deleted last column or row)
+    const fm = this.focusModel();
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    const columnCount = this.tableModel.getColumnCount();
+    if (fm && rowCount > 0 && columnCount > 0) {
+      const [r, c] = fm.getFocus();
+      if (r >= rowCount || c >= columnCount) {
+        const row = Math.min(Math.max(0, r), rowCount - 1);
+        const col = Math.min(Math.max(this.getFirstDataColumnIndex(), c), columnCount - 1);
+        fm.setFocus(row, col);
+        this.selectionService.collapseTo(row, col);
+      }
+    }
+    this.repaintHard();
   }
 
   /**
@@ -1786,7 +1825,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.96
    */
   getFillHandleOptions(): FillHandleOptionsIf | undefined {
-    return FillHandleOptions.create(this.tableOptions.fillHandle);
+    return FillHandleOptions.create(spreadsheetOption(this.tableOptions, 'fillHandle'));
   }
 
   /**

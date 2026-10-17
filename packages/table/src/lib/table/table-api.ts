@@ -38,6 +38,8 @@ import { toExcelFormula } from './sheet/excel-formula';
 import type { ExcelSheetPlacementIf } from './sheet/excel-formula';
 import { SHEET_MAX_COLUMNS, SHEET_MAX_ROWS } from './sheet/cell-address';
 import { parseCellAddress } from './sheet/cell-address';
+import { applyStructureEdit } from './spreadsheet/structure-edit';
+import { AreaModelSheet } from './spreadsheet/area-model-sheet';
 import type { TableSheet } from './sheet/table-sheet';
 import type { SheetEngine } from './sheet/sheet-engine';
 
@@ -1012,13 +1014,23 @@ export class TableApi {
       columns.push(c);
     }
 
+    // a spreadsheet (since 1.1.99): only up to the last filled row and column, not its empty rest
+    const sheetBody = tableModel.getBodyModel();
+    const extent = sheetBody instanceof AreaModelSheet ? sheetBody.getContentExtent() : undefined;
+    if (extent) {
+      const firstData = this.tableScope.getFirstDataColumnIndex();
+      for (let i = columns.length - 1; i >= 0; i--) {
+        if (columns[i] >= firstData && columns[i] > extent[1]) columns.splice(i, 1);
+      }
+    }
     // cell formulas as Excel formulas (since 1.1.99): only if the export is the sheet itself
-    const formulas = exportOptions.cellFormulas ? this.getExcelFormulaOffset(columns) : undefined;
+    const formulas = exportOptions.cellFormulas ? this.getExcelFormulaOffset(columns, extent?.[1]) : undefined;
     const areas: AreaIdent[] = ["header" , "body" , "footer"];
     for (const area of areas) {
       const areaModel = tableModel.getAreaModel(area);
-      const rowCount = areaModel?.getRowCount() ?? 0;
+      const rowCount = area === 'body' && extent ? extent[0] + 1 : areaModel?.getRowCount() ?? 0;
       for (let r = 0; r < rowCount; r++) {
+        if (area === 'header' && isColumnLetterRow(areaModel, r)) continue; // the letters are Excel's own
         matrix.push(columns.map(c => formulas && area === 'body'
           ? this.getExcelFormulaCell(areaModel, r, c, formulas) ?? this.getExportValue(tableModel, area, areaModel, r, c)
           : this.getExportValue(tableModel, area, areaModel, r, c)));
@@ -1038,7 +1050,7 @@ export class TableApi {
    * Where the data of a sheet start in the Excel file (rows above, columns in front) – `undefined` with a warning if
    * the export is not the sheet: no cell formulas, a filter, sorting, a hidden data column or no formula support.
    */
-  private getExcelFormulaOffset(columns: number[]): (ExcelSheetPlacementIf & { sheet: TableSheet }) | undefined {
+  private getExcelFormulaOffset(columns: number[], lastColumn = Number.MAX_SAFE_INTEGER): (ExcelSheetPlacementIf & { sheet: TableSheet }) | undefined {
     const scope = this.tableScope;
     const sheet = scope.tableSheet;
     if (!sheet) {
@@ -1065,9 +1077,14 @@ export class TableApi {
       expected++;
     }
     for (let c = 0; c < scope.tableModel.getColumnCount(); c++) {
-      if (sheet.engineColumn(c) !== undefined && !columns.includes(c)) return warn('a data column is hidden');
+      // an empty column after the content of a sheet is left out on purpose
+      if (sheet.engineColumn(c) !== undefined && !columns.includes(c) && c <= lastColumn) return warn('a data column is hidden');
     }
-    const dRow = scope.tableModel.getAreaModel('header')?.getRowCount() ?? 0;
+    const header = scope.tableModel.getAreaModel('header');
+    let dRow = 0;
+    for (let r = 0; r < (header?.getRowCount() ?? 0); r++) {
+      if (!isColumnLetterRow(header, r)) dRow++; // letter rows are not exported
+    }
     if (dRow + rows > SHEET_MAX_ROWS || Math.max(0, dCol) + expected > SHEET_MAX_COLUMNS) {
       return warn('the sheet is larger than an Excel sheet');
     }
@@ -2593,6 +2610,134 @@ export class TableApi {
     return this.tableScope.tableSheet?.engine;
   }
 
+  /**
+   * The active body cell (the focused cell), `undefined` if there is none or the header has the focus.
+   *
+   * @returns {[number, number] | undefined} display row and model column
+   *
+   * @example
+   * const cell = tableApi.getActiveCell();
+   * if (cell) console.log(tableApi.getCellAddress(cell[0], cell[1]));   // "B3"
+   *
+   * @since 1.1.99
+   */
+  getActiveCell(): [number, number] | undefined {
+    return this.tableScope.getActiveBodyCell();
+  }
+
+  /**
+   * Goes to a cell or range of the sheet by its address (cell formulas): `"D10"` makes it the active cell, `"B2:C5"`
+   * selects the range (its first cell becomes active); the view scrolls to it. `false` for an invalid address, one
+   * outside the data or a row a filter hides.
+   *
+   * @param {string} address - e.g. `"D10"`, `"$B$2:C5"`
+   * @returns {boolean} true if it went there
+   *
+   * @example
+   * tableApi.goToAddress("B2:C5");
+   *
+   * @since 1.1.99
+   */
+  goToAddress(address: string): boolean {
+    const sheet = this.tableScope.tableSheet;
+    const parts = address.trim().split(":");
+    if (!sheet || parts.length > 2) return false;
+    const cells = parts.map(p => sheet.cellOfAddress(p));
+    if (cells.some(c => !c || c[0] < 0)) return false;
+    const [a, b] = [cells[0]!, cells[cells.length - 1]!];
+    const range = new CellRange(Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1]));
+    this.tableScope.selectBodyRange(range);
+    this.tableScope.ensureRowIsVisible(range.r1);
+    this.tableScope.ensureColumnIsVisible(range.c1);
+    return true;
+  }
+
+  /**
+   * Inserts empty rows before a row of the sheet (`at` = row number − 1, the physical row: also when sorted or
+   * filtered) and adjusts the cell formulas (`=SUM(D2:D4)` grows when rows are inserted inside). One undo step, one
+   * `onModelChanged` (source `"structure"`). Works for a spreadsheet ({@link SpreadsheetFactory}), object rows (new
+   * objects from `clipboard.createRow`, otherwise `{}` – the app's array changes in place) and arrays.
+   *
+   * @param {number} at - the physical row the new rows come before (row count = append)
+   * @param {number} [count=1] - rows
+   * @returns {boolean} true if inserted
+   *
+   * @example
+   * tableApi.insertRows(4, 2);   // two empty rows before row 5
+   *
+   * @since 1.1.99
+   */
+  insertRows(at: number, count = 1): boolean {
+    return applyStructureEdit(this.tableScope, { kind: "insertRows", at, count });
+  }
+
+  /**
+   * Deletes rows of the sheet (`at` = row number − 1) and adjusts the cell formulas (a deleted reference becomes
+   * `#REF!`). One undo step.
+   *
+   * @param {number} at - the first physical row
+   * @param {number} [count=1] - rows
+   * @returns {boolean} true if deleted
+   *
+   * @example
+   * tableApi.deleteRows(2);   // row 3
+   *
+   * @since 1.1.99
+   */
+  deleteRows(at: number, count = 1): boolean {
+    return applyStructureEdit(this.tableScope, { kind: "deleteRows", at, count });
+  }
+
+  /**
+   * Inserts empty columns before a column of a spreadsheet ({@link SpreadsheetFactory}; `at` = letter index, A = 0)
+   * and adjusts the cell formulas. One undo step.
+   *
+   * @param {number} at - the data column the new columns come before
+   * @param {number} [count=1] - columns
+   * @returns {boolean} true if inserted (`false` for other models)
+   *
+   * @example
+   * tableApi.insertColumns(1);   // a new column B
+   *
+   * @since 1.1.99
+   */
+  insertColumns(at: number, count = 1): boolean {
+    return applyStructureEdit(this.tableScope, { kind: "insertColumns", at, count });
+  }
+
+  /**
+   * Deletes columns of a spreadsheet (`at` = letter index, A = 0) and adjusts the cell formulas. One undo step.
+   *
+   * @param {number} at - the first data column
+   * @param {number} [count=1] - columns
+   * @returns {boolean} true if deleted (`false` for other models)
+   *
+   * @example
+   * tableApi.deleteColumns(2);   // column C
+   *
+   * @since 1.1.99
+   */
+  deleteColumns(at: number, count = 1): boolean {
+    return applyStructureEdit(this.tableScope, { kind: "deleteColumns", at, count });
+  }
+
+  /**
+   * The inputs of a spreadsheet ({@link SpreadsheetFactory}) as rows × columns – formulas as text, up to the last
+   * filled row and column (empty cells `""`). Save them; `SpreadsheetFactory.create({ data })` loads them again.
+   * `undefined` for other models (their data are the app's rows).
+   *
+   * @returns {unknown[][] | undefined} the data
+   *
+   * @example
+   * localStorage.setItem("sheet", JSON.stringify(tableApi.getSheetData()));
+   *
+   * @since 1.1.99
+   */
+  getSheetData(): unknown[][] | undefined {
+    const body = this.tableScope.tableModel.getBodyModel();
+    return body instanceof AreaModelSheet ? body.getSheetData() : undefined;
+  }
+
   /** A column index or property → index (`-1` if unknown). */
   private toColumnIndex(column: number | string): number {
     return typeof column === 'number' ? column : this.getColumnIndex(column);
@@ -3116,4 +3261,9 @@ export class TableApi {
   }
 
 
+}
+
+/** True for a header row with column letters (spreadsheet, `columnLetters`) – not exported. */
+function isColumnLetterRow(areaModel: AreaModelIf | undefined, rowIndex: number): boolean {
+  return !!(areaModel as { isColumnLetterRow?: (r: number) => boolean } | undefined)?.isColumnLetterRow?.(rowIndex);
 }

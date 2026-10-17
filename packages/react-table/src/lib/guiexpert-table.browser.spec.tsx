@@ -6,7 +6,7 @@ import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
-import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
+import { FormulaBar, SpreadsheetFactory, TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeStateChangeEvent } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
@@ -187,6 +187,23 @@ describe('GuiexpertTable (React)', () => {
     expect([rows[1].qty, rows[2].qty]).toEqual([8, 9]);
     expect(modelChanged).toHaveBeenCalledTimes(1);
     expect(modelChanged.mock.calls[0][0].source).toBe('paste');
+  });
+
+  it('spreadsheet: SpreadsheetFactory + FormulaBar without wrapper code – typing a formula, modelChanged (since 1.1.99)', async () => {
+    const modelChanged = vi.fn<(evt: GeModelChangeEvent) => void>();
+    const { tableModel, tableOptions } = SpreadsheetFactory.create({ data: [[2, 3]] });
+    let api: TableApi | undefined;
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={a => { api = a; }}
+                                       modelChanged={modelChanged} />);
+    await nextFrame();
+    const bar = new FormulaBar(host, api!);
+    await userEvent.click(bodyCell(host, 0, 3));
+    await userEvent.keyboard('=A1*B1{Enter}');
+    expect(api!.getCellValue(0, 3)).toBe(6);
+    expect(modelChanged).toHaveBeenCalledTimes(1);
+    act(() => { api!.goToAddress('C1'); });
+    expect(bar.input.value).toBe('=A1*B1');
+    bar.destroy();
   });
 
   it('undo and redo: undoStackChanged after a change and after api.undo() (since 1.1.99)', async () => {

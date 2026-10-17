@@ -202,7 +202,8 @@ export class MouseHandler {
       const areaModel = this.tableScope.tableModel.getAreaModel(areaIdent);
 
       if (area && areaIdent === "header") {
-        if (this.tableScope.tableModel.isSortable(colIdx)) {
+        const letters = (areaModel as { isColumnLetterRow?: (r: number) => boolean }).isColumnLetterRow?.(rowIdx);
+        if (this.tableScope.tableModel.isSortable(colIdx) && !letters) { // a column letter selects, it doesn't sort
           this.tableScope.clearSelection();
           this.tableScope.onHeaderDblClicked(event, rowIdx, colIdx);
         }

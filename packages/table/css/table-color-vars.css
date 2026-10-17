@@ -159,6 +159,11 @@ html, html[data-theme="light"] {
   --ge-table-formula-popup-muted: #5f6368;
   --ge-table-formula-popup-border: #c4c7c5;
   --ge-table-formula-popup-active-bg: #e8f0fe;
+  /* formula bar (since 1.1.99) */
+  --ge-table-formula-bar-bg: #fff;
+  --ge-table-formula-bar-text: #111;
+  --ge-table-formula-bar-muted: #5f6368;
+  --ge-table-formula-bar-border: #c4c7c5;
 }
 
 
@@ -309,4 +314,9 @@ html[data-theme="dark"] {
   --ge-table-formula-popup-muted: #9aa0a6;
   --ge-table-formula-popup-border: #4b5563;
   --ge-table-formula-popup-active-bg: #374151;
+  /* formula bar (since 1.1.99) */
+  --ge-table-formula-bar-bg: #1f2937;
+  --ge-table-formula-bar-text: #f3f4f6;
+  --ge-table-formula-bar-muted: #9aa0a6;
+  --ge-table-formula-bar-border: #4b5563;
 }

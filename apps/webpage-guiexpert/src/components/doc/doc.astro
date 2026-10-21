@@ -57,6 +57,7 @@ const PACKAGES = [
   { framework: "React 18 / 19", pkg: "@guiexpert/react-table", component: "<GuiexpertTable>", start: "/getstarted/react/", slug: "react" },
   { framework: "Vue 3", pkg: "@guiexpert/vue3-table", component: "<GuiexpertTable>", start: "/getstarted/vue/", slug: "vue" },
   { framework: "Angular 14 – 22", pkg: "@guiexpert/angular-table", component: "<guiexpert-table>", start: "/getstarted/angular/", slug: "angular" },
+  { framework: "Angular 22+ (signals)", pkg: "@guiexpert/angular-table", component: "<guiexpert-table-signal>", start: undefined, slug: "angular" },
   { framework: "Svelte 4 / 5", pkg: "@guiexpert/svelte-table", component: "<GuiexpertTable>", start: "/getstarted/svelte/", slug: "one-model-every-framework" },
   { framework: "Solid", pkg: "@guiexpert/solid-table", component: "<GuiexpertTable>", start: undefined, slug: "one-model-every-framework" },
   { framework: "Preact 10", pkg: "@guiexpert/preact-table", component: "<GuiexpertTable>", start: "/getstarted/preact/", slug: "one-model-every-framework" }
@@ -106,10 +107,10 @@ const API_GROUPS = [
 ];
 
 const EVENTS = [
-  { event: "tableReady", listener: undefined, payload: "TableApi", note: "once, after the first render (wrappers only)" },
+  { event: "tableReady", listener: undefined, payload: "TableApi", note: "once, after the first render (wrappers only; <guiexpert-table-signal>: [(tableApi)] signal instead)" },
   { event: "mouseClicked", listener: "onMouseClicked", payload: "GeMouseEvent", note: "area, row, column, click count; debounced in Angular and Vue" },
   { event: "mouseMoved", listener: "onMouseMoved", payload: "GeMouseEvent", note: "" },
-  { event: "contextmenu", listener: "onContextmenu", payload: "GeMouseEvent", note: "for your own context menu" },
+  { event: "contextmenu", listener: "onContextmenu", payload: "GeMouseEvent", note: "for your own context menu; <guiexpert-table-signal>: contextMenu" },
   { event: "mouseDragging", listener: "onMouseDragging", payload: "GeMouseEvent", note: "" },
   { event: "mouseDraggingEnd", listener: "onMouseDraggingEnd", payload: "GeMouseEvent", note: "Angular: mouseDraggingEnded" },
   { event: "checkboxChanged", listener: "onCheckboxChanged", payload: "checked rows", note: "row and tree checkboxes" },
@@ -376,7 +377,8 @@ tableScope.firstInit();                                     // 4 · render
 const tableApi = tableScope.getApi();                       // scroll, sort, filter, export …`} />
       <p>
         A framework wrapper takes over step 4: you pass <code>tableModel</code> and <code>tableOptions</code> as
-        inputs or props and receive the <code>TableApi</code> with the <code>tableReady</code> event. The guides for
+        inputs or props and receive the <code>TableApi</code> with the <code>tableReady</code> event (Angular 22+:
+        <code>&lt;guiexpert-table-signal [(tableApi)]="api"&gt;</code> – the API as a signal). The guides for
         each framework are listed under <a href="#packages">{T.packages}</a>.
       </p>
       <Callout type="tip" title="Keep model and options stable">

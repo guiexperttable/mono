@@ -1,9 +1,10 @@
 /**
- * The features added in October 2026 (prompts 001 – 013, releases 1.1.91 – 1.1.99) – one list for
+ * The features added in October 2026 (prompts 001 – 015, releases 1.1.91 – 1.1.100) – one list for
  * the page /whats-new/, the "What's new" section of the home page and the feature finder of the training.
  *
  * Every snippet is checked against the real API (see `snippets` in scripts/check-feature-snippets.mjs):
- * keep them ≤ 15 lines and use only names that exist in @guiexpert/table.
+ * keep them ≤ 15 lines and use only names that exist in @guiexpert/table. A framework snippet (`framework`) must be
+ * a verbatim part of its demo file (`demoFile`), which is compiled there (Angular: `ngc`, strictTemplates).
  * `api` names are resolved against the typedoc index at build time (src/training/api.ts) – a renamed
  * symbol breaks the build instead of producing a dead link.
  */
@@ -25,8 +26,16 @@ export interface NewFeature {
   points: string[];
   /** ≤ 15 lines, compiles against the API */
   snippet: string;
-  /** folder below /showcase/ */
-  showcase: { name: string; title: string };
+  /** folder below /showcase/ – a feature without a showcase (a framework wrapper) has a `demo` instead */
+  showcase?: { name: string; title: string };
+  /** a demo app outside the website (when there is no showcase) */
+  demo?: { href: string; title: string };
+  /** thumbnail src/assets/screens/thumbs/<thumb>.png (default: the showcase name) */
+  thumb?: string;
+  /** the snippet is framework code (not checked against the core): it must be part of `demoFile` */
+  framework?: "angular";
+  /** repo path of the demo file that contains the snippet verbatim (checked by check-feature-snippets.mjs) */
+  demoFile?: string;
   /** training chapter (and section) */
   training: { slug: string; hash?: string; label: string };
   /** API symbols, e.g. "TableApi.announce" */
@@ -327,8 +336,56 @@ tableApi.setDetailExpanded(0, true);`,
       "TableApi.undo", "TableApi.insertRows"],
     agGrid: "partly",
     agGridNote: "undo: Community · clipboard, fill handle, A1 formulas: Enterprise"
+  },
+  {
+    id: "angular-signals", prompt: "015", since: "1.1.100", icon: "mdi:angular",
+    title: "Angular Signals: the table as a signal",
+    problem: "Angular 22 apps run on signals and without Zone.js – but the table API arrived through (tableReady), a " +
+      "field and ?. chains everywhere.",
+    points: [
+      "<guiexpert-table-signal>: signal inputs, signal outputs, the TableApi as a signal – [(tableApi)]=\"api\"",
+      "computed() and effect() on the API: buttons enable themselves, code runs once the table exists",
+      "zoneless-ready, no RxJS; a new model switches the API directly – no undefined in between",
+      "for Angular 22 and every later major – the classic <guiexpert-table> stays for Angular 14 – 22"
+    ],
+    snippet: `@Component({
+  selector: "app-orders",
+  imports: [TableSignalComponent],
+  template: \`
+    <guiexpert-table-signal class="table-div" [tableModel]="model" [(tableApi)]="api" />
+    <button [disabled]="!ready()" (click)="api()?.downloadExcel('orders.xlsx', 'me')">Excel</button>\`
+})
+export class OrdersComponent {
+  readonly model = TableFactory.createTableModel({ rows: createOrders(100_000), properties: ["id", "customer", "city", "total"] });
+  readonly api = signal<TableApi | undefined>(undefined);
+  readonly ready = computed(() => !!this.api());
+  constructor() {
+    effect(() => this.api()?.scrollToIndex(0, 0));
+  }
+}`,
+    framework: "angular",
+    demoFile: "apps/angular-signal-demo/src/orders.component.ts",
+    demo: { href: "https://github.com/guiexperttable/mono/tree/main/apps/angular-signal-demo", title: "Angular 22 demo app" },
+    thumb: "angular-signals",
+    training: { slug: "angular", hash: "signals", label: "Chapter 9 · Angular Signals" },
+    api: ["TableApi"],
+    agGrid: "community",
+    agGridNote: "the Angular wrapper also works zoneless"
   }
 ];
+
+const COUNT_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+  "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+
+/** "fourteen" – the number of features in words (for the texts on /whats-new/, home, training, showcases) */
+export const featureCountWord = (n: number = NEW_FEATURES.length): string => COUNT_WORDS[n] ?? String(n);
+/** "Fourteen" */
+export const FeatureCountWord = (n: number = NEW_FEATURES.length): string => {
+  const w = featureCountWord(n);
+  return w.charAt(0).toUpperCase() + w.slice(1);
+};
+/** the releases of the list, e.g. "1.1.91 – 1.1.100" */
+export const featureVersions = (): string => `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.length - 1].since}`;
 
 /** ag-Grid tier as a short, neutral text. */
 export function agGridLabel(f: NewFeature): string {
@@ -337,4 +394,9 @@ export function agGridLabel(f: NewFeature): string {
 }
 
 export const trainingHref = (f: NewFeature) => `/training/${f.training.slug}/${f.training.hash ? "#" + f.training.hash : ""}`;
-export const showcaseHref = (f: NewFeature) => `/showcase/${f.showcase.name}/run/`;
+/** the live showcase – or, for a feature without one, its demo app */
+export const showcaseHref = (f: NewFeature) => f.showcase ? `/showcase/${f.showcase.name}/run/` : f.demo?.href ?? "/showcase/";
+/** the title of the live link: showcase or demo app */
+export const liveTitle = (f: NewFeature) => f.showcase?.title ?? f.demo?.title ?? f.title;
+/** the thumbnail name below src/assets/screens/thumbs/ */
+export const thumbName = (f: NewFeature) => f.thumb ?? f.showcase?.name ?? f.id;

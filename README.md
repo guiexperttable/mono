@@ -19,6 +19,8 @@ Right-to-left: `tableOptions.direction: "rtl"` (or `"auto"` from `<html dir="rtl
 
 Spreadsheet: `SpreadsheetFactory.create({ data })` builds a sheet in one call – column letters, row numbers, cell formulas with A1 references (`=SUM(B2:B9)`, 70 Excel functions, colored references while typing, own parser, no `eval`), copy & paste with Excel and Google Sheets, undo/redo, a formula bar, insert/delete rows and columns with adjusted references, Excel export with real formulas. Existing tables get the same with `spreadsheet: true` or the single options `editing`, `clipboard`, `undo`, `cellFormulas` (since 1.1.99).
 
+Angular Signals: for Angular 22 and later a second, signal-native component `<guiexpert-table-signal>` (`TableSignalComponent`) – signal inputs, signal outputs and the `TableApi` as a signal (`[(tableApi)]="api"`), zoneless-ready, no RxJS (since 1.1.100). The classic `<guiexpert-table>` stays for Angular 14 – 22+.
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside
@@ -54,6 +56,10 @@ version-specific parts (Angular/TypeScript/ng-packagr versions, tsconfig, npm ma
 into `angular-builds/ngNN/lib/src` and generates the component stylesheet from `packages/table/css/table*.css`,
 then `ng-packagr` writes the package to `angular-builds/ngNN/dist`.
 Version-specific code, if ever needed, goes into `angular-builds/ngNN/overrides/` (copied over the shared source).
+Code for newer Angular majors stays in the shared source with a marker (since 1.1.100): a file whose first line is
+`// @since-angular 22` is copied only for Angular 22 and later, a line ending with `// @since-angular 22` (an export in
+`public-api.ts`) is removed for older majors – a new `ng23` gets it without further work. Example:
+`TableSignalComponent`. Tests of the Angular wrapper: `pnpm test:angular` (Angular 22, built package, Chromium).
 
 ## Versions
 

@@ -1,4 +1,4 @@
-# GuiExpert Table for Angular (14 – 22)
+# GuiExpert Table for Angular (14 – 22 and later)
 
 How to use `@guiexpert/table` and `@guiexpert/angular-table` in Angular applications. The major version of
 `@guiexpert/angular-table` equals your Angular major (`@guiexpert/angular-table@^22.0.0` for Angular 22, `^17.0.0` for
@@ -45,7 +45,15 @@ The table fills its host element – give it a height:
 | Selector | `guiexpert-table` |
 | Change detection | `OnPush`; rendering runs outside the Angular zone (`NgZone.runOutsideAngular`) |
 | Inputs | `tableModel: TableModelIf` (required), `tableOptions: TableOptionsIf` (default `new TableOptions()`), `debounceMouseClickDelay: number` (default 150 ms), `loading: boolean` (default `false`, since 1.1.92: loading overlay, no re-creation) |
-| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92), `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`, since 1.1.95 – row drag, instructions.md 6.16), `batchEditChanged` (`GeBatchEditEvent`, since 1.1.96), `detailExpandedChanged` (`GeDetailEvent`, since 1.1.97 – master/detail, instructions.md 6.18) |
+| Outputs | `tableReady` (`TableApi`), `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` (`GeMouseEvent`), `checkboxChanged` (`any[]`), `modelChanged` (`GeModelChangeEvent`), `selectionChanged` (`SelectionModelIf`), `focusChanged` (`FocusModelIf`), `scroll` (`GeScrollEvent`), `stateChanged` (`GeStateChangeEvent`, since 1.1.92), `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`, since 1.1.95 – row drag, instructions.md 6.16), `batchEditChanged` (`GeBatchEditEvent`, since 1.1.96), `detailExpandedChanged` (`GeDetailEvent`, since 1.1.97 – master/detail, instructions.md 6.18), `editingChanged` (`GeEditEvent`, since 1.1.99), `undoStackChanged` (`GeUndoEvent`, since 1.1.99) |
+
+> **`(contextmenu)` fires twice.** Angular binds an output named like a DOM event to the output **and** to the native
+> event of the host element – the right click bubbles out of the table, so the handler first gets the native
+> `MouseEvent`, then the `GeMouseEvent`. Skip the first one (`if (evt instanceof MouseEvent) return;`) or use the
+> signal component (section 14), whose output is called `contextMenu`. The name stays for compatibility.
+
+**Angular 22 and later:** a second, signal-native component `TableSignalComponent` (`<guiexpert-table-signal>`):
+`input()`, `output()`, the `TableApi` as a signal (`[(tableApi)]`), zoneless-ready – section 14.
 
 Other exports: `RenderWrapperFactory` (Angular components as cell renderers), `ComponentRendererIf<T>`,
 `RendererWrapper`, `DomService`, since 1.1.97 `DetailRenderWrapperFactory`, `DetailComponentRendererIf<T>` and
@@ -400,6 +408,13 @@ export class MouseEventsDemo {   // the component class of the template above
   onMouseClicked(evt: GeMouseEvent) {
     console.info(evt.rowIndex, evt.columnIndex, evt.areaIdent, evt.clickCount);
   }
+  onMouseMoved(evt: GeMouseEvent) {
+    console.info(evt.rowIndex, evt.columnIndex);
+  }
+  onContextmenu(evt: GeMouseEvent | MouseEvent) {
+    if (evt instanceof MouseEvent) return;  // the native event of the host element (section 2)
+    console.info("context menu on row", evt.rowIndex);
+  }
 }
 ```
 
@@ -629,7 +644,80 @@ html {
 
 ---
 
-## 14. Not available yet
+## 14. Signal component (Angular 22 and later)
+
+Since 1.1.100 (`@guiexpert/angular-table@22.1.100`) the packages for **Angular 22 and every later major** contain a
+second component next to `TableComponent`: `TableSignalComponent`, selector `guiexpert-table-signal`. It is built with
+signal inputs (`input()`), signal outputs (`output()`) and `effect()` instead of `ngOnChanges` – no RxJS, works with
+and without Zone.js. The packages for Angular 14 – 21 are unchanged.
+
+```ts
+import { Component, computed, effect, signal } from "@angular/core";
+import { TableSignalComponent } from "@guiexpert/angular-table";
+import { TableApi, TableFactory } from "@guiexpert/table";
+
+@Component({
+  selector: "app-orders",
+  imports: [TableSignalComponent],
+  template: `
+    <guiexpert-table-signal class="table-div" [tableModel]="model" [(tableApi)]="api" />
+    <button [disabled]="!ready()" (click)="api()?.downloadExcel('orders.xlsx', 'me')">Excel</button>`
+})
+export class OrdersComponent {
+  readonly model = TableFactory.createTableModel({
+    rows: [{ id: 1, customer: "Acme", total: 120 }], properties: ["id", "customer", "total"]
+  });
+  readonly api = signal<TableApi | undefined>(undefined);
+  readonly ready = computed(() => !!this.api());
+
+  constructor() {
+    effect(() => this.api()?.scrollToIndex(0, 0));  // runs once the table exists
+  }
+}
+```
+
+| | `TableSignalComponent` |
+|---|---|
+| Selector | `guiexpert-table-signal` (standalone, `OnPush`, same stylesheet as `TableComponent`) |
+| Inputs (`input()`) | `tableModel: TableModelIf \| undefined`, `tableOptions: TableOptionsIf` (default `new TableOptions()`), `loading: boolean` (default `false`), `debounceMouseClickDelay: number` (default 150 ms, `0` = synchronous, read at click time) |
+| The API as a signal (`model()`) | `tableApi: TableApi \| undefined` – two-way binding `[(tableApi)]="api"`, event form `(tableApiChange)`, or `viewChild(TableSignalComponent)?.tableApi()` |
+| Outputs (`output()`) | `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnded`, **`contextMenu`** (`GeMouseEvent`), `scroll` (`GeScrollEvent`), `modelChanged`, `selectionChanged`, `focusChanged`, `checkboxChanged`, `stateChanged`, `rowDragStart`, `rowDragMove`, `rowDragEnd`, `batchEditChanged`, `detailExpandedChanged`, `editingChanged`, `undoStackChanged` – the same events as `TableComponent` |
+
+Rules:
+
+- **`tableApi`** is set when the table is built, switches **directly** to the new API when a new `tableModel` or
+  `tableOptions` value re-creates the table (no `undefined` in between – an `effect` on it runs once per table), and
+  becomes `undefined` when the component is destroyed. It is set by the table: a value written from outside is
+  replaced (with a warning in dev mode). Bind it to a **signal** – a plain field can cause
+  `ExpressionChangedAfterItHasBeenChecked` when the parent template reads it.
+- **No `tableReady` output:** the API comes only as the signal `tableApi` – `(tableApiChange)="…"` is the event form
+  (it also reports `undefined` when the component is destroyed).
+- **`contextMenu`** (capital M) instead of `contextmenu`: no second call with the native event (section 2). `scroll`
+  keeps its name: Angular binds the host's native `scroll` event as well, but `scroll` does not bubble and the host
+  element itself never scrolls (the table scrolls inside), so only `GeScrollEvent`s arrive – unless you make the host
+  element scrollable with your own CSS.
+- **Change detection:** the table runs outside the Angular zone, so the events of the table – mouse, keyboard,
+  scroll, drag, editing (also `mouseClicked`, unlike `TableComponent`) – reach your handler outside the zone. Events
+  caused by your own API calls come where you call them, `tableApiChange` comes from change detection. Write a
+  **signal** in a handler – that schedules change detection with and without Zone.js. A handler that sets a plain
+  field calls `ChangeDetectorRef.markForCheck()` itself.
+- **Zoneless:** works with `provideZonelessChangeDetection()`; no Zone.js needed.
+- **SSR:** on the server no table is created (no DOM access); it is built in the browser.
+- `loading`, renderer wrappers (`RenderWrapperFactory`, `DetailRenderWrapperFactory`) and all table options work as
+  with `TableComponent`.
+
+Switching from `TableComponent`:
+
+| `TableComponent` (`<guiexpert-table>`) | `TableSignalComponent` (`<guiexpert-table-signal>`) |
+|---|---|
+| `(tableReady)="api = $event"` + field `api?: TableApi` | `[(tableApi)]="api"` + `api = signal<TableApi \| undefined>(undefined)`, or `(tableApiChange)="…"` |
+| `(contextmenu)="…"` (fires twice, section 2) | `(contextMenu)="…"` |
+| `mouseClicked` inside the Angular zone | table events (also `mouseClicked`) outside the zone – write signals |
+| Angular 14 – 22+ | Angular 22+ |
+
+---
+
+## 15. Not available yet
 
 - No built-in filter UI, context menu or pagination (row drag: core guide 6.16).
 - Master/detail only for flat tables (no detail rows below tree nodes, group rows or pivot rows).

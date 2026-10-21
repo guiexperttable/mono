@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": [
+      "vitest/globals"
+    ],
+    "allowJs": true,
+    "checkJs": false,
+    "paths": {
+      "@guiexpert/table": [
+        "../../packages/table/src/index.ts"
+      ],
+      "@guiexpert/angular-table": [
+        "./dist/types/guiexpert-angular-table.d.ts"
+      ],
+      "zone.js": [
+        "./node_modules/zone.js-for-tests/zone.d.ts"
+      ]
+    },
+    "rootDir": "../..",
+    "noUncheckedSideEffectImports": false
+  },
+  "include": [
+    "test/**/*.ts",
+    "vitest.config.ts"
+  ]
+}

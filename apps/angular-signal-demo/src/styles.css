@@ -1,0 +1,11 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0; padding: 16px; }
+header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+h1 { font-size: 1.25rem; margin: 0 0 8px; }
+h1 small { font-weight: normal; opacity: 0.7; font-size: 0.85rem; }
+nav button.active { font-weight: bold; }
+.toolbar, .status { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 8px 0; }
+.status { font-size: 0.9rem; }
+.table-div { display: block; height: 520px; width: 100%; }
+app-orders { display: block; }
+app-orders button { margin-top: 8px; }

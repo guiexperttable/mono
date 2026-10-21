@@ -29,14 +29,16 @@ mono/
 │       ├── lib/package.json   #   veröffentlichtes npm-Manifest (Peer-Dependencies!)
 │       ├── lib/ng-package.json, lib/tsconfig.lib*.json
 │       ├── lib/src/           #   GENERIERT (git-ignored) durch scripts/sync-angular-src.mjs
-│       └── overrides/         #   optional: versionsspezifische Dateien über den gemeinsamen Code
+│       ├── overrides/         #   optional: versionsspezifische Dateien über den gemeinsamen Code
+│       └── test/              #   nur ng22 (neueste Major): Angular-Tests gegen das gebaute dist/ (seit 1.1.100)
 ├── apps/
 │   ├── table-demo/ ts-todo-demo/ react-/preact-/solid-/svelte-/vue3-table-demo/ vue3-multi-demo/ webcomponent-table-demo/
 │   ├── angular-table-demo/    # Angular 17, NgModule-basiert, ~20 Feature-Demos (nutzt noch npm-Pakete, s. TODO.md)
+│   ├── angular-signal-demo/   # Angular 22, zoneless, TableSignalComponent gegen angular-builds/ng22/dist (seit 1.1.100)
 │   ├── webpage-guiexpert/     # Astro 7 + Tailwind 3 (via PostCSS): Quelle von https://gui.expert
 │   └── table-website/         # Ziel für typedoc-Ausgabe
 ├── scripts/
-│   ├── sync-angular-src.mjs   # packages/angular-table/src + Core-CSS → angular-builds/ngNN/lib/src
+│   ├── sync-angular-src.mjs   # packages/angular-table/src + Core-CSS → angular-builds/ngNN/lib/src (Marke @since-angular N)
 │   └── version.mjs            # check | sync | patch | minor – ein Versionsschema für alle Pakete
 ├── instructions.md            # Entwickler-Doku aller Frameworks (geprüft, s. §6)
 ├── TODO.md                    # offene Code-Aufgaben
@@ -51,7 +53,8 @@ mono/
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
 | Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
-| Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`) |
+| Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`; enthält Angular 22 – braucht vorher `pnpm build:core`) |
+| Angular-Wrapper testen | `pnpm test:angular` (baut ng22, testet das `dist` in Chromium; Typen: `pnpm --filter angular-build-ng22 test:types`) |
 | Alle Bibliotheken | `pnpm build:libs` |
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
@@ -78,6 +81,13 @@ mono/
   TS1479 bei CJS-Konsumenten mit node16). `scripts/fix-dts-imports.mjs` (im `afterBuild` von vite-plugin-dts aller
   Pakete) ergänzt `.js` in relativen `.d.ts`-Importen (node16/nodenext). `vue3-table` ist `"type": "module"`
   (`postcss.config.cjs`, `.eslintrc.cjs`).
+- Angular-Tests (ng22) laden Zone.js als Alias **`zone.js-for-tests` = `npm:zone.js@0.14.10`** (die Version, die
+  schon im Lockfile steht). Ein echtes `zone.js@0.16` irgendwo im Workspace ändert über `auto-install-peers` die
+  Peer-Auflösung **aller** Angular-Majors im Lockfile – nicht einführen. Folge des Alias: nur die Angular-22-Einträge
+  (ng22, `apps/angular-signal-demo`) tragen den Peer `zone.js@0.14.10` – außerhalb von Angulars Bereich
+  `~0.15 || ~0.16`; die Zone.js-Tests belegen also 0.14 (die Apps der Anwender bringen ihr eigenes Zone.js mit).
+  Beim Hinzufügen hat pnpm außerdem doppelte Transitive auf Versionen zusammengeführt, die schon im Lockfile standen
+  (Babel-Helfer 7.29.7, semver 7.8.5, picomatch 4.0.7; `@babel/core` bleibt 7.28.6).
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
 - Root-`pnpm.packageExtensions`: `@angular/animations` bekommt die Peer-Dependency `@angular/common`. Angular 17
@@ -573,7 +583,8 @@ Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`
 | svelte-table | `GuiexpertTable` | Svelte-Events (`on:tableReady`, `e.detail`) **und** Callback-Props `onTableReady`, `onMouseClicked` … (Runes-Modus) | Paket = Svelte-**Quellcode** (plain JS + `.d.ts`, Build `build.mjs`), läuft unter Svelte 4 und 5; neues Modell = Neuaufbau |
 | solid-table | `GuiexpertTable` | Callback-Props (zusätzlich DOM-`CustomEvent`s, bubbling) | `createEffect` auf Modell/Options → Neuaufbau; `contextmenu`-CustomEvent kommt nicht an (s. `TODO.md`) |
 | webcomponent-table | Klasse `GuiexpertTable extends HTMLElement` | `el.data = { tableModel, tableOptions }`, `el.licenseKey` | **Selbst registrieren**: `customElements.define('guiexpert-table', GuiexpertTable)`; Events als `CustomEvent` auf dem Element (`contextmenu` nicht bubbling); Entfernen = `destroy()`, Wieder-Einfügen = Neuaufbau |
-| angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded` |
+| angular-table | `<guiexpert-table [tableModel] [tableOptions] (tableReady) (mouseClicked) …>` | `debounceMouseClickDelay` (150 ms) | Standalone `TableComponent`, `OnPush`, Init `runOutsideAngular`; `ngOnChanges` → neues Modell = Neuaufbau; Output heißt `mouseDraggingEnded`; `(contextmenu)` bekommt zusätzlich das native `MouseEvent` (Angular bindet Output + DOM-Event, Test `it.fails` in `angular-builds/ng22/test`) |
+| angular-table (Angular 22+) | `<guiexpert-table-signal [tableModel] [(tableApi)] (contextMenu) …>` | `input()`: `tableModel`, `tableOptions`, `loading`, `debounceMouseClickDelay` (beim Klick gelesen, `0` = synchron) | `TableSignalComponent` (seit 1.1.100): `tableApi = model<TableApi \| undefined>()` (direkt neue API beim Neuaufbau, `undefined` nach Abbau, Schreiben von außen wird ersetzt), `output()` wie oben, aber **kein `tableReady`** (nur `tableApi`/`tableApiChange`) und **`contextMenu`**; `effect()`+`untracked()` statt `ngOnChanges`, Abbau in `ngOnDestroy` (vor dem Abmelden der Outputs → kein NG0953), Tabellen-Events (Maus, Tastatur, Scroll …) außerhalb der Zone, kein RxJS, SSR ohne Tabelle; eigenes `EventListenerIf`-Objekt |
 
 Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Component Property + Attribut): Loading-Overlay
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
@@ -593,9 +604,13 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 - Änderungen am Angular-Wrapper **nur** in `packages/angular-table/src`. Danach `pnpm build:angular` – baut ng14 … ng22.
 - `table.component.css` wird bei jedem Build aus `packages/table/css/table*.css` erzeugt (früher veraltete Kopie).
 - Versionsspezifischen Code (falls je nötig) unter `angular-builds/ngNN/overrides/` ablegen.
-- Neue Angular-Major: `ng22` → `ng23` kopieren, Versionen + Peer-Deps anpassen, `latest`-Tag umhängen
-  (s. `angular-builds/README.md`).
-- Angular-Doku: `packages/angular-table/instructions.md` (gilt für 14–22).
+- **Code nur für neuere Majors** (seit 1.1.100) bleibt im gemeinsamen Quellcode und bekommt eine Marke: erste Zeile
+  `// @since-angular 22` = Datei nur für ng22 und später; Zeile, die auf `// @since-angular 22` endet (Export in
+  `public-api.ts`), fällt für ältere Majors weg. Unmarkierter Code wird byte-gleich kopiert (Test
+  `angular-builds/ng22/test/sync-angular-src.node.spec.ts`). Beispiel: `TableSignalComponent`.
+- Neue Angular-Major: `ng22` → `ng23` kopieren, Versionen + Peer-Deps anpassen, `latest`-Tag umhängen, Tests
+  (`test/`, `vitest.config.ts`, Scripts) mitnehmen und `test:angular`/CI-Filter umstellen (s. `angular-builds/README.md`).
+- Angular-Doku: `packages/angular-table/instructions.md` (gilt für 14–22; Abschnitt 14 = `TableSignalComponent`, 22+).
 
 ## 5. Code-Konventionen
 
@@ -671,7 +686,12 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `tableReady`, Zeilen, Klick-Event, Modellwechsel = Neuaufbau + `destroy()`, Unmount = `destroy()`); Core per Alias aus
     `packages/table/src`; gemeinsame Helfer `packages/table/test-utils/wrapper-test-utils.ts` (ohne `vitest`-Import).
     Svelte läuft zweimal: Svelte 5 (`@sveltejs/vite-plugin-svelte` 5) und Svelte 4 (devDependency `"svelte4":
-    "npm:svelte@^4.2.20"`, kleines Compile-Plugin in der Config). CI: `.github/workflows/test-wrappers.yml`.
+    "npm:svelte@^4.2.20"`, kleines Compile-Plugin in der Config). **Angular** (seit 1.1.100) in `angular-builds/ng22`:
+    Vitest-Browser gegen das **gebaute** `dist/` (JIT: `test/setup-jit.ts` lädt `@angular/compiler` vor allem anderen,
+    Test-Hosts ohne Signal-Inputs), echte Anwendung je Test (`createApplication`, `test/angular-test-utils.ts`), zoneless
+    + eine Datei mit Zone.js; Projekt `angular-ng22-unit` (Node) testet das Sync-Skript. Der Core verschluckt ein
+    Kontextmenü in den ersten 50 ms nach dem Aufbau – Specs stellen `Date.now` vor. CI: `.github/workflows/test-wrappers.yml`
+    (baut vorher den Core).
   - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
     Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
@@ -777,6 +797,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 35 | Excel im Browser: Formeln, Copy & Paste, Undo – MIT-lizenziert (Clipboard, Fill-Handle, A1-Formeln bei ag-Grid Enterprise, Undo Community) | `videos/13-excel-im-browser/`, Showcase `spreadsheet`, Training-Kapitel `spreadsheet` (40), `apps/table-demo/spreadsheet.html`, `instructions.md` 6.20 – 6.25 |
 | 36 | Copy & Paste mit Excel – ohne Enterprise-Lizenz (optional) | Training-Kapitel `selection-and-copy` (`#paste`), `instructions.md` 6.21 |
 | 37 | Excel-Formeln mit Zellbezügen – Zeigemodus, F4, Zeilen einfügen (optional) | Training-Kapitel `spreadsheet`, `instructions.md` 6.23 – 6.25 |
+| 38 | Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden (Angular 22+) | `videos/14-angular-signals/`, `apps/angular-signal-demo`, Training-Kapitel `angular` (`#signals`), `packages/angular-table/instructions.md` 14 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

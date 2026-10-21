@@ -53,7 +53,7 @@ This is the UI-agnostic table component for your next web app. 😊
 - Right-to-left for Arabic, Hebrew, Persian: `direction: "rtl"` (1.1.98)
 - A spreadsheet: A1 cell formulas, copy & paste with Excel, undo/redo, formula bar – `SpreadsheetFactory`, or `spreadsheet: true` for your table (1.1.99)
 
-All thirteen with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/) ·
+All of them with code and live demos: [gui.expert/whats-new](https://gui.expert/whats-new/) ·
 training: [gui.expert/training](https://gui.expert/training/)
 
 ## Links

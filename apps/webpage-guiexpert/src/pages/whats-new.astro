@@ -1,7 +1,8 @@
 ---
 /**
- * /whats-new/ – the thirteen features of October 2026 (releases 1.1.91 – 1.1.99) on one page:
- * problem, code (checked: pnpm --filter webpage-guiexpert check:features), live showcase, training chapter, API.
+ * /whats-new/ – the features of October 2026 (releases 1.1.91 – 1.1.100) on one page:
+ * problem, code (checked: pnpm --filter webpage-guiexpert check:features), live showcase (or demo app), training
+ * chapter, API. The number in the texts follows the list (featureCountWord).
  * Data: src/features/new-features.ts (also used by the home page and the training index).
  */
 import IndexLayout from "../layouts/IndexLayout.astro";
@@ -11,7 +12,7 @@ import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import { Icon } from "astro-icon/components";
 import { Code } from "astro-expressive-code/components";
-import { NEW_FEATURES, agGridLabel, showcaseHref, trainingHref } from "../features/new-features";
+import { NEW_FEATURES, FeatureCountWord, agGridLabel, featureCountWord, featureVersions, liveTitle, showcaseHref, thumbName, trainingHref } from "../features/new-features";
 import { apiEntry } from "../training/api";
 import { chapterBySlug } from "../training/chapters";
 import corePkg from "../../../../packages/table/package.json";
@@ -28,31 +29,34 @@ const thumbOf = (name: string) => {
 const showcasePages = import.meta.glob("/src/pages/showcase/*/run.astro");
 for (const f of NEW_FEATURES) {
   chapterBySlug(f.training.slug);
-  if (!showcasePages[`/src/pages/showcase/${f.showcase.name}/run.astro`]) throw new Error(`whats-new: unknown showcase ${f.showcase.name}`);
+  if (f.showcase && !showcasePages[`/src/pages/showcase/${f.showcase.name}/run.astro`]) throw new Error(`whats-new: unknown showcase ${f.showcase.name}`);
+  if (!f.showcase && !f.demo) throw new Error(`whats-new: ${f.id} needs a showcase or a demo`);
 }
 const short = (name: string) => {
   const member = name.includes(".") ? name.slice(name.indexOf(".") + 1) : name;
   return apiEntry(name).kind === "method" ? `${member}()` : member;
 };
 const enterprise = NEW_FEATURES.filter(f => f.agGrid === "enterprise").length;
-const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.length - 1].since}`;
+const versions = featureVersions();
+const count = featureCountWord();
+const Count = FeatureCountWord();
 ---
 <IndexLayout
   title="What's new · GuiExpert Table"
-  description="Thirteen new features in one month: accessibility, overlays, state, row numbers, totals, row grouping, pivot tables, formulas, row drag, fill handle, master/detail, right-to-left and a spreadsheet with cell formulas – MIT-licensed.">
+  description={`${Count} new features in one month: accessibility, overlays, state, row numbers, totals, row grouping, pivot tables, formulas, row drag, fill handle, master/detail, right-to-left, a spreadsheet with cell formulas and an Angular signal component – MIT-licensed.`}>
   <Header splashMode={false} smallGap={true} />
 
   <div class="whats-new">
     <section class="training-hero">
       <p class="chapter-no">Releases {versions} · October 2026</p>
-      <h1><span class="gradient-text">Thirteen new features.</span><br />One month. Still MIT.</h1>
+      <h1><span class="gradient-text">{Count} new features.</span><br />One month. Still MIT.</h1>
       <p class="lead">
-        From screen readers to pivot tables: everything you see on this page is part of the free core – in Angular, React,
-        Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. {enterprise} of the thirteen are Enterprise features
+        From screen readers to pivot tables: everything you see on this page is part of the free packages – in Angular, React,
+        Vue, Svelte, Solid, Preact, Web Components and plain JavaScript. {enterprise} of the {count} are Enterprise features
         at ag-Grid.
       </p>
       <div class="training-cta">
-        <a class="btn-gradient" href="#features">See all thirteen ↓</a>
+        <a class="btn-gradient" href="#features">See all {count} ↓</a>
         <a class="btn-outline" href="/showcase/">Live showcases</a>
         <a class="btn-outline" href="/training/#new">In the training</a>
       </div>
@@ -61,7 +65,7 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
       </div>
     </section>
 
-    <nav class="wn-index training-section" id="features" aria-label="The thirteen features">
+    <nav class="wn-index training-section" id="features" aria-label={`The ${count} features`}>
       {NEW_FEATURES.map(f => (
         <a href={`#${f.id}`} class="wn-chip">
           <span class="wn-chip-icon"><Icon name={f.icon} /></span>
@@ -84,7 +88,7 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
             {f.points.map(p => <li>{p}</li>)}
           </ul>
           <div class="wn-links">
-            <a class="btn-gradient" href={showcaseHref(f)}><span aria-hidden="true">▶</span> Live: {f.showcase.title}</a>
+            <a class="btn-gradient" href={showcaseHref(f)}><span aria-hidden="true">▶</span> {f.showcase ? "Live" : "Demo"}: {liveTitle(f)}</a>
             <a class="btn-outline" href={trainingHref(f)}>{f.training.label}</a>
           </div>
           <p class="wn-api">API:{" "}
@@ -94,8 +98,8 @@ const versions = `${NEW_FEATURES[0].since} – ${NEW_FEATURES[NEW_FEATURES.lengt
           </p>
         </div>
         <div class="wn-side">
-          <a class="wn-thumb" href={showcaseHref(f)} aria-label={`Open the live showcase ${f.showcase.title}`}>
-            <Image src={thumbOf(f.showcase.name)} alt="" width={640} loading="lazy" />
+          <a class="wn-thumb" href={showcaseHref(f)} aria-label={f.showcase ? `Open the live showcase ${liveTitle(f)}` : `Open the ${liveTitle(f)}`}>
+            <Image src={thumbOf(thumbName(f))} alt="" width={640} loading="lazy" />
           </a>
           <Code lang="ts" code={f.snippet} />
         </div>

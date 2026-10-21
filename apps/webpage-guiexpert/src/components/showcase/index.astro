@@ -16,7 +16,10 @@ import mouseeventsImage from "../../assets/screens/thumbs/mouseevents.png";
 import largeImage from "../../assets/screens/thumbs/large.png";
 import type { ImageMetadata } from "astro";
 import downloadExcelImage from "../../assets/screens/thumbs/downloadexcel.png";
-import { NEW_FEATURES, showcaseHref } from "../../features/new-features";
+import { NEW_FEATURES, featureCountWord, showcaseHref } from "../../features/new-features";
+
+// features with a live showcase on this site (a framework wrapper feature has a demo app instead – see /whats-new/)
+const WITH_SHOWCASE = NEW_FEATURES.filter(f => f.showcase);
 import ContentSection from "../content-section.astro";
 import ShowcaseCard from "./common/ShowcaseCard.astro";
 
@@ -45,9 +48,9 @@ const thumbOf = (name: string) => {
 
 
   <div class="max-w-6xl space-y-4 w-full">
-    <h3 class="showcase-group-title"><span class="showcase-new-badge">New</span> October 2026 – thirteen features, one showcase each</h3>
+    <h3 class="showcase-group-title"><span class="showcase-new-badge">New</span> October 2026 – {featureCountWord(WITH_SHOWCASE.length)} features, one showcase each</h3>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {NEW_FEATURES.map(f => (
+      {WITH_SHOWCASE.map(f => f.showcase && (
         <div>
           <ShowcaseCard title={f.showcase.title} img={thumbOf(f.showcase.name)} url={showcaseHref(f)}>
             <p><b>{f.title}</b> · v{f.since}{f.agGrid === "enterprise" ? " · Enterprise at ag-Grid" : ""}</p>

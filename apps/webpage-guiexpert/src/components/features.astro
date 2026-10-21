@@ -2,6 +2,7 @@
 import { Icon } from "astro-icon/components";
 import ContentSection from "~/components/content-section.astro";
 import "../styles/home.css";
+import { featureCountWord } from "../features/new-features";
 
 interface Feature {
   title: string;
@@ -72,7 +73,7 @@ const features: Feature[] = [
 <ContentSection title="Everything included" id="features">
   <Fragment slot="lead">
     Every feature is part of the <span class="text-primary">MIT-licensed</span> core – in every framework.
-    <a class="block mt-2 text-base font-semibold text-secondary hover:underline" href="/whats-new/">New in October: thirteen features with code →</a>
+    <a class="block mt-2 text-base font-semibold text-secondary hover:underline" href="/whats-new/">New in October: {featureCountWord()} features with code →</a>
   </Fragment>
   <div class="home-features">
     {

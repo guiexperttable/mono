@@ -392,6 +392,28 @@ export class SimpleTableComponent {
 module. Since 1.1.86 a new `tableModel` / `tableOptions` object (e.g. from a signal) re-creates the table
 (`ngOnChanges`), and the table is released in `ngOnDestroy`. The full Angular guide is [`packages/angular-table/instructions.md`](packages/angular-table/instructions.md).
 
+**Angular 22 and later (since 1.1.100):** additionally `TableSignalComponent` (`<guiexpert-table-signal>`) – signal
+inputs, signal outputs and the `TableApi` as a signal, zoneless-ready:
+
+```ts
+import { Component, signal } from "@angular/core";
+import { TableSignalComponent } from "@guiexpert/angular-table";
+import { TableApi, TableModelIf } from "@guiexpert/table";
+import { generateSimpleModel } from "@guiexpert/demo-table-models";
+
+@Component({
+  selector: "app-signal-table",
+  imports: [TableSignalComponent],
+  template: `<guiexpert-table-signal class="table-div" [tableModel]="tableModel" [(tableApi)]="api" />`
+})
+export class SignalTableComponent {
+  tableModel: TableModelIf = generateSimpleModel(1000, 100);
+  readonly api = signal<TableApi | undefined>(undefined);
+}
+```
+
+Details (outputs, change detection, switching from `TableComponent`): Angular guide section 14.
+
 ---
 
 ## 5. Creating table models
@@ -1203,7 +1225,7 @@ listener.onSelectionChanged = () => {
 |---|---|---|
 | `tableReady` | `TableApi` | once, after the first render |
 | `mouseClicked` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`, `originalEvent`) | debounced in Angular and Vue (`debounceMouseClickDelay`, default 150 ms) |
-| `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded` |
+| `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded`; Angular `(contextmenu)` also receives the native `MouseEvent` first (Angular guide section 2) – `TableSignalComponent` (Angular 22+) calls it `contextMenu` |
 | `checkboxChanged` | `any[]` (checked rows) | tree/row checkboxes |
 | `modelChanged` | `GeModelChangeEvent` | once per edit, fill or batch commit; since 1.1.96 with `changes` (old/new values) and `source` (6.17) |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` | |

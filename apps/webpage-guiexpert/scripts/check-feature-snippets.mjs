@@ -1,8 +1,10 @@
 // Type check of the code snippets of src/features/new-features.ts (page /whats-new/, home page) against the built core.
 //   pnpm build:core && pnpm --filter webpage-guiexpert check:features
 // Every snippet is compiled as its own module with a small prelude (all exports of the core + a few declared names).
+// Framework snippets (`framework`, e.g. Angular) must be a verbatim part of their demo file (`demoFile`), which is
+// compiled there (apps/angular-signal-demo: `pnpm --filter angular-signal-demo check`, ngc with strictTemplates).
 import { execFileSync } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { NEW_FEATURES } from "../src/features/new-features.ts";
@@ -29,9 +31,31 @@ declare function sendToServer(changes: unknown): Promise<void>;
 void GE; void AutoRestoreOptions; void ColumnDef; void PivotFactory; void RowGroupFactory; void SelectionModel; void TableFactory; void TableOptions; void SpreadsheetFactory;
 `;
 
+let failed = false;
+for (const f of NEW_FEATURES.filter(f => f.framework)) {
+  if (!f.demoFile) {
+    console.error(`✗ ${f.id}: a ${f.framework} snippet needs demoFile`);
+    failed = true;
+    continue;
+  }
+  const demo = readFileSync(resolve(site, "../..", f.demoFile), "utf8");
+  if (!demo.includes(f.snippet)) {
+    console.error(`✗ ${f.id}: the snippet is not a verbatim part of ${f.demoFile}`);
+    failed = true;
+  } else if (f.snippet.split("\n").length > 15) {
+    console.error(`✗ ${f.id}: the snippet has more than 15 lines`);
+    failed = true;
+  } else {
+    console.log(`✓ ${f.id}: snippet = ${f.demoFile} (${f.framework})`);
+  }
+}
+if (failed) {
+  process.exit(1);
+}
+
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-const files = NEW_FEATURES.map(f => {
+const files = NEW_FEATURES.filter(f => !f.framework).map(f => {
   const file = join(out, `${f.id}.ts`);
   writeFileSync(file, `${prelude}\nexport async function snippet() {\n${f.snippet}\n}\n`);
   return file;

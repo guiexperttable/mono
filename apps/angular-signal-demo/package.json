@@ -1,0 +1,32 @@
+{
+  "name": "angular-signal-demo",
+  "version": "1.1.100",
+  "private": true,
+  "license": "MIT",
+  "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
+  "description": "Angular 22 demo (zoneless) of TableSignalComponent <guiexpert-table-signal> \u2013 uses the built package angular-builds/ng22/dist",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "ngc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@angular/common": "^22.0.1",
+    "@angular/compiler": "^22.0.1",
+    "@angular/core": "^22.0.1",
+    "@angular/platform-browser": "^22.0.1",
+    "@guiexpert/angular-table": "link:../../angular-builds/ng22/dist",
+    "@guiexpert/demo-table-models": "workspace:^",
+    "@guiexpert/table": "workspace:^",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "angular-build-ng22": "workspace:*",
+    "@angular/compiler-cli": "^22.0.1",
+    "typescript": "~6.0.3",
+    "vite": "6.4.4"
+  }
+}

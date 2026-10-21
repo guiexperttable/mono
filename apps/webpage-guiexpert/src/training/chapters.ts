@@ -133,7 +133,8 @@ export const CHAPTERS: Chapter[] = [
     slug: "angular", no: 9, part: "frameworks", episode: 9, minutes: 5,
     title: "GuiExpert Table in Angular 14 to 22", nav: "Angular 14–22",
     lead: "One source, nine builds: the package major follows your Angular major.",
-    learn: ["pick the right package version", "use the standalone TableComponent", "rebuild the table from a signal"],
+    learn: ["pick the right package version", "use the standalone TableComponent", "rebuild the table from a signal",
+      "Angular 22+: get the TableApi as a signal with <guiexpert-table-signal>"],
     api: ["TableApi", "GeMouseEvent", "TableOptions"]
   },
   {

@@ -1,12 +1,12 @@
 {
   "name": "@guiexpert/angular-table",
-  "version": "20.1.99",
+  "version": "20.1.100",
   "license": "MIT",
   "author": "Dr. Marc Kronberg <info@gui.expert> (https://gui.expert)",
   "peerDependencies": {
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
-    "@guiexpert/table": "^1.1.99"
+    "@guiexpert/table": "^1.1.100"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -4,11 +4,11 @@
  */
 import ContentSection from "~/components/content-section.astro";
 import { CHAPTERS } from "../../training/chapters";
-import { NEW_FEATURES, showcaseHref, type NewFeature } from "../../features/new-features";
+import { NEW_FEATURES, FeatureCountWord, featureCountWord, liveTitle, showcaseHref, type NewFeature } from "../../features/new-features";
 import "../../styles/home.css";
 
 const GROUPS: { tag: string; title: string; from: string; to: string }[] = [
-  { tag: "v1.1.97 – 1.1.98", title: "Master/detail and right-to-left", from: "1.1.97", to: "1.1.98" },
+  { tag: "v1.1.97 – 1.1.100", title: "Master/detail, right-to-left, a spreadsheet, Angular Signals", from: "1.1.97", to: "1.1.100" },
   { tag: "v1.1.94 – 1.1.96", title: "Spreadsheet power", from: "1.1.94", to: "1.1.96" },
   { tag: "v1.1.91 – 1.1.93", title: "Accessible, friendly, remembers you", from: "1.1.91", to: "1.1.93" }
 ];
@@ -19,7 +19,7 @@ const enterprise = NEW_FEATURES.filter(f => f.agGrid === "enterprise").length;
 
 <ContentSection title="What's new" id="news">
   <Fragment slot="lead">
-    <span class="text-primary">Thirteen features</span> in October 2026 – {enterprise} of them are Enterprise features at ag-Grid.
+    <span class="text-primary">{FeatureCountWord()} features</span> in October 2026 – {enterprise} of them are Enterprise features at ag-Grid.
   </Fragment>
   <div class="home-news">
     {GROUPS.map(g => (
@@ -30,7 +30,7 @@ const enterprise = NEW_FEATURES.filter(f => f.agGrid === "enterprise").length;
           {NEW_FEATURES.filter(f => inGroup(f, g)).map(f => (
             <li>
               <a href={`/whats-new/#${f.id}`}>{f.title}</a>
-              {" "}(<a href={showcaseHref(f)} aria-label={`Live showcase: ${f.showcase.title}`}>live</a>)
+              {" "}(<a href={showcaseHref(f)} aria-label={f.showcase ? `Live showcase: ${liveTitle(f)}` : liveTitle(f)}>{f.showcase ? "live" : "demo"}</a>)
             </li>
           ))}
         </ul>
@@ -38,7 +38,7 @@ const enterprise = NEW_FEATURES.filter(f => f.agGrid === "enterprise").length;
     ))}
   </div>
   <p class="home-links">
-    <a href="/whats-new/">All thirteen with code →</a>
+    <a href="/whats-new/">All {featureCountWord()} with code →</a>
     <a href="/training/">Training: {CHAPTERS.length} chapters with live demos →</a>
     <a href="https://github.com/guiexperttable/mono/releases">All releases on GitHub →</a>
   </p>

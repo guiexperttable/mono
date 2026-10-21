@@ -27,6 +27,7 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 011 | [011-master-detail.md](011-master-detail.md) | Master/Detail | Enterprise | 001, 003 | XL |
 | 012 | [012-rtl.md](012-rtl.md) | Rechts-nach-links-Sprachen (RTL) | Community | alle vorherigen | L |
 | 013 | [013-tabellenkalkulation.md](013-tabellenkalkulation.md) | Tabellenkalkulation: Excel-Bedienung, Zwischenablage, Undo/Redo, Zellformeln mit A1-Bezügen, Spreadsheet-Modus (5 Teile, 9 Etappen) | Enterprise (teils Community) | 001, 004, 008, 010, 012 | XL |
+| 015 | [015-angular-signal-table.md](015-angular-signal-table.md) | signal-native Angular-Komponente `<guiexpert-table-signal>` (`input()`, `output()`, `model()` für die `TableApi`, zoneless) ab Angular 22 und allen Folgeversionen | – | – | M |
 
 Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern). Grobe Schätzung, nur zum Planen.
 
@@ -48,6 +49,10 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
   jede releasefähig; Website, Training und Video einmal am Ende. Sitzungswechsel laufen über den Abschnitt
   „Fortschritt“ im Design-Dokument. RTL (012) und ARIA (001) gelten von Anfang an.
 
+- **015 Angular-Signal-Komponente:** reiner Wrapper-Prompt (kein Core-Feature), deshalb unabhängig von der Kette. Ab
+  Angular 22 zusätzlich zu `TableComponent`; ng14–21 bleiben unverändert. Bringt nebenbei das erste Angular-Test-Setup.
+  (`014 - webseite schaerfen.md` ist eine Notiz zur Website/SEO, kein Feature-Prompt.)
+
 **Vorschlag (noch kein Prompt):** 014 Kontextmenü – ein eingebautes, barrierefreies Kontextmenü für alle Tabellen
 (Ausschneiden/Kopieren/Einfügen, Zeilen/Spalten einfügen/löschen, eigene Einträge). 013 zeigt es nur als Beispiel
 (`apps/table-demo/spreadsheet.html`, plain HTML über `onContextmenu`).
@@ -63,4 +68,8 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
 
 Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als Entscheidungsprotokoll liegen.
 
+<<<<<<< HEAD
 - [x] 001 (Screenreader-Tests offen) · [x] 002 (Angular-Smoke-Test offen) · [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release) · [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release) · [x] 008 (Demo-Repo `ep-039`, Videos offen) · [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release) · [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 013 (Screenreader und Excel-Rundreise in Firefox/Safari manuell, Demo-Repo `ep-040`; Angular-Demo-Route `spreadsheet` seit 1.1.99)
+=======
+- [x] 001 (Screenreader-Tests offen) · [x] 002 (Angular-Smoke-Test offen) · [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release) · [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release) · [x] 008 (Demo-Repo `ep-039`, Videos offen) · [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release) · [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 013 (Screenreader und Excel-Rundreise in Firefox/Safari manuell, Demo-Repo `ep-040` und Angular-Demo nach dem Release) · [x] 015 (Video 14 nach dem Release; AOT-App und SSR manuell; Demo-Repo entfällt)
+>>>>>>> feat/angular-signal-table

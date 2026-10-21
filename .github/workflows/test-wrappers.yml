@@ -1,6 +1,7 @@
-# Smoke tests of the framework wrappers (React, Preact, Vue 3, Svelte 4 + 5, Solid, Web Component) in headless
-# Chromium (Vitest 5 browser mode, see CLAUDE.md §6). The wrappers import the core from packages/table/src –
-# no build needed.
+# Smoke tests of the framework wrappers (React, Preact, Vue 3, Svelte 4 + 5, Solid, Web Component, Angular 22) in
+# headless Chromium (Vitest 5 browser mode, see CLAUDE.md §6). The wrappers import the core from packages/table/src.
+# Angular (angular-builds/ng22, since 1.1.100) tests the BUILT package: its test script runs ng-packagr, which compiles
+# against packages/table/dist – so the core is built first.
 #
 # Reusable workflow – called by
 #   - ci.yml           on every push to main and every pull request
@@ -38,18 +39,21 @@ jobs:
           cache: ${{ inputs.use-cache && 'pnpm' || '' }}
           package-manager-cache: ${{ inputs.use-cache }}
 
-      # only the wrapper packages and their devDependencies
-      - run: pnpm install --frozen-lockfile --filter "./packages/*-table"
+      # only the wrapper packages, the core (built for the Angular package) and the Angular 22 harness
+      - run: pnpm install --frozen-lockfile --filter "./packages/*-table" --filter @guiexpert/table --filter angular-build-ng22
 
       - name: Cache Playwright browsers
         if: inputs.use-cache
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-wrappers-${{ hashFiles('packages/*-table/package.json') }}
+          key: playwright-${{ runner.os }}-wrappers-${{ hashFiles('packages/*-table/package.json', 'angular-builds/ng22/package.json') }}
 
       - name: Install Chromium for Playwright
         run: pnpm --filter @guiexpert/react-table exec playwright install --with-deps chromium
+
+      - name: Build the core (Angular compiles against packages/table/dist)
+        run: pnpm build:core
 
       - name: Wrapper tests (Chromium)
         run: pnpm test:wrappers
@@ -59,5 +63,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: wrapper-test-failures
-          path: packages/*-table/.vitest/
+          path: |
+            packages/*-table/.vitest/
+            angular-builds/ng22/.vitest/
           if-no-files-found: ignore

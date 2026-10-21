@@ -2,8 +2,17 @@
 
 > Offene Aufgaben. Herkunft: Code-Analyse und Aufsetzen des Mono-Repos (Oktober 2026).
 
+- [ ] wenn in den TableOptions headerSeparatorBorderVisible: false ist, dann sollte das Border-div (höhe=1) nicht gerendert werden. siehe ele-scope zeile 162 ff.
+
 ## Wrapper-Korrekturen
 
+- [ ] **Angular `TableComponent`: `(contextmenu)` feuert doppelt** (gefunden bei 015, Test `it.fails` in
+      `angular-builds/ng22/test/table.component.browser.spec.ts`): Angular bindet einen Output, der wie ein DOM-Event
+      heißt, **auch** an das native Event des Host-Elements; der Core lauscht am selben Element ohne
+      `stopPropagation` → der Handler bekommt zuerst das `MouseEvent`, dann das `GeMouseEvent`. Umbenennen = Breaking
+      Change. Heute: Doku-Hinweis + Workaround `if (evt instanceof MouseEvent) return;`; `TableSignalComponent` heißt
+      `contextMenu`. Möglich: zusätzlicher Output `contextMenu` in `TableComponent` (additiv) und `contextmenu`
+      `@deprecated`.
 - [x] **Solid-Wrapper** (`packages/solid-table/src/GuiexpertTable.tsx`): ruft keine Callback-Props auf
       (`mouseClicked`, `tableReady`, … sind in `GuiexpertTableProps` deklariert), sondern feuert DOM-`CustomEvent`s
       auf dem Container-Div. → Callback-Props wie bei React/Preact aufrufen (CustomEvents ggf. zusätzlich behalten).
@@ -457,6 +466,21 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       im Demo-Repo, Website-Deploy (nur mit Freigabe). Angular-Demo: Route `demo/spreadsheet` erledigt (17.10.2026, Pakete 1.1.99
       von npm). Offen: Routen `rowgroup` und `pivot` (seit 1.1.94 angekündigt).
 
+- [x] **015 Angular-Signal-Komponente** (angelegt 21.10.2026, `prompts/015-angular-signal-table.md`, **umgesetzt**
+      21.10.2026, Branch `feat/angular-signal-table`, Design `prompts/015-angular-signal-table.design.md`):
+      `TableSignalComponent` / `<guiexpert-table-signal>` ab Angular 22 (und Folgeversionen) mit `input()`, `output()`,
+      `model<TableApi | undefined>()` (`[(tableApi)]`), `effect()` statt `ngOnChanges`, zoneless; Versions-Schalter in
+      `scripts/sync-angular-src.mjs`; erstes Angular-Test-Setup (erledigt auch den offenen Angular-Smoke-Test).
+      Zu prüfen: `(contextmenu)`/`(scroll)` binden an einer Komponente auch das native DOM-Event (doppelter Aufruf?).
+      → Ergebnis: `(contextmenu)` feuert doppelt (Eintrag unter „Wrapper-Korrekturen“), `(scroll)` nicht.
+      Umgesetzt: Marke `// @since-angular N` in `scripts/sync-angular-src.mjs` (ng14–21 byte-gleich), `TableSignalComponent`
+      ohne `tableReady` (nur `[(tableApi)]` / `(tableApiChange)`), 34 Tests in `angular-builds/ng22/test` (in
+      `pnpm test:wrappers` + CI), Demo `apps/angular-signal-demo` (Vite + JIT), Doku, What's new (14. Eintrag, ohne
+      Showcase), Training Kapitel 9 `#signals`, Video 14. Offen: Aufnahme Video 14 nach dem Release; manuell in einer
+      echten Angular-CLI-App (AOT) und mit SSR ausprobieren (die Tests laufen JIT bzw. mit `PLATFORM_ID` "server").
+      Vorschläge: lesbare Komfort-Signale (`selection`, `state`, `canUndo`, `isEditing`, `overlayState`) über
+      `api.subscribe`; Demo-App bei Bedarf auf Angular CLI (AOT) umstellen.
+
 ## Mono-Repo / Build
 
 - [ ] `pnpm --filter @guiexpert/preact-table build` meldet beim Typ-Build des Core-Quelltexts (lib < ES2019) zwei
@@ -499,7 +523,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `npm-publish.yml` (Job `publish` hat `needs: test` → rote Tests = kein Release).
 - [ ] GitHub → Settings → Branches → Regel für `main`: „Require status checks to pass“ mit
       `test-core / Test @guiexpert/table`, `test-wrappers / Test framework wrappers` und `build` (nur im GitHub-UI).
-- [ ] Tests Phase 4 (Rest): Playwright-E2E gegen die Website-Showcases; Angular-Wrapper-Smoke-Test (ng22); weitere
+- [ ] Tests Phase 4 (Rest): Playwright-E2E gegen die Website-Showcases; ~~Angular-Wrapper-Smoke-Test (ng22)~~ –
+      **erledigt in 1.1.100** (`angular-builds/ng22/test`, `pnpm test:angular`); weitere
       Browser (Firefox/WebKit) als `instances`.
 - [ ] Später: Vite 7/8 (ändert das ausgelieferte Bundle; Vite 8 = Rolldown, `vite-plugin-babel` warnt) – erst mit
       ausreichend Browser-Tests. `ts-todo-demo` (Vite 6.2.6) und preact-/solid-Demo (Vite ^5) noch nicht angeglichen.
@@ -686,6 +711,13 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.100 – Angular Signals (015)**, additiv, nur `@guiexpert/angular-table` für Angular 22 und später:
+  `TableSignalComponent` (`<guiexpert-table-signal>`): `input()` `tableModel`, `tableOptions`, `loading`,
+  `debounceMouseClickDelay`; `tableApi = model<TableApi | undefined>()` (`[(tableApi)]`, `(tableApiChange)`), **kein**
+  `tableReady`; `output()` wie `TableComponent`, aber `contextMenu`; zoneless, kein RxJS, SSR ohne Tabelle. Pakete für
+  Angular 14–21 und `TableComponent` unverändert; Core unverändert. Neu im Repo: `pnpm test:angular`,
+  `test:wrappers` enthält Angular 22 (braucht vorher `pnpm build:core`), Demo `apps/angular-signal-demo`.
 
 - **1.1.99 – Excel-Bedienung (013, Etappe 1)**, additiv: `TableOptionsIf.editing` (`EditingOptionsIf`,
   `EditingOptions`), `ColumnDefIf.editor`/`emptyValue`, `CellEditorIf` + `TextCellEditor`, `NumberCellEditor`,

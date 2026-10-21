@@ -6,6 +6,16 @@ import ApiLink from "../../components/training/ApiLink.astro";
 import ChapterLink from "../../components/training/ChapterLink.astro";
 import Callout from "../../components/training/Callout.astro";
 import { Code } from "astro-expressive-code/components";
+import { NEW_FEATURES } from "../../features/new-features";
+
+// the snippet of /whats-new/ – a verbatim part of apps/angular-signal-demo/src/orders.component.ts (check:features)
+const signalFeature = NEW_FEATURES.find(f => f.id === "angular-signals");
+if (!signalFeature) throw new Error("angular.astro: feature angular-signals is missing in new-features.ts");
+const signalSnippet = `import { Component, computed, effect, signal } from "@angular/core";
+import { TableSignalComponent } from "@guiexpert/angular-table";
+import { TableApi, TableFactory } from "@guiexpert/table";
+
+${signalFeature.snippet}`;
 ---
 <TrainingLayout slug="angular">
 
@@ -42,6 +52,31 @@ import { Code } from "astro-expressive-code/components";
   </ul>
   <Callout type="pitfall" title="Angular CLI 22 and Node">
     <p>Angular CLI 22 needs Node ≥ 22.22.3. With an older Node the dev server refuses to start – that has nothing to do with the table.</p>
+  </Callout>
+
+  <h2 id="signals">Angular 22+: the table as a signal</h2>
+  <p>
+    From Angular 22 on, the package contains a second component: <code>&lt;guiexpert-table-signal&gt;</code>
+    (<code>TableSignalComponent</code>). Its inputs are signal inputs, its outputs signal outputs – and the
+    <ApiLink name="TableApi" /> itself is a signal. Bind it two-way, and <code>computed()</code> and <code>effect()</code>
+    work on the API like on any other signal:
+  </p>
+  <Code lang="ts" code={signalSnippet} title="orders.component.ts" />
+  <ul>
+    <li><code>[(tableApi)]="api"</code> sets your signal as soon as the table exists – the button enables itself, the
+      <code>effect</code> runs once. There is no <code>(tableReady)</code>: the event form is <code>(tableApiChange)</code>.</li>
+    <li>A new <code>[tableModel]</code> rebuilds the table and switches <code>api()</code> <strong>directly</strong> to the new
+      API – no <code>undefined</code> in between. When the component is removed, <code>api()</code> becomes
+      <code>undefined</code>.</li>
+    <li>The right-click output is called <code>(contextMenu)</code>. On <code>&lt;guiexpert-table&gt;</code>, Angular also binds
+      <code>(contextmenu)</code> to the browser event – the handler runs twice, first with a plain <code>MouseEvent</code>.</li>
+    <li>Works without Zone.js (<code>provideZonelessChangeDetection()</code>). Mouse, keyboard and scroll events come outside
+      the Angular zone: write a signal in the handler and the view updates – with or without Zone.js.</li>
+  </ul>
+  <Callout type="version">
+    <p>Needs <code>@guiexpert/angular-table@22.1.100</code> (Angular 22 and every later major). The classic
+      <code>&lt;guiexpert-table&gt;</code> stays unchanged for Angular 14 – 22. Demo app:
+      <a href="https://github.com/guiexperttable/mono/tree/main/apps/angular-signal-demo">apps/angular-signal-demo</a>.</p>
   </Callout>
 
   <h2 id="cells">Angular components inside cells</h2>

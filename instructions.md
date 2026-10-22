@@ -1225,7 +1225,7 @@ listener.onSelectionChanged = () => {
 |---|---|---|
 | `tableReady` | `TableApi` | once, after the first render |
 | `mouseClicked` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`, `originalEvent`) | debounced in Angular and Vue (`debounceMouseClickDelay`, default 150 ms) |
-| `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded`; Angular `(contextmenu)` also receives the native `MouseEvent` first (Angular guide section 2) – `TableSignalComponent` (Angular 22+) calls it `contextMenu` |
+| `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnd` | `GeMouseEvent` | Angular names the last one `mouseDraggingEnded`; Angular: use `contextMenu` (`TableComponent` since 1.1.101, `TableSignalComponent`) – the deprecated `(contextmenu)` also receives the native `MouseEvent` first (Angular guide section 2) |
 | `checkboxChanged` | `any[]` (checked rows) | tree/row checkboxes |
 | `modelChanged` | `GeModelChangeEvent` | once per edit, fill or batch commit; since 1.1.96 with `changes` (old/new values) and `source` (6.17) |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` | |

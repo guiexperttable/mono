@@ -46,7 +46,7 @@ ${signalFeature.snippet}`;
       trigger change detection.</li>
     <li>A <strong>new <code>[tableModel]</code> object rebuilds the table</strong> (<code>ngOnChanges</code>) – here via
       <code>computed()</code>; <code>ngOnDestroy</code> cleans up.</li>
-    <li>Outputs: <code>(tableReady)</code>, <code>(mouseClicked)</code>, <code>(selectionChanged)</code>, <code>(contextmenu)</code>,
+    <li>Outputs: <code>(tableReady)</code>, <code>(mouseClicked)</code>, <code>(selectionChanged)</code>, <code>(contextMenu)</code>,
       <code>(mouseDraggingEnded)</code> … <code>$event</code> is the <ApiLink name="TableApi" /> resp. <ApiLink name="GeMouseEvent" />.</li>
     <li>The element needs <code>display: block</code> and a height.</li>
   </ul>
@@ -68,8 +68,9 @@ ${signalFeature.snippet}`;
     <li>A new <code>[tableModel]</code> rebuilds the table and switches <code>api()</code> <strong>directly</strong> to the new
       API – no <code>undefined</code> in between. When the component is removed, <code>api()</code> becomes
       <code>undefined</code>.</li>
-    <li>The right-click output is called <code>(contextMenu)</code>. On <code>&lt;guiexpert-table&gt;</code>, Angular also binds
-      <code>(contextmenu)</code> to the browser event – the handler runs twice, first with a plain <code>MouseEvent</code>.</li>
+    <li>The right-click output is called <code>(contextMenu)</code> – on <code>&lt;guiexpert-table&gt;</code> too, since 1.1.101.
+      Avoid the old <code>(contextmenu)</code> (deprecated): Angular also binds it to the browser event, so the handler runs
+      twice, first with a plain <code>MouseEvent</code>.</li>
     <li>Works without Zone.js (<code>provideZonelessChangeDetection()</code>). Mouse, keyboard and scroll events come outside
       the Angular zone: write a signal in the handler and the view updates – with or without Zone.js.</li>
   </ul>

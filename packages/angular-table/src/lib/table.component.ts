@@ -56,8 +56,30 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
   @Output()
   mouseDraggingEnded: Subject<GeMouseEvent> = new Subject<GeMouseEvent>();
 
+  /**
+   * Right click / context menu key on the table.
+   *
+   * @deprecated since 1.1.101 – use `contextMenu`. Angular binds an output named like a DOM event to the output
+   * **and** to the native event of the host element: `(contextmenu)="…"` runs twice, first with the browser's
+   * `MouseEvent`, then with the `GeMouseEvent`. Kept for compatibility.
+   */
   @Output()
   contextmenu: Subject<GeMouseEvent> = new Subject<GeMouseEvent>();
+
+  /**
+   * Right click / context menu key on the table – exactly once per event, always a `GeMouseEvent`
+   * (replaces `contextmenu`, which also receives the native `MouseEvent`). Call `evt.originalEvent?.preventDefault()`
+   * to suppress the browser menu.
+   *
+   * @example
+   * ```html
+   * <guiexpert-table [tableModel]="tableModel" (contextMenu)="onContextMenu($event)" />
+   * ```
+   *
+   * @since 1.1.101
+   */
+  @Output()
+  contextMenu: Subject<GeMouseEvent> = new Subject<GeMouseEvent>();
 
   @Output()
   mouseClicked: Subject<GeMouseEvent> = new Subject<GeMouseEvent>();
@@ -175,6 +197,7 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onContextmenu(evt: GeMouseEvent): void {
     this.contextmenu.next(evt);
+    this.contextMenu.next(evt);
   }
 
   onScroll(evt: GeScrollEvent): void {

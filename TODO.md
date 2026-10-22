@@ -6,13 +6,15 @@
 
 ## Wrapper-Korrekturen
 
-- [ ] **Angular `TableComponent`: `(contextmenu)` feuert doppelt** (gefunden bei 015, Test `it.fails` in
-      `angular-builds/ng22/test/table.component.browser.spec.ts`): Angular bindet einen Output, der wie ein DOM-Event
-      heißt, **auch** an das native Event des Host-Elements; der Core lauscht am selben Element ohne
-      `stopPropagation` → der Handler bekommt zuerst das `MouseEvent`, dann das `GeMouseEvent`. Umbenennen = Breaking
-      Change. Heute: Doku-Hinweis + Workaround `if (evt instanceof MouseEvent) return;`; `TableSignalComponent` heißt
-      `contextMenu`. Möglich: zusätzlicher Output `contextMenu` in `TableComponent` (additiv) und `contextmenu`
-      `@deprecated`.
+- [x] **Angular `TableComponent`: `(contextmenu)` feuert doppelt** (gefunden bei 015): Angular bindet einen Output,
+      der wie ein DOM-Event heißt, **auch** an das native Event des Host-Elements; der Core lauscht am selben Element
+      ohne `stopPropagation` → der Handler bekommt zuerst das `MouseEvent`, dann das `GeMouseEvent`. Umbenennen =
+      Breaking Change. → **Behoben in 1.1.101 (additiv)**: neuer Output `contextMenu` in `TableComponent` (genau ein
+      `GeMouseEvent`, wie `TableSignalComponent`), `contextmenu` bleibt und ist `@deprecated` (feuert weiter doppelt).
+      Tests in `angular-builds/ng22/test/table.component.browser.spec.ts` (S9: `contextMenu` einmal; Charakterisierung
+      für `contextmenu`, `it.fails` entfernt). Doku: Angular-Guide Abschnitte 2/10/14, `instructions.md`, Training
+      `angular`. Offen: `apps/angular-table-demo` (`mouseevent`) auf `(contextMenu)` umstellen, sobald die Demo an die
+      lokalen Builds gekoppelt ist bzw. 1.1.101 auf npm liegt.
 - [x] **Solid-Wrapper** (`packages/solid-table/src/GuiexpertTable.tsx`): ruft keine Callback-Props auf
       (`mouseClicked`, `tableReady`, … sind in `GuiexpertTableProps` deklariert), sondern feuert DOM-`CustomEvent`s
       auf dem Container-Div. → Callback-Props wie bei React/Preact aufrufen (CustomEvents ggf. zusätzlich behalten).

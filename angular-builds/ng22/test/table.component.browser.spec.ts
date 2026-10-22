@@ -19,7 +19,8 @@ const ZONELESS = [provideZonelessChangeDetection()];
         [tableModel]="model()" [tableOptions]="options()" [loading]="loading()" [debounceMouseClickDelay]="0"
         (tableReady)="ready.push($event)"
         (mouseClicked)="clicks.push($event)"
-        (contextmenu)="contextmenus.push($event)" />
+        (contextmenu)="contextmenus.push($event)"
+        (contextMenu)="contextMenus.push($event)" />
     }`,
 })
 class ClassicHost {
@@ -30,6 +31,7 @@ class ClassicHost {
   readonly ready: TableApi[] = [];
   readonly clicks: GeMouseEvent[] = [];
   readonly contextmenus: unknown[] = [];
+  readonly contextMenus: unknown[] = [];
 }
 
 afterEach(() => {
@@ -78,18 +80,19 @@ describe('TableComponent (Angular 22, zoneless)', () => {
     expect(cmp.ready).toHaveLength(1);
   });
 
-  // BUG: Angular binds `(contextmenu)` on a component element to the output AND to the native DOM event; the core
-  // listens on the same host element without stopping it – the handler runs twice, first with the native MouseEvent.
-  // Kept for compatibility (renaming the output would be a breaking change); TableSignalComponent uses `contextMenu`.
-  // Workaround: `if (evt instanceof MouseEvent) return;` (TODO.md, instructions Angular section 2).
-  it.fails('S9: a right click reaches (contextmenu) once, as GeMouseEvent', async () => {
+  it('S9: a right click reaches (contextMenu) exactly once, as GeMouseEvent (since 1.1.101)', async () => {
     const { host, cmp } = await mount(ClassicHost, ZONELESS);
     vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1_000);  // past the 50 ms throttle after creating the table
     bodyCell(host, 3, 1).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 }));
-    expect(cmp.contextmenus).toHaveLength(1);
+    expect(cmp.contextMenus).toHaveLength(1);
+    expect(cmp.contextMenus[0]).not.toBeInstanceOf(MouseEvent);
+    expect(cellOf(cmp.contextMenus[0] as GeMouseEvent)).toEqual({ areaIdent: 'body', rowIndex: 3, columnIndex: 1 });
   });
 
-  it('S9 (characterization): the handler gets the native MouseEvent first, then the GeMouseEvent', async () => {
+  // NOTE: Angular binds `(contextmenu)` on a component element to the output AND to the native DOM event; the core
+  // listens on the same host element without stopping it – the handler runs twice, first with the native MouseEvent.
+  // Not fixable without a breaking change: the output is deprecated, `contextMenu` (above) replaces it.
+  it('S9 (characterization, deprecated contextmenu): the native MouseEvent first, then the GeMouseEvent', async () => {
     const { host, cmp } = await mount(ClassicHost, ZONELESS);
     vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1_000);
     bodyCell(host, 3, 1).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 }));

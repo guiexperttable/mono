@@ -231,7 +231,8 @@ describe.each(DIRECTIONS)('%s', dir => {
     it('fixedWestSeparatorBorderVisible = false hides the west separator border', async () => {
       const { host } = mountTable(wideModel({ fixedLeft: 2 }), { tableOptions: { fixedWestSeparatorBorderVisible: false } });
       await nextFrame();
-      expect(host.querySelector<HTMLElement>('.ge-table-west-fixed-column-border')!.style.display).toBe('none');
+      // since 1.1.103 the separator div is not created when switched off (before: display none)
+      expect(host.querySelector('.ge-table-west-fixed-column-border')).toBeNull();
     });
 
     // Regression: ele-scope.ts checked getFixedLeftColumnCount() for the EAST separator – with only fixed right

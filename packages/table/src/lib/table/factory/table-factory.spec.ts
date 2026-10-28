@@ -230,11 +230,13 @@ describe('TableFactory', () => {
         expect(tm.getColumnDefs()).toEqual([]);
       });
 
-      // BUG: without columnSizes TableModel.recalcColumnWidths fills the widths with overridingColumnWidth (-1).
-      it.fails('gives the columns a non-negative width when columnSizes is missing', () => {
+      // Regression (fixed in 1.1.103): without columnSizes the widths were filled with overridingColumnWidth (-1).
+      it('gives the columns a width of 100px when columnSizes is missing', () => {
         const tm = TableFactory.createTableModel({ headerData: [['A', 'B']], bodyData: [[1, 2]] });
         tm.init();
-        expect(tm.getColumnWidth(0)).toBeGreaterThanOrEqual(0);
+        expect(tm.getColumnWidth(0)).toBe(100);
+        expect(tm.getColumnWidth(1)).toBe(100);
+        expect(tm.getContentWidthInPixel()).toBe(200);
       });
     });
 

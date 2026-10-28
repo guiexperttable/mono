@@ -97,9 +97,9 @@ describe('SchemeGenerator', () => {
     expect(generator.rootPropertyType).toBe(root);
   });
 
-  // BUG: the list of already rendered class names (renderTypeScriptInterfacesDone) is never reset,
-  // so a second call on the same instance renders nothing.
-  it.fails('renders the same result when called twice on the same instance', () => {
+  // Regression (fixed in 1.1.103): the list of already rendered class names was never reset,
+  // so a second call on the same instance rendered nothing.
+  it('renders the same result when called twice on the same instance', () => {
     const generator = new SchemeGenerator();
     const root = new PropertyTypeService().object2PropertyType([{ a: 1 }], 'R');
     const first = generator.renderTypeScriptInterfaces(root);

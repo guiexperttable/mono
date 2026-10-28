@@ -64,8 +64,8 @@ describe('CssVars', () => {
     expect(light.get('--ge-table-focus-border')).toBe('rgb(0, 255, 255)');
   });
 
-  // BUG: typo in the blackboard theme – "otransparent" is not a CSS colour, the border falls back to the default.
-  it.fails('blackboard: --ge-table-footer-center-vertical-border is "transparent"', () => {
+  // Regression (fixed in 1.1.103): typo "otransparent" in the blackboard theme.
+  it('blackboard: --ge-table-footer-center-vertical-border is "transparent"', () => {
     expect(declarations(CssVars.vars.blackboard).get('--ge-table-footer-center-vertical-border')).toBe('transparent');
   });
 });

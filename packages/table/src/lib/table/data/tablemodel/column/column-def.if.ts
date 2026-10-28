@@ -59,9 +59,15 @@ export interface ColumnDefIf {
   headerLabel: string;
   /** Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. See {@link SizeUnitType}. */
   width: SizeIf;
-  /** Lower limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse. */
+  /**
+   * Lower limit of the column width: applied to percentage widths (`"%"`) and, since 1.1.103, when the user resizes the
+   * column with the mouse. A pixel width itself is not changed. `ColumnDef` default: `0px` (no limit).
+   */
   minWidth: SizeIf;
-  /** Upper limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse. */
+  /**
+   * Upper limit of the column width: applied to percentage widths (`"%"`) and, since 1.1.103, when the user resizes the
+   * column with the mouse. `ColumnDef` default: `100000px` (no limit).
+   */
   maxWidth: SizeIf;
   /**
    * Cell renderers per area – `rendererMap.header`, `.body`, `.footer`.

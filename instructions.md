@@ -470,6 +470,8 @@ const tableModel = TableFactory.createTableModel({
 
 Width constants `px0 … px500` (and `new Size(n, "px")`), alignment helpers `bodyLeft`, `bodyCenter`, `bodyRight`,
 `allLeft`, `allCenter`, `allRight`, boolean helpers `TrueFn` / `FalseFn`.
+`minWidth` / `maxWidth` clamp percentage widths and (since 1.1.103) resizing with the mouse; without them a column has no
+limits.
 `ColumnDef.create(...)` accepts: `property`, `headerLabel`, `width`, `minWidth`, `maxWidth`, `headerRenderer`,
 `bodyRenderer`, `footerRenderer`, `headerClasses`, `bodyClasses`, `footerClasses`, `sortable`, `sortIconVisible`,
 `sortComparator`, `sortState`, `sortStatesOrder`, `editable`, `isVisible`, `getEditRenderer`, `editInputPipe` and

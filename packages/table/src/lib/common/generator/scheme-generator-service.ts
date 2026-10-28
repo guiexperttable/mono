@@ -94,6 +94,7 @@ export class SchemeGenerator {
     }
 
     this.renderTypeScriptInterfacesFifo = [];
+    this.renderTypeScriptInterfacesDone = [];
     this.renderTypeScriptInterfacesRecursive(this.rootPropertyType, buf);
     this.renderTypeScriptInterfacesFifoNext(buf);
 

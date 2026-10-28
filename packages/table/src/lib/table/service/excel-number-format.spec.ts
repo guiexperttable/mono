@@ -33,7 +33,8 @@ describe('ExcelFormattedValueIf', () => {
   it('a format code is escaped; a non-finite value is written as text', async () => {
     const { sheet, styles } = await files([[{ value: 1, numberFormat: '0"<x>"' }, { value: Infinity, numberFormat: '0%' }]]);
     expect(styles).toContain('formatCode="0&quot;&lt;x&gt;&quot;"');
-    expect(sheet).toContain('<c r="B1" t="inlineStr"><is><t>[object Object]</t></is></c>');
+    // until 1.1.102: "[object Object]"
+    expect(sheet).toContain('<c r="B1" t="inlineStr"><is><t>Infinity</t></is></c>');
   });
 
   it('isExcelFormattedValue()', () => {

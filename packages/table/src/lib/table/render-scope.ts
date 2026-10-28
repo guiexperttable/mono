@@ -730,15 +730,17 @@ export class RenderScope extends EleScope {
         this.hostElement,
         'ge-table-border'));
     }
-    // The border between east and center in  header/body/footer (full height):
-    if (this.tableModel.getFixedLeftColumnCount() > 0) {
+    // The border between the fixed west columns and the center in header/body/footer (full height) –
+    // only with fixedWestSeparatorBorderVisible (until 1.1.102 always drawn):
+    if (this.tableModel.getFixedLeftColumnCount() > 0 && this.tableOptions.fixedWestSeparatorBorderVisible !== false) {
       this.removables.push(this.dom.addVerticalBorder(
         new GeoData(westWidth, 1, hostHeight, 0),
         this.hostElement,
         'ge-table-body-west-vertical-border'));
     }
-    // The border between header and body (full width), not for a hidden header (setHeaderVisible):
-    if (this.tableModel.isHeaderVisibe()) {
+    // The border between header and body (full width), not for a hidden header (setHeaderVisible) and only with
+    // headerSeparatorBorderVisible (until 1.1.102 always drawn, the option only hid the separator div of EleScope):
+    if (this.tableModel.isHeaderVisibe() && this.tableOptions.headerSeparatorBorderVisible !== false) {
       this.removables.push(this.dom.addHorizontalBorder(
         new GeoData(0, hostWidth, 1, headerHeight),
         this.hostElement,

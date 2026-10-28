@@ -2995,10 +2995,40 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private resizeColumn(mouseEvent: GeMouseEvent) {
     // right-to-left: the handle is on the left edge – dragging to the left makes the column wider
     const dx = this.isRtl() ? -mouseEvent.draggingX : mouseEvent.draggingX;
-    this.tableModel.setColumnWidth(this.mouseStartColumnIndex, this.mouseStartWidth + dx);
+    const width = this.clampToColumnWidthLimits(this.mouseStartColumnIndex, this.mouseStartWidth + dx, this.mouseStartWidth);
+    this.tableModel.setColumnWidth(this.mouseStartColumnIndex, width);
     this.tableModel.recalcPadding();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
+  }
+
+  /**
+   * Limits a column width to `ColumnDefIf.minWidth` / `maxWidth` (since 1.1.103: mouse resizing and
+   * {@link autoResizeColumns}). `px` limits are taken as they are, `%` limits relative to the width that % columns share
+   * (host minus fixed west columns and scroll bar, like the layout); `weight` limits and `%` limits without a host
+   * width are ignored. With `startWidth` (dragging) a width that is already outside the limits does not jump: the
+   * limits are widened to include it, so the user can only move towards the allowed range.
+   */
+  private clampToColumnWidthLimits(columnIndex: number, width: number, startWidth?: number): number {
+    const def = this.tableModel.getColumnDefs?.()?.[columnIndex];
+    if (!def) return width;
+    const available = this.getAvailableColumnWidth();
+    const toPx = (size: ColumnDefIf["minWidth"] | undefined): number | undefined => {
+      if (!size || !Number.isFinite(size.value)) return undefined;
+      if (size.unit === "px") return size.value;
+      if (size.unit === "%" && available > 0) return Math.floor(size.value * available / 100);
+      return undefined;
+    };
+    let min = toPx(def.minWidth);
+    let max = toPx(def.maxWidth);
+    if (min !== undefined && max !== undefined && min > max) return width;
+    if (startWidth !== undefined && startWidth >= 0) {
+      if (min !== undefined) min = Math.min(min, startWidth);
+      if (max !== undefined) max = Math.max(max, startWidth);
+    }
+    if (min !== undefined) width = Math.max(min, width);
+    if (max !== undefined) width = Math.min(max, width);
+    return width;
   }
 
   /**
@@ -3133,7 +3163,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const columnWidthes = this.calcAutoColumnWidths();
     for (let i = 0; i < columnWidthes.length; i++) {
       if (isRowNumberColumnDef(this.tableModel.getColumnDef(i))) continue; // its width follows the numbers
-      const columnWidth = columnWidthes[i];
+      // minWidth / maxWidth apply here, too (since 1.1.103)
+      const columnWidth = this.clampToColumnWidthLimits(i, columnWidthes[i]);
       this.tableModel.setColumnWidth(i, columnWidth);
     }
     if (recalcWrappers) this.recalcWrappers();

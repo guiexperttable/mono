@@ -21,12 +21,15 @@ Jede Demo liegt in einem eigenen Ordner unter `src/app/` – der Code dort ist d
 | `/demo/cellgroup` | `cellgroup/` | Mehrzeilige, auf-/zuklappbare Header-Gruppen |
 | `/demo/tablecheckbox`, `/demo/treecheckbox` | `checkbox/` | Checkboxen in Tabelle und Baum |
 | `/demo/todo` | `todo/` | Inline-Editing (Input, Select, Datum, Checkbox) |
-| `/demo/mouseevent` | `mouseevent/` | Maus-Events (`mouseClicked`, `mouseMoved`, `contextmenu`) |
+| `/demo/mouseevent` | `mouseevent/` | Maus-Events (`mouseClicked`, `mouseMoved`, `contextMenu`) |
 | `/demo/multisize` | `multisize/` | Unterschiedliche Spaltenbreiten/Zeilenhöhen |
 | `/demo/style`, `/demo/ultra` | `style/` | Look & Feel, 1024 × 1024 Farbzellen |
 | `/demo/covergrid` | `covergrid/` | Kachel-Ansicht (Cover-Grid) |
 | `/demo/olympic` | `olympic/` | Reales Daten-Beispiel |
 | `/demo/chunksocket` | `chunksocket/` | Daten-Chunks über Socket (experimentell) |
+| `/demo/rowgroup` | `rowgroup/` | Row Grouping mit Summen und Gesamtzeile, Umgruppieren zur Laufzeit |
+| `/demo/pivot` | `pivot/` | Pivot-Tabelle, neu pivotieren, Drill-down per Klick |
+| `/demo/spreadsheet` | `spreadsheet/` | Tabellenkalkulation: Formeln, Copy & Paste mit Excel, Undo |
 
 Starten (im Mono-Repo-Root): `pnpm i` und danach `pnpm serve:angular-table-demo` → http://localhost:4200
 
@@ -162,14 +165,16 @@ siehe `componentrenderer/`.
 | Output | Payload |
 |---|---|
 | `tableReady` | `TableApi` (z. B. `scrollToIndex`, `externalFilterChanged`, `repaint`, `clearSelection`, `copyToClipboard`, `downloadExcel`, `updateCells`) |
-| `mouseClicked`, `mouseMoved`, `contextmenu`, `mouseDragging`, `mouseDraggingEnded` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`) |
+| `mouseClicked`, `mouseMoved`, `contextMenu`, `mouseDragging`, `mouseDraggingEnded` | `GeMouseEvent` (`rowIndex`, `columnIndex`, `areaIdent`, `clickCount`) |
+| `contextmenu` (`@deprecated` seit 1.1.101) | feuert doppelt: zuerst das native `MouseEvent`, dann `GeMouseEvent` – `contextMenu` nutzen |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` |
 | `checkboxChanged` | `any[]` |
 | `modelChanged` | `GeModelChangeEvent` |
 | `scroll` | `GeScrollEvent` |
 
-Hinweis: Die Tabelle wird einmalig in `ngOnInit` aufgebaut. Ein später geändertes `tableModel` wird nicht
-übernommen – deshalb wird die Komponente in den Demos per `*ngIf` erst erzeugt, wenn die Daten da sind.
+Hinweis: Ein neues `tableModel` bzw. `tableOptions`-Objekt baut die Tabelle neu auf (`ngOnChanges`, alte Tabelle per
+`destroy()` freigegeben). Modell und Options deshalb einmal erzeugen und nicht im Template neu bauen; Umgruppieren,
+Filtern und Neu-Pivotieren gehen über die `TableApi` ohne Neuaufbau.
 
 ## Barrierefreiheit (ab `@guiexpert/table` 1.1.91)
 
@@ -181,10 +186,18 @@ oder `ariaLabel: "Bestellungen"`; deutsche Ansagen über `ariaTexts`. Diese Demo
 
 ## Row Grouping und Pivot-Tabellen (ab `@guiexpert/table` 1.1.94)
 
-`RowGroupFactory` (Zeilen gruppieren) und `PivotFactory` (Pivot-Tabellen) gibt es ab 1.1.94. Diese Demo nutzt noch die
-npm-Pakete (`TODO.md`) – die Routen `rowgroup` und `pivot` kommen nach dem Release. Angular-Beispiele:
-`packages/angular-table/instructions.md` Abschnitt 11, lauffähige Demos im Mono-Repo: `pnpm serve:table-demo` →
-`/row-grouping.html` und `/pivot.html`.
+`RowGroupFactory` (Zeilen gruppieren) und `PivotFactory` (Pivot-Tabellen) gibt es ab 1.1.94.
+
+- Route `demo/rowgroup` (`src/app/rowgroup/`): 50.000 Bestellungen, gruppiert nach Land › Stadt, mit Summen, Mittelwert
+  und Gesamtzeile (`createRowGroupModelAndOptions` aus `@guiexpert/demo-table-models`). Die Auswahl gruppiert zur Laufzeit
+  um (`tableApi.setRowGroupBy([...])` – kein neues Modell), das Suchfeld filtert die Bestellungen
+  (`externalFilterFunction` + `externalFilterChanged()`), Gruppen und Summen folgen.
+- Route `demo/pivot` (`src/app/pivot/`): Land › Stadt × Jahr › Quartal mit Umsatz und Anzahl
+  (`createPivotModelAndOptions`). Die Auswahl pivotiert neu (`tableApi.setPivotConfig({ columnFields })`), ein Klick auf
+  eine Zelle zeigt die Anzahl der Bestellungen dahinter (`getPivotBody().getCellSourceRows(...)` – die Tabelle läuft
+  außerhalb der Zone, daher `cdr.detectChanges()`).
+
+Weitere Angular-Beispiele: `packages/angular-table/instructions.md` Abschnitt 11.
 
 ## Tabellenkalkulation (ab `@guiexpert/table` 1.1.99)
 

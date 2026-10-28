@@ -1,0 +1,22 @@
+<div class="demo-bar">
+  <label>
+    Columns
+    <select #columns (change)="repivot(columns.value)">
+      <option value="year,quarter">Year › Quarter</option>
+      <option value="year">Year</option>
+      <option value="category">Category</option>
+      <option value="">– (values only)</option>
+    </select>
+  </label>
+  <input #filterInput type="search" placeholder="Filter (country, city, product …)" (input)="filter(filterInput.value)">
+  <button mat-stroked-button (click)="expandAll()">Expand all</button>
+  <button mat-stroked-button (click)="collapseAll()">Collapse all</button>
+  <span class="demo-hint">{{ drillText }}</span>
+</div>
+<guiexpert-table
+  [tableModel]="tableModel"
+  [tableOptions]="tableOptions"
+  (tableReady)="onTableReady($event)"
+  (mouseClicked)="onMouseClicked($event)"
+  class="table-div"
+></guiexpert-table>

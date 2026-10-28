@@ -1,0 +1,20 @@
+<div class="demo-bar">
+  <label>
+    Group by
+    <select #groupBy (change)="regroup(groupBy.value)">
+      <option value="country,city">Country › City</option>
+      <option value="category,product">Category › Product</option>
+      <option value="country">Country</option>
+      <option value="">– (flat)</option>
+    </select>
+  </label>
+  <input #filterInput type="search" placeholder="Filter (country, city, product …)" (input)="filter(filterInput.value)">
+  <button mat-stroked-button (click)="expandAll()">Expand all</button>
+  <button mat-stroked-button (click)="collapseAll()">Collapse all</button>
+</div>
+<guiexpert-table
+  [tableModel]="tableModel"
+  [tableOptions]="tableOptions"
+  (tableReady)="onTableReady($event)"
+  class="table-div"
+></guiexpert-table>

@@ -33,6 +33,7 @@ export class DemoMouseeventComponent {
   }
 
 
+  /** `(contextMenu)` (since 1.1.101) fires once with a `GeMouseEvent` – the deprecated `(contextmenu)` also got the native MouseEvent. */
   onContextmenu(evt: GeMouseEvent) {
     this.debugEvent(evt, 'onContextmenu');
   }

@@ -4,7 +4,7 @@
 // Selection on click/ctrl-click/shift-click is covered elsewhere (selection-service) and deliberately not asserted.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { ColumnDef, EventAdapter, FalseFn, Icon, SortedOptions, TableFactory, TrueFn, px100, px150 } from '@guiexpert/table';
+import { ColumnDef, EventAdapter, FalseFn, Icon, SortedOptions, TableFactory, TrueFn, px100, px150, px80, Size } from '@guiexpert/table';
 import type { ColumnDefIf, GeMouseEvent, SortState, TableOptionsIf } from '@guiexpert/table';
 import {
   areaRows,
@@ -343,7 +343,8 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
     expect(model.getColumnWidth(1)).toBe(100 - (198 - 140));
   });
 
-  it('dragging ignores ColumnDef.maxWidth', async () => {
+  // Regression (fixed in 1.1.103): min/maxWidth only applied to % widths, not when resizing with the mouse.
+  it('dragging respects ColumnDef.maxWidth', async () => {
     const columnDefs = [
       ColumnDef.create({ property: 'id', width: px100, maxWidth: px150 }),
       ColumnDef.create({ property: 'name', width: px100 }),
@@ -352,8 +353,79 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
     const { host, model } = await mountMouseTable({ columnDefs });
     await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
     await nextFrame();
-    // NOTE: min/maxWidth only apply to % widths (table-model.ts recalcColumnWidths), not when dragging (TODO.md).
+    expect(model.getColumnWidth(0)).toBe(150);
+  });
+
+  it('dragging respects ColumnDef.minWidth', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: px100 }),
+      ColumnDef.create({ property: 'name', width: px100, minWidth: px80 }),
+      ColumnDef.create({ property: 'value', width: px100 }),
+    ];
+    const { host, model } = await mountMouseTable({ columnDefs });
+    await userEvent.dragAndDrop(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 40, y: 10 } });
+    await nextFrame();
+    expect(model.getColumnWidth(1)).toBe(80);
+  });
+
+  it('dragging respects a maxWidth in % (relative to the width the % columns share)', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: px100, maxWidth: new Size(20, '%') }),
+      ColumnDef.create({ property: 'name', width: px100 }),
+      ColumnDef.create({ property: 'value', width: px100 }),
+    ];
+    const { host, model } = await mountMouseTable({ columnDefs });
+    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
+    await nextFrame();
+    // 20 % of 800 px minus a vertical scroll bar (0 … 20 px, depends on the platform)
+    expect(model.getColumnWidth(0)).toBeGreaterThanOrEqual(156);
+    expect(model.getColumnWidth(0)).toBeLessThanOrEqual(160);
+  });
+
+  it('a width that is already outside the limits does not jump when dragging starts', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: px100, maxWidth: px80 }),
+      ColumnDef.create({ property: 'name', width: px100 }),
+      ColumnDef.create({ property: 'value', width: px100 }),
+    ];
+    const { host, model } = await mountMouseTable({ columnDefs });
+    // a little to the right: wider is not allowed, but the column must not snap to 80 px either
+    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 20, y: 10 } });
+    await nextFrame();
+    expect(model.getColumnWidth(0)).toBe(100);
+    // to the left: narrower works
+    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 0), { targetPosition: { x: 30, y: 10 } });
+    await nextFrame();
+    expect(model.getColumnWidth(0)).toBeLessThan(80);
+  });
+
+  it('autoResizeColumns() respects minWidth and maxWidth', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: px100, maxWidth: new Size(40, 'px') }),
+      ColumnDef.create({ property: 'name', width: px100, minWidth: new Size(300, 'px') }),
+      ColumnDef.create({ property: 'value', width: px100 }),
+    ];
+    const { api, model } = await mountMouseTable({ columnDefs });
+    api.autoResizeColumns();
+    await nextFrame();
+    expect(model.getColumnWidth(0)).toBe(40);
+    expect(model.getColumnWidth(1)).toBe(300);
+    expect(model.getColumnWidth(2)).toBeLessThan(300);
+  });
+
+  it('dragging a ColumnDef without limits is not limited', async () => {
+    const columnDefs = [
+      ColumnDef.create({ property: 'id', width: px100 }),
+      ColumnDef.create({ property: 'name', width: px100 }),
+      ColumnDef.create({ property: 'value', width: px100 }),
+    ];
+    const { host, model } = await mountMouseTable({ columnDefs });
+    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
+    await nextFrame();
     expect(model.getColumnWidth(0)).toBe(252);
+    await userEvent.dragAndDrop(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 10, y: 10 } });
+    await nextFrame();
+    expect(model.getColumnWidth(1)).toBeLessThan(50);
   });
 });
 

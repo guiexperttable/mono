@@ -24,11 +24,12 @@ describe('ColumnDef', () => {
       expect(def.headerLabel).toBe('Customer');
     });
 
-    it('defaults to a width of 100px with minWidth and maxWidth of 100px', () => {
+    it('defaults to a width of 100px without limits (minWidth 0px, maxWidth 100000px)', () => {
+      // Until 1.1.102 a px column reported minWidth = maxWidth = 100px (unused at that time).
       const def = new ColumnDef('a', 'A');
       expect(def.width).toEqual(new Size(100, 'px'));
-      expect(def.minWidth).toEqual(new Size(100, 'px'));
-      expect(def.maxWidth).toEqual(new Size(100, 'px'));
+      expect(def.minWidth).toEqual(new Size(0, 'px'));
+      expect(def.maxWidth).toEqual(new Size(100000, 'px'));
     });
 
     it('defaults to empty class and renderer maps', () => {
@@ -81,8 +82,8 @@ describe('ColumnDef', () => {
       }
     });
 
-    // BUG: the constructor overwrites minWidth/maxWidth for every non-px width, although ColumnDefIf documents them as the limits for % widths.
-    it.fails('keeps an explicit minWidth and maxWidth for a % width', () => {
+    // Regression (fixed in 1.1.103): the constructor overwrote minWidth/maxWidth for every non-px width.
+    it('keeps an explicit minWidth and maxWidth for a % width', () => {
       const def = new ColumnDef('a', 'A', new Size(10, '%'), undefined, undefined, new Size(50, 'px'), new Size(300, 'px'));
       expect(def.minWidth).toEqual(new Size(50, 'px'));
       expect(def.maxWidth).toEqual(new Size(300, 'px'));
@@ -105,13 +106,13 @@ describe('ColumnDef', () => {
       expect(ColumnDef.create({})).toBeInstanceOf(ColumnDef);
     });
 
-    it('defaults: empty property and label, 100px width and limits', () => {
+    it('defaults: empty property and label, 100px width, no limits', () => {
       const def = ColumnDef.create({});
       expect(def.property).toBe('');
       expect(def.headerLabel).toBe('');
       expect(def.width).toEqual(new Size(100, 'px'));
-      expect(def.minWidth).toEqual(new Size(100, 'px'));
-      expect(def.maxWidth).toEqual(new Size(100, 'px'));
+      expect(def.minWidth).toEqual(new Size(0, 'px'));
+      expect(def.maxWidth).toEqual(new Size(100000, 'px'));
     });
 
     it('defaults: not editable, visible, not sortable, no sort icon', () => {

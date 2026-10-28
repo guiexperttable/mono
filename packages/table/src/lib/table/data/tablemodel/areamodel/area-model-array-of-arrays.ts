@@ -133,7 +133,17 @@ export class AreaModelArrayOfArrays<T> extends AbstractAreaModel<T[][]> {
   }
 
   override changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
-    this.filteredArr.forEach(row => this.arrayMove(row, sourceColumnIndex, targetColumnIndex));
+    // all rows – also those hidden by the filter (filteredArr holds the same row arrays); each row array once,
+    // even if the application put the same array into the data twice (until 1.1.102 only filteredArr was moved)
+    const moved = new Set<T[]>();
+    const move = (row: T[]) => {
+      if (row && !moved.has(row)) {
+        moved.add(row);
+        this.arrayMove(row, sourceColumnIndex, targetColumnIndex);
+      }
+    };
+    (this.arr ?? []).forEach(move);
+    this.filteredArr.forEach(move);
     super.changeColumnOrder(sourceColumnIndex, targetColumnIndex);
   }
 

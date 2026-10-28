@@ -2,7 +2,17 @@
 
 > Offene Aufgaben. Herkunft: Code-Analyse und Aufsetzen des Mono-Repos (Oktober 2026).
 
-- [ ] wenn in den TableOptions headerSeparatorBorderVisible: false ist, dann sollte das Border-div (höhe=1) nicht gerendert werden. siehe ele-scope zeile 162 ff.
+- [x] wenn in den TableOptions headerSeparatorBorderVisible: false ist, dann sollte das Border-div (höhe=1) nicht gerendert werden. siehe ele-scope zeile 162 ff.
+      → **Behoben in 1.1.103** (Branch `fix/bugfix-1.1.103`): Die sichtbare Linie kam gar nicht aus `ele-scope.ts` (das Div
+      stand schon auf `display: none`), sondern aus `RenderScope.adjustAfterScrolling`: dort wurde bei jedem Render-Durchgang
+      eine eigene 1-px-Linie unter den Header gezeichnet – ohne Blick auf die Option. Ebenso die senkrechte Linie hinter den
+      fixierten West-Spalten (`fixedWestSeparatorBorderVisible`). Beide Linien fallen jetzt bei `false` weg; die vier
+      Separator-Divs in `EleScope` werden bei `false` gar nicht mehr angelegt. Tests in `theming.browser.spec.ts`.
+      Offen: ein Options-Objekt **ohne** diese Felder (Plain-Object statt `new TableOptions()`) behandelt `EleScope` als
+      „aus“ (kein Div), `RenderScope` als „an“ (`!== false`, Linie wie bisher) – wie in 1.1.102; einheitlich machen? ·
+      `api.setColumnWidth()` und wiederhergestellte Breiten (Zustand) werden bewusst nicht auf `minWidth`/`maxWidth`
+      begrenzt (nur Ziehen und `autoResizeColumns`). · Offen (nur Kosmetik): bei `true` liegen Header- und West-Linie doppelt übereinander (Div aus `EleScope` + Linie aus
+      `RenderScope`, Klasse `ge-table-body-west-vertical-border`, s. `// NOTE:` in `theming.browser.spec.ts`).
 
 ## Wrapper-Korrekturen
 
@@ -58,7 +68,8 @@
       Callback-Props `onTableReady`, `onMouseClicked` … für den Runes-Modus, `on:…`-Events bleiben.
       `ComponentRendererWrapper` nutzt unter Svelte 5 `mount()/unmount()`. Peer `^4.0.0 || ^5.0.0`, kein CJS-Build mehr.
       Demo auf Svelte 5 (Runes) umgestellt. Paketversion ab jetzt **5.x** (`scripts/version.mjs`), nächstes Release 5.1.86.
-- [ ] `vue3-table`: unnötige Laufzeit-Abhängigkeiten `vue-i18n`/`vue-router` entfernt – beim Release erwähnen.
+- [x] `vue3-table`: unnötige Laufzeit-Abhängigkeiten `vue-i18n`/`vue-router` entfernt – beim Release erwähnen. (In die
+      Release-Notes 1.1.103 aufgenommen.)
 
 ## Core
 
@@ -485,8 +496,9 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
 
 ## Mono-Repo / Build
 
-- [ ] `pnpm --filter @guiexpert/preact-table build` meldet beim Typ-Build des Core-Quelltexts (lib < ES2019) zwei
-      Fehler in `selection/selection-model.ts:387` (`flatMap`, implizites `any`) – nicht fatal (Build-Exit 0), aber
+- [ ] `pnpm --filter @guiexpert/preact-table build` meldet beim Typ-Build des Core-Quelltexts (lib < ES2019) Fehler in
+      `selection/selection-model.ts:387` (`flatMap`, implizites `any`), inzwischen auch `area-model-aggregate-footer.ts:358`
+      (`flatMap`) und `rowgroup/row-group-internals.ts:121` (`Symbol.description`) – nicht fatal (Build-Exit 0), aber
       Rauschen; `lib` der Preact-tsconfig anheben oder die Stelle ohne `flatMap` schreiben (gefunden bei 002).
 
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
@@ -607,27 +619,32 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Variable Zeilenhöhen: `TableModel.getAreaHeight` (`table-model.ts:275`) ignoriert `getRowHeight()`, sobald
       `defaultRowHeights.body` gesetzt ist (Factory setzt immer 34) → falsche Scrollhöhe; `AbstractAreaModel.getYPosByRowIndex`
       (`abstract-area-model.ts:95`) ignoriert ein überschriebenes `getRowHeight()` → `scrollToIndex` daneben.
-- [ ] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): ~~`setValue` schreibt bei aktivem Filter in die falsche Zeile~~ (behoben 1.1.96, Prompt 010)
-      (`:46`); `changeColumnOrder` verschiebt ausgefilterte Zeilen nicht mit (`:70`) – Spalten-Drag ist Standard.
-- [ ] `ColumnDef`-Konstruktor überschreibt `minWidth`/`maxWidth` bei %-Breiten (`column-def.ts:62`).
-- [ ] `createTableModel({headerData, bodyData})` ohne `columnSizes` → Spaltenbreiten −1 (`table-model.ts:512`).
+- [x] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): ~~`setValue` schreibt bei aktivem Filter in die falsche Zeile~~ (behoben 1.1.96, Prompt 010)
+      (`:46`); ~~`changeColumnOrder` verschiebt ausgefilterte Zeilen nicht mit~~ (behoben 1.1.103: alle Zeilen, jedes
+      Zeilen-Array genau einmal).
+- [x] `ColumnDef`-Konstruktor überschreibt `minWidth`/`maxWidth` bei %-Breiten (`column-def.ts:62`). Behoben 1.1.103.
+- [x] `createTableModel({headerData, bodyData})` ohne `columnSizes` → Spaltenbreiten −1 (`table-model.ts:512`). Behoben
+      1.1.103: 100 px je Spalte (wie ein Default-`ColumnDef`).
 - [ ] `CoverGridBodyModel`: Breite < 1 Cover → 0 Spalten → `getRowCount() = Infinity` (`:44`); leere Extrazeile bei
       voller letzter Zeile (`:40`, `floor+1` statt `ceil`).
 - [ ] Header-Gruppen (`AreaModelCellGroups`, WIP): zugeklappte Gruppe überdeckt ihr „always“-Kind (`:130/168`).
-- [ ] Excel-Export: `NaN`/`Infinity` als `<v>NaN</v>` → Excel meldet defekte Datei (`excel-service.ts:194`).
+- [x] Excel-Export: `NaN`/`Infinity` als `<v>NaN</v>` → Excel meldet defekte Datei (`excel-service.ts:194`). Behoben 1.1.103:
+      Textzelle („NaN“, „Infinity“ wie in der Tabelle); ein `ExcelFormattedValueIf` mit solchem Wert ergab „[object Object]“
+      – jetzt ebenfalls der Text.
 
 **Gering:**
 - [ ] `setValue` auf verschachteltem Pfad mit fehlendem Elternobjekt überschreibt das Elternfeld
       (`abstract-area-model.ts:157`).
 - [x] `setColumnWidth` aktualisierte die x-Positionen nicht → `GeMouseEvent.columnLeft` veraltet (Branch
       `fix/columns-scrolling`).
-- [ ] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`). (`buildByTypedRows(rows, [])` wirft
+- [x] `getColumnProperty` ohne ColumnDefs wirft statt `''` (`table-model.ts:457`) – behoben 1.1.103. (`buildByTypedRows(rows, [])` wirft
       nicht mehr – nebenbei behoben mit 004, 1.1.93.)
 - [x] `TreeFactory`: `deepMaxLimit` off-by-one behoben (Zeilen bis Tiefe n, vorher n + 1); `TreeCheckboxModel.checkAll()`
       endlose Rekursion behoben (Argument optional, Default: ganzer Baum; entfernt weiterhin die Häkchen).
-- [ ] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei).
-- [ ] `CssVars` Blackboard-Theme: Tippfehler `otransparent` (`css-vars.ts:225`).
-- [ ] `SchemeGenerator.renderTypeScriptInterfaces` liefert beim zweiten Aufruf `[]` (`scheme-generator-service.ts:83`).
+- [x] Excel: Autor nicht XML-escaped (`excel-service.ts:138`, „Smith & Co“ → defekte Datei). Behoben 1.1.103.
+- [x] `CssVars` Blackboard-Theme: Tippfehler `otransparent` (`css-vars.ts:225`). Behoben 1.1.103.
+- [x] `SchemeGenerator.renderTypeScriptInterfaces` liefert beim zweiten Aufruf `[]` (`scheme-generator-service.ts:83`).
+      Behoben 1.1.103.
 - [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
@@ -713,6 +730,34 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.103 – Bugfix-Release**, nur Core (`@guiexpert/table`), keine neuen Exporte:
+  - `headerSeparatorBorderVisible: false` entfernt jetzt wirklich die Linie zwischen Header und Body, und
+    `fixedWestSeparatorBorderVisible: false` die Linie hinter den fixierten West-Spalten (beide wurden zusätzlich von
+    `RenderScope` gezeichnet, ohne die Option zu beachten). **DOM-Änderung:** bei `false` gibt es die Divs
+    `.ge-table-header-border`, `.ge-table-footer-border`, `.ge-table-west-fixed-column-border`,
+    `.ge-table-east-fixed-column-border` gar nicht mehr (vorher `display: none`).
+  - `ColumnDef.minWidth`/`maxWidth` begrenzen jetzt auch das Ziehen der Spaltenbreite mit der Maus und bleiben bei
+    %-Breiten erhalten (der Konstruktor hat sie überschrieben). **Verhaltensänderung:** ein `ColumnDef` ohne Angabe meldet
+    `minWidth = 0px`, `maxWidth = 100000px` (vorher bei px-Spalten `100px`/`100px`). Wer bei eigenen `ColumnDefIf`-Objekten
+    Grenzen setzt, die nicht zur Breite passen, kann die Spalte nur noch in Richtung dieser Grenzen ziehen (eine Breite
+    außerhalb springt beim Ziehen nicht, sie lässt sich nur nicht weiter nach außen ziehen). Achtung bei gespeicherten
+    oder gespreizten Konfigurationen mit den alten Defaults `minWidth = maxWidth = 100px`: so eine Spalte lässt sich nur
+    noch bis 100 px verbreitern bzw. verschmälern. Neu begrenzt beim Ziehen: `CheckboxColumnDef` (50–100 px),
+    `RowGroupColumnDef` (60–2000 px), `PivotColumnDef` (40–2000 px), Spreadsheet-Spalten (20–2000 px).
+    `%`-Grenzen beziehen sich wie im Layout auf die Breite der %-Spalten (Host minus fixierte West-Spalten und
+    Scrollleiste). Auch `api.autoResizeColumns()` hält die Grenzen jetzt ein.
+  - Excel-Export: `NaN`/`±Infinity` als Textzelle statt ungültiger Zahl (Excel meldete die Datei als defekt); ein
+    formatierter Wert (`{ value, numberFormat }`) mit solchem Wert ergab „[object Object]“; der Autor wird XML-escaped
+    („Smith & Co“ machte die Datei kaputt); ein ungültiges `Date` brach den ganzen Export mit `RangeError` ab (jetzt Text
+    „Invalid Date“); Steuerzeichen (U+0000–U+001F außer Tab, LF, CR) in Zellen und Autor werden entfernt (XML-ungültig).
+  - `AreaModelArrayOfArrays.changeColumnOrder` verschiebt auch die gerade ausgefilterten Zeilen (Spalten-Drag bei
+    `bodyData`-Tabellen mit Filter).
+  - `TableFactory.createTableModel({ headerData, bodyData })` ohne `columnSizes`: 100 px je Spalte statt −1.
+  - `TableModel.getColumnProperty()` ohne Spaltendefinitionen liefert `''` statt eines TypeErrors.
+  - `CssVars` Blackboard-Theme: `--ge-table-footer-center-vertical-border` war `otransparent` (Tippfehler).
+  - `SchemeGenerator.renderTypeScriptInterfaces()` liefert auch beim zweiten Aufruf auf derselben Instanz ein Ergebnis.
+  - Außerdem (seit 1.1.86 offen): `vue3-table` hat die unnötigen Laufzeit-Abhängigkeiten `vue-i18n`/`vue-router` nicht mehr.
 
 - **1.1.100 – Angular Signals (015)**, additiv, nur `@guiexpert/angular-table` für Angular 22 und später:
   `TableSignalComponent` (`<guiexpert-table-signal>`): `input()` `tableModel`, `tableOptions`, `loading`,
@@ -984,8 +1029,11 @@ Objekt-Tabelle hat `ge-focused-row`.
       füllen oder entfernen (zeigen „Simple demo“ / „Dies ist ein Test“).
 - [ ] `TableApi.setRows/addRows/addRowsAt/removeRows` zeichnen nicht neu und setzen Filter + Sortierung zurück –
       Anwender müssen `externalFilterChanged()` + `repaintHard()` selbst aufrufen (jetzt dokumentiert). Automatisch machen?
-- [ ] `ColumnDef.minWidth/maxWidth` wirken nur bei %-Breiten, nicht beim Ziehen mit der Maus. Begrenzen? (Die Folge 013 der
-      Videoreihe zeigt `minWidth: px80, maxWidth: px200` an einer px-Spalte – ohne Wirkung.)
+- [x] `ColumnDef.minWidth/maxWidth` wirken nur bei %-Breiten, nicht beim Ziehen mit der Maus. Begrenzen? (Die Folge 013 der
+      Videoreihe zeigt `minWidth: px80, maxWidth: px200` an einer px-Spalte – ohne Wirkung.) → **1.1.103**: Ziehen wird auf
+      `minWidth`/`maxWidth` begrenzt (`TableScope.clampToColumnWidthLimits`, px direkt, % relativ zur Host-Breite, `weight`
+      ignoriert). Damit Standardspalten weiter frei ziehbar sind, meldet `ColumnDef` ohne Angabe jetzt `0px`/`100000px`
+      (vorher bei px-Spalten `100px`/`100px`, damals ungenutzt).
 - [ ] Ohne `getSelectionModel` ist nichts auswählbar (eigenes `SelectionModel()` vom Typ `"none"`). Bewusst so?
 - [ ] `TableOptions.headerToggleExpandCollapseIcons` wird nirgends ausgewertet.
 - [ ] `ColumnDef`-Felder erben die Doku von `ColumnDefIf` nicht (typedoc) – ggf. `@inheritDoc`.

@@ -153,7 +153,7 @@ export class ExcelService implements ExcelServiceIf {
     const docPropsAppXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Macintosh Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>1</vt:i4></vt:variant></vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="1" baseType="lpstr"><vt:lpstr>Sheet1</vt:lpstr></vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>16.0300</AppVersion></Properties>`;
     const docPropsCoreXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:creator>${author}</dc:creator><cp:lastModifiedBy>${author}</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">2024-12-13T19:45:08Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2024-12-13T19:45:35Z</dcterms:modified></cp:coreProperties>`;
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:creator>${this.escapeXml(author)}</dc:creator><cp:lastModifiedBy>${this.escapeXml(author)}</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">2024-12-13T19:45:08Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2024-12-13T19:45:35Z</dcterms:modified></cp:coreProperties>`;
 
     const x1WorkbookXmlRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>`;
@@ -213,7 +213,7 @@ export class ExcelService implements ExcelServiceIf {
       for (let c = 0; c < row.length; c++) {
         const cell = row[c];
         const cellAddress = this.getCellAddress(r, c);
-        if (typeof cell === 'number') {
+        if (typeof cell === 'number' && Number.isFinite(cell)) {
           sb.push(`<c r="${cellAddress}"><v>${cell}</v></c>`);
 
         } else if (isExcelFormulaCell(cell)) {
@@ -223,11 +223,14 @@ export class ExcelService implements ExcelServiceIf {
           // a number with format: style index 1… (see withNumberFormats)
           sb.push(`<c r="${cellAddress}" s="${this.numberFormatStyles.get(cell.numberFormat) ?? 0}"><v>${cell.value}</v></c>`);
 
-        } else if (cell instanceof Date) {
+        } else if (cell instanceof Date && !isNaN(cell.getTime())) {
           const d: Date = cell;
           sb.push(`<c r="${cellAddress}" t="inlineStr"><is><t>${d.toISOString()}</t></is></c>`);
         } else {
-          const cellValue = cell != null ? this.escapeXml(String(cell)) : '';
+          // NaN / Infinity are no valid OOXML numbers → text, as the table shows them ("NaN", "Infinity").
+          // A formatted value with such a number is written as its plain value (not "[object Object]").
+          const plain = isExcelFormattedValue(cell) ? cell.value : cell;
+          const cellValue = plain != null ? this.escapeXml(String(plain)) : '';
           sb.push(`<c r="${cellAddress}" t="inlineStr"><is><t>${cellValue}</t></is></c>`);
         }
       }
@@ -288,6 +291,9 @@ export class ExcelService implements ExcelServiceIf {
   private escapeXml(value: any): string {
     if (value == null) return '';
     return String(value)
+      // control characters are not allowed in XML 1.0 – Excel reports the file as corrupt (tab, LF and CR are fine)
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')

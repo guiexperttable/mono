@@ -145,9 +145,48 @@ describe('border options (TableOptions)', () => {
     expect(footer.style.display).toBe('block');
     expect(stylePx(footer, 'top')).toBe(500 - 34);
 
+    // since 1.1.103 the separator divs are not created at all when switched off (before: display none)
     const hidden = (await mountStyledTable({ headerSeparatorBorderVisible: false, footerSeparatorBorderVisible: false })).host;
-    expect(area(hidden, ':scope > .ge-table-header-border').style.display).toBe('none');
-    expect(area(hidden, ':scope > .ge-table-footer-border').style.display).toBe('none');
+    expect(hidden.querySelectorAll(':scope > .ge-table-header-border')).toHaveLength(0);
+    expect(hidden.querySelectorAll(':scope > .ge-table-footer-border')).toHaveLength(0);
+  });
+
+  /** Host children that are 1px lines across the full host width (height 1) or full host height (width 1). */
+  const fullLines = (host: HTMLElement, kind: 'horizontal' | 'vertical') => Array.from(host.children)
+    .filter((e): e is HTMLElement => e instanceof HTMLElement && e.style.display !== 'none')
+    .filter(e => kind === 'horizontal'
+      ? stylePx(e, 'height') === 1 && stylePx(e, 'width') === host.clientWidth
+      : stylePx(e, 'width') === 1 && stylePx(e, 'height') === host.clientHeight);
+
+  // Regression (fixed in 1.1.103): RenderScope drew its own line between header and body on every render pass,
+  // ignoring headerSeparatorBorderVisible – the line stayed visible although the option was false.
+  it('headerSeparatorBorderVisible: false draws no line between header and body', async () => {
+    const shown = (await mountStyledTable({ tableTopBorderVisible: false, tableBottomBorderVisible: false })).host;
+    expect(fullLines(shown, 'horizontal').map(l => stylePx(l, 'top'))).toContain(34);
+
+    const hidden = (await mountStyledTable({
+      headerSeparatorBorderVisible: false, tableTopBorderVisible: false, tableBottomBorderVisible: false,
+    })).host;
+    expect(fullLines(hidden, 'horizontal').map(l => stylePx(l, 'top'))).not.toContain(34);
+  });
+
+  // Regression (fixed in 1.1.103): the full-height line behind the fixed west columns ignored
+  // fixedWestSeparatorBorderVisible.
+  it('fixedWestSeparatorBorderVisible: false draws no line behind the fixed west columns', async () => {
+    const shown = (await mountStyledTable()).host;
+    expect(fullLines(shown, 'vertical').map(l => stylePx(l, 'left'))).toContain(100);
+    expect(shown.querySelectorAll(':scope > .ge-table-west-fixed-column-border')).toHaveLength(1);
+
+    const hidden = (await mountStyledTable({ fixedWestSeparatorBorderVisible: false })).host;
+    expect(fullLines(hidden, 'vertical').map(l => stylePx(l, 'left'))).not.toContain(100);
+    expect(hidden.querySelectorAll(':scope > .ge-table-west-fixed-column-border')).toHaveLength(0);
+  });
+
+  it('fixedEastSeparatorBorderVisible: false creates no east separator div', async () => {
+    const hidden = (await mountStyledTable({ fixedEastSeparatorBorderVisible: false })).host;
+    expect(hidden.querySelectorAll(':scope > .ge-table-east-fixed-column-border')).toHaveLength(0);
+    const shown = (await mountStyledTable()).host;
+    expect(shown.querySelectorAll(':scope > .ge-table-east-fixed-column-border')).toHaveLength(1);
   });
 
   it('no footer rows: no footer separator', async () => {

@@ -65,6 +65,10 @@ export class ColumnDef implements ColumnDefIf {
   public emptyValue?: unknown;
   /** `false`: no cell formulas in this column, see {@link ColumnDefIf.cellFormulas} (since 1.1.99). */
   public cellFormulas?: boolean;
+  /** Lower limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.minWidth}. Default `0px`. */
+  public minWidth: SizeIf;
+  /** Upper limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.maxWidth}. Default `100000px`. */
+  public maxWidth: SizeIf;
 
   constructor(
     public property: string,
@@ -72,8 +76,8 @@ export class ColumnDef implements ColumnDefIf {
     public width: SizeIf = new Size(100, "px"),
     public classes: AreaObjectMapType<string[]> = new AreaObjectMap<string[]>(),
     public rendererMap: AreaObjectMapType<CellRendererIf> = new AreaObjectMap<CellRendererIf>(),
-    public minWidth: SizeIf = new Size(100, "px"),
-    public maxWidth: SizeIf = new Size(100, "px"),
+    minWidth?: SizeIf,
+    maxWidth?: SizeIf,
     public sortable?: BooleanFunction,
     public sortComparator?: ValueRowSortComparator,
     public sortState?: SortState,
@@ -84,10 +88,10 @@ export class ColumnDef implements ColumnDefIf {
     public editInputPipe?: editInputPipe,
     public isVisible: BooleanFunction = ()=>this.visible
   ) {
-    if (width.unit !== 'px') {
-      this.minWidth = new Size(0, "px");
-      this.maxWidth = new Size(100000, "px");
-    }
+    // Without limits: 0 … 100000 px for every unit. (Until 1.1.102 a px column reported 100 px / 100 px – unused –
+    // and the limits of a % column were overwritten, see TODO.md.)
+    this.minWidth = minWidth ?? new Size(0, "px");
+    this.maxWidth = maxWidth ?? new Size(100000, "px");
   }
 
   static bodyRenderer(bodyRenderer: CellRendererIf) {
@@ -119,9 +123,9 @@ export class ColumnDef implements ColumnDefIf {
     headerLabel?: string,
     /** Width, default 100 px. */
     width?: SizeIf,
-    /** Lower limit for % widths. */
+    /** Lower limit for % widths and for resizing with the mouse (default `0px`). */
     minWidth?: SizeIf,
-    /** Upper limit for % widths. */
+    /** Upper limit for % widths and for resizing with the mouse (default `100000px`). */
     maxWidth?: SizeIf,
     /** Renderer of the header cell. */
     headerRenderer?: CellRendererIf,
@@ -200,8 +204,8 @@ export class ColumnDef implements ColumnDefIf {
       param.width ?? new Size(100, "px"),
       cm,
       am,
-      param.minWidth ?? new Size(100, "px"),
-      param.maxWidth ?? new Size(100, "px"),
+      param.minWidth,
+      param.maxWidth,
       param.sortable,
       param.sortComparator,
       param.sortState,

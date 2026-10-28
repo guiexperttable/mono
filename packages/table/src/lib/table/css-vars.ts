@@ -246,7 +246,7 @@ export class CssVars {
   --ge-table-footer-west-horizontal-border: transparent;
   --ge-table-footer-west-vertical-border: transparent;
   --ge-table-footer-center-horizontal-border: transparent;
-  --ge-table-footer-center-vertical-border: otransparent;
+  --ge-table-footer-center-vertical-border: transparent;
   --ge-table-footer-east-horizontal-border: transparent;
   --ge-table-footer-east-vertical-border: transparent;
   --ge-table-border: oklch(0% 0 0);

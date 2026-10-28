@@ -179,10 +179,11 @@ describe('ExcelService', () => {
       expect(core).toContain('<dcterms:modified xsi:type="dcterms:W3CDTF">2024-12-13T19:45:35Z</dcterms:modified>');
     });
 
-    // BUG: the author is inserted into core.xml without XML escaping (cell values are escaped) → invalid XML.
-    it.fails('escapes XML special characters in the author', async () => {
+    // Regression (fixed in 1.1.103): the author was inserted into core.xml without XML escaping → invalid XML.
+    it('escapes XML special characters in the author', async () => {
       const core = (await xlsx([['x']], 'Smith & <Sons>')).get('docProps/core.xml')!.text;
       expect(core).toContain('<dc:creator>Smith &amp; &lt;Sons&gt;</dc:creator>');
+      expect(core).toContain('<cp:lastModifiedBy>Smith &amp; &lt;Sons&gt;</cp:lastModifiedBy>');
     });
 
     it('docProps/app.xml names the single worksheet "Sheet1"', async () => {
@@ -323,12 +324,33 @@ describe('ExcelService', () => {
       expect(cellXml(xml, 'B1')).toContain('<t>1,b</t>');
     });
 
-    // BUG: NaN / Infinity are written as <v>NaN</v> / <v>Infinity</v> – not valid numbers in OOXML, Excel reports the
-    // file as corrupt. (Expected: an empty cell or a text cell – anything but an invalid numeric value.)
-    it.fails('does not write NaN and Infinity as (invalid) numeric cells', async () => {
-      const xml = await sheetXml([[NaN, Infinity]]);
-      expect(cellXml(xml, 'A1')).not.toContain('<v>NaN</v>');
-      expect(cellXml(xml, 'B1')).not.toContain('<v>Infinity</v>');
+    // Regression (fixed in 1.1.103): NaN / Infinity were written as <v>NaN</v> / <v>Infinity</v> – not valid numbers in
+    // OOXML, Excel reported the file as corrupt. Now text cells, as the table shows them.
+    it('does not write NaN and Infinity as (invalid) numeric cells', async () => {
+      const xml = await sheetXml([[NaN, Infinity, -Infinity]]);
+      expect(cellXml(xml, 'A1')).toBe('<c r="A1" t="inlineStr"><is><t>NaN</t></is></c>');
+      expect(cellXml(xml, 'B1')).toBe('<c r="B1" t="inlineStr"><is><t>Infinity</t></is></c>');
+      expect(cellXml(xml, 'C1')).toBe('<c r="C1" t="inlineStr"><is><t>-Infinity</t></is></c>');
+    });
+
+    // fixed in 1.1.103: toISOString() threw a RangeError and aborted the whole export
+    it('writes an invalid Date as text instead of throwing', async () => {
+      const xml = await sheetXml([[new Date(NaN)]]);
+      expect(cellXml(xml, 'A1')).toBe('<c r="A1" t="inlineStr"><is><t>Invalid Date</t></is></c>');
+    });
+
+    // fixed in 1.1.103: control characters are not allowed in XML 1.0 – Excel reported the file as corrupt
+    it('removes XML-illegal control characters, keeps tab, LF and CR', async () => {
+      const xml = await sheetXml([['a\u0000b\u0007c\u001Fd', 'x\ty\nz\r']]);
+      expect(cellXml(xml, 'A1')).toBe('<c r="A1" t="inlineStr"><is><t>abcd</t></is></c>');
+      expect(xml).toContain('<c r="B1" t="inlineStr"><is><t>x\ty\nz\r</t></is></c>'); // cellXml() stops at line breaks
+      const core = (await xlsx([['x']], 'Smith\u0001')).get('docProps/core.xml')!.text;
+      expect(core).toContain('<dc:creator>Smith</dc:creator>');
+    });
+
+    it('writes a formatted value with NaN as its plain text, not "[object Object]"', async () => {
+      const xml = await sheetXml([[{ value: NaN, numberFormat: '0.0%' }]]);
+      expect(cellXml(xml, 'A1')).toBe('<c r="A1" t="inlineStr"><is><t>NaN</t></is></c>');
     });
 
     it('does not mark strings with leading/trailing spaces as xml:space="preserve"', async () => {

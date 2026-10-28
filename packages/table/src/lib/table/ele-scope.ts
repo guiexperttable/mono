@@ -46,10 +46,11 @@ export class EleScope {
   protected areaFooterWest: DivScope;
   protected areaFooterEast: DivScope;
 
-  protected borderHeaderBottom: HTMLDivElement;
-  protected borderFooterTop: HTMLDivElement;
-  protected borderFixedWest: HTMLDivElement;
-  protected borderFixedEast: HTMLDivElement;
+  // The separator lines exist only when their option is on (since 1.1.103; before: always created, display none).
+  protected borderHeaderBottom?: HTMLDivElement;
+  protected borderFooterTop?: HTMLDivElement;
+  protected borderFixedWest?: HTMLDivElement;
+  protected borderFixedEast?: HTMLDivElement;
 
   protected hoverRow: HTMLDivElement;
   protected hoverColumn: HTMLDivElement;
@@ -159,27 +160,21 @@ export class EleScope {
     this.areaBodyCenter = dom.appendRelativeChildDiv(
       dom.createDivWithClass("ge-table-body-center", this.contentDiv));
 
-    this.borderHeaderBottom =
-      dom.applyStylePosistionAbsolute(
-        dom.createDivWithClass("ge-table-header-border", hostEle));
-
-    this.borderFixedWest =
-      dom.applyStylePosistionAbsolute(
-        dom.createDivWithClass("ge-table-west-fixed-column-border", hostEle));
-
-    this.borderFixedEast =
-      dom.applyStylePosistionAbsolute(
-        dom.createDivWithClass("ge-table-east-fixed-column-border", hostEle));
-
-    this.borderFooterTop =
-      dom.applyStylePosistionAbsolute(
-        dom.createDivWithClass("ge-table-footer-border", hostEle));
+    // separator lines: only created when switched on (the options are fixed for the lifetime of the scope)
+    const separator = (visible: boolean | undefined, clazz: string) =>
+      visible ? dom.applyStylePosistionAbsolute(dom.createDivWithClass(clazz, hostEle)) : undefined;
+    this.borderHeaderBottom = separator(tableOptions?.headerSeparatorBorderVisible, "ge-table-header-border");
+    this.borderFixedWest = separator(tableOptions?.fixedWestSeparatorBorderVisible, "ge-table-west-fixed-column-border");
+    this.borderFixedEast = separator(tableOptions?.fixedEastSeparatorBorderVisible, "ge-table-east-fixed-column-border");
+    this.borderFooterTop = separator(tableOptions?.footerSeparatorBorderVisible, "ge-table-footer-border");
 
     // Screen readers: decoration is hidden, the nine row containers are row groups in the logical order
     // header → body → footer (in the DOM the body center comes last, inside the scroll viewport).
     [this.hoverRow, this.hoverColumn, this.draggingColumn,
       this.borderHeaderBottom, this.borderFixedWest, this.borderFixedEast, this.borderFooterTop]
-      .forEach(div => dom.setAriaHidden(div));
+      .forEach(div => {
+        if (div) dom.setAriaHidden(div);
+      });
     // Chrome makes a scroll container without focusable children a tab stop of its own – the table is ONE tab
     // stop (the host, keyboard navigation inside).
     if (!tableOptions?.shortcutActionsDisabled) {
@@ -383,7 +378,7 @@ export class EleScope {
     this.areaBodyWestGeo.top = padding.top;
     this.areaBodyWestGeo.left = 0;
     this.dom.applyStyleInPx(this.areaBodyWest.parent, this.areaBodyWestGeo);
-    if (this.tableOptions.fixedWestSeparatorBorderVisible &&
+    if (this.borderFixedWest &&
       this.tableModel.getFixedLeftColumnCount()) {
       this.dom.applyDisplayBlockStyle(
         this.dom.applyStyle(this.borderFixedWest, {
@@ -394,7 +389,7 @@ export class EleScope {
         })
       );
     } else {
-      this.dom.applyDisplayNoneStyle(this.borderFixedWest);
+      if (this.borderFixedWest) this.dom.applyDisplayNoneStyle(this.borderFixedWest);
     }
 
     // Body/East:
@@ -404,7 +399,7 @@ export class EleScope {
     this.areaBodyEastGeo.left = w - padding.right;
     this.dom.applyStyleInPx(this.areaBodyEast.parent, this.areaBodyEastGeo);
 
-    if (this.tableOptions.fixedEastSeparatorBorderVisible &&
+    if (this.borderFixedEast &&
       this.tableModel.getFixedRightColumnCount()) {
       this.dom.applyDisplayBlockStyle(
         this.dom.applyStyle(this.borderFixedEast, {
@@ -414,7 +409,7 @@ export class EleScope {
           left: `${this.areaBodyEastGeo.left}px`
         }));
     } else {
-      this.dom.applyDisplayNoneStyle(this.borderFixedEast);
+      if (this.borderFixedEast) this.dom.applyDisplayNoneStyle(this.borderFixedEast);
     }
 
     // Body/Center:
@@ -444,7 +439,7 @@ export class EleScope {
       top: "0",
       left: `${w - padding.right}px`
     });
-    if (this.tableOptions.headerSeparatorBorderVisible &&
+    if (this.borderHeaderBottom &&
       this.tableModel.isHeaderVisibe()) {
       this.dom.applyDisplayBlockStyle(
         this.dom.applyStyle(this.borderHeaderBottom, {
@@ -454,7 +449,7 @@ export class EleScope {
           left: "0px"
         }));
     } else {
-      this.dom.applyDisplayNoneStyle(this.borderHeaderBottom);
+      if (this.borderHeaderBottom) this.dom.applyDisplayNoneStyle(this.borderHeaderBottom);
     }
 
     // Footer:
@@ -476,7 +471,7 @@ export class EleScope {
       top: `${h - padding.bottom}px`,
       left: `${w - padding.right}px`
     });
-    if (this.tableOptions.footerSeparatorBorderVisible &&
+    if (this.borderFooterTop &&
       this.tableModel.isFooterVisibe()) {
       this.dom.applyDisplayBlockStyle(
         this.dom.applyStyle(this.borderFooterTop, {
@@ -486,7 +481,7 @@ export class EleScope {
           left: "0px"
         }));
     } else {
-      this.dom.applyDisplayNoneStyle(this.borderFooterTop);
+      if (this.borderFooterTop) this.dom.applyDisplayNoneStyle(this.borderFooterTop);
     }
 
     // Overlay: the visible body (below the header, above the footer, without the vertical scroll bar)

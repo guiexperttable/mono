@@ -225,13 +225,11 @@ describe('TableModel', () => {
         expect(tm.getColumnWidth(0)).toBe(200);
       });
 
-      it('ignore minWidth and maxWidth of a ColumnDef instance (its constructor resets them for non-px widths)', () => {
-        // see column-def.spec.ts – the limits only work with plain ColumnDefIf objects.
-        // Pins the BUG of column-def.spec.ts ('keeps an explicit minWidth and maxWidth for a % width'):
-        // once that is fixed, this test fails – then expect 200 here.
+      it('apply minWidth and maxWidth of a ColumnDef instance, too', () => {
+        // Regression (fixed in 1.1.103): the ColumnDef constructor reset the limits for non-px widths.
         const tm = create({ columnDefs: [ColumnDef.create({ property: 'a', width: new Size(10, '%'), minWidth: new Size(200, 'px') })] });
         tm.recalcSize(1000);
-        expect(tm.getColumnWidth(0)).toBe(100);
+        expect(tm.getColumnWidth(0)).toBe(200);
       });
     });
 
@@ -533,8 +531,8 @@ describe('TableModel', () => {
       expect(create().getColumnProperty(3)).toBe('city');
     });
 
-    // BUG: the guard only checks `!this.columnDefs` – with the default [] it throws a TypeError instead of returning ''.
-    it.fails('getColumnProperty returns an empty string without column definitions', () => {
+    // Regression (fixed in 1.1.103): with the default [] it threw a TypeError instead of returning ''.
+    it('getColumnProperty returns an empty string without column definitions', () => {
       const tm = TableFactory.createTableModel({ bodyData: [[1, 2]], columnSizes: [10, 10] });
       expect(tm.getColumnProperty(0)).toBe('');
     });

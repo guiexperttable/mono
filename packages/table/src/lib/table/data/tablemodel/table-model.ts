@@ -45,6 +45,8 @@ import { TableScope } from '../../table-scope';
  */
 export class TableModel implements TableModelIf {
 
+  /** Width in px of a column without ColumnDef and without `columnSizes` (like the default of `ColumnDef`). */
+  protected static readonly DEFAULT_COLUMN_WIDTH = 100;
   protected rowCount = 0;
   protected contentHeightInPx = 0;
   protected contentWidthInPx = 0;
@@ -570,10 +572,7 @@ export class TableModel implements TableModelIf {
    * @return {string} The property associated with the specified column index.
    */
   getColumnProperty(columnIndex: number): string {
-    if (!this.columnDefs) {
-      return '';
-    }
-    return this.columnDefs[columnIndex].property;
+    return this.columnDefs?.[columnIndex]?.property ?? '';
   }
 
   /**
@@ -625,7 +624,10 @@ export class TableModel implements TableModelIf {
 
   private recalcColumnWidths(clientWidth: number) {
     if (!this.columnDefs?.length && !this.columnSizes?.length) {
-      this.columnSizes = new Array(this.getColumnCount()).fill(this.overridingColumnWidth);
+      // neither ColumnDefs nor columnSizes (e.g. bodyData without columnSizes): 100 px per column like a default
+      // ColumnDef – until 1.1.102 the widths were filled with overridingColumnWidth, i.e. -1
+      this.columnSizes = new Array(this.getColumnCount())
+        .fill(this.overridingColumnWidth > -1 ? this.overridingColumnWidth : TableModel.DEFAULT_COLUMN_WIDTH);
     }
     if (this.columnDefs?.length) {
       const widthsWithWeights = this.columnDefs.filter(cd => cd.width?.unit === 'weight');

@@ -39,8 +39,9 @@ import { Code } from "astro-expressive-code/components";
       <tr><td><code>"weight"</code></td><td><code>new Size(1, "weight")</code></td><td>the space left after px and % columns, split by weight</td></tr>
     </tbody>
   </table>
-  <p><code>minWidth</code> and <code>maxWidth</code> only apply to percentage widths – resizing with the mouse
-    (<ChapterLink slug="table-options" />) is not limited by them.</p>
+  <p><code>minWidth</code> and <code>maxWidth</code> clamp percentage widths and – since 1.1.103 – resizing with the
+    mouse (<ChapterLink slug="table-options" />). A pixel width itself is taken as it is. Without them a column has
+    no limits.</p>
 
   <h2 id="alignment">Alignment and CSS classes</h2>
   <p>The fourth constructor argument maps areas to CSS classes. Ready-made maps:</p>

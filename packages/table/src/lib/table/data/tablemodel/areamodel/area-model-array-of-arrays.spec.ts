@@ -191,13 +191,20 @@ describe('AreaModelArrayOfArrays', () => {
       expect(model.getCellRenderer(0, 0)).toBeUndefined();
     });
 
-    // BUG: only the rows of filteredArr are reordered – rows hidden by the filter keep the old column order.
-    it.fails('also moves the values of rows that are currently filtered out', () => {
+    // Regression (fixed in 1.1.103): only the rows of filteredArr were reordered.
+    it('also moves the values of rows that are currently filtered out', () => {
       const model = create();
       model.externalFilterChanged((row: (string | number)[]) => row[0] !== 2);
       model.changeColumnOrder(2, 0);
       model.externalFilterChanged(() => true);
       expect(model.getRowByIndex(1)).toEqual(['FR', 2, 'Paris']);
+    });
+
+    it('moves a row array that occurs twice in the data only once', () => {
+      const row = ['a', 'b', 'c'];
+      const model = new AreaModelArrayOfArrays<string>('body', [row, row], 30);
+      model.changeColumnOrder(0, 2);
+      expect(row).toEqual(['b', 'c', 'a']);
     });
   });
 

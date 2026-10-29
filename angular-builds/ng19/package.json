@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng19",
-  "version": "19.1.104",
+  "version": "19.1.105",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 19 -> @guiexpert/angular-table@19.x",
   "license": "MIT",

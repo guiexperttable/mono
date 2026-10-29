@@ -1,6 +1,6 @@
 {
   "name": "angular-build-ng21",
-  "version": "21.1.104",
+  "version": "21.1.105",
   "private": true,
   "description": "Build harness: compiles packages/angular-table/src for Angular 21 -> @guiexpert/angular-table@21.x",
   "license": "MIT",

@@ -23,8 +23,8 @@
       `GeMouseEvent`, wie `TableSignalComponent`), `contextmenu` bleibt und ist `@deprecated` (feuert weiter doppelt).
       Tests in `angular-builds/ng22/test/table.component.browser.spec.ts` (S9: `contextMenu` einmal; Charakterisierung
       für `contextmenu`, `it.fails` entfernt). Doku: Angular-Guide Abschnitte 2/10/14, `instructions.md`, Training
-      `angular`. Offen: `apps/angular-table-demo` (`mouseevent`) auf `(contextMenu)` umstellen, sobald die Demo an die
-      lokalen Builds gekoppelt ist bzw. 1.1.101 auf npm liegt.
+      `angular`. Erledigt (28.10.2026): `apps/angular-table-demo` (`mouseevent`) nutzt `(contextMenu)` (Pakete 1.1.102 von
+      npm, im Browser geprüft: genau ein Aufruf mit `GeMouseEvent`).
 - [x] **Solid-Wrapper** (`packages/solid-table/src/GuiexpertTable.tsx`): ruft keine Callback-Props auf
       (`mouseClicked`, `tableReady`, … sind in `GuiexpertTableProps` deklariert), sondern feuert DOM-`CustomEvent`s
       auf dem Container-Div. → Callback-Props wie bei React/Preact aufrufen (CustomEvents ggf. zusätzlich behalten).
@@ -242,8 +242,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `getRowGroupBy()`, `AreaModelIf.invalidateDerivedValues?(change?)` mit `DerivedValuesChangeIf`, `isRowGroup`,
       `isGroupRow`, `isAreaModelRowGroups`, `isRowGroupColumnDef`; CSS `ge-table-row-group*`. Showcase `rowgrouping`,
       Training-Kapitel 36, `videos/07-row-grouping/`. Selbständig umgesetzt.
-      Offen: Demo-Repo `ep-036` (nach dem Release, Freigabe), Angular-Demo-Route `rowgroup` erst nach dem Release (die App
-      nutzt npm-Pakete), Bench auf dem Mac nachmessen.
+      Offen: Demo-Repo `ep-036` (nach dem Release, Freigabe), ~~Angular-Demo-Route `rowgroup`~~ (erledigt 28.10.2026:
+      `demo/rowgroup`, Umgruppieren, Filter, alle auf/zu), Bench auf dem Mac nachmessen.
 - [ ] Folgepunkte 006: Gruppenleiste per Drag & Drop (baut auf `api.setRowGroupBy`) · Excel-Gliederung (Outline-Level)
       für Gruppenzeilen · Zeilennummern zählen Gruppenzeilen mit (004-Folgepunkt: evtl. nur Detailzeilen nummerieren) ·
       eine selbst ausgeblendete gruppierte Spalte erscheint nach dem Umgruppieren wieder (`row-group-layout.ts` merkt nur
@@ -257,8 +257,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `PivotColumnDef`, `api.setPivotConfig()` / `getPivotConfig()`, `AreaModelCellGroups.setGroups()`,
       `AreaModelIf.isRowHeaderCell?()`, `isPivotTableModel`, `isAreaModelPivot`, `isPivotColumnDef`; CSS `ge-table-pivot-*`.
       Showcase `pivot`, Training-Kapitel 37, `videos/08-pivot-ohne-enterprise/`. Selbständig umgesetzt.
-      Offen: Demo-Repo `ep-037` (nach dem Release, Freigabe), Angular-Demo-Route `pivot` erst nach dem Release (die App
-      nutzt npm-Pakete), Bench auf dem Mac nachmessen.
+      Offen: Demo-Repo `ep-037` (nach dem Release, Freigabe), ~~Angular-Demo-Route `pivot`~~ (erledigt 28.10.2026:
+      `demo/pivot`, Neu-Pivotieren, Filter, Drill-down per Klick), Bench auf dem Mac nachmessen.
 - [ ] Folgepunkte 007: Feldliste per Drag & Drop (baut auf `api.setPivotConfig`) · Zwischensummen-Zeilen unterhalb der
       Gruppen (ag-Grid `groupTotalRow: "bottom"`) · Filter auf fertige Pivot-Zeilen („nur Regionen > 200“) · ein
       Doppelklick auf eine Spaltengruppen-Zelle im Header („2026“) sortiert nach der ersten Spalte der Gruppe (Header-Gruppen
@@ -477,7 +477,7 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       + Abschnitte 31/22, What's new (13 Features), Vergleichsseiten, Video 13, Doku. Vor dem Release manuell: Screenreader
       über die Vorschlagsliste (NVDA/VoiceOver), Einfügen aus Excel in Firefox und Safari. Nach dem Release: Tag `ep-040`
       im Demo-Repo, Website-Deploy (nur mit Freigabe). Angular-Demo: Route `demo/spreadsheet` erledigt (17.10.2026, Pakete 1.1.99
-      von npm). Offen: Routen `rowgroup` und `pivot` (seit 1.1.94 angekündigt).
+      von npm). Routen `rowgroup` und `pivot` erledigt (28.10.2026, Pakete 1.1.102 von npm).
 
 - [x] **015 Angular-Signal-Komponente** (angelegt 21.10.2026, `prompts/015-angular-signal-table.md`, **umgesetzt**
       21.10.2026, Branch `feat/angular-signal-table`, Design `prompts/015-angular-signal-table.design.md`):
@@ -502,7 +502,10 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Rauschen; `lib` der Preact-tsconfig anheben oder die Stelle ohne `flatMap` schreiben (gefunden bei 002).
 
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
-      (`@guiexpert/angular-table@^17.1.83`, `@guiexpert/table@^1.1.84`). Ziel: `workspace:`-Core +
+      (seit 28.10.2026 `@guiexpert/angular-table@^17.1.102`, `@guiexpert/table@^1.1.102`, `demo-table-models@^1.1.102`;
+      im Lockfile nur diese drei Einträge angehoben). Noch ohne Demo-Route: Overlays (002), Zustand (003),
+      Zeilennummern (004), Summenzeile (005), Formeln (008), Row Drag (009), Fill/Batch (010), Master/Detail (011), RTL
+      (012) – in `apps/table-demo` gibt es sie alle. Ziel: `workspace:`-Core +
       `link:../../angular-builds/ng17/dist` (oder Demo auf aktuelles Angular heben).
 - [x] **Publish-Workflow**: ein Workflow `.github/workflows/npm-publish.yml` für alle 9 Pakete, npm Trusted Publishing
       (OIDC, kein Token), Release = Publish, manuell Dry-Run. Ablauf: `RELEASING.md`.

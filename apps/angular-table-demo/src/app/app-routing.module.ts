@@ -75,6 +75,14 @@ const routes: Routes = [
     loadChildren: () => import("./spreadsheet/demo-spreadsheet.module").then(m => m.DemoSpreadsheetModule)
   },
   {
+    path: "demo",
+    loadChildren: () => import("./rowgroup/demo-rowgroup.module").then(m => m.DemoRowgroupModule)
+  },
+  {
+    path: "demo",
+    loadChildren: () => import("./pivot/demo-pivot.module").then(m => m.DemoPivotModule)
+  },
+  {
     path: "**", redirectTo: "welcome"
   }
 ];

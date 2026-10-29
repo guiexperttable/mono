@@ -410,14 +410,14 @@ importers:
         specifier: ^17.0.0
         version: 17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@angular/platform-browser@17.3.12(@angular/animations@17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10)))(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10)))(rxjs@7.8.2)
       '@guiexpert/angular-table':
-        specifier: ^17.1.99
-        version: 17.1.99(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@guiexpert/table@1.1.99)
+        specifier: ^17.1.102
+        version: 17.1.102(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@guiexpert/table@1.1.102)
       '@guiexpert/demo-table-models':
-        specifier: ^1.1.99
-        version: 1.1.99
+        specifier: ^1.1.102
+        version: 1.1.102
       '@guiexpert/table':
-        specifier: ^1.1.99
-        version: 1.1.99
+        specifier: ^1.1.102
+        version: 1.1.102
       ngx-socket-io:
         specifier: ^4.1.0
         version: 4.11.1(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
@@ -4871,18 +4871,18 @@ packages:
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
 
-  '@guiexpert/angular-table@17.1.99':
-    resolution: {integrity: sha512-M79Y/sIrldvx2HWlwXc++hGp98SLQd2lktdgj62nE/lMuWghxtNiRLWZTy63ifYqwNJkabdSuCtvnZka/rHghg==}
+  '@guiexpert/angular-table@17.1.102':
+    resolution: {integrity: sha512-3eERv3jXgj/28BvgRaWPxKqbIm/FhztzdRMCzUt9V12oUwRule/XU1PgOG6bWbbca9DpZq2rTkFCHDu6k7579g==}
     peerDependencies:
       '@angular/common': ^17.1.1
       '@angular/core': ^17.1.1
-      '@guiexpert/table': ^1.1.99
+      '@guiexpert/table': ^1.1.102
 
-  '@guiexpert/demo-table-models@1.1.99':
-    resolution: {integrity: sha512-8hNVQXANqYJcEk3UkAVD/KT+wWosa3g8chQXe9qkz5AQk+NabRP2M1HCYkeJqqUT1E+48u8vY81go4FTPygfTg==}
+  '@guiexpert/demo-table-models@1.1.102':
+    resolution: {integrity: sha512-vdE8vGWOlbouzX1wU2w2gpC/rwE2kiFvzGuhksBfYf9rNtI9MsQPbkZ7Wvp0t2bq9lMinK9hPF5RETopL3oodw==}
 
-  '@guiexpert/table@1.1.99':
-    resolution: {integrity: sha512-lLLG2T1E9B2tgm/duT/J4s+5HNvRDZQ4Z2K+ECdGqQUBh75jUQtZWwdjNm1Fz3DfT3BVgofi1I63EuWx75Ov1w==}
+  '@guiexpert/table@1.1.102':
+    resolution: {integrity: sha512-vSNYiN5XeRIt6e/U4GvMeNO/NGpczHYvz+xfUKhvltb7ph++nDD1dO3dJ7TRbEcWT8kxHkmZKjSYJqBgo34mxw==}
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -20617,26 +20617,26 @@ snapshots:
 
   '@gar/promisify@1.1.3': {}
 
-  '@guiexpert/angular-table@17.1.99(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@guiexpert/table@1.1.99)':
+  '@guiexpert/angular-table@17.1.102(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@guiexpert/table@1.1.102)':
     dependencies:
       '@angular/common': 17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
       '@angular/core': 17.3.12(rxjs@7.8.2)(zone.js@0.14.10)
-      '@guiexpert/table': 1.1.99
+      '@guiexpert/table': 1.1.102
       tslib: 2.8.1
 
-  '@guiexpert/demo-table-models@1.1.99':
+  '@guiexpert/demo-table-models@1.1.102':
     dependencies:
-      '@guiexpert/table': 1.1.99
+      '@guiexpert/table': 1.1.102
       tslib: 2.8.1
 
-  '@guiexpert/table@1.1.99':
+  '@guiexpert/table@1.1.102':
     dependencies:
       tslib: 2.8.1
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@5.5.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color

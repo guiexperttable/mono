@@ -10,12 +10,16 @@
 // File conventions (next to the code):
 //   *.spec.ts          → project "unit", runs in Node (most of the core is DOM-free)
 //   *.browser.spec.ts  → project "browser", runs in headless Chromium (layout, scrolling, events)
+//   *.scrollbars.browser.spec.ts → project "browser-scrollbars": headless Chromium with classic scroll bars
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { fileURLToPath } from 'node:url';
 
 // Optional: use a preinstalled Chromium instead of Playwright's own download (e.g. in a container).
 const chromiumPath = process.env['CHROMIUM_PATH'];
+// GE_ALL_SCROLLBARS=1: the project "browser-scrollbars" runs ALL browser specs with classic scroll bars
+// (`pnpm test:browser:scrollbars`) – a check that no layout assumes scroll bars without width.
+const allWithScrollbars = !!process.env['GE_ALL_SCROLLBARS'];
 
 export default defineConfig({
   resolve: {
@@ -45,10 +49,32 @@ export default defineConfig({
         test: {
           name: 'browser',
           include: ['src/**/*.browser.spec.ts'],
+          exclude: ['src/**/*.scrollbars.browser.spec.ts'],
           browser: {
             enabled: true,
             headless: true,
             provider: playwright(chromiumPath ? { launchOptions: { executablePath: chromiumPath } } : {}),
+            instances: [{ browser: 'chromium' }],
+            viewport: { width: 1200, height: 900 },
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          // Headless Chromium hides scroll bars (Playwright passes --hide-scrollbars): they take no space. These specs
+          // need real, classic scroll bars that take space (Windows, Linux, macOS with a mouse / "always show").
+          name: 'browser-scrollbars',
+          include: [allWithScrollbars ? 'src/**/*.browser.spec.ts' : 'src/**/*.scrollbars.browser.spec.ts'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({
+              launchOptions: {
+                ...(chromiumPath ? { executablePath: chromiumPath } : {}),
+                ignoreDefaultArgs: ['--hide-scrollbars'],
+              },
+            }),
             instances: [{ browser: 'chromium' }],
             viewport: { width: 1200, height: 900 },
           },

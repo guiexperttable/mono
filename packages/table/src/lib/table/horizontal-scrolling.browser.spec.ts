@@ -51,6 +51,12 @@ function centerCells(rowDiv: HTMLElement): HTMLElement[] {
   return Array.from(rowDiv.querySelectorAll<HTMLElement>(':scope > .ge-table-col-div'));
 }
 
+/** Width of a vertical scroll bar that takes space (0 in headless Chromium, see the project "browser-scrollbars"). */
+const verticalScrollBarWidth = (host: HTMLElement) => {
+  const viewport = host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!;
+  return viewport.offsetWidth - viewport.clientWidth;
+};
+
 const bodyCenterWidth = (host: HTMLElement) => stylePx(host.querySelector<HTMLElement>('.ge-table-body-center')!, 'width');
 
 describe.each(DIRECTIONS)('%s', dir => {
@@ -201,9 +207,9 @@ describe.each(DIRECTIONS)('%s', dir => {
         expect(stylePx(west, 'width'), area).toBe(200);
         expect(startPx(west), area).toBe(0);
         expect(stylePx(east, 'width'), area).toBe(100);
-        expect(startPx(east), area).toBe(700);
+        expect(startPx(east), area).toBe(700 - verticalScrollBarWidth(host)); // next to the scroll bar
       }
-      expect(bodyCenterWidth(host)).toBe(500);
+      expect(bodyCenterWidth(host)).toBe(500 - verticalScrollBarWidth(host));
       expect(startPx(host.querySelector<HTMLElement>('.ge-table-header-center')!)).toBe(200);
     });
 
@@ -242,7 +248,7 @@ describe.each(DIRECTIONS)('%s', dir => {
       await nextFrame();
       const border = host.querySelector<HTMLElement>('.ge-table-east-fixed-column-border')!;
       expect(border.style.display).toBe('block');
-      expect(startPx(border)).toBe(800 - 100);
+      expect(startPx(border)).toBe(800 - 100 - verticalScrollBarWidth(host));
     });
 
     it('shows no east separator border with fixed left columns only', async () => {

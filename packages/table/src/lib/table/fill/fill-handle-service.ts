@@ -303,12 +303,11 @@ export class FillHandleService {
     const { autoScrollZoneInPx: zone, autoScrollMaxSpeedInPx: max } = session.options;
     const scope = this.tableScope;
     const padding = scope.tableModel.getPadding();
-    const host = scope.hostElement;
     const ramp = (depth: number) => Math.max(1, Math.round(max * Math.min(1, depth / zone) ** 2));
     const top = padding.top;
-    const bottom = host.clientHeight - padding.bottom;
+    const bottom = scope.getLayoutHeight() - padding.bottom;
     const left = padding.left;
-    const right = host.clientWidth - padding.right;
+    const right = scope.getLayoutWidth() - padding.right;
     session.speedY = zone <= 0 || max <= 0 ? 0
       : y < top + zone ? -ramp(top + zone - y) : y > bottom - zone ? ramp(y - (bottom - zone)) : 0;
     session.speedX = zone <= 0 || max <= 0 ? 0

@@ -280,8 +280,8 @@ export class RenderScope extends EleScope {
     const tableModel = this.tableModel;
     const body = tableModel.getBodyModel();
     const padding = tableModel.getPadding();
-    const hostWidth = this.hostElement.clientWidth;
-    const hostHeight = this.hostElement.clientHeight;
+    const hostWidth = this.getLayoutWidth();
+    const hostHeight = this.getLayoutHeight();
     const top = padding.top + this.getBodyRowTop(rowIndex) - this.contentScrollTop;
     const left = this.getColumnLeftInHost(columnIndex, tableModel.getXPosByColumnIndex(columnIndex));
     const columnCount = tableModel.getColumnCount();
@@ -324,8 +324,8 @@ export class RenderScope extends EleScope {
       return [-1, -1];
     }
     const padding = tableModel.getPadding();
-    const hostWidth = this.hostElement.clientWidth;
-    const bodyHeight = this.hostElement.clientHeight - padding.top - padding.bottom;
+    const hostWidth = this.getLayoutWidth();
+    const bodyHeight = this.getLayoutHeight() - padding.top - padding.bottom;
     const contentY = Math.min(Math.max(y - padding.top, 0), Math.max(0, bodyHeight - 1)) + this.contentScrollTop;
     const rowIndex = this.getBodyRowIndexAtY(contentY);
 
@@ -619,10 +619,52 @@ export class RenderScope extends EleScope {
     // so the width is taken from the host, not from the viewport.
     const widthInPixel = this.getAvailableColumnWidth(clientWidth);
     if (widthInPixel > 0) {
-      this.tableModel.setParentWidth(widthInPixel);
+      this.setParentWidth(widthInPixel);
     }
     this.tableModel.init();
     this.repaintHard();
+  }
+
+  /** `TableModelIf.setParentWidth` – remembers the width for {@link adjustRelativeColumnWidthsToScrollBar}. */
+  protected setParentWidth(widthInPixel: number): void {
+    this.relativeWidthsBase = widthInPixel;
+    this.tableModel.setParentWidth(widthInPixel);
+  }
+
+  /** True if a column has a % or weight width (it depends on the width of the host). */
+  protected hasRelativeColumnWidths(): boolean {
+    return !!this.tableModel.getColumnDefs?.()?.some(def => def.width?.unit === 'weight' || def.width?.unit === '%');
+  }
+
+  override adjustContainersAndRows() {
+    super.adjustContainersAndRows();
+    this.adjustRelativeColumnWidthsToScrollBar();
+  }
+
+  /**
+   * % and weight columns share the width next to the vertical scroll bar. The bar appears (or disappears) only after
+   * the rows are laid out – the first layout, rows added or removed, a filter: then the columns were computed for the
+   * wrong width – too wide by the width of the bar, so a horizontal scroll bar appeared and covered the last row. Here
+   * they are computed again (once – the flag stops a second pass) with the width that is available now.
+   */
+  protected adjustRelativeColumnWidthsToScrollBar(): void {
+    if (this.adjustingRelativeWidths || !this.hasRelativeColumnWidths()) {
+      return;
+    }
+    const available = this.getAvailableColumnWidth();
+    if (available <= 0 || available === this.relativeWidthsBase) {
+      return;
+    }
+    this.adjustingRelativeWidths = true;
+    try {
+      this.setParentWidth(available);
+      this.tableModel.init();
+      this.tableModel.recalcPadding();
+      this.resetSizeOfWrapperDiv();
+      this.adjustContainersAndRows();
+    } finally {
+      this.adjustingRelativeWidths = false;
+    }
   }
 
   /**
@@ -652,7 +694,7 @@ export class RenderScope extends EleScope {
           this.tableModel.recalcPadding();
           const available = this.getAvailableColumnWidth();
           if (available > 0) {
-            this.tableModel.setParentWidth(available);
+            this.setParentWidth(available);
             this.tableModel.init();
           }
         }
@@ -2013,6 +2055,10 @@ export class RenderScope extends EleScope {
   private rowNumberWidth?: { text: string; width: number; approximate: boolean };
   /** true while the containers are adjusted to a new row number width (no second change in that nested pass). */
   private adjustingRowNumberWidth = false;
+  /** Guards {@link adjustRelativeColumnWidthsToScrollBar} against re-entry. */
+  private adjustingRelativeWidths = false;
+  /** The width % and weight columns were last computed for (`TableModelIf.setParentWidth`), -1 = unknown. */
+  protected relativeWidthsBase = -1;
   /** the approximate first width is measured again once (see adjustAfterScrolling). */
   private rowNumberRemeasureScheduled = false;
 

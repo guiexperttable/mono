@@ -198,19 +198,28 @@ Danach: Showcase und Training-Demo im Browser ansehen (light und dark); `instruc
 Referenzfälle gegen eine unabhängige Rechnung bzw. Beobachtung prüfen. Abschluss-Review durch einen separaten
 Agenten, der den Code nicht geschrieben hat (Schwerpunkte stehen im Feature-Prompt).
 
-**Release-Befehle:** Nach jedem **fertigen Feature** (im Abschlussbericht, nach dem Merge) die Befehle für einen Patch-Release nennen –
-als einen Block, den Marc direkt in die Konsole kopieren kann: **ohne `#`-Kommentare**, ohne Platzhalter, mit der
-konkreten nächsten Version (`packages/table/package.json` + 1). Claude führt sie nicht selbst aus (Release = npm-Publish).
-Muster für 1.1.91 → 1.1.92:
+**Merge- und Release-Befehle:** Nach jedem **fertigen Feature** und jedem **größeren Fix** (im Abschlussbericht) die
+Befehle nennen, die die Arbeit nach `main` mergen **und** einen Patch-Release machen – als **einen** Block, den Marc
+direkt in die Konsole kopieren kann: **ohne `#`-Kommentare**, ohne Platzhalter, mit dem echten Branch-Namen, den echten
+Pfaden neuer (ungetrackter) Dateien und der konkreten nächsten Version (`packages/table/package.json` + 1). Vorher den
+Stand prüfen (`git status`, `git branch --show-current`, `git log --oneline -5`) – sonst landet ein Fix auf einem
+Neben-Branch und das Release erscheint ohne ihn (so geschehen bei 1.1.104). Liegt die Arbeit schon auf `main`, entfallen
+`git merge` bzw. `git add`. Mögliche Konflikte (z. B. Versionen in `package.json`) in einem Satz darunter nennen.
+Claude führt die Befehle nicht selbst aus (Release = npm-Publish). Muster (Fix auf `chore/angular-demo-routes`, neue
+Demo-Dateien, 1.1.104 → 1.1.105):
 ```bash
 git checkout main
 git pull
+git merge chore/angular-demo-routes
+git add apps/table-demo/scroll-bars.html apps/table-demo/src/scroll-bars
+git commit -m "docs(table-demo): scroll-bars demo"
+pnpm --filter @guiexpert/table test
 pnpm version:patch
 pnpm version:check
 pnpm build:all
-git commit -am "chore: release 1.1.92"
+git commit -am "chore: release 1.1.105"
 git push
-gh release create v1.1.92 --target main --title "v1.1.92" --generate-notes
+gh release create v1.1.105 --target main --title "v1.1.105" --generate-notes
 ```
 
 ## 3. Definition of Done (gilt zusätzlich zu der des Feature-Prompts)
@@ -221,4 +230,4 @@ gh release create v1.1.92 --target main --title "v1.1.92" --generate-notes
 - [ ] JSDoc + `docs:check`, API-Doku neu erzeugt, `instructions.md`, READMEs, beide `llms.txt`, `CLAUDE.md`, `TODO.md`
 - [ ] Demos, Website, Training, Video wie in Phase 1 entschieden; `pnpm build:webpage-guiexpert` grün
 - [ ] Kein Publish, kein Deploy, keine Versionsänderung, kein Push ohne ausdrückliche Anweisung
-- [ ] Im Abschlussbericht: die Release-Befehle für den nächsten Patch (Phase 10), kopierfertig ohne `#`-Kommentare
+- [ ] Im Abschlussbericht: die Merge- und Release-Befehle (Phase 10) – Merge nach `main` + nächster Patch, kopierfertig ohne `#`-Kommentare

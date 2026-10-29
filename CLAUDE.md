@@ -64,11 +64,16 @@ mono/
 | Versionen | `pnpm version:check`, `pnpm version:patch` (Core 1.1.84 → 1.1.85, Wrapper behalten Framework-Major) |
 | Release / Publish | **nie ohne ausdrückliche Anweisung.** Ablauf in `RELEASING.md`: `pnpm version:patch` → Commit → GitHub-Release → Workflow `npm-publish.yml` (Trusted Publishing, kein Token). Lokal: `pnpm pub:all:dry` / `pnpm pub:all` (`scripts/publish.mjs`, überspringt bereits veröffentlichte Versionen). Angular-Dist-Tags: `latest` = neueste Major, sonst `a14` … `a21` |
 
-**Nach jedem fertigen Feature** nennt Claude die Release-Befehle für den nächsten Patch als kopierfertigen Konsolen-Block
-(**ohne `#`-Kommentare**, ohne Platzhalter, mit der konkreten Version) – ausführen tut sie Marc. Muster und Regel:
-`prompts/000-arbeitsweise.md` Phase 10. Kurzform: `git checkout main`, `git pull`, `pnpm version:patch`,
-`pnpm version:check`, `pnpm build:all`, `git commit -am "chore: release X.Y.Z"`, `git push`,
-`gh release create vX.Y.Z --target main --title "vX.Y.Z" --generate-notes`.
+**Nach jedem fertigen Feature und jedem größeren Fix** nennt Claude **einen** kopierfertigen Konsolen-Block, der die
+Arbeit nach `main` bringt **und** den nächsten Patch veröffentlicht (**ohne `#`-Kommentare**, ohne Platzhalter, mit dem
+echten Branch-Namen, den echten Pfaden neuer Dateien und der konkreten Version) – ausführen tut ihn Marc. Vorher den
+Stand prüfen (`git status`, `git branch --show-current`, `git log`), damit Branch, ungetrackte Dateien und Version
+stimmen; liegt die Arbeit schon auf `main`, entfällt der Merge. Muster und Regel: `prompts/000-arbeitsweise.md`
+Phase 10. Kurzform: `git checkout main`, `git pull`, `git merge <branch>`, `git add <neue Dateien>` +
+`git commit -m "…"`, `pnpm --filter @guiexpert/table test`, `pnpm version:patch`, `pnpm version:check`,
+`pnpm build:all`, `git commit -am "chore: release X.Y.Z"`, `git push`,
+`gh release create vX.Y.Z --target main --title "vX.Y.Z" --generate-notes`. Mögliche Merge-Konflikte (z. B.
+Versionsnummern in `package.json`) darunter in einem Satz nennen.
 
 **Abhängigkeits-Fallen (beim Aufsetzen gelöst, nicht zurückdrehen):**
 - `pnpm-lock.yaml` basiert auf der Lockdatei von `ge-table`. Ohne sie zieht pnpm neuere Transitive (z. B. Babel 8),

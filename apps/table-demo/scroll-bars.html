@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+  Scroll bars that take space (since 1.1.104): the horizontal one must not cover the last row or the footer, the
+  vertical one not the last column or the fixed end columns; % and weight columns share the width next to it.
+  Start: pnpm serve:table-demo → http://localhost:4200/scroll-bars.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – scroll bars</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 900px; }
+    .bar { display: flex; gap: 14px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button, .bar select { font: inherit; padding: 4px 12px; }
+    .table-div { height: 420px; width: 100%; max-width: 900px; outline: 1px dashed #c00; }
+    #log { font: 13px/1.5 ui-monospace, monospace; margin: 8px 0 0; min-height: 3em; white-space: pre-wrap; }
+    /* Classic scroll bars that take space – like Windows, Linux or macOS with a mouse attached / "Show scroll bars:
+       Always". Chrome, Edge, Safari and Electron honour this; Firefox ignores it (use the macOS setting there). */
+    html.classic-scrollbars .ge-table-scroll-viewport::-webkit-scrollbar { width: 16px; height: 16px; }
+    html.classic-scrollbars .ge-table-scroll-viewport::-webkit-scrollbar-track { background: #e4e4e4; }
+    html.classic-scrollbars .ge-table-scroll-viewport::-webkit-scrollbar-thumb { background: #8a8a8a; border-radius: 8px; border: 3px solid #e4e4e4; }
+    html.classic-scrollbars .ge-table-scroll-viewport::-webkit-scrollbar-corner { background: #e4e4e4; }
+  </style>
+</head>
+<body>
+<h1>Scroll bars that take space</h1>
+<p>Scroll to the bottom right. The <b>last row</b> (“row N – last”), the <b>footer</b>, the <b>last column</b> and the
+  <b>fixed end column</b> must be fully visible next to the scroll bars – before 1.1.104 the bars covered them.
+  With <b>%</b> or <b>weight</b> columns there must be <b>no</b> horizontal scroll bar.</p>
+<div class="bar">
+  <label><input id="classic" type="checkbox" checked> classic scroll bars</label>
+  <label>columns <select id="columns">
+    <option value="px" selected>30 × 120 px (wide)</option>
+    <option value="percent">5 × 20 %</option>
+    <option value="weight">5 × weight 1</option>
+  </select></label>
+  <label>rows <select id="rows">
+    <option value="5">5</option>
+    <option value="500" selected>500</option>
+  </select></label>
+  <label><input id="footer" type="checkbox" checked> footer</label>
+  <label><input id="fixed" type="checkbox" checked> fixed start + end column</label>
+  <label>direction <select id="direction">
+    <option value="ltr" selected>ltr</option>
+    <option value="rtl">rtl</option>
+  </select></label>
+  <button id="add" type="button">+ 500 rows</button>
+  <button id="end" type="button">scroll to the end</button>
+</div>
+<div class="table-div"></div>
+<pre id="log" aria-live="off"></pre>
+<script src="/src/scroll-bars/scroll-bars-demo.ts" type="module"></script>
+</body>
+</html>

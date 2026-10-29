@@ -1071,6 +1071,80 @@ column formula refers to fields of the same row and to column aggregates. Spread
 the cells themselves: 6.23 – 6.25 (since 1.1.99). 1,000,000 rows with a formula column: compiled once, ~0.5 µs per row
 and evaluated only for the visible cells (`bench/formula.bench.ts`).
 
+### 5.10 Cover grid: items as tiles
+
+Not every list is a table: book or comic covers, photos, products, videos. `CoverGridFactory.createCoverGridModel()`
+returns a `CoverGridTableModel` that shows a flat array as **tiles** – as many per row as fit into the width
+(`floor(width / coverWidth)`), no header, no footer. It is a normal GuiExpert Table with a different model: only the
+visible rows are in the DOM, filter, sort, scroll position and resize work as usual.
+
+```ts
+import {
+  AreaIdent, AreaModelIf, CellRendererIf, CoverGridFactory, EventAdapter, RendererCleanupFnType, SimpleDomService,
+  TableScope
+} from "@guiexpert/table";
+
+interface Book { title: string; coverUrl: string; }
+
+class BookRenderer implements CellRendererIf {
+  render(cellDiv: HTMLDivElement, _row: number, _col: number, _area: AreaIdent, _model: AreaModelIf,
+         cellValue: any): RendererCleanupFnType | undefined {
+    const book = cellValue as Book | undefined;
+    if (!book) return undefined;                 // the cells after the last item are empty
+    const img = document.createElement("img");
+    img.src = book.coverUrl;
+    img.alt = book.title;                        // user data as text/attribute, never as innerHTML
+    img.style.cssText = "width: 100%; height: 100%; object-fit: cover; padding: 8px; box-sizing: border-box";
+    cellDiv.append(img);
+    return undefined;
+  }
+}
+
+declare const books: Book[];
+declare const host: HTMLDivElement;              // needs a height, like every table
+let searchText = "";
+
+const tableModel = CoverGridFactory.createCoverGridModel(books, new BookRenderer(), 160, 240);
+const tableOptions = {
+  ...CoverGridFactory.createCoverGrisDefaultOptions(240, () => "books"),   // (sic) no borders, no hover
+  externalFilterFunction: (book: Book) => book.title.toLowerCase().includes(searchText),
+  shortcutActionsDisabled: true                  // cell navigation does not apply to tiles
+};
+const listener = new EventAdapter();
+listener.onMouseClicked = evt => {
+  const book = tableModel.bodyModel.getValueAt(evt.rowIndex, evt.columnIndex);   // the tile under the mouse
+  if (book) console.info(book.title);
+};
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener)
+  .firstInit()
+  .getApi();
+```
+
+`createCoverGridModel(items, cellRenderer, coverWidth = 200, coverHeight = 300, width = 0, firstRowPaddingTop = 0)`:
+the renderer gets the **item** as `cellValue`; `firstRowPaddingTop` makes the first row higher (room for a floating
+toolbar above the first tiles). `createCoverGrisDefaultOptions(rowHeight, getStorageKeyFn)` switches off borders and
+hover and restores the scroll position under the given key (spelled with an `s` – kept for compatibility).
+
+| Task | How |
+|---|---|
+| Width / number of columns | automatic: the table hands the width of its host to the model (`setParentWidth`) on start and after a resize (debounced, `resizeEventDebounceDelay`). Immediately: `tableApi.recalcColumnWidths()` |
+| Tile size | `tableModel.bodyModel.coverWidth = 220; tableModel.bodyModel.coverHeight = 330; tableApi.repaintHard();` – no new model |
+| Fill the width | stretch the tiles: `columns = floor(bodyModel.width / wanted)`, `coverWidth = floor(bodyModel.width / columns)`, then `repaintHard()` |
+| Filter | `externalFilterFunction` gets the item; after a change `tableApi.externalFilterChanged()` (scrolls to the top, keeps the order) |
+| Sort | `tableApi.sort((a, b) => a.title.localeCompare(b.title))` – sorts the shown items; survives the next filter |
+| New items | `tableModel.bodyModel.items = list; tableModel.bodyModel.filteredItems = list; tableApi.repaintHard();` (or `externalFilterChanged()` when a filter is set) |
+| Item ↔ cell | `bodyModel.getValueAt(row, col)` = `filteredItems[row * columns + col]`; to scroll to item `i`: `tableApi.scrollToIndex(0, Math.floor(i / tableModel.getColumnCount()))` |
+| Selection / focus | the cover grid has no selection model of its own – keep the selected item in your app and let the renderer mark it (repaint after a change). The cell focus frame of the table can be hidden with `.my-grid .ge-table-focus-border { display: none }` |
+
+Notes: the tiles start at the left edge – with a fixed `coverWidth` the space right of the last column stays empty
+(stretch the tiles, see above). `getRowCount()` adds one empty row when the last row is full, and a grid narrower than
+one tile has 0 columns – keep `coverWidth ≤ width` (both in `TODO.md`).
+
+Demo: `pnpm serve:table-demo` → http://localhost:4200/cover-grid.html (10,000 – 100,000 books, search, size, order,
+fill the width). Showcase: [Cover grid](https://gui.expert/showcase/covergrid/run). Model, books and renderer of both:
+`packages/demo-table-models/src/lib/createCoverGridModel.ts` (`createCoverGridModelAndOptions`, `BookCoverRenderer`,
+`fitCoversToWidth`).
+
 ## 6. Features
 
 ### 6.1 Cell renderers

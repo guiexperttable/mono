@@ -630,6 +630,10 @@ Verhalten steht als `// NOTE:` in den Specs.
       1.1.103: 100 px je Spalte (wie ein Default-`ColumnDef`).
 - [ ] `CoverGridBodyModel`: Breite < 1 Cover → 0 Spalten → `getRowCount() = Infinity` (`:44`); leere Extrazeile bei
       voller letzter Zeile (`:40`, `floor+1` statt `ceil`).
+- [ ] `FocusModel("none")` wird ignoriert: `RenderScope` zeichnet den Fokusrahmen, sobald `hasFocus()` stimmt – der
+      `selectionType` des `FocusModel` wird nirgends gelesen. Cover-Grid-Demo und -Showcase blenden den Rahmen per CSS
+      aus (`.ge-table-focus-border { display: none }`, Okt. 2026). Fix nur mit Bedacht: `new FocusModel()` hat den
+      Default `"none"` – Anwender-Code mit `new FocusModel()` bekäme dann gar keinen Fokusrahmen mehr.
 - [ ] Header-Gruppen (`AreaModelCellGroups`, WIP): zugeklappte Gruppe überdeckt ihr „always“-Kind (`:130/168`).
 - [x] Excel-Export: `NaN`/`Infinity` als `<v>NaN</v>` → Excel meldet defekte Datei (`excel-service.ts:194`). Behoben 1.1.103:
       Textzelle („NaN“, „Infinity“ wie in der Tabelle); ein `ExcelFormattedValueIf` mit solchem Wert ergab „[object Object]“

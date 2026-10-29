@@ -172,7 +172,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     `defaultRowHeights`, `getSelectionModel`, `rowCheckboxVisible`, `rowNumbersVisible` (1.1.93), `footerAggregates`
     (1.1.94), `rowDrag` (1.1.95), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
-  - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)`, `CrudTableModelFactory`,
+  - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)` (Kacheln statt Zeilen, Spalten =
+    `floor(Breite / coverWidth)`; Doku `instructions.md` 5.10, Demo `apps/table-demo/cover-grid.html`, Showcase `covergrid`,
+    Modell `createCoverGridModelAndOptions` in `demo-table-models`), `CrudTableModelFactory`,
     `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“),
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
@@ -809,6 +811,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 36 | Copy & Paste mit Excel – ohne Enterprise-Lizenz (optional) | Training-Kapitel `selection-and-copy` (`#paste`), `instructions.md` 6.21 |
 | 37 | Excel-Formeln mit Zellbezügen – Zeigemodus, F4, Zeilen einfügen (optional) | Training-Kapitel `spreadsheet`, `instructions.md` 6.23 – 6.25 |
 | 38 | Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden (Angular 22+) | `videos/14-angular-signals/`, `apps/angular-signal-demo`, Training-Kapitel `angular` (`#signals`), `packages/angular-table/instructions.md` 14 |
+| 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

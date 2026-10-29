@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+  Cover grid: items as tiles (covers, photos, products) in a virtual grid – CoverGridFactory.createCoverGridModel.
+  The number of columns follows the width; filter, sort, cover size and click work without rebuilding the table.
+  Start: pnpm serve:table-demo → http://localhost:4200/cover-grid.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – cover grid</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    p { margin: 4px 0; max-width: 900px; }
+    .bar { display: flex; gap: 14px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar input, .bar select, .bar button { font: inherit; padding: 4px 8px; }
+    .table-div { height: calc(100vh - 220px); min-height: 300px; width: 100%; }
+    #status { font-size: 14px; min-height: 1.5em; }
+    /* tiles, not cells: no focus frame around the clicked cell – the renderer frames the selected book */
+    .table-div .ge-table-focus-border { display: none; }
+  </style>
+</head>
+<body>
+<h1>Cover grid</h1>
+<p>Books as tiles – only the visible rows are in the DOM. Resize the window: the number of columns follows the width.
+  Type to filter, change the size or the order, click a book.</p>
+<div class="bar">
+  <label>Search <input id="search" type="search" placeholder="title, author, genre" autocomplete="off"></label>
+  <label>Size <select id="size">
+    <option value="100x170">small</option>
+    <option value="160x260" selected>medium</option>
+    <option value="220x340">large</option>
+  </select></label>
+  <label><input id="stretch" type="checkbox" checked> fill the width</label>
+  <label>Order <select id="order">
+    <option value="id" selected>collection</option>
+    <option value="title">title</option>
+    <option value="author">author</option>
+    <option value="year">newest first</option>
+  </select></label>
+  <label>Books <select id="count">
+    <option value="1000">1,000</option>
+    <option value="10000" selected>10,000</option>
+    <option value="100000">100,000</option>
+  </select></label>
+  <button id="top" type="button">Top</button>
+</div>
+<div id="status" aria-live="polite"></div>
+<div class="table-div"></div>
+<script src="/src/cover-grid/cover-grid-demo.ts" type="module"></script>
+</body>
+</html>

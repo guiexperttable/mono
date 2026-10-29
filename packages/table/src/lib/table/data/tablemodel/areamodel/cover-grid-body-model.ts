@@ -7,7 +7,22 @@ import { SortItem } from '../../common/sort-item';
 import { AreaIdent } from '../area-ident.type';
 import { SorterService } from '../../../service/sorter.service';
 
-/** @category Area models */
+/**
+ * Body of a cover grid: `filteredItems[row * columns + column]` is the item of a tile (`getValueAt`), `columns` =
+ * `floor(width / coverWidth)`. `items` = all items, `filteredItems` = shown items (filter and `sort()` work on it).
+ * Change `coverWidth`/`coverHeight` or the items and call `tableApi.repaintHard()`.
+ *
+ * @example
+ * ```ts
+ * declare const grid: CoverGridTableModel<string>;
+ * const tiles = grid.bodyModel;
+ * tiles.items = ["new-1.jpg", "new-2.jpg"];
+ * tiles.filteredItems = tiles.items;   // or tableApi.externalFilterChanged() with a filter
+ * tableApi.repaintHard();
+ * ```
+ *
+ * @category Area models
+ */
 export class CoverGridBodyModel<T> implements AreaModelIf {
 
   public rowSelectionModel: CheckboxModelIf<any> | undefined = undefined;

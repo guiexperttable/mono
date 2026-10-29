@@ -10,7 +10,20 @@ import { ColumnDefIf } from './column/column-def.if';
 import { Padding } from './padding';
 import { SelectionModelIf } from '../../selection/selection-model.if';
 
-/** @category Table model */
+/**
+ * Table model of a cover grid (created by {@link CoverGridFactory.createCoverGridModel}): items as tiles, the number of
+ * columns follows the width (`floor(width / coverWidth)`), header and footer are hidden. The data and the tile size
+ * live in {@link CoverGridBodyModel} (`tableModel.bodyModel`).
+ *
+ * @example
+ * ```ts
+ * declare const grid: CoverGridTableModel<{ title: string }>;
+ * const columns = grid.getColumnCount();
+ * tableApi.scrollToIndex(0, Math.floor(500 / columns));   // the row of item 500
+ * ```
+ *
+ * @category Table model
+ */
 export class CoverGridTableModel<T> implements TableModelIf {
 
   private headerAreaModel = new AreaModelHidden();
@@ -114,6 +127,7 @@ export class CoverGridTableModel<T> implements TableModelIf {
     // ignore
   }
 
+  /** No-op: the height follows from the item count, the column count and `coverHeight` – `repaintHard()` is enough. */
   recalcHeightAndPadding(): void {
     // ignore
   }

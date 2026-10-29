@@ -126,7 +126,9 @@ describe('R2 – fixed columns at start and end', () => {
     const east = getCellDiv(host, 'body', 'east', 0, 29);
     const center = getCellDiv(host, 'body', 'center', 0, 1);
     near(rect(west).right, hostRect.right);
-    near(rect(east).left, hostRect.left);
+    // next to the vertical scroll bar – on the left in right-to-left (0 px in headless Chromium)
+    const viewport = host.querySelector<HTMLElement>('.ge-table-scroll-viewport')!;
+    near(rect(east).left, hostRect.left + viewport.offsetWidth - viewport.clientWidth);
     expect(rect(center).right).toBeLessThanOrEqual(rect(west).left + 0.5);
     // the separator lines between the fixed and the scrolled columns
     const westBorder = host.querySelector<HTMLElement>('.ge-table-west-fixed-column-border')!;

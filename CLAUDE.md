@@ -127,7 +127,12 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `applyStyleInPx` mit `left`, nie `element.style.left`; `scrollLeft` nur über `getViewportScrollLeft()`/
   `setViewportScrollLeft()`, Maus-x über `clientXToHostX()`.
 - Ein `scrollViewport` mit riesigem `contentWrapperDiv` (Höhe = Summe aller Zeilenhöhen) liefert die native Scrollbar;
-  der sichtbare `contentDiv` wird mitgeschoben.
+  der sichtbare `contentDiv` wird mitgeschoben. Der Viewport reicht bis ans Ende und unter den Footer – **klassische
+  Scrollbalken** (Windows, Linux, macOS mit Maus) nehmen Platz weg: seit 1.1.104 misst `adjustContainersAndRows()` beide
+  Balken und legt Header/Body/Footer/East in `getLayoutWidth()` × `getLayoutHeight()` daneben (sonst verdeckten sie die
+  letzte Zeile, den Footer, die letzte Spalte, die East-Spalten). %-/Gewichtsspalten werden neu verteilt, wenn der
+  senkrechte Balken kommt oder geht (`RenderScope.adjustRelativeColumnWidthsToScrollBar`). Positionen im Host nie mit
+  `hostElement.clientWidth/-Height` rechnen, sondern mit diesen beiden.
 
 ### 3.3 Virtual Scrolling (Kern des Performance-Versprechens)
 - Bei jedem Scroll: `scrollFactorY = scrollTop / (scrollHeight - clientHeight)` →
@@ -653,7 +658,8 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   |---|---|
   | `test` | Unit + Browser |
   | `test:unit` / `test:watch` | nur Node, ~3 s (~2.170 Tests) |
-  | `test:browser` | echtes Chromium, ~930 Tests in 30 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) |
+  | `test:browser` | echtes Chromium, ~930 Tests in 30 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) – plus Projekt `browser-scrollbars` (`*.scrollbars.browser.spec.ts`) |
+  | `test:browser:scrollbars` | **alle** Browser-Specs mit klassischen Scrollbalken (Headless-Chromium versteckt sie sonst: 0 px). Neue Layout-Specs so schreiben, dass sie in beiden Modi grün sind |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |

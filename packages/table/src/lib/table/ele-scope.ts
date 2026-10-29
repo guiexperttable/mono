@@ -58,6 +58,18 @@ export class EleScope {
 
   protected scrollTop = 0;
 
+  /**
+   * Height of the horizontal scroll bar of {@link scrollViewport} in px, measured in {@link adjustContainersAndRows}.
+   * 0 without a horizontal scroll bar and with overlay scroll bars (macOS default, mobile) – they take no space.
+   */
+  protected horizontalScrollBarHeight = 0;
+
+  /**
+   * Width of the vertical scroll bar of {@link scrollViewport} in px (at the end of the rows: right, in right-to-left
+   * on the left), measured in {@link adjustContainersAndRows}. 0 without one and with overlay scroll bars.
+   */
+  protected verticalScrollBarWidth = 0;
+
   protected areaBodyWestGeo: GeoData = new GeoData();
   protected areaBodyCenterGeo: GeoData = new GeoData();
   protected areaBodyEastGeo: GeoData = new GeoData();
@@ -352,14 +364,22 @@ export class EleScope {
    */
   adjustContainersAndRows() {
     const padding = this.tableModel.getPadding();
-    const w = this.hostElement.clientWidth;
-    const h = this.hostElement.clientHeight;
+    const hostWidth = this.hostElement.clientWidth;
+    const hostHeight = this.hostElement.clientHeight;
+    // The viewport reaches to the bottom and to the end of the host (below the footer, below the fixed east columns),
+    // so its scroll bars are the last line and the last column of the table. Classic scroll bars (Windows, Linux, macOS
+    // with a mouse / "always show") take space there: header, body, footer and the east columns are laid out next to
+    // them – otherwise the bars cover the last body row (or the footer), the last center column and the east columns.
     this.dom.applyStyle(this.scrollViewport, {
-      width: `${(w - padding.left)}px`,
-      height: `${(h - padding.top)}px`,
+      width: `${(hostWidth - padding.left)}px`,
+      height: `${(hostHeight - padding.top)}px`,
       top: `${padding.top}px`,
       left: `${padding.left}px`
     });
+    this.horizontalScrollBarHeight = this.measureHorizontalScrollBarHeight();
+    this.verticalScrollBarWidth = this.measureVerticalScrollBarWidth();
+    const w = this.getLayoutWidth();
+    const h = this.getLayoutHeight();
 
     this.scrollTop = this.scrollViewport.scrollTop;
 
@@ -499,6 +519,43 @@ export class EleScope {
       Math.max(0, Math.min(h - padding.top - padding.bottom, this.scrollViewport.clientHeight)));
 
     this.adjustAfterScrolling();
+  }
+
+  /**
+   * The height the table lays out header, body and footer in: the host height minus a horizontal scroll bar that
+   * takes space (see {@link horizontalScrollBarHeight}).
+   *
+   * @returns {number} px
+   * @since 1.1.104
+   */
+  getLayoutHeight(): number {
+    return Math.max(0, this.hostElement.clientHeight - this.horizontalScrollBarHeight);
+  }
+
+  /**
+   * The width the table lays out header, body and footer in: the host width minus a vertical scroll bar that takes
+   * space (see {@link verticalScrollBarWidth}). A logical width – in right-to-left the bar is on the left.
+   *
+   * @returns {number} px
+   * @since 1.1.104
+   */
+  getLayoutWidth(): number {
+    return Math.max(0, this.hostElement.clientWidth - this.verticalScrollBarWidth);
+  }
+
+  /**
+   * Height of the horizontal scroll bar of the scroll viewport: offsetHeight − clientHeight (the viewport has no
+   * border, see the constructor).
+   */
+  protected measureHorizontalScrollBarHeight(): number {
+    const viewport = this.scrollViewport;
+    return Math.max(0, viewport.offsetHeight - viewport.clientHeight);
+  }
+
+  /** Width of the vertical scroll bar of the scroll viewport: offsetWidth − clientWidth. */
+  protected measureVerticalScrollBarWidth(): number {
+    const viewport = this.scrollViewport;
+    return Math.max(0, viewport.offsetWidth - viewport.clientWidth);
   }
 
   /**

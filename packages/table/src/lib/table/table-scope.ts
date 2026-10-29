@@ -2023,7 +2023,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // ResizeObserver corrects it only ≥ 500 ms later)
     const availableWidth = this.getAvailableColumnWidth();
     if (availableWidth > 0) {
-      this.tableModel.setParentWidth(availableWidth);
+      this.setParentWidth(availableWidth);
     }
     // the restore of the state (autoRestoreOptions, initialState) runs in the first firstInit() only
     this.stateService.initBeforeModel();

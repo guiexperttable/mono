@@ -35,6 +35,10 @@ export class MouseHandler {
   private mouseDown = false;
   private repaintAfterMouseUp = false;
   private dragging = false;
+  /** Counts the drags: a frame callback of a drag that is over (a new one started) does nothing. */
+  private dragGeneration = 0;
+  /** The end of the last drag, until its frame ran – a new mousedown handles it at once (see {@link flushDraggingEnd}). */
+  private pendingDraggingEnd?: { evt: MouseEvent; start?: GeMouseEvent; frameId: number };
 
   constructor(
     protected tableScope: TableScope
@@ -297,7 +301,11 @@ export class MouseHandler {
 
     if (!this.dragging) {
       this.mouseEvent = evt;
+      // read the pressed cell first: handling the end of the previous drag repaints and replaces the elements
       this.startMouseEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
+      // The end of the previous drag must be handled before this one starts: its frame may come later on a busy
+      // machine and would reset the start of this drag (before 1.1.106 a quick second column resize was lost).
+      this.flushDraggingEnd();
       this.tableScope.onMouseDown(this.startMouseEvent);
       this.mouseDown = true;
     }
@@ -318,7 +326,10 @@ export class MouseHandler {
         this.dragging = true;
         this.tableScope.setDragging(true);
       }
-      requestAnimationFrame(this.mouseDraggingOnFrame.bind(this));
+      const generation = this.dragGeneration;
+      requestAnimationFrame(() => {
+        if (generation === this.dragGeneration) this.mouseDraggingOnFrame();
+      });
     } else {
       requestAnimationFrame(this.mouseMoveOnFrame.bind(this));
     }
@@ -336,7 +347,10 @@ export class MouseHandler {
       this.tableScope.debounceRepaint();
     }
     if (this.dragging) {
-      requestAnimationFrame(this.mouseDraggingEndOnFrame.bind(this));
+      // the end with its own events: a new drag may change mouseEvent / startMouseEvent before the frame runs
+      const pending = { evt, start: this.startMouseEvent, frameId: 0 };
+      pending.frameId = requestAnimationFrame(() => this.flushDraggingEnd());
+      this.pendingDraggingEnd = pending;
     }
     this.mouseDown = false;
     this.dragging = false;
@@ -355,15 +369,21 @@ export class MouseHandler {
     }
   }
 
-  private mouseDraggingEndOnFrame() {
-    if (this.mouseEvent) {
-      const mouseEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
-      if (this.startMouseEvent?.originalEvent) {
-        mouseEvent.draggingX = this.mouseEvent.clientX - this.startMouseEvent.originalEvent.clientX;
-        mouseEvent.draggingY = this.mouseEvent.clientY - this.startMouseEvent.originalEvent.clientY;
-      }
-      this.tableScope.mouseDraggingEndOnFrame(mouseEvent);
+  /** Handles the end of the last drag now (in its frame, or earlier when the next mousedown comes first). */
+  private flushDraggingEnd() {
+    const pending = this.pendingDraggingEnd;
+    if (!pending) {
+      return;
     }
+    this.pendingDraggingEnd = undefined;
+    cancelAnimationFrame(pending.frameId);
+    this.dragGeneration++; // frame callbacks of this drag that did not run yet are outdated
+    const mouseEvent = this.tableScope.createGeMouseEvent(pending.evt);
+    if (pending.start?.originalEvent) {
+      mouseEvent.draggingX = pending.evt.clientX - pending.start.originalEvent.clientX;
+      mouseEvent.draggingY = pending.evt.clientY - pending.start.originalEvent.clientY;
+    }
+    this.tableScope.mouseDraggingEndOnFrame(mouseEvent);
   }
 
 

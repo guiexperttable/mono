@@ -413,8 +413,29 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
     expect(model.getColumnWidth(2)).toBeLessThan(300);
   });
 
-  // NOTE: once seen red on macOS in the project browser-scrollbars (Nov 2026), not reproducible since: 20 runs of
-  // the test plus 10 of the file (with scrollbars) and two full runs green (prompt 016). Red again: look for a timing gap.
+  it('a second resize that starts before the end of the first one was rendered still works (before 1.1.106 it was lost)', async () => {
+    // Found on the macOS CI runner (prompt 016): the end of a drag is handled in the next animation frame. On a busy
+    // machine that frame came after the mousedown of the next drag and reset its start (column, action) – the second
+    // drag did nothing. Here both drags happen in one task, before any frame.
+    const { host, model } = await mountMouseTable();
+    const fire = (target: EventTarget, type: string, x: number, y: number) =>
+      target.dispatchEvent(new MouseEvent(type, { clientX: x, clientY: y, bubbles: true, cancelable: true, button: 0 }));
+    const drag = (col: number, dx: number) => {
+      const handle = resizeHandle(host, col)!;
+      const r = handle.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      fire(handle, 'mousedown', x, y);
+      // the pressed handle may be replaced by a repaint: move and release go to the host (the element under the mouse)
+      fire(host, 'mousemove', x + dx, y);
+      fire(host, 'mouseup', x + dx, y);
+    };
+    drag(0, 50);
+    drag(1, -40);
+    await nextFrame();
+    expect(model.getColumnWidth(0)).toBe(150);
+    expect(model.getColumnWidth(1)).toBe(60);
+  });
+
   it('dragging a ColumnDef without limits is not limited', async () => {
     const columnDefs = [
       ColumnDef.create({ property: 'id', width: px100 }),

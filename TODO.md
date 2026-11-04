@@ -671,7 +671,15 @@ Verhalten steht als `// NOTE:` in den Specs.
       auf, weil Alt+↓ dort die native Liste öffnet und sie das Enter schluckt. Behoben 1.1.106
       (`sheet-editing-options.browser.spec.ts` „Enter without choosing a value writes nothing“). Plattform-Abfrage des
       Cores gebündelt in `common/platform.ts` (`isMacPlatform`, intern). `mouse-handler` „dragging a ColumnDef without
-      limits“ (einmal rot im Projekt `browser-scrollbars`) ließ sich nicht reproduzieren (30 Läufe grün) → `// NOTE:`.
+      limits“ war auf dem macOS-CI-Runner wieder rot – Ursache gefunden (unten, Wettlauf beim Ende eines Ziehens), behoben
+      1.1.106. `table-state` „scrolling is reported once“: Entprellzeit im Test 20 → 500 ms (langsamer Runner).
+- [x] **Wettlauf beim Ende eines Ziehens (`MouseHandler`, 1.1.106):** Das Ende wurde erst im nächsten Animation-Frame
+      verarbeitet und las dann den gemeinsamen Zustand (`mouseEvent`, `startMouseEvent`); kam auf einem ausgelasteten
+      Rechner vorher das `mousedown` des nächsten Ziehens, setzte der alte Frame dessen Start zurück – eine schnelle zweite
+      Spaltenbreiten-Änderung ging verloren (auch die erste). Jetzt: das Ende hält seine eigenen Ereignisse fest und wird
+      spätestens beim nächsten `mousedown` sofort ausgeführt (`flushDraggingEnd`), Frames eines beendeten Ziehens verfallen
+      (`dragGeneration`). Test `mouse-handler.browser.spec.ts` „a second resize that starts before the end …“ (beide
+      Ziehen in einer Task, ohne Frame dazwischen – deterministisch rot ohne Fix).
 - [ ] **Offen (Entscheidung Marc):** ⌘Y als Redo auf macOS? Heute nur ⌘⇧Z (dokumentiert, instructions.md 6.22); Excel
       für Mac und Google Sheets kennen beide.
 - [x] **macOS-Job in der CI** (Entscheidung Marc, 04.11.2026): Job `test-core-macos` in `test-core.yml` (`macos-15`,
@@ -763,6 +771,8 @@ Objekt-Tabelle hat `ge-focused-row`.
     schreibt nichts mehr; vorher wurde die Zelle geleert (`""`). Ein gewählter Wert wird wie bisher geschrieben.
   - Intern: die Plattform-Erkennung (⌘-Kürzel, ⌥+Buchstabe tippt, `aria-keyshortcuts`) an einer Stelle
     (`navigator.platform`, Verhalten gleich).
+  - Spaltenbreite mit der Maus: eine zweite Änderung kurz nach der ersten (bevor deren Ende gezeichnet war) ging auf
+    langsamen Rechnern verloren; das Ende eines Ziehens wird jetzt vor dem nächsten `mousedown` abgeschlossen.
 
 - **1.1.103 – Bugfix-Release**, nur Core (`@guiexpert/table`), keine neuen Exporte:
   - `headerSeparatorBorderVisible: false` entfernt jetzt wirklich die Linie zwischen Header und Body, und

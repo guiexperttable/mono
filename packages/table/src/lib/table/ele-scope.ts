@@ -165,9 +165,15 @@ export class EleScope {
     this.contentWrapperDiv = dom.applyStyleNoPadding(
       dom.applyStylePosistionRelative(
         dom.createDivWithClass("ge-table-scroll-content-wrapper", this.scrollViewport)));
+    // The visible body content is sticky (since 1.1.106): browsers scroll on their own thread – also while the thumb
+    // is dragged – and show a scrolled frame before the `scroll` event reaches the table. With `top = scrollTop`
+    // (until 1.1.105) the content moved with the scroll delta in such frames (empty areas, rows out of line with the
+    // fixed columns); sticky keeps it in the viewport without the table. Its start is set here once (`left` = the
+    // start: in right-to-left `right`, the direction is set above), top/left are never written while scrolling.
     this.contentDiv = dom.applyStyleNoPadding(
       dom.applyStylePosistionRelative(
         dom.createDivWithClass("ge-table-scroll-content", this.contentWrapperDiv)));
+    dom.applyStyle(this.contentDiv, { position: "sticky", top: "0", left: "0" });
 
     this.areaBodyCenter = dom.appendRelativeChildDiv(
       dom.createDivWithClass("ge-table-body-center", this.contentDiv));
@@ -386,10 +392,8 @@ export class EleScope {
     // Content:
     this.dom.applyStyle(this.contentDiv, {
       width: `${this.scrollViewport.clientWidth}px`,
-      height: `${this.scrollViewport.clientHeight}px`,
-      top: `${this.scrollTop}px`,
-      left: `${this.getViewportScrollLeft()}px`
-    });
+      height: `${this.scrollViewport.clientHeight}px`
+    }); // sticky: no top/left (see the constructor)
 
     // Body:
     // Body/West:

@@ -1201,11 +1201,7 @@ export class RenderScope extends EleScope {
     const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.getBodyContentHeight();
     const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);
     this.contentScrollTop = -virtualRowDivTop;
-
-    this.dom.setStyle(this.contentDiv, 'top', `${this.scrollTop}px`);
-    // inside a render pass scrollLeft was read before any DOM write; otherwise read it live
-    const scrollLeft = this.areaHeightsOfRenderPass ? this.scrollLeft : this.getViewportScrollLeft();
-    this.dom.setStyle(this.contentDiv, 'left', `${scrollLeft}px`);
+    // contentDiv is position: sticky (since 1.1.106) – the browser keeps it in the viewport, no top/left here
 
     this.adjustArea('body', virtualRowDivTop);
   }

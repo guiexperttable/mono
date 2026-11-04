@@ -132,7 +132,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `applyStyleInPx` mit `left`, nie `element.style.left`; `scrollLeft` nur über `getViewportScrollLeft()`/
   `setViewportScrollLeft()`, Maus-x über `clientXToHostX()`.
 - Ein `scrollViewport` mit riesigem `contentWrapperDiv` (Höhe = Summe aller Zeilenhöhen) liefert die native Scrollbar;
-  der sichtbare `contentDiv` wird mitgeschoben. Der Viewport reicht bis ans Ende und unter den Footer – **klassische
+  der sichtbare `contentDiv` ist seit 1.1.106 `position: sticky` (top/Anfang 0) – der Browser hält ihn selbst im
+  Viewport, auch in Frames, die der Compositor-Thread schon gescrollt hat, bevor das `scroll`-Event ankommt (vorher
+  `top = scrollTop` im Event: beim Ziehen am Balken sprang die Mitte, leere Flächen, Versatz zu West/East). Nie wieder
+  `top`/`left` am `contentDiv` setzen; Test `scroll-sync.browser.spec.ts`. Der Viewport reicht bis ans Ende und unter den Footer – **klassische
   Scrollbalken** (Windows, Linux, macOS mit Maus) nehmen Platz weg: seit 1.1.104 misst `adjustContainersAndRows()` beide
   Balken und legt Header/Body/Footer/East in `getLayoutWidth()` × `getLayoutHeight()` daneben (sonst verdeckten sie die
   letzte Zeile, den Footer, die letzte Spalte, die East-Spalten). %-/Gewichtsspalten werden neu verteilt, wenn der

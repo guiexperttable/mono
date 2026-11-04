@@ -638,13 +638,15 @@ describe('onStateChanged (S11)', () => {
   });
 
   it('scrolling is reported once, after the scrolling stopped', async () => {
-    const { api, events } = mountWithEvents();
+    // a long debounce: the two scroll steps (two frames) must fall into one interval even on a slow CI runner
+    // (with 20 ms the macOS runner reported row 20 on its own)
+    const { api, events } = mountWithEvents({ stateChangedDebounceDelay: 500 });
     await nextFrame();
     api.scrollToIndex(0, 20);
     await nextFrame();
     api.scrollToIndex(0, 40);
     await nextFrame();
-    await vi.waitFor(() => expect(events).toHaveLength(1));
+    await vi.waitFor(() => expect(events).toHaveLength(1), { timeout: 3000 });
     expect(events[0].changedParts).toEqual(['scroll']);
     expect(events[0].state.scroll).toEqual({ left: 0, top: 40 * 34, firstRowId: 40 });
   });

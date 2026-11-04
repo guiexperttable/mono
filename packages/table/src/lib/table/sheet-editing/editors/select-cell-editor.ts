@@ -17,6 +17,8 @@ import type { ValueLabelIf } from "../../data/common/value-label.if";
 export class SelectCellEditor implements CellEditorIf {
 
   private select?: HTMLSelectElement;
+  /** The text of the cell when the editor opened: "nothing chosen" counts as unchanged (since 1.1.106). */
+  private startText = "";
   private readonly abort = new AbortController();
 
   constructor(protected readonly options: ValueLabelIf[]) {
@@ -36,6 +38,7 @@ export class SelectCellEditor implements CellEditorIf {
     const dom = ctx.domService;
     const select = dom.createElement<HTMLSelectElement>("select");
     this.select = select;
+    this.startText = ctx.input;
     dom.setAttribute(select, "aria-label", ctx.ariaLabel);
     dom.addClass(select, "ge-table-cell-editor-field");
     let selectedIndex = -1;
@@ -64,7 +67,16 @@ export class SelectCellEditor implements CellEditorIf {
     return this.options[select.selectedIndex]?.value;
   }
 
+  /**
+   * The chosen value as text; with nothing chosen (the cell's value is not in the list) the start text, so that
+   * Enter without a choice writes nothing (before 1.1.106 it emptied the cell).
+   *
+   * @returns {string} the text
+   */
   getText(): string {
+    if (!this.select || this.select.selectedIndex < 0) {
+      return this.startText;
+    }
     return String(this.getValue() ?? "");
   }
 

@@ -9,6 +9,7 @@ import { isRowNumberColumnDef, isTreeRow } from "../instanceof-workaround";
 import { DEFAULT_GET_EDIT_RENDERER } from "../data/options/table-options";
 import { editInputPipeForNumber } from "../renderer/edit/edit-input-pipe-for-number";
 import { FormulaAssist } from "./formula-assist";
+import { isMacPlatform } from "../../common/platform";
 
 interface EditSession {
   rowIndex: number;
@@ -507,7 +508,7 @@ export class CellEditorService {
   }
 
   private isMac(): boolean {
-    return typeof navigator !== "undefined" && /Mac/.test(navigator.platform);
+    return isMacPlatform();
   }
 
   /** A key on the focused table (no editor open): printable keys open the editor ("enter" mode). */

@@ -3,6 +3,7 @@ import type { FillHandleOptionsIf } from "./fill-handle-options.if";
 import type { FillDirection } from "./fill-direction.type";
 import { CellRange } from "../data/common/cell-range";
 import { getFillRange } from "./compute-fill-changes";
+import { isMacPlatform } from "../../common/platform";
 
 /** The attribute value of the fill handle (`data-ge-action`). */
 const FILL_HANDLE_ACTION = "fill-handle";
@@ -137,7 +138,7 @@ export class FillHandleService {
 
   /** Keyboard alternative on the grid: Ctrl/⌘+D, Ctrl/⌘+R (only directions the options allow). */
   private updateHostShortcuts(options: FillHandleOptionsIf): void {
-    const mac = typeof navigator !== "undefined" && navigator.platform.indexOf("Mac") > -1;
+    const mac = isMacPlatform();
     const mod = mac ? "Meta" : "Control";
     const keys: string[] = [];
     if (options.direction !== "horizontal") keys.push(`${mod}+D`);

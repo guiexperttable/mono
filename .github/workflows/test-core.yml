@@ -1,5 +1,8 @@
 # Tests of the core package @guiexpert/table (Vitest 5, see CLAUDE.md §6):
 #   type check of the specs · JSDoc @example check · unit tests (Node) · browser tests (headless Chromium)
+#   + the browser tests once more on macOS (job test-core-macos): ⌘ shortcuts, ⌥+letter types, the browser's own keys
+#     in inputs (⌘A, ⌘→, the ⌘C copy command) – Linux simulates the macOS shortcuts, only a Mac runs them for real
+#     (prompt 016)
 #
 # Reusable workflow – called by
 #   - ci.yml           on every push to main and every pull request
@@ -82,4 +85,47 @@ jobs:
         with:
           name: coverage-table
           path: packages/table/coverage/
+          if-no-files-found: ignore
+
+  test-core-macos:
+    name: Browser tests @guiexpert/table (macOS)
+    runs-on: macos-15
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ inputs.use-cache && 'pnpm' || '' }}
+          package-manager-cache: ${{ inputs.use-cache }}
+
+      - run: pnpm install --frozen-lockfile --filter @guiexpert/table
+
+      - name: Cache Playwright browsers
+        if: inputs.use-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/Library/Caches/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('packages/table/package.json') }}
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @guiexpert/table exec playwright install chromium
+
+      - name: Browser tests (Chromium, macOS)
+        run: pnpm --filter @guiexpert/table test:browser
+
+      - name: Screenshots of failed browser tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-test-failures-macos
+          path: packages/table/.vitest/
           if-no-files-found: ignore

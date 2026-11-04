@@ -6,6 +6,7 @@ import { OsxShortcutActionIdMapping } from "./osx-shortcut-actionId-mapping";
 import { OnActionTriggeredIf } from "./on-action-triggered.if";
 import { createHarmonizedShortcutByKeyboardEvent, harmonizeShortcut } from './shortcut-util';
 import { mirrorArrowKeys } from '../rtl/rtl-util';
+import { isMacPlatform } from '../../common/platform';
 
 
 /**
@@ -100,7 +101,7 @@ export class ShortcutService {
   }
 
   private isMacintosh() {
-    return navigator.platform.indexOf("Mac") > -1;
+    return isMacPlatform();
   }
 
   private isDebug() {

@@ -39,6 +39,7 @@ import {
   renderedRows,
 } from '../../../../test-utils/mount-table';
 import { axeViolations } from '../../../../test-utils/axe';
+import { PLATFORMS, ariaShortcutOf, mockPlatform } from '../../../../test-utils/platform';
 
 const XSS = '"><img src=x onerror="window.__geXss=1">';
 
@@ -1224,7 +1225,8 @@ describe('edge cases of the keyboard model and the ARIA attributes', () => {
     }
   });
 
-  it('fill handle and batch edit (1.1.96): handle and preview hidden, keyboard shortcuts on the grid, invalid cells', async () => {
+  it.each(PLATFORMS)('fill handle and batch edit (1.1.96): handle and preview hidden, keyboard shortcuts on the grid, invalid cells (%s)', async platform => {
+    mockPlatform(platform);
     const sm = new SelectionModel('range', 'multi');
     const rows = createRows(5);
     const defs = [
@@ -1241,7 +1243,7 @@ describe('edge cases of the keyboard model and the ARIA attributes', () => {
       scope.firstInit();
       sm.addSelection(new CellRange(0, 1, 1, 1));
       scope.repaint();
-      expect(host.getAttribute('aria-keyshortcuts')).toBe('Control+D Control+R');
+      expect(host.getAttribute('aria-keyshortcuts')).toBe(`${ariaShortcutOf(platform, 'D')} ${ariaShortcutOf(platform, 'R')}`);
       expect(host.querySelector('.ge-table-fill-handle')!.getAttribute('aria-hidden')).toBe('true');
       scope.getApi().applyCellChanges([{ rowIndex: 0, column: 'name', value: '' }]);
       await nextFrame();

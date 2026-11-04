@@ -18,6 +18,7 @@ import {
 import type { ClipboardOptionsIf, ColumnDefIf, GeModelChangeEvent, TableOptionsIf } from '@guiexpert/table';
 import { destroyAllTables, mountTable, nextFrame } from '../../../../test-utils/mount-table';
 import { axeViolations } from '../../../../test-utils/axe';
+import { PLATFORMS, keyInitOf, mockPlatform, userEventPrimary } from '../../../../test-utils/platform';
 
 afterEach(destroyAllTables);
 
@@ -463,13 +464,15 @@ describe('internal copy and cut (P12)', () => {
 
 describe('keys and the hidden text field', () => {
 
-  it('Ctrl+C / Ctrl+X / Ctrl+V focus the hidden text field for the key, then the table again', async () => {
+  it.each(PLATFORMS)('Ctrl/⌘+C, X, V focus the hidden text field for the key, then the table again (%s)', async platform => {
+    mockPlatform(platform);
+    const mod = keyInitOf(platform);
     const t = await mount();
     t.select(0, NAME, 0, NAME);
     const seen: (string | null)[] = [];
     const onCopy = (e: Event) => seen.push((e.target as HTMLElement).className);
     document.addEventListener('copy', onCopy, true);
-    const keydown = new KeyboardEvent('keydown', { key: 'c', code: 'KeyC', ctrlKey: true, bubbles: true, cancelable: true });
+    const keydown = new KeyboardEvent('keydown', { key: 'c', code: 'KeyC', ...mod, bubbles: true, cancelable: true });
     t.host.dispatchEvent(keydown);
     expect(keydown.defaultPrevented).toBe(false); // the browser must run its copy command
     const proxy = t.host.querySelector<HTMLTextAreaElement>('.ge-table-clipboard-proxy')!;
@@ -480,28 +483,29 @@ describe('keys and the hidden text field', () => {
     expect(document.activeElement).toBe(t.host);
     document.removeEventListener('copy', onCopy, true);
     // the browser fired nothing (refused): the focus comes back anyway
-    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', code: 'KeyV', ctrlKey: true, bubbles: true, cancelable: true }));
+    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', code: 'KeyV', ...mod, bubbles: true, cancelable: true }));
     expect(document.activeElement).toBe(proxy);
     await new Promise(r => setTimeout(r, 5));
     expect(document.activeElement).toBe(t.host);
     // paste through the hidden field
-    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', code: 'KeyV', ctrlKey: true, bubbles: true, cancelable: true }));
+    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', code: 'KeyV', ...mod, bubbles: true, cancelable: true }));
     fire(proxy, 'paste', { 'text/plain': 'pasted' });
     expect(t.rows[0].name).toBe('pasted');
     expect(document.activeElement).toBe(t.host);
     // cut
-    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', code: 'KeyX', ctrlKey: true, bubbles: true, cancelable: true }));
+    t.host.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', code: 'KeyX', ...mod, bubbles: true, cancelable: true }));
     fire(proxy, 'cut');
     expect(t.scope.clipboardService!.isCutMarked()).toBe(true);
   });
 
-  it('a real Ctrl+C in the browser fills the clipboard event', async () => {
+  it('a real Ctrl+C (macOS ⌘C) in the browser fills the clipboard event', async () => {
+    // the browser's own copy command: the keys of the real platform
     const t = await mount();
     t.select(1, NAME, 1, PRICE);
     let copied = '';
     const onCopy = (e: ClipboardEvent) => queueMicrotask(() => (copied = e.clipboardData?.getData('text/plain') ?? ''));
     document.addEventListener('copy', onCopy);
-    await userEvent.keyboard('{Control>}c{/Control}');
+    await userEvent.keyboard(userEventPrimary('c'));
     await new Promise(r => setTimeout(r, 10));
     document.removeEventListener('copy', onCopy);
     expect(document.activeElement).toBe(t.host);

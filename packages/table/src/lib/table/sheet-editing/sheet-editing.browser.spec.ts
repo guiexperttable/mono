@@ -17,6 +17,7 @@ import {
 } from '@guiexpert/table';
 import type { EditingOptionsIf, GeEditEvent, GeModelChangeEvent, TableOptionsIf } from '@guiexpert/table';
 import { destroyAllTables, getCellDiv, mountTable, nextFrame } from '../../../../test-utils/mount-table';
+import { PLATFORMS, lineEndKeys, mockPlatform, userEventKeyOf } from '../../../../test-utils/platform';
 import { axeViolations } from '../../../../test-utils/axe';
 
 afterEach(destroyAllTables);
@@ -275,19 +276,21 @@ describe('selection with the keyboard (E11–E13)', () => {
     expect(t.sm.getRanges().at(-1)).toMatchObject({ r1: 3, c1: NAME, r2: 5, c2: PRICE });
   });
 
-  it('E12: Ctrl+↓ jumps to the end of the block / to the next filled cell; Ctrl+Shift+↓ extends', async () => {
+  it.each(PLATFORMS)('E12: Ctrl/⌘+↓ jumps to the end of the block / to the next filled cell; Ctrl/⌘+Shift+↓ extends (%s)', async platform => {
+    mockPlatform(platform);
+    const down = userEventKeyOf(platform, '{ArrowDown}');
     const rows = createSheetRows(20);
     for (const i of [3, 4, 5]) rows[i].name = '';
     const t = await mountSheet({ rows });
     focusCell(t, 0, NAME);
-    await userEvent.keyboard('{Control>}{ArrowDown}{/Control}');
+    await userEvent.keyboard(down);
     expect(t.fm.getFocus()).toEqual([2, NAME]);
-    await userEvent.keyboard('{Control>}{ArrowDown}{/Control}');
+    await userEvent.keyboard(down);
     expect(t.fm.getFocus()).toEqual([6, NAME]);
-    await userEvent.keyboard('{Control>}{ArrowDown}{/Control}');
+    await userEvent.keyboard(down);
     expect(t.fm.getFocus()).toEqual([19, NAME]);
     focusCell(t, 0, NAME); // a focus set by code: Shift+arrows start at it (the anchor follows the active cell)
-    await userEvent.keyboard('{Control>}{Shift>}{ArrowDown}{/Shift}{/Control}');
+    await userEvent.keyboard(userEventKeyOf(platform, '{Shift>}{ArrowDown}{/Shift}'));
     expect(t.sm.getRanges().at(-1)).toMatchObject({ r1: 0, r2: 2, c1: NAME, c2: NAME });
   });
 
@@ -521,7 +524,7 @@ describe('API, events, defaults', () => {
     const t = await mountSheet({ editing: false });
     focusCell(t, 3, NAME);
     await userEvent.keyboard('{F2}');
-    await userEvent.keyboard('{End}xyz');
+    await userEvent.keyboard(`${lineEndKeys()}xyz`); // caret to the end of the input: ⌘→ on macOS
     t.api.repaint();
     const input = t.host.querySelector<HTMLInputElement>('input.ge-table-cell-editor-input')!;
     expect(input.value).toBe('Name 3xyz');

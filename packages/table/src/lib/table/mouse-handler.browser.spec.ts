@@ -413,6 +413,8 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
     expect(model.getColumnWidth(2)).toBeLessThan(300);
   });
 
+  // NOTE: once seen red on macOS in the project browser-scrollbars (Nov 2026), not reproducible since: 20 runs of
+  // the test plus 10 of the file (with scrollbars) and two full runs green (prompt 016). Red again: look for a timing gap.
   it('dragging a ColumnDef without limits is not limited', async () => {
     const columnDefs = [
       ColumnDef.create({ property: 'id', width: px100 }),

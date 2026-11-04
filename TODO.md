@@ -502,8 +502,14 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       Rauschen; `lib` der Preact-tsconfig anheben oder die Stelle ohne `flatMap` schreiben (gefunden bei 002).
 
 - [ ] **Angular-Demo an lokale Builds koppeln**: `apps/angular-table-demo` nutzt noch npm
-      (seit 28.10.2026 `@guiexpert/angular-table@^17.1.102`, `@guiexpert/table@^1.1.102`, `demo-table-models@^1.1.102`;
-      im Lockfile nur diese drei Einträge angehoben). Noch ohne Demo-Route: Overlays (002), Zustand (003),
+      (seit 04.11.2026 `@guiexpert/angular-table@^17.1.105`, `@guiexpert/table@^1.1.105`, `demo-table-models@^1.1.105`;
+      im Lockfile nur diese drei Einträge angehoben – `pnpm i` löst dabei zusätzlich `debug` neu auf
+      (`supports-color@8.1.1` → `5.5.0`, 14 Stellen); deshalb die drei Einträge von Hand gesetzt und mit
+      `pnpm i --frozen-lockfile` geprüft). **Folge der npm-Kopplung (Prompt 016):** mit 1.1.102 lag die East-Area auf
+      `/demo/simple` (`fixedRightColumnCount: 2`) über dem klassischen Scrollbalken – er ließ sich nicht ziehen; im Core
+      seit 1.1.104 behoben, in der Demo erst mit dem Anheben. Core-Fixes kommen in der Demo also erst nach Release +
+      Anheben an. Die `workspace:`-Kopplung ändert das Lockfile über diese drei Einträge hinaus (npm-Einträge weg,
+      `link:` dazu, Peer-Auflösung von Angular 17 neu) – deshalb noch nicht umgesetzt. Noch ohne Demo-Route: Overlays (002), Zustand (003),
       Zeilennummern (004), Summenzeile (005), Formeln (008), Row Drag (009), Fill/Batch (010), Master/Detail (011), RTL
       (012) – in `apps/table-demo` gibt es sie alle. Ziel: `workspace:`-Core +
       `link:../../angular-builds/ng17/dist` (oder Demo auf aktuelles Angular heben).
@@ -658,6 +664,20 @@ Verhalten steht als `// NOTE:` in den Specs.
 
 ## Gefunden durch die Browser-Tests (Okt. 2026)
 
+- [x] **macOS (Prompt 016, 04.11.2026):** 16 Browser-Tests waren nur auf dem Mac rot. 15 davon nahmen Windows/Linux an
+      (Strg statt ⌘, `{End}`/Strg+A im Input, ⌥+Buchstabe) → plattformneutral über `test-utils/platform.ts`, Mac **und**
+      andere Plattform je Lauf (`it.each(PLATFORMS)` + `mockPlatform`). Ein echter Fehler (alle Plattformen):
+      `SelectCellEditor` – Enter ohne Auswahl (Zellwert nicht in der Liste) leerte die Zelle; unter Linux fiel es nicht
+      auf, weil Alt+↓ dort die native Liste öffnet und sie das Enter schluckt. Behoben 1.1.106
+      (`sheet-editing-options.browser.spec.ts` „Enter without choosing a value writes nothing“). Plattform-Abfrage des
+      Cores gebündelt in `common/platform.ts` (`isMacPlatform`, intern). `mouse-handler` „dragging a ColumnDef without
+      limits“ (einmal rot im Projekt `browser-scrollbars`) ließ sich nicht reproduzieren (30 Läufe grün) → `// NOTE:`.
+- [ ] **Offen (Entscheidung Marc):** ⌘Y als Redo auf macOS? Heute nur ⌘⇧Z (dokumentiert, instructions.md 6.22); Excel
+      für Mac und Google Sheets kennen beide.
+- [x] **macOS-Job in der CI** (Entscheidung Marc, 04.11.2026): Job `test-core-macos` in `test-core.yml` (`macos-15`,
+      nur `test:browser`) – läuft bei jedem Push/PR und vor jedem npm-Publish. Kosten: macOS-Runner zählen bei privaten
+      Repos 10× (öffentlich frei). Erster Lauf auf GitHub steht noch aus.
+
 Je ein `it.fails('<richtiges Verhalten>')` + `// BUG:` in den Browser-Specs (`packages/table/src/**/*.browser.spec.ts`).
 
 **Spaltenbreiten, Scrollen, fixierte Spalten**
@@ -737,6 +757,12 @@ Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderV
 Objekt-Tabelle hat `ge-focused-row`.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.106 – Bugfix-Release**, nur Core (`@guiexpert/table`), keine neuen Exporte:
+  - `SelectCellEditor`: Enter (oder ein anderer Commit) ohne gewählten Wert – der Zellwert steht nicht in der Liste –
+    schreibt nichts mehr; vorher wurde die Zelle geleert (`""`). Ein gewählter Wert wird wie bisher geschrieben.
+  - Intern: die Plattform-Erkennung (⌘-Kürzel, ⌥+Buchstabe tippt, `aria-keyshortcuts`) an einer Stelle
+    (`navigator.platform`, Verhalten gleich).
 
 - **1.1.103 – Bugfix-Release**, nur Core (`@guiexpert/table`), keine neuen Exporte:
   - `headerSeparatorBorderVisible: false` entfernt jetzt wirklich die Linie zwischen Header und Body, und

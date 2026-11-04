@@ -13,6 +13,7 @@ import {
 } from '@guiexpert/table';
 import type { GeModelChangeEvent, GeUndoEvent, TableOptionsIf, UndoOptionsIf } from '@guiexpert/table';
 import { destroyAllTables, getCellDiv, mountTable, nextFrame } from '../../../../test-utils/mount-table';
+import { PLATFORMS, mockPlatform, userEventKeyOf, userEventPrimary } from '../../../../test-utils/platform';
 
 afterEach(destroyAllTables);
 
@@ -65,14 +66,15 @@ const paste = (host: HTMLElement, text: string) => {
 
 describe('undo and redo', () => {
 
-  it('U1: edit, Ctrl+Z: the old value, focus and selection on the cell, one event "undo", announced', async () => {
+  it.each(PLATFORMS)('U1: edit, Ctrl/⌘+Z: the old value, focus and selection on the cell, one event "undo", announced (%s)', async platform => {
+    mockPlatform(platform);
     const t = await mount();
     t.focus(3, QTY);
     await userEvent.keyboard('7{Enter}');
     expect(t.rows[3].qty).toBe(7);
     t.focus(10, NAME);
     t.changes.length = 0;
-    await userEvent.keyboard('{Control>}z{/Control}');
+    await userEvent.keyboard(userEventKeyOf(platform, 'z'));
     expect(t.rows[3].qty).toBe(30);
     expect(t.changes).toHaveLength(1);
     expect(t.changes[0].source).toBe('undo');
@@ -116,17 +118,19 @@ describe('undo and redo', () => {
     expect([t.rows[0].name, t.rows[0].qty, t.rows[1].name, t.rows[1].qty]).toEqual(['N0', 0, 'N1', 10]);
   });
 
-  it('U4: Ctrl+Y and Ctrl+Shift+Z redo (source "redo")', async () => {
+  it.each(PLATFORMS)('U4: Ctrl+Y and Ctrl/⌘+Shift+Z redo (source "redo") (%s)', async platform => {
+    mockPlatform(platform);
+    const shiftZ = userEventKeyOf(platform, '{Shift>}z{/Shift}');
     const t = await mount();
     t.api.applyCellChanges([{ rowIndex: 0, column: NAME, value: 'x' }], 'edit');
     t.api.undo();
     t.changes.length = 0;
-    await userEvent.keyboard('{Control>}y{/Control}');
+    await userEvent.keyboard(platform === 'mac' ? shiftZ : '{Control>}y{/Control}'); // macOS: no ⌘Y (instructions.md 6.22)
     expect(t.rows[0].name).toBe('x');
     expect(t.changes[0].source).toBe('redo');
-    await userEvent.keyboard('{Control>}z{/Control}');
+    await userEvent.keyboard(userEventKeyOf(platform, 'z'));
     expect(t.rows[0].name).toBe('N0');
-    await userEvent.keyboard('{Control>}{Shift>}z{/Shift}{/Control}');
+    await userEvent.keyboard(shiftZ);
     expect(t.rows[0].name).toBe('x');
     expect(t.api.redo()).toBe(false); // nothing left
   });
@@ -154,11 +158,11 @@ describe('undo and redo', () => {
     expect(t.fm.getFocus()).toEqual([36, NAME]); // only shown cells get the focus
   });
 
-  it('U8: Ctrl+Z in the open editor belongs to the editor', async () => {
+  it('U8: Ctrl/⌘+Z in the open editor belongs to the editor', async () => {
     const t = await mount();
     t.api.applyCellChanges([{ rowIndex: 0, column: NAME, value: 'x' }], 'edit');
     t.focus(4, NAME);
-    await userEvent.keyboard('abc{Control>}z{/Control}');
+    await userEvent.keyboard(`abc${userEventPrimary('z')}`);
     expect(t.api.isEditing()).toBe(true);
     expect(t.rows[0].name).toBe('x');
     expect(t.api.undo()).toBe(false); // not while editing
@@ -222,10 +226,10 @@ describe('undo and redo', () => {
     expect(t.undoEvents).toHaveLength(n);
   });
 
-  it('U15: without the option Ctrl+Z does nothing; the API is safe', async () => {
+  it('U15: without the option Ctrl/⌘+Z does nothing; the API is safe', async () => {
     const t = await mount({ undo: false });
     t.api.applyCellChanges([{ rowIndex: 0, column: NAME, value: 'x' }], 'edit');
-    await userEvent.keyboard('{Control>}z{/Control}');
+    await userEvent.keyboard(userEventPrimary('z'));
     expect(t.rows[0].name).toBe('x');
     expect([t.api.undo(), t.api.redo(), t.api.canUndo(), t.api.canRedo()]).toEqual([false, false, false, false]);
     expect(t.api.getUndoState()).toBeUndefined();
@@ -299,7 +303,7 @@ describe('undo and redo', () => {
   it('the old in-cell editor and a double click are recorded too', async () => {
     const t = await mount();
     await userEvent.dblClick(getCellDiv(t.host, 'body', 'center', 2, NAME));
-    await userEvent.keyboard('{Control>}a{/Control}new{Enter}');
+    await userEvent.keyboard(`${userEventPrimary('a')}new{Enter}`); // select all of the input: ⌘A on macOS
     expect(t.rows[2].name).toBe('new');
     t.api.undo();
     expect(t.rows[2].name).toBe('N2');
@@ -310,7 +314,7 @@ describe('undo and redo', () => {
     t.api.applyCellChanges([{ rowIndex: 0, column: NAME, value: 'x' }], 'edit');
     t.focus(0, NAME);
     t.api.showLoadingOverlay();
-    await userEvent.keyboard('{Control>}z{/Control}');
+    await userEvent.keyboard(userEventPrimary('z'));
     expect(t.rows[0].name).toBe('x');
     t.api.hideOverlay();
     vi.useRealTimers();

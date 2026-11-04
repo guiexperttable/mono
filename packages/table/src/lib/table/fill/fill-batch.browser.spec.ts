@@ -22,6 +22,7 @@ import type {
 } from '@guiexpert/table';
 import { destroyAllTables, getCellDiv, mountTable, nextFrame } from '../../../../test-utils/mount-table';
 import { axeViolations } from '../../../../test-utils/axe';
+import { PLATFORMS, ariaShortcutOf, keyInitOf, mockPlatform } from '../../../../test-utils/platform';
 
 interface Item { id: number; qty: number | string; name: string; day: string; price: number }
 
@@ -125,7 +126,8 @@ const qtys = (items: Item[]) => items.map(i => i.qty);
 
 describe('fill handle', () => {
 
-  it('sits on the bottom right corner of the last range, hidden for screen readers', async () => {
+  it.each(PLATFORMS)('sits on the bottom right corner of the last range, hidden for screen readers (%s)', async platform => {
+    mockPlatform(platform);
     const t = await mountFill();
     expect(fillHandle(t.host)).toBeNull(); // nothing selected yet
     select(t, 1, 1, 2, 2);
@@ -137,7 +139,7 @@ describe('fill handle', () => {
     const hc = center(h);
     expect(Math.abs(hc.x - cell.right)).toBeLessThanOrEqual(1.5);
     expect(Math.abs(hc.y - cell.bottom)).toBeLessThanOrEqual(1.5);
-    expect(t.host.getAttribute('aria-keyshortcuts')).toBe('Control+D Control+R');
+    expect(t.host.getAttribute('aria-keyshortcuts')).toBe(`${ariaShortcutOf(platform, 'D')} ${ariaShortcutOf(platform, 'R')}`);
   });
 
   it('several ranges: only the last one has the handle', async () => {
@@ -252,12 +254,13 @@ describe('fill handle', () => {
     expect([t.items[3].qty, t.items[4].qty]).toEqual(['Item 1', 'Item 0']);
   });
 
-  it('direction "vertical": dragging right fills nothing', async () => {
+  it.each(PLATFORMS)('direction "vertical": dragging right fills nothing (%s)', async platform => {
+    mockPlatform(platform);
     const t = await mountFill({ tableOptions: { fillHandle: { direction: 'vertical' } } });
     select(t, 1, 1, 1, 1);
     dragHandleTo(t.host, 1, 3);
     expect(t.modelEvents).toHaveLength(0);
-    expect(t.host.getAttribute('aria-keyshortcuts')).toBe('Control+D');
+    expect(t.host.getAttribute('aria-keyshortcuts')).toBe(ariaShortcutOf(platform, 'D'));
   });
 
   it('H5: not editable cells (editable false, calculated column without valueSetter) are skipped', async () => {
@@ -392,12 +395,15 @@ describe('fill handle', () => {
   });
 });
 
-describe('keyboard: Ctrl+D, Ctrl+R', () => {
+describe.each(PLATFORMS)('keyboard: Ctrl/⌘+D, Ctrl/⌘+R (%s)', platform => {
+  beforeEach(() => {
+    mockPlatform(platform); // the ShortcutService reads it when the table is mounted
+  });
 
   it('Ctrl+D copies the top row of the range down (a series is copied, not continued)', async () => {
     const t = await mountFill();
     select(t, 1, 1, 3, 2);
-    const evt = keydown(t.host, 'd', { ctrlKey: true });
+    const evt = keydown(t.host, 'd', keyInitOf(platform));
     expect(evt.defaultPrevented).toBe(true);
     expect(t.items.slice(1, 4).map(i => [i.qty, i.name])).toEqual([[1, 'Item 1'], [1, 'Item 1'], [1, 'Item 1']]);
     expect(t.modelEvents).toHaveLength(1);
@@ -406,20 +412,20 @@ describe('keyboard: Ctrl+D, Ctrl+R', () => {
   it('Ctrl+D on one row copies the cell above; Ctrl+R on one column the cell left of it', async () => {
     const t = await mountFill();
     select(t, 2, 2, 2, 2);
-    keydown(t.host, 'd', { ctrlKey: true });
+    keydown(t.host, 'd', keyInitOf(platform));
     expect(t.items[2].name).toBe('Item 1');
     expect(t.sm.getRanges()).toEqual([new CellRange(2, 2, 2, 2)]);
     select(t, 4, 3, 4, 3);
-    keydown(t.host, 'r', { ctrlKey: true });
+    keydown(t.host, 'r', keyInitOf(platform));
     expect(t.items[4].day).toBe('Item 4');
   });
 
   it('without fill handle or range the browser keeps its key (bookmark, reload)', async () => {
     const t = await mountFill({ tableOptions: { fillHandle: false } });
     select(t, 1, 1, 2, 1);
-    expect(keydown(t.host, 'd', { ctrlKey: true }).defaultPrevented).toBe(false);
+    expect(keydown(t.host, 'd', keyInitOf(platform)).defaultPrevented).toBe(false);
     const t2 = await mountFill();
-    expect(keydown(t2.host, 'r', { ctrlKey: true }).defaultPrevented).toBe(false);
+    expect(keydown(t2.host, 'r', keyInitOf(platform)).defaultPrevented).toBe(false);
   });
 });
 
@@ -834,10 +840,11 @@ describe('review fixes', () => {
     expect(t.api.commitBatchEdit()).toBe(true);
   });
 
-  it('switching the fill handle off at runtime removes handle and aria-keyshortcuts', async () => {
+  it.each(PLATFORMS)('switching the fill handle off at runtime removes handle and aria-keyshortcuts (%s)', async platform => {
+    mockPlatform(platform);
     const t = await mountFill();
     select(t, 0, 1, 0, 1);
-    expect(t.host.getAttribute('aria-keyshortcuts')).toBe('Control+D Control+R');
+    expect(t.host.getAttribute('aria-keyshortcuts')).toBe(`${ariaShortcutOf(platform, 'D')} ${ariaShortcutOf(platform, 'R')}`);
     t.scope.tableOptions.fillHandle = false;
     t.api.repaint();
     expect(fillHandle(t.host)).toBeNull();
@@ -853,12 +860,13 @@ describe('review fixes', () => {
     expect(t.modelEvents).toHaveLength(0);
   });
 
-  it('Ctrl+D on one row: one selection event with the unchanged range', async () => {
+  it.each(PLATFORMS)('Ctrl/⌘+D on one row: one selection event with the unchanged range (%s)', async platform => {
+    mockPlatform(platform);
     const sel: unknown[] = [];
     const t = await mountFill();
     select(t, 2, 2, 2, 2);
     t.scope.getEventListener().onSelectionChanged = sm => sel.push(sm.getRanges().map(r => [r.r1, r.c1, r.r2, r.c2]));
-    keydown(t.host, 'd', { ctrlKey: true });
+    keydown(t.host, 'd', keyInitOf(platform));
     expect(sel).toEqual([[[2, 2, 2, 2]]]);
   });
 });

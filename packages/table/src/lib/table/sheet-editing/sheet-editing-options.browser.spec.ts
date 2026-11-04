@@ -18,6 +18,7 @@ import {
 } from '@guiexpert/table';
 import type { CellEditorContextIf, EditingOptionsIf, GeEditEvent, GeModelChangeEvent, TableOptionsIf } from '@guiexpert/table';
 import { destroyAllTables, getCellDiv, mountTable, nextFrame } from '../../../../test-utils/mount-table';
+import { PLATFORMS, mockPlatform, userEventPrimary } from '../../../../test-utils/platform';
 
 afterEach(destroyAllTables);
 
@@ -242,7 +243,7 @@ describe('options', () => {
   it('Ctrl+A then Delete clears all editable cells', async () => {
     const t = await mount({ rows: rowsOf(5) });
     t.focus(0, NAME);
-    await userEvent.keyboard('{Control>}a{/Control}{Delete}');
+    await userEvent.keyboard(`${userEventPrimary('a')}{Delete}`);
     expect(t.rows.every(r => r.name === '' && r.qty === '' as unknown as number)).toBe(true);
     expect(t.rows.map(r => r.id)).toEqual([0, 1, 2, 3, 4]);
   });
@@ -382,6 +383,28 @@ describe('more branches', () => {
     expect(document.activeElement).toBe(select);
     await userEvent.keyboard('{Enter}');
     expect(t.rows[3].name).toBe('Name 3'); // unchanged text: nothing written
+  });
+
+  it('select editor: Enter without choosing a value writes nothing (before 1.1.106 it emptied the cell)', async () => {
+    // Found on macOS (prompt 016): there Alt+↓ does not open the native list, so the Enter of the test above reached
+    // the editor – the same as F2, Enter on every platform.
+    const t = await mount();
+    t.scope.tableModel.getColumnDef(NAME)!.editor = () => SelectCellEditor.create(['open', 'paid']);
+    t.focus(3, NAME);
+    await userEvent.keyboard('{F2}');
+    expect(t.host.querySelector<HTMLSelectElement>('.ge-table-cell-editor select')!.selectedIndex).toBe(-1);
+    await userEvent.keyboard('{Enter}');
+    expect(open(t.host)).toBe(false);
+    expect(t.rows[3].name).toBe('Name 3');
+    expect(t.modelChanges).toHaveLength(0);
+    // a chosen value is written
+    t.focus(3, NAME);
+    await userEvent.keyboard('{F2}');
+    const select = t.host.querySelector<HTMLSelectElement>('.ge-table-cell-editor select')!;
+    select.selectedIndex = 1;
+    select.dispatchEvent(new Event('change'));
+    await userEvent.keyboard('{Enter}');
+    expect(t.rows[3].name).toBe('paid');
   });
 
   it('subscribe: a throwing subscriber is logged and does not stop the others; unsubscribe', async () => {
@@ -655,13 +678,22 @@ describe('review fixes (stage 1)', () => {
     expect(t.scope.tableModel.getBodyModel().isEditable(0, ID)).toBe(false);
   });
 
-  it('Alt+letter is left to the page (access keys); Shift+arrows in the header select nothing', async () => {
+  it.each(PLATFORMS)('Alt+letter is left to the page (access keys), on macOS ⌥+letter types; Shift+arrows in the header select nothing (%s)', async platform => {
+    mockPlatform(platform);
     const t = await mount();
     t.focus(3, NAME);
-    const alt = new KeyboardEvent('keydown', { key: 'f', altKey: true, bubbles: true, cancelable: true });
+    // the key the browser reports: ⌥F on macOS is "ƒ"
+    const alt = new KeyboardEvent('keydown', { key: platform === 'mac' ? 'ƒ' : 'f', altKey: true, bubbles: true, cancelable: true });
     t.host.dispatchEvent(alt);
-    expect(alt.defaultPrevented).toBe(false);
-    expect(open(t.host)).toBe(false);
+    if (platform === 'mac') {
+      expect(alt.defaultPrevented).toBe(true);
+      expect(open(t.host)).toBe(true);
+      expect(field(t.host)!.value).toBe('ƒ');
+      await userEvent.keyboard('{Escape}');
+    } else {
+      expect(alt.defaultPrevented).toBe(false);
+      expect(open(t.host)).toBe(false);
+    }
     t.focus(0, NAME);
     await userEvent.keyboard('{ArrowUp}{Shift>}{ArrowRight}{ArrowDown}{/Shift}');
     expect(t.sm.hasSelection()).toBe(false);

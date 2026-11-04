@@ -27,7 +27,7 @@ let direction: 'ltr' | 'rtl' = 'ltr';
 const mountTable = (model: TableModelIf, opts: MountOptions = {}) =>
   mountTableBase(model, { ...opts, tableOptions: { direction, ...opts.tableOptions } });
 
-function model(opts: { columns: number; rows?: number; footer?: boolean; fixedRight?: number; width?: Size }): TableModelIf {
+function model(opts: { columns: number; rows?: number; footer?: boolean; fixedLeft?: number; fixedRight?: number; width?: Size }): TableModelIf {
   const columnDefs = Array.from({ length: opts.columns },
     (_, c) => ColumnDef.create({ property: 'c' + c, headerLabel: 'H' + c, width: opts.width ?? px100 }));
   const rows = Array.from({ length: opts.rows ?? 200 },
@@ -35,6 +35,7 @@ function model(opts: { columns: number; rows?: number; footer?: boolean; fixedRi
   return TableFactory.createTableModel({
     rows,
     columnDefs,
+    fixedLeftColumnCount: opts.fixedLeft ?? 0,
     fixedRightColumnCount: opts.fixedRight ?? 0,
     footerData: opts.footer ? [columnDefs.map((_, c) => 'F' + c)] : undefined,
   });
@@ -226,6 +227,44 @@ describe.each(DIRECTIONS)('%s', dir => {
       expect(scrollBarWidth(host)).toBeGreaterThan(0);
       expect(scope.tableModel.getColumnWidth(0)).toBeLessThan(before);
       expect(scrollBarHeight(host)).toBe(0);
+    });
+  });
+  // Before 1.1.104 the east area (and the footer) lay over the classic scroll bars: a click on the vertical bar hit
+  // a header/body/footer cell of an east column, so the bar could not be dragged (Angular demo /demo/simple,
+  // fixedRightColumnCount: 2). Prompt 016.
+  describe('the scroll bars can be grabbed: elementFromPoint on them hits the scroll viewport', () => {
+
+    async function mountGrabTable() {
+      const t = mountTable(model({ columns: 30, footer: true, fixedLeft: 1, fixedRight: 2 }));
+      await nextFrame();
+      const viewport = viewportOf(t.host);
+      expect(scrollBarWidth(t.host)).toBeGreaterThan(0);
+      expect(scrollBarHeight(t.host)).toBeGreaterThan(0);
+      const r = viewport.getBoundingClientRect();
+      const barX = direction === 'ltr' ? r.right - scrollBarWidth(t.host) / 2 : r.left + scrollBarWidth(t.host) / 2;
+      const barY = visibleBottom(t.host) + scrollBarHeight(t.host) / 2;
+      return { ...t, viewport, r, barX, barY };
+    }
+
+    const hit = (x: number, y: number) => document.elementFromPoint(x, y);
+
+    // (the viewport starts below the header and after the fixed west columns: there is no bar beside the header and
+    // below the west columns)
+    it('vertical bar: in the middle and beside the footer (fixed east columns)', async () => {
+      const { host, viewport, r, barX } = await mountGrabTable();
+      expect(hit(barX, (r.top + visibleBottom(host)) / 2)).toBe(viewport);
+      const body = rect(renderedRows(host, 'east')[0]);
+      expect(hit(barX, body.top + body.height / 2)).toBe(viewport);
+      const footer = rect(areaRows(host, 'footer', 'east')[0]);
+      expect(hit(barX, footer.top + footer.height / 2)).toBe(viewport);
+    });
+
+    it('horizontal bar: below the fixed east columns and below the center', async () => {
+      const { host, viewport, barY } = await mountGrabTable();
+      for (const side of ['center', 'east'] as const) {
+        const footer = rect(areaRows(host, 'footer', side)[0]);
+        expect(hit(footer.left + footer.width / 2, barY), side).toBe(viewport);
+      }
     });
   });
 });

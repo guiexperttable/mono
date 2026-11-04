@@ -698,6 +698,12 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,
     `columnIndices`, `stylePx`, `createRows`, `destroyAllTables`.
+  - **Tastenkürzel nie hart `ctrlKey`/`Control`** (auf macOS gelten ⌘-Kürzel, ⌥+Buchstabe tippt; der Core fragt nur
+    `common/platform.ts` `isMacPlatform()` = `navigator.platform`): Helfer aus `test-utils/platform.ts`. Vom Core
+    entschiedene Kürzel für **beide** Plattformen je Lauf: `it.each(PLATFORMS)` + `mockPlatform(platform)` **vor**
+    `mountTable` (der `ShortcutService` liest beim Aufbau), dann `keyInitOf`/`userEventKeyOf`/`ariaShortcutOf`. Vom
+    Browser entschiedene Tasten (Strg/⌘+A bzw. Zeilenende im Input, Kopierbefehl) mit der echten Plattform:
+    `userEventPrimary('a')`, `lineEndKeys()`. Seit 1.1.106 sind `test:browser` und `test:browser:scrollbars` auf dem Mac grün.
   - **Wrapper-Tests**: je Wrapper-Paket `vitest.config.ts` + `*.browser.spec.*` neben dem Code (Smoke: Mount →
     `tableReady`, Zeilen, Klick-Event, Modellwechsel = Neuaufbau + `destroy()`, Unmount = `destroy()`); Core per Alias aus
     `packages/table/src`; gemeinsame Helfer `packages/table/test-utils/wrapper-test-utils.ts` (ohne `vitest`-Import).
@@ -711,7 +717,9 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   - **CI**: `.github/workflows/test-core.yml` (wiederverwendbar) läuft bei jedem Push/PR (aus `ci.yml`, parallel zum
     Build) und **vor jedem npm-Publish** (aus `npm-publish.yml`, dort ohne Caches): `test:types` → `docs:check` →
     `test:unit` → `test:browser` (Chromium) → Coverage-Report als Artefakt `coverage-table`; bei roten Browser-Tests
-    Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release.
+    Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release. Seit 1.1.106 zusätzlich Job
+    `test-core-macos` (`macos-15`, nur `test:browser`, Artefakt `browser-test-failures-macos`) – prüft die echten
+    Mac-Tasten (⌘-Kürzel, ⌘A/⌘→ im Input, ⌘C-Kopierbefehl); gehört zu `test-core.yml`, sperrt also auch den Release.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
   (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 39 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**

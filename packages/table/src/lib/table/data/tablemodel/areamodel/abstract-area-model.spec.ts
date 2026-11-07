@@ -103,7 +103,7 @@ describe('AbstractAreaModel', () => {
       expect(model.getYPosByRowIndex(2)).toBe(50);
     });
 
-    it('uses the y positions computed by init() for defaultRowHeight -1 (variable heights)', () => {
+    it('sums the row heights for defaultRowHeight -1 (variable heights)', () => {
       const model = new TestAreaModel([{}, {}, {}], [], -1, [10, 20, 30]);
       model.init();
       expect(model.getYPosByRowIndex(0)).toBe(0);
@@ -112,27 +112,25 @@ describe('AbstractAreaModel', () => {
       expect(model.getYPosByRowIndex(3)).toBe(60);
     });
 
-    it('is undefined for defaultRowHeight -1 before init() was called', () => {
-      // NOTE: without init() there are no y positions – callers get undefined instead of a number.
+    // since 1.1.107: always the sum of getRowHeight() (no cache from init() that could be missing or stale)
+    it('sums the row heights also before init()', () => {
       const model = new TestAreaModel([{}, {}], [], -1, [10, 20]);
-      expect(model.getYPosByRowIndex(1)).toBeUndefined();
+      expect(model.getYPosByRowIndex(1)).toBe(10);
     });
 
-    it('init() computes the y positions only once', () => {
-      // NOTE: rows added after init() get no y position (the cache is never invalidated).
+    it('follows rows added after init()', () => {
       const model = new TestAreaModel([{}, {}], [], -1, [10, 20, 30]);
       model.init();
       model.rows.push({});
-      model.init();
       expect(model.getYPosByRowIndex(2)).toBe(30);
-      expect(model.getYPosByRowIndex(3)).toBeUndefined();
+      expect(model.getYPosByRowIndex(3)).toBe(60);
     });
 
-    it('is undefined for defaultRowHeight 0 even after init()', () => {
-      // NOTE: init() computes y positions only for exactly -1; 0 leaves the model without positions.
+    it('sums the row heights for defaultRowHeight 0', () => {
       const model = new TestAreaModel([{}, {}], [], 0, [10, 20]);
       model.init();
-      expect(model.getYPosByRowIndex(1)).toBeUndefined();
+      expect(model.getYPosByRowIndex(1)).toBe(10);
+      expect(model.getYPosByRowIndex(2)).toBe(30);
     });
   });
 

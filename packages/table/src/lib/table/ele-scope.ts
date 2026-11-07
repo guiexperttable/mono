@@ -364,11 +364,24 @@ export class EleScope {
 
 
   /**
-   * Adjusts the containers and rows of the table based on the current state.
+   * Adjusts the containers and rows of the table based on the current state: lays out the areas
+   * ({@link layoutContainers}) and renders the visible rows ({@link adjustAfterScrolling}).
    *
    * @return {void}
    */
   adjustContainersAndRows() {
+    this.layoutContainers();
+    this.adjustAfterScrolling();
+  }
+
+  /**
+   * Lays out the scroll viewport, the nine areas, the separator borders, the overlay and the detail layer for the
+   * current size of the host and the current padding – without rendering the rows (that is
+   * {@link adjustAfterScrolling}). `repaintHard()` uses it to set a new scroll position before its one render pass.
+   *
+   * @since 1.1.107
+   */
+  protected layoutContainers(): void {
     const padding = this.tableModel.getPadding();
     const hostWidth = this.hostElement.clientWidth;
     const hostHeight = this.hostElement.clientHeight;
@@ -521,8 +534,6 @@ export class EleScope {
       padding.top,
       Math.min(w, padding.left + this.scrollViewport.clientWidth),
       Math.max(0, Math.min(h - padding.top - padding.bottom, this.scrollViewport.clientHeight)));
-
-    this.adjustAfterScrolling();
   }
 
   /**
@@ -601,7 +612,9 @@ export class EleScope {
    */
   protected resetSizeOfWrapperDiv() {
     const w = `${this.tableModel.getContentWidthInPixel()}px`;
-    const contentHeight = this.getBodyContentHeight() + 1; // + 1, we want to see the last horizontal border
+    // + 1, we want to see the last horizontal border: the line below the last row is drawn below it (top + height),
+    // whatever horizontalBorderVisible says, and the focus frame is 1 px higher than the cell (checked in 1.1.107)
+    const contentHeight = this.getBodyContentHeight() + 1;
     const h = `${Math.min(contentHeight, EleScope.maxScrollHeightInPx)}px`;
     this.dom.setStyle(this.contentWrapperDiv, "width", w);
     this.dom.setStyle(this.contentWrapperDiv, "height", h);

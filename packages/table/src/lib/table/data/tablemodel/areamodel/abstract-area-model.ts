@@ -23,6 +23,10 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
   private columnValuesInstance?: ColumnValues;
   private calcTextRenderer?: AggregateCellRenderer;
   protected cellRenderers: (CellRendererIf | undefined)[];
+  /**
+   * @deprecated since 1.1.107 – filled by `init()` for `defaultRowHeight -1`, but no longer read:
+   * {@link getYPosByRowIndex} sums `getRowHeight()` (the cache missed rows added after `init()`).
+   */
   protected yPositions: number[] = [];
   /** Cell formulas of the table (since 1.1.99, set by the table for a flat body). @internal */
   sheetCells?: SheetCellsIf;
@@ -110,11 +114,35 @@ export abstract class AbstractAreaModel<T> implements AreaModelIf, HasDefaultRow
   }
 
 
+  /**
+   * The top of a row in px from the first row of this area.
+   *
+   * With a constant row height (`getConstantRowHeight()` of the subclass – the built-in models return their
+   * `defaultRowHeight` as long as `getRowHeight()` is not overridden) it is `rowIndex × height` (O(1)); otherwise the
+   * sum of `getRowHeight()` of all rows above (O(n), always up to date). Before 1.1.107 it was
+   * `defaultRowHeight × rowIndex` also when a subclass overrode `getRowHeight()`, and for `defaultRowHeight -1` a cache
+   * from `init()` that missed rows added later. The table itself positions the body rows with its own row layout.
+   *
+   * @param {number} rowIndex - the index of the row
+   * @returns {number} px from the top of the first row
+   *
+   * @example
+   * // a subclass with taller even rows: the positions follow the overridden getRowHeight()
+   * class Striped extends AreaModelObjectArray<any> {
+   *   override getRowHeight(rowIndex: number): number { return rowIndex % 2 ? 20 : 40; }
+   * }
+   * const y = new Striped("body", rows, 34, columnDefs).getYPosByRowIndex(3); // 40 + 20 + 40 = 100
+   */
   getYPosByRowIndex(rowIndex: number): number {
-    if (this.defaultRowHeight > 0) {
-      return this.defaultRowHeight * rowIndex;
+    const constantRowHeight = (this as AreaModelIf).getConstantRowHeight?.();
+    if (constantRowHeight !== undefined && constantRowHeight > 0) {
+      return constantRowHeight * rowIndex;
     }
-    return this.yPositions[rowIndex];
+    let y = 0;
+    for (let i = 0; i < rowIndex; i++) {
+      y += this.getRowHeight(i);
+    }
+    return y;
   }
 
 

@@ -300,23 +300,44 @@ export class TableModel implements TableModelIf {
   }
 
   /**
-   * Calculates the height of the area identified by the given area identifier.
+   * Calculates the height of the area identified by the given area identifier – the height of the rows the table
+   * draws (since 1.1.107 the same source as the rendering):
+   *
+   * 1. `getConstantRowHeight()` of the area model (> 0): row count × that height – O(1), also for millions of rows,
+   * 2. otherwise the sum of `getRowHeight(i)` of all rows (variable heights; O(n), like the row layout of the body),
+   * 3. only if the model has no row heights of its own (every `getRowHeight(i)` is 0): row count ×
+   *    `defaultRowHeights[area]`.
+   *
+   * Before 1.1.107 `defaultRowHeights[area]` came first: an area model with other heights got a wrong scroll height
+   * (a scroll bar without overflow, a wrong thumb). The built-in area models take their row height from
+   * `defaultRowHeights` anyway, so nothing changes for them.
    *
    * @param {AreaIdent} areaIdent - The identifier of the area.
-   * @return {number} - The height of the area.
+   * @return {number} - The height of the area in px.
+   *
+   * @example
+   * // an own body with 20 px rows: 3000 rows are 60,000 px high – also if defaultRowHeights.body is 34
+   * const height = (tableModel as TableModel).getAreaHeight("body");
    */
   getAreaHeight(areaIdent: AreaIdent): number {
     const model = this.getModel(areaIdent);
     const rowCount = model.getRowCount();
-    if (this.defaultRowHeights[areaIdent]) {
-      return rowCount * this.defaultRowHeights[areaIdent];
+    if (!(rowCount > 0)) {
+      return 0;
     }
-
+    const constantRowHeight = model.getConstantRowHeight?.();
+    if (constantRowHeight !== undefined && constantRowHeight > 0) {
+      return rowCount * constantRowHeight;
+    }
     let ret = 0;
     for (let i = 0; i < rowCount; i++) {
       ret = ret + model.getRowHeight(i);
     }
-    return ret;
+    if (ret > 0) {
+      return ret;
+    }
+    // a model without row heights of its own (e.g. an AreaModel subclass that does not override getRowHeight)
+    return rowCount * (this.defaultRowHeights[areaIdent] || 0);
   }
 
   /**

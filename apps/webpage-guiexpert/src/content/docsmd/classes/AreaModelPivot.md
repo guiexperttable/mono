@@ -254,7 +254,7 @@ the table). Row number, checkbox and group columns stay read only.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L150)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L178)
 
 ___
 
@@ -361,13 +361,18 @@ ___
 
 • `Protected` **yPositions**: `number`[] = `[]`
 
+**`Deprecated`**
+
+since 1.1.107 – filled by `init()` for `defaultRowHeight -1`, but no longer read:
+[getYPosByRowIndex](AbstractAreaModel.md#getyposbyrowindex) sums `getRowHeight()` (the cache missed rows added after `init()`).
+
 #### Inherited from
 
 [AreaModelTree](AreaModelTree.md).[yPositions](AreaModelTree.md#ypositions)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L26)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L30)
 
 ## Methods
 
@@ -395,7 +400,7 @@ The CSS class and tooltip of an error value of a formula.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:356](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L356)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L384)
 
 ___
 
@@ -451,7 +456,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:208](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L208)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L236)
 
 ___
 
@@ -724,7 +729,7 @@ The renderer of a „Show values as“ column without an own renderer: the text 
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:348](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L348)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:376](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L376)
 
 ___
 
@@ -751,7 +756,7 @@ The text of a cell of a calculated / „Show values as“ column; `undefined` fo
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L336)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:364](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L364)
 
 ___
 
@@ -863,7 +868,7 @@ getColspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L65)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L69)
 
 ___
 
@@ -1128,7 +1133,7 @@ getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L76)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L80)
 
 ___
 
@@ -1319,7 +1324,7 @@ getMaxColspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L104)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L108)
 
 ___
 
@@ -1362,7 +1367,7 @@ getMaxRowspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L108)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:112](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L112)
 
 ___
 
@@ -1581,6 +1586,10 @@ ___
 Returns the height of the row at the specified index, in pixels.
 This method allows for variable row heights in the table.
 
+The table draws the rows with these heights, and since 1.1.107 the height of the area (scroll height of the body,
+height of header and footer) is their sum as well – [getConstantRowHeight](../interfaces/AreaModelIf.md#getconstantrowheight) × row count if given.
+`defaultRowHeights` of the table model only counts if every row height is 0.
+
 #### Parameters
 
 | Name | Type | Description |
@@ -1674,7 +1683,7 @@ body.getRowValue({ price: 25, quantity: 10 }, "total");   // 250
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L255)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L283)
 
 ___
 
@@ -1728,7 +1737,7 @@ getRowspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L80)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L84)
 
 ___
 
@@ -1970,53 +1979,34 @@ ___
 
 ▸ **getYPosByRowIndex**(`rowIndex`): `number`
 
-Returns the Y-coordinate (in pixels) of the top of the row at the specified index.
-This method is used for scrolling and positioning rows in the viewport.
+The top of a row in px from the first row of this area.
+
+With a constant row height (`getConstantRowHeight()` of the subclass – the built-in models return their
+`defaultRowHeight` as long as `getRowHeight()` is not overridden) it is `rowIndex × height` (O(1)); otherwise the
+sum of `getRowHeight()` of all rows above (O(n), always up to date). Before 1.1.107 it was
+`defaultRowHeight × rowIndex` also when a subclass overrode `getRowHeight()`, and for `defaultRowHeight -1` a cache
+from `init()` that missed rows added later. The table itself positions the body rows with its own row layout.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `rowIndex` | `number` | The index of the row |
+| `rowIndex` | `number` | the index of the row |
 
 #### Returns
 
 `number`
 
-The Y-coordinate of the top of the row, in pixels
+px from the top of the first row
 
 **`Example`**
 
 ```ts
-// Get the Y-position of a row
-const yPos = bodyAreaModel.getYPosByRowIndex(10);
-console.log(`Row 10 starts at Y-position: ${yPos}px`);
-```
-
-**`Example`**
-
-```ts
-// Implementation example with fixed row heights
-getYPosByRowIndex(rowIndex: number): number {
-  return rowIndex * this.defaultRowHeight;
+// a subclass with taller even rows: the positions follow the overridden getRowHeight()
+class Striped extends AreaModelObjectArray<any> {
+  override getRowHeight(rowIndex: number): number { return rowIndex % 2 ? 20 : 40; }
 }
-```
-
-**`Example`**
-
-```ts
-// Implementation example with variable row heights
-getYPosByRowIndex(rowIndex: number): number {
-  // Use a pre-calculated array of Y-positions
-  return this.yPositions[rowIndex];
-  
-  // Or calculate on-the-fly
-  // let yPos = 0;
-  // for (let i = 0; i < rowIndex; i++) {
-  //   yPos += this.getRowHeight(i);
-  // }
-  // return yPos;
-}
+const y = new Striped("body", rows, 34, columnDefs).getYPosByRowIndex(3); // 40 + 20 + 40 = 100
 ```
 
 #### Inherited from
@@ -2025,7 +2015,7 @@ getYPosByRowIndex(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L113)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L136)
 
 ___
 
@@ -2052,7 +2042,7 @@ whether derived columns exist
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L270)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:298](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L298)
 
 ___
 
@@ -2116,7 +2106,7 @@ init(): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L121)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L149)
 
 ___
 
@@ -2136,7 +2126,7 @@ Drops the cached aggregates and the getter lookup of calculated columns.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:303](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L303)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:331](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L331)
 
 ___
 
@@ -2201,7 +2191,7 @@ tableModel.getBodyModel().isCalculatedProperty?.("total");   // true
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:237](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L237)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:265](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L265)
 
 ___
 
@@ -2233,7 +2223,7 @@ whether the column is derived
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L282)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:310](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L310)
 
 ___
 
@@ -2303,7 +2293,7 @@ isFilterable(): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L131)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L159)
 
 ___
 
@@ -2356,7 +2346,7 @@ isRowCheckable(rowIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L88)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L92)
 
 ___
 
@@ -2409,7 +2399,7 @@ isRowChecked(rowIndex: number): CheckedType | undefined {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L92)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L96)
 
 ___
 
@@ -2488,7 +2478,7 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L184)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:212](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L212)
 
 ___
 
@@ -2639,7 +2629,7 @@ Writes an edited value of a calculated column through its `valueSetter`; without
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:325](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L325)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:353](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L353)
 
 ___
 
@@ -2665,7 +2655,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:193](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L193)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:221](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L221)
 
 ___
 
@@ -2716,7 +2706,7 @@ setRowChecked(rowIndex: number, checked: boolean): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L97)
+[src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/abstract-area-model.ts#L101)
 
 ___
 

@@ -686,6 +686,10 @@ export interface AreaModelIf {
   /**
    * Returns the height of the row at the specified index, in pixels.
    * This method allows for variable row heights in the table.
+   *
+   * The table draws the rows with these heights, and since 1.1.107 the height of the area (scroll height of the body,
+   * height of header and footer) is their sum as well – {@link getConstantRowHeight} × row count if given.
+   * `defaultRowHeights` of the table model only counts if every row height is 0.
    * 
    * @param {number} rowIndex - The index of the row
    * @returns {number} The height of the row in pixels
@@ -724,6 +728,8 @@ export interface AreaModelIf {
    * of all rows above it – with millions of rows this keeps scrolling at the end of the table as fast as at
    * the beginning. Only return a number if `getRowHeight(i)` returns exactly this value for every row.
    * If the method is missing or returns `undefined`, the renderer falls back to iterating the row heights.
+   * The height of the area (the scroll height of the body) is then this value × row count – O(1) – and wins over
+   * `defaultRowHeights` of the table model (since 1.1.107; before, `defaultRowHeights` came first).
    *
    * @returns {number | undefined} The constant row height in pixels, or `undefined` if row heights may vary.
    *

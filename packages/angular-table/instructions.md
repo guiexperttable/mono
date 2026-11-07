@@ -615,6 +615,13 @@ export function updatePrice(api: TableApi, row: number, col: number, value: numb
   api.updateCells([new TableCellUpdateEvent("body", row, col, value)]);
 }
 
+// Live tail: rows were appended to the area model – count them and show the first visible row at the top (or follow
+// the end) in ONE render pass (since 1.1.107; exact also with millions of rows, see instructions.md 6.9):
+export function afterRowsAppended(api: TableApi, rowHeight: number, follow: boolean) {
+  const py = follow ? Number.MAX_SAFE_INTEGER : api.getFirstVisibleRowIndex() * rowHeight;
+  api.repaintHard({ py });
+}
+
 // Excel export (no extra library):
 export function exportExcel(api: TableApi) {
   api.downloadExcel("export.xlsx", "Me");   // current view: filtered + sorted rows, header and footer
@@ -633,6 +640,10 @@ export const persistentOptions = {
   }
 };
 ```
+
+Run `afterRowsAppended` outside the zone when the rows come in fast (e.g. 5000 per second from a WebSocket or a Tauri
+event): `ngZone.runOutsideAngular(() => afterRowsAppended(api, 20, follow))` – the table needs no change detection.
+The scroll height follows the row height of your area model (`getConstantRowHeight()`), not `defaultRowHeights`.
 
 Colors are CSS variables (`--ge-table-*`, light/dark via `html[data-theme]`), e.g. in `src/styles.css`:
 

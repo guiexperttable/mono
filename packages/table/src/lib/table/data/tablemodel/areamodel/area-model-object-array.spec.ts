@@ -532,8 +532,9 @@ describe('AreaModelObjectArray', () => {
       expect(model.getYPosByRowIndex(2)).toBe(68);
     });
 
-    // BUG: AbstractAreaModel.getYPosByRowIndex uses defaultRowHeight * rowIndex whenever defaultRowHeight > 0 and ignores an overridden getRowHeight().
-    it.fails('getYPosByRowIndex sums up the row heights if a subclass overrides getRowHeight', () => {
+    // Regression (TODO.md): AbstractAreaModel.getYPosByRowIndex used defaultRowHeight * rowIndex and ignored an
+    // overridden getRowHeight() – fixed in 1.1.107.
+    it('getYPosByRowIndex sums up the row heights if a subclass overrides getRowHeight', () => {
       class VariableHeights extends AreaModelObjectArray<Person> {
         override getRowHeight(rowIndex: number): number {
           return rowIndex === 0 ? 50 : 20;

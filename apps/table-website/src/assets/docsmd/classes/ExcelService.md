@@ -153,7 +153,7 @@ downloads use [createZipCompressed](ExcelService.md#createzipcompressed).
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L314)
+[src/lib/table/service/excel-service.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L320)
 
 ___
 
@@ -176,7 +176,7 @@ where that is not available. 100,000 rows × 7 columns: ~40 MB stored → a few 
 
 #### Defined in
 
-[src/lib/table/service/excel-service.ts:327](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L327)
+[src/lib/table/service/excel-service.ts:333](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/excel-service.ts#L333)
 
 ___
 

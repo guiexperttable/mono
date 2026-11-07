@@ -283,6 +283,7 @@
 - [RowGroupModelOptionsIf](interfaces/RowGroupModelOptionsIf.md)
 - [RowGroupTableModelParaIf](interfaces/RowGroupTableModelParaIf.md)
 - [RowNumberOptionsIf](interfaces/RowNumberOptionsIf.md)
+- [ScrollPositionIf](interfaces/ScrollPositionIf.md)
 - [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
 - [SelectionSnapshot](interfaces/SelectionSnapshot.md)
@@ -3759,7 +3760,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L245)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:251](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L251)
 
 ___
 
@@ -4242,7 +4243,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:236](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L236)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:242](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L242)
 
 ___
 

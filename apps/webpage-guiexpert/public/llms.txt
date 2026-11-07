@@ -25,6 +25,14 @@
 - [README file](https://github.com/guiexperttable/mono/blob/main/README.md): Overview and project structure.
 - Choose your stack and import `@guiexpert/table` + appropriate adapter.
 
+## Quick answers (FAQ)
+Full answers: [instructions.md 6.26](https://github.com/guiexperttable/mono/blob/main/instructions.md#626-faq--quick-answers).
+- Hide the scroll bars: CSS `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – full width/height, wheel, touch, keyboard and the API still scroll; no table option needed.
+- Scroll bar although all rows fit (own AreaModel): fixed in 1.1.107 (scroll height from `getConstantRowHeight()` / `getRowHeight()`); older versions: set `defaultRowHeights.body` to the model's row height.
+- Live data with growing rows, keep the position or follow the end: `tableApi.repaintHard({ py })` – one render pass, since 1.1.107.
+- `repaint()` = same row count, `repaintHard()` = rows added/removed or heights changed, `updateCells()` = single cells.
+- Empty table: the host div needs a fixed height and `@guiexpert/table/css/main.css`.
+
 ## Optional Extras
 - 🔧 *.md source versions of key documentation pages* (e.g., README.md) are available in repo.
 - 🧑‍💻 *Developer community*: use issues and discussions on GitHub for support and feedback.

@@ -157,8 +157,8 @@ describe('AreaModelCellGroups', () => {
       expect(m().getRowHeight(1)).toBe(34);
     });
 
-    // BUG: getYPosByRowIndex is a stub (TODO) and returns 0 for every row.
-    it.fails('getYPosByRowIndex is the sum of the heights of the rows above', () => {
+    // Regression (TODO.md): getYPosByRowIndex was a stub (TODO) and returned 0 for every row – fixed in 1.1.107.
+    it('getYPosByRowIndex is the sum of the heights of the rows above', () => {
       expect(m().getYPosByRowIndex(1)).toBe(34);
     });
 

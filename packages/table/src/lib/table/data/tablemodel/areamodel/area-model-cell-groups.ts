@@ -178,9 +178,8 @@ Gold A     Gold B    Gold C   Gold D    Gold Sum    HOH Loc    HOH A    HOH B   
     return '' + this.getValueAt(rowIndex, columnIndex);
   }
 
-  getYPosByRowIndex(_rowIndex: number): number {
-    // TODO
-    return 0;
+  getYPosByRowIndex(rowIndex: number): number {
+    return rowIndex * this.defaultRowHeight; // every row has the default row height (getRowHeight); was 0 before 1.1.107
   }
 
 

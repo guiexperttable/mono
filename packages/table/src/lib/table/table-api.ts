@@ -42,6 +42,7 @@ import { applyStructureEdit } from './spreadsheet/structure-edit';
 import { AreaModelSheet } from './spreadsheet/area-model-sheet';
 import type { TableSheet } from './sheet/table-sheet';
 import type { SheetEngine } from './sheet/sheet-engine';
+import type { ScrollPositionIf } from './data/common/scroll-position.if';
 
 
 /**
@@ -545,19 +546,24 @@ export class TableApi {
 
 
   /**
-   * Performs a complete repaint of the table by triggering a hard repaint on the underlying table scope.
+   * Performs a complete repaint of the table: use it when the row count or the row heights changed (rows added or
+   * removed, a filter, a new model content, `ColumnDefIf.isVisible` changed yourself …). It
+   * - drops cached derived values (footer totals, calculated columns),
+   * - recalculates the heights and the padding of the table model and the size of the scroll content,
+   * - lays out header, body and footer again and
+   * - renders the visible rows – **once** (since 1.1.107; before: twice).
    *
-   * A hard repaint is more thorough than a regular repaint and performs the following operations:
-   * - Recalculates the height and padding of the table model
-   * - Resets the size of the wrapper div elements
-   * - Adjusts containers and rows positioning
-   * - Makes additional adjustments after scrolling
+   * With `scrollTo` (since 1.1.107) it also sets the scroll position in that same render pass – exactly like
+   * {@link scrollToPixel}, also with a capped scroll height (more than {@link EleScope.maxScrollHeightInPx} px of rows).
+   * A live tail that appends rows and keeps a position needs one render per update instead of three
+   * (`repaintHard()` + `scrollToPixel()`). The `scroll` event of the browser for that position renders nothing.
+   * A missing axis keeps its position.
    *
-   * Use this method when regular repaint isn't sufficient, such as when:
-   * - Table dimensions have significantly changed
-   * - The structure of data has been modified (rows/columns added or removed)
-   * - The table layout needs complete recalculation
-   * - After major DOM changes affecting the table's container
+   * For a repaint with the same row count (values changed) {@link repaint} is enough.
+   *
+   * @param {ScrollPositionIf} [scrollTo] - the position to show: `px` horizontal scroll position from the start, `py`
+   *   content pixels from the top of the first body row (both like {@link scrollToPixel}); without it the position stays
+   * @returns {void} This method doesn't return a value
    *
    * @example
    * // Example 1: Basic usage
@@ -580,11 +586,22 @@ export class TableApi {
    * column.isVisible = FalseFn;
    * tableApi.repaintHard();
    *
-   * @returns {void} This method doesn't return a value
+   * @example
+   * // Example 5: live tail – rows were appended to the area model, the first visible row stays at the top
+   * // (pixel-exact: keep your own py from the last update instead – e.g. from onScroll)
+   * const rowHeight = 20;                                   // the row height of the area model
+   * const first = tableApi.getFirstVisibleRowIndex();
+   * rows.push(...newData);                                  // the row count of the model grows
+   * tableApi.repaintHard({ py: first * rowHeight });        // one render pass, exact also for millions of rows
+   *
+   * @example
+   * // Example 6: follow the end ("tail -f") – show the last row after every update
+   * rows.push(...newData);
+   * tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER }); // clamped to the end of the content
    */
-  repaintHard() {
+  repaintHard(scrollTo?: ScrollPositionIf) {
     this.tableScope.invalidateAggregates();
-    this.tableScope.repaintHard();
+    this.tableScope.repaintHard(scrollTo);
   }
 
 

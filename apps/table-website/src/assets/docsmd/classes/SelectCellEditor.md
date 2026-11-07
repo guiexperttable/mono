@@ -61,7 +61,7 @@ ColumnDef.create({
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L22)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L24)
 
 ## Properties
 
@@ -71,7 +71,7 @@ ColumnDef.create({
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L22)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:24](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L24)
 
 ## Methods
 
@@ -91,7 +91,7 @@ Removes listeners and elements.
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L89)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L101)
 
 ___
 
@@ -111,7 +111,7 @@ Gives the input element the keyboard focus.
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L71)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L83)
 
 ___
 
@@ -131,7 +131,7 @@ The element that has the focus (the table names it and lets the active cell own 
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L77)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L89)
 
 ___
 
@@ -139,11 +139,14 @@ ___
 
 ▸ **getText**(): `string`
 
-The text of the editor, e.g. `"=B2*C2"` (formula input, later stages).
+The chosen value as text; with nothing chosen (the cell's value is not in the list) the start text, so that
+Enter without a choice writes nothing (before 1.1.106 it emptied the cell).
 
 #### Returns
 
 `string`
+
+the text
 
 #### Implementation of
 
@@ -151,7 +154,7 @@ The text of the editor, e.g. `"=B2*C2"` (formula input, later stages).
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L67)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L76)
 
 ___
 
@@ -171,7 +174,7 @@ The value to write (it runs through `editInputPipe` and `validate` of the column
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L59)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L62)
 
 ___
 
@@ -198,7 +201,7 @@ Builds the editor into `container` (the table positions the container over the c
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L35)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L37)
 
 ___
 
@@ -225,7 +228,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L81)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L93)
 
 ___
 
@@ -249,4 +252,4 @@ the editor
 
 #### Defined in
 
-[src/lib/table/sheet-editing/editors/select-cell-editor.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L31)
+[src/lib/table/sheet-editing/editors/select-cell-editor.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/editors/select-cell-editor.ts#L33)

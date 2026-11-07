@@ -122,7 +122,12 @@ export interface CreateTableModelPara {
    * @since 1.1.99
    */
   columnLetters: boolean;
-  /** Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34. */
+  /**
+   * Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34.
+   * The area models built by the factory get these heights. An own area model (`bodyAreaModel` …) keeps its own:
+   * since 1.1.107 the table measures every area with the heights of its model (`getConstantRowHeight()`, otherwise
+   * `getRowHeight(i)`) – `defaultRowHeights` only counts for a model whose `getRowHeight()` returns 0.
+   */
   defaultRowHeights: DefaultRowHeightsIf;
   /** The columns: property, header label, width, classes, renderers, sorting, editing. See {@link ColumnDef}. */
   columnDefs: ColumnDefIf[];

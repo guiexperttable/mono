@@ -76,7 +76,8 @@ ___
 
 • **maxWidth**: [`SizeIf`](../interfaces/SizeIf.md)
 
-Upper limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse.
+Upper limit of the column width: applied to percentage widths (`"%"`) and, since 1.1.103, when the user resizes the
+column with the mouse. `ColumnDef` default: `100000px` (no limit).
 
 #### Implementation of
 
@@ -92,7 +93,8 @@ ___
 
 • **minWidth**: [`SizeIf`](../interfaces/SizeIf.md)
 
-Lower limit for percentage widths (`"%"`). Not applied to pixel widths or to resizing with the mouse.
+Lower limit of the column width: applied to percentage widths (`"%"`) and, since 1.1.103, when the user resizes the
+column with the mouse. A pixel width itself is not changed. `ColumnDef` default: `0px` (no limit).
 
 #### Implementation of
 

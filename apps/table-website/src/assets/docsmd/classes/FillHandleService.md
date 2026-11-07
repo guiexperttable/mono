@@ -44,7 +44,7 @@ table (range selection, column drag) never sees it.
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L52)
+[src/lib/table/fill/fill-handle-service.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L53)
 
 ## Methods
 
@@ -92,7 +92,7 @@ true while the handle is dragged.
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L70)
+[src/lib/table/fill/fill-handle-service.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L71)
 
 ___
 
@@ -109,4 +109,4 @@ hides it: no fill handle option, no range, the corner scrolled out, an open edit
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L78)
+[src/lib/table/fill/fill-handle-service.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L79)

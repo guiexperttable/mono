@@ -40,6 +40,7 @@ Represents a store for HTML elements.
 - [direction](EleScope.md#direction)
 - [dom](EleScope.md#dom)
 - [draggingColumn](EleScope.md#draggingcolumn)
+- [horizontalScrollBarHeight](EleScope.md#horizontalscrollbarheight)
 - [hostElement](EleScope.md#hostelement)
 - [hoverColumn](EleScope.md#hovercolumn)
 - [hoverRow](EleScope.md#hoverrow)
@@ -48,6 +49,7 @@ Represents a store for HTML elements.
 - [tableModel](EleScope.md#tablemodel)
 - [tableOptions](EleScope.md#tableoptions)
 - [tableOverlay](EleScope.md#tableoverlay)
+- [verticalScrollBarWidth](EleScope.md#verticalscrollbarwidth)
 - [maxScrollHeightInPx](EleScope.md#maxscrollheightinpx)
 
 ### Methods
@@ -58,9 +60,14 @@ Represents a store for HTML elements.
 - [clientXToHostX](EleScope.md#clientxtohostx)
 - [getAreaChild](EleScope.md#getareachild)
 - [getBodyContentHeight](EleScope.md#getbodycontentheight)
+- [getLayoutHeight](EleScope.md#getlayoutheight)
+- [getLayoutWidth](EleScope.md#getlayoutwidth)
 - [getViewportScrollLeft](EleScope.md#getviewportscrollleft)
 - [initHostAria](EleScope.md#inithostaria)
 - [isRtl](EleScope.md#isrtl)
+- [layoutContainers](EleScope.md#layoutcontainers)
+- [measureHorizontalScrollBarHeight](EleScope.md#measurehorizontalscrollbarheight)
+- [measureVerticalScrollBarWidth](EleScope.md#measureverticalscrollbarwidth)
 - [removeHostAria](EleScope.md#removehostaria)
 - [resetSizeOfWrapperDiv](EleScope.md#resetsizeofwrapperdiv)
 - [restoreHostAriaAttribute](EleScope.md#restorehostariaattribute)
@@ -89,7 +96,7 @@ Represents a store for HTML elements.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L77)
+[src/lib/table/ele-scope.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L90)
 
 ## Properties
 
@@ -109,7 +116,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L61)
+[src/lib/table/ele-scope.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L74)
 
 ___
 
@@ -129,7 +136,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L62)
+[src/lib/table/ele-scope.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L75)
 
 ___
 
@@ -149,7 +156,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L60)
+[src/lib/table/ele-scope.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L73)
 
 ___
 
@@ -225,13 +232,23 @@ The IDs this table uses for ARIA references (prefix from the host id).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L65)
+[src/lib/table/ele-scope.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L78)
 
 ___
 
 ### borderFixedEast
 
-• `Protected` **borderFixedEast**: `HTMLDivElement`
+• `Protected` `Optional` **borderFixedEast**: `HTMLDivElement`
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L53)
+
+___
+
+### borderFixedWest
+
+• `Protected` `Optional` **borderFixedWest**: `HTMLDivElement`
 
 #### Defined in
 
@@ -239,9 +256,9 @@ ___
 
 ___
 
-### borderFixedWest
+### borderFooterTop
 
-• `Protected` **borderFixedWest**: `HTMLDivElement`
+• `Protected` `Optional` **borderFooterTop**: `HTMLDivElement`
 
 #### Defined in
 
@@ -249,23 +266,13 @@ ___
 
 ___
 
-### borderFooterTop
+### borderHeaderBottom
 
-• `Protected` **borderFooterTop**: `HTMLDivElement`
+• `Protected` `Optional` **borderHeaderBottom**: `HTMLDivElement`
 
 #### Defined in
 
 [src/lib/table/ele-scope.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L50)
-
-___
-
-### borderHeaderBottom
-
-• `Protected` **borderHeaderBottom**: `HTMLDivElement`
-
-#### Defined in
-
-[src/lib/table/ele-scope.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L49)
 
 ___
 
@@ -302,7 +309,7 @@ is built).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L74)
+[src/lib/table/ele-scope.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L87)
 
 ___
 
@@ -312,7 +319,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L80)
+[src/lib/table/ele-scope.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L93)
 
 ___
 
@@ -322,7 +329,20 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L56)
+[src/lib/table/ele-scope.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L57)
+
+___
+
+### horizontalScrollBarHeight
+
+• `Protected` **horizontalScrollBarHeight**: `number` = `0`
+
+Height of the horizontal scroll bar of [scrollViewport](TableScope.md#scrollviewport) in px, measured in [adjustContainersAndRows](TableScope.md#adjustcontainersandrows).
+0 without a horizontal scroll bar and with overlay scroll bars (macOS default, mobile) – they take no space.
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L65)
 
 ___
 
@@ -332,7 +352,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L78)
+[src/lib/table/ele-scope.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L91)
 
 ___
 
@@ -342,7 +362,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L55)
+[src/lib/table/ele-scope.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L56)
 
 ___
 
@@ -352,7 +372,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L54)
+[src/lib/table/ele-scope.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L55)
 
 ___
 
@@ -362,7 +382,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L58)
+[src/lib/table/ele-scope.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L59)
 
 ___
 
@@ -382,7 +402,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L79)
+[src/lib/table/ele-scope.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L92)
 
 ___
 
@@ -392,7 +412,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L81)
+[src/lib/table/ele-scope.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L94)
 
 ___
 
@@ -408,7 +428,20 @@ The overlay layer over the body ("Loading…", "No rows to show").
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L68)
+[src/lib/table/ele-scope.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L81)
+
+___
+
+### verticalScrollBarWidth
+
+• `Protected` **verticalScrollBarWidth**: `number` = `0`
+
+Width of the vertical scroll bar of [scrollViewport](TableScope.md#scrollviewport) in px (at the end of the rows: right, in right-to-left
+on the left), measured in [adjustContainersAndRows](TableScope.md#adjustcontainersandrows). 0 without one and with overlay scroll bars.
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L71)
 
 ___
 
@@ -440,7 +473,7 @@ This method must be overwritten in child classes.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:524](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L524)
+[src/lib/table/ele-scope.ts:591](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L591)
 
 ___
 
@@ -448,7 +481,8 @@ ___
 
 ▸ **adjustContainersAndRows**(): `void`
 
-Adjusts the containers and rows of the table based on the current state.
+Adjusts the containers and rows of the table based on the current state: lays out the areas
+([layoutContainers](EleScope.md#layoutcontainers)) and renders the visible rows ([adjustAfterScrolling](EleScope.md#adjustafterscrolling)).
 
 #### Returns
 
@@ -456,7 +490,7 @@ Adjusts the containers and rows of the table based on the current state.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:358](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L358)
+[src/lib/table/ele-scope.ts:372](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L372)
 
 ___
 
@@ -485,7 +519,7 @@ Position and size of the detail layer (master/detail) in the host – overwritte
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:514](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L514)
+[src/lib/table/ele-scope.ts:581](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L581)
 
 ___
 
@@ -514,7 +548,7 @@ px from the start
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:250](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L250)
+[src/lib/table/ele-scope.ts:263](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L263)
 
 ___
 
@@ -537,7 +571,7 @@ The element that holds the rows of an area (`DivScope.child`).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:343](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L343)
+[src/lib/table/ele-scope.ts:356](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L356)
 
 ___
 
@@ -560,7 +594,53 @@ px
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:535](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L535)
+[src/lib/table/ele-scope.ts:602](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L602)
+
+___
+
+### getLayoutHeight
+
+▸ **getLayoutHeight**(): `number`
+
+The height the table lays out header, body and footer in: the host height minus a horizontal scroll bar that
+takes space (see [horizontalScrollBarHeight](TableScope.md#horizontalscrollbarheight)).
+
+#### Returns
+
+`number`
+
+px
+
+**`Since`**
+
+1.1.104
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:546](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L546)
+
+___
+
+### getLayoutWidth
+
+▸ **getLayoutWidth**(): `number`
+
+The width the table lays out header, body and footer in: the host width minus a vertical scroll bar that takes
+space (see [verticalScrollBarWidth](TableScope.md#verticalscrollbarwidth)). A logical width – in right-to-left the bar is on the left.
+
+#### Returns
+
+`number`
+
+px
+
+**`Since`**
+
+1.1.104
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:557](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L557)
 
 ___
 
@@ -583,7 +663,7 @@ px
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:228](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L228)
+[src/lib/table/ele-scope.ts:241](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L241)
 
 ___
 
@@ -604,7 +684,7 @@ and description from the table options. Counts and the active cell follow with e
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:328](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L328)
+[src/lib/table/ele-scope.ts:341](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L341)
 
 ___
 
@@ -626,7 +706,62 @@ true for `"rtl"` (also a resolved `"auto"`)
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:217](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L217)
+[src/lib/table/ele-scope.ts:230](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L230)
+
+___
+
+### layoutContainers
+
+▸ **layoutContainers**(): `void`
+
+Lays out the scroll viewport, the nine areas, the separator borders, the overlay and the detail layer for the
+current size of the host and the current padding – without rendering the rows (that is
+[adjustAfterScrolling](EleScope.md#adjustafterscrolling)). `repaintHard()` uses it to set a new scroll position before its one render pass.
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.107
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L384)
+
+___
+
+### measureHorizontalScrollBarHeight
+
+▸ **measureHorizontalScrollBarHeight**(): `number`
+
+Height of the horizontal scroll bar of the scroll viewport: offsetHeight − clientHeight (the viewport has no
+border, see the constructor).
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:565](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L565)
+
+___
+
+### measureVerticalScrollBarWidth
+
+▸ **measureVerticalScrollBarWidth**(): `number`
+
+Width of the vertical scroll bar of the scroll viewport: offsetWidth − clientWidth.
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:571](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L571)
 
 ___
 
@@ -646,7 +781,7 @@ Removes the ARIA attributes the table has set on the host element (see [initHost
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:311](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L311)
+[src/lib/table/ele-scope.ts:324](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L324)
 
 ___
 
@@ -664,7 +799,7 @@ Returns nothing.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:546](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L546)
+[src/lib/table/ele-scope.ts:613](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L613)
 
 ___
 
@@ -691,7 +826,7 @@ loading), or removes it if the host had none.
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:295](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L295)
+[src/lib/table/ele-scope.ts:308](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L308)
 
 ___
 
@@ -719,7 +854,7 @@ time, so that [removeHostAria](TableScope.md#removehostaria) can restore it (e.g
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L275)
+[src/lib/table/ele-scope.ts:288](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L288)
 
 ___
 
@@ -745,7 +880,7 @@ Sets the horizontal scroll position of the body as distance from the **start** (
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:238](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L238)
+[src/lib/table/ele-scope.ts:251](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L251)
 
 ___
 
@@ -766,4 +901,4 @@ Overwritten in [RenderScope](RenderScope.md).
 
 #### Defined in
 
-[src/lib/table/ele-scope.ts:262](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L262)
+[src/lib/table/ele-scope.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L275)

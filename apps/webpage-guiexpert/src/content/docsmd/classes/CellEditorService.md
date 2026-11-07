@@ -52,7 +52,7 @@ only with the option (`tableScope.cellEditorService`).
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L63)
+[src/lib/table/sheet-editing/cell-editor-service.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L64)
 
 ## Properties
 
@@ -62,7 +62,7 @@ only with the option (`tableScope.cellEditorService`).
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L63)
+[src/lib/table/sheet-editing/cell-editor-service.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L64)
 
 ## Methods
 
@@ -78,7 +78,7 @@ Closes the editor without writing (Escape).
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:260](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L260)
+[src/lib/table/sheet-editing/cell-editor-service.ts:261](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L261)
 
 ___
 
@@ -107,7 +107,7 @@ true if the editor closed
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:217](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L217)
+[src/lib/table/sheet-editing/cell-editor-service.ts:218](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L218)
 
 ___
 
@@ -123,7 +123,7 @@ Removes the editor (table destroyed).
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:304](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L304)
+[src/lib/table/sheet-editing/cell-editor-service.ts:305](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L305)
 
 ___
 
@@ -141,7 +141,7 @@ display row and model column, `undefined` without editor
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L87)
+[src/lib/table/sheet-editing/cell-editor-service.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L88)
 
 ___
 
@@ -167,7 +167,7 @@ the id
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L99)
+[src/lib/table/sheet-editing/cell-editor-service.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L100)
 
 ___
 
@@ -192,7 +192,7 @@ true for the editor above the cell
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L115)
+[src/lib/table/sheet-editing/cell-editor-service.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L116)
 
 ___
 
@@ -208,7 +208,7 @@ True while the editor is open.
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L78)
+[src/lib/table/sheet-editing/cell-editor-service.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L79)
 
 ___
 
@@ -238,7 +238,7 @@ true if the editor is open
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L136)
+[src/lib/table/sheet-editing/cell-editor-service.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L137)
 
 ___
 
@@ -254,4 +254,4 @@ Places the editor over its cell (called after every render pass) – also when t
 
 #### Defined in
 
-[src/lib/table/sheet-editing/cell-editor-service.ts:268](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L268)
+[src/lib/table/sheet-editing/cell-editor-service.ts:269](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/sheet-editing/cell-editor-service.ts#L269)

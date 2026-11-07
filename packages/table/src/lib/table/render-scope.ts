@@ -42,6 +42,8 @@ import { AriaTextsIf } from './aria/aria-texts.if';
 import { RowLayout } from './row-layout/row-layout';
 import type { MasterDetailService } from './master-detail/master-detail-service';
 import type { TableSheet } from './sheet/table-sheet';
+import type { ScrollPositionIf } from './data/common/scroll-position.if';
+import { toPhysicalScrollLeft } from './rtl/rtl-util';
 
 
 /**
@@ -119,6 +121,12 @@ export class RenderScope extends EleScope {
   protected contentScrollTop = 0;
   /** Exact content position requested by scrollToPixel() for a capped scroll height (see TableScope). */
   protected pendingContentScroll?: { scrollTop: number; contentTop: number };
+  /**
+   * The scroll position (`scrollTop`, logical `scrollLeft`) of the last render pass – the `scroll` event of a position
+   * that is already rendered (`repaintHard({ py })`, `scrollToPixel()` render it at once) renders nothing.
+   */
+  protected renderedScrollTop = Number.NaN;
+  protected renderedScrollLeft = Number.NaN;
   /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
   protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
 
@@ -412,18 +420,18 @@ export class RenderScope extends EleScope {
   }
 
   /**
-   * The top of a body row in content pixels: {@link AreaModelIf.getYPosByRowIndex} plus the heights of the open detail
-   * rows above it (master/detail).
+   * The top of a body row in content pixels – from the row layout of the table ({@link getBodyRowLayout}: the heights
+   * the rows are drawn with, plus the open detail rows above it). Since 1.1.107 always from the layout (before: without
+   * detail rows from {@link AreaModelIf.getYPosByRowIndex}, which an area model with its own `getRowHeight()` could
+   * get wrong – `scrollToIndex()` landed beside the row). O(1) for constant heights, otherwise after one O(n) build.
    *
    * @param {number} rowIndex - display index
    * @returns {number} px from the top of the first body row
    * @since 1.1.97
    */
   getBodyRowTop(rowIndex: number): number {
-    // with open detail rows from the prefix sums (O(1), consistent with getBodyRowIndexAtY); without them unchanged
-    return this.hasBodyRowExtras()
-      ? this.getBodyRowLayout().getTop(rowIndex)
-      : this.tableModel.getBodyModel().getYPosByRowIndex(rowIndex);
+    // one source with the rendering and getBodyRowIndexAtY (prefix sums, detail rows included)
+    return this.getBodyRowLayout().getTop(rowIndex);
   }
 
   /**
@@ -588,13 +596,14 @@ export class RenderScope extends EleScope {
 
 
   /**
-   * Repaints the UI by resetting the size of the wrapper div,
-   * adjusting the containers and rows, and performing additional adjustments
-   * after scrolling.
+   * Repaints the UI after the row count or the row heights changed: new heights and padding, new size of the scroll
+   * content, new layout of the areas – then **one** render pass (since 1.1.107; before: two).
    *
+   * @param {ScrollPositionIf} [scrollTo] - a content position to show in that render pass (like {@link scrollToPixel},
+   *   exact also with a capped scroll height); a missing axis keeps its position
    * @return {void} This method does not return any value.
    */
-  repaintHard() {
+  repaintHard(scrollTo?: ScrollPositionIf) {
     // rows were added/removed (setRows, filter, tree toggle …): the col-/rowspan ranges must match the new rows
     for (const areaIdent of ['header', 'body', 'footer'] as const) {
       this.colAndRowspanModels[areaIdent]?.initIfRowCountChanged();
@@ -602,7 +611,67 @@ export class RenderScope extends EleScope {
     this.tableModel.recalcHeightAndPadding();
     this.invalidateRowLayout();
     this.resetSizeOfWrapperDiv();
-    this.adjustContainersAndRows();
+    this.layoutContainers(); // without rendering: the position is set first, then one render pass
+    if (scrollTo) {
+      this.setContentScrollPosition(scrollTo.px, scrollTo.py);
+    }
+    this.adjustAfterScrolling();
+  }
+
+  /**
+   * Sets the scroll position of the viewport to a content position **without rendering** (shared by
+   * `scrollToPixel()` and `repaintHard({ px, py })`). `py` is a content position: the scroll bar range differs from the
+   * content range – always with a capped scroll height, but also slightly without (the scroll content is 1 px higher
+   * than the rows, the scroll viewport includes the footer and the horizontal scroll bar). `scrollTop = py` would leave
+   * the target row a few pixels off, so the exact content position is remembered (`pendingContentScroll`) and used by
+   * the next render passes as long as the scroll bar is not moved.
+   *
+   * @param {number | undefined} px - from the start of the rows (logical, right-to-left from the right edge);
+   *   `undefined` keeps the horizontal position
+   * @param {number | undefined} py - content px from the top of the first body row; `undefined` keeps the vertical
+   *   position
+   * @returns {boolean} true if the exact content position was set (then render now – a scroll event may not fire);
+   *   false if the browser renders it with its scroll event (nothing to scroll vertically, or only `px`)
+   * @since 1.1.107
+   */
+  protected setContentScrollPosition(px: number | undefined, py: number | undefined): boolean {
+    const viewport = this.scrollViewport;
+    const options: ScrollToOptions = {};
+    if (px !== undefined) {
+      options.left = toPhysicalScrollLeft(px, this.isRtl());
+    }
+    if (py === undefined) {
+      if (px !== undefined) {
+        viewport.scrollTo(options); // scrollTop and with it pendingContentScroll stay
+      }
+      return false;
+    }
+    const contentRange = this.getContentScrollRangeY();
+    const scrollerRange = this.getScrollerRangeY();
+    if (contentRange > 0 && scrollerRange > 0) {
+      const contentTop = Math.min(contentRange, Math.max(0, py));
+      options.top = contentTop / contentRange * scrollerRange;
+      viewport.scrollTo(options);
+      this.pendingContentScroll = { scrollTop: viewport.scrollTop, contentTop };
+      return true;
+    }
+    options.top = py;
+    viewport.scrollTo(options);
+    return false;
+  }
+
+  /**
+   * The `scroll` listener of the scroll viewport: renders the new position – nothing if the position is already
+   * rendered (the event of a `repaintHard({ py })`, `scrollToPixel()` or `ensureColumnIsVisible()` arrives after
+   * their own render pass).
+   *
+   * @since 1.1.107
+   */
+  onViewportScroll(): void {
+    if (this.scrollViewport.scrollTop === this.renderedScrollTop
+      && this.getViewportScrollLeft() === this.renderedScrollLeft) {
+      return;
+    }
     this.adjustAfterScrolling();
   }
 
@@ -636,8 +705,8 @@ export class RenderScope extends EleScope {
     return !!this.tableModel.getColumnDefs?.()?.some(def => def.width?.unit === 'weight' || def.width?.unit === '%');
   }
 
-  override adjustContainersAndRows() {
-    super.adjustContainersAndRows();
+  protected override layoutContainers(): void {
+    super.layoutContainers();
     this.adjustRelativeColumnWidthsToScrollBar();
   }
 
@@ -661,7 +730,7 @@ export class RenderScope extends EleScope {
       this.tableModel.init();
       this.tableModel.recalcPadding();
       this.resetSizeOfWrapperDiv();
-      this.adjustContainersAndRows();
+      this.layoutContainers(); // the caller renders (adjustContainersAndRows, repaintHard)
     } finally {
       this.adjustingRelativeWidths = false;
     }
@@ -797,6 +866,9 @@ export class RenderScope extends EleScope {
       });
     }
     this.afterRenderPass();
+    // only after a complete pass: if a renderer throws, the next scroll event of the same position renders again
+    this.renderedScrollTop = this.scrollTop;
+    this.renderedScrollLeft = this.scrollLeft;
   }
 
   /**
@@ -1145,17 +1217,17 @@ export class RenderScope extends EleScope {
     return this.getBodyContentHeight() + 1 > EleScope.maxScrollHeightInPx;
   }
 
+  /** The detail layer (master/detail) covers the visible body. @since 1.1.97 */
+  protected override adjustDetailLayerBounds(left: number, top: number, width: number, height: number): void {
+    this.masterDetailService?.setBounds(left, top, width, height);
+  }
+
   /**
    * The model's content height plus the heights of open detail rows (master/detail).
    *
    * @returns {number} px
    * @since 1.1.97
    */
-  /** The detail layer (master/detail) covers the visible body. @since 1.1.97 */
-  protected override adjustDetailLayerBounds(left: number, top: number, width: number, height: number): void {
-    this.masterDetailService?.setBounds(left, top, width, height);
-  }
-
   protected override getBodyContentHeight(): number {
     const height = this.tableModel.getContentHeightInPixel();
     return this.masterDetailService?.hasExpanded() ? height + this.getBodyRowLayout().getExtraTotal() : height;
@@ -2050,7 +2122,7 @@ export class RenderScope extends EleScope {
    */
   private rowNumberWidth?: { text: string; width: number; approximate: boolean };
   /** true while the containers are adjusted to a new row number width (no second change in that nested pass). */
-  private adjustingRowNumberWidth = false;
+  protected adjustingRowNumberWidth = false;
   /** Guards {@link adjustRelativeColumnWidthsToScrollBar} against re-entry. */
   private adjustingRelativeWidths = false;
   /** The width % and weight columns were last computed for (`TableModelIf.setParentWidth`), -1 = unknown. */

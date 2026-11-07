@@ -592,7 +592,8 @@ describe('TableFactory', () => {
       expect(tm.isRowCheckboxVisible()).toBe(true);
       expect(tm.getColumnWidth(2)).toBe(150);
       expect(tm.getXPosByColumnIndex(2)).toBe(300);
-      expect(tm.getContentHeightInPixel()).toBe(20);
+      // since 1.1.107 the height of the rows the table draws: the body model's own 30 px, not defaultRowHeights.body
+      expect(tm.getContentHeightInPixel()).toBe(30);
     });
   });
 });

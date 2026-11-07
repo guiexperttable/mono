@@ -710,6 +710,10 @@ ___
 Returns the height of the row at the specified index, in pixels.
 This method allows for variable row heights in the table.
 
+The table draws the rows with these heights, and since 1.1.107 the height of the area (scroll height of the body,
+height of header and footer) is their sum as well – [getConstantRowHeight](../interfaces/AreaModelIf.md#getconstantrowheight) × row count if given.
+`defaultRowHeights` of the table model only counts if every row height is 0.
+
 #### Parameters
 
 | Name | Type | Description |

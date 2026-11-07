@@ -7,7 +7,7 @@
 // Before the fix the body and the footer were laid out for the full host height: when scrolled to the end, the
 // last row lay half behind the scroll bar (without footer), with a footer the bar covered the footer.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ColumnDef, Size, TableFactory, px100 } from '@guiexpert/table';
+import { AreaModel, ColumnDef, Size, TableFactory, px100 } from '@guiexpert/table';
 import type { TableModelIf } from '@guiexpert/table';
 import {
   areaRows,
@@ -265,6 +265,78 @@ describe.each(DIRECTIONS)('%s', dir => {
         const footer = rect(areaRows(host, 'footer', side)[0]);
         expect(hit(footer.left + footer.width / 2, barY), side).toBe(viewport);
       }
+    });
+  });
+  // No scroll bars at all (instead of an option overflowY "hidden", prompt 017): plain CSS on the scroll viewport.
+  // The table measures 0 px bars and uses the full width and height; wheel, keyboard and the API still scroll.
+  describe('scroll bars hidden with CSS (scrollbar-width: none)', () => {
+    it('no space for bars, the content still scrolls to the last row', async () => {
+      const style = document.createElement('style');
+      style.textContent = '.no-bars .ge-table-scroll-viewport { scrollbar-width: none; }';
+      document.head.appendChild(style);
+      try {
+        const { host, api } = mountTable(model({ columns: 30 }));
+        host.classList.add('no-bars');
+        api.repaintHard();
+        await nextFrame();
+        expect(scrollBarWidth(host)).toBe(0);
+        expect(scrollBarHeight(host)).toBe(0);
+        await scrollToEnd(host);
+        expect(api.getLastFullVisibleRowIndex()).toBe(199);
+        api.scrollToIndex(-1, 50);
+        await nextFrame();
+        expect(api.getFirstVisibleRowIndex()).toBe(50);
+      } finally {
+        style.remove();
+      }
+    });
+  });
+
+  // prompt 017 part B (1.1.107): the scroll height comes from the area model, not from defaultRowHeights (34)
+  describe('an own area model with 20 px rows (defaultRowHeights 34)', () => {
+    class Rows20 extends AreaModel {
+      constructor(private readonly rowCount: number) {
+        super();
+        this.areaIdent = 'body';
+      }
+
+      override getRowCount(): number {
+        return this.rowCount;
+      }
+
+      override getRowHeight(): number {
+        return 20;
+      }
+
+      override getConstantRowHeight(): number {
+        return 20;
+      }
+
+      override getValueAt(row: number, col: number): any {
+        return `${row}/${col}`;
+      }
+    }
+
+    const ownModel = (rows: number, columns = 3) => TableFactory.createTableModel({
+      bodyAreaModel: new Rows20(rows),
+      columnDefs: Array.from({ length: columns }, (_, c) => ColumnDef.create({ property: 'c' + c, headerLabel: 'H' + c, width: px100 })),
+    });
+
+    it('15 rows (300 px) in a 500 px host: no vertical scroll bar', async () => {
+      const { host } = mountTable(ownModel(15));
+      await nextFrame();
+      expect(scrollBarWidth(host)).toBe(0);
+      expect(viewportOf(host).scrollHeight).toBeLessThanOrEqual(viewportOf(host).clientHeight);
+    });
+
+    it('3000 rows: the scroll height is 3000 × 20 + 1, at the end the last row is fully visible', async () => {
+      const { host, api } = mountTable(ownModel(3000, 30));
+      await nextFrame();
+      expect(scrollBarWidth(host)).toBeGreaterThan(0);
+      expect(viewportOf(host).scrollHeight).toBe(3000 * 20 + 1);
+      await scrollToEnd(host);
+      expect(api.getLastFullVisibleRowIndex()).toBe(2999);
+      expect(lastRowBottom(host)).toBeLessThanOrEqual(visibleBottom(host) + 0.5);
     });
   });
 });

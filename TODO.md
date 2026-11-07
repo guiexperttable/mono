@@ -625,9 +625,9 @@ Verhalten steht als `// NOTE:` in den Specs.
 **Mittel:**
 - [x] Mehrspaltiges `doSort([a, b])`: das **letzte** Item war Primärschlüssel (JSDoc: „name desc, then age asc“) –
       jetzt das erste (Branch `fix/tree-2`).
-- [ ] Variable Zeilenhöhen: `TableModel.getAreaHeight` (`table-model.ts:275`) ignoriert `getRowHeight()`, sobald
-      `defaultRowHeights.body` gesetzt ist (Factory setzt immer 34) → falsche Scrollhöhe; `AbstractAreaModel.getYPosByRowIndex`
-      (`abstract-area-model.ts:95`) ignoriert ein überschriebenes `getRowHeight()` → `scrollToIndex` daneben.
+- [x] Variable Zeilenhöhen: `TableModel.getAreaHeight` ignorierte `getRowHeight()`, sobald `defaultRowHeights.body`
+      gesetzt war; `AbstractAreaModel.getYPosByRowIndex` ignorierte ein überschriebenes `getRowHeight()` → beide behoben
+      in 1.1.107 (Prompt 017, s. „Gefunden im log-commander-Spike“).
 - [x] `AreaModelArrayOfArrays` (`bodyData`-Tabellen): ~~`setValue` schreibt bei aktivem Filter in die falsche Zeile~~ (behoben 1.1.96, Prompt 010)
       (`:46`); ~~`changeColumnOrder` verschiebt ausgefilterte Zeilen nicht mit~~ (behoben 1.1.103: alle Zeilen, jedes
       Zeilen-Array genau einmal).
@@ -764,7 +764,65 @@ sortiert aber nicht · Spaltenziehen ignoriert min/max · Kontextmenü-Drossel 5
 Header-Gruppen-Zellen doppelt gezeichnet · Rahmenklassen bei `horizontalBorderVisible: false` uneinheitlich · Zeile 0 jeder
 Objekt-Tabelle hat `ge-focused-row`.
 
+## Gefunden im log-commander-Spike (Nov. 2026)
+
+Herkunft: Tauri-Live-Log-Viewer mit `@guiexpert/table@1.1.106`, eigenem `AreaModel` (bis 10 Mio. Zeilen, 5000 neue
+Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoehe.md`, Branch
+`fix/ein-render-je-update-scrollhoehe`.
+
+- [x] **Drei Renders je Update**: `repaintHard()` renderte zweimal (`adjustContainersAndRows()` + am Ende), das nötige
+      `scrollToPixel()` (Position halten bei gekappter Scrollhöhe) ein drittes Mal, das native `scroll`-Event ein viertes.
+      → 1.1.107: `repaintHard()` rendert einmal (`EleScope.layoutContainers()` ohne Render), `repaintHard({ px, py })`
+      setzt die Position im selben Durchgang (`RenderScope.setContentScrollPosition`, gemeinsam mit `scrollToPixel`), der
+      `scroll`-Listener `onViewportScroll()` überspringt eine schon gezeichnete Position. Gemessen (Headless-Chromium,
+      Mac, 2 Spalten, ~23 sichtbare Zeilen, +500 Zeilen je Update, 100 Updates): Render-Durchgänge je Update 4,02 → 1,01;
+      Dauer des synchronen Teils p50 4,6 → 2,8 ms, p95 5,2 → 3,6 ms, max 5,7–6,6 → 3,9 ms – mit 1 Mio. und 10 Mio. Zeilen
+      gleich. Nebenwirkung: `adjustContainersAndRows()` mit %-/Gewichtsspalten, deren Breite sich wegen des senkrechten
+      Balkens ändert, rendert jetzt einmal statt zweimal. Test `repaint-count.browser.spec.ts`.
+- [x] **Scrollhöhe aus `defaultRowHeights` statt aus dem Area-Modell**: `TableModel.getAreaHeight` nahm zuerst
+      `defaultRowHeights[area]` (Factory: immer 34), gezeichnet wurde mit `getConstantRowHeight()`/`getRowHeight()` → ein
+      Modell mit 20 px bekam 15 Zeilen = 511 px Scrollhöhe (Balken ohne Überlauf), zu kleiner Daumen, falsche Bereiche für
+      `scrollFactorY`, `scrollToPixel`, Rad-Skalierung, gekappte Höhe; ebenso Header/Footer eigener Modelle. → 1.1.107:
+      konstante Höhe des Modells, sonst Summe, `defaultRowHeights` nur, wenn alle Höhen 0 sind. Tests `scroll-height.browser.spec.ts` (inkl. Regressionswerte für Objekt-Array,
+      `bodyData`, Baum, Gruppen, Pivot, Master/Detail) und `scroll-bars.scrollbars.browser.spec.ts`.
+- [x] **Entschieden (Marc, 07.11.2026): das „+1“ der Scrollhöhe bleibt** (Inhalt genau so hoch wie der Body → 1-px-Balken).
+      Grund: die Linie unter der letzten Zeile wird immer gezeichnet (`RenderScope`, `lastRowOfModel`, unabhängig von
+      `horizontalBorderVisible`), der Fokusrahmen ist 1 px höher als die Zelle – ohne das „+1“ wären beide am Ende
+      abgeschnitten. Test `scroll-height.browser.spec.ts` („1 px to scroll – also without horizontal borders“).
+- [x] **`overflowY: "hidden"` nicht gebaut**: dasselbe leistet eine CSS-Zeile
+      `.ge-table-scroll-viewport { scrollbar-width: none; }` – die Tabelle misst dann 0-px-Balken und nutzt die volle
+      Fläche, Rad/Touch/Tastatur/API scrollen weiter (Test in `scroll-bars.scrollbars.browser.spec.ts`, Doku
+      `instructions.md` 6.9). Eine Option erst bei konkretem Bedarf (z. B. Scrollen per Rad sperren).
+- [x] `AbstractAreaModel.getYPosByRowIndex` ignorierte ein überschriebenes `getRowHeight()` (Unterklasse von
+      `AreaModelObjectArray`/`ArrayOfArrays`/`Tree`) → `scrollToIndex`/`ensureRowIsVisible` daneben (Zeile 1134 statt
+      1001 bei 20/40 px). → 1.1.107: `getConstantRowHeight()` × Index, sonst Summe (kein veralteter `init()`-Cache mehr,
+      `yPositions` `@deprecated`); `RenderScope.getBodyRowTop` nimmt immer das `RowLayout` (eine Quelle mit dem
+      Rendern); `AreaModelCellGroups.getYPosByRowIndex` war ein Stub (0). Tests: zwei `it.fails` → `it`,
+      `scroll-height.browser.spec.ts`.
+- [ ] Optional: „nur geänderte Zeilen neu aufbauen“ statt `innerText = ''` je Render (eigener Prompt, falls gewünscht).
+
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.107 – Bugfix-Release mit kleiner API-Ergänzung**, nur Core (`@guiexpert/table`), neuer Typ `ScrollPositionIf`
+  (keine neuen Laufzeit-Exporte):
+  - `TableApi.repaintHard(scrollTo?: { px?, py? })`: Zeilen neu zählen und in **einem** Render-Durchgang eine
+    Inhaltsposition zeigen (wie `scrollToPixel`, exakt auch bei gekappter Scrollhöhe) – ein Live-Tail braucht einen
+    Render je Update statt vier. Ohne Argument wie bisher, nur mit einem statt zwei Render-Durchgängen.
+  - Das `scroll`-Event des Browsers für eine Position, die die Tabelle schon gezeichnet hat (`scrollToPixel`,
+    `repaintHard({ py })`, `ensureColumnIsVisible`), zeichnet nicht noch einmal; `onScroll` kommt dafür nicht doppelt.
+  - **Verhaltensänderung Höhen:** Header-, Body- und Footer-Höhe kommen aus den Zeilenhöhen des Area-Modells
+    (`getConstantRowHeight()`, sonst Summe von `getRowHeight()`), `defaultRowHeights` nur noch für Modelle ohne eigene
+    Höhen. Betrifft jedes Area-Modell, dessen Höhe von `defaultRowHeights` abweicht – eigene Klassen und eingebaute, die
+    mit einer eigenen Höhe erzeugt und übergeben werden (`bodyAreaModel`, `createByAreaModels`); von der Fabrik gebaute
+    Modelle nehmen ihre Höhe aus `defaultRowHeights` und bleiben gleich. Folge: richtige Scrollhöhe, kein Balken ohne
+    Überlauf. Wer bisher `defaultRowHeights.body` an sein Modell angepasst hat, kann das lassen. Ohne
+    `getConstantRowHeight()` wird bei jedem `repaintHard()` summiert (O(n)).
+  - Mit Zeilennummern sendet ein Render-Durchgang, in dem die Nummernspalte breiter wird, ein `onScroll` statt zwei.
+  - `AreaModelIf.getYPosByRowIndex()` der eingebauten Modelle folgt einem überschriebenen `getRowHeight()` (vorher
+    `defaultRowHeight × Index`); `scrollToIndex`/`ensureRowIsVisible` treffen die Zeile auch dann.
+    `AreaModelCellGroups.getYPosByRowIndex()` liefert die echte Position statt 0. `AbstractAreaModel.yPositions` ist
+    `@deprecated` (wird nicht mehr gelesen).
+
 
 - **1.1.106 – Bugfix-Release**, nur Core (`@guiexpert/table`), keine neuen Exporte:
   - `SelectCellEditor`: Enter (oder ein anderer Commit) ohne gewählten Wert – der Zellwert steht nicht in der Liste –

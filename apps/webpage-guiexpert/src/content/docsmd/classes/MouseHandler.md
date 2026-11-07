@@ -37,7 +37,7 @@ Class representing a MouseHandler.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L39)
+[src/lib/table/mouse-handler.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L43)
 
 ## Properties
 
@@ -101,4 +101,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L40)
+[src/lib/table/mouse-handler.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L44)

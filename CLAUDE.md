@@ -151,6 +151,24 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Invalidiert in `repaintHard()`, `invalidateAggregates()` (Filter, Sortieren, Edit, öffentliches `repaint`), `setRows`, Detail
   auf/zu; zusätzlich Schlüssel Body-Modell + Zeilenzahl. Positionen im Body immer über `getBodyRowTop(i)` /
   `getBodyRowIndexAtY(y)` (Modellwert + Detailhöhen), Scrollhöhe über `getBodyContentHeight()`.
+- **Ein Render je `repaintHard`** (seit 1.1.107, Prompt 017): `EleScope.adjustContainersAndRows()` = `layoutContainers()`
+  (Areas, Balken messen, %-Spalten über `RenderScope.adjustRelativeColumnWidthsToScrollBar` – rendert **nicht**) +
+  `adjustAfterScrolling()`. `repaintHard(scrollTo?)` ruft nur `layoutContainers()`, setzt die Position
+  (`RenderScope.setContentScrollPosition(px, py)` – gemeinsam mit `scrollToPixel`, setzt `pendingContentScroll`) und
+  rendert **einmal** (vorher 2, mit `scrollToPixel` 3, dazu das native `scroll`-Event). Der `scroll`-Listener ist
+  `onViewportScroll()`: steht der Viewport schon auf der zuletzt gezeichneten Position (`renderedScrollTop/-Left`),
+  rendert er nicht; der verschachtelte Durchgang einer Zeilennummern-Breitenänderung sendet kein eigenes `onScroll`
+  (`adjustingRowNumberWidth`). API `repaintHard({ px, py })` (`ScrollPositionIf`, fehlende Achse bleibt) – Live-Tail mit 1/10 Mio.
+  Zeilen: 4 → 1 Render-Durchgang je Update, p50 4,6 → 2,8 ms. Test `repaint-count.browser.spec.ts` (Zähler = Spy auf
+  `adjustAfterScrolling`).
+- **Eine Höhenquelle** (seit 1.1.107): `TableModel.getAreaHeight(area)` = `getConstantRowHeight()` × Zeilen, sonst Summe
+  von `getRowHeight(i)`, nur wenn alles 0 ist `defaultRowHeights[area]` (vorher kam `defaultRowHeights` zuerst → eigene
+  Modelle mit 20 px bekamen 34 px je Zeile Scrollhöhe). Das „+1“ der Scrollhöhe bleibt immer: die Linie unter der
+  letzten Zeile wird unabhängig von `horizontalBorderVisible` gezeichnet, der Fokusrahmen ist 1 px höher als die Zelle.
+  Zeilen-Positionen im Body immer aus dem `RowLayout` (`getBodyRowTop`); `AbstractAreaModel.getYPosByRowIndex` =
+  konstante Höhe × Index, sonst Summe (folgt überschriebenem `getRowHeight()`). Ohne Balken: CSS
+  `.ge-table-scroll-viewport { scrollbar-width: none }` (keine Option `overflowY: "hidden"`).
+  Test `scroll-height.browser.spec.ts`.
 - Horizontal analog über `scrollFactorX` und `adjustColumnsToRowParent(...)` (nur sichtbare Spalten).
 - DOM wird pro Render neu aufgebaut (`innerText = ''`); Renderer können Cleanup-Funktionen zurückgeben
   (`RendererCleanupFnType`), die vor dem nächsten Render aufgerufen werden (`cleanupFunctions[area]`).
@@ -650,6 +668,11 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 
 ## 6. Doku, Tests & Verifikation
 
+- **Wichtige Antworten auffindbar ablegen** (auch für KI-Assistenten): kurze Frage-Antwort-Einträge in `instructions.md`
+  **6.26 FAQ** (jede Antwort für sich verständlich, mit Verweis auf den Abschnitt), gekürzt in `llms.txt` (Root,
+  „Quick answers“), `apps/webpage-guiexpert/public/llms.txt` und `packages/table/README.md` („Quick answers“ – liegt im
+  npm-Paket), dazu in der JSDoc der betroffenen Option/Methode (landet in den `.d.ts` und unter /api). Beispiel:
+  Scrollbalken ausblenden per CSS (`scrollbar-width: none`) statt einer Option.
 - Entwickler-Doku: `instructions.md` (alle Frameworks), `packages/angular-table/instructions.md` (Angular 14–22),
   `apps/angular-table-demo/instructions.md` (deutsch, Demo-Übersicht). Stand Okt. 2026 gegen den Code geprüft: alle
   `ts`-Blöcke kompilieren (strict, TS 6, Angular-22-Typen). **Bei API-Änderungen mitpflegen** und erneut prüfen

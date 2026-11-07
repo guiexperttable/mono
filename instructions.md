@@ -5,6 +5,9 @@ How to display large tabular data sets in web applications with `@guiexpert/tabl
 > **Source of truth:** every API used in this guide exists in the source code of
 > [guiexperttable/mono](https://github.com/guiexperttable/mono) (version 1.1.x). If something here and the code disagree,
 > the code wins – see also the generated API docs at https://gui.expert/api.
+>
+> **Quick answers** to frequent "how do I …?" questions (scroll bars, live data, row heights, repainting): section
+> [6.26 FAQ](#626-faq--quick-answers).
 
 ---
 
@@ -737,11 +740,21 @@ The showcase *Large dataset* (https://gui.expert/showcase/large) does exactly th
 (`createLargeModelAndOptions` in `@guiexpert/demo-table-models`).
 
 Tips for very large models:
+- **Row heights of your model win over `defaultRowHeights`** (since 1.1.107): the scroll height, the header and the
+  footer height are the heights the table draws – `getConstantRowHeight()` × rows, otherwise the sum of
+  `getRowHeight()`. `defaultRowHeights` (34 px by default, `TableFactory` always sets it) only counts for a model whose
+  `getRowHeight()` returns 0. Before, a model with 20 px rows got a scroll height of 34 px per row: a scroll bar
+  without overflow (15 rows), a thumb that was too small. Models the factory builds (from `rows`, `bodyData` …) get
+  their height from `defaultRowHeights` – nothing changes for them; an area model of yours (also a built-in class
+  created with its own height) is measured with its height now. Without `getConstantRowHeight()` the heights are
+  summed on every `repaintHard()` (O(n)) – return it when all rows are equally high.
 - Return the row height from `getConstantRowHeight()` if all rows are equally high – the renderer then computes the
   first visible row directly instead of summing up the heights of all rows above it (2 million rows: rendering at the
   end of the table drops from ~29 ms to ~15 ms). The built-in models do this automatically.
-- `scrollToIndex()` uses `getYPosByRowIndex()`. Since 1.1.85 the `AreaModel` default derives it from the row heights
-  (O(1) with `getConstantRowHeight()`, otherwise O(n)); override it for huge models with variable row heights.
+- `scrollToIndex()` and `ensureRowIsVisible()` position the body rows with the row layout of the table (the heights
+  the rows are drawn with, since 1.1.107) – your `getYPosByRowIndex()` is not needed for that. The defaults of
+  `AreaModel` and of the built-in models derive it from the row heights (O(1) with `getConstantRowHeight()`, otherwise
+  O(n)); since 1.1.107 the built-in models also follow an overridden `getRowHeight()`.
 - Variable row heights: since 1.1.97 the table keeps prefix sums of the heights (`RowLayout`), so a scroll frame finds
   the first visible row by a binary search – 2 million rows with variable heights render as fast as with a constant
   height (before, every frame summed the heights of all rows above the viewport). The sums are built again after
@@ -1409,6 +1422,45 @@ function onPriceTick(tableApi: TableApi, row: number, col: number, price: number
 A footer from `footerAggregates` (5.4) is recomputed after `updateCells()`; after changing row objects yourself call
 `tableApi.repaint()`.
 
+**Growing rows – a live tail (since 1.1.107).** When rows are appended (a log viewer, a ticker), the row count changes:
+`repaintHard()`. To keep a position – or to follow the end – pass it along: `repaintHard({ px, py })` counts the rows,
+sets the position and renders **once** (`px`/`py` like `scrollToPixel`: `py` in content pixels, exact also above
+8,000,000 px of rows, where the scroll bar is scaled; a missing axis keeps its position). Before, `repaintHard()` +
+`scrollToPixel()` rendered three times, plus once more for the browser's `scroll` event.
+
+```ts
+import { AreaModel, TableApi } from "@guiexpert/table";
+
+class LogBody extends AreaModel {                 // millions of lines, 20 px each
+  readonly lines: string[] = [];
+  override getRowCount(): number { return this.lines.length; }
+  override getRowHeight(): number { return 20; }
+  override getConstantRowHeight(): number { return 20; }
+  override getValueAt(row: number): string { return this.lines[row]; }
+}
+
+function onNewLines(tableApi: TableApi, body: LogBody, newLines: string[], follow: boolean) {
+  const firstRow = tableApi.getFirstVisibleRowIndex();
+  body.lines.push(...newLines);
+  tableApi.repaintHard({ py: follow ? Number.MAX_SAFE_INTEGER : firstRow * 20 }); // end, or that row at the top
+}
+```
+
+`firstRow * 20` puts the first visible row at the top (a partly scrolled row snaps to its top; open detail rows above
+are not counted) – for a pixel-exact position keep your own `py` (e.g. from the last update).
+
+- Without `py` the scroll bar stays where it is: in a normal table the rows stay, too. Above 8,000,000 px the content
+  position is `scrollTop / scroll range × content range` – it moves when the rows grow, unless the last position came
+  from `scrollToPixel()`/`repaintHard({ py })` (that one is kept as long as the scroll bar is not moved).
+- The scroll height comes from the row heights of the area model (`getConstantRowHeight()`, otherwise the sum of
+  `getRowHeight()`) – see 5.5 for `defaultRowHeights`.
+- No scroll bars at all (e.g. a viewer that draws its own position indicator): hide them with CSS (more in 6.12) –
+  the table then measures 0 px bars and uses the full width and height; wheel, touch, keyboard and the API still scroll:
+
+```css
+.my-log .ge-table-scroll-viewport { scrollbar-width: none; }
+```
+
 ### 6.10 Export: clipboard and Excel
 
 ```ts
@@ -1537,6 +1589,23 @@ html {
 
 Per-cell styling: `getCustomClassesAt` / `getCustomStyleAt` in the area model, or CSS classes in the column
 definition. Showcase: *Look and Feel* (https://gui.expert/showcase/laf).
+
+**Scroll bars.** The table has one scroll container, `.ge-table-scroll-viewport`; its bars are the browser's own. Style
+or hide them with plain CSS – the table measures the bars on every layout (`adjustContainersAndRows`, since 1.1.104) and
+lays out header, body, footer and the fixed columns next to them, so nothing is covered and no space is wasted:
+
+```css
+/* no scroll bars at all – wheel, touch, keyboard and the API (scrollToIndex …) still scroll */
+.my-table .ge-table-scroll-viewport { scrollbar-width: none; }
+
+/* thin, colored bars */
+.my-table .ge-table-scroll-viewport { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; }
+```
+
+- `.my-table` is a class on the host div (or any ancestor) – the rule then applies to this table only.
+- A vertical bar always, also without overflow: `tableOptions.overflowY: "scroll"` (horizontal: `overflowX`).
+- There is no option `"hidden"`: CSS does it (tested with classic scroll bars in `scroll-bars.scrollbars.browser.spec.ts`).
+- A bar without overflow (e.g. 15 rows of 20 px) was a wrong scroll height before 1.1.107 – see 6.26.
 
 ### 6.13 Other useful API methods
 
@@ -2339,6 +2408,48 @@ new FormulaBar(document.querySelector<HTMLElement>(".formula-bar")!, api);
   insert/delete rows and columns through the API) – no built-in menu.
 - **Not included**: several sheets, named ranges, cell formatting, merged cells, conditional formatting, charts,
   array formulas, collaborative editing, XLSX import, localized function names, row drag in a sheet.
+
+### 6.26 FAQ – quick answers
+
+Short answers with the section that explains more. Written for people and for AI assistants – each answer stands
+on its own.
+
+**How do I hide the scroll bars?** CSS on the scroll container – no option needed:
+`.my-table .ge-table-scroll-viewport { scrollbar-width: none; }`. The table then uses the full width and height;
+wheel, touch, keyboard and `scrollToIndex()` still scroll. Thin or colored bars: `scrollbar-width: thin;
+scrollbar-color: …`. Always a vertical bar: `tableOptions.overflowY: "scroll"`. → 6.12
+
+**Why do I see a scroll bar although all rows fit?** Before 1.1.107 the scroll height was row count ×
+`defaultRowHeights.body` (34 px, always set by `TableFactory`), even if your area model draws other heights (e.g.
+20 px). Since 1.1.107 it is the height of the rows the table draws: `getConstantRowHeight()` × rows, otherwise the sum
+of `getRowHeight()`. On older versions set `defaultRowHeights: { header: 34, body: 20, footer: 34 }` to the height of
+your model. → 5.5
+
+**Why is the scroll content 1 px taller than the rows?** On purpose: the line below the last row is drawn below it and
+the focus frame is 1 px taller than its cell. If the rows fill the body exactly, there is a 1 px scroll range. → 6.12
+
+**Rows are appended all the time (live log, ticker) – how do I keep the position or follow the end?**
+`tableApi.repaintHard({ py })` counts the rows and shows the content position `py` in **one** render pass (since
+1.1.107; before you needed `repaintHard()` + `scrollToPixel()` = three render passes). Follow the end:
+`repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Keep the first visible row at the top:
+`repaintHard({ py: tableApi.getFirstVisibleRowIndex() * rowHeight })`. Exact also with millions of rows
+(capped scroll height above 8,000,000 px). → 6.9
+
+**`repaint()` or `repaintHard()`?** `repaint()` when values changed and the row count stayed (or use
+`updateCells()` for single cells); `repaintHard()` when rows were added or removed, heights changed or you changed
+`ColumnDefIf.isVisible` yourself. Both render once (since 1.1.107). → 6.9, 6.13
+
+**My rows have different heights – what must my area model return?** `getRowHeight(i)` for every row and
+`getConstantRowHeight()` only if all rows are equally high (then positions and the scroll height are O(1), without it
+the table builds prefix sums of all heights once per change). `scrollToIndex()` and `ensureRowIsVisible()` use the same heights as the rendering (since 1.1.107 also
+for subclasses of the built-in models that override `getRowHeight()`). → 5.5
+
+**Which height wins – `defaultRowHeights` or my model?** Your model (since 1.1.107). `defaultRowHeights` sets the
+heights of the models the factory builds (from `rows`, `bodyData` …) and counts only for a model whose `getRowHeight()`
+returns 0. → 5.5
+
+**The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
+gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4
 
 ---
 

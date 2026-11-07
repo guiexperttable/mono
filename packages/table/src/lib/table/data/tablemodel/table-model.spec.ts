@@ -441,20 +441,49 @@ describe('TableModel', () => {
       expect(tm.getAreaHeight('body')).toBe(60);
     });
 
-    it('getAreaHeight uses the default row height of the table model, not the row heights of the area model', () => {
-      // NOTE: an area model with its own row height (here 30) is measured with TableModel.defaultRowHeights (here 99).
+    // since 1.1.107 (prompt 017): the height of the rows the table draws – the area model before defaultRowHeights
+    it('getAreaHeight uses the constant row height of the area model, not the default row height of the table model', () => {
       const body = new AreaModelObjectArray<Row>('body', rows(), 30, defs());
       const tm = new TableModel(new AreaModelHidden(), body, new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(34, 99, 34), defs());
-      expect(tm.getAreaHeight('body')).toBe(3 * 99);
+      expect(tm.getAreaHeight('body')).toBe(3 * 30);
       expect(tm.getRowHeight('body', 0)).toBe(30);
     });
 
-    // BUG: TableModel.getAreaHeight ignores getRowHeight() whenever defaultRowHeights.body is set (34 by default, also via TableFactory),
-    // so the scroll height of a body with variable row heights is wrong (ele-scope.ts expects "sum of rows height").
-    it.fails('getContentHeightInPixel is the sum of the body row heights for variable row heights', () => {
+    // Regression (TODO.md, before 1.1.107: getAreaHeight ignored getRowHeight() whenever defaultRowHeights.body was set)
+    it('getContentHeightInPixel is the sum of the body row heights for variable row heights', () => {
       const tm = TableFactory.createTableModel({ bodyAreaModel: new VariableHeightBody(), columnSizes: [100] });
       tm.init();
       expect(tm.getContentHeightInPixel()).toBe(60);
+    });
+
+    it('getAreaHeight with a constant row height does not ask getRowHeight() for every row (O(1))', () => {
+      class Million extends AreaModel {
+        calls = 0;
+        override getRowCount(): number { return 1_000_000; }
+        override getRowHeight(): number { this.calls++; return 20; }
+        override getConstantRowHeight(): number { return 20; }
+      }
+      const body = new Million();
+      const tm = new TableModel(new AreaModelHidden(), body, new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(34, 34, 34), [], [10]);
+      expect(tm.getAreaHeight('body')).toBe(20_000_000);
+      expect(body.calls).toBe(0);
+    });
+
+    it('getAreaHeight falls back to the default row height if the area model has no row heights (getRowHeight() = 0)', () => {
+      class NoHeights extends AreaModel {
+        override getRowCount(): number { return 4; }
+      }
+      const tm = new TableModel(new AreaModelHidden(), new NoHeights(), new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(34, 25, 34), [], [10]);
+      expect(tm.getAreaHeight('body')).toBe(4 * 25);
+    });
+
+    it('getAreaHeight is 0 without rows, whatever the default row height', () => {
+      class Empty extends AreaModel {
+        override getRowCount(): number { return 0; }
+        override getRowHeight(): number { return 20; }
+      }
+      const tm = new TableModel(new AreaModelHidden(), new Empty(), new AreaModelHidden(), 0, 0, false, new DefaultRowHeights(34, 34, 34), [], [10]);
+      expect(tm.getAreaHeight('body')).toBe(0);
     });
 
     it('getContentHeightInPixel is the body height after init()', () => {

@@ -77,7 +77,7 @@ The body as rows of values (`any[][]`).
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L144)
+[src/lib/table/factory/table-factory.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L149)
 
 ___
 
@@ -89,7 +89,7 @@ Number of columns. Default: derived from `columnDefs`, `headerData` or `columnSi
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L134)
+[src/lib/table/factory/table-factory.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L139)
 
 ___
 
@@ -101,7 +101,7 @@ The columns: property, header label, width, classes, renderers, sorting, editing
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L128)
+[src/lib/table/factory/table-factory.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L133)
 
 ___
 
@@ -137,7 +137,7 @@ Column widths in px – the simple alternative to `columnDefs` (e.g. with `bodyD
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L130)
+[src/lib/table/factory/table-factory.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L135)
 
 ___
 
@@ -146,10 +146,13 @@ ___
 • **defaultRowHeights**: [`DefaultRowHeightsIf`](DefaultRowHeightsIf.md)
 
 Row heights of header, body and footer in px. Default: `tableOptions.defaultRowHeights`, otherwise 34 / 34 / 34.
+The area models built by the factory get these heights. An own area model (`bodyAreaModel` …) keeps its own:
+since 1.1.107 the table measures every area with the heights of its model (`getConstantRowHeight()`, otherwise
+`getRowHeight(i)`) – `defaultRowHeights` only counts for a model whose `getRowHeight()` returns 0.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L126)
+[src/lib/table/factory/table-factory.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L131)
 
 ___
 
@@ -230,7 +233,7 @@ Footer rows as values (static – they don't follow filter or edits).
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L148)
+[src/lib/table/factory/table-factory.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L153)
 
 ___
 
@@ -242,7 +245,7 @@ Selection model factory. Default: `tableOptions.getSelectionModel`.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:138](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L138)
+[src/lib/table/factory/table-factory.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L143)
 
 ___
 
@@ -266,7 +269,7 @@ Header rows as values – several rows are possible.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L146)
+[src/lib/table/factory/table-factory.ts:151](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L151)
 
 ___
 
@@ -278,7 +281,7 @@ A width in px for all columns; -1 (default) = use the column definitions.
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L132)
+[src/lib/table/factory/table-factory.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L137)
 
 ___
 
@@ -290,7 +293,7 @@ Width of the parent element in px, used for percentage column widths before the 
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L136)
+[src/lib/table/factory/table-factory.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L141)
 
 ___
 
@@ -302,7 +305,7 @@ Which properties of `rows` become columns, in this order (ignored if `columnDefs
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:142](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L142)
+[src/lib/table/factory/table-factory.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L147)
 
 ___
 
@@ -386,7 +389,7 @@ The rows as objects (`T[]`) or tree rows from [TreeFactory.buildTreeRows](../cla
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L140)
+[src/lib/table/factory/table-factory.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L145)
 
 ___
 
@@ -398,4 +401,4 @@ Options of the table; the factory reads `defaultRowHeights`, `getSelectionModel`
 
 #### Defined in
 
-[src/lib/table/factory/table-factory.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L150)
+[src/lib/table/factory/table-factory.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/table-factory.ts#L155)

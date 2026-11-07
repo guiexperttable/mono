@@ -38,7 +38,7 @@ Represents a service for managing shortcuts and triggering actions based on keyb
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L25)
+[src/lib/table/action/shortcut.service.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L26)
 
 ## Properties
 
@@ -48,7 +48,7 @@ Represents a service for managing shortcuts and triggering actions based on keyb
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L26)
+[src/lib/table/action/shortcut.service.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L27)
 
 ## Methods
 
@@ -70,7 +70,7 @@ Adds a listener to the list of listeners.
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L39)
+[src/lib/table/action/shortcut.service.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L40)
 
 ___
 
@@ -88,7 +88,7 @@ Retrieves the shortcut action mapping object.
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:221](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L221)
+[src/lib/table/action/shortcut.service.ts:222](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L222)
 
 ___
 
@@ -105,4 +105,4 @@ Also adds key down event listener to the table host element.
 
 #### Defined in
 
-[src/lib/table/action/shortcut.service.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L49)
+[src/lib/table/action/shortcut.service.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/shortcut.service.ts#L50)

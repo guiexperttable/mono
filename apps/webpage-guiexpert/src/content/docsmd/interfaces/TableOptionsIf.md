@@ -133,7 +133,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaDescribedBy: "
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:321](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L321)
+[src/lib/table/data/options/table-options.if.ts:331](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L331)
 
 ___
 
@@ -160,7 +160,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabel: "Orders
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:298](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L298)
+[src/lib/table/data/options/table-options.if.ts:308](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L308)
 
 ___
 
@@ -184,7 +184,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), ariaLabelledBy: "o
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:310](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L310)
+[src/lib/table/data/options/table-options.if.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L320)
 
 ___
 
@@ -214,7 +214,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:339](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L339)
+[src/lib/table/data/options/table-options.if.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L349)
 
 ___
 
@@ -231,7 +231,7 @@ Remember sorting, scroll position and expanded tree nodes in `localStorage`. Off
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:254](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L254)
+[src/lib/table/data/options/table-options.if.ts:264](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L264)
 
 ___
 
@@ -259,7 +259,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), batchEdit: true };
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:493](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L493)
+[src/lib/table/data/options/table-options.if.ts:503](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L503)
 
 ___
 
@@ -291,7 +291,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:466](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L466)
+[src/lib/table/data/options/table-options.if.ts:476](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L476)
 
 ___
 
@@ -322,7 +322,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:427](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L427)
+[src/lib/table/data/options/table-options.if.ts:437](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L437)
 
 ___
 
@@ -334,7 +334,7 @@ The width of the column resize handle in pixels.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L180)
+[src/lib/table/data/options/table-options.if.ts:190](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L190)
 
 ___
 
@@ -346,7 +346,7 @@ Flag indicating whether the columns are draggable.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:174](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L174)
+[src/lib/table/data/options/table-options.if.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L184)
 
 ___
 
@@ -358,7 +358,7 @@ Represents whether the columns are resizable.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L168)
+[src/lib/table/data/options/table-options.if.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L178)
 
 ___
 
@@ -371,7 +371,7 @@ when it creates the area models – pass the options there as `tableOptions`, to
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:200](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L200)
+[src/lib/table/data/options/table-options.if.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L210)
 
 ___
 
@@ -404,7 +404,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), direction: "rtl" }
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:530](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L530)
+[src/lib/table/data/options/table-options.if.ts:540](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L540)
 
 ___
 
@@ -435,7 +435,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:408](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L408)
+[src/lib/table/data/options/table-options.if.ts:418](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L418)
 
 ___
 
@@ -466,7 +466,7 @@ Training: [Filtering with a live search](https://gui.expert/training/filtering/)
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:237](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L237)
+[src/lib/table/data/options/table-options.if.ts:247](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L247)
 
 ___
 
@@ -500,7 +500,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:389](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L389)
+[src/lib/table/data/options/table-options.if.ts:399](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L399)
 
 ___
 
@@ -548,7 +548,7 @@ Indicates whether a vertical separator should be displayed in the footer.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L194)
+[src/lib/table/data/options/table-options.if.ts:204](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L204)
 
 ___
 
@@ -565,7 +565,7 @@ Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:262](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L262)
+[src/lib/table/data/options/table-options.if.ts:272](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L272)
 
 ___
 
@@ -577,7 +577,7 @@ Returns the focus model of the table. Default: every table creates its own [Focu
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:277](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L277)
+[src/lib/table/data/options/table-options.if.ts:287](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L287)
 
 ___
 
@@ -601,7 +601,7 @@ Training: [Select cells, rows and ranges](https://gui.expert/training/selection-
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:274](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L274)
+[src/lib/table/data/options/table-options.if.ts:284](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L284)
 
 ___
 
@@ -613,7 +613,7 @@ Icons of collapsible header groups ([AreaModelCellGroups](../classes/AreaModelCe
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:209](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L209)
+[src/lib/table/data/options/table-options.if.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L219)
 
 ___
 
@@ -637,7 +637,7 @@ Reserved – currently not evaluated (tree tables always show the expand-all / c
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L203)
+[src/lib/table/data/options/table-options.if.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L213)
 
 ___
 
@@ -653,7 +653,7 @@ Represents whether a vertical separator should be displayed in a header.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L188)
+[src/lib/table/data/options/table-options.if.ts:198](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L198)
 
 ___
 
@@ -678,7 +678,7 @@ If true, the column get the hover background color while the mouse is over the c
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:162](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L162)
+[src/lib/table/data/options/table-options.if.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L172)
 
 ___
 
@@ -691,7 +691,7 @@ If true, the row get the hover background color while the mouse is over the row.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L155)
+[src/lib/table/data/options/table-options.if.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L165)
 
 ___
 
@@ -720,7 +720,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: save
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:544](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L544)
+[src/lib/table/data/options/table-options.if.ts:554](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L554)
 
 ___
 
@@ -754,7 +754,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:512](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L512)
+[src/lib/table/data/options/table-options.if.ts:522](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L522)
 
 ___
 
@@ -762,11 +762,18 @@ ___
 
 • **overflowX**: ``"auto"`` \| ``"scroll"``
 
-The value of the css `overflowX` determines the behavior of horizontal overflow for the table body (scroll port).
+The css `overflow-x` of the scroll viewport (`.ge-table-scroll-viewport`): `"auto"` (default) shows the horizontal
+scroll bar only when the columns are wider than the table, `"scroll"` always.
+
+To hide the scroll bars completely use CSS – there is no `"hidden"` (wheel, touch, keyboard and the API still
+scroll, the table lays out without the bars):
+```css
+.my-table .ge-table-scroll-viewport { scrollbar-width: none; }
+```
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L129)
+[src/lib/table/data/options/table-options.if.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L134)
 
 ___
 
@@ -774,11 +781,18 @@ ___
 
 • **overflowY**: ``"auto"`` \| ``"scroll"``
 
-The value of the css `overflowX` determines the behavior of vertical overflow for the table body (scroll port).
+The css `overflow-y` of the scroll viewport (`.ge-table-scroll-viewport`): `"auto"` (default) shows the vertical
+scroll bar only when the rows are higher than the body, `"scroll"` always.
+
+To hide the scroll bars completely use CSS – there is no `"hidden"` (wheel, touch, keyboard and the API still
+scroll, the table lays out without the bars):
+```css
+.my-table .ge-table-scroll-viewport { scrollbar-width: none; }
+```
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L135)
+[src/lib/table/data/options/table-options.if.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L145)
 
 ___
 
@@ -809,7 +823,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:355](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L355)
+[src/lib/table/data/options/table-options.if.ts:365](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L365)
 
 ___
 
@@ -851,7 +865,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:370](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L370)
+[src/lib/table/data/options/table-options.if.ts:380](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L380)
 
 ___
 
@@ -864,7 +878,7 @@ Default: [WindowsShortcutActionIdMapping](../classes/WindowsShortcutActionIdMapp
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L283)
+[src/lib/table/data/options/table-options.if.ts:293](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L293)
 
 ___
 
@@ -876,7 +890,7 @@ Switch off all keyboard shortcuts of the table (copy, select all, navigation, F2
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:286](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L286)
+[src/lib/table/data/options/table-options.if.ts:296](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L296)
 
 ___
 
@@ -894,7 +908,7 @@ Training: [Tree table with checkboxes](https://gui.expert/training/tree-table/)
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:218](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L218)
+[src/lib/table/data/options/table-options.if.ts:228](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L228)
 
 ___
 
@@ -907,7 +921,7 @@ Add `""` to get "unsorted" as third state. Per column: [ColumnDefIf.sortStatesOr
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:246](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L246)
+[src/lib/table/data/options/table-options.if.ts:256](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L256)
 
 ___
 
@@ -919,7 +933,7 @@ The sort icons shown in sortable header cells.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:240](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L240)
+[src/lib/table/data/options/table-options.if.ts:250](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L250)
 
 ___
 
@@ -945,7 +959,7 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), spreadsheet: true 
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:480](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L480)
+[src/lib/table/data/options/table-options.if.ts:490](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L490)
 
 ___
 
@@ -962,7 +976,7 @@ Delay in ms between the last change of the state (resize, sort, scroll …) and
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:552](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L552)
+[src/lib/table/data/options/table-options.if.ts:562](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L562)
 
 ___
 
@@ -974,7 +988,7 @@ Specifies whether the bottom border of a table is visible.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L148)
+[src/lib/table/data/options/table-options.if.ts:158](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L158)
 
 ___
 
@@ -986,7 +1000,7 @@ Indicates whether the top border of a table is visible or hidden.
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:142](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L142)
+[src/lib/table/data/options/table-options.if.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L152)
 
 ___
 
@@ -998,7 +1012,7 @@ Icons and behaviour of tree tables (arrows, indentation). See [TreeOptionsIf](Tr
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:206](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L206)
+[src/lib/table/data/options/table-options.if.ts:216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L216)
 
 ___
 
@@ -1029,7 +1043,7 @@ const tableOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/data/options/table-options.if.ts:446](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L446)
+[src/lib/table/data/options/table-options.if.ts:456](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/options/table-options.if.ts#L456)
 
 ___
 

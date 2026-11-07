@@ -83,6 +83,19 @@ This is the UI-agnostic table component for your next web app. 😊
 - Full control over the HTML structure and style
 
 
+## Quick answers
+
+- **Hide the scroll bars:** `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – the table uses the full
+  width and height; wheel, touch, keyboard and the API still scroll.
+- **Rows are appended all the time** (live log, ticker): `tableApi.repaintHard({ py })` counts the rows and shows the
+  position in one render pass (`py: Number.MAX_SAFE_INTEGER` follows the end) – since 1.1.107.
+- **Own area model with other row heights:** return them from `getRowHeight(i)` and, if all are equal,
+  `getConstantRowHeight()` – the scroll height follows them (since 1.1.107; `defaultRowHeights` is only the default).
+- **`repaint()` or `repaintHard()`?** `repaint()` for changed values, `repaintHard()` when rows were added or removed.
+- **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
+
+More: [FAQ in the developer guide](https://github.com/guiexperttable/mono/blob/main/instructions.md#626-faq--quick-answers).
+
 ## Links
 
 - [Training: GuiExpert Table step by step](https://gui.expert/training/)

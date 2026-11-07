@@ -1,4 +1,3 @@
-import { toPhysicalScrollLeft } from "./rtl/rtl-util";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 /* eslint @typescript-eslint/no-explicit-any: "off" */
@@ -2717,20 +2716,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {void}
    */
   scrollToPixel(px: number, py: number) {
-    // py is a content position. The scroll bar range differs from the content range – always with a capped scroll
-    // height, but also slightly without: the scroll content is 1 px higher than the rows, the scroll viewport
-    // includes the footer and the horizontal scroll bar. scrollTop = py would leave the target row a few pixels off.
-    const contentRange = this.getContentScrollRangeY();
-    const scrollerRange = this.getScrollerRangeY();
-    if (contentRange > 0 && scrollerRange > 0) {
-      const contentTop = Math.min(contentRange, Math.max(0, py));
-      const scrollTop = contentTop / contentRange * scrollerRange;
-      this.scrollViewport.scrollTo(toPhysicalScrollLeft(px, this.isRtl()), scrollTop);
-      this.pendingContentScroll = { scrollTop: this.scrollViewport.scrollTop, contentTop };
+    // py is a content position (see setContentScrollPosition)
+    if (this.setContentScrollPosition(px, py)) {
       this.adjustAfterScrolling(); // render the exact position now (a scroll event may not fire)
-      return;
     }
-    this.scrollViewport.scrollTo(toPhysicalScrollLeft(px, this.isRtl()), py);
   }
 
   /**
@@ -2784,6 +2773,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   override adjustAfterScrolling() {
     super.adjustAfterScrolling();
+    if (this.adjustingRowNumberWidth) {
+      return; // the nested pass of a row-number width change: the outer pass sends the event (one per render)
+    }
     const viewport = this.scrollViewport;
     this.eventListener.onScroll?.(new GeScrollEvent(
       this.scrollTop,

@@ -702,7 +702,14 @@ ___
 
 • **overflowX**: ``"auto"`` \| ``"scroll"`` = `"auto"`
 
-The value of the css `overflowX` determines the behavior of horizontal overflow for the table body (scroll port).
+The css `overflow-x` of the scroll viewport (`.ge-table-scroll-viewport`): `"auto"` (default) shows the horizontal
+scroll bar only when the columns are wider than the table, `"scroll"` always.
+
+To hide the scroll bars completely use CSS – there is no `"hidden"` (wheel, touch, keyboard and the API still
+scroll, the table lays out without the bars):
+```css
+.my-table .ge-table-scroll-viewport { scrollbar-width: none; }
+```
 
 #### Implementation of
 
@@ -718,7 +725,14 @@ ___
 
 • **overflowY**: ``"auto"`` \| ``"scroll"`` = `"auto"`
 
-The value of the css `overflowX` determines the behavior of vertical overflow for the table body (scroll port).
+The css `overflow-y` of the scroll viewport (`.ge-table-scroll-viewport`): `"auto"` (default) shows the vertical
+scroll bar only when the rows are higher than the body, `"scroll"` always.
+
+To hide the scroll bars completely use CSS – there is no `"hidden"` (wheel, touch, keyboard and the API still
+scroll, the table lays out without the bars):
+```css
+.my-table .ge-table-scroll-viewport { scrollbar-width: none; }
+```
 
 #### Implementation of
 

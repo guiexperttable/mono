@@ -29,6 +29,7 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 013 | [013-tabellenkalkulation.md](013-tabellenkalkulation.md) | Tabellenkalkulation: Excel-Bedienung, Zwischenablage, Undo/Redo, Zellformeln mit A1-Bezügen, Spreadsheet-Modus (5 Teile, 9 Etappen) | Enterprise (teils Community) | 001, 004, 008, 010, 012 | XL |
 | 015 | [015-angular-signal-table.md](015-angular-signal-table.md) | signal-native Angular-Komponente `<guiexpert-table-signal>` (`input()`, `output()`, `model()` für die `TableApi`, zoneless) ab Angular 22 und allen Folgeversionen | – | – | M |
 | 016 | [016-macos-tests-und-angular-demo-scrollbar.md](016-macos-tests-und-angular-demo-scrollbar.md) | Bugfix: 16 Browser-Tests nur auf macOS rot (⌘ statt Strg), Scrollbalken der Angular-Demo verdeckt (npm 1.1.102) | – | – | S–M |
+| 017 | [017-ein-render-je-update-und-scrollhoehe.md](017-ein-render-je-update-und-scrollhoehe.md) | Bugfix aus dem log-commander-Spike: `repaintHard` + Position in einem Render statt drei; Scrollhöhe aus der Zeilenhöhe des Area-Modells statt `defaultRowHeights` (Balken ohne Überlauf) | – | – | M |
 
 Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern). Grobe Schätzung, nur zum Planen.
 

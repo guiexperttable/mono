@@ -30,6 +30,9 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 015 | [015-angular-signal-table.md](015-angular-signal-table.md) | signal-native Angular-Komponente `<guiexpert-table-signal>` (`input()`, `output()`, `model()` für die `TableApi`, zoneless) ab Angular 22 und allen Folgeversionen | – | – | M |
 | 016 | [016-macos-tests-und-angular-demo-scrollbar.md](016-macos-tests-und-angular-demo-scrollbar.md) | Bugfix: 16 Browser-Tests nur auf macOS rot (⌘ statt Strg), Scrollbalken der Angular-Demo verdeckt (npm 1.1.102) | – | – | S–M |
 | 017 | [017-ein-render-je-update-und-scrollhoehe.md](017-ein-render-je-update-und-scrollhoehe.md) | Bugfix aus dem log-commander-Spike: `repaintHard` + Position in einem Render statt drei; Scrollhöhe aus der Zeilenhöhe des Area-Modells statt `defaultRowHeights` (Balken ohne Überlauf) – **umgesetzt** (Branch `fix/ein-render-je-update-scrollhoehe`, Release 1.1.107) | – | – | M |
+| 018 | [018-klick-trotz-api-render.md](018-klick-trotz-api-render.md) | Bugfix aus dem log-commander: `mouseClicked` geht verloren, wenn die Anwendung zwischen `mousedown` und `mouseup` über die API rendert (natives `click` braucht dasselbe Element); empfohlen dazu: kein Zellen-Neuaufbau bei reinem Zeilenzuwachs | – | – | S–M |
+| 019 | [019-live-append.md](019-live-append.md) | Live-Daten anhängen (Log-Viewer): `appendRows`/`rowsAppended` in O(k) ohne Kopie, Filter und Sortierung nur für neue Zeilen, Auswahl/Fokus/Position bleiben (auch Ringpuffer `maxRows`), ein Render je Update; Freeze als App-Muster | Community (Transactions) | 018 | M |
+| 020 | [020-llms-txt-nutzungsanleitung.md](020-llms-txt-nutzungsanleitung.md) | Doku: `llms.txt` als Nutzungsanleitung für KI-Assistenten – Rezepte (Maus-/Tastatur-Events, Zeilen-Selektion, Zellen performant updaten, Zeilen anhängen, Millionen Zeilen, Wrapper …) und Pitfalls, Snippets kompiliert, Gegenprobe mit fremden Subagenten | – | (018, 019) | S–M |
 
 Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern). Grobe Schätzung, nur zum Planen.
 
@@ -70,4 +73,17 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
 
 Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als Entscheidungsprotokoll liegen.
 
-- [x] 001 (Screenreader-Tests offen) · [x] 002 (Angular-Smoke-Test offen) · [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release) · [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release) · [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release) · [x] 008 (Demo-Repo `ep-039`, Videos offen) · [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release) · [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt) · [x] 013 (Screenreader und Excel-Rundreise in Firefox/Safari manuell, Demo-Repo `ep-040`; Angular-Demo-Route `spreadsheet` seit 1.1.99) · [x] 015 (Video 14 nach dem Release; AOT-App und SSR manuell; Demo-Repo entfällt)
+- [x] 001 (Screenreader-Tests offen)
+- [x] 002 (Angular-Smoke-Test offen)
+- [x] 003 (Demo-Repo entfällt, Angular-Demo nach dem Release)
+- [x] 004 (Demo-Repo entfällt, Angular-Demo nach dem Release)
+- [x] 005 (Demo-Repo entfällt, Angular-Demo nach dem Release)
+- [x] 006 (Demo-Repo `ep-036` und Angular-Demo nach dem Release)
+- [x] 007 (Demo-Repo `ep-037` und Angular-Demo nach dem Release)
+- [x] 008 (Demo-Repo `ep-039`, Videos offen)
+- [x] 009 (Angular-Demo nach dem Release; Demo-Repo entfällt)
+- [x] 010 (Angular-Demo nach dem Release; Demo-Repo entfällt)
+- [x] 011 (Demo-Repo `ep-038` und Angular-Demo nach dem Release)
+- [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt)
+- [x] 013 (Screenreader und Excel-Rundreise in Firefox/Safari manuell, Demo-Repo `ep-040`; Angular-Demo-Route `spreadsheet` seit 1.1.99)
+- [x] 015 (Video 14 nach dem Release; AOT-App und SSR manuell; Demo-Repo entfällt)

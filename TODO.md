@@ -703,6 +703,10 @@ Verhalten steht als `// NOTE:` in den Specs.
       auch CPU-gedrosselt; derselbe Commit im CI grün). Dabei zwei echte Schwächen behoben (1.1.112): ein `mousemove`
       ohne Bewegung (Chromium nach einem Render unter dem gedrückten Zeiger) startete einen Zug, und ein Drag-/End-Frame
       las den Zeilenindex des ersetzten Elements. Tritt der Test wieder auf: Fokus- und Auswahl-Ereignisse mitloggen.
+      Publish v1.1.112 (nach dem Actions-Ausfall, macOS): wieder rot – 7 statt 8 Klicks (der Test prüfte, bevor der
+      Ersatz-Klick per `setTimeout 0` kam; jetzt wartet er je Klick) und `mouse-handler` „dragging a ColumnDef without
+      limits“ (`userEvent.dragAndDrop` sucht Quelle/Ziel per CSS-Pfad neu – alle Resize-/Drag-Tests dort jetzt mit
+      echter Maus an festen Koordinaten, `realDrag`). Nur Tests geändert; 1.1.112 nicht veröffentlicht.
 
 - [x] `appendRows`/`rowsAppended`, Showcase `logtail`, Demo `log-tail.html`, Training `live-data#append`, Video-Skript
       `videos/15-live-log/` (Design-Dokument `prompts/019-live-append.design.md`).

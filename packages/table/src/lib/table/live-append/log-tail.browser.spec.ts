@@ -83,7 +83,10 @@ describe.each(DIRECTIONS)('LogTailController (%s)', direction => {
       await realMouse.down();
       await frames(2); // updates while the button is held – the view does not jump, the rows still move up
       await realMouse.up();
-      await nextFrame();
+      // a render replaced the pressed cell: the table reports the click itself (setTimeout 0) – on a busy CI runner
+      // only after some frames. Wait for it before the next press (before, the 8th click was counted too early and two
+      // pending reports could overlap; macOS runner, 1.1.111 / 1.1.112)
+      await vi.waitFor(() => expect(t.clicked.length).toBe(i + 1), { timeout: 2_000 });
     }
     t.live.stop();
     expect(t.clicked.length).toBe(8);

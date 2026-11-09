@@ -18,10 +18,30 @@ import {
 } from '../../../test-utils/mount-table';
 import { realMouse } from '../../../test-utils/real-mouse';
 
-afterEach(() => {
+afterEach(async () => {
   destroyAllTables();
   vi.restoreAllMocks();
+  await realMouse.move(0, 0); // the next test starts without a hovered cell
 });
+
+/**
+ * Drags `source` (centre) to a point of `target` with the REAL mouse at coordinates read once up front, and waits until
+ * the end of the drag was handled (it runs in the next animation frame). Not userEvent.dragAndDrop: that one resolves
+ * source and target again by a CSS path while the drag repaints the header – on the macOS CI runner a drag then
+ * sometimes did not arrive (1.1.108, 1.1.112).
+ */
+async function realDrag(source: Element, target: Element, targetPosition?: { x: number; y: number }) {
+  const s = source.getBoundingClientRect();
+  const t = target.getBoundingClientRect();
+  const x = s.left + s.width / 2, y = s.top + s.height / 2;
+  const tx = targetPosition ? t.left + targetPosition.x : t.left + t.width / 2;
+  const ty = targetPosition ? t.top + targetPosition.y : t.top + t.height / 2;
+  await realMouse.move(x, y);
+  await realMouse.down();
+  await realMouse.move(tx, ty, 4);
+  await realMouse.up();
+  await nextFrame();
+}
 
 interface MountOpts {
   rows?: number;
@@ -325,7 +345,7 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
   it('dragging the handle 52 px to the right widens the column by 52 px', async () => {
     const { host, model, dragging, draggingEnd } = await mountMouseTable();
     const handle = resizeHandle(host, 0)!; // centre at x = 98
-    await userEvent.dragAndDrop(handle, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 50, y: 10 } });
+    await realDrag(handle, getCellDiv(host, 'header', 'center', 0, 1), { x: 50, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(0)).toBe(152);
     expect(getCellDiv(host, 'body', 'center', 0, 0).style.width).toBe('152px');
@@ -339,7 +359,7 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
 
   it('dragging to the left narrows the column', async () => {
     const { host, model } = await mountMouseTable();
-    await userEvent.dragAndDrop(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 40, y: 10 } });
+    await realDrag(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { x: 40, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(1)).toBe(100 - (198 - 140));
   });
@@ -352,7 +372,7 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
       ColumnDef.create({ property: 'value', width: px100 }),
     ];
     const { host, model } = await mountMouseTable({ columnDefs });
-    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
+    await realDrag(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { x: 50, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(0)).toBe(150);
   });
@@ -364,7 +384,7 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
       ColumnDef.create({ property: 'value', width: px100 }),
     ];
     const { host, model } = await mountMouseTable({ columnDefs });
-    await userEvent.dragAndDrop(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 40, y: 10 } });
+    await realDrag(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { x: 40, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(1)).toBe(80);
   });
@@ -376,7 +396,7 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
       ColumnDef.create({ property: 'value', width: px100 }),
     ];
     const { host, model } = await mountMouseTable({ columnDefs });
-    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
+    await realDrag(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { x: 50, y: 10 });
     await nextFrame();
     // 20 % of 800 px minus a vertical scroll bar (0 … 20 px, depends on the platform)
     expect(model.getColumnWidth(0)).toBeGreaterThanOrEqual(156);
@@ -454,10 +474,10 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
       ColumnDef.create({ property: 'value', width: px100 }),
     ];
     const { host, model } = await mountMouseTable({ columnDefs });
-    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { targetPosition: { x: 50, y: 10 } });
+    await realDrag(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 2), { x: 50, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(0)).toBe(252);
-    await userEvent.dragAndDrop(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 10, y: 10 } });
+    await realDrag(resizeHandle(host, 1)!, getCellDiv(host, 'header', 'center', 0, 1), { x: 10, y: 10 });
     await nextFrame();
     expect(model.getColumnWidth(1)).toBeLessThan(50);
   });
@@ -468,7 +488,7 @@ describe('column drag & drop (columnsDraggable)', () => {
   it('dragging the header of column 0 onto column 2 moves the column', async () => {
     const { host, model } = await mountMouseTable();
     expect(headerLabels(host)).toEqual(['ID', 'NAME', 'VALUE']);
-    await userEvent.dragAndDrop(getCellDiv(host, 'header', 'center', 0, 0), getCellDiv(host, 'header', 'center', 0, 2));
+    await realDrag(getCellDiv(host, 'header', 'center', 0, 0), getCellDiv(host, 'header', 'center', 0, 2));
     await nextFrame();
     expect(headerLabels(host)).toEqual(['NAME', 'VALUE', 'ID']);
     expect(model.getColumnDefs()!.map(cd => cd.property)).toEqual(['name', 'value', 'id']);
@@ -580,7 +600,7 @@ describe('column drag & drop (columnsDraggable)', () => {
 
   it('columnsDraggable = false keeps the column order', async () => {
     const { host, model } = await mountMouseTable({ tableOptions: { columnsDraggable: false } });
-    await userEvent.dragAndDrop(getCellDiv(host, 'header', 'center', 0, 0), getCellDiv(host, 'header', 'center', 0, 2));
+    await realDrag(getCellDiv(host, 'header', 'center', 0, 0), getCellDiv(host, 'header', 'center', 0, 2));
     await nextFrame();
     expect(headerLabels(host)).toEqual(['ID', 'NAME', 'VALUE']);
     expect(model.getColumnDefs()!.map(cd => cd.property)).toEqual(['id', 'name', 'value']);

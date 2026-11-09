@@ -16,6 +16,7 @@
     "test:core": "pnpm --filter @guiexpert/table test",
     "test:core:unit": "pnpm --filter @guiexpert/table test:unit",
     "test:perf": "pnpm --filter @guiexpert/table test:perf",
+    "check:llms": "node scripts/check-llms-snippets.mjs",
     "test:wrappers": "pnpm --filter \"./packages/*-table\" --filter \"./angular-builds/*\" --workspace-concurrency=1 test",
     "test:angular": "pnpm --filter angular-build-ng22 test",
     "build:libs": "pnpm --filter \"./packages/*\" build",

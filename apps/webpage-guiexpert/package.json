@@ -9,7 +9,7 @@
     "i": "pnpm i",
     "dev": "pnpm pre:build && astro dev",
     "start": "pnpm pre:build && astro dev",
-    "pre:build": "node copy_script_demo_table_models.js && node copy_script_table.js",
+    "pre:build": "node copy_script_demo_table_models.js && node copy_script_table.js && node -e \"require('fs').copyFileSync('../../llms.txt', 'public/llms.txt')\"",
     "build": "pnpm pre:build && astro build",
     "deploy": "node deploy.cjs",
     "deploy-but-no-img": "node deploy-but-no-images.cjs",

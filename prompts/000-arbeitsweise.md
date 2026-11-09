@@ -114,8 +114,11 @@ Regeln aus CLAUDE.md §6:
   (ohne ihn bauen die `<ApiLink>`s im Training nicht).
 - `instructions.md`: Abschnitt an passender Stelle; alle `ts`-Blöcke kompilieren (Snippets extrahieren → `tsc` strict mit
   `paths` auf `packages/*/src`). `packages/angular-table/instructions.md`, wenn Angular-spezifisch etwas zu sagen ist.
-- `README.md` (Root), `packages/table/README.md` („Features“), `llms.txt` (Root) **und**
-  `apps/webpage-guiexpert/public/llms.txt` („Key Features“, Kapitelzahl).
+- `README.md` (Root), `packages/table/README.md` („Features“), `llms.txt` (Root, seit Prompt 020 eine
+  **Nutzungsanleitung**: Feature-Zeile unter „Feature reference“, typische Aufgabe als Rezept unter „How to use –
+  recipes“, Fallen unter „Pitfalls“; `pnpm check:llms` kompiliert jeden `ts`-Block). Die Website-Kopie
+  `apps/webpage-guiexpert/public/llms.txt` und `packages/table/dist/llms.txt` entstehen aus der Root-Datei
+  (`pre:build` bzw. Core-Build) – nur die Root-Datei bearbeiten.
 - `CLAUDE.md`: betroffene Abschnitte (§3 Architektur, §6 Zahlen, §10 Backlog, §11 Kapitelzahl).
 - `TODO.md`: Eintrag abhaken, „Für die Release-Notes (nächstes Release)“ ergänzen, Funde eintragen.
 

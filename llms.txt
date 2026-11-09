@@ -1,24 +1,522 @@
-# llms.txt for @guiexpert/table
+# GuiExpert Table (@guiexpert/table)
 
-## Project Overview
-@guiexpert/table is a UI-agnostic table component for web applications. It's designed to handle large datasets with excellent performance through virtual scrolling. The project is part of the GuiExpert Table Project, which provides table components for various frameworks.
+> A framework-agnostic, high-performance data grid for the browser: virtual scrolling in both directions (millions of
+> rows), zero runtime dependencies, full control over HTML and CSS, MIT-licensed (also for commercial use). One core
+> (`@guiexpert/table`, plain TypeScript) with wrappers for Angular 14–22, React, Preact, Vue 3, Svelte 4/5, Solid and a
+> Web Component.
 
-## Repository
-- Repository URL: https://github.com/guiexperttable/mono
-- License: MIT (current releases; future releases may be dual-licensed, see https://gui.expert/license/)
+This file is a usage guide for AI assistants and people: **recipes** (the shortest correct code for typical tasks),
+**pitfalls** (symptom → cause → fix), quick answers and a feature reference. Every `ts` snippet below is compiled
+against the real API (`pnpm check:llms`); names are exact – including the misspelled ones (`showCheckboxWihoutExtraColumn`,
+`isHeaderVisibe`, `emmitDataKey`, `createCoverGrisDefaultOptions`), do not "correct" them. If something is not in this
+file or in [instructions.md](https://github.com/guiexperttable/mono/blob/main/instructions.md), do not invent it –
+the code wins (API: https://gui.expert/api).
 
-## Project Structure
-This is a monorepo containing multiple packages:
-- @guiexpert/table: Core UI-agnostic table component (plain JS/TS)
-- @guiexpert/react-table: React wrapper
-- @guiexpert/preact-table: Preact wrapper
-- @guiexpert/solid-table: Solid wrapper
-- @guiexpert/svelte-table: Svelte wrapper
-- @guiexpert/vue3-table: Vue 3 wrapper
-- @guiexpert/webcomponent-table: Web Component wrapper
-- demo-table-models: Shared table models for demos
+## Packages
 
-## Key Features
+- `@guiexpert/table` – the core (plain JS/TS). Stylesheet `@guiexpert/table/css/main.css`.
+- `@guiexpert/react-table`, `@guiexpert/preact-table`, `@guiexpert/solid-table`, `@guiexpert/svelte-table` (Svelte 4 and 5),
+  `@guiexpert/vue3-table`, `@guiexpert/webcomponent-table` – wrappers with the same version as the core (1.1.x / Svelte 5.1.x).
+- `@guiexpert/angular-table@NN.x` – one build per Angular major 14 … 22 (`@guiexpert/angular-table@22` for Angular 22);
+  Angular 22+ also has `TableSignalComponent` (`<guiexpert-table-signal>`).
+- `@guiexpert/demo-table-models` – demo data and model factories (not needed in apps).
+
+Repository: https://github.com/guiexperttable/mono · License: MIT (current releases; future releases may be
+dual-licensed, see https://gui.expert/license/).
+
+## How to use – recipes
+
+Concepts in one paragraph: a **table model** (`TableModelIf`, built by `TableFactory.createTableModel(...)`) holds three
+**area models** (header, body, footer) and the column definitions; **table options** (`TableOptionsIf`, always
+`{ ...new TableOptions(), ... }`) switch features on; a **`TableScope`** renders the model into a host `div` and gives you
+the **`TableApi`** (`tableScope.getApi()`, in wrappers the `tableReady` event). Events go to an **`EventListenerIf`**
+(extend `EventAdapter`). Indices in events and API calls are **display indices** (after filtering and sorting).
+
+### R1 – First table (plain TypeScript)
+
+How do I show an array of objects?
+
+```ts
+import "@guiexpert/table/css/main.css";               // or <link> to https://cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css
+import { EventAdapter, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+
+interface Order { id: number; customer: string; total: number }
+const orders: Order[] = [{ id: 1, customer: "Smith & Co", total: 120.5 }, { id: 2, customer: "Jones", total: 99 }];
+
+const host = document.querySelector<HTMLDivElement>(".table-div")!;   // needs a fixed height, e.g. height: 500px
+const tableModel = TableFactory.createTableModel({ rows: orders, properties: ["id", "customer", "total"] });
+const tableOptions = { ...new TableOptions(), hoverColumnVisible: false };
+const tableScope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter());
+tableScope.firstInit();
+const tableApi = tableScope.getApi();
+```
+
+- The host `div` **must have a height** (`.table-div { height: 500px }` or a flex/grid parent) – otherwise nothing is visible.
+- Values are shown as text by default (no renderer needed). Column labels, widths, renderers:
+  `columnDefs: [ColumnDef.create({ property: "total", headerLabel: "Total", width: px120 })]`
+  instead of `properties`. Sizes: `px0 … px500` or `new Size(2, "weight")` / `new Size(30, "%")`.
+- Remove or replace the table: `tableApi.destroy()` first (wrappers do it themselves). → instructions.md 2, 4.1, 5.1–5.2
+
+### R2 – The same table in a framework (and how to get the TableApi)
+
+Every wrapper takes `tableModel` + `tableOptions` and reports the `TableApi` once (`tableReady`). **A new model or
+options object re-creates the table** (state, scroll position, selection gone) – create them once (outside the
+component, `useMemo`, a constant / `shallowRef`, a class field) and change data through the `TableApi`.
+
+```tsx
+// React (Preact and Solid: same props)
+import { GuiexpertTable } from "@guiexpert/react-table";
+import { GeMouseEvent, TableApi, TableFactory, TableOptions } from "@guiexpert/table";
+import { useMemo, useRef } from "react";
+
+export function Orders({ orders }: { orders: { id: number; total: number }[] }) {
+  const api = useRef<TableApi>();
+  const tableModel = useMemo(() => TableFactory.createTableModel({ rows: orders, properties: ["id", "total"] }), [orders]);
+  const tableOptions = useMemo(() => new TableOptions(), []);
+  return <div className="table-div">
+    <GuiexpertTable tableModel={tableModel} tableOptions={tableOptions}
+      tableReady={(a: TableApi) => api.current = a}
+      mouseClicked={(e: GeMouseEvent) => console.log(e.rowIndex)} />
+  </div>;
+}
+```
+
+- Callback props may be inline functions – the wrapper always calls the latest one; only `tableModel`/`tableOptions`
+  identity matters. React/Preact/Solid clicks are not debounced. The component fills its parent (100 % × 100 %): give
+  the parent a height.
+- **Vue 3**: `<GuiexpertTable :tableModel :tableOptions @tableReady="api = $event" @mouseClicked="…" />`; model as a
+  constant or `shallowRef` (a deep `ref()` wraps it in a proxy). Clicks are debounced (`debounceMouseClickDelay`, 150 ms, `0` = immediate).
+- **Angular** (14–22): `<guiexpert-table [tableModel]="model" [tableOptions]="options" (tableReady)="api = $event" (mouseClicked)="…">`
+  (`TableComponent`, standalone; `(mouseDraggingEnded)`, `(contextMenu)` – not `(contextmenu)`). **Angular 22+**:
+  `<guiexpert-table-signal [tableModel]="model" [(tableApi)]="api" />` with `api = signal<TableApi | undefined>(undefined)`
+  (no `tableReady`, zoneless). Guide: `packages/angular-table/instructions.md`.
+- **Svelte**: `<GuiexpertTable {tableModel} {tableOptions} on:tableReady={e => api = e.detail} />` or (runes)
+  `onTableReady={a => api = a}`.
+- **Web Component**: `customElements.define("guiexpert-table", GuiexpertTable)` yourself, then
+  `el.data = new TableModelAndOptions(tableModel, tableOptions)`; events are `CustomEvent`s on the element (`e.detail`).
+  → instructions.md 4.2–4.8
+
+### R3 – Mouse events (click, double click, context menu)
+
+```ts
+import { EventAdapter, GeMouseEvent, SimpleDomService, TableFactory, TableOptions, TableScope } from "@guiexpert/table";
+
+interface Order { id: number; customer: string }
+declare const host: HTMLDivElement;
+declare const orders: Order[];
+
+const listener = new EventAdapter();
+listener.onMouseClicked = (evt: GeMouseEvent) => {
+  if (evt.areaIdent !== "body") return;                                   // "header" | "body" | "footer"
+  const order = tableApi.getBodyModel().getRowByIndex(evt.rowIndex) as Order; // the DISPLAYED row (filter/sort applied)
+  if (evt.clickCount === 2) console.log("open", order.id); else console.log("select", order.id);
+};
+listener.onContextmenu = (evt: GeMouseEvent) => {
+  evt.originalEvent?.preventDefault();                                    // no browser menu – show your own menu
+  console.log("menu at", evt.originalEvent?.clientX, evt.originalEvent?.clientY, "row", evt.rowIndex);
+};
+const tableModel = TableFactory.createTableModel({ rows: orders, properties: ["id", "customer"] });
+const tableScope = new TableScope(host, tableModel, new SimpleDomService(), new TableOptions(), listener);
+tableScope.firstInit();
+const tableApi = tableScope.getApi();
+const unsubscribe = tableApi.subscribe({ onMouseClicked: e => console.log("second listener", e.rowIndex) });
+```
+
+- `rowIndex`/`columnIndex` are display/model indices – never use `orders[evt.rowIndex]` (wrong after sorting or
+  filtering). `getRowByIndex()` returns `any` (cast it); `undefined` outside the rows. Column by name:
+  `tableApi.getColumnIndex("customer")`. Without a selection model a click still fires `onMouseClicked` and moves the
+  focus frame – it only selects nothing.
+- A double click arrives as a click with `clickCount: 1`, then one with `clickCount: 2`. On a header cell a double click
+  sorts (sortable columns), on an editable body cell it opens the editor.
+- Since 1.1.108 a click is reported even if your code renders between `mousedown` and `mouseup` (live data).
+- There is no built-in context menu – `onContextmenu` + your own HTML. `onMouseMoved` fires per mouse move (keep it cheap).
+  → instructions.md 6.5, training "events-and-context-menu"
+
+### R4 – Keyboard: built-in keys and your own keys
+
+Built in (WAI-ARIA grid): arrows, Home/End, Ctrl/⌘+Home/End, Page Up/Down, Enter (`ACTIVATE_CELL`), F2 (edit),
+Ctrl/⌘+A, Ctrl/⌘+C – macOS uses ⌘. There is **no keyboard event in `EventListenerIf`**: react to your own keys with a
+`keydown` listener on the host and read the focused cell with `getActiveCell()`.
+
+```ts
+import { ShortcutActionIdMapping, TableApi, TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+declare const host: HTMLDivElement;      // the element you passed to TableScope (in wrappers: the component's element)
+declare const tableApi: TableApi;
+
+host.addEventListener("keydown", evt => {          // the Delete key removes the focused row
+  if (evt.key !== "Delete") return;
+  const cell = tableApi.getActiveCell();          // [row, column] of the focused body cell, or undefined
+  if (!cell) return;
+  const row = tableApi.getBodyModel().getRowByIndex(cell[0]);
+  tableApi.removeRows([row]);
+  tableApi.repaintHard();
+});
+
+const shortcutActionIdMapping: ShortcutActionIdMapping = { "ctrl c": "COPY_2_CLIPBOARD", "f2": "START_EDITING" };
+const tableOptions: TableOptionsIf = { ...new TableOptions(), shortcutActionIdMapping }; // spellings are harmonized
+tableApi.triggerAction("NAVIGATE_DOWN");                                                // run an action from code
+```
+
+- Every table has a cell focus by default (an own `FocusModel("cell")`): a click or the arrow keys move it, so
+  `getActiveCell()` works without configuration. To keep a reference, pass `getFocusModel: () => focusModel`
+  (`new FocusModel("cell")`) and read `focusModel.getFocus()`; `onFocusChanged` reports moves.
+- Your `keydown` listener and the table's own handler both run (both listen on the host); the table does not stop the
+  event. Enter also triggers the built-in `ACTIVATE_CELL` (toggles a row checkbox / tree node, else nothing); with
+  `editing` (Excel-style) Delete also clears the selected cells – remap or disable those keys
+  (`shortcutActionIdMapping`, `shortcutActionsDisabled: true` switches all built-in keys off).
+- `removeRows(rows, predicate?)` works on a `TableFactory.createTableModel({ rows })` body: O(n) (filters all rows into a
+  new array), returns nothing and does not repaint – call `repaintHard()`. Selection and focus indices are not
+  adjusted (the focus stays at the same index = the next row) – clear or re-set the selection afterwards.
+- Your own shortcut that the browser also uses (Ctrl/⌘+S): `evt.preventDefault()` in your `keydown` listener; check
+  `evt.ctrlKey || evt.metaKey` (macOS).
+- The table is **one tab stop**; controls inside cells must have `tabindex="-1"`.
+  → instructions.md 6.4, 6.14
+
+### R5 – Row selection and the selected rows
+
+The default selection type is `"none"` – nothing is selected until you pass a selection model.
+
+```ts
+import { CellRange, SelectionModel, TableApi, TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+interface Order { id: number; total: number }
+declare const tableApi: TableApi;
+
+const selectionModel = new SelectionModel("row", "multi");   // "none" | "cell" | "row" | "column" | "range"; "single" | "multi"
+const tableOptions: TableOptionsIf = { ...new TableOptions(), getSelectionModel: () => selectionModel };
+
+function selectedOrders(): Order[] {                           // the selected row OBJECTS
+  const body = tableApi.getBodyModel();
+  return selectionModel.getMergedRowIndices(body.getRowCount()).map(i => body.getRowByIndex(i) as Order);
+}
+const sumOfSelected = () => selectedOrders().reduce((sum, o) => sum + o.total, 0);
+
+selectionModel.addSelection(CellRange.singleRow(3));          // select from code (repaint to show it)
+tableApi.repaint();
+tableApi.clearSelection();                                     // clears and repaints
+```
+
+- React to changes: `listener.onSelectionChanged = (sm: SelectionModelIf) => …` (wrappers: `selectionChanged`) – fires
+  after mouse and keyboard changes, the model is already up to date (reading your own `selectionModel` is the same).
+  Mouse: click, Shift+click (range), Ctrl/⌘+click (toggle), drag (`"range"`). Focus (the frame) ≠ selection.
+- `getMergedRowIndices()` returns a new sorted array of display indices – O(selected rows); for "select all" on huge
+  tables check `selectionModel.isAllSelected()` first.
+- `tableApi.getSelectionAggregates()` = count/sum/avg/min/max of the selected **numeric cells** (all columns) – for one
+  column use the row objects as above.
+- Indices: `externalFilterChanged()` and `setRows()` clear the selection; sorting keeps the indices (not the rows).
+  `appendRows()` keeps the selection at its rows. Restore by row id: state API part `selection` (`getState`/`applyState`).
+- Checkboxes instead: `TableFactory.createTableModel({ rows, properties, rowCheckboxVisible: true })` + `onCheckboxChanged`.
+  → instructions.md 6.4, 6.6, 6.11
+
+### R6 – Change data: the right update
+
+| What changed | Call | Cost |
+|---|---|---|
+| a few cell values | `tableApi.updateCells([new TableCellUpdateEvent("body", row, col, value, cssClasses?)])` | only these cells |
+| values inside your row objects (same row count) | `tableApi.repaint()` | one render |
+| row count or row heights (own area model) | `tableApi.repaintHard()` / `repaintHard({ py })` | one render |
+| rows keep coming (log, stream) | `tableApi.appendRows(rows, { follow, maxRows })` (R7) | O(k), one render |
+| a new data set | `tableApi.setRows(rows)` + `tableApi.repaintHard()` (+ `externalFilterChanged()` with a filter) | O(n) |
+| new columns / structure | a new table model | rebuild – avoid for data |
+
+```ts
+import { TableApi, TableCellUpdateEvent } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+const changes = new Map<number, number>();               // display row → new price, collected from a WebSocket
+
+function flush() {                                       // once per animation frame, not once per message
+  const col = tableApi.getColumnIndex("price");
+  tableApi.updateCells([...changes].map(([row, price]) =>
+    new TableCellUpdateEvent("body", row, col, price, { "ge-table-color-error": price < 0 })));
+  changes.clear();
+  requestAnimationFrame(flush);
+}
+requestAnimationFrame(flush);
+```
+
+- `updateCells` takes the **displayed** row index and writes into that row object (after sorting/filtering this is not
+  the index in your array). A totals footer follows automatically. `updateCells` with a body from
+  `createTableModel({ rows })` updates **your** objects – read the old value before the call.
+- `cssClasses` (`{ className: boolean }`, optional) adds (`true`) or removes (`false`) classes on the **current** cell
+  element only – a flash: it stays until the cell is drawn again (scrolling, a repaint), then it is gone. Set both
+  directions on every update (`{ "tick-up": up, "tick-down": !up }`), otherwise an old class stays. Colors that must
+  survive scrolling belong into the model (`getCustomClassesAt`, see the heatmap showcases). Your CSS, e.g.
+  `.tick-up { color: #15803d } .tick-down { color: #be123c }` (no prefix needed). A ticker:
+
+```ts
+import { TableApi, TableCellUpdateEvent } from "@guiexpert/table";
+
+interface Quote { symbol: string; price: number }
+declare const tableApi: TableApi;
+
+setInterval(() => {                                       // 50 random prices every 100 ms – one updateCells call
+  const col = tableApi.getColumnIndex("price");
+  const body = tableApi.getBodyModel();
+  const events: TableCellUpdateEvent[] = [];
+  for (let n = 0; n < 50; n++) {
+    const row = Math.floor(Math.random() * body.getRowCount());   // a displayed row
+    const quote = body.getRowByIndex(row) as Quote;
+    const price = Math.round(quote.price * (1 + (Math.random() - 0.5) / 50) * 100) / 100;
+    const up = price >= quote.price;
+    events.push(new TableCellUpdateEvent("body", row, col, price, { "tick-up": up, "tick-down": !up }));
+  }
+  tableApi.updateCells(events);                            // only these cells are redrawn
+}, 100);
+```
+
+Showcase "crypto", training chapter "live-data".
+  → instructions.md 6.9, 6.13, showcases "fps", "crypto"
+
+### R7 – A rolling log: rows that keep coming (since 1.1.108)
+
+```ts
+import { TableApi } from "@guiexpert/table";
+
+interface LogLine { time: string; level: string; text: string }
+declare const tableApi: TableApi;
+const pending: LogLine[] = [];
+let frozen = false, newBelow = 0, scheduled = false;
+
+function onMessage(line: LogLine) {                      // e.g. WebSocket: buffer, append once per frame
+  pending.push(line);
+  if (!scheduled) { scheduled = true; requestAnimationFrame(flush); }
+}
+function flush() {
+  scheduled = false;
+  const result = tableApi.appendRows(pending.splice(0), { follow: frozen ? false : "auto", maxRows: 1_000_000 });
+  if (result) newBelow = result.following ? 0 : newBelow + result.shown;   // "+N new lines"
+}
+function setFrozen(f: boolean) { frozen = f; }            // "Freeze scroll" button
+function scrollToEnd() { frozen = false; newBelow = 0; tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER }); }
+```
+
+- `appendRows` (body from `TableFactory.createTableModel({ rows })`): pushes into **your** array (no copy), runs the
+  filter only for the new rows, merges them into a sorted view, keeps selection/focus/anchor at their rows, renders once
+  – and not at all if only rows below the view came in. `follow: "auto"` = stay at the end if the view was at the end
+  (an empty table counts as "at the end"), otherwise keep the first visible row; `false` = always keep the first
+  visible row (also at the end, also while the ring buffer drops older rows – unless that row itself leaves); while the
+  mouse button is held, the rows under the pointer stay. After `scrollToEnd()` the view is at the end, so `"auto"`
+  follows again.
+- Result `{ added, shown, removed, following }`: `shown` = new rows that passed the filter (use it for "+N new lines"),
+  `removed` = rows dropped by `maxRows`. A body that cannot append (tree, row groups, pivot) → `false`.
+- `maxRows`: the oldest rows leave in blocks of ≥ 1 % (row count 99–100 % of `maxRows`). Measured (Chromium, Mac): ~3–4 ms
+  per update of 500 rows incl. render, the same for 100,000 and 2,000,000 rows; ~0.5 ms for a reader in the middle.
+- Own area model: append yourself (a loop – `push(...lines)` overflows above ~100,000), then
+  `tableApi.rowsAppended(count, { follow: "auto", removedAtStart })`.
+- Clicks: read the line in the handler (`getRowByIndex(evt.rowIndex)`) – a stored index points to another line after
+  the next update. Keys: R4. Pause the intake = keep buffering, call `appendRows` later once.
+- Don't: `addRows()` per tick (copies all rows, resets filter and sort order), a new model per tick, `repaintHard()`
+  without a position. Showcase "logtail", `apps/table-demo/log-tail.html`. → instructions.md 6.9
+
+### R8 – Millions of rows (own area model)
+
+```ts
+import { AreaModel, ColumnDef, TableFactory, px120 } from "@guiexpert/table";
+
+class MillionRows extends AreaModel {                     // values on demand – no object per row
+  constructor(private readonly count: number) { super(); this.areaIdent = "body"; }
+  override getRowCount(): number { return this.count; }
+  override getRowHeight(): number { return 24; }
+  override getConstantRowHeight(): number { return 24; }  // all rows equal → O(1) positions
+  override getValueAt(row: number, col: number): string { return col === 0 ? String(row) : `cell ${row}/${col}`; }
+}
+const tableModel = TableFactory.createTableModel({
+  bodyAreaModel: new MillionRows(10_000_000),
+  columnDefs: ["#", "A", "B"].map((label, i) => new ColumnDef("c" + i, label, px120)),
+});
+```
+
+- Variable heights: return them from `getRowHeight(i)` and leave out `getConstantRowHeight()` (prefix sums, O(log n)).
+  The scroll height comes from the model (since 1.1.107). Showcase "large" (2 million rows). → instructions.md 5.5
+
+### R9 – Sorting and filtering
+
+```ts
+import { ColumnDef, TableApi, TableOptions, TableOptionsIf, TrueFn } from "@guiexpert/table";
+
+interface Order { id: number; customer: string; total: number }
+declare const tableApi: TableApi;
+let search = "";
+
+const columnDefs = [
+  ColumnDef.create({ property: "customer", headerLabel: "Customer", sortable: TrueFn }),
+  ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
+    sortComparator: (a: number, b: number) => a - b }),
+];
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  externalFilterFunction: (order: Order) => order.customer.toLowerCase().includes(search),
+};
+function onSearch(text: string) { search = text.toLowerCase(); tableApi.externalFilterChanged(); }
+tableApi.sortByColumn("total", "desc");                   // like a double click on the header
+```
+
+- The header sorts on **double click** (not single click). After changing data: `tableApi.reSort()`.
+- `externalFilterChanged()` filters all rows, clears the selection and scrolls to the top. There is no built-in filter
+  UI – build inputs yourself. → instructions.md 6.2, 6.3
+
+### R10 – Own cell renderer
+
+```ts
+import { AreaIdent, AreaModelIf, CellRendererIf, ColumnDef, DomServiceIf, RendererCleanupFnType } from "@guiexpert/table";
+
+class StatusRenderer implements CellRendererIf {
+  render(cellDiv: HTMLDivElement, rowIndex: number, columnIndex: number, areaIdent: AreaIdent,
+         areaModel: AreaModelIf, cellValue: unknown, domService: DomServiceIf): RendererCleanupFnType | undefined {
+    const badge = domService.createElement<HTMLSpanElement>("span");
+    domService.addClass(badge, "status-" + String(cellValue));
+    domService.appendChild(badge, domService.createText(String(cellValue)));  // text – never data in innerHTML
+    domService.appendChild(cellDiv, badge);
+    return undefined;                                                          // or a cleanup function
+  }
+}
+const column = ColumnDef.create({ property: "status", headerLabel: "Status", bodyRenderer: new StatusRenderer() });
+```
+
+- Built in: `NumberCellRenderer`, `ProgressBarCellRenderer`, `StarRatingCellRenderer`, `DateToLocaleDateCellRenderer`,
+  `TrueFalseCellRenderer`, `CheckboxCellRenderer`, … Framework components as cells: `ComponentRendererWrapper` (React,
+  Preact, Vue, Svelte, Solid), Angular `RenderWrapperFactory.create(MyComponent, cdr)`.
+- If you must build HTML: `escapeHtml(value)`. Buttons/inputs in a cell: `tabindex="-1"`. → instructions.md 6.1, 6.14
+
+### R11 – Editing
+
+```ts
+import { ColumnDef, EventAdapter, GeModelChangeEvent, TableOptions, TableOptionsIf, TrueFn } from "@guiexpert/table";
+
+const columns = [ColumnDef.create({ property: "qty", headerLabel: "Qty", editable: TrueFn,
+  validate: (value: unknown) => typeof value === "number" && value >= 0 ? undefined : "must be ≥ 0" })];
+const tableOptions: TableOptionsIf = { ...new TableOptions(), editing: true };   // Excel-style: type over, Enter, Tab, Delete
+const listener = new EventAdapter();
+listener.onModelChanged = (evt: GeModelChangeEvent) => {
+  evt.changes?.forEach(c => console.log(c.property, c.oldValue, "→", c.newValue, "row", c.row));  // save here
+};
+```
+
+- Without `editing`: double click / F2 opens the classic in-cell editor (`editable`). "Collect, then save":
+  `batchEdit: true` + `commitBatchEdit()`. Paste from Excel: `clipboard: true`; undo: `undo: true`.
+  → instructions.md 6.7, 6.17, 6.20–6.22
+
+### R12 – Columns: fixed, hidden, width, index
+
+- Fixed columns belong to the **model**: `TableFactory.createTableModel({ rows, properties, fixedLeftColumnCount: 1, fixedRightColumnCount: 1 })`.
+- `tableApi.setColumnVisible("total", false)`, `tableApi.setColumnWidth(index, px)`, `tableApi.autoResizeColumns()`.
+- Row numbers (`rowNumbersVisible: true`), a checkbox column or a row-group column shift all column indices by one –
+  always `tableApi.getColumnIndex(property)`. Header groups: `instructions.md` 5.2, demo "headergroup".
+
+### R13 – Look and feel
+
+- CSS variables `--ge-table-*` (`packages/table/css/table-color-vars.css`), dark mode with `<html data-theme="dark">`.
+- Hide scroll bars: `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` (no option needed).
+- Right-to-left: `tableOptions.direction: "rtl"` (or `"auto"`). Borders, hover: `verticalBorderVisible`,
+  `hoverRowVisible`, `hoverColumnVisible`. → instructions.md 6.12, 6.19
+
+### R14 – Remember the state (sorting, widths, scroll position, selection)
+
+```ts
+import { AutoRestoreOptions, TableApi, TableOptions, TableOptionsIf } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  autoRestoreOptions: {
+    ...new AutoRestoreOptions<{ id: number }>(),
+    getStorageKeyFn: () => "orders-table",        // REQUIRED – without a key nothing is stored
+    getRowId: row => row.id,                      // selection/checked rows by id, not by index
+    autoRestoreSortingState: true, autoRestoreColumnLayout: true, autoRestoreScrollPosition: true,
+    autoRestoreSelectedState: true,
+  },
+};
+const state = tableApi.getState();                 // JSON for your server; later tableApi.applyState(state)
+```
+
+→ instructions.md 6.11
+
+### R15 – Export
+
+`await tableApi.copyToClipboard()` (selection, tab-separated) and `tableApi.downloadExcel("orders.xlsx", "author")`
+(own XLSX writer, the **current view**: filtered and sorted rows + header + footer). All rows or other data:
+`new ExcelService().downloadExcel(matrix, …)`. → instructions.md 6.10
+
+### R16 – Lifecycle
+
+Plain TS: call `tableApi.destroy()` before you replace the model or remove the host (listeners, ResizeObserver, renderer
+cleanups). Wrappers do it on unmount and on a new model/options object. Never create a second `TableScope` on the same
+host without destroying the first.
+
+### R17 – Not built in (and how to do it)
+
+- **Filter UI**: inputs of your own + `externalFilterFunction` + `externalFilterChanged()` (R9).
+- **Context menu**: `onContextmenu` + your own HTML menu (R3); example `apps/table-demo/spreadsheet.html`.
+- **Pagination**: not needed for size (virtual scrolling); if wanted, `setRows(page)` + `repaintHard()`.
+- **Server-side row model** (fetch rows on demand): an own `AreaModel` whose `getValueAt` reads a cache and requests
+  missing blocks; `repaint()` when a block arrives (R8).
+- **Drag between tables**: row drag works inside one table (`rowDrag: true`); between tables use `onRowDragEnd` +
+  `rowDragOptions.managed: false` and move the data yourself.
+
+More (short): tree + checkboxes `TreeFactory` (instructions.md 6.6), master/detail `masterDetail` (6.18), row grouping
+`RowGroupFactory` (5.6), pivot `PivotFactory` (5.7), calculated columns `valueGetter`/`formula` (5.2, 5.9), spreadsheet
+`SpreadsheetFactory.create` (6.25), cover grid (5.10), totals footer `footerAggregates` (5.4), row numbers (5.2).
+
+## Pitfalls
+
+Symptom → cause → fix.
+
+- **The table is empty / invisible** → the host has no height or the CSS is missing → give the host a fixed height and
+  load `@guiexpert/table/css/main.css`.
+- **The table is rebuilt on every render; selection, scroll position and sorting are lost** → a new model or options
+  object per render (inline in JSX/templates, a deep `ref()`, a computed that creates a new object) → create them once;
+  change data through the `TableApi` (R6).
+- **Clicks select nothing / no `onSelectionChanged`** → selection type defaults to `"none"` → pass
+  `getSelectionModel: () => new SelectionModel("row", "multi")`.
+- **The wrong row is used after sorting/filtering** → `rowIndex` is the displayed index → `getRowByIndex(rowIndex)`,
+  never `myRows[rowIndex]`.
+- **The wrong column** → row numbers/checkbox/group column shift indices → `tableApi.getColumnIndex(property)`.
+- **Single click on the header does not sort** → it sorts on double click → or `tableApi.sortByColumn(...)`.
+- **Selection gone after filtering; view jumps to the top** → `externalFilterChanged()` does that by design → restore via
+  the state API (`getState(["selection"])` / `applyState`) with `getRowId`.
+- **`repaint()` after adding rows shows nothing new / wrong scroll bar** → the row count changed → `repaintHard()`
+  (or `appendRows`).
+- **Slow live updates** → a new model, `setRows` or `addRows` per tick → `updateCells` (values) or `appendRows` (new
+  rows), once per animation frame.
+- **`Maximum call stack size exceeded`** → `array.push(...rows)` with ~100,000+ rows → a `for` loop (or `appendRows`).
+- **Clicks lost while the table updates** (before 1.1.108) → a render between `mousedown` and `mouseup` → update to
+  1.1.108; older: render only when the visible part changed.
+- **Context menu right after creating the table is ignored** → the first 50 ms are swallowed → normal; Angular: use
+  `(contextMenu)` – `(contextmenu)` fires twice (also the native event).
+- **Clicks arrive late in Angular/Vue** → `debounceMouseClickDelay` (150 ms) → `0` for immediate clicks (a double click
+  then also delivers the single click first).
+- **Own model with 20 px rows shows a scroll bar / wrong height** (before 1.1.107) → `defaultRowHeights` won → update,
+  or set `defaultRowHeights.body` to your height. Since 1.1.107 the model's `getRowHeight()` wins.
+- **Shortcut works on Windows, not on the Mac** → checked `ctrlKey` → the table uses ⌘ on macOS; map both or use the
+  table's actions.
+- **Second tab stop / keyboard focus lost in a cell** → focusable elements in a cell → `tabindex="-1"`.
+- **XSS from cell values** → data in `innerHTML` of a renderer → `textContent` / `domService.createText` / `escapeHtml`.
+- **State is not stored** → `autoRestoreOptions` without `getStorageKeyFn` (a console warning says so) → add the key.
+- **`instanceof AreaModelTree` is false** → two copies of the core in the bundle → `isAreaModelTree(x)`, `isTreeRow(x)`;
+  dedupe `@guiexpert/table`.
+- **TypeScript: unknown option** → "corrected" a misspelled API → use `showCheckboxWihoutExtraColumn`, `isHeaderVisibe`,
+  `emmitDataKey`, `createCoverGrisDefaultOptions` as they are.
+- **`AsyncBodyAreaModelObjectArray` cannot be imported** → unfinished, not exported → own `AreaModel` (R8, R17).
+- **Invented APIs** – these do NOT exist: `getSelectedRows()`, `onKeyDown`, `api.addRow()`, `api.refresh()`,
+  `setData()`, `gridOptions`, `rowData`, `columnDefs` as a table option (it is a model parameter). Use R4–R7.
+
+## Quick answers (FAQ)
+Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mono/blob/main/instructions.md#626-faq--quick-answers).
+- Hide the scroll bars: CSS `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – the table uses the full width/height, wheel, touch, keyboard and the API still scroll. No table option needed (`overflowY` is only "auto" | "scroll"). Thin/colored: `scrollbar-width: thin; scrollbar-color: …`.
+- Scroll bar although all rows fit (own AreaModel): fixed in 1.1.107 – the scroll height comes from the model's `getConstantRowHeight()` / `getRowHeight()`. Older versions: set `defaultRowHeights.body` to the model's row height.
+- Rows appended continuously (live log, ticker) and keep the position or follow the end: `tableApi.repaintHard({ py })` – one render pass (since 1.1.107); follow the end with `py: Number.MAX_SAFE_INTEGER`.
+- Clicks lost while the app renders (live tail, `repaint()`/`repaintHard()` between mousedown and mouseup): fixed in 1.1.108 – the table reports `mouseClicked` (and the double click) for the pressed cell itself, once, with the current index of that row object.
+- Rows that keep coming (log, stream, ticker of trades): `tableApi.appendRows(rows, { follow: "auto", maxRows })` (since 1.1.108) – in place, O(k), one render, filter/sort only for new rows, selection/focus stay; freeze = `follow: false`, jump to the end = `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Own AreaModel: `rowsAppended(count, { removedAtStart })`. Not `addRows()`.
+- `repaint()` = values changed, same row count; `repaintHard()` = row count or heights changed; `updateCells()` = single cells.
+- Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
+- Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
+
+## Feature reference
+
+What the table can do – one line per feature, details in instructions.md (each line names the options and API).
+
 - Virtual scrolling for handling large datasets
 - Excellent performance for large tables
 - No third-party dependencies
@@ -55,46 +553,20 @@ This is a monorepo containing multiple packages:
 - State persistence: column layout (width, order, visibility), sorting, scroll position, expanded tree nodes, checked and selected rows, header groups, custom data – in localStorage (tableOptions.autoRestoreOptions: autoRestoreColumnLayout, autoRestoreSortingState, autoRestoreScrollPosition, autoRestoreCollapsedExpandedState, autoRestoreCheckedState, autoRestoreSelectedState, autoRestoreHeaderGroupState, autoRestoreCustomState; storage: StateStorageIf) or on your server (tableApi.getState(parts?), applyState(state, parts?), resetState(), setCustomState(), tableOptions.initialState, EventListenerIf.onStateChanged(GeStateChangeEvent), `stateChanged` event in all wrappers); columns by property, rows by getRowId – since 1.1.92
 - Customizable cell contents via renderers
 
-## Usage
-The core package can be installed via npm:
-```
-npm install --save @guiexpert/table
-```
+## Documentation and links
 
-Basic usage involves:
-1. Adding a container div to your HTML
-2. Creating a table model
-3. Creating a table scope with the container, model, and services
-4. Initializing the table
+- Developer guide (all frameworks, checked against the code): https://github.com/guiexperttable/mono/blob/main/instructions.md
+- Angular guide (14–22, signals): https://github.com/guiexperttable/mono/blob/main/packages/angular-table/instructions.md
+- API reference (TypeDoc): https://gui.expert/api
+- Training (40 chapters, step by step, live demos): https://gui.expert/training/
+- What's new (features since October 2026 with code): https://gui.expert/whats-new/
+- Showcases: https://gui.expert/showcase/ (large, logtail, crypto, treetable, pivot, spreadsheet, masterdetail, rtl …)
+- Demos in the repo: apps/table-demo (plain TS), apps/*-table-demo (frameworks), apps/angular-table-demo
 
-## Documentation
-- Demos: https://gui.expert/demos
-- Training (40 chapters, step by step): https://gui.expert/training/
-- What's new (thirteen features of October 2026 with code): https://gui.expert/whats-new/
-- Documentation: https://gui.expert/doc
-- API: https://gui.expert/api
+## Notes for LLMs
 
-## Framework Compatibility
-The project provides specific packages for different frameworks:
-- Plain JS/TS: @guiexpert/table
-- Angular: @guiexpert/angular-table (versions for Angular 14-22; Angular 22+ additionally TableSignalComponent <guiexpert-table-signal>: input(), output(), model() for the TableApi, zoneless)
-- Vue 3: @guiexpert/vue3-table
-- React: @guiexpert/react-table
-- Preact: @guiexpert/preact-table
-- Solid: @guiexpert/solid-table
-- Svelte: @guiexpert/svelte-table
-- Web Component: @guiexpert/webcomponent-table
-
-## Quick answers (FAQ)
-Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mono/blob/main/instructions.md#626-faq--quick-answers).
-- Hide the scroll bars: CSS `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – the table uses the full width/height, wheel, touch, keyboard and the API still scroll. No table option needed (`overflowY` is only "auto" | "scroll"). Thin/colored: `scrollbar-width: thin; scrollbar-color: …`.
-- Scroll bar although all rows fit (own AreaModel): fixed in 1.1.107 – the scroll height comes from the model's `getConstantRowHeight()` / `getRowHeight()`. Older versions: set `defaultRowHeights.body` to the model's row height.
-- Rows appended continuously (live log, ticker) and keep the position or follow the end: `tableApi.repaintHard({ py })` – one render pass (since 1.1.107); follow the end with `py: Number.MAX_SAFE_INTEGER`.
-- Clicks lost while the app renders (live tail, `repaint()`/`repaintHard()` between mousedown and mouseup): fixed in 1.1.108 – the table reports `mouseClicked` (and the double click) for the pressed cell itself, once, with the current index of that row object.
-- Rows that keep coming (log, stream, ticker of trades): `tableApi.appendRows(rows, { follow: "auto", maxRows })` (since 1.1.108) – in place, O(k), one render, filter/sort only for new rows, selection/focus stay; freeze = `follow: false`, jump to the end = `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Own AreaModel: `rowsAppended(count, { removedAtStart })`. Not `addRows()`.
-- `repaint()` = values changed, same row count; `repaintHard()` = row count or heights changed; `updateCells()` = single cells.
-- Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
-- Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
-
-## For LLMs
-This project is a specialized table component library focused on performance and flexibility. When discussing this project, emphasize its UI-agnostic nature, virtual scrolling capabilities, and support for multiple frameworks. The core functionality is in @guiexpert/table, with framework-specific wrappers provided separately. Before answering a "how do I …?" question, check the Quick answers above and instructions.md (it is checked against the code; the code wins).
+- Prefer the recipes above; for anything else read instructions.md (it is compiled against the code) – the code wins.
+- Do not invent APIs (see the last pitfall); if a feature is listed as "not built in" (R17), say so and show the way
+  with the existing API.
+- Plain TypeScript works in every framework; the wrappers only add props/events and lifecycle.
+- License: MIT for current releases ("free, also for commercial use"); do not quote prices.

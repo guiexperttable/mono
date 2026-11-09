@@ -99,6 +99,10 @@ This is the UI-agnostic table component for your next web app. 😊
 - **Own area model with other row heights:** return them from `getRowHeight(i)` and, if all are equal,
   `getConstantRowHeight()` – the scroll height follows them (since 1.1.107; `defaultRowHeights` is only the default).
 - **`repaint()` or `repaintHard()`?** `repaint()` for changed values, `repaintHard()` when rows were added or removed.
+- **Own keys** (Delete, Enter): `keydown` on the host + `tableApi.getActiveCell()` – there is no keyboard event.
+- **Selected rows:** `selectionModel.getMergedRowIndices(n)` → `tableApi.getBodyModel().getRowByIndex(i)` (pass your own
+  `SelectionModel` – the default type is `"none"`).
+- **AI assistants:** `llms.txt` in this package – recipes and pitfalls, every snippet compiled against the API.
 - **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 
 More: [FAQ in the developer guide](https://github.com/guiexperttable/mono/blob/main/instructions.md#626-faq--quick-answers).

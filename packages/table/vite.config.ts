@@ -43,6 +43,11 @@ export default defineConfig({
           dest: './'
         },
         {
+          // the usage guide for AI assistants (prompt 020) – also in node_modules/@guiexpert/table/llms.txt
+          src: '../../llms.txt',
+          dest: './'
+        },
+        {
           src: 'css/*.css',
           dest: './css/'
         }

@@ -231,7 +231,7 @@ export class TableApi {
    * };
    *
    * // Initialize your table with these options
-   * const tableApi = new TableApi(tableScope);
+   * const tableApi = tableScope.getApi();
    *
    * // Later, when filter criteria change (e.g., in a search input handler)
    * function onFilterTextChanged() {
@@ -505,7 +505,7 @@ export class TableApi {
    *
    * @example
    * // Update data and repaint the table
-   * const tableApi = new TableApi(tableScope);
+   * const tableApi = tableScope.getApi();
    * tableApi.setRows(newData);
    * tableApi.repaint();
    *
@@ -1180,7 +1180,7 @@ export class TableApi {
    *
    * @example
    * // Access the TableScope to perform a custom operation
-   * const tableApi = new TableApi(myTableScope);
+   * const tableApi = myTableScope.getApi();
    * const tableScope = tableApi.getTableScope();
    *
    * // Example: Manually trigger a context menu at a specific location
@@ -3162,7 +3162,7 @@ export class TableApi {
    * @example
    * ```typescript
    * // Get the first visible row index
-   * const tableApi = new TableApi(tableScope);
+   * const tableApi = tableScope.getApi();
    * const firstVisibleIndex = tableApi.getFirstVisibleRowIndex();
    *
    * // Use the index for scroll position calculations

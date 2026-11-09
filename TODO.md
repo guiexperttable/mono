@@ -662,6 +662,21 @@ Verhalten steht als `// NOTE:` in den Specs.
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
 
+## llms.txt als Nutzungsanleitung (Prompt 020, 09.11.2026)
+
+- [x] `llms.txt` neu: Rezepte R1–R17, Pitfalls, Quick answers, Feature-Referenz; `pnpm check:llms` (CI); Website-Kopie per
+      `pre:build`, im npm-Paket (`dist/llms.txt`). Blindtest mit fremden Subagenten: Design-Dokument.
+- [x] B5: `instructions.md` 6.5 sagte, React leite `scroll` nicht weiter – falsch (Callback-Prop `scroll`), korrigiert.
+- [x] B6: vier JSDoc-Beispiele mit `new TableApi(tableScope)` → `tableScope.getApi()`.
+- [ ] **B1 – kein Tastatur-Event** in `EventListenerIf` (`GeKeyEvent` exportiert, nie gemeldet). Heute: `keydown` am Host +
+      `tableApi.getActiveCell()` (Rezept R4, Test `usage-recipes.browser.spec.ts`). Vorschlag: optionales
+      `onKeyDown?(evt: GeKeyEvent)` mit Fokuszelle und ausgelöster `ActionId`, in allen Wrappern – eigener Prompt.
+- [ ] **B7 – Komfort-Methode `tableApi.getSelectedRows<T>(): T[]`** (heute `getMergedRowIndices` + `getRowByIndex`, Rezept
+      R5). Klein, additiv.
+- [ ] `getSelectionAggregates()` rechnet über alle numerischen Zellen der Auswahl (bei Zeilenauswahl alle Spalten) – ein
+      Parameter `property`/`columns` wäre für „Summe der ausgewählten Beträge“ naheliegend.
+- [ ] `ShortcutService` loggt auf `localhost` (s. o., Prompt 021).
+
 ## Live-Daten (Prompt 019, 09.11.2026)
 
 - [x] `appendRows`/`rowsAppended`, Showcase `logtail`, Demo `log-tail.html`, Training `live-data#append`, Video-Skript

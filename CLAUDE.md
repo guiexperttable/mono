@@ -53,6 +53,7 @@ mono/
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
 | Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
+| `llms.txt`-Snippets prüfen (jeder `ts`-Block einzeln gegen `packages/table/src`, Prompt 020) | `pnpm check:llms` |
 | Performance prüfen (Verhältnis kleines/großes n + Trend gegen Baseline, Prompt 021) | `pnpm test:perf` (~20 s, nicht in `pnpm test`); Baseline übernehmen: `pnpm --filter @guiexpert/table perf:baseline` |
 | Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`; enthält Angular 22 – braucht vorher `pnpm build:core`) |
 | Angular-Wrapper testen | `pnpm test:angular` (baut ng22, testet das `dist` in Chromium; Typen: `pnpm --filter angular-build-ng22 test:types`) |
@@ -696,6 +697,12 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 
 ## 6. Doku, Tests & Verifikation
 
+- **`llms.txt` (Root) = Nutzungsanleitung für KI-Assistenten** (seit Prompt 020, Design `prompts/020-llms-txt.design.md`):
+  Rezepte R1–R17 (kürzester richtiger Code je Aufgabe), Pitfalls (Symptom → Ursache → Lösung, inkl. „erfundene APIs“),
+  Quick answers, Feature-Referenz. Jeder ```` ```ts ````-Block kompiliert (`pnpm check:llms`, `scripts/check-llms-snippets.mjs`,
+  auch in `test-core.yml`); Framework-Code als ```` ```tsx ```` = nur Anzeige. Ausgeliefert als
+  https://gui.expert/llms.txt (Kopie per `pre:build`) und im npm-Paket (`packages/table/dist/llms.txt`, `vite.config.ts`).
+  Charakterisierungstests der Rezept-Annahmen: `usage-recipes.browser.spec.ts`.
 - **Wichtige Antworten auffindbar ablegen** (auch für KI-Assistenten): kurze Frage-Antwort-Einträge in `instructions.md`
   **6.26 FAQ** (jede Antwort für sich verständlich, mit Verweis auf den Abschnitt), gekürzt in `llms.txt` (Root,
   „Quick answers“), `apps/webpage-guiexpert/public/llms.txt` und `packages/table/README.md` („Quick answers“ – liegt im

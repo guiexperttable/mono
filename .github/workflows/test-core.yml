@@ -53,6 +53,9 @@ jobs:
       - name: JSDoc examples compile (docs:check)
         run: pnpm --filter @guiexpert/table docs:check
 
+      - name: llms.txt snippets compile (check:llms)
+        run: node scripts/check-llms-snippets.mjs
+
       - name: Unit tests (Node)
         run: pnpm --filter @guiexpert/table test:unit
 

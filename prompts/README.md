@@ -96,4 +96,5 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [x] 017 (Release 1.1.107)
 - [x] 018 Teil A (Release 1.1.108; Teil B – kein Zellen-Neuaufbau bei reinem Zeilenzuwachs – übernimmt 019)
 - [x] 019 (Video 15 nach dem Release; Tastatur-Event bewusst App-Muster; Angular-Demo nach dem Release)
+- [x] 020 (Blindtest mit fremden Subagenten im Design-Dokument; Lücken B1/B7 als Vorschläge in `TODO.md`)
 - [x] 021 (CI-Lauf `test-perf` und erste `linux-ci`-Baseline nach dem nächsten Push; Stufe 2 sperrend ab ~01.12.2026)

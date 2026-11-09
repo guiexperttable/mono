@@ -1318,7 +1318,7 @@ listener.onSelectionChanged = () => {
 | `checkboxChanged` | `any[]` (checked rows) | tree/row checkboxes |
 | `modelChanged` | `GeModelChangeEvent` | once per edit, fill or batch commit; since 1.1.96 with `changes` (old/new values) and `source` (6.17) |
 | `selectionChanged` / `focusChanged` | `SelectionModelIf` / `FocusModelIf` | |
-| `scroll` | `GeScrollEvent` | not forwarded by the React wrapper |
+| `scroll` | `GeScrollEvent` | all wrappers (React: callback prop `scroll`) |
 | `stateChanged` | `GeStateChangeEvent` | since 1.1.92, see 6.11 |
 | `rowDragStart`, `rowDragMove`, `rowDragEnd` | `GeRowDragEvent` | since 1.1.95, see 6.16 (core: `onRowDragStart/Move/End`) |
 | `batchEditChanged` | `GeBatchEditEvent` | since 1.1.96, pending changes of a batch edit, see 6.17 (core: `onBatchEditChanged`) |
@@ -2513,6 +2513,18 @@ the focus frame is 1 px taller than its cell. If the rows fill the body exactly,
 `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Keep the first visible row at the top:
 `repaintHard({ py: tableApi.getFirstVisibleRowIndex() * rowHeight })`. Exact also with millions of rows
 (capped scroll height above 8,000,000 px). → 6.9
+
+**How do I react to my own keys (Delete removes the row, Enter opens a dialog)?** There is no keyboard event in
+`EventListenerIf`. Listen for `keydown` on the host element and read the focused body cell with
+`tableApi.getActiveCell()` (`[row, column]` or `undefined`); the row object is `getBodyModel().getRowByIndex(row)`.
+Built-in keys can be remapped (`shortcutActionIdMapping`) or switched off (`shortcutActionsDisabled`). → 6.4
+
+**How do I get the selected rows?** There is no `getSelectedRows()`: pass your own selection model
+(`getSelectionModel: () => selectionModel`), then `selectionModel.getMergedRowIndices(body.getRowCount())` gives the
+selected display indices, `body.getRowByIndex(i)` the row objects (`body = tableApi.getBodyModel()`). → 6.4
+
+**Which row index does `updateCells` take?** The displayed index (after filtering and sorting) – it writes into that row
+object. Look the index up with the row on screen, not with the position in your array. → 6.9
 
 **New rows arrive all the time (a log, a stream) – how do I tell the table?** `tableApi.appendRows(rows, { follow:
 "auto", maxRows })` (since 1.1.108): in place, O(k) for k new rows, one render pass, filter and sort order only for the

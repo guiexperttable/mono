@@ -386,3 +386,5 @@ export * from './lib/table/spreadsheet/area-model-sheet';
 export * from './lib/table/spreadsheet/spreadsheet-factory';
 export * from './lib/table/spreadsheet/structure-edit';
 export * from './lib/table/spreadsheet/formula-bar';
+export * from './lib/table/live-append/row-index-shift';
+export * from './lib/table/live-append/append-rows-options.if';

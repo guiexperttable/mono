@@ -1,6 +1,7 @@
 import { FocusType } from "./focus.type";
 import { FocusModelIf } from "./focus-model.if";
 import { EventFocusChangedListenerIf } from './event-focus-changed-listener.if';
+import type { RowIndexShift } from '../live-append/row-index-shift';
 
 
 /**
@@ -109,6 +110,30 @@ export class FocusModel implements FocusModelIf {
       this.changed = true;
       this.fireChangeEvent();
     }
+  }
+
+  /**
+   * Live data (since 1.1.108): the focused row moves along when rows were removed at the start or inserted
+   * (`tableApi.appendRows()`). The same row keeps the focus without an event; if it was removed, the next remaining
+   * row gets it (with an event – the table keeps it inside the rows).
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   *
+   * @example
+   * focusModel.adjustForRowChanges?.(new RowIndexShift([0, 1], []));   // row 5 → row 3
+   */
+  adjustForRowChanges(shift: RowIndexShift): void {
+    if (this.rowIndex < 0 || shift.isEmpty()) {
+      return;
+    }
+    const mapped = shift.mapIndex(this.rowIndex);
+    if (mapped >= 0) {
+      this.rowIndex = mapped; // the same row: not a focus change
+      return;
+    }
+    this.rowIndex = shift.mapIndexOrNext(this.rowIndex);
+    this.changed = true;
+    this.fireChangeEvent();
   }
 
   hasFocus(rowIndex: number, columnIndex: number): boolean {

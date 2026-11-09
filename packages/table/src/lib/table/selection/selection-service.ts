@@ -8,6 +8,7 @@ import { CellRange } from "../data/common/cell-range";
 import { OnActionTriggeredIf } from "../action/on-action-triggered.if";
 import { ActionId } from "../action/action-id.type";
 import type { SelectionModel, SelectionSnapshot } from "./selection-model";
+import type { RowIndexShift } from "../live-append/row-index-shift";
 import { isCheckboxColumnDef, isRowNumberColumnDef } from "../instanceof-workaround";
 
 
@@ -227,6 +228,32 @@ export class SelectionService implements OnActionTriggeredIf {
    * @returns {[number, number] | undefined} row and column, `undefined` before the first click/keyboard move
    * @since 1.1.99
    */
+  /**
+   * Live data (since 1.1.108): anchor, moving corner and last click follow their rows when rows were removed at the
+   * start or inserted (`tableApi.appendRows()`); a removed row drops them.
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   */
+  adjustForRowChanges(shift: RowIndexShift): void {
+    const move = (cell?: [number, number]): [number, number] | undefined => {
+      if (!cell) return undefined;
+      const row = shift.mapIndex(cell[0]);
+      return row >= 0 ? [row, cell[1]] : undefined;
+    };
+    this.anchor = move(this.anchor);
+    this.extent = move(this.extent);
+    if (this.previousEvt && this.previousEvt.areaIdent === 'body') {
+      const row = shift.mapIndex(this.previousEvt.rowIndex);
+      if (row >= 0) {
+        this.previousEvt.rowIndex = row;
+      } else {
+        this.previousEvt = undefined;
+      }
+    }
+    const ranges = this.getSelectionModel?.()?.getRanges() ?? [];
+    this.anchorRanges = this.anchorRanges.filter(r => ranges.includes(r));
+  }
+
   getAnchor(): [number, number] | undefined {
     return this.anchor ? [this.anchor[0], this.anchor[1]] : undefined;
   }

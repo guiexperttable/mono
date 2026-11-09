@@ -90,6 +90,10 @@ import { createEventListenerHub } from './event-listener-hub';
 import { CellFormulaOptions } from './sheet/cell-formula-options';
 import { spreadsheetOption } from './spreadsheet/spreadsheet-preset';
 import { CopiedFormula, TableSheet } from './sheet/table-sheet';
+import { RowIndexShift } from './live-append/row-index-shift';
+import type {
+  AppendFollowMode, AppendRowsModelResultIf, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf
+} from './live-append/append-rows-options.if';
 
 
 /**
@@ -174,6 +178,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private firstDraggingRendering = true;
   /** Last comparator passed to `sort()`; re-applied after filtering. Cleared by a header sort. */
   private lastSortCompareFn?: (a: any, b: any) => number;
+  /** Live data: the content position held while the mouse button was down in a view that followed the end. */
+  private followHeldAt?: number;
   /** Excel-style editing (`tableOptions.editing`), `undefined` = off. @since 1.1.99 */
   private readonly editingOptions?: EditingOptionsIf = EditingOptions.create(spreadsheetOption(this.tableOptions, 'editing'));
   /** Listeners of {@link TableApi.subscribe}. @since 1.1.99 */
@@ -3191,6 +3197,137 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.tableModel.recalcPadding();
     this.resetSizeOfWrapperDiv();
     this.adjustContainersAndRows();
+  }
+
+  /**
+   * Live data (since 1.1.108): appends rows to an {@link AreaModelObjectArray} body in place – filter and sort order
+   * only for the new rows, optional ring buffer – moves selection, focus and anchor along, keeps the first visible row
+   * or follows the end, and renders once (not at all if only rows behind the visible ones came in).
+   * See {@link TableApi.appendRows}.
+   *
+   * @param {T[]} rows - the new rows
+   * @param {AppendRowsOptionsIf} [options] - follow mode, ring buffer
+   * @returns {AppendRowsResultIf | false} what changed; false (with a warning) for other bodies (tree, row groups,
+   *   pivot, spreadsheet, cell formulas)
+   */
+  appendRows<T>(rows: T[], options: AppendRowsOptionsIf = {}): AppendRowsResultIf | false {
+    const body = this.tableModel.getBodyModel();
+    if (!body.appendRows || this.tableSheet || this.isRowGroupingOrTree()) {
+      console.warn('appendRows() works with an AreaModelObjectArray body (TableFactory.createTableModel({ rows })) '
+        + 'without cell formulas – use rowsAppended() for an own area model. Nothing changed.');
+      return false;
+    }
+    const result = body.appendRows(rows, {
+      filter: this.tableOptions.externalFilterFunction as ((row: unknown) => boolean) | undefined,
+      compare: this.getActiveSortComparator(),
+      maxRows: options.maxRows,
+    });
+    if (!result) {
+      console.warn('appendRows(): the body model did not append the rows.');
+      return false;
+    }
+    return this.afterRowsAppended(result, options.follow ?? 'auto');
+  }
+
+  /**
+   * Live data (since 1.1.108): an own area model appended `count` rows at the end (and maybe removed some at the
+   * start) – moves selection, focus and anchor along, keeps the first visible row or follows the end, renders once.
+   * See {@link TableApi.rowsAppended}.
+   *
+   * @param {number} count - rows the model appended at the end (display order)
+   * @param {RowsAppendedOptionsIf} [options] - follow mode, rows removed at the start
+   * @returns {AppendRowsResultIf} what changed
+   */
+  notifyRowsAppended(count: number, options: RowsAppendedOptionsIf = {}): AppendRowsResultIf {
+    const rowCount = Math.max(0, this.tableModel.getBodyModel().getRowCount());
+    const added = Math.max(0, Math.min(Math.floor(count) || 0, rowCount));
+    const oldCount = this.renderedBodyRows.count;
+    const removed = Math.max(0, Math.min(Math.floor(options.removedAtStart ?? 0) || 0, oldCount));
+    const removedPositions = new Int32Array(removed);
+    for (let i = 0; i < removed; i++) removedPositions[i] = i;
+    const insertedPositions = new Int32Array(added);
+    for (let i = 0; i < added; i++) insertedPositions[i] = rowCount - added + i;
+    return this.afterRowsAppended({ added, shown: added, removed, removedPositions, insertedPositions },
+      options.follow ?? 'auto');
+  }
+
+  /** The order new rows are sorted in: the last `sort(fn)`, otherwise the columns with a sort state. */
+  protected getActiveSortComparator(): ((a: unknown, b: unknown) => number) | undefined {
+    if (this.lastSortCompareFn) {
+      return this.lastSortCompareFn;
+    }
+    const sortItems: SortItem[] = [];
+    this.tableModel.getColumnDefs()?.forEach((cd, index) => {
+      if (cd.sortState === 'asc' || cd.sortState === 'desc') sortItems.push(new SortItem(index, cd.sortState));
+    });
+    const body = this.tableModel.getBodyModel() as { createSortComparator?: (items: SortItem[]) => ((a: unknown, b: unknown) => number) | undefined };
+    return sortItems.length ? body.createSortComparator?.(sortItems) : undefined;
+  }
+
+  /** Moves the index-based state along, chooses the position and renders once (or only updates the row count). */
+  private afterRowsAppended(result: AppendRowsModelResultIf, follow: AppendFollowMode): AppendRowsResultIf {
+    const shift = new RowIndexShift(result.removedPositions, result.insertedPositions);
+    const rendered = this.renderedBodyRows;
+    const sm = this.selectionModel();
+    const selectionChanged = sm?.adjustForRowChanges?.(shift) ?? false;
+    this.focusModel()?.adjustForRowChanges?.(shift);
+    this.selectionService.adjustForRowChanges(shift);
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    const fm = this.focusModel();
+    if (fm && rowCount > 0 && fm.getFocus()[0] >= rowCount) {
+      fm.setFocus(rowCount - 1, fm.getFocus()[1]);
+    }
+    if (result.removed) {
+      this.batchEditService?.pruneOrphans();
+    }
+    // spans: only the new rows are scanned (a full scan of all rows per update was O(n))
+    this.colAndRowspanModels.body?.updateForInsertedRows(result.insertedPositions);
+    this.invalidateAggregates();
+
+    // a held mouse button (click, drag, row drag, fill) keeps the rows under the pointer; a view that followed the end
+    // when the button went down follows again after it is released – unless the user scrolled meanwhile
+    const busy = this.mouseHandler.isButtonDown() || !!this.rowDragService?.isDragging()
+      || !!this.fillHandleService?.isFilling();
+    const held = this.followHeldAt;
+    const atEnd = rendered.atEnd || (held !== undefined && Math.abs(this.contentScrollTop - held) < 1);
+    const following = follow === true || (follow === 'auto' && atEnd && !busy);
+    let py: number;
+    if (following) {
+      py = Number.MAX_SAFE_INTEGER;
+    } else if (rendered.count > 0) {
+      const firstStays = shift.mapIndex(rendered.first) >= 0;
+      const first = Math.min(shift.mapIndexOrNext(rendered.first), Math.max(0, rowCount - 1));
+      py = rowCount > 0 ? this.getBodyRowTop(first) + (firstStays ? rendered.offset : 0) : 0;
+    } else {
+      py = 0;
+    }
+
+    const drawnRowsStay = !following && shift.getRemovedCount() === 0 && rendered.count > 0
+      && rendered.last < rendered.count - 1 && !shift.touchesUpTo(rendered.last);
+    if (!(drawnRowsStay && this.canKeepDrawnRows() && this.updateRowCountWithoutRender(py))) {
+      this.repaintHard({ py });
+    }
+    this.followHeldAt = follow === 'auto' && busy && atEnd ? this.contentScrollTop : undefined;
+    if (selectionChanged && sm) {
+      this.onSelectionChanged(sm);
+    }
+    return { added: result.added, shown: result.shown, removed: result.removed, following };
+  }
+
+  /**
+   * True if nothing else on the screen depends on the row count: no row number column (its width may grow), no
+   * totals footer, no calculated/„show values as“ columns, no open detail rows.
+   */
+  private canKeepDrawnRows(): boolean {
+    if (this.getFirstDataColumnIndex() > 0 || this.masterDetailService) {
+      return false;
+    }
+    const footer = this.tableModel.getAreaModel('footer');
+    if (footer.getRowCount() > 0 && footer.invalidateDerivedValues) {
+      return false;
+    }
+    const body = this.tableModel.getBodyModel() as { hasDerivedColumns?: () => boolean };
+    return !body.hasDerivedColumns?.();
   }
 
   reSort() {

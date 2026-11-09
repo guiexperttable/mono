@@ -597,6 +597,16 @@ export class MouseHandler {
 
 
 
+  /**
+   * True while the mouse button is held in the table (a click or a drag in progress) – live data does not jump to
+   * the end then (`tableApi.appendRows({ follow: "auto" })`, since 1.1.108).
+   *
+   * @returns {boolean} true between mousedown and mouseup
+   */
+  isButtonDown(): boolean {
+    return this.mouseDown;
+  }
+
   /** A mouse event on a blocking loading overlay ({@link TableOverlay.isEventBlocked}): the table ignores it. */
   private isBlocked(evt: Event): boolean {
     // also events from a detail row (master/detail, e.g. a nested table): they belong to the detail

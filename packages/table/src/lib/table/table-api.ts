@@ -43,6 +43,7 @@ import { AreaModelSheet } from './spreadsheet/area-model-sheet';
 import type { TableSheet } from './sheet/table-sheet';
 import type { SheetEngine } from './sheet/sheet-engine';
 import type { ScrollPositionIf } from './data/common/scroll-position.if';
+import type { AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf } from './live-append/append-rows-options.if';
 
 
 /**
@@ -1353,6 +1354,8 @@ export class TableApi {
    * Only works with an {@link AreaModelObjectArray} body – logs a console warning otherwise.
    * Does **not** repaint and resets filtering and sorting of the body: afterwards call
    * {@link externalFilterChanged} (if a filter function is set) and {@link repaintHard} (the row count changed).
+   * Copies all rows (O(n)) – for live data (rows arriving all the time) use {@link appendRows}: in place, filter and
+   * order only for the new rows, selection and position stay.
    *
    * @template T - The type of elements in the rows array
    * @param {T[]} rows - An array of data objects to append to the table's existing rows
@@ -1369,6 +1372,87 @@ export class TableApi {
    * tableApi.repaintHard();
    * tableApi.ensureRowIsVisible(tableApi.getDisplayedRowCount() - 1);
    */
+  /**
+   * **Live data** (a log tail, a ticker – since 1.1.108): appends rows to the body and shows them in **one** render
+   * pass – O(k) for k new rows, not O(n).
+   *
+   * - **In place**: the rows are pushed to your array (`getAllRows()`), nothing is copied.
+   * - **Filter and order** (`externalFilterFunction`, a sorted column or `sort(fn)`) apply to the new rows only:
+   *   filtered rows are kept but not shown, sorted rows are merged in (O(n + k), behind equal rows).
+   * - **Selection, focus, anchor, checked rows** stay at their rows (the indices move along; no `onSelectionChanged`
+   *   unless a selected row was removed).
+   * - **Position**: `follow: "auto"` (default) stays at the end if the view was at the end ("tail -f"), otherwise the
+   *   first visible row stays; `true` = always the end, `false` = always keep the row ("freeze scroll"). While the
+   *   mouse button is held in the table, `"auto"` keeps the row.
+   * - **Ring buffer**: `maxRows` removes the oldest rows from the start.
+   * - Rows behind the visible ones (a reader in the middle of the log): the cells are not rebuilt – only scroll height
+   *   and scroll bar change.
+   *
+   * Works with an {@link AreaModelObjectArray} body (`TableFactory.createTableModel({ rows, … })`) without cell
+   * formulas; a tree, row grouping, pivot or spreadsheet → `false` and a console warning. Own area model:
+   * {@link rowsAppended}.
+   *
+   * @param {T[]} rows - the new rows (appended in this order)
+   * @param {AppendRowsOptionsIf} [options] - `follow` ("auto" | true | false), `maxRows`
+   * @returns {AppendRowsResultIf | false} `{ added, shown, removed, following }`, or false
+   *
+   * @example
+   * // a log viewer: new lines every animation frame, at most one million
+   * const result = tableApi.appendRows(newLines, { follow: "auto", maxRows: 1_000_000 });
+   * if (result && !result.following) {
+   *   console.log(`+${result.shown} new lines below`);
+   * }
+   *
+   * @example
+   * // "Freeze scroll" / "Scroll to end" buttons of the app
+   * let frozen = false;
+   * function onLines(lines: { time: string; text: string }[]) {
+   *   tableApi.appendRows(lines, { follow: frozen ? false : "auto" });
+   * }
+   * function scrollToEnd() {
+   *   frozen = false;
+   *   tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER });
+   * }
+   *
+   * @since 1.1.108
+   */
+  appendRows<T>(rows: T[], options?: AppendRowsOptionsIf): AppendRowsResultIf | false {
+    return this.tableScope.appendRows(rows, options);
+  }
+
+  /**
+   * **Live data with an own area model** (since 1.1.108): your model appended `count` rows at the end (and maybe
+   * removed `removedAtStart` rows at the start) – the table moves selection, focus and anchor along, keeps the first
+   * visible row or follows the end (`follow` as in {@link appendRows}) and renders once (not at all if only rows behind
+   * the visible ones came in). Filtering and sorting are up to your model.
+   *
+   * @param {number} count - rows appended at the end
+   * @param {RowsAppendedOptionsIf} [options] - `follow`, `removedAtStart`
+   * @returns {AppendRowsResultIf} `{ added, shown, removed, following }`
+   *
+   * @example
+   * class LogBody extends AreaModel {
+   *   readonly lines: string[] = [];
+   *   override getRowCount(): number { return this.lines.length; }
+   *   override getRowHeight(): number { return 20; }
+   *   override getConstantRowHeight(): number { return 20; }
+   *   override getValueAt(row: number): string { return this.lines[row]; }
+   * }
+   * const body = new LogBody();
+   *
+   * function onNewLines(newLines: string[]) {
+   *   for (const line of newLines) body.lines.push(line);      // a loop: push(...lines) overflows above ~100,000
+   *   const dropped = Math.max(0, body.lines.length - 1_000_000);
+   *   body.lines.splice(0, dropped);                            // the app's own ring buffer
+   *   tableApi.rowsAppended(newLines.length, { follow: "auto", removedAtStart: dropped });
+   * }
+   *
+   * @since 1.1.108
+   */
+  rowsAppended(count: number, options?: RowsAppendedOptionsIf): AppendRowsResultIf {
+    return this.tableScope.notifyRowsAppended(count, options);
+  }
+
   addRows<T>(rows: T[]){
     const bodyModel = this.getBodyModel();
     if (bodyModel instanceof AreaModelObjectArray){

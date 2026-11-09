@@ -43,3 +43,7 @@ export * from "./model/rtl-city-sales.if";
 export * from "./lib/createSpreadsheetQuoteModel";
 export * from "./lib/createCoverGridModel";
 export * from "./model/book.if";
+export * from "./model/log-line.if";
+export * from "./lib/log-tail/log-generator";
+export * from "./lib/log-tail/log-tail-controller";
+export * from "./lib/log-tail/createLogTailModel";

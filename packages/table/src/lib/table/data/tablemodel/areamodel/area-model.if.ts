@@ -1,4 +1,5 @@
 import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
+import type { AppendRowsContextIf, AppendRowsModelResultIf } from "../../../live-append/append-rows-options.if";
 import type { DerivedValuesChangeIf } from "./derived-values-change.if";
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { CheckedType } from "../../common/checked-type";
@@ -326,6 +327,20 @@ export interface AreaModelIf {
    * @since 1.1.95
    */
   moveRows?(rowIndices: number[], target: RowDropTargetIf): boolean;
+
+  /**
+   * Optional (live data, since 1.1.108): appends rows **in place** – the active filter only for the new rows, sorted
+   * in by the active order, oldest rows removed for a ring buffer – and reports the display positions, so the table
+   * moves selection, focus and scroll position along (`tableApi.appendRows()`). Implemented by
+   * {@link AreaModelObjectArray}; `false` = not supported (the table logs a warning and changes nothing).
+   *
+   * @param {unknown[]} rows - the new rows
+   * @param {AppendRowsContextIf} ctx - active filter, sort order, ring buffer size
+   * @returns {AppendRowsModelResultIf | false} what changed, or false
+   * @example
+   * const result = bodyModel.appendRows?.(lines, { maxRows: 100_000 });
+   */
+  appendRows?(rows: unknown[], ctx: AppendRowsContextIf): AppendRowsModelResultIf | false;
 
   /**
    * Optional: drops cached, derived values (e.g. the totals of an {@link AreaModelAggregateFooter}). The table calls

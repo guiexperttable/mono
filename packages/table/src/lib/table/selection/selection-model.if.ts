@@ -1,5 +1,6 @@
 import { CellRange } from "../data/common/cell-range";
 import { EventSelectionChangedListenerIf } from './event-selection-changed-listener.if';
+import type { RowIndexShift } from '../live-append/row-index-shift';
 
 /**
  * What is selected in a table – a list of rectangles ({@link CellRange}). The implementation is {@link SelectionModel};
@@ -98,4 +99,17 @@ export interface SelectionModelIf {
 
   /** Called by the table on a click: starts a selection at this cell, depending on selection type and mode. */
   firstClick(rowIndex: number, columnIndex: number): void;
+
+  /**
+   * Optional (live data, since 1.1.108): moves the selected rows along when rows were removed at the start or
+   * inserted (`tableApi.appendRows()` / `rowsAppended()`), instead of clearing the selection. Removed rows leave the
+   * selection; rows inserted inside a selected range split it (they are not selected); whole columns and "all
+   * selected" stay. Fires no event.
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   * @returns {boolean} true if a selected row was removed (the selection shows other rows now)
+   * @example
+   * selectionModel.adjustForRowChanges?.(new RowIndexShift([0, 1], [98, 99]));
+   */
+  adjustForRowChanges?(shift: RowIndexShift): boolean;
 }

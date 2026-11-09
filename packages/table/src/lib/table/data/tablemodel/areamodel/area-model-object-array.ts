@@ -14,6 +14,9 @@ import type { ShowValuesAsIf } from '../../../calc/show-values-as.type';
 import { isFormulaError } from '../../../formula/formula-error';
 import type { RowDropTargetIf } from '../../../row-drag/row-drop-target.if';
 import { canMoveFlatRows, moveFlatRows } from '../../../row-drag/move-rows';
+import type { AppendRowsContextIf, AppendRowsModelResultIf } from '../../../live-append/append-rows-options.if';
+
+const NO_POSITIONS = new Int32Array(0);
 
 /**
  * @class AreaModelObjectArray
@@ -181,6 +184,12 @@ export class AreaModelObjectArray<T>
    */
   protected sorterService: SorterService = new SorterService();
 
+  /**
+   * True while the displayed rows are in the order of {@link getAllRows} (unsorted, maybe filtered) – then the rows a
+   * ring buffer removes at the start are a prefix of the displayed rows (no O(n) search, see {@link appendRows}).
+   */
+  private displayInDataOrder = true;
+
   /** Cached „Show values as“ values per property (cleared on filter, sorting and invalidation). */
   private showValuesCache = new Map<string, { total?: number; values?: (number | undefined)[] }>();
 
@@ -279,7 +288,157 @@ export class AreaModelObjectArray<T>
   setRows(rows: T[]) {
     this.rows = rows;
     this.filteredRows = [...rows];
+    this.displayInDataOrder = true;
     this.showValuesCache.clear();
+  }
+
+  /**
+   * Live data (since 1.1.108): appends rows **in place** to {@link getAllRows} (your array – no copy) and to the
+   * displayed rows: the active filter runs only for the new rows (O(k)), with an active sort order they are sorted
+   * and merged in (O(n + k), stable – behind equal rows, like a sort of all rows). With `ctx.maxRows` the oldest
+   * rows are removed from the start (ring buffer) – in blocks of at least 1 % of `maxRows` (moving the rows of an
+   * array is O(n)), so the row count stays between 99 % and 100 % of `maxRows`. Use `tableApi.appendRows()` – it passes filter and order and moves
+   * selection, focus and scroll position along.
+   *
+   * @param {unknown[]} newRows - the new rows (appended in this order)
+   * @param {AppendRowsContextIf<T>} [ctx] - active filter, sort order, ring buffer size
+   * @returns {AppendRowsModelResultIf} the removed and inserted display positions
+   *
+   * @example
+   * const result = bodyAreaModel.appendRows(lines, { maxRows: 100_000 });
+   * console.log(result.insertedPositions);   // where the new rows are shown
+   *
+   * @since 1.1.108
+   */
+  appendRows(newRows: unknown[], ctx: AppendRowsContextIf<T> = {}): AppendRowsModelResultIf {
+    const rows = this.rows;
+    const maxRows = ctx.maxRows !== undefined && ctx.maxRows >= 0 ? Math.floor(ctx.maxRows) : Number.POSITIVE_INFINITY;
+    const overflow = Math.max(0, rows.length + newRows.length - maxRows);
+    // Removing from the start of an array moves all other rows (O(n), ~1.5 ms per million rows and array): it is done
+    // in blocks of at least 1 % of maxRows – one move per many updates, the row count stays between 99 and 100 %.
+    const block = overflow > 0 ? Math.max(overflow, Math.ceil(maxRows / 100)) : 0;
+    const removeOld = Math.min(block, rows.length);
+    const skipNew = Math.max(0, overflow - removeOld); // more new rows than the buffer holds: the first never come in
+    const removedPositions = removeOld > 0 ? this.removeFirstRows(removeOld) : NO_POSITIONS;
+
+    const shown: T[] = [];
+    const filter = ctx.filter;
+    for (let i = skipNew; i < newRows.length; i++) {
+      const row = newRows[i] as T;
+      rows.push(row); // a loop: push(...newRows) overflows the call stack above ~100,000 rows
+      if (!filter || filter(row)) {
+        shown.push(row);
+      }
+    }
+    const insertedPositions = ctx.compare ? this.mergeSorted(shown, ctx.compare) : this.appendShown(shown);
+    if (shown.length || removedPositions.length) {
+      this.showValuesCache.clear();
+    }
+    return {
+      added: newRows.length - skipNew, shown: shown.length, removed: removeOld, removedPositions, insertedPositions,
+    };
+  }
+
+  /** Removes the first `count` rows of the data (in place) and of the displayed rows; their old display positions. */
+  private removeFirstRows(count: number): Int32Array {
+    const removed = this.rows.splice(0, count);
+    const shown = this.filteredRows;
+    if (this.displayInDataOrder) {
+      // the displayed rows are a subsequence of the data in the same order: the removed ones are a prefix
+      let c = 0;
+      for (let j = 0; j < removed.length && c < shown.length; j++) {
+        if (shown[c] === removed[j]) c++;
+      }
+      shown.splice(0, c);
+      const positions = new Int32Array(c);
+      for (let i = 0; i < c; i++) positions[i] = i;
+      return positions;
+    }
+    // sorted: one pass over the displayed rows
+    const gone = new Set<T>(removed);
+    const positions: number[] = [];
+    let w = 0;
+    for (let r = 0; r < shown.length; r++) {
+      const row = shown[r];
+      if (gone.has(row)) {
+        positions.push(r);
+      } else {
+        shown[w++] = row;
+      }
+    }
+    shown.length = w;
+    return Int32Array.from(positions);
+  }
+
+  private appendShown(shown: T[]): Int32Array {
+    const fr = this.filteredRows;
+    const positions = new Int32Array(shown.length);
+    for (let i = 0; i < shown.length; i++) {
+      positions[i] = fr.length;
+      fr.push(shown[i]);
+    }
+    return positions;
+  }
+
+  /** Sorts the new rows and merges them into the (sorted) displayed rows from the back – stable, in place. */
+  private mergeSorted(shown: T[], compare: (a: T, b: T) => number): Int32Array {
+    const fr = this.filteredRows;
+    const m = shown.length;
+    const positions = new Int32Array(m);
+    if (!m) {
+      return positions;
+    }
+    shown.sort(compare); // stable: equal new rows keep their order
+    let end = fr.length;  // old rows [0, end) not moved yet
+    for (let k = 0; k < m; k++) fr.push(shown[k]); // grow without holes; overwritten below
+    // from the back: binary search for the place of each new row (O(log n) comparisons – a sort comparator reads
+    // cell values, comparing every moved row was ~100 ms per update at 2 million rows), then move the old rows behind
+    // it as one block (copyWithin = memmove)
+    for (let j = m - 1; j >= 0; j--) {
+      const row = shown[j];
+      let lo = 0;
+      let hi = end;
+      while (lo < hi) {   // first old row that is greater (equal old rows stay in front of the new one)
+        const mid = (lo + hi) >>> 1;
+        if (compare(fr[mid], row) > 0) hi = mid; else lo = mid + 1;
+      }
+      if (lo < end) {
+        fr.copyWithin(lo + j + 1, lo, end);
+      }
+      fr[lo + j] = row;
+      positions[j] = lo + j;
+      end = lo;
+    }
+    return positions;
+  }
+
+  /**
+   * The comparator of sort items (first item = primary key, the following ones break ties), as used by
+   * {@link doSort} – e.g. to sort new rows in (live data). `undefined` if no item sorts (state "").
+   *
+   * @param {SortItem[]} sortItems - column index and sort state per sorted column
+   * @returns {((a: T, b: T) => number) | undefined} the comparator
+   *
+   * @example
+   * const compare = bodyAreaModel.createSortComparator([new SortItem(2, "desc")]);
+   *
+   * @since 1.1.108
+   */
+  createSortComparator(sortItems: SortItem[]): ((a: T, b: T) => number) | undefined {
+    const comparators = sortItems
+      .filter(({ sortState }) => sortState === 'asc' || sortState === 'desc')
+      .map(({ columnIndex, sortState }) =>
+        this.genericFlatTableSortComparator(this.properties[columnIndex], sortState === 'asc' ? 1 : -1));
+    if (!comparators.length) {
+      return undefined;
+    }
+    return (a: T, b: T) => {
+      for (const comparator of comparators) {
+        const c = comparator(a, b);
+        if (c) return c;
+      }
+      return 0;
+    };
   }
 
   /**
@@ -362,6 +521,7 @@ export class AreaModelObjectArray<T>
   moveRows(rowIndices: number[], target: RowDropTargetIf): boolean {
     const moved = moveFlatRows(this.filteredRows, this.rows, rowIndices, target);
     if (moved) {
+      this.displayInDataOrder = true; // the display order was written to the data
       this.invalidateDerivedValues();
     }
     return moved;
@@ -659,6 +819,7 @@ export class AreaModelObjectArray<T>
    */
   externalFilterChanged(predictFn: FilterFunction<any>): void {
     this.filteredRows = (this.rows ? this.rows.filter(predictFn) : []);
+    this.displayInDataOrder = true; // the table sorts again afterwards (reapplySorting)
     this.showValuesCache.clear();
   }
 
@@ -691,6 +852,9 @@ export class AreaModelObjectArray<T>
       return this.genericFlatTableSortComparator(this.properties[columnIndex], f);
     });
     this.showValuesCache.clear(); // running totals, ranks and differences follow the display order
+    if (sortItems.some(({ sortState }) => sortState === 'asc' || sortState === 'desc')) {
+      this.displayInDataOrder = false;
+    }
     if (comparators.length) {
       // the first item is the primary key, the following ones break ties (before: one stable sort per item, so the
       // LAST item became the primary key)
@@ -727,6 +891,7 @@ export class AreaModelObjectArray<T>
    * });
    */
   override sort(compareFn: (a: T, b: T) => number): void {
+    this.displayInDataOrder = false;
     this.filteredRows = this.filteredRows.sort(compareFn);
     this.showValuesCache.clear();
   }

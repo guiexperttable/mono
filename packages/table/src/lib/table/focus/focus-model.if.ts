@@ -1,4 +1,5 @@
 import { EventFocusChangedListenerIf } from './event-focus-changed-listener.if';
+import type { RowIndexShift } from '../live-append/row-index-shift';
 
 /**
  * The focused cell of a table (moved by click and arrow keys; F2 edits it). The implementation is {@link FocusModel};
@@ -38,4 +39,15 @@ export interface FocusModelIf {
 
   /** Resets {@link hasChanged}. */
   clearChanged(): void;
+
+  /**
+   * Optional (live data, since 1.1.108): the focused row moves along when rows were removed at the start or
+   * inserted (`tableApi.appendRows()`). Same row: no event. Focused row removed: the next remaining row gets the
+   * focus (with an event).
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   * @example
+   * focusModel.adjustForRowChanges?.(new RowIndexShift([0], []));
+   */
+  adjustForRowChanges?(shift: RowIndexShift): void;
 }

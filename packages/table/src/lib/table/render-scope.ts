@@ -126,6 +126,11 @@ export class RenderScope extends EleScope {
    * that is already rendered (`repaintHard({ py })`, `scrollToPixel()` render it at once) renders nothing.
    */
   protected renderedScrollTop = Number.NaN;
+  /**
+   * The body rows of the last render pass (live data, since 1.1.108): row count, first visible row and the content
+   * offset into it, last (partly) visible row, and whether the view was at the end.
+   */
+  protected renderedBodyRows = { count: 0, first: 0, offset: 0, last: -1, atEnd: true };
   protected renderedScrollLeft = Number.NaN;
   /** Area heights read once at the start of adjustAfterScrolling() (before the DOM is modified). */
   protected areaHeightsOfRenderPass?: { [key in AreaIdent]?: number };
@@ -618,6 +623,58 @@ export class RenderScope extends EleScope {
     this.adjustAfterScrolling();
   }
 
+  /** Remembers which body rows the render pass drew ({@link renderedBodyRows}) – two O(log n) lookups. */
+  private rememberRenderedBodyRows(): void {
+    const count = this.tableModel.getBodyModel().getRowCount();
+    if (count <= 0) {
+      this.renderedBodyRows = { count: Math.max(0, count), first: 0, offset: 0, last: -1, atEnd: true };
+      return;
+    }
+    const top = this.contentScrollTop;
+    const first = this.getBodyRowIndexAtY(top);
+    const last = this.getBodyRowIndexAtY(top + Math.max(0, this.areaBodyCenterGeo.height - 1));
+    const range = this.getContentScrollRangeY();
+    // at the end: within half a row (a capped scroll bar or a rounded scrollTop is never exactly at the end)
+    const tolerance = Math.max(1, this.tableModel.getRowHeight('body', count - 1) / 2);
+    this.renderedBodyRows = {
+      count, first, offset: top - this.getBodyRowTop(first), last, atEnd: range <= 0 || top >= range - tolerance,
+    };
+  }
+
+  /**
+   * Live data (since 1.1.108, prompt 018 part B): the body got more rows, but the drawn rows stay the same (rows
+   * appended or sorted in behind the visible ones, the view does not follow). Updates heights, scroll content, scroll
+   * bar and `aria-rowcount` – **without** rebuilding the cells. Returns false (and does nothing more) if that is not
+   * enough: the vertical scroll bar appeared or disappeared (the widths change) or col-/rowspans exist.
+   *
+   * @param {number} py - the content position to keep (the same rows as drawn)
+   * @returns {boolean} true if done, false if the caller must render
+   */
+  protected updateRowCountWithoutRender(py: number): boolean {
+    for (const areaIdent of ['header', 'body', 'footer'] as const) {
+      const spans = this.colAndRowspanModels[areaIdent];
+      spans?.initIfRowCountChanged(); // O(1) without spans (the model reports a max span of 1)
+      if (spans?.getRanges().length) {
+        return false; // spans are drawn separately – let the render pass do it
+      }
+    }
+    const widthBefore = this.scrollViewport.clientWidth;
+    this.tableModel.recalcHeightAndPadding();
+    this.invalidateRowLayout();
+    this.resetSizeOfWrapperDiv();
+    this.layoutContainers();
+    if (this.scrollViewport.clientWidth !== widthBefore) {
+      return false;
+    }
+    this.setContentScrollPosition(undefined, py);
+    // the drawn rows are right: the scroll event of a moved (capped) scroll bar must not render them again
+    this.renderedScrollTop = this.scrollViewport.scrollTop;
+    this.scrollTop = this.scrollViewport.scrollTop;
+    this.renderedBodyRows = { ...this.renderedBodyRows, count: this.tableModel.getBodyModel().getRowCount(), atEnd: false };
+    this.setHostAttribute('aria-rowcount', `${AriaGridInfo.create(this.tableModel).rowCount}`);
+    return true;
+  }
+
   /**
    * Sets the scroll position of the viewport to a content position **without rendering** (shared by
    * `scrollToPixel()` and `repaintHard({ px, py })`). `py` is a content position: the scroll bar range differs from the
@@ -865,6 +922,7 @@ export class RenderScope extends EleScope {
         if (this.hostElement.isConnected) this.repaint();
       });
     }
+    this.rememberRenderedBodyRows();
     this.afterRenderPass();
     // only after a complete pass: if a renderer throws, the next scroll event of the same position renders again
     this.renderedScrollTop = this.scrollTop;

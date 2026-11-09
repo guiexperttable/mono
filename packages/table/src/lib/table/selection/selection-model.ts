@@ -2,6 +2,7 @@ import { CellRange } from "../data/common/cell-range";
 import { ExtendedSelectionType, SelectionMode } from './selection.type';
 import { SelectionModelIf } from "./selection-model.if";
 import { EventSelectionChangedListenerIf } from './event-selection-changed-listener.if';
+import type { RowIndexShift } from '../live-append/row-index-shift';
 //import { AvoidDoubleExecution } from '../../common/decorator/avoid-double-execution.decorator';
 
 
@@ -130,6 +131,61 @@ export class SelectionModel implements SelectionModelIf {
     this.negativeRanges = [...snapshot.negativeRanges];
     this.allSelected = snapshot.allSelected;
     this.fireChangeEvent();
+  }
+
+  /**
+   * Live data (since 1.1.108): moves the selected rows along when rows were removed at the start or inserted
+   * (`tableApi.appendRows()` / `rowsAppended()`). Ranges are adjusted **in place** (snapshots and the anchor of the
+   * selection service keep pointing at them); removed rows leave a range, rows inserted inside split it (not
+   * selected – like Excel); whole columns (`r1 = 0`, `r2 = MAX_SAFE_INTEGER`) and "all selected" stay. No event.
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   * @returns {boolean} true if a selected row was removed
+   *
+   * @example
+   * // rows 0 and 1 removed (ring buffer): the selection of row 5 is row 3 now
+   * selectionModel.adjustForRowChanges(new RowIndexShift([0, 1], []));
+   */
+  adjustForRowChanges(shift: RowIndexShift): boolean {
+    if (shift.isEmpty()) {
+      return false;
+    }
+    const removedSelected = SelectionModel.shiftRanges(this.ranges, shift);
+    SelectionModel.shiftRanges(this.negativeRanges, shift);
+    return removedSelected;
+  }
+
+  /** Shifts ranges in place (split pieces are appended); true if rows of a range were removed. */
+  private static shiftRanges(ranges: CellRange[], shift: RowIndexShift): boolean {
+    let removedRows = false;
+    const result: CellRange[] = [];
+    for (const range of ranges) {
+      const lo = Math.min(range.r1, range.r2);
+      const hi = Math.max(range.r1, range.r2);
+      if (lo === 0 && hi >= Number.MAX_SAFE_INTEGER) {
+        result.push(range); // whole columns
+        continue;
+      }
+      const pieces = shift.mapRange(lo, hi);
+      const kept = pieces.reduce((n, [a, b]) => n + (b >= Number.MAX_SAFE_INTEGER ? 0 : b - a + 1), 0);
+      if (hi < Number.MAX_SAFE_INTEGER && kept < hi - lo + 1) {
+        removedRows = true;
+      }
+      if (!pieces.length) {
+        continue;
+      }
+      const reversed = range.r1 > range.r2;
+      const [first, ...rest] = pieces;
+      range.r1 = reversed ? first[1] : first[0];
+      range.r2 = reversed ? first[0] : first[1];
+      result.push(range);
+      for (const [a, b] of rest) {
+        result.push(new CellRange(a, range.c1, b, range.c2, range.gammaRange));
+      }
+    }
+    ranges.length = 0;
+    for (const range of result) ranges.push(range);
+    return removedRows;
   }
 
   getSelectionCount(rowIndex: number, columnIndex: number): number {

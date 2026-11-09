@@ -49,7 +49,9 @@ import {
   shiftFormula, offsetReferences, adjustFormula, SheetDataSourceIf, SheetRecalcResultIf, isFormulaText, SheetEngine,
   FormulaFunctionInfoIf, FORMULA_FUNCTION_INFO, TableSheet, FormulaAssist, ExcelFormulaCellIf,
   SpreadsheetFactory, SpreadsheetParamIf, SpreadsheetTableModel, AreaModelSheet, AreaModelSheetHeader,
-  SpreadsheetOptionsIf, applySpreadsheetPreset, spreadsheetOption, FormulaBar, FormulaBarOptionsIf, StructureEditIf, applyStructureEdit
+  SpreadsheetOptionsIf, applySpreadsheetPreset, spreadsheetOption, FormulaBar, FormulaBarOptionsIf, StructureEditIf, applyStructureEdit,
+  RowIndexShift, AppendFollowMode, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf, AppendRowsContextIf,
+  AppendRowsModelResultIf
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -118,6 +120,9 @@ declare function fetchDataFromServer(): any[];
 declare const focusModel: FocusModelIf;
 declare class MyFocusChangeListener implements EventFocusChangedListenerIf { onFocusChanged(m: FocusModelIf): void }
 declare const dom: DomServiceIf; declare const cellValue: any;
+declare const lines: { time: string; level: string; text: string }[];
+declare const newLines: string[];
+declare const bodyModel: AreaModelIf;
 // row grouping (since 1.1.94): the sales of the reference cases R1–R5
 interface Sale { region: string; produkt: string; monat: string; umsatz: number }
 declare const sales: Sale[];

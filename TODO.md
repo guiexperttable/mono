@@ -209,7 +209,9 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       `readLegacyState` und die `@deprecated` `StoreState*Service`-Klassen entfernen · Fokuszelle im Zustand (ag-Grid
       hat sie) · Mehrspalten-Sortierung per Shift-Klick im Header (Speicher und `applyState` können sie schon) ·
       Programmatische Änderungen an Haken über das Modell werden erst mit der nächsten Änderung oder `destroy()`
-      gespeichert · Verschieben über die Grenze fixierter Spalten (Drag und Restore) prüfen.
+      gespeichert · ~~Verschieben über die Grenze fixierter Spalten (Drag und Restore) prüfen~~ (1.1.110, Prompt 022:
+      Ziehen bleibt im eigenen Bereich; `applyState` stellt die gespeicherte Reihenfolge weiter auch über die Grenze her –
+      gespeichert wird nur, was der Nutzer bzw. die App erzeugt hat).
 - [x] **004 Zeilennummern** – Branch `feat/row-numbers`, Design `prompts/004-zeilennummern.design.md`:
       `RowNumberColumnDef` (+ `isRowNumberColumnDef`, `RowNumberCellRenderer`, `RowNumberOptions`), Flag
       `rowNumbersVisible` in `TableFactory.createTableModel` (Spalte vorne, fixiert), Zählweise `display`/`original`,
@@ -464,8 +466,8 @@ gemeinsame Regeln: `prompts/000-arbeitsweise.md`.
       **Etappe 7 umgesetzt** (17.10.2026, Branch `feat/spreadsheet-7-mode`): `SpreadsheetFactory`, `AreaModelSheet`
       (dünn), Preset `tableOptions.spreadsheet`, `columnLetters`, Spaltenauswahl per Buchstabe, `FormulaBar`,
       Zeilen/Spalten einfügen/löschen mit Bezugsanpassung und Undo, `getSheetData`, Demo `spreadsheet.html`. Offen aus
-      Etappe 7: Ziehen über Buchstaben (mehrere Spalten) fehlt (Shift-Klick geht) · Doppelklick auf den Spaltengriff
-      passt die Breite nicht an · kein automatisches Wachsen am Blattende (Knopf „+100 rows“) · `addRows`/`removeRows`
+      Etappe 7: Ziehen über Buchstaben (mehrere Spalten) fehlt (Shift-Klick geht) · ~~Doppelklick auf den Spaltengriff
+      passt die Breite nicht an~~ (1.1.110, Prompt 022) · kein automatisches Wachsen am Blattende (Knopf „+100 rows“) · `addRows`/`removeRows`
       passen Bezüge weiter nicht an (`insertRows`/`deleteRows` nutzen) · Ausschneiden passt Bezüge auf die verschobenen
       Zellen nicht an · Vorschlag Prompt 014 Kontextmenü (`prompts/README.md`).
       Review Etappe 7 (separater Agent, 15 Funde behoben): Preset ändert die Options nicht mehr (`spreadsheetOption`),
@@ -677,6 +679,23 @@ Verhalten steht als `// NOTE:` in den Specs.
       Parameter `property`/`columns` wäre für „Summe der ausgewählten Beträge“ naheliegend.
 - [ ] `ShortcutService` loggt auf `localhost` (s. o., Prompt 021).
 
+## Spalten ziehen (Prompt 022, 09.11.2026)
+
+- [x] Ereignisse `onColumnResizeStart/End`, `onColumnMoveStart/End` (alle Wrapper), Sperre `ColumnDef.resizable/movable`,
+      Bereichsgrenze west/center/east, Escape, Doppelklick auf den Griff + `autoResizeColumn`, `columnAutoWidth`
+      (`maxRows`, `getWidth`), Demo `apps/table-demo/column-drag.html`, `instructions.md` 6.27, `llms.txt` R18.
+- [x] Gefunden: Doppelklick auf den Griff sortierte die Spalte (der Griff trägt `data-col-index`) – behoben.
+- [x] Gefunden: ein Klick auf Griff/Titel ohne Ziehen ließ den Spalten-Zug stehen; das nächste Ziehen im Body änderte die
+      Breite bzw. verschob die Spalte – behoben (`resetColumnDrag` bei jedem Druck).
+- [ ] Spaltenbreite und -reihenfolge per Tastatur (`source: "keyboard"`) – weiter ARIA-Folgepunkt (Fokus im Kopf,
+      Tasten, Ansagen).
+- [ ] Prüfen: `CheckboxColumnDef` ist verschiebbar – bricht eine verschobene Checkbox-Spalte die Checkbox-/Baumpfeil-
+      Erkennung (Versatz `getFirstDataColumnIndex`)? Ggf. `movable: false` setzen.
+- [ ] Header-Gruppen (`AreaModelCellGroups.changeColumnOrder` ist leer): Spalten unter Gruppen lassen sich verschieben,
+      die Gruppen folgen nicht – Sperre oder Gruppen mitziehen (vor 022 genauso).
+- [ ] log-commander: `onHeaderMouseDown`, `onMouseUp` + `setTimeout(syncFromTable)`, `onHeaderDblClick`,
+      `stopPropagation` der Zeilennummern entfernen (Design 022, letzter Abschnitt) – nach dem Release 1.1.110.
+
 ## Live-Daten (Prompt 019, 09.11.2026)
 
 - [x] `appendRows`/`rowsAppended`, Showcase `logtail`, Demo `log-tail.html`, Training `live-data#append`, Video-Skript
@@ -884,6 +903,20 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.110**, Core + alle Wrapper (Prompt 022):
+  - **Neu: Spalten-Ereignisse** `onColumnResizeStart/End` (`GeColumnResizeEvent`), `onColumnMoveStart/End`
+    (`GeColumnMoveEvent`) – nur Nutzeraktionen, ein Ende je Zug nach der Änderung, Escape = `"cancel"`; Wrapper-Events
+    `columnResizeStart/End`, `columnMoveStart/End`; API `isColumnDragging()`, `cancelColumnDrag()`.
+  - **Neu: Sperre je Spalte** `ColumnDef.resizable: false` / `movable: false` (`RowNumberColumnDef` nutzt sie).
+  - **Neu: Doppelklick auf den Spaltengriff** passt die Breite an (`columnAutoWidth: { doubleClick, maxRows, getWidth }`,
+    `tableApi.autoResizeColumn(column)`); neue Exporte `ColumnAutoWidthOptions(If)`, `ColumnAutoWidthContextIf`.
+  - Verhalten: ein Doppelklick auf den Griff sortiert nicht mehr; ein Zug beginnt erst nach 4 px (darunter Klick);
+    eine Spalte bleibt beim Ziehen in ihrem Bereich (fixiert links / Mitte / fixiert rechts); `autoResizeColumns()` misst
+    über 10 000 Zeilen nur die gezeichneten Zeilen (vorher alle – Hänger bei Millionen) und lässt `resizable: false` aus;
+    ein Klick auf Griff/Titel ohne Ziehen wirkt nicht mehr auf das nächste Ziehen im Body nach; `autoResizeColumns()`
+    blendet ausgeblendete Spalten nicht mehr ein; Spalten-Drag in Tabellen ohne `columnDefs` (`bodyData`) fügte
+    `undefined`-Einträge in die leere Liste ein (`TableModel.arrayMove`) – behoben.
 
 - **1.1.108** (in Arbeit), Core (`@guiexpert/table`) + `@guiexpert/demo-table-models`:
   - **Neu: Live-Daten anhängen** – `tableApi.appendRows(rows, { follow, maxRows })` und `tableApi.rowsAppended(count,

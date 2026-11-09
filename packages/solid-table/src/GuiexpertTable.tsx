@@ -2,7 +2,7 @@ import {GuiexpertTableProps} from "./GuiexpertTableProps";
 import {createEffect, mergeProps, onCleanup, untrack} from "solid-js";
 import {
   EventListenerIf,
-  FocusModelIf, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
+  FocusModelIf, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent,
   LicenseManager,
   SelectionModelIf,
   SimpleDomService,
@@ -59,7 +59,11 @@ export default (props: GuiexpertTableProps) => {
     onBatchEditChanged: (evt: GeBatchEditEvent) => emit("batchEditChanged", evt, merged.batchEditChanged),
     onDetailExpandedChanged: (evt: GeDetailEvent) => emit("detailExpandedChanged", evt, merged.detailExpandedChanged),
     onEditingChanged: (evt: GeEditEvent) => emit("editingChanged", evt, merged.editingChanged),
-    onUndoStackChanged: (evt: GeUndoEvent) => emit("undoStackChanged", evt, merged.undoStackChanged)
+    onUndoStackChanged: (evt: GeUndoEvent) => emit("undoStackChanged", evt, merged.undoStackChanged),
+    onColumnResizeStart: (evt: GeColumnResizeEvent) => emit("columnResizeStart", evt, merged.columnResizeStart),
+    onColumnResizeEnd: (evt: GeColumnResizeEvent) => emit("columnResizeEnd", evt, merged.columnResizeEnd),
+    onColumnMoveStart: (evt: GeColumnMoveEvent) => emit("columnMoveStart", evt, merged.columnMoveStart),
+    onColumnMoveEnd: (evt: GeColumnMoveEvent) => emit("columnMoveEnd", evt, merged.columnMoveEnd)
   };
 
   let currentScope: TableScope | undefined;

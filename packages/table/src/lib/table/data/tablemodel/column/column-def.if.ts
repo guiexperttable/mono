@@ -230,7 +230,31 @@ export interface ColumnDefIf {
    *
    * @since 1.1.99
    */
-  cellFormulas?: boolean
+  cellFormulas?: boolean;
+
+  /**
+   * `false`: the user can't change the width of this column – no resize handle, no double click, and
+   * {@link TableApi.autoResizeColumns} / {@link TableApi.autoResizeColumn} leave it out. `setColumnWidth` and
+   * `applyState` still set it. Default `true` (works only with `tableOptions.columnsResizable`).
+   *
+   * @example
+   * ColumnDef.create({ property: "line", headerLabel: "#", width: px50, resizable: false, movable: false })
+   *
+   * @since 1.1.110
+   */
+  resizable?: boolean;
+
+  /**
+   * `false`: the user can't move this column – its header is not draggable, and no other column pushes it away (it
+   * keeps its index; `applyState` with another order leaves it in place, too). Default `true` (works only with
+   * `tableOptions.columnsDraggable`). A {@link RowNumberColumnDef} has `resizable` and `movable` `false`.
+   *
+   * @example
+   * ColumnDef.create({ property: "id", headerLabel: "ID", movable: false })
+   *
+   * @since 1.1.110
+   */
+  movable?: boolean;
 }
 
 /**

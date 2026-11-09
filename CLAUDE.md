@@ -209,9 +209,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
-  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag, validate })`
+  getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag, validate,
+  resizable, movable })`
   (`valueGetter` … `rowDrag` seit 1.1.95, § 3.6 „Berechnete Spalten“ bzw. „Row Drag“; `validate` seit 1.1.96, § 3.6
-  „Fill-Handle und Batch-Edit“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+  „Fill-Handle und Batch-Edit“; `resizable`/`movable` seit 1.1.110, § 3.6 „Spalten ziehen“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
 - Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
   `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
   Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
@@ -232,9 +233,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 ### 3.6 Interaktion
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
-  seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged`, seit 1.1.97 `onDetailExpandedChanged` (optional). Event-Typen: `GeMouseEvent`,
+  seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged`, seit 1.1.97 `onDetailExpandedChanged`, seit 1.1.110
+  `onColumnResizeStart/End`, `onColumnMoveStart/End` (optional). Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent` (seit 1.1.96 + `changes`/`source`), `GeScrollEvent`, `GeStateChangeEvent`,
-  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`.
+  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`, `GeColumnResizeEvent`, `GeColumnMoveEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -611,6 +613,35 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   { follow, removedAtStart })` (`TableScope.notifyRowsAppended`; das ältere interne `rowsAppended()` gehört zum Einfügen
   mit `pasteAddsRows`). Kein Wrapper-Code. Demo-Logik in `demo-table-models` (`LogGenerator`, `LogTailController`,
   `createLogTailModelAndOptions`, `LogLevelCellRenderer`) – Showcase `logtail`, `apps/table-demo/log-tail.html`, Specs.
+- **Spalten ziehen (seit 1.1.110, `column-drag/`, Design `prompts/022-spalten-ziehen.design.md`)**: Zug-Zustand
+  `TableScope.columnDrag` (`ColumnDragState`, intern), angelegt in `onMouseDown` nur für eine erlaubte Spalte
+  (`RenderScope.isColumnResizable`/`isColumnMovable` = `ColumnDef.resizable/movable !== false` + globale Option +
+  `tableSheet.allowsColumnDrag()`); **jeder Druck setzt den alten Zustand zurück** (`resetColumnDrag` – vorher blieb
+  er nach einem Klick ohne Ziehen stehen, das nächste Ziehen im Body änderte die Breite). Start erst ab
+  `MouseHandler.clickMoveTolerance` (4 px) in `beginColumnDrag` (auch aus dem End-Frame, wenn kein Drag-Frame lief) →
+  `onColumnResizeStart`/`onColumnMoveStart`, Escape-Listener am Dokument (eigener `AbortController`, `destroy()` bricht
+  ab, kein Ereignis). Ende in `mouseDraggingEndOnFrame` **zuletzt** (nach Modell, `markDirty`, Repaint) →
+  `GeColumnResizeEvent`/`GeColumnMoveEvent` (`type` start/end/cancel, `source` mouse/dblclick, `columnOrder`, `moved`).
+  `cancelColumnDrag()` (Escape, auch aus dem Start-Handler = Veto) stellt Breite bzw. Reihenfolge her (die
+  `changeColumnOrder`-Züge `drag.moves` rückwärts – geht auch ohne `columnDefs`); der Rest des Drucks tut nichts. Der
+  End-Frame verschiebt noch zur Spalte unter der Maus (kam das Ende vor jedem Drag-Frame, ging der Zug verloren). Nur Nutzeraktionen melden (nicht `setColumnWidth`, `applyState`, `autoResize*`). Verschieben:
+  `moveDraggedColumn` – Ziel per `clampToColumnArea` im eigenen Bereich (west/center/east; vorher wechselte die
+  Fixierung still), `planColumnMove(movable[], from, to)` (DOM-frei `column-drag/column-order.ts`: gesperrte Spalten =
+  feste Plätze, Hauptzug + Rückzüge der verdrängten gesperrten Spalten, `undefined` für einen gesperrten Platz – die Maus
+  über einem gesperrten Platz rückt das Ziel bis davor, unabhängig von der Framerate); die Drop-Zone markiert die
+  aktuelle Position. `TableStateService.applyColumns` nutzt `orderKeepingLocked`.
+  `RowNumberColumnDef` hat `resizable`/`movable` `false` (vorher fest verdrahtet). Renders der App während des Zugs
+  (`repaintHard({ py })`, `appendRows`) sind unschädlich (Breite = Startbreite + Mausweg, Geisterbild am Host).
+  **Doppelklick auf den Griff** (`MouseHandler.handleDblClick`, Aktion `resize-column` → `autoResizeColumnByUser`, kein
+  Header-Doppelklick/Sortieren): Start + Ende mit `source: "dblclick"`. Messung `ColumnWidthMeasurer` +
+  `collectColumnTextCandidates` (`column-drag/column-width-measurer.ts`, intern): Kopf + Fuß ganz, Body bis
+  `columnAutoWidth.maxRows` (10 000) alle Zeilen, darüber nur `renderedBodyRows` (auch `calcAutoColumnWidths`/
+  `autoResizeColumns`); `columnAutoWidth.getWidth(ctx)` (`ColumnAutoWidthContextIf`, `measureText`, lazy
+  `getDefaultWidth`), Ergebnis über `clampToColumnWidthLimits`. `autoResize*` lassen `resizable: false` und
+  Zeilennummern aus. API `autoResizeColumn(column)`, `isColumnDragging()`, `cancelColumnDrag()`. Wrapper-Events
+  `columnResizeStart/End`, `columnMoveStart/End`. Specs `column-drag/column-drag.realmouse.browser.spec.ts` (echte Maus,
+  ltr/rtl, auch WebKit), `column-order.spec.ts`, Invarianten in `perf-invariants`, `test:perf`-Szenario
+  `autoResizeColumn`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -630,7 +661,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 `getSelectionModel`, `getFocusModel`, `shortcutActionIdMapping`, `shortcutActionsDisabled`, `resizeEventDebounceDelay`,
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
-seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`, `spreadsheet`.
+seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`, `spreadsheet`, seit 1.1.110
+`columnAutoWidth`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -652,7 +684,7 @@ Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Compone
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
-(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`), `undoStackChanged` (`GeUndoEvent`) – und je Wrapper `DetailComponentRendererWrapper`
+(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`), `undoStackChanged` (`GeUndoEvent`), seit 1.1.110 `columnResizeStart`, `columnResizeEnd` (`GeColumnResizeEvent`), `columnMoveStart`, `columnMoveEnd` (`GeColumnMoveEvent`) – und je Wrapper `DetailComponentRendererWrapper`
 (Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`). `direction` (1.1.98) ist eine Option wie jede
 andere: kein Wrapper-Code, ein neues Options-Objekt baut neu auf (Smoke-Tests React + Web Component).
 
@@ -698,7 +730,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
 ## 6. Doku, Tests & Verifikation
 
 - **`llms.txt` (Root) = Nutzungsanleitung für KI-Assistenten** (seit Prompt 020, Design `prompts/020-llms-txt.design.md`):
-  Rezepte R1–R17 (kürzester richtiger Code je Aufgabe), Pitfalls (Symptom → Ursache → Lösung, inkl. „erfundene APIs“),
+  Rezepte R1–R18 (kürzester richtiger Code je Aufgabe), Pitfalls (Symptom → Ursache → Lösung, inkl. „erfundene APIs“),
   Quick answers, Feature-Referenz. Jeder ```` ```ts ````-Block kompiliert (`pnpm check:llms`, `scripts/check-llms-snippets.mjs`,
   auch in `test-core.yml`); Framework-Code als ```` ```tsx ```` = nur Anzeige. Ausgeliefert als
   https://gui.expert/llms.txt (Kopie per `pre:build`) und im npm-Paket (`packages/table/dist/llms.txt`, `vite.config.ts`).
@@ -714,7 +746,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   (Snippets extrahieren → `tsc` mit `paths` auf `packages/*/src`).
 - **API-Doc (JSDoc → https://gui.expert/api)**: `pnpm --filter @guiexpert/table docs:check` kompiliert jedes `@example`
   (und ```` ```ts ````-Blöcke in Beschreibungen) einzeln gegen `src/` (Prelude: `packages/table/scripts/doc-examples-prelude.ts`).
-  Stand Okt. 2026: 693 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
+  Stand Nov. 2026: 729 Beispiele, 0 Fehler – **bei jeder JSDoc-Änderung laufen lassen.** Jedes exportierte Symbol hat ein
   `@category` (Gruppierung im typedoc-Index, Reihenfolge in `packages/table/typedoc.json`); neue Exporte bekommen eins.
   Interna, die öffentlich sein müssen: `@category Internals`; gar nicht dokumentieren: `@internal`.
 - **API-Doc erzeugen**: `pnpm --filter @guiexpert/table typedoc:website` → HTML/JSON/MD nach `apps/table-website/src/assets`,
@@ -899,6 +931,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 38 | Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden (Angular 22+) | `videos/14-angular-signals/`, `apps/angular-signal-demo`, Training-Kapitel `angular` (`#signals`), `packages/angular-table/instructions.md` 14 |
 | 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
 | 40 | Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end per Knopf (kein „ohne Enterprise“: Transactions bei ag-Grid Community) | `videos/15-live-log/`, Showcase `logtail`, Training-Kapitel `live-data` (`#append`), `apps/table-demo/log-tail.html`, `instructions.md` 6.9 |
+| 41 | Spaltenlayout speichern, wenn der Nutzer zieht – Ereignisse, gesperrte Spalte, Doppelklick passt die Breite an (geplant; kein „ohne Enterprise“: bei ag-Grid Community) | `apps/table-demo/column-drag.html`, Training-Kapitel `persist-state` (`#column-events`), `instructions.md` 6.27 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

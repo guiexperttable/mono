@@ -5,7 +5,7 @@ import { FormulaBar, SpreadsheetFactory, GeBatchEditEvent, GeDetailEvent, GeEdit
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -40,6 +40,20 @@ function data(tableModel: TableModelIf, tableOptions = new TableOptions()): Tabl
 }
 
 describe('GuiexpertTable (Web Component)', () => {
+
+  it('column drag events: "columnResizeStart" / "columnResizeEnd" (bubbling) for a double click on the handle (since 1.1.110)', async () => {
+    const { host, el } = createTableElement();
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    host.addEventListener('columnResizeStart', e => starts.push((e as CustomEvent).detail));
+    host.addEventListener('columnResizeEnd', e => ends.push((e as CustomEvent).detail));
+    el.data = data(createModel(5));
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+  });
 
   it('el.data = … dispatches tableReady once with a TableApi and renders the rows', async () => {
     const { el, events } = createTableElement();

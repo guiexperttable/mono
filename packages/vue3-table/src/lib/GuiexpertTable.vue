@@ -16,7 +16,8 @@ import {
   TableOptions,
   TableScope,
   TableModelIf, TableOptionsIf,
-  GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent
+  GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent,
+  GeColumnResizeEvent, GeColumnMoveEvent
 } from '@guiexpert/table';
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -82,7 +83,11 @@ export default defineComponent({
     "batchEditChanged", // since 1.1.96 (batch edit)
     "detailExpandedChanged", // since 1.1.97 (master/detail)
     "editingChanged", // since 1.1.99 (Excel-style editing)
-    "undoStackChanged" // since 1.1.99 (undo and redo)
+    "undoStackChanged", // since 1.1.99 (undo and redo)
+    "columnResizeStart", // since 1.1.110 (column drag)
+    "columnResizeEnd",
+    "columnMoveStart",
+    "columnMoveEnd"
   ],
 
   setup(props, { emit }) {
@@ -188,6 +193,18 @@ export default defineComponent({
         },
         onUndoStackChanged: (evt: GeUndoEvent) => {
           emit("undoStackChanged", evt);
+        },
+        onColumnResizeStart: (evt: GeColumnResizeEvent) => {
+          emit("columnResizeStart", evt);
+        },
+        onColumnResizeEnd: (evt: GeColumnResizeEvent) => {
+          emit("columnResizeEnd", evt);
+        },
+        onColumnMoveStart: (evt: GeColumnMoveEvent) => {
+          emit("columnMoveStart", evt);
+        },
+        onColumnMoveEnd: (evt: GeColumnMoveEvent) => {
+          emit("columnMoveEnd", evt);
         },
       };
 

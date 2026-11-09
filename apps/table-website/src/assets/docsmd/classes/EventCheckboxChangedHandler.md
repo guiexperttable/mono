@@ -18,6 +18,10 @@
 
 - [onBatchEditChanged](EventCheckboxChangedHandler.md#onbatcheditchanged)
 - [onCheckboxChanged](EventCheckboxChangedHandler.md#oncheckboxchanged)
+- [onColumnMoveEnd](EventCheckboxChangedHandler.md#oncolumnmoveend)
+- [onColumnMoveStart](EventCheckboxChangedHandler.md#oncolumnmovestart)
+- [onColumnResizeEnd](EventCheckboxChangedHandler.md#oncolumnresizeend)
+- [onColumnResizeStart](EventCheckboxChangedHandler.md#oncolumnresizestart)
 - [onContextmenu](EventCheckboxChangedHandler.md#oncontextmenu)
 - [onDetailExpandedChanged](EventCheckboxChangedHandler.md#ondetailexpandedchanged)
 - [onEditingChanged](EventCheckboxChangedHandler.md#oneditingchanged)
@@ -85,7 +89,7 @@
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L74)
+[src/lib/table/event-adapter.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L76)
 
 ___
 
@@ -111,7 +115,119 @@ Checked rows changed (row checkboxes, tree checkboxes) – the argument holds al
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L30)
+[src/lib/table/event-adapter.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L32)
+
+___
+
+### onColumnMoveEnd
+
+▸ **onColumnMoveEnd**(`_evt`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_evt` | [`GeColumnMoveEvent`](GeColumnMoveEvent.md) |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.110
+
+#### Inherited from
+
+[EventAdapter](EventAdapter.md).[onColumnMoveEnd](EventAdapter.md#oncolumnmoveend)
+
+#### Defined in
+
+[src/lib/table/event-adapter.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L104)
+
+___
+
+### onColumnMoveStart
+
+▸ **onColumnMoveStart**(`_evt`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_evt` | [`GeColumnMoveEvent`](GeColumnMoveEvent.md) |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.110
+
+#### Inherited from
+
+[EventAdapter](EventAdapter.md).[onColumnMoveStart](EventAdapter.md#oncolumnmovestart)
+
+#### Defined in
+
+[src/lib/table/event-adapter.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L100)
+
+___
+
+### onColumnResizeEnd
+
+▸ **onColumnResizeEnd**(`_evt`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_evt` | [`GeColumnResizeEvent`](GeColumnResizeEvent.md) |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.110
+
+#### Inherited from
+
+[EventAdapter](EventAdapter.md).[onColumnResizeEnd](EventAdapter.md#oncolumnresizeend)
+
+#### Defined in
+
+[src/lib/table/event-adapter.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L96)
+
+___
+
+### onColumnResizeStart
+
+▸ **onColumnResizeStart**(`_evt`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_evt` | [`GeColumnResizeEvent`](GeColumnResizeEvent.md) |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.110
+
+#### Inherited from
+
+[EventAdapter](EventAdapter.md).[onColumnResizeStart](EventAdapter.md#oncolumnresizestart)
+
+#### Defined in
+
+[src/lib/table/event-adapter.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L92)
 
 ___
 
@@ -137,7 +253,7 @@ Right-click on the table. Call `evt.originalEvent?.preventDefault()` to suppress
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L33)
+[src/lib/table/event-adapter.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L35)
 
 ___
 
@@ -165,7 +281,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L78)
+[src/lib/table/event-adapter.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L80)
 
 ___
 
@@ -193,7 +309,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L82)
+[src/lib/table/event-adapter.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L84)
 
 ___
 
@@ -219,7 +335,7 @@ The focused cell changed – read it from [FocusModelIf.getFocus](../interfaces/
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L57)
+[src/lib/table/event-adapter.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L59)
 
 ___
 
@@ -245,7 +361,7 @@ Cells were edited – `evt.cells` holds row and column index of each; the new va
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L36)
+[src/lib/table/event-adapter.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L38)
 
 ___
 
@@ -272,7 +388,7 @@ A click on the table. A double-click on the same cell is reported again with `cl
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L39)
+[src/lib/table/event-adapter.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L41)
 
 ___
 
@@ -298,7 +414,7 @@ The mouse is being dragged; `evt.draggingX` / `evt.draggingY` hold the distance.
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L42)
+[src/lib/table/event-adapter.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L44)
 
 ___
 
@@ -324,7 +440,7 @@ A drag with the mouse ended (column resize, column move or range selection).
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L45)
+[src/lib/table/event-adapter.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L47)
 
 ___
 
@@ -350,7 +466,7 @@ The mouse moved over the table (cell under the mouse in `evt`). Called often –
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L48)
+[src/lib/table/event-adapter.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L50)
 
 ___
 
@@ -382,7 +498,7 @@ Managed: called after the move (`evt.toIndex` = the real position). Save the new
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L70)
+[src/lib/table/event-adapter.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L72)
 
 ___
 
@@ -413,7 +529,7 @@ invalid (no drop marker, no drop).
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L67)
+[src/lib/table/event-adapter.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L69)
 
 ___
 
@@ -444,7 +560,7 @@ cancels it. See [GeRowDragEvent](GeRowDragEvent.md).
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L64)
+[src/lib/table/event-adapter.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L66)
 
 ___
 
@@ -470,7 +586,7 @@ The table was scrolled.
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L51)
+[src/lib/table/event-adapter.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L53)
 
 ___
 
@@ -496,7 +612,7 @@ The selection changed – read it from [SelectionModelIf.getRanges](../interface
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L54)
+[src/lib/table/event-adapter.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L56)
 
 ___
 
@@ -524,7 +640,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L61)
+[src/lib/table/event-adapter.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L63)
 
 ___
 
@@ -552,4 +668,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/event-adapter.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L86)
+[src/lib/table/event-adapter.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-adapter.ts#L88)

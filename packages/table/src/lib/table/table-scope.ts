@@ -91,10 +91,38 @@ import { CellFormulaOptions } from './sheet/cell-formula-options';
 import { spreadsheetOption } from './spreadsheet/spreadsheet-preset';
 import { CopiedFormula, TableSheet } from './sheet/table-sheet';
 import { RowIndexShift } from './live-append/row-index-shift';
+import { clampToColumnArea, planColumnMove } from './column-drag/column-order';
+import { ColumnAutoWidthOptions } from './column-drag/column-auto-width-options';
+import type { ColumnAutoWidthOptionsIf } from './column-drag/column-auto-width-options.if';
+import type { ColumnAutoWidthContextIf } from './column-drag/column-auto-width-context.if';
+import { collectColumnTextCandidates, ColumnWidthMeasurer } from './column-drag/column-width-measurer';
+import { GeColumnResizeEvent } from './data/common/event/ge-column-resize-event';
+import type { GeColumnDragEventType, GeColumnResizeSource } from './data/common/event/ge-column-resize-event';
+import { GeColumnMoveEvent } from './data/common/event/ge-column-move-event';
 import type {
   AppendFollowMode, AppendRowsModelResultIf, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf
 } from './live-append/append-rows-options.if';
 
+
+/** A column resize or move by the user (prompt 022). Internal. */
+interface ColumnDragState {
+  kind: 'resize' | 'move';
+  source: GeColumnResizeSource;
+  /** Index at the start (a resize does not change it). */
+  columnIndex: number;
+  /** Index now (a move changes it). */
+  currentIndex: number;
+  columnDef: ColumnDefIf | undefined;
+  startWidth: number;
+  /** The `changeColumnOrder` calls of this move (Escape undoes them in reverse – also without column definitions). */
+  moves: [number, number][];
+  /** The mouse moved past the threshold: the start was reported. */
+  started: boolean;
+  /** Escape / cancelColumnDrag(): the rest of the press does nothing. */
+  cancelled: boolean;
+  /** Ends the Escape listener. */
+  keyAbort?: AbortController;
+}
 
 /**
  * Creates and runs one table in a host element – the core that every framework wrapper uses.
@@ -170,6 +198,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private mouseStartAction = '';
   private mouseStartWidth = -1;
   private mouseStartColumnIndex = -1;
+
+  /** The column resize or move of the current press (prompt 022) – `undefined` without an allowed column action. */
+  private columnDrag?: ColumnDragState;
 
   private dragFrom = -1;
   private dragTo = -1;
@@ -2074,6 +2105,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     } catch (e) {
       console.error(e);            // an own onStateChanged / getRowId threw – release the table anyway
     }
+    this.columnDrag?.keyAbort?.abort(); // a running column drag: no event (the table is gone)
+    this.columnDrag = undefined;
     try {
       this.rowDragService?.destroy(); // a running row drag: "cancel" event, ghost and marker removed
     } catch (e) {
@@ -2316,16 +2349,148 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   onMouseDown(mouseEvent: GeMouseEvent) {
     this.selectionService.onMouseDown();
-    if (mouseEvent.columnIndex > -1 && mouseEvent.action && ['resize-column', 'drag-column'].includes(mouseEvent.action)
-      && !isRowNumberColumnDef(this.tableModel.getColumnDef(mouseEvent.columnIndex))) { // the row numbers stay
+    // a new press starts from scratch: a click on a handle or a header without a drag used to leave its column action
+    // set, and the next drag in the body resized (or moved) that column (found in prompt 022)
+    this.resetColumnDrag();
+    const columnIndex = mouseEvent.columnIndex;
+    const resize = mouseEvent.action === 'resize-column';
+    if (columnIndex > -1 && (resize || mouseEvent.action === 'drag-column')
+      && (resize ? this.isColumnResizable(columnIndex) : this.isColumnMovable(columnIndex))) { // e.g. the row numbers stay
 
-      this.mouseStartWidth = this.tableModel.getColumnWidth(mouseEvent.columnIndex);
-      this.mouseStartAction = mouseEvent.action;
-      this.mouseStartColumnIndex = mouseEvent.columnIndex;
+      this.mouseStartWidth = this.tableModel.getColumnWidth(columnIndex);
+      this.mouseStartAction = mouseEvent.action!;
+      this.mouseStartColumnIndex = columnIndex;
 
       if (this.mouseStartAction === 'drag-column') {
         this.firstDraggingRendering = true;
         this.dragFrom = this.mouseStartColumnIndex;
+      }
+      const allowed = resize
+        ? this.tableOptions.columnsResizable
+        : this.tableOptions.columnsDraggable && this.tableSheet?.allowsColumnDrag() !== false;
+      if (allowed) {
+        const columnDef = this.tableModel.getColumnDef(columnIndex);
+        this.columnDrag = {
+          kind: resize ? 'resize' : 'move', source: 'mouse', columnIndex, currentIndex: columnIndex, columnDef,
+          startWidth: this.mouseStartWidth, moves: [], started: false, cancelled: false,
+        };
+      }
+    }
+  }
+
+  /** Forgets the column action of the last press (no events). */
+  private resetColumnDrag() {
+    this.columnDrag?.keyAbort?.abort();
+    this.columnDrag = undefined;
+    this.mouseStartAction = '';
+    this.mouseStartWidth = -1;
+    this.mouseStartColumnIndex = -1;
+    this.dragFrom = -1;
+    this.dragTo = -1;
+    this.firstDraggingRendering = true;
+  }
+
+  /**
+   * Starts the column drag of this press once the mouse moved past {@link MouseHandler.clickMoveTolerance}: reports
+   * `onColumnResizeStart` / `onColumnMoveStart` and listens for Escape.
+   *
+   * @returns true if the drag runs (started now or before), false below the threshold, without a drag or cancelled
+   */
+  private beginColumnDrag(mouseEvent: GeMouseEvent): boolean {
+    const drag = this.columnDrag;
+    if (!drag || drag.cancelled) {
+      return false;
+    }
+    if (drag.started) {
+      return true;
+    }
+    const dx = mouseEvent.draggingX || 0;
+    const dy = mouseEvent.draggingY || 0;
+    const tolerance = this.mouseHandler?.clickMoveTolerance ?? 4;
+    if (dx * dx + dy * dy <= tolerance * tolerance) {
+      return false; // a click (sorting, selection), or a little jitter of a double click
+    }
+    drag.started = true;
+    const keyAbort = new AbortController();
+    drag.keyAbort = keyAbort;
+    (this.hostElement.ownerDocument ?? document).addEventListener('keydown', (evt: KeyboardEvent) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.cancelColumnDrag(evt);
+      }
+    }, { capture: true, signal: keyAbort.signal });
+    this.emitColumnDragEvent(drag, 'start', mouseEvent.originalEvent);
+    // the start handler may cancel the drag (cancelColumnDrag) or destroy the table
+    return !drag.cancelled && this.columnDrag === drag && !this.isDestroyed();
+  }
+
+  /**
+   * true between the start and the end of a column resize or move by the user ({@link TableApi.isColumnDragging}).
+   *
+   * @returns {boolean} true while the user drags a column (or its resize handle)
+   * @since 1.1.110
+   */
+  isColumnDragging(): boolean {
+    return !!this.columnDrag?.started && !this.columnDrag.cancelled;
+  }
+
+  /**
+   * Cancels a running column drag like Escape ({@link TableApi.cancelColumnDrag}): the old width resp. order is back,
+   * the end is reported with type `"cancel"`. Without a running drag nothing happens.
+   *
+   * @param {Event} [originalEvent] - the key event (Escape)
+   * @since 1.1.110
+   */
+  cancelColumnDrag(originalEvent?: Event): void {
+    const drag = this.columnDrag;
+    if (!drag || !drag.started || drag.cancelled) {
+      return;
+    }
+    drag.cancelled = true; // the rest of this press does nothing (the column action stays set: no selection drag)
+    drag.keyAbort?.abort();
+    if (drag.kind === 'resize') {
+      this.tableModel.setColumnWidth(drag.columnIndex, drag.startWidth);
+      this.tableModel.recalcPadding();
+      this.resetSizeOfWrapperDiv();
+      this.adjustContainersAndRows();
+    } else {
+      this.hideDraggingColumn();
+      this.draggingTargetColumnIndex = -1;
+      for (let i = drag.moves.length - 1; i >= 0; i--) {
+        const [from, to] = drag.moves[i];
+        this.tableModel.changeColumnOrder(to, from);
+      }
+      drag.moves = [];
+      drag.currentIndex = drag.columnIndex;
+      this.resetSizeOfWrapperDiv();
+      this.adjustContainersAndRows();
+      this.stateService.markDirty('selection');
+    }
+    this.stateService.markDirty('columns');
+    this.emitColumnDragEvent(drag, 'cancel', originalEvent);
+  }
+
+  /** Reports a column drag to the listener (and the subscribers). */
+  private emitColumnDragEvent(drag: ColumnDragState, type: GeColumnDragEventType, originalEvent?: Event) {
+    const property = drag.columnDef?.property;
+    if (drag.kind === 'resize') {
+      const newWidth = type === 'start' ? drag.startWidth : this.tableModel.getColumnWidth(drag.columnIndex);
+      const evt = new GeColumnResizeEvent(type, drag.source, drag.columnIndex, drag.columnDef, property,
+        drag.startWidth, newWidth, originalEvent);
+      if (type === 'start') {
+        this.eventListener.onColumnResizeStart?.(evt);
+      } else {
+        this.eventListener.onColumnResizeEnd?.(evt);
+      }
+    } else {
+      const order = (this.tableModel.getColumnDefs?.() ?? []).map(def => def?.property);
+      const evt = new GeColumnMoveEvent(type, drag.columnIndex, type === 'start' ? drag.columnIndex : drag.currentIndex,
+        drag.columnDef, property, order, originalEvent);
+      if (type === 'start') {
+        this.eventListener.onColumnMoveStart?.(evt);
+      } else {
+        this.eventListener.onColumnMoveEnd?.(evt);
       }
     }
   }
@@ -2340,29 +2505,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.eventListener.onMouseDragging?.(mouseEvent);
     this.mouseEvent = mouseEvent;
 
-    if (this.mouseStartColumnIndex > -1 && this.mouseStartAction === 'resize-column' && this.tableOptions.columnsResizable) {
+    if ((this.mouseStartAction === 'resize-column' || this.mouseStartAction === 'drag-column')
+      && !this.beginColumnDrag(mouseEvent)) {
+      return; // below the drag threshold, not allowed (columnsResizable / columnsDraggable) or cancelled (Escape)
+    }
+
+    if (this.mouseStartAction === 'resize-column') {
       this.resizeColumn(mouseEvent);
 
     } else if (!this.mouseStartAction && this.selectionService.onMouseDragging(mouseEvent, startMouseEvent)) {
       this.repaint(); // drag selection (selection type "range")
 
-    } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1 && this.tableOptions.columnsDraggable
-      && this.tableSheet?.allowsColumnDrag() !== false) {
-
-      // no column in front of the row numbers (RowNumberColumnDef, since 1.1.93)
-      this.draggingTargetColumnIndex = Math.max(mouseEvent.columnIndex, this.getFirstDataColumnIndex());
-      this.dragTo = this.draggingTargetColumnIndex;
-
-      if (this.dragFrom > -1 && this.dragTo > -1 && this.dragFrom !== this.dragTo) {
-        if (!(this.lastDragFrom === this.dragTo && this.lastDragTo === this.dragFrom)) {
-          this.tableModel.changeColumnOrder(this.dragFrom, this.dragTo);
-          this.lastDragFrom = this.dragFrom;
-          this.lastDragTo = this.dragTo;
-          this.dragFrom = this.dragTo;
-          this.resetSizeOfWrapperDiv();
-          this.adjustContainersAndRows();
-        }
-      }
+    } else if (this.mouseStartAction === 'drag-column' && mouseEvent.columnIndex > -1) {
+      this.moveDraggedColumn(mouseEvent.columnIndex);
       if (startMouseEvent) {
         // dragFrom = the CURRENT index of the dragged column – it may already have been moved by this first move
         // (a fast drag); the start index would then show the column that took its place
@@ -2371,6 +2526,39 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       }
       this.repaint();
     }
+  }
+
+  /**
+   * Moves the dragged column to the column under the mouse: within its area (fixed west, center, fixed east), locked
+   * columns (`movable: false`) keep their place; over a locked column it moves as far as it can towards it (the same
+   * result whether the mouse passed the columns in between in single frames or jumped there in one).
+   */
+  private moveDraggedColumn(columnUnderMouse: number) {
+    const model = this.tableModel;
+    const count = model.getColumnCount();
+    let target = clampToColumnArea(this.dragFrom, columnUnderMouse, count,
+      model.getFixedLeftColumnCount(), model.getFixedRightColumnCount());
+    while (this.dragFrom > -1 && target !== this.dragFrom && !this.isColumnMovable(target)) {
+      target += target > this.dragFrom ? -1 : 1;
+    }
+    if (this.dragFrom > -1 && target !== this.dragFrom
+      && !(this.lastDragFrom === target && this.lastDragTo === this.dragFrom)) { // no flip-flop over a wide column
+      const movable = Array.from({ length: count }, (_, c) => this.isColumnMovable(c));
+      const moves = planColumnMove(movable, this.dragFrom, target);
+      if (moves?.length) {
+        moves.forEach(([from, to]) => model.changeColumnOrder(from, to));
+        this.columnDrag?.moves.push(...moves);
+        this.lastDragFrom = this.dragFrom;
+        this.lastDragTo = target;
+        this.dragFrom = target;
+        if (this.columnDrag) this.columnDrag.currentIndex = target;
+        this.resetSizeOfWrapperDiv();
+        this.adjustContainersAndRows();
+      }
+    }
+    // the drop zone marks where the dragged column is now
+    this.draggingTargetColumnIndex = this.dragFrom;
+    this.dragTo = this.dragFrom;
   }
 
   /**
@@ -2383,23 +2571,35 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   mouseDraggingEndOnFrame(mouseEvent: GeMouseEvent) {
     this.eventListener.onMouseDraggingEnd?.(mouseEvent);
     this.draggingTargetColumnIndex = -1;
+    const drag = this.columnDrag;
+    if (drag) {
+      this.beginColumnDrag(mouseEvent); // the end may come before the first drag frame (a fast drag, a busy machine)
+    }
+    const active = !!drag && drag.started && !drag.cancelled;
 
     if (this.mouseStartAction === 'resize-column') {
-      this.resizeColumn(mouseEvent);
-      this.stateService.markDirty('columns');
+      if (active) {
+        this.resizeColumn(mouseEvent);
+        this.stateService.markDirty('columns');
+      }
 
     } else if (this.mouseStartAction === 'drag-column') {
+      if (active && mouseEvent.columnIndex > -1) {
+        this.moveDraggedColumn(mouseEvent.columnIndex); // the end may come before any drag frame moved the column
+        this.draggingTargetColumnIndex = -1;            // no drop zone after the drop
+      }
       this.hideDraggingColumn();
-      this.repaint();
-      this.stateService.markDirty('columns');
-      this.stateService.markDirty('selection'); // column indices of the selection moved
+      if (active) {
+        this.repaint();
+        this.stateService.markDirty('columns');
+        this.stateService.markDirty('selection'); // column indices of the selection moved
+      }
     }
-    this.mouseStartWidth = -1;
-    this.mouseStartColumnIndex = -1;
-    this.dragFrom = -1;
-    this.dragTo = -1;
-    this.firstDraggingRendering = true;
-    this.mouseStartAction = '';
+    this.resetColumnDrag();
+    if (active) {
+      // last: model, state and rendering are through – the listener reads the result
+      this.emitColumnDragEvent(drag!, 'end', mouseEvent.originalEvent);
+    }
   }
 
   /**
@@ -3068,62 +3268,149 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * Calculates a width per column that fits the widest text of header, body and footer.
    *
    * The text is measured with the font and padding of a rendered cell label (canvas `measureText`),
-   * so dates, numbers and long names are no longer cut off. To stay fast with millions of rows, the body
-   * is scanned once by character length and only the longest candidates per column are measured.
+   * so dates, numbers and long names are no longer cut off. The body is scanned once by character length and only the
+   * longest candidates per column are measured. Body rows: all up to {@link ColumnAutoWidthOptionsIf.maxRows}
+   * (10 000), above only the rows drawn now (since 1.1.110 – before, millions of rows froze the page).
    * Without a canvas (e.g. in tests) it falls back to 8 px per character.
    *
    * @returns {number[]} one width in px per column (at least 50 px)
    */
   calcAutoColumnWidths(): number[] {
-    const bodyModel = this.tableModel.getBodyModel();
-    const columnCount = this.tableModel.getColumnCount();
-
-    if (!bodyModel) {
+    if (!this.tableModel.getBodyModel()) {
       console.warn('Body model is not available.');
       return [];
     }
+    const columns = Array.from({ length: this.tableModel.getColumnCount() }, (_, c) => c);
+    return this.measureDefaultColumnWidths(columns, new ColumnWidthMeasurer(this.hostElement));
+  }
 
-    // 1. candidates: per column the texts with (almost) the greatest character length
-    const maxCandidates = 30;
-    const candidates: Set<string>[] = Array.from({length: columnCount}, () => new Set<string>());
-    const maxLength = new Array(columnCount).fill(0);
-    const collect = (area: AreaIdent) => {
+  /** The default widths of some columns: one pass over header, footer and the measured body rows. */
+  private measureDefaultColumnWidths(columns: number[], measurer: ColumnWidthMeasurer): number[] {
+    const candidates: Set<string>[] = columns.map(() => new Set<string>());
+    const maxLength: number[] = columns.map(() => 0);
+    (['header', 'body', 'footer'] as AreaIdent[]).forEach(area => {
       const model = this.tableModel.getAreaModel(area);
-      const rowCount = model?.getRowCount() ?? 0;
-      for (let r = 0; r < rowCount; r++) {
-        for (let c = 0; c < columnCount; c++) {
-          const text = model.getTextValueAt?.(r, c) || (model.getValueAt(r, c)?.toString() ?? '');
-          const length = text.length;
-          if (length > maxLength[c]) {
-            maxLength[c] = length;
-            candidates[c].forEach(t => { if (t.length < length - 2) candidates[c].delete(t); });
-          }
-          if (length >= maxLength[c] - 2 && candidates[c].size < maxCandidates) candidates[c].add(text);
-        }
-      }
-    };
-    collect('header');
-    collect('body');
-    collect('footer');
-
-    // 2. measure the candidates with the font and padding of a real cell label
-    const label = this.hostElement.querySelector('.ge-table-label') as HTMLElement | null;
-    const style = getComputedStyle(label ?? this.hostElement);
-    const padding = label ? (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0) : 20;
-    let ctx: CanvasRenderingContext2D | null = null;
-    try {
-      ctx = document.createElement('canvas').getContext('2d');
-    } catch (_e) {
-      ctx = null;
-    }
-    if (ctx) ctx.font = style.font || `${style.fontSize} ${style.fontFamily}`;
-    const measure = (text: string) => ctx ? ctx.measureText(text).width : text.length * 8;
-
-    return candidates.map(texts => {
-      let px = 0;
-      texts.forEach(t => { px = Math.max(px, measure(t)); });
-      return Math.max(Math.ceil(px + padding + 2), 50);
+      const [from, to] = area === 'body' ? this.getMeasuredBodyRows() : [0, (model?.getRowCount() ?? 0) - 1];
+      collectColumnTextCandidates(model, from, to, columns, candidates, maxLength);
     });
+    return candidates.map(texts => measurer.measureWidest(texts));
+  }
+
+  /** The body rows the auto width measures: all up to `maxRows`, above only the rows drawn now. */
+  private getMeasuredBodyRows(): [number, number] {
+    const count = this.tableModel.getBodyModel()?.getRowCount() ?? 0;
+    if (count <= this.getColumnAutoWidthOptions().maxRows) {
+      return [0, count - 1];
+    }
+    const rendered = this.renderedBodyRows;
+    const first = Math.min(Math.max(0, rendered.first), count - 1);
+    const last = rendered.last >= first ? Math.min(rendered.last, count - 1) : Math.min(first + 50, count - 1);
+    return [first, last];
+  }
+
+  private getColumnAutoWidthOptions(): ColumnAutoWidthOptionsIf {
+    return ColumnAutoWidthOptions.create(this.tableOptions.columnAutoWidth);
+  }
+
+  /**
+   * The fitted width of a column: {@link ColumnAutoWidthOptionsIf.getWidth} or the default, limited by
+   * `minWidth` / `maxWidth`.
+   */
+  private calcAutoColumnWidth(columnIndex: number, source: 'dblclick' | 'api', measurer: ColumnWidthMeasurer,
+                              defaultWidth?: number): number {
+    let measured = defaultWidth;
+    const getDefaultWidth = () => {
+      if (measured === undefined) measured = this.measureDefaultColumnWidths([columnIndex], measurer)[0];
+      return measured;
+    };
+    const getWidth = this.getColumnAutoWidthOptions().getWidth;
+    let width: number | undefined;
+    if (getWidth) {
+      const columnDef = this.tableModel.getColumnDef(columnIndex);
+      const ctx: ColumnAutoWidthContextIf = {
+        columnIndex, columnDef, property: columnDef?.property, source,
+        firstRenderedRow: this.renderedBodyRows.first, lastRenderedRow: this.renderedBodyRows.last,
+        measureText: text => measurer.measureText(text),
+        getDefaultWidth,
+      };
+      const own = getWidth(ctx);
+      width = typeof own === 'number' && Number.isFinite(own) && own >= 0 ? Math.round(own) : undefined;
+    }
+    return this.clampToColumnWidthLimits(columnIndex, width ?? getDefaultWidth());
+  }
+
+  /**
+   * Fits the width of one column to its content ({@link TableApi.autoResizeColumn}). No event.
+   *
+   * @param {number | string | ColumnDefIf} column - index, property or column definition
+   * @returns {number | undefined} the width set, `undefined` for an unknown column, a row number column or
+   *          `resizable: false`
+   * @since 1.1.110
+   */
+  autoResizeColumn(column: number | string | ColumnDefIf): number | undefined {
+    const columnIndex = this.resolveColumnIndex(column);
+    if (columnIndex < 0 || !this.isColumnAutoResizable(columnIndex)) {
+      return undefined;
+    }
+    const width = this.calcAutoColumnWidth(columnIndex, 'api', new ColumnWidthMeasurer(this.hostElement));
+    this.tableModel.setColumnWidth(columnIndex, width);
+    this.recalcWrappers();
+    this.stateService.markDirty('columns');
+    return width;
+  }
+
+  /**
+   * A double click on the resize handle: fits the width (if allowed) and reports start and end with source
+   * `"dblclick"`. Called by the {@link MouseHandler}.
+   *
+   * @param {number} columnIndex - the column of the handle
+   * @param {Event} [originalEvent] - the double click
+   * @returns {boolean} true if the width was fitted
+   * @since 1.1.110
+   */
+  autoResizeColumnByUser(columnIndex: number, originalEvent?: Event): boolean {
+    if (!this.tableOptions.columnsResizable || !this.getColumnAutoWidthOptions().doubleClick
+      || columnIndex < 0 || columnIndex >= this.tableModel.getColumnCount() || !this.isColumnAutoResizable(columnIndex)) {
+      return false;
+    }
+    const startWidth = this.tableModel.getColumnWidth(columnIndex);
+    const columnDef = this.tableModel.getColumnDef(columnIndex);
+    const drag: ColumnDragState = {
+      kind: 'resize', source: 'dblclick', columnIndex, currentIndex: columnIndex, columnDef, startWidth,
+      moves: [], started: true, cancelled: false,
+    };
+    const width = this.calcAutoColumnWidth(columnIndex, 'dblclick', new ColumnWidthMeasurer(this.hostElement));
+    const pressed = this.columnDrag; // the press of the second click (never started)
+    this.columnDrag = drag;          // isColumnDragging() is true in the handlers
+    try {
+      this.emitColumnDragEvent(drag, 'start', originalEvent);
+      if (drag.cancelled || this.isDestroyed()) {
+        return true;
+      }
+      this.tableModel.setColumnWidth(columnIndex, width);
+      this.recalcWrappers();
+      this.stateService.markDirty('columns');
+      this.emitColumnDragEvent(drag, 'end', originalEvent);
+    } finally {
+      if (this.columnDrag === drag) this.columnDrag = pressed;
+    }
+    return true;
+  }
+
+  /** Not for a row number column (its width follows the numbers), `resizable: false` or a hidden column. */
+  private isColumnAutoResizable(columnIndex: number): boolean {
+    const def = this.tableModel.getColumnDef(columnIndex);
+    return this.isColumnResizable(columnIndex) && !isRowNumberColumnDef(def) && def?.isVisible?.() !== false;
+  }
+
+  /** Index of a column given by index, property or column definition; -1 if unknown. */
+  private resolveColumnIndex(column: number | string | ColumnDefIf): number {
+    const count = this.tableModel.getColumnCount();
+    if (typeof column === 'number') {
+      return Number.isInteger(column) && column >= 0 && column < count ? column : -1;
+    }
+    const defs = this.tableModel.getColumnDefs?.() ?? [];
+    return typeof column === 'string' ? defs.findIndex(def => def.property === column) : defs.indexOf(column);
   }
 
 
@@ -3181,13 +3468,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   autoResizeColumns(recalcWrappers: boolean= true) {
-    // Resize columns
-    const columnWidthes = this.calcAutoColumnWidths();
-    for (let i = 0; i < columnWidthes.length; i++) {
-      if (isRowNumberColumnDef(this.tableModel.getColumnDef(i))) continue; // its width follows the numbers
+    const columnCount = this.tableModel.getColumnCount();
+    if (!this.tableModel.getBodyModel()) {
+      console.warn('Body model is not available.');
+      return;
+    }
+    const measurer = new ColumnWidthMeasurer(this.hostElement);
+    const columns = Array.from({ length: columnCount }, (_, c) => c);
+    const defaults = this.measureDefaultColumnWidths(columns, measurer);
+    for (let i = 0; i < columnCount; i++) {
+      // row numbers: the width follows the numbers; resizable: false: the width is up to the application (1.1.110)
+      if (!this.isColumnAutoResizable(i)) continue;
       // minWidth / maxWidth apply here, too (since 1.1.103)
-      const columnWidth = this.clampToColumnWidthLimits(i, columnWidthes[i]);
-      this.tableModel.setColumnWidth(i, columnWidth);
+      this.tableModel.setColumnWidth(i, this.calcAutoColumnWidth(i, 'api', measurer, defaults[i]));
     }
     if (recalcWrappers) this.recalcWrappers();
     this.stateService.markDirty('columns');

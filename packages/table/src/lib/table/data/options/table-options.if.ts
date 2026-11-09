@@ -23,6 +23,7 @@ import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { TableDirection } from "../../rtl/table-direction.type";
+import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
 
 /**
  * Represents the options for configuring a table.
@@ -171,13 +172,17 @@ export interface TableOptionsIf {
    */
   hoverColumnVisible: boolean;
   /**
-   * Represents whether the columns are resizable.
+   * The user can change column widths by dragging the handle at the end of a header cell (and fit a width to the
+   * content by a double click on it, {@link columnAutoWidth}). A single column is locked with
+   * `ColumnDef.resizable: false`. Events: {@link EventListenerIf.onColumnResizeStart} / `onColumnResizeEnd`.
    *
    * @type {boolean}
    */
   columnsResizable: boolean;
   /**
-   * Flag indicating whether the columns are draggable.
+   * The user can move columns by dragging a header cell. A single column is locked with `ColumnDef.movable: false`;
+   * a column stays in its area (fixed west, center, fixed east – since 1.1.110). Events:
+   * {@link EventListenerIf.onColumnMoveStart} / `onColumnMoveEnd`.
    *
    * @type {boolean}
    */
@@ -378,6 +383,21 @@ export interface TableOptionsIf {
    * @see [Live demo: row drag](https://gui.expert/showcase/rowdrag/run/) · Training: [Dragging rows into order](https://gui.expert/training/events-and-context-menu/#row-drag)
    */
   rowDragOptions?: Partial<RowDragOptionsIf>;
+
+  /**
+   * Fitting a column width to its content: double click on the resize handle (on by default), the number of body
+   * rows that are measured, an own measurement (see {@link ColumnAutoWidthOptionsIf}). Also used by
+   * {@link TableApi.autoResizeColumn} and {@link TableApi.autoResizeColumns}.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   columnAutoWidth: { getWidth: ctx => ctx.property === "id" ? 80 : undefined },
+   * };
+   *
+   * @since 1.1.110
+   */
+  columnAutoWidth?: Partial<ColumnAutoWidthOptionsIf>;
 
   /**
    * The fill handle: a small square at the bottom right corner of the selected range. Dragging it fills the

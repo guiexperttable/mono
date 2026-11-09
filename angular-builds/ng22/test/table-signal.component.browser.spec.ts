@@ -6,7 +6,7 @@ import { DetailRenderWrapperFactory, TableSignalComponent } from '@guiexpert/ang
 import type { DetailComponentRendererIf } from '@guiexpert/angular-table';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { DetailRenderContextIf, GeMouseEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableModelIf, TableOptionsIf } from '@guiexpert/table';
-import { bodyCell, cellOf, clickDetailToggle, createModel, createRowDragModel, detailRowsOf, dragRow, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
+import { bodyCell, cellOf, clickDetailToggle, createModel, createRowDragModel, dblClickResizeHandle, detailRowsOf, dragRow, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
 import { destroyApps, mount } from './angular-test-utils';
 
 const ZONELESS = [provideZonelessChangeDetection()];
@@ -297,6 +297,8 @@ const FORWARDED: [string, string][] = [
   ['onRowDragMove', 'rowDragMove'], ['onRowDragEnd', 'rowDragEnd'], ['onBatchEditChanged', 'batchEditChanged'],
   ['onDetailExpandedChanged', 'detailExpandedChanged'], ['onEditingChanged', 'editingChanged'],
   ['onUndoStackChanged', 'undoStackChanged'],
+  ['onColumnResizeStart', 'columnResizeStart'], ['onColumnResizeEnd', 'columnResizeEnd'],
+  ['onColumnMoveStart', 'columnMoveStart'], ['onColumnMoveEnd', 'columnMoveEnd'],
 ];
 
 @Component({
@@ -313,7 +315,9 @@ const FORWARDED: [string, string][] = [
       (stateChanged)="got('stateChanged', $event)" (rowDragStart)="got('rowDragStart', $event)"
       (rowDragMove)="got('rowDragMove', $event)" (rowDragEnd)="got('rowDragEnd', $event)"
       (batchEditChanged)="got('batchEditChanged', $event)" (detailExpandedChanged)="got('detailExpandedChanged', $event)"
-      (editingChanged)="got('editingChanged', $event)" (undoStackChanged)="got('undoStackChanged', $event)" />`,
+      (editingChanged)="got('editingChanged', $event)" (undoStackChanged)="got('undoStackChanged', $event)"
+      (columnResizeStart)="got('columnResizeStart', $event)" (columnResizeEnd)="got('columnResizeEnd', $event)"
+      (columnMoveStart)="got('columnMoveStart', $event)" (columnMoveEnd)="got('columnMoveEnd', $event)" />`,
 })
 class AllOutputsHost {
   readonly model = createRowDragModel();
@@ -352,6 +356,14 @@ describe('TableSignalComponent: outputs', () => {
     expect(names).toContain('rowDragMove');
     expect(names[names.length - 1]).toBe('rowDragEnd');
     expect(cmp.received.find(r => r[0] === 'rowDragEnd')![1]).toMatchObject({ type: 'end', moved: true, toIndex: 3 });
+  });
+
+  it('a double click on the resize handle reports columnResizeStart and columnResizeEnd (since 1.1.110)', async () => {
+    const { host, cmp } = await mount(AllOutputsHost, ZONELESS);
+    dblClickResizeHandle(host, 1);
+    const names = cmp.received.map(r => r[0]).filter(n => n.startsWith('column'));
+    expect(names).toEqual(['columnResizeStart', 'columnResizeEnd']);
+    expect(cmp.received.find(r => r[0] === 'columnResizeEnd')![1]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1 });
   });
 });
 

@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -242,6 +242,54 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onUndoStackChanged(evt: GeUndoEvent): void {
     this.undoStackChanged.next(evt);
+  }
+
+  /**
+   * The user started to resize a column (dragged the resize handle 4 px, or a double click on it).
+   *
+   * @since 1.1.110
+   */
+  @Output()
+  columnResizeStart: Subject<GeColumnResizeEvent> = new Subject<GeColumnResizeEvent>();
+
+  /**
+   * A column resize by the user ended – `evt.type` "end" or "cancel" (Escape). Save the column layout here.
+   *
+   * @since 1.1.110
+   */
+  @Output()
+  columnResizeEnd: Subject<GeColumnResizeEvent> = new Subject<GeColumnResizeEvent>();
+
+  /**
+   * The user started to move a column (dragged its header 4 px).
+   *
+   * @since 1.1.110
+   */
+  @Output()
+  columnMoveStart: Subject<GeColumnMoveEvent> = new Subject<GeColumnMoveEvent>();
+
+  /**
+   * A column move by the user ended – `evt.columnOrder` holds the new order, `evt.moved` whether it changed.
+   *
+   * @since 1.1.110
+   */
+  @Output()
+  columnMoveEnd: Subject<GeColumnMoveEvent> = new Subject<GeColumnMoveEvent>();
+
+  onColumnResizeStart(evt: GeColumnResizeEvent): void {
+    this.columnResizeStart.next(evt);
+  }
+
+  onColumnResizeEnd(evt: GeColumnResizeEvent): void {
+    this.columnResizeEnd.next(evt);
+  }
+
+  onColumnMoveStart(evt: GeColumnMoveEvent): void {
+    this.columnMoveStart.next(evt);
+  }
+
+  onColumnMoveEnd(evt: GeColumnMoveEvent): void {
+    this.columnMoveEnd.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

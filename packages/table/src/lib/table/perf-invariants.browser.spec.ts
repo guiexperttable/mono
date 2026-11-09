@@ -266,6 +266,28 @@ describe.each(DIRECTIONS)('performance invariants (%s)', direction => {
     });
   });
 
+  describe('column auto width (prompt 022)', () => {
+    it('autoResizeColumn with 20,000 rows: 1 render, reads only the rendered body rows (above maxRows)', async () => {
+      const t = await mount(20_000, direction);
+      const body = t.scope.tableModel.getBodyModel();
+      const renders = countRenders(t.scope);
+      const reads = countCalls(body, 'getTextValueAt');
+      t.api.autoResizeColumn('name');
+      expect(renders.count()).toBe(1);
+      expect(reads.count()).toBeGreaterThan(0);
+      expect(reads.count()).toBeLessThanOrEqual(60); // the rows drawn now (~15), not 20,000
+      reads.stop();
+    });
+
+    it('a double click on a resize handle: 1 render', async () => {
+      const t = await mount(1_000, direction);
+      const renders = countRenders(t.scope);
+      const handle = t.host.querySelector<HTMLElement>('.ge-table-column-resize-handle[data-col-index="1"]')!;
+      handle.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, detail: 2 }));
+      expect(renders.count()).toBe(1);
+    });
+  });
+
   describe('resize', () => {
     it('a host resize: 1 render (debounced)', async () => {
       const t = await mount(1_000, direction);

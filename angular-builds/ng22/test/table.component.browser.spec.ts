@@ -5,7 +5,7 @@ import { Component, provideZonelessChangeDetection, signal } from '@angular/core
 import { TableComponent } from '@guiexpert/angular-table';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, TableModelIf, TableOptionsIf } from '@guiexpert/table';
-import { bodyCell, cellOf, createModel, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
+import { bodyCell, cellOf, createModel, dblClickResizeHandle, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
 import { destroyApps, mount } from './angular-test-utils';
 
 const ZONELESS = [provideZonelessChangeDetection()];
@@ -20,7 +20,9 @@ const ZONELESS = [provideZonelessChangeDetection()];
         (tableReady)="ready.push($event)"
         (mouseClicked)="clicks.push($event)"
         (contextmenu)="contextmenus.push($event)"
-        (contextMenu)="contextMenus.push($event)" />
+        (contextMenu)="contextMenus.push($event)"
+        (columnResizeStart)="columnEvents.push($event)"
+        (columnResizeEnd)="columnEvents.push($event)" />
     }`,
 })
 class ClassicHost {
@@ -32,6 +34,7 @@ class ClassicHost {
   readonly clicks: GeMouseEvent[] = [];
   readonly contextmenus: unknown[] = [];
   readonly contextMenus: unknown[] = [];
+  readonly columnEvents: unknown[] = [];
 }
 
 afterEach(() => {
@@ -40,6 +43,13 @@ afterEach(() => {
 });
 
 describe('TableComponent (Angular 22, zoneless)', () => {
+
+  it('a double click on the resize handle reaches (columnResizeStart) and (columnResizeEnd) (since 1.1.110)', async () => {
+    const { host, cmp } = await mount(ClassicHost, ZONELESS);
+    dblClickResizeHandle(host, 1);
+    expect(cmp.columnEvents).toHaveLength(2);
+    expect(cmp.columnEvents[1]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1 });
+  });
 
   it('S15: tableReady once, rows rendered', async () => {
     const { host, cmp } = await mount(ClassicHost, ZONELESS);

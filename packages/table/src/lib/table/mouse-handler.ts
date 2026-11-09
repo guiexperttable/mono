@@ -287,8 +287,15 @@ export class MouseHandler {
     // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
     const geMouseEvent = cell ? this.createCellEvent(event, cell) : this.tableScope.createGeMouseEvent(event);
     const targetData = new MouseTargetData(eventTarget, this.tableScope);
+    // a double click on the resize handle fits the width – it does not sort or edit (prompt 022)
+    const resizeHandle = (cell ? cell.action : targetData.action) === 'resize-column';
+    if (resizeHandle) {
+      const colIdx = cell ? cell.colIdx
+        : Number((eventTarget instanceof Element ? eventTarget.closest('[data-col-index]') : null)?.getAttribute('data-col-index') ?? -1);
+      this.tableScope.autoResizeColumnByUser(colIdx, event);
+    }
 
-    if (eventTarget instanceof HTMLElement && !this.isClickAction(targetData)) {
+    if (!resizeHandle && eventTarget instanceof HTMLElement && !this.isClickAction(targetData)) {
       // the target may be an element inside the cell (renderer, component) → look up the cell attributes
       const target = (eventTarget.closest("[data-col-index]") ?? eventTarget) as HTMLElement;
       const area = cell ? cell.areaIdent : target.closest("[data-area]")?.getAttribute("data-area") ?? null;

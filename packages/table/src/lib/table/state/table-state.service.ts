@@ -1,4 +1,5 @@
 import { toPhysicalScrollLeft } from "../rtl/rtl-util";
+import { orderKeepingLocked } from "../column-drag/column-order";
 import type { TableScope } from "../table-scope";
 import { ColumnDefIf } from "../data/tablemodel/column/column-def.if";
 import { SizeIf } from "../data/common/size.if";
@@ -776,9 +777,11 @@ export class TableStateService {
       const at = i > 0 ? target.lastIndexOf(current[i - 1]) : -1;
       target.splice(at + 1, 0, property);
     });
-    for (let i = 0; i < target.length; i++) {
+    // locked columns (movable: false) keep their place (since 1.1.110)
+    const targetOrder = orderKeepingLocked(target, current, new Set(defs.filter(def => def.movable === false).map(def => def.property)));
+    for (let i = 0; i < targetOrder.length; i++) {
       const now = model.getColumnDefs()!.map(def => def.property);
-      const from = now.indexOf(target[i], i);
+      const from = now.indexOf(targetOrder[i], i);
       if (from > i) {
         model.changeColumnOrder(from, i);   // keeps column sizes and the properties of the area models in sync
       }

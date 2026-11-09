@@ -1323,6 +1323,8 @@ listener.onSelectionChanged = () => {
 | `rowDragStart`, `rowDragMove`, `rowDragEnd` | `GeRowDragEvent` | since 1.1.95, see 6.16 (core: `onRowDragStart/Move/End`) |
 | `batchEditChanged` | `GeBatchEditEvent` | since 1.1.96, pending changes of a batch edit, see 6.17 (core: `onBatchEditChanged`) |
 | `detailExpandedChanged` | `GeDetailEvent` | since 1.1.97, a detail row was expanded or collapsed, see 6.18 (core: `onDetailExpandedChanged`) |
+| `columnResizeStart`, `columnResizeEnd` | `GeColumnResizeEvent` | since 1.1.110, the user resized a column (handle dragged or double-clicked), see 6.27 (core: `onColumnResizeStart/End`) |
+| `columnMoveStart`, `columnMoveEnd` | `GeColumnMoveEvent` | since 1.1.110, the user moved a column by its header, see 6.27 (core: `onColumnMoveStart/End`) |
 
 **Clicks while the app renders (since 1.1.108).** The browser sends `click` only if `mousedown` and `mouseup` hit the
 same element. A render between the two (`repaint()`, `repaintHard()`, `scrollToPixel()` from a live update) replaces
@@ -2559,8 +2561,116 @@ for subclasses of the built-in models that override `getRowHeight()`). → 5.5
 heights of the models the factory builds (from `rows`, `bodyData` …) and counts only for a model whose `getRowHeight()`
 returns 0. → 5.5
 
+**How do I save the column layout when the user resizes or moves a column?** Listen for `onColumnResizeEnd` /
+`onColumnMoveEnd` (wrappers: `columnResizeEnd`, `columnMoveEnd`, since 1.1.110). They come once per drag, after the
+table applied the change – read `tableApi.getState(["columns"])` in the handler, no `setTimeout`, no DOM listeners on
+the header. API calls (`setColumnWidth`, `applyState`, `autoResizeColumns`) report nothing. → 6.27
+
+**How do I lock one column (no resizing, no moving)?** `ColumnDef.create({ …, resizable: false, movable: false })`
+(since 1.1.110): no resize handle, the header can't be dragged, and no other column is dropped onto its place. A
+column also stays in its area – nobody drags a center column into the fixed columns. → 6.27
+
+**A double click on the column border should fit the width.** It does (since 1.1.110): header, footer and the body rows
+– all up to 10,000 rows, above only the rows drawn now. Own measurement: `tableOptions.columnAutoWidth.getWidth`;
+off: `columnAutoWidth: { doubleClick: false }`; one column by code: `tableApi.autoResizeColumn("name")`. → 6.27
+
 **The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
 gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4
+
+### 6.27 Dragging columns: events, locks, double click (since 1.1.110)
+
+The user changes the width of a column by dragging the handle at the end of a header cell (`columnsResizable`) and
+the order by dragging a header cell (`columnsDraggable`). Since 1.1.110 the table reports both, locks single columns
+and fits a width by a double click on the handle.
+
+**Events** – once per drag, after the table applied the change:
+
+```ts
+import { EventAdapter } from "@guiexpert/table";
+import type { GeColumnMoveEvent, GeColumnResizeEvent, TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+declare function saveLayout(layout: unknown): void;
+
+const listener = new EventAdapter();
+listener.onColumnResizeEnd = (evt: GeColumnResizeEvent) => {
+  if (evt.type === "end") saveLayout(tableApi.getState(["columns"]));   // the new width is already in the state
+};
+listener.onColumnMoveEnd = (evt: GeColumnMoveEvent) => {
+  if (evt.moved) saveLayout(tableApi.getState(["columns"]));           // evt.columnOrder = properties in the new order
+};
+```
+
+| Event | When | Payload |
+|---|---|---|
+| `onColumnResizeStart` / `onColumnResizeEnd` | the mouse moved 4 px with the handle pressed (`MouseHandler.clickMoveTolerance`) / released – also outside of the table; a double click on the handle sends both at once (`source: "dblclick"`) | `GeColumnResizeEvent`: `type` (`"start"`, `"end"`, `"cancel"`), `source` (`"mouse"`, `"dblclick"`), `columnIndex`, `columnDef`, `property`, `oldWidth`, `newWidth` |
+| `onColumnMoveStart` / `onColumnMoveEnd` | the header was dragged 4 px / released | `GeColumnMoveEvent`: `type`, `fromIndex`, `toIndex`, `columnDef`, `property`, `columnOrder`, `moved` |
+
+- **Only the user**: `setColumnWidth`, `applyState`, `autoResizeColumns`, `autoResizeColumn` and
+  `tableModel.changeColumnOrder` report nothing – saving in the handler can't loop.
+- **One move event per drag**: the table moves the column step by step while the mouse moves; you get the start and
+  the end, not the steps.
+- **Escape** (or `tableApi.cancelColumnDrag()`) cancels: the old width resp. order is back, the end has
+  `type: "cancel"`. `tableApi.isColumnDragging()` is true between start and end.
+- **Renders while dragging are fine**: `repaint()`, `repaintHard({ py })`, `appendRows()` of a live table don't disturb
+  the drag (no `headerBusy` flag needed). Do not change column widths or the order yourself while
+  `isColumnDragging()` is true.
+- A press that moves less than 4 px is a click (sorting, selection) – no drag, no event.
+- `onStateChanged` (6.11) still comes, debounced and for every change (also API calls); the column events are the
+  direct way for "the user changed the layout".
+
+**Locks per column** – both default `true`, they only work while the global option is on:
+
+```ts
+import { ColumnDef, TableFactory, px50, px500 } from "@guiexpert/table";
+
+const lines = [{ line: 1, message: "started" }, { line: 2, message: "connected" }];
+const tableModel = TableFactory.createTableModel({
+  rows: lines,
+  columnDefs: [
+    ColumnDef.create({ property: "line", headerLabel: "#", width: px50, resizable: false, movable: false }),
+    ColumnDef.create({ property: "message", headerLabel: "Message", width: px500 }),
+  ],
+  fixedLeftColumnCount: 1,
+});
+```
+
+- `resizable: false`: no resize handle, no double click, `autoResizeColumns()` / `autoResizeColumn()` leave the column
+  out (hidden columns, too – they stay hidden). `setColumnWidth()` and `applyState()` still set it.
+- `movable: false`: the header can't be dragged (no `data-ge-action="drag-column"`), and no other column takes its
+  place – locked columns are fixed places, the others fill the remaining places. `applyState()` with another order
+  leaves a locked column in place, too. `RowNumberColumnDef` has both flags `false` (before 1.1.110 a special case).
+- **A column stays in its area**: west (fixed left), center, east (fixed right). Before 1.1.110 a drag over the border
+  silently changed which column was fixed.
+
+**Fit the width to the content** – a double click on the resize handle (does not sort, does not edit), or by code:
+
+```ts
+import { TableOptions } from "@guiexpert/table";
+import type { TableApi, TableOptionsIf } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  columnAutoWidth: {
+    maxRows: 10_000,                                  // default: all body rows up to 10,000, above the rows drawn now
+    getWidth: ctx => ctx.property === "message"       // own measurement, undefined = default
+      ? ctx.measureText("x".repeat(80))
+      : undefined,
+  },
+};
+const width = tableApi.autoResizeColumn("message");   // one column, no events; undefined for resizable: false
+```
+
+`ColumnAutoWidthContextIf` gives `columnIndex`, `columnDef`, `property`, `source` (`"dblclick"` | `"api"`), the rows
+drawn now (`firstRenderedRow`, `lastRenderedRow`), `measureText(text)` (font and padding of a cell) and
+`getDefaultWidth()`. The result is limited by `minWidth` / `maxWidth`. `columnAutoWidth: { doubleClick: false }`
+switches the double click off. `maxRows` and `getWidth` (with `source: "api"`) also apply to `autoResizeColumns()` –
+with millions of rows it measured every row before 1.1.110. Calling `tableApi.cancelColumnDrag()` in a start handler
+vetoes the drag (nothing changes, the end comes with `type: "cancel"`).
+
+Not yet: resizing or moving columns with the keyboard.
 
 ---
 

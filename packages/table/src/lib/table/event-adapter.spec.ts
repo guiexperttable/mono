@@ -21,6 +21,7 @@ const METHODS = [
   'onSelectionChanged',
   'onStateChanged',  // since 1.1.92
   'onUndoStackChanged', // since 1.1.99
+  'onColumnResizeStart', 'onColumnResizeEnd', 'onColumnMoveStart', 'onColumnMoveEnd', // since 1.1.110
 ];
 
 describe('EventAdapter', () => {
@@ -32,7 +33,7 @@ describe('EventAdapter', () => {
 
   it('has exactly these event methods', () => {
     const names = Object.getOwnPropertyNames(EventAdapter.prototype).filter(n => n !== 'constructor').sort();
-    expect(names).toEqual(METHODS);
+    expect(names).toEqual([...METHODS].sort());
   });
 
   it('every method is a no-op returning undefined', () => {

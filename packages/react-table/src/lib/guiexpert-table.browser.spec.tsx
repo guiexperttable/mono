@@ -12,7 +12,7 @@ import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
 import type { DetailComponentProps } from './detail-component-renderer-wrapper';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -45,6 +45,17 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (React)', () => {
+
+  it('column drag events: a double click on the resize handle reports columnResizeStart/End (since 1.1.110)', async () => {
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} columnResizeStart={e => starts.push(e)} columnResizeEnd={e => ends.push(e)} />);
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+  });
 
   it('master/detail: a React component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
     const unmounted = vi.fn();

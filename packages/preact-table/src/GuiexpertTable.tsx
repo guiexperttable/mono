@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -22,6 +22,8 @@ export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 export type GeDetailEventFn = (evt: GeDetailEvent) => void;
 export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
+export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
+export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -56,6 +58,14 @@ export interface GuiexpertTableProps {
   editingChanged?: GeEditEventFn;
   /** The undo history changed (since 1.1.99). */
   undoStackChanged?: GeUndoEventFn;
+  /** The user started to resize a column (since 1.1.110). */
+  columnResizeStart?: GeColumnResizeEventFn;
+  /** A column resize by the user ended – `evt.type` "end" or "cancel"; save the layout here (since 1.1.110). */
+  columnResizeEnd?: GeColumnResizeEventFn;
+  /** The user started to move a column (since 1.1.110). */
+  columnMoveStart?: GeColumnMoveEventFn;
+  /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
+  columnMoveEnd?: GeColumnMoveEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -137,7 +147,11 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onBatchEditChanged: (evt: GeBatchEditEvent) => current().batchEditChanged?.(evt),
       onDetailExpandedChanged: (evt: GeDetailEvent) => current().detailExpandedChanged?.(evt),
       onEditingChanged: (evt: GeEditEvent) => current().editingChanged?.(evt),
-      onUndoStackChanged: (evt: GeUndoEvent) => current().undoStackChanged?.(evt)
+      onUndoStackChanged: (evt: GeUndoEvent) => current().undoStackChanged?.(evt),
+      onColumnResizeStart: (evt: GeColumnResizeEvent) => current().columnResizeStart?.(evt),
+      onColumnResizeEnd: (evt: GeColumnResizeEvent) => current().columnResizeEnd?.(evt),
+      onColumnMoveStart: (evt: GeColumnMoveEvent) => current().columnMoveStart?.(evt),
+      onColumnMoveEnd: (evt: GeColumnMoveEvent) => current().columnMoveEnd?.(evt)
     };
 
     const tableScope = new TableScope(

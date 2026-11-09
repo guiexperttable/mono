@@ -10,7 +10,7 @@ import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper
 import type { DetailComponentProps } from './DetailComponentRendererWrapper';
 import type { GeMouseEventFn } from './GuiexpertTableProps';
 import {
-  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../table/test-utils/wrapper-test-utils';
 
 const disposers: (() => void)[] = [];
@@ -36,6 +36,23 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Solid)', () => {
+
+  it('column drag events: a double click on the resize handle reports columnResizeStart/End (since 1.1.110)', async () => {
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    const domEvents: unknown[] = [];
+    const host = createHost();
+    host.addEventListener('columnResizeEnd', e => domEvents.push((e as CustomEvent).detail));
+    disposers.push(render(() => (
+      <GuiexpertTable tableModel={createModel(5)} columnResizeStart={e => starts.push(e)} columnResizeEnd={e => ends.push(e)} />
+    ), host));
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+    expect(domEvents).toEqual(ends);
+  });
 
   it('master/detail: a Solid component as detail keeps its state while scrolling, is disposed on collapse (since 1.1.97)', async () => {
     const disposed = vi.fn();

@@ -298,6 +298,11 @@ export * from './lib/table/row-drag/row-drag-options';
 export * from './lib/table/row-drag/move-rows';
 export * from './lib/table/row-drag/row-drag-service';
 export * from './lib/table/data/common/event/ge-row-drag-event';
+export * from './lib/table/data/common/event/ge-column-resize-event';
+export * from './lib/table/data/common/event/ge-column-move-event';
+export * from './lib/table/column-drag/column-auto-width-options.if';
+export * from './lib/table/column-drag/column-auto-width-options';
+export * from './lib/table/column-drag/column-auto-width-context.if';
 
 // Fill handle and batch edit (since 1.1.96)
 export * from './lib/table/batch-edit/cell-change.if';

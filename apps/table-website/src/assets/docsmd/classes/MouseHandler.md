@@ -22,6 +22,7 @@ Class representing a MouseHandler.
 
 ### Methods
 
+- [adjustForRowChanges](MouseHandler.md#adjustforrowchanges)
 - [isButtonDown](MouseHandler.md#isbuttondown)
 
 ## Constructors
@@ -42,7 +43,7 @@ Class representing a MouseHandler.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L89)
+[src/lib/table/mouse-handler.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L90)
 
 ## Properties
 
@@ -56,7 +57,7 @@ this many pixels (screen coordinates) between mousedown and mouseup. Since 1.1.1
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L64)
+[src/lib/table/mouse-handler.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L65)
 
 ___
 
@@ -70,7 +71,7 @@ double-click speed of the operating system.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L55)
+[src/lib/table/mouse-handler.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L56)
 
 ___
 
@@ -80,7 +81,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L68)
+[src/lib/table/mouse-handler.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L69)
 
 ___
 
@@ -90,7 +91,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L69)
+[src/lib/table/mouse-handler.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L70)
 
 ___
 
@@ -100,7 +101,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L66)
+[src/lib/table/mouse-handler.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L67)
 
 ___
 
@@ -110,7 +111,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L67)
+[src/lib/table/mouse-handler.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L68)
 
 ___
 
@@ -120,9 +121,32 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L90)
+[src/lib/table/mouse-handler.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L91)
 
 ## Methods
+
+### adjustForRowChanges
+
+▸ **adjustForRowChanges**(`shift`): `void`
+
+Live data (since 1.1.108): a drag in progress (range selection) keeps its start row when rows were removed at the
+start or inserted.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `shift` | [`RowIndexShift`](RowIndexShift.md) | how the display indices move |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/mouse-handler.ts:435](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L435)
+
+___
 
 ### isButtonDown
 
@@ -139,4 +163,4 @@ true between mousedown and mouseup
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:606](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L606)
+[src/lib/table/mouse-handler.ts:642](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L642)

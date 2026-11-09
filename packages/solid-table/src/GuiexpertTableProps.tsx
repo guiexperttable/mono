@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -17,6 +17,8 @@ export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 export type GeDetailEventFn = (evt: GeDetailEvent) => void;
 export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
+export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
+export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -50,6 +52,14 @@ export interface GuiexpertTableProps {
   editingChanged?: GeEditEventFn,
   /** The undo history changed (since 1.1.99). */
   undoStackChanged?: GeUndoEventFn,
+  /** The user started to resize a column (since 1.1.110). */
+  columnResizeStart?: GeColumnResizeEventFn,
+  /** A column resize by the user ended – `evt.type` "end" or "cancel"; save the layout here (since 1.1.110). */
+  columnResizeEnd?: GeColumnResizeEventFn,
+  /** The user started to move a column (since 1.1.110). */
+  columnMoveStart?: GeColumnMoveEventFn,
+  /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
+  columnMoveEnd?: GeColumnMoveEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

@@ -2,7 +2,7 @@ import {
   EventListenerIf,
   FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableApi,
   TableModelIf,
@@ -24,6 +24,8 @@ export type GeBatchEditEventFn = (evt: GeBatchEditEvent) => void;
 export type GeDetailEventFn = (evt: GeDetailEvent) => void;
 export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
+export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
+export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -59,6 +61,14 @@ export interface GuiexpertTableProps {
   editingChanged?: GeEditEventFn,
   /** The undo history changed (since 1.1.99). */
   undoStackChanged?: GeUndoEventFn,
+  /** The user started to resize a column (since 1.1.110). */
+  columnResizeStart?: GeColumnResizeEventFn,
+  /** A column resize by the user ended – `evt.type` "end" or "cancel"; save the layout here (since 1.1.110). */
+  columnResizeEnd?: GeColumnResizeEventFn,
+  /** The user started to move a column (since 1.1.110). */
+  columnMoveStart?: GeColumnMoveEventFn,
+  /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
+  columnMoveEnd?: GeColumnMoveEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**
@@ -90,6 +100,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.detailExpandedChanged] - Master/detail: a detail row was expanded or collapsed (since 1.1.97).
  * @param {Function} [props.editingChanged] - The cell editor opened, changed, committed or was cancelled (since 1.1.99).
  * @param {Function} [props.undoStackChanged] - The undo history changed (since 1.1.99).
+ * @param {Function} [props.columnResizeEnd] - A column resize by the user ended (since 1.1.110); also `columnResizeStart`, `columnMoveStart`, `columnMoveEnd`.
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
  * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.92).
  *
@@ -139,7 +150,11 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       onBatchEditChanged: (evt: GeBatchEditEvent) => propsRef.current.batchEditChanged?.(evt),
       onDetailExpandedChanged: (evt: GeDetailEvent) => propsRef.current.detailExpandedChanged?.(evt),
       onEditingChanged: (evt: GeEditEvent) => propsRef.current.editingChanged?.(evt),
-      onUndoStackChanged: (evt: GeUndoEvent) => propsRef.current.undoStackChanged?.(evt)
+      onUndoStackChanged: (evt: GeUndoEvent) => propsRef.current.undoStackChanged?.(evt),
+      onColumnResizeStart: (evt: GeColumnResizeEvent) => propsRef.current.columnResizeStart?.(evt),
+      onColumnResizeEnd: (evt: GeColumnResizeEvent) => propsRef.current.columnResizeEnd?.(evt),
+      onColumnMoveStart: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveStart?.(evt),
+      onColumnMoveEnd: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveEnd?.(evt)
     };
 
     // A new tableModel or tableOptions object re-creates the table (dependency array below);

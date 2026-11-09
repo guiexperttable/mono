@@ -204,3 +204,16 @@ export function clickDetailToggle(container: Element, rowIndex: number): void {
   }
   toggle.click();
 }
+
+/**
+ * Double click on the resize handle of a header column (since 1.1.110): fits the width to the content and reports
+ * `onColumnResizeStart` + `onColumnResizeEnd` (source "dblclick"). A synthetic `dblclick` – no mouse needed.
+ */
+export function dblClickResizeHandle(container: Element, columnIndex: number): void {
+  const handle = container.querySelector<HTMLElement>(`.ge-table-column-resize-handle[data-col-index="${columnIndex}"]`);
+  if (!handle) throw new Error(`no resize handle for column ${columnIndex}`);
+  const r = handle.getBoundingClientRect();
+  handle.dispatchEvent(new MouseEvent('dblclick', {
+    bubbles: true, cancelable: true, detail: 2, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
+  }));
+}

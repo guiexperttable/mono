@@ -1,6 +1,8 @@
 import type { GeEditEvent } from './data/common/event/ge-edit-event';
 import type { GeUndoEvent } from './data/common/event/ge-undo-event';
 import type { GeDetailEvent } from './data/common/event/ge-detail-event';
+import type { GeColumnResizeEvent } from './data/common/event/ge-column-resize-event';
+import type { GeColumnMoveEvent } from './data/common/event/ge-column-move-event';
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
@@ -136,4 +138,36 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.99
    */
   onUndoStackChanged?(evt: GeUndoEvent): void;
+
+  /**
+   * Optional: the user started to resize a column (the mouse moved 4 px with the resize handle pressed, or a double
+   * click on it). Not reported for API calls. See {@link GeColumnResizeEvent}.
+   *
+   * @since 1.1.110
+   */
+  onColumnResizeStart?(evt: GeColumnResizeEvent): void;
+
+  /**
+   * Optional: a column resize ended – `evt.type` `"end"` (also released outside the table) or `"cancel"` (Escape: the
+   * old width is back). Once per start, after the table applied the width: save the column layout here.
+   *
+   * @since 1.1.110
+   */
+  onColumnResizeEnd?(evt: GeColumnResizeEvent): void;
+
+  /**
+   * Optional: the user started to move a column (dragged its header 4 px). Not reported for API calls. See
+   * {@link GeColumnMoveEvent}.
+   *
+   * @since 1.1.110
+   */
+  onColumnMoveStart?(evt: GeColumnMoveEvent): void;
+
+  /**
+   * Optional: a column move ended – `evt.type` `"end"` (`evt.moved` = another index) or `"cancel"` (Escape: the old
+   * order is back). Once per start, no event for the steps in between, after the table applied the order.
+   *
+   * @since 1.1.110
+   */
+  onColumnMoveEnd?(evt: GeColumnMoveEvent): void;
 }

@@ -8,6 +8,8 @@ import type {
   GeDetailEvent,
   GeEditEvent,
   GeUndoEvent,
+  GeColumnResizeEvent,
+  GeColumnMoveEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -48,6 +50,14 @@ export interface GuiexpertTableProps {
   onEditingChanged?: (evt: GeEditEvent) => void;
   /** The undo history changed. @since 1.1.99 */
   onUndoStackChanged?: (evt: GeUndoEvent) => void;
+  /** The user started to resize a column. @since 1.1.110 */
+  onColumnResizeStart?: (evt: GeColumnResizeEvent) => void;
+  /** A column resize by the user ended (`evt.type` "end" or "cancel"). @since 1.1.110 */
+  onColumnResizeEnd?: (evt: GeColumnResizeEvent) => void;
+  /** The user started to move a column. @since 1.1.110 */
+  onColumnMoveStart?: (evt: GeColumnMoveEvent) => void;
+  /** A column move by the user ended (`evt.columnOrder`). @since 1.1.110 */
+  onColumnMoveEnd?: (evt: GeColumnMoveEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -76,6 +86,11 @@ export interface GuiexpertTableEvents {
   editingChanged: CustomEvent<GeEditEvent>;
   /** @since 1.1.99 */
   undoStackChanged: CustomEvent<GeUndoEvent>;
+  /** @since 1.1.110 */
+  columnResizeStart: CustomEvent<GeColumnResizeEvent>;
+  columnResizeEnd: CustomEvent<GeColumnResizeEvent>;
+  columnMoveStart: CustomEvent<GeColumnMoveEvent>;
+  columnMoveEnd: CustomEvent<GeColumnMoveEvent>;
 }
 
 /**

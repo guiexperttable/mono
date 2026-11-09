@@ -58,7 +58,7 @@ ONE event – no storage access per scroll frame.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L115)
+[src/lib/table/state/table-state.service.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L116)
 
 ## Properties
 
@@ -70,7 +70,7 @@ Suffix of the storage key: `<key>tableState`.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L79)
+[src/lib/table/state/table-state.service.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L80)
 
 ## Methods
 
@@ -94,7 +94,7 @@ Reports the change with `onStateChanged` and stores it.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L210)
+[src/lib/table/state/table-state.service.ts:211](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L211)
 
 ___
 
@@ -110,7 +110,7 @@ Stops the timer and stores / reports a pending change (called by `TableScope.des
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:375](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L375)
+[src/lib/table/state/table-state.service.ts:376](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L376)
 
 ___
 
@@ -126,7 +126,7 @@ Stores and reports the dirty parts now (normally called by the timer of [markDir
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:334](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L334)
+[src/lib/table/state/table-state.service.ts:335](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L335)
 
 ___
 
@@ -151,7 +151,7 @@ the state
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:195](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L195)
+[src/lib/table/state/table-state.service.ts:196](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L196)
 
 ___
 
@@ -167,7 +167,7 @@ After the external filter: tree, sorting, checked rows, selection.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L160)
+[src/lib/table/state/table-state.service.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L161)
 
 ___
 
@@ -183,7 +183,7 @@ After the layout (scroll height known): scroll position; the restore is finished
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:174](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L174)
+[src/lib/table/state/table-state.service.ts:175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L175)
 
 ___
 
@@ -199,7 +199,7 @@ After `tableModel.init()`: remembers the defaults, applies the column layout.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L140)
+[src/lib/table/state/table-state.service.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L141)
 
 ___
 
@@ -216,7 +216,7 @@ First `firstInit()` only, before `tableModel.init()`: reads the start state and 
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L125)
+[src/lib/table/state/table-state.service.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L126)
 
 ___
 
@@ -239,7 +239,7 @@ reported – only if it really changed. No effect before the table is built.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:308](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L308)
+[src/lib/table/state/table-state.service.ts:309](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L309)
 
 ___
 
@@ -255,7 +255,7 @@ Called after each render pass: marks the scroll position as changed if it change
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L320)
+[src/lib/table/state/table-state.service.ts:321](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L321)
 
 ___
 
@@ -273,7 +273,7 @@ scrolled to the top, custom data removed – and removes the stored state.
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:269](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L269)
+[src/lib/table/state/table-state.service.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L270)
 
 ___
 
@@ -295,7 +295,7 @@ Sets the part `custom` (data of the application).
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:291](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L291)
+[src/lib/table/state/table-state.service.ts:292](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L292)
 
 ___
 
@@ -317,4 +317,4 @@ The column was sorted by a header click / `sortByColumn` – it becomes the prim
 
 #### Defined in
 
-[src/lib/table/state/table-state.service.ts:297](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L297)
+[src/lib/table/state/table-state.service.ts:298](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.service.ts#L298)

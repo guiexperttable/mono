@@ -366,9 +366,11 @@ export const CHAPTERS: Chapter[] = [
     title: "Remember the state: sorting, scroll position, open nodes", nav: "Persist state",
     lead: "After a reload everything looks like before – one localStorage key per table, or your server.",
     learn: ["switch on autoRestoreOptions", "remember expanded tree nodes", "choose a storage key",
-      "remember the column layout, checked and selected rows (since 1.1.92)", "save the state on your server (since 1.1.92)"],
+      "remember the column layout, checked and selected rows (since 1.1.92)", "save the state on your server (since 1.1.92)",
+      "save the layout when the user resizes or moves a column, lock a column (since 1.1.110)"],
     api: ["AutoRestoreOptions", "AutoRestoreOptionsIf", "TableOptionsIf.autoRestoreOptions", "TableApi.getState",
-      "TableApi.applyState", "TableApi.resetState", "TableOptionsIf.initialState", "GeStateChangeEvent", "TableStateIf"],
+      "TableApi.applyState", "TableApi.resetState", "TableOptionsIf.initialState", "GeStateChangeEvent", "TableStateIf",
+      "GeColumnResizeEvent", "GeColumnMoveEvent", "TableApi.autoResizeColumn"],
     since: "1.1.89"
   },
   {

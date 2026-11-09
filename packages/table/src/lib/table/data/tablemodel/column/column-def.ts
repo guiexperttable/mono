@@ -65,6 +65,10 @@ export class ColumnDef implements ColumnDefIf {
   public emptyValue?: unknown;
   /** `false`: no cell formulas in this column, see {@link ColumnDefIf.cellFormulas} (since 1.1.99). */
   public cellFormulas?: boolean;
+  /** `false`: no resize handle, no auto width, see {@link ColumnDefIf.resizable} (since 1.1.110). */
+  public resizable?: boolean;
+  /** `false`: can't be moved by dragging, see {@link ColumnDefIf.movable} (since 1.1.110). */
+  public movable?: boolean;
   /** Lower limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.minWidth}. Default `0px`. */
   public minWidth: SizeIf;
   /** Upper limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.maxWidth}. Default `100000px`. */
@@ -179,6 +183,10 @@ export class ColumnDef implements ColumnDefIf {
     emptyValue?: unknown,
     /** `false`: `"=…"` stays text in this column of a table with cell formulas (since 1.1.99). */
     cellFormulas?: boolean,
+    /** `false`: the user can't resize the column (since 1.1.110). */
+    resizable?: boolean,
+    /** `false`: the user can't move the column (since 1.1.110). */
+    movable?: boolean,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -229,6 +237,8 @@ export class ColumnDef implements ColumnDefIf {
     if (param.editor) def.editor = param.editor;
     if (param.emptyValue !== undefined) def.emptyValue = param.emptyValue;
     if (param.cellFormulas !== undefined) def.cellFormulas = param.cellFormulas;
+    if (param.resizable !== undefined) def.resizable = param.resizable;
+    if (param.movable !== undefined) def.movable = param.movable;
     return def;
   }
 

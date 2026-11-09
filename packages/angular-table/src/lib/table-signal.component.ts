@@ -29,6 +29,8 @@ import {
   GeScrollEvent,
   GeStateChangeEvent,
   GeUndoEvent,
+  GeColumnResizeEvent,
+  GeColumnMoveEvent,
   SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -165,6 +167,14 @@ export class TableSignalComponent implements OnDestroy {
   readonly editingChanged = output<GeEditEvent>();
   /** The undo history changed. */
   readonly undoStackChanged = output<GeUndoEvent>();
+  /** The user started to resize a column (since 1.1.110). */
+  readonly columnResizeStart = output<GeColumnResizeEvent>();
+  /** A column resize by the user ended – `evt.type` "end" or "cancel"; save the layout here (since 1.1.110). */
+  readonly columnResizeEnd = output<GeColumnResizeEvent>();
+  /** The user started to move a column (since 1.1.110). */
+  readonly columnMoveStart = output<GeColumnMoveEvent>();
+  /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
+  readonly columnMoveEnd = output<GeColumnMoveEvent>();
 
   // ---------------------------------------------------------------- internals
 
@@ -201,6 +211,10 @@ export class TableSignalComponent implements OnDestroy {
     onDetailExpandedChanged: evt => this.detailExpandedChanged.emit(evt),
     onEditingChanged: evt => this.emitUnlessDestroyed(() => this.editingChanged.emit(evt)),
     onUndoStackChanged: evt => this.emitUnlessDestroyed(() => this.undoStackChanged.emit(evt)),
+    onColumnResizeStart: evt => this.columnResizeStart.emit(evt),
+    onColumnResizeEnd: evt => this.emitUnlessDestroyed(() => this.columnResizeEnd.emit(evt)),
+    onColumnMoveStart: evt => this.columnMoveStart.emit(evt),
+    onColumnMoveEnd: evt => this.emitUnlessDestroyed(() => this.columnMoveEnd.emit(evt)),
   };
 
   constructor() {

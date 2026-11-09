@@ -79,6 +79,10 @@ This is the UI-agnostic table component for your next web app. 😊
 - Customizable Look & Feel (via CSS variables)
 - Row sorting
 - Column Reordering (Drag and Drop)
+- Column drag events and locks: `onColumnResizeEnd` / `onColumnMoveEnd` once per drag (after the change – save the
+  layout there), `ColumnDef.resizable: false` / `movable: false` per column, a column stays in its fixed area, a double
+  click on the resize handle fits the width (`columnAutoWidth`, `tableApi.autoResizeColumn()`, flat with millions of
+  rows) – since 1.1.110
 - State persistence: column layout (width, order, visibility), sorting, scroll position, tree, checked and selected
   rows, header groups – in `localStorage` (`autoRestoreOptions`) or on your server (`tableApi.getState()` /
   `applyState()`, `initialState`, `onStateChanged`); stored by property and row id, never by index – since 1.1.92
@@ -102,6 +106,9 @@ This is the UI-agnostic table component for your next web app. 😊
 - **Own keys** (Delete, Enter): `keydown` on the host + `tableApi.getActiveCell()` – there is no keyboard event.
 - **Selected rows:** `selectionModel.getMergedRowIndices(n)` → `tableApi.getBodyModel().getRowByIndex(i)` (pass your own
   `SelectionModel` – the default type is `"none"`).
+- **Save the column layout when the user drags a column:** `onColumnResizeEnd` / `onColumnMoveEnd` (wrappers
+  `columnResizeEnd`, `columnMoveEnd`) – once per drag, after the change, only for the user (since 1.1.110). Lock one
+  column: `ColumnDef.resizable: false`, `movable: false`.
 - **AI assistants:** `llms.txt` in this package – recipes and pitfalls, every snippet compiled against the API.
 - **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 

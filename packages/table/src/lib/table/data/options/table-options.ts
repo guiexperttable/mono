@@ -16,6 +16,7 @@ import { HeaderGroupOptions } from './header-group-options';
 import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
+import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
@@ -131,6 +132,8 @@ export class TableOptions implements TableOptionsIf {
   /** Texts and behaviour of the "Loading…" / "No rows" overlays; missing fields use {@link OverlayOptions}. @since 1.1.92 */
   overlayOptions?: Partial<OverlayOptionsIf> = undefined;
   rowDragOptions?: Partial<RowDragOptionsIf> = undefined;
+  /** Fitting a column width to its content (double click on the resize handle …). @since 1.1.110 */
+  columnAutoWidth?: Partial<ColumnAutoWidthOptionsIf> = undefined;
   fillHandle?: boolean | Partial<FillHandleOptionsIf> = undefined;
   masterDetail?: Partial<MasterDetailOptionsIf> = undefined;
   batchEdit?: boolean | Partial<BatchEditOptionsIf> = undefined;

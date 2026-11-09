@@ -52,6 +52,7 @@
 - [ColAndRowspanModel](classes/ColAndRowspanModel.md)
 - [CollapsedExpandedData](classes/CollapsedExpandedData.md)
 - [ColorRgb](classes/ColorRgb.md)
+- [ColumnAutoWidthOptions](classes/ColumnAutoWidthOptions.md)
 - [ColumnDef](classes/ColumnDef.md)
 - [ColumnDefGenerator](classes/ColumnDefGenerator.md)
 - [ColumnWidths](classes/ColumnWidths.md)
@@ -86,6 +87,8 @@
 - [FormulaRange](classes/FormulaRange.md)
 - [GeBatchEditEvent](classes/GeBatchEditEvent.md)
 - [GeCellIndices](classes/GeCellIndices.md)
+- [GeColumnMoveEvent](classes/GeColumnMoveEvent.md)
+- [GeColumnResizeEvent](classes/GeColumnResizeEvent.md)
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
 - [GeDetailEvent](classes/GeDetailEvent.md)
 - [GeEditEvent](classes/GeEditEvent.md)
@@ -226,6 +229,8 @@
 - [ChunkDataIf](interfaces/ChunkDataIf.md)
 - [ClipboardOptionsIf](interfaces/ClipboardOptionsIf.md)
 - [ColorRgbIf](interfaces/ColorRgbIf.md)
+- [ColumnAutoWidthContextIf](interfaces/ColumnAutoWidthContextIf.md)
+- [ColumnAutoWidthOptionsIf](interfaces/ColumnAutoWidthOptionsIf.md)
 - [ColumnDefIf](interfaces/ColumnDefIf.md)
 - [ColumnWidthsIf](interfaces/ColumnWidthsIf.md)
 - [CompiledFormula](interfaces/CompiledFormula.md)
@@ -366,6 +371,8 @@
 - [FormulaNode](modules.md#formulanode)
 - [FormulaValue](modules.md#formulavalue)
 - [GeBatchEditEventType](modules.md#gebatchediteventtype)
+- [GeColumnDragEventType](modules.md#gecolumndrageventtype)
+- [GeColumnResizeSource](modules.md#gecolumnresizesource)
 - [GeDetailEventSource](modules.md#gedetaileventsource)
 - [GeEditEventType](modules.md#geediteventtype)
 - [GeOverlayKind](modules.md#geoverlaykind)
@@ -3767,7 +3774,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:251](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L251)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L275)
 
 ___
 
@@ -4194,6 +4201,41 @@ normalizeRowIndices([5, 2, 2, 99, -1], 10);   // [2, 5]
 
 [src/lib/table/row-drag/move-rows.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/move-rows.ts#L17)
 
+## Column drag
+
+### GeColumnDragEventType
+
+Ƭ **GeColumnDragEventType**: ``"start"`` \| ``"end"`` \| ``"cancel"``
+
+Phase of a column drag (resize or move): `"start"` (the mouse moved past the drag threshold of 4 px, or a double
+click on the resize handle), `"end"` (released – also outside of the table) or `"cancel"` (Escape,
+[TableApi.cancelColumnDrag](classes/TableApi.md#cancelcolumndrag): the old width resp. order is back).
+
+**`Since`**
+
+1.1.110
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-column-resize-event.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L11)
+
+___
+
+### GeColumnResizeSource
+
+Ƭ **GeColumnResizeSource**: ``"mouse"`` \| ``"dblclick"``
+
+What changed the width: dragging the resize handle (`"mouse"`) or a double click on it (`"dblclick"`, fits the width
+to the content).
+
+**`Since`**
+
+1.1.110
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-column-resize-event.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L20)
+
 ## Fill handle &amp; batch edit
 
 ### CellChangeSource
@@ -4250,7 +4292,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:242](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L242)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:266](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L266)
 
 ___
 

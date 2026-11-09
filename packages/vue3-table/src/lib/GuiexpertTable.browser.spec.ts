@@ -9,7 +9,7 @@ import type { GeDetailEvent, GeMouseEvent, TableModelIf, TableOptionsIf } from '
 import GuiexpertTable from './GuiexpertTable.vue';
 import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
 import {
-  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../../table/test-utils/wrapper-test-utils';
 
 interface Mounted {
@@ -42,6 +42,23 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Vue 3)', () => {
+
+  it('column drag events: @columnResizeStart / @columnResizeEnd for a double click on the handle (since 1.1.110)', async () => {
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    const host = createHost();
+    const app = createApp({
+      render: () => h(GuiexpertTable, { tableModel: createModel(5),
+        onColumnResizeStart: (e: unknown) => starts.push(e), onColumnResizeEnd: (e: unknown) => ends.push(e) }),
+    });
+    app.mount(host);
+    apps.push(app);
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+  });
 
   it('master/detail: a Vue component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
     const unmounted = vi.fn();

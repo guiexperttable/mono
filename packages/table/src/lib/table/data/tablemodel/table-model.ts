@@ -723,6 +723,9 @@ export class TableModel implements TableModelIf {
   }
 
   private arrayMove(arr: any[], fromIndex: number, toIndex: number) {
+    if (fromIndex < 0 || fromIndex >= arr.length) {
+      return arr; // e.g. no column definitions (bodyData): before 1.1.110 an undefined entry was inserted
+    }
     const element = arr.splice(fromIndex, 1)[0];
     arr.splice(toIndex, 0, element);
     return arr;

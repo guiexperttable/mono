@@ -63,6 +63,35 @@ const tableOptions: TableOptionsIf = { ...new TableOptions(), initialState: save
     The state holds no cell values – but row ids can be personal data (an e-mail address as id); prefer technical ids.
   </p>
 
+  <h2 id="column-events">Save the layout when the user drags a column</h2>
+  <p>
+    <ApiLink name="EventListenerIf.onStateChanged" /> comes for every change, also for your own API calls, and only
+    after a pause. When you want to know “the user changed the columns”, listen for
+    <ApiLink name="EventListenerIf.onColumnResizeEnd" /> and <ApiLink name="EventListenerIf.onColumnMoveEnd" />: once
+    per drag, after the table applied the change – no <code>setTimeout</code>, no own listeners on the header. API calls
+    (<code>setColumnWidth</code>, <code>applyState</code>, <code>autoResizeColumns</code>) report nothing, so saving in
+    the handler can't loop. Escape cancels a drag (<code>evt.type === "cancel"</code>).
+  </p>
+  <Code lang="ts" title="src/table/order-table.ts" code={`listener.onColumnResizeEnd = (evt: GeColumnResizeEvent) => {
+  if (evt.type === "end") savePrefs(tableApi.getState(["columns"]));   // evt.newWidth is in the state already
+};
+listener.onColumnMoveEnd = (evt: GeColumnMoveEvent) => {
+  if (evt.moved) savePrefs(tableApi.getState(["columns"]));           // evt.columnOrder = the new order
+};`} />
+  <p>
+    A column the user must not touch – a line number, a status icon – gets
+    <ApiLink name="ColumnDefIf.resizable" label="resizable: false" /> and <ApiLink name="ColumnDefIf.movable" label="movable: false" />:
+    no resize handle, the header can't be dragged, and no other column takes its place. A double click on a column
+    border fits the width to the content (<ApiLink name="TableApi.autoResizeColumn" /> does the same by code; with
+    millions of rows only the rows on screen are measured).
+  </p>
+  <Code lang="ts" title="src/model/order-columns.ts" code={`ColumnDef.create({ property: "id", headerLabel: "#", width: px60, resizable: false, movable: false })`} />
+  <Callout type="version">
+    <p>Since <code>@guiexpert/table@1.1.110</code>: column events in all wrappers (<code>columnResizeEnd</code>,
+      <code>columnMoveEnd</code> …), locks per column, the double click on the border. A column now stays in its fixed
+      area while it is dragged.</p>
+  </Callout>
+
   <Callout type="pitfall" title="One key per table">
     <p><code>getStorageKeyFn</code> must be unique per table – two tables with the same key overwrite each other's state. Include the
       user id if several people share a browser. Without <code>getStorageKeyFn</code> nothing is stored (the table warns once).</p>

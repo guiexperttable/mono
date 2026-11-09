@@ -1263,15 +1263,73 @@ export class TableApi {
 
 
   /**
-   * Automatically resizes all columns to fit their content.
+   * Automatically resizes all columns to fit their content (header, footer and body rows – all up to
+   * {@link ColumnAutoWidthOptionsIf.maxRows}, 10 000, above only the rows drawn now). Leaves out row number columns and
+   * columns with `resizable: false`; uses {@link ColumnAutoWidthOptionsIf.getWidth} and `minWidth` / `maxWidth`.
+   * Reports no column events.
    *
    * @param {boolean} recalcWrappers - Determines whether to recalculate wrapper dimensions after resizing columns.
    *                                   Default value is true.
-   * 
+   *
+   * @example
+   * tableApi.autoResizeColumns();
+   *
    * @return {void} - This method doesn't return anything.
    */
   autoResizeColumns(recalcWrappers: boolean= true) {
     this.tableScope.autoResizeColumns(recalcWrappers);
+  }
+
+  /**
+   * Fits the width of **one** column to its content – what a double click on its resize handle does, but without
+   * events. Measures header, footer and body rows (all up to {@link ColumnAutoWidthOptionsIf.maxRows}, 10 000, above
+   * only the rows drawn now – the time does not grow with millions of rows), or asks
+   * {@link ColumnAutoWidthOptionsIf.getWidth}; limited by `minWidth` / `maxWidth`.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or column definition
+   * @returns {number | undefined} the width set in px; `undefined` for an unknown column, a row number column or a
+   *          column with `resizable: false`
+   *
+   * @example
+   * const width = tableApi.autoResizeColumn("message");
+   * console.log(`message is ${width} px wide now`);
+   *
+   * @since 1.1.110
+   * @see Training: [Remember the state](https://gui.expert/training/persist-state/#column-events)
+   */
+  autoResizeColumn(column: number | string | ColumnDefIf): number | undefined {
+    return this.tableScope.autoResizeColumn(column);
+  }
+
+  /**
+   * True while the user resizes or moves a column (between `onColumnResizeStart` / `onColumnMoveStart` and the end).
+   * Renders through the API (repaint, live data) are fine meanwhile; do not change column widths or the column order
+   * yourself then.
+   *
+   * @returns {boolean} true during a column drag
+   *
+   * @example
+   * if (!tableApi.isColumnDragging()) {
+   *   tableApi.applyState(savedLayout, ["columns"]);
+   * }
+   *
+   * @since 1.1.110
+   */
+  isColumnDragging(): boolean {
+    return this.tableScope.isColumnDragging();
+  }
+
+  /**
+   * Cancels a running column resize or move like Escape: the old width resp. order is back, `onColumnResizeEnd` /
+   * `onColumnMoveEnd` get the type `"cancel"`. Without a running drag nothing happens.
+   *
+   * @example
+   * tableApi.cancelColumnDrag();   // e.g. another layout was loaded
+   *
+   * @since 1.1.110
+   */
+  cancelColumnDrag(): void {
+    this.tableScope.cancelColumnDrag();
   }
 
   /**

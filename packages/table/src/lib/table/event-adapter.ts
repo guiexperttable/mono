@@ -10,6 +10,8 @@ import { FocusModelIf } from './focus/focus-model.if';
 import { GeStateChangeEvent } from "./data/common/event/ge-state-change-event";
 import { GeBatchEditEvent } from "./data/common/event/ge-batch-edit-event";
 import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
+import type { GeColumnResizeEvent } from "./data/common/event/ge-column-resize-event";
+import type { GeColumnMoveEvent } from "./data/common/event/ge-column-move-event";
 
 /**
  * Empty implementation of {@link EventListenerIf} – extend it and override only the events you need.
@@ -84,6 +86,22 @@ export class EventAdapter implements EventListenerIf {
 
   /** @since 1.1.99 */
   onUndoStackChanged(_evt: GeUndoEvent): void {
+  }
+
+  /** @since 1.1.110 */
+  onColumnResizeStart(_evt: GeColumnResizeEvent): void {
+  }
+
+  /** @since 1.1.110 */
+  onColumnResizeEnd(_evt: GeColumnResizeEvent): void {
+  }
+
+  /** @since 1.1.110 */
+  onColumnMoveStart(_evt: GeColumnMoveEvent): void {
+  }
+
+  /** @since 1.1.110 */
+  onColumnMoveEnd(_evt: GeColumnMoveEvent): void {
   }
 
 }

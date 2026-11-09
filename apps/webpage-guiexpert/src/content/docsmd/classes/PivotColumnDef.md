@@ -43,9 +43,11 @@ columns.map(c => c.pivot.kind);   // ["value", "value", "total"]
 - [isVisible](PivotColumnDef.md#isvisible)
 - [maxWidth](PivotColumnDef.md#maxwidth)
 - [minWidth](PivotColumnDef.md#minwidth)
+- [movable](PivotColumnDef.md#movable)
 - [pivot](PivotColumnDef.md#pivot)
 - [property](PivotColumnDef.md#property)
 - [rendererMap](PivotColumnDef.md#renderermap)
+- [resizable](PivotColumnDef.md#resizable)
 - [rowDrag](PivotColumnDef.md#rowdrag)
 - [showValuesAs](PivotColumnDef.md#showvaluesas)
 - [sortComparator](PivotColumnDef.md#sortcomparator)
@@ -123,7 +125,7 @@ are ready-made maps for the alignment.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L77)
+[src/lib/table/data/tablemodel/column/column-def.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L81)
 
 ___
 
@@ -139,7 +141,7 @@ Converts the text of the editor before it is written into the model, e.g. [editI
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L88)
+[src/lib/table/data/tablemodel/column/column-def.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L92)
 
 ___
 
@@ -159,7 +161,7 @@ Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L86)
+[src/lib/table/data/tablemodel/column/column-def.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L90)
 
 ___
 
@@ -229,7 +231,7 @@ getEditRenderer: () => new SelectCellRenderer(["open", "paid"].map(s => new Valu
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L87)
+[src/lib/table/data/tablemodel/column/column-def.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L91)
 
 ___
 
@@ -245,7 +247,7 @@ Text of the header cell (used when the header is built from the column definitio
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L75)
+[src/lib/table/data/tablemodel/column/column-def.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L79)
 
 ___
 
@@ -267,7 +269,7 @@ ColumnDef.create({ property: "category", headerLabel: "Category", isVisible: Fal
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L89)
+[src/lib/table/data/tablemodel/column/column-def.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L93)
 
 ___
 
@@ -283,7 +285,7 @@ Upper limit for % widths and for resizing with the mouse, see [ColumnDefIf.maxWi
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L71)
+[src/lib/table/data/tablemodel/column/column-def.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L75)
 
 ___
 
@@ -299,7 +301,23 @@ Lower limit for % widths and for resizing with the mouse, see [ColumnDefIf.minWi
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L69)
+[src/lib/table/data/tablemodel/column/column-def.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L73)
+
+___
+
+### movable
+
+• `Optional` **movable**: `boolean`
+
+`false`: can't be moved by dragging, see [ColumnDefIf.movable](../interfaces/ColumnDefIf.md#movable) (since 1.1.110).
+
+#### Inherited from
+
+[ColumnDef](ColumnDef.md).[movable](ColumnDef.md#movable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L71)
 
 ___
 
@@ -327,7 +345,7 @@ Property of the row object shown in this column (`"customer"`). With nested obje
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L74)
+[src/lib/table/data/tablemodel/column/column-def.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L78)
 
 ___
 
@@ -355,7 +373,23 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L78)
+[src/lib/table/data/tablemodel/column/column-def.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L82)
+
+___
+
+### resizable
+
+• `Optional` **resizable**: `boolean`
+
+`false`: no resize handle, no auto width, see [ColumnDefIf.resizable](../interfaces/ColumnDefIf.md#resizable) (since 1.1.110).
+
+#### Inherited from
+
+[ColumnDef](ColumnDef.md).[resizable](ColumnDef.md#resizable)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L69)
 
 ___
 
@@ -426,7 +460,7 @@ Training: [Sorting](https://gui.expert/training/sorting/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L82)
+[src/lib/table/data/tablemodel/column/column-def.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L86)
 
 ___
 
@@ -442,7 +476,7 @@ Show the sort icon in the header. Default: follows `sortable` resp. `sortState`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L85)
+[src/lib/table/data/tablemodel/column/column-def.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L89)
 
 ___
 
@@ -459,7 +493,7 @@ sort the rows once with [TableModelIf.doSort](../interfaces/TableModelIf.md#doso
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L83)
+[src/lib/table/data/tablemodel/column/column-def.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L87)
 
 ___
 
@@ -475,7 +509,7 @@ Order of the sort states on repeated double-clicks. Default: `TableOptions.sortO
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L84)
+[src/lib/table/data/tablemodel/column/column-def.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L88)
 
 ___
 
@@ -491,7 +525,7 @@ The column can be sorted by a double-click on its header (e.g. `TrueFn`).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L81)
+[src/lib/table/data/tablemodel/column/column-def.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L85)
 
 ___
 
@@ -581,7 +615,7 @@ Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. Se
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L76)
+[src/lib/table/data/tablemodel/column/column-def.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L80)
 
 ## Methods
 
@@ -605,7 +639,7 @@ Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. Se
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L97)
+[src/lib/table/data/tablemodel/column/column-def.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L101)
 
 ___
 
@@ -642,7 +676,9 @@ fill [ColumnDefIf.rendererMap](../interfaces/ColumnDefIf.md#renderermap) and [Co
 | `param.isVisible?` | [`BooleanFunction`](../modules.md#booleanfunction) | Column is shown (default `TrueFn`). |
 | `param.maxWidth?` | [`SizeIf`](../interfaces/SizeIf.md) | Upper limit for % widths and for resizing with the mouse (default `100000px`). |
 | `param.minWidth?` | [`SizeIf`](../interfaces/SizeIf.md) | Lower limit for % widths and for resizing with the mouse (default `0px`). |
+| `param.movable?` | `boolean` | `false`: the user can't move the column (since 1.1.110). |
 | `param.property?` | `string` | Property of the row object, see [ColumnDefIf.property](../interfaces/ColumnDefIf.md#property). |
+| `param.resizable?` | `boolean` | `false`: the user can't resize the column (since 1.1.110). |
 | `param.rowDrag?` | [`RowDragColumnOption`](../modules.md#rowdragcolumnoption) | - |
 | `param.showValuesAs?` | [`ShowValuesAsConfig`](../modules.md#showvaluesasconfig) | „Show values as“: `"percentOfColumnTotal"`, `"rank"` … (since 1.1.95). |
 | `param.sortComparator?` | [`ValueRowSortComparator`](../modules.md#valuerowsortcomparator) | Own comparison of two cell values. |
@@ -675,4 +711,4 @@ ColumnDef.create({
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L119)
+[src/lib/table/data/tablemodel/column/column-def.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.ts#L123)

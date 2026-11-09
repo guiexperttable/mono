@@ -503,8 +503,10 @@ describe('N9 – not movable, not sortable, not resizable', () => {
     const { scope, api } = await mount(numberedModel(10), { tableOptions: { columnsDraggable: true } });
     const start = mouseEvent(2, 'drag-column');
     scope.onMouseDown(start);
-    scope.mouseDraggingOnFrame(mouseEvent(0), start);
-    scope.mouseDraggingEndOnFrame(mouseEvent(0));
+    const over0 = mouseEvent(0);
+    over0.draggingX = -200; // since 1.1.110 a column drag starts after 4 px
+    scope.mouseDraggingOnFrame(over0, start);
+    scope.mouseDraggingEndOnFrame(over0);
     const model = api.getTableModel();
     expect(isRowNumberColumnDef(model.getColumnDef(0))).toBe(true);
     expect(model.getColumnDef(1)?.property).toBe('name'); // moved to the first data column

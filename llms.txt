@@ -401,7 +401,10 @@ listener.onModelChanged = (evt: GeModelChangeEvent) => {
 ### R12 – Columns: fixed, hidden, width, index
 
 - Fixed columns belong to the **model**: `TableFactory.createTableModel({ rows, properties, fixedLeftColumnCount: 1, fixedRightColumnCount: 1 })`.
-- `tableApi.setColumnVisible("total", false)`, `tableApi.setColumnWidth(index, px)`, `tableApi.autoResizeColumns()`.
+- `tableApi.setColumnVisible("total", false)`, `tableApi.setColumnWidth(index, px)`, `tableApi.autoResizeColumns()`,
+  one column `tableApi.autoResizeColumn("name")` (since 1.1.110).
+- Lock a column for the user: `ColumnDef.create({ …, resizable: false, movable: false })` (since 1.1.110). Save the
+  layout when the user drags: R18.
 - Row numbers (`rowNumbersVisible: true`), a checkbox column or a row-group column shift all column indices by one –
   always `tableApi.getColumnIndex(property)`. Header groups: `instructions.md` 5.2, demo "headergroup".
 
@@ -455,6 +458,27 @@ host without destroying the first.
 - **Drag between tables**: row drag works inside one table (`rowDrag: true`); between tables use `onRowDragEnd` +
   `rowDragOptions.managed: false` and move the data yourself.
 
+### R18 – Save the column layout when the user resizes or moves a column (since 1.1.110)
+
+```ts
+import { EventAdapter } from "@guiexpert/table";
+import type { GeColumnMoveEvent, GeColumnResizeEvent, TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+const listener = new EventAdapter();               // 5th argument of new TableScope(…); wrappers: columnResizeEnd …
+listener.onColumnResizeEnd = (evt: GeColumnResizeEvent) => {
+  if (evt.type === "end") localStorage.setItem("layout", JSON.stringify(tableApi.getState(["columns"])));
+};
+listener.onColumnMoveEnd = (evt: GeColumnMoveEvent) => {
+  if (evt.moved) localStorage.setItem("layout", JSON.stringify(tableApi.getState(["columns"])));
+};
+```
+
+Once per drag, after the table applied the change (no `setTimeout`); `type: "cancel"` after Escape; API calls
+(`setColumnWidth`, `applyState`, `autoResizeColumns`) report nothing. Double click on the resize handle fits the width
+(`source: "dblclick"`; own measurement `tableOptions.columnAutoWidth.getWidth`). Renders of a live table while the
+user drags are fine. → instructions.md 6.27
+
 More (short): tree + checkboxes `TreeFactory` (instructions.md 6.6), master/detail `masterDetail` (6.18), row grouping
 `RowGroupFactory` (5.6), pivot `PivotFactory` (5.7), calculated columns `valueGetter`/`formula` (5.2, 5.9), spreadsheet
 `SpreadsheetFactory.create` (6.25), cover grid (5.10), totals footer `footerAggregates` (5.4), row numbers (5.2).
@@ -498,6 +522,9 @@ Symptom → cause → fix.
   dedupe `@guiexpert/table`.
 - **TypeScript: unknown option** → "corrected" a misspelled API → use `showCheckboxWihoutExtraColumn`, `isHeaderVisibe`,
   `emmitDataKey`, `createCoverGrisDefaultOptions` as they are.
+- **Own `mousedown`/`mouseup`/`dblclick` listeners on the header** (to save widths, lock a column, fit on double click)
+  → the table had no column events before 1.1.110 → `onColumnResizeEnd` / `onColumnMoveEnd` (R18),
+  `ColumnDef.resizable: false` / `movable: false`, the built-in double click (`columnAutoWidth`).
 - **`AsyncBodyAreaModelObjectArray` cannot be imported** → unfinished, not exported → own `AreaModel` (R8, R17).
 - **Invented APIs** – these do NOT exist: `getSelectedRows()`, `onKeyDown`, `api.addRow()`, `api.refresh()`,
   `setData()`, `gridOptions`, `rowData`, `columnDefs` as a table option (it is a model parameter). Use R4–R7.
@@ -511,6 +538,7 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - Rows that keep coming (log, stream, ticker of trades): `tableApi.appendRows(rows, { follow: "auto", maxRows })` (since 1.1.108) – in place, O(k), one render, filter/sort only for new rows, selection/focus stay; freeze = `follow: false`, jump to the end = `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Own AreaModel: `rowsAppended(count, { removedAtStart })`. Not `addRows()`.
 - `repaint()` = values changed, same row count; `repaintHard()` = row count or heights changed; `updateCells()` = single cells.
 - Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
+- Save the column layout when the user resizes or moves a column: `onColumnResizeEnd` / `onColumnMoveEnd` (wrappers `columnResizeEnd`, `columnMoveEnd`, since 1.1.110) – once per drag, after the change; read `tableApi.getState(["columns"])` there. Lock a column: `ColumnDef.resizable: false`, `movable: false`. Double click on the column border fits the width (`columnAutoWidth`, `tableApi.autoResizeColumn(column)`).
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 
 ## Feature reference
@@ -544,7 +572,8 @@ What the table can do – one line per feature, details in instructions.md (each
 - Undo/redo (since 1.1.99): tableOptions.undo: true | { maxSteps, maxCells, onConflict: "skip" | "overwrite", recordApiChanges } – Ctrl+Z / Ctrl+Y (Cmd+Shift+Z) for edit, fill, paste, cut, clear, batch edits and structure changes; rows found by object (sorting/filter safe). api.undo(), redo(), canUndo(), canRedo(), clearUndoHistory(), getUndoState(), batchUndoable(label, fn); event onUndoStackChanged (GeUndoEvent: canUndo, canRedo, undoLabel, redoLabel).
 - Cell formulas with A1 references (since 1.1.99): tableOptions.cellFormulas: true | { columns, functions } (ColumnDef.cellFormulas: false = free text) – texts with "=" in the data are formulas ("'=" = text): A1, $A$1, B2:D9, A:A, 70 Excel functions (FORMULA_FUNCTION_INFO; SUM, AVERAGE, IF, IFS, VLOOKUP, XLOOKUP, INDEX/MATCH, SUMIFS, COUNTIFS, TEXT, DATE, EOMONTH …), errors #DIV/0! #REF! #NAME? #VALUE! #N/A #NUM! #CIRC!; dependency graph, only dependents recalculate; own parser, no eval. Formula input: colored references, pointing with arrows/mouse, F4 toggles $, function list (combobox) and hint. Fill/copy shift relative references; Excel export with real formulas: downloadExcel(name, author, { cellFormulas: true }). api.getCellInput/getCellValue/setCellInput/getCellAddress/getCellByAddress/evaluateFormula/getPrecedents/getDependents/recalculate/getSheetEngine. DOM-free: SheetEngine.fromArrays(data), shiftFormula, adjustFormula.
 - Spreadsheet mode (since 1.1.99): SpreadsheetFactory.create({ data: unknown[][], rowCount (100), columnCount (26), columnWidth, rowHeight, rowNumbers, locale, functions, tableOptions }) → { tableModel: SpreadsheetTableModel, tableOptions } – column letters (AreaModelSheetHeader), row numbers, sparse AreaModelSheet; preset tableOptions.spreadsheet: true | { editing, clipboard, undo, cellFormulas, fillHandle } (false = off) for any flat table (TableFactory columnLetters: true). FormulaBar(container, api) – address box + formula input. api.getActiveCell(), goToAddress("B2:C5"), insertRows(at, count), deleteRows, insertColumns, deleteColumns (references adjusted, one undo step, source "structure"), getSheetData() (inputs for JSON).
-- Angular signal component (since 1.1.100, Angular 22 and later): TableSignalComponent, selector guiexpert-table-signal, from @guiexpert/angular-table@22.x – inputs (input()) tableModel (TableModelIf | undefined), tableOptions (default new TableOptions()), loading, debounceMouseClickDelay (150, 0 = synchronous); tableApi = model<TableApi | undefined>() → [(tableApi)]="api" with api = signal<TableApi | undefined>(undefined), (tableApiChange), viewChild(TableSignalComponent)?.tableApi(); set when the table is built, switches directly to the new API on a new model/options, undefined after destroy, written from outside = replaced. Outputs (output()): no tableReady (the API comes as the signal tableApi / tableApiChange), mouseClicked, mouseMoved, mouseDragging, mouseDraggingEnded, contextMenu (camelCase – TableComponent's (contextmenu) also receives the native MouseEvent first), scroll, modelChanged, selectionChanged, focusChanged, checkboxChanged, stateChanged, rowDragStart/Move/End, batchEditChanged, detailExpandedChanged, editingChanged, undoStackChanged – events of the table (mouse, keyboard, scroll …) are emitted outside the Angular zone (write signals in handlers). effect() instead of ngOnChanges, no RxJS, zoneless (provideZonelessChangeDetection()), SSR: no table on the server. TableComponent (<guiexpert-table>) unchanged for Angular 14 – 22+.
+- Angular signal component (since 1.1.100, Angular 22 and later): TableSignalComponent, selector guiexpert-table-signal, from @guiexpert/angular-table@22.x – inputs (input()) tableModel (TableModelIf | undefined), tableOptions (default new TableOptions()), loading, debounceMouseClickDelay (150, 0 = synchronous); tableApi = model<TableApi | undefined>() → [(tableApi)]="api" with api = signal<TableApi | undefined>(undefined), (tableApiChange), viewChild(TableSignalComponent)?.tableApi(); set when the table is built, switches directly to the new API on a new model/options, undefined after destroy, written from outside = replaced. Outputs (output()): no tableReady (the API comes as the signal tableApi / tableApiChange), mouseClicked, mouseMoved, mouseDragging, mouseDraggingEnded, contextMenu (camelCase – TableComponent's (contextmenu) also receives the native MouseEvent first), scroll, modelChanged, selectionChanged, focusChanged, checkboxChanged, stateChanged, rowDragStart/Move/End, batchEditChanged, detailExpandedChanged, editingChanged, undoStackChanged, columnResizeStart/End, columnMoveStart/End (since 1.1.110) – events of the table (mouse, keyboard, scroll …) are emitted outside the Angular zone (write signals in handlers). effect() instead of ngOnChanges, no RxJS, zoneless (provideZonelessChangeDetection()), SSR: no table on the server. TableComponent (<guiexpert-table>) unchanged for Angular 14 – 22+.
+- Column drag (since 1.1.110): events EventListenerIf.onColumnResizeStart/End (GeColumnResizeEvent: type "start" | "end" | "cancel", source "mouse" | "dblclick", columnIndex, columnDef, property, oldWidth, newWidth) and onColumnMoveStart/End (GeColumnMoveEvent: type, fromIndex, toIndex, columnDef, property, columnOrder, moved) – only user actions, once per drag, the end after the change, start after 4 px, Escape / tableApi.cancelColumnDrag() = "cancel", tableApi.isColumnDragging(); wrappers columnResizeStart/End, columnMoveStart/End. Locks: ColumnDef.resizable: false (no handle, no double click, no auto width), movable: false (fixed place, applyState keeps it); RowNumberColumnDef has both false; a column stays in its area (west/center/east). Double click on the resize handle fits the width (no sorting): tableOptions.columnAutoWidth: { doubleClick (true), maxRows (10,000: all body rows, above only the rendered rows), getWidth(ctx: ColumnAutoWidthContextIf { columnIndex, columnDef, property, source, firstRenderedRow, lastRenderedRow, measureText(text), getDefaultWidth() }) => number | undefined }, limited by minWidth/maxWidth; tableApi.autoResizeColumn(index | property | ColumnDef) → width | undefined.
 - Live data / log tail (since 1.1.108): tableApi.appendRows(rows, { follow?: "auto" (default: stays at the end if it was at the end, else the first visible row stays) | true (always the end) | false (freeze), maxRows?: ring buffer – oldest rows removed from the start in blocks of ≥ 1 % }) → AppendRowsResultIf { added, shown, removed, following } | false (tree, row groups, pivot, spreadsheet, cell formulas) – AreaModelObjectArray body only, IN PLACE (pushes to your array, no copy), O(k): externalFilterFunction only for the new rows, sorted column / sort(fn) → merged in (binary search, behind equal rows); selection, focus, Shift+arrow anchor and checked rows stay at their rows (RowIndexShift, SelectionModel/FocusModel.adjustForRowChanges – no onSelectionChanged unless a selected row left the buffer); one render pass, none when only rows below the view came in (cells not rebuilt). Held mouse button: "auto" keeps the rows under the pointer and follows again after release. Own AreaModel: append yourself, then tableApi.rowsAppended(count, { follow, removedAtStart }). Not addRows() (copies all rows, resets filter and sort). Showcase logtail, demo apps/table-demo/log-tail.html, LogTailController + createLogTailModelAndOptions in @guiexpert/demo-table-models.
 - Custom filtering
 - In-place cell editing

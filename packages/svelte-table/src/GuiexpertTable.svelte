@@ -82,6 +82,26 @@
    * @type {((evt: import("@guiexpert/table").GeUndoEvent) => void) | undefined}
    */
   export let onUndoStackChanged = undefined;
+  /**
+   * The user started to resize a column (since 1.1.110).
+   * @type {((evt: import("@guiexpert/table").GeColumnResizeEvent) => void) | undefined}
+   */
+  export let onColumnResizeStart = undefined;
+  /**
+   * A column resize by the user ended – `evt.type` "end" or "cancel" (since 1.1.110).
+   * @type {((evt: import("@guiexpert/table").GeColumnResizeEvent) => void) | undefined}
+   */
+  export let onColumnResizeEnd = undefined;
+  /**
+   * The user started to move a column (since 1.1.110).
+   * @type {((evt: import("@guiexpert/table").GeColumnMoveEvent) => void) | undefined}
+   */
+  export let onColumnMoveStart = undefined;
+  /**
+   * A column move by the user ended – `evt.columnOrder` (since 1.1.110).
+   * @type {((evt: import("@guiexpert/table").GeColumnMoveEvent) => void) | undefined}
+   */
+  export let onColumnMoveEnd = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -110,7 +130,11 @@
     onBatchEditChanged: (evt) => { dispatch("batchEditChanged", evt); onBatchEditChanged?.(evt); },
     onDetailExpandedChanged: (evt) => { dispatch("detailExpandedChanged", evt); onDetailExpandedChanged?.(evt); },
     onEditingChanged: (evt) => { dispatch("editingChanged", evt); onEditingChanged?.(evt); },
-    onUndoStackChanged: (evt) => { dispatch("undoStackChanged", evt); onUndoStackChanged?.(evt); }
+    onUndoStackChanged: (evt) => { dispatch("undoStackChanged", evt); onUndoStackChanged?.(evt); },
+    onColumnResizeStart: (evt) => { dispatch("columnResizeStart", evt); onColumnResizeStart?.(evt); },
+    onColumnResizeEnd: (evt) => { dispatch("columnResizeEnd", evt); onColumnResizeEnd?.(evt); },
+    onColumnMoveStart: (evt) => { dispatch("columnMoveStart", evt); onColumnMoveStart?.(evt); },
+    onColumnMoveEnd: (evt) => { dispatch("columnMoveEnd", evt); onColumnMoveEnd?.(evt); }
   };
 
   /**

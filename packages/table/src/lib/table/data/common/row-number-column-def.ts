@@ -58,6 +58,10 @@ export class RowNumberColumnDef implements ColumnDefIf {
     ["ge-table-row-number-footer"]
   );
   isVisible: BooleanFunction = TrueFn;
+  /** No resize handle: the width follows the largest number (since 1.1.110 a flag, before a special case). */
+  resizable = false;
+  /** Stays in front: can't be dragged, no column is dropped in front of it (since 1.1.110 a flag). */
+  movable = false;
 
   /** The options (defaults from {@link RowNumberOptions}). */
   readonly options: RowNumberOptionsIf;

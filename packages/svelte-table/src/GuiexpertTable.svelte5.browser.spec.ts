@@ -10,7 +10,7 @@ import DetailCounter from '../test/DetailCounter.svelte';
 import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper';
 import RunesHost from '../test/RunesHost.svelte';
 import {
-  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../table/test-utils/wrapper-test-utils';
 
 const cleanups: (() => void)[] = [];
@@ -22,6 +22,26 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Svelte 5)', () => {
+
+  it('column drag events: onColumnResizeStart/End and on:columnResizeEnd for a double click on the handle (since 1.1.110)', async () => {
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    const endEvent = vi.fn<(e: CustomEvent) => void>();
+    const host = createHost();
+    const instance = mount(GuiexpertTable, {
+      target: host,
+      props: { tableModel: createModel(5), onColumnResizeStart: (e: unknown) => starts.push(e), onColumnResizeEnd: (e: unknown) => ends.push(e) },
+      events: { columnResizeEnd: endEvent },
+    });
+    cleanups.push(() => unmount(instance));
+    flushSync();
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+    expect(endEvent.mock.calls[0][0].detail).toBe(ends[0]);
+  });
 
   it('master/detail: a Svelte component as detail keeps its state while scrolling, is destroyed on collapse (since 1.1.97)', async () => {
     (window as { __mdDestroyed?: number[] }).__mdDestroyed = [];

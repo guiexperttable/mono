@@ -10,7 +10,7 @@ import { DetailComponentRendererWrapper } from './DetailComponentRendererWrapper
 import type { DetailComponentProps } from './DetailComponentRendererWrapper';
 import { useEffect, useState } from 'preact/hooks';
 import {
-  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount
+  bodyCell, cellOf, clickDetailToggle, createHost, detailRowsOf, createModel, isDestroyed, nextFrame, overlayKind, removeHosts, rowTexts, tableCount, dblClickResizeHandle
 } from '../../table/test-utils/wrapper-test-utils';
 
 let host: HTMLDivElement | undefined;
@@ -38,6 +38,17 @@ afterEach(() => {
 });
 
 describe('GuiexpertTable (Preact)', () => {
+
+  it('column drag events: a double click on the resize handle reports columnResizeStart/End (since 1.1.110)', async () => {
+    const starts: unknown[] = [];
+    const ends: unknown[] = [];
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} columnResizeStart={e => starts.push(e)} columnResizeEnd={e => ends.push(e)} />);
+    await nextFrame();
+    dblClickResizeHandle(host, 1);
+    expect(ends).toHaveLength(1);
+    expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
+    expect(starts).toHaveLength(1);
+  });
 
   it('master/detail: a Preact component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
     const unmounted = vi.fn();

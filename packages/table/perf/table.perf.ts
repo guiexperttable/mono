@@ -96,6 +96,17 @@ describe('the work per step does not grow with the row count', () => {
     report(task, 'horizontal scroll render, columns', { small: { n: small, m: s }, large: { n: large, m: l } });
     expectScalesFlat(s, l);
   });
+
+  // prompt 022: fitting one column (double click on the resize handle) measures only the rows drawn now above
+  // columnAutoWidth.maxRows (10,000) – before, autoResizeColumns read every row of every column
+  it('autoResizeColumn (double click on the handle): 100,000 → 10,000,000 rows', async ({ task }) => {
+    const [small, large] = [100_000, 10_000_000];
+    const { s, l } = await measureBoth(small, large, n => mountBig(n), (t, run) => {
+      t.api.autoResizeColumn(run % 3);
+    }, { inner: 5 });
+    report(task, 'autoResizeColumn', { small: { n: small, m: s }, large: { n: large, m: l } });
+    expectScalesFlat(s, l);
+  });
 });
 
 describe('real input: time from the browser event to the table event', () => {

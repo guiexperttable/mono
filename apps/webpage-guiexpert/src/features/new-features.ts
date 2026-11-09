@@ -1,5 +1,5 @@
 /**
- * The features added since October 2026 (prompts 001 – 019, releases 1.1.91 – 1.1.108) – one list for
+ * The features added since October 2026 (prompts 001 – 022, releases 1.1.91 – 1.1.110) – one list for
  * the page /whats-new/, the "What's new" section of the home page and the feature finder of the training.
  *
  * Every snippet is checked against the real API (see `snippets` in scripts/check-feature-snippets.mjs):
@@ -399,6 +399,36 @@ function scrollToEnd() {
     api: ["TableApi.appendRows", "TableApi.rowsAppended", "AppendRowsOptionsIf", "AppendRowsResultIf"],
     agGrid: "community",
     agGridNote: "transactions (applyTransactionAsync) are in Community"
+  },
+  {
+    id: "column-drag", prompt: "022", since: "1.1.110", icon: "mdi:table-column-width",
+    title: "Column drag: events, locks, double click",
+    problem: "To save the column layout an app had to listen for mousedown/mouseup on the header and wait a tick, " +
+      "a single column could not be locked, and a double click on the border sorted the column.",
+    points: [
+      "onColumnResizeEnd / onColumnMoveEnd: once per drag, after the change – only for the user, Escape = \"cancel\"",
+      "ColumnDef.resizable: false / movable: false – a locked column keeps its place; columns stay in their fixed area",
+      "double click on the border fits the width – flat with millions of rows, own measurement via columnAutoWidth",
+      "renders of a live table while the user drags are fine – all framework wrappers get the events"
+    ],
+    snippet: `const columnDefs = [
+  ColumnDef.create({ property: "line", headerLabel: "#", resizable: false, movable: false }),
+  ColumnDef.create({ property: "message", headerLabel: "Message" })
+];
+listener.onColumnResizeEnd = evt => {
+  if (evt.type === "end") save([tableApi.getState(["columns"])]);
+};
+listener.onColumnMoveEnd = evt => {
+  if (evt.moved) save([tableApi.getState(["columns"])]);
+};
+tableApi.autoResizeColumn("message");   // what a double click on the border does`,
+    demo: { href: "https://github.com/guiexperttable/mono/blob/main/apps/table-demo/column-drag.html", title: "Demo: dragging columns" },
+    thumb: "columndrag",
+    training: { slug: "persist-state", hash: "column-events", label: "Chapter 33 · Remember the state" },
+    api: ["EventListenerIf.onColumnResizeEnd", "EventListenerIf.onColumnMoveEnd", "GeColumnResizeEvent", "GeColumnMoveEvent",
+      "ColumnDefIf.resizable", "ColumnDefIf.movable", "TableApi.autoResizeColumn", "ColumnAutoWidthOptionsIf"],
+    agGrid: "community",
+    agGridNote: "column events, lockPosition and auto-size are in Community"
   }
 ];
 

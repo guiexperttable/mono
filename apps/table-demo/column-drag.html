@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+  Dragging columns (since 1.1.110): events when the user resizes or moves a column, a locked first column and a double
+  click on the resize handle that fits the width.
+  Start: pnpm serve:table-demo → http://localhost:4200/column-drag.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – dragging columns</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .hint { margin: 0 0 8px; opacity: .8; font-size: 14px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; }
+    .table-div { height: 460px; width: 100%; }
+    .log { height: 460px; overflow: auto; margin: 0; padding: 8px; font: 12px/1.5 ui-monospace, monospace;
+      border: 1px solid var(--ge-table-border, #ddd); list-style: none; }
+    .log li { white-space: pre-wrap; }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .log { height: 200px; } }
+  </style>
+</head>
+<body>
+<h1>Log lines</h1>
+<p class="hint">Drag a column border or a header. Double-click a border to fit the width. “#” is locked. Escape cancels a
+  drag. The layout is saved on every end event and restored after a reload.</p>
+<div class="bar">
+  <label>Rows
+    <select id="rows">
+      <option value="1000">1,000</option>
+      <option value="1000000">1,000,000</option>
+    </select>
+  </label>
+  <label><input id="live" type="checkbox"> live: 20 lines per 100 ms</label>
+  <button id="fit">Fit “Message” (autoResizeColumn)</button>
+  <button id="reset">Reset layout</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<div class="layout">
+  <div class="table-div"></div>
+  <ol class="log" id="log" aria-label="Column events"></ol>
+</div>
+<script src="/src/column-drag/column-drag-demo.ts" type="module"></script>
+</body>
+</html>

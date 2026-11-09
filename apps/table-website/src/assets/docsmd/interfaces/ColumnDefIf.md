@@ -48,8 +48,10 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 - [isVisible](ColumnDefIf.md#isvisible)
 - [maxWidth](ColumnDefIf.md#maxwidth)
 - [minWidth](ColumnDefIf.md#minwidth)
+- [movable](ColumnDefIf.md#movable)
 - [property](ColumnDefIf.md#property)
 - [rendererMap](ColumnDefIf.md#renderermap)
+- [resizable](ColumnDefIf.md#resizable)
 - [rowDrag](ColumnDefIf.md#rowdrag)
 - [showValuesAs](ColumnDefIf.md#showvaluesas)
 - [sortComparator](ColumnDefIf.md#sortcomparator)
@@ -271,6 +273,30 @@ column with the mouse. A pixel width itself is not changed. `ColumnDef` default:
 
 ___
 
+### movable
+
+• `Optional` **movable**: `boolean`
+
+`false`: the user can't move this column – its header is not draggable, and no other column pushes it away (it
+keeps its index; `applyState` with another order leaves it in place, too). Default `true` (works only with
+`tableOptions.columnsDraggable`). A [RowNumberColumnDef](../classes/RowNumberColumnDef.md) has `resizable` and `movable` `false`.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "id", headerLabel: "ID", movable: false })
+```
+
+**`Since`**
+
+1.1.110
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:257](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L257)
+
+___
+
 ### property
 
 • **property**: `string`
@@ -304,6 +330,30 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
 #### Defined in
 
 [src/lib/table/data/tablemodel/column/column-def.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L82)
+
+___
+
+### resizable
+
+• `Optional` **resizable**: `boolean`
+
+`false`: the user can't change the width of this column – no resize handle, no double click, and
+[TableApi.autoResizeColumns](../classes/TableApi.md#autoresizecolumns) / [TableApi.autoResizeColumn](../classes/TableApi.md#autoresizecolumn) leave it out. `setColumnWidth` and
+`applyState` still set it. Default `true` (works only with `tableOptions.columnsResizable`).
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "line", headerLabel: "#", width: px50, resizable: false, movable: false })
+```
+
+**`Since`**
+
+1.1.110
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L245)
 
 ___
 

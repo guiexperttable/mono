@@ -81,7 +81,7 @@ const AREA_MODELS: { name: string; text: string; slug?: string; showcase?: strin
 // ── options ───────────────────────────────────────────────────────────────
 const OPTION_GROUPS = [
   { title: "Layout", names: ["defaultRowHeights", "overflowX", "overflowY", "resizeEventDebounceDelay"] },
-  { title: "Mouse", names: ["hoverRowVisible", "hoverColumnVisible", "columnsResizable", "columnsDraggable", "columnResizeHandleWidthInPx"] },
+  { title: "Mouse", names: ["hoverRowVisible", "hoverColumnVisible", "columnsResizable", "columnsDraggable", "columnResizeHandleWidthInPx", "columnAutoWidth"] },
   { title: "Borders", names: ["verticalBorderVisible", "horizontalBorderVisible", "headerSeparatorBorderVisible", "footerSeparatorBorderVisible", "fixedWestSeparatorBorderVisible", "fixedEastSeparatorBorderVisible", "tableTopBorderVisible", "tableBottomBorderVisible"] },
   { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction"] },
   { title: "Selection and keyboard", names: ["getSelectionModel", "getFocusModel", "shortcutActionIdMapping", "shortcutActionsDisabled"] },
@@ -100,7 +100,7 @@ const API_GROUPS = [
   { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
   { title: "Live data (append)", names: ["appendRows", "rowsAppended"] },
   { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
-  { title: "Columns", names: ["autoResizeColumns", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "setColumnFormula", "setShowValuesAs"] },
+  { title: "Columns", names: ["autoResizeColumns", "autoResizeColumn", "isColumnDragging", "cancelColumnDrag", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "setColumnFormula", "setShowValuesAs"] },
   { title: "Grouping and pivot", names: ["setRowGroupBy", "setPivotConfig", "getSelectionAggregates"] },
   { title: "Editing, rows and details", names: ["applyCellChanges", "commitBatchEdit", "cancelBatchEdit", "moveRows", "setDetailExpanded"] },
   { title: "State, overlays, announcements", names: ["getState", "applyState", "resetState", "showLoadingOverlay", "hideOverlay", "announce"] },
@@ -126,7 +126,9 @@ const EVENTS = [
   { event: "batchEditChanged", listener: "onBatchEditChanged", payload: "GeBatchEditEvent", note: "start, change, commit, cancel" },
   { event: "detailExpandedChanged", listener: "onDetailExpandedChanged", payload: "GeDetailEvent", note: "a detail row opened or closed" },
   { event: "editingChanged", listener: "onEditingChanged", payload: "GeEditEvent", note: "the cell editor: start, input, commit, cancel" },
-  { event: "undoStackChanged", listener: "onUndoStackChanged", payload: "GeUndoEvent", note: "canUndo, canRedo and the labels – for undo buttons" }
+  { event: "undoStackChanged", listener: "onUndoStackChanged", payload: "GeUndoEvent", note: "canUndo, canRedo and the labels – for undo buttons" },
+  { event: "columnResizeEnd", listener: "onColumnResizeEnd", payload: "GeColumnResizeEvent", note: "the user resized a column (also by a double click on the border) – once per drag, after the change; also columnResizeStart" },
+  { event: "columnMoveEnd", listener: "onColumnMoveEnd", payload: "GeColumnMoveEvent", note: "the user moved a column – fromIndex, toIndex, columnOrder; also columnMoveStart" }
 ];
 
 // ── features ──────────────────────────────────────────────────────────────

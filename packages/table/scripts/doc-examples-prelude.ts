@@ -51,7 +51,9 @@ import {
   SpreadsheetFactory, SpreadsheetParamIf, SpreadsheetTableModel, AreaModelSheet, AreaModelSheetHeader,
   SpreadsheetOptionsIf, applySpreadsheetPreset, spreadsheetOption, FormulaBar, FormulaBarOptionsIf, StructureEditIf, applyStructureEdit,
   RowIndexShift, AppendFollowMode, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf, AppendRowsContextIf,
-  AppendRowsModelResultIf
+  AppendRowsModelResultIf,
+  GeColumnResizeEvent, GeColumnMoveEvent, GeColumnDragEventType, GeColumnResizeSource, ColumnAutoWidthOptionsIf,
+  ColumnAutoWidthOptions, ColumnAutoWidthContextIf
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -118,6 +120,7 @@ declare const eventTarget: EventTarget;
 declare const headerAreaModel: AreaModelIf;
 declare function fetchDataFromServer(): any[];
 declare const focusModel: FocusModelIf;
+declare const savedLayout: TableStateIf;
 declare class MyFocusChangeListener implements EventFocusChangedListenerIf { onFocusChanged(m: FocusModelIf): void }
 declare const dom: DomServiceIf; declare const cellValue: any;
 declare const lines: { time: string; level: string; text: string }[];

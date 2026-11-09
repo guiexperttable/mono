@@ -2190,9 +2190,20 @@ export class RenderScope extends EleScope {
     return getLeadingRowNumberColumnCount(this.tableModel.getColumnDefs?.());
   }
 
-  /** false for a row number column: it has no resize handle (its width follows the numbers). */
+  /**
+   * false for `ColumnDef.resizable: false` (e.g. a row number column – its width follows the numbers): no resize handle,
+   * no double click, no auto width (since 1.1.110 a flag, before a special case of the row numbers).
+   */
   protected isColumnResizable(columnIndex: number): boolean {
-    return !isRowNumberColumnDef(this.tableModel.getColumnDef(columnIndex));
+    return this.tableModel.getColumnDef(columnIndex)?.resizable !== false;
+  }
+
+  /**
+   * false for `ColumnDef.movable: false` (e.g. a row number column): the header can't be dragged, and no other column
+   * is dropped onto its place (since 1.1.110).
+   */
+  protected isColumnMovable(columnIndex: number): boolean {
+    return this.tableModel.getColumnDef(columnIndex)?.movable !== false;
   }
 
   /**
@@ -2439,8 +2450,8 @@ export class RenderScope extends EleScope {
       this.dom.addFocusBorderDivs(parent, geo, {});
       this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
     }
-    if (areaIdent === 'header' && !rowNumberColumn) {
-      this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // the row numbers stay in front
+    if (areaIdent === 'header' && this.isColumnMovable(index)) {
+      this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // not for movable: false (e.g. the row numbers)
     }
     if (areaIdent === 'body' && this.masterDetailService?.isActive()) {
       this.masterDetailService.decorateCell(cell, rowIndex, index); // the expand icon of a master row (since 1.1.97)

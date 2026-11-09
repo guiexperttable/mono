@@ -250,7 +250,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:351](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L351)
+[src/lib/table/selection/selection-model.ts:354](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L354)
 
 ___
 
@@ -278,7 +278,7 @@ Adds a rectangle to the selection (adjusted to the selection type: whole rows fo
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:300](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L300)
+[src/lib/table/selection/selection-model.ts:303](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L303)
 
 ___
 
@@ -345,7 +345,7 @@ the same range object
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:374](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L374)
+[src/lib/table/selection/selection-model.ts:377](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L377)
 
 ___
 
@@ -365,7 +365,7 @@ Removes the whole selection.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:220](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L220)
+[src/lib/table/selection/selection-model.ts:223](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L223)
 
 ___
 
@@ -494,7 +494,7 @@ console.log(`${rowIndices.length} rows with selected cells`);
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:252](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L252)
+[src/lib/table/selection/selection-model.ts:255](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L255)
 
 ___
 
@@ -516,7 +516,7 @@ Array of CellRange objects representing the ranges.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:216](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L216)
+[src/lib/table/selection/selection-model.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L219)
 
 ___
 
@@ -568,7 +568,7 @@ In how many selected ranges is this cell (0 = not selected)?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L191)
+[src/lib/table/selection/selection-model.ts:194](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L194)
 
 ___
 
@@ -588,7 +588,7 @@ Is nothing selected?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:231](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L231)
+[src/lib/table/selection/selection-model.ts:234](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L234)
 
 ___
 
@@ -608,7 +608,7 @@ Is anything selected?
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:227](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L227)
+[src/lib/table/selection/selection-model.ts:230](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L230)
 
 ___
 
@@ -628,7 +628,7 @@ Was everything selected with [selectAll](../interfaces/SelectionModelIf.md#selec
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:289](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L289)
+[src/lib/table/selection/selection-model.ts:292](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L292)
 
 ___
 
@@ -653,7 +653,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:207](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L207)
+[src/lib/table/selection/selection-model.ts:210](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L210)
 
 ___
 
@@ -682,7 +682,7 @@ Checks if a specific cell in a grid is selected.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:346](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L346)
+[src/lib/table/selection/selection-model.ts:349](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L349)
 
 ___
 
@@ -710,7 +710,7 @@ removed are selected again). A negative range that overlaps `range` is split int
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:417](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L417)
+[src/lib/table/selection/selection-model.ts:420](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L420)
 
 ___
 
@@ -764,7 +764,7 @@ A following [addSelection](SelectionModel.md#addselection) / [togglePoint](Selec
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:311](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L311)
+[src/lib/table/selection/selection-model.ts:314](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L314)
 
 ___
 
@@ -795,7 +795,7 @@ true if the cell is selected again, false if it has to be added as a new range
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:399](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L399)
+[src/lib/table/selection/selection-model.ts:402](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L402)
 
 ___
 
@@ -842,7 +842,7 @@ removing cells afterwards cuts holes into "all selected".
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:280](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L280)
+[src/lib/table/selection/selection-model.ts:283](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L283)
 
 ___
 
@@ -912,7 +912,7 @@ without adding a second, overlapping range.
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:336](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L336)
+[src/lib/table/selection/selection-model.ts:339](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L339)
 
 ___
 

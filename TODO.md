@@ -662,6 +662,22 @@ Verhalten steht als `// NOTE:` in den Specs.
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
 
+## Performance-Absicherung (Prompt 021, 09.11.2026)
+
+- [x] Drei Stufen eingerichtet: Invarianten (`perf-invariants.browser.spec.ts`, in `test:browser`), Verhältnisse
+      (`pnpm test:perf`, `packages/table/perf/`), Trend gegen `perf/baseline.json` (Warnung). Gegenprobe: 4 künstliche
+      Rückschritte, alle gefunden (Design-Dokument).
+- [ ] **CI-Job `test-perf` sperrend machen** (Stufe 2): nach ~20 grünen Läufen auf GitHub ohne Wackler, frühestens
+      **01.12.2026** – dann `continue-on-error` in `test-core.yml` entfernen. Stufe 3 bleibt Warnung.
+- [ ] Erste Baseline `linux-ci` aus dem Artefakt `perf-results` des ersten CI-Laufs (`perf:baseline <datei>`, committen).
+- [ ] NOTE (Stufe 1): ↓ am unteren Rand rendert zweimal (Scroll-Event von `ensureRowIsVisible` + Fokus-Repaint) –
+      einer würde reichen. Kein Fehler, nur Arbeit; bei Bedarf eigener Prompt.
+- [ ] NOTE (Stufe 1): das öffentliche `tableApi.repaint()` baut die Zeilenpositionen (`RowLayout`) neu
+      (`invalidateAggregates`) – O(n) bei variablen Höhen je Aufruf. Gewollt (die App kann Daten geändert haben); für
+      Live-Daten mit variablen Höhen `updateCells` nehmen.
+- [ ] `ShortcutService` loggt auf `localhost` jede Taste per `console.debug` (`isDebug()` = `isLocalhost()`) – auch in
+      Tests und lokalen Apps. Lieber an `setLoggingActive` koppeln.
+
 ## Gefunden durch die Browser-Tests (Okt. 2026)
 
 - [x] **macOS (Prompt 016, 04.11.2026):** 16 Browser-Tests waren nur auf dem Mac rot. 15 davon nahmen Windows/Linux an

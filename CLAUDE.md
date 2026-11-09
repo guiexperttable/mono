@@ -53,6 +53,7 @@ mono/
 | Install | `pnpm i` |
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
 | Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
+| Performance prüfen (Verhältnis kleines/großes n + Trend gegen Baseline, Prompt 021) | `pnpm test:perf` (~20 s, nicht in `pnpm test`); Baseline übernehmen: `pnpm --filter @guiexpert/table perf:baseline` |
 | Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`; enthält Angular 22 – braucht vorher `pnpm build:core`) |
 | Angular-Wrapper testen | `pnpm test:angular` (baut ng22, testet das `dist` in Chromium; Typen: `pnpm --filter angular-build-ng22 test:types`) |
 | Alle Bibliotheken | `pnpm build:libs` |
@@ -700,6 +701,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
   | `bench` | Messungen außerhalb von `src/` (`bench/*.bench.ts`, eigene Config, keine Zeit-Assertions) |
+  | `test:perf` | Performance-Verhältnisse + Trend (`perf/`, eigenes Browser-Projekt, s. „Performance-Absicherung“) |
   - Specs liegen **neben dem Code**: `*.spec.ts` = Node (Projekt `unit`), `*.browser.spec.ts` = Chromium (Projekt
     `browser`, Helfer `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `destroyAllTables`).
     Weitere Helfer in `test-utils/` (ZIP-Leser, Fake-KeyboardEvents, In-Memory-`localStorage`, `axe.ts` =
@@ -735,6 +737,17 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `mountTable` (der `ShortcutService` liest beim Aufbau), dann `keyInitOf`/`userEventKeyOf`/`ariaShortcutOf`. Vom
     Browser entschiedene Tasten (Strg/⌘+A bzw. Zeilenende im Input, Kopierbefehl) mit der echten Plattform:
     `userEventPrimary('a')`, `lineEndKeys()`. Seit 1.1.106 sind `test:browser` und `test:browser:scrollbars` auf dem Mac grün.
+  - **Performance-Absicherung (seit Prompt 021, Design `prompts/021-performance-regressionsschutz.design.md`)** –
+    nur Vitest, drei Stufen: (1) **zählen** in `test:browser` (sperrt den Release): `perf-invariants.browser.spec.ts` mit
+    `test-utils/perf-counters.ts` (`countRenders` = Spy auf `adjustAfterScrolling`, `countCellBuilds` =
+    `MutationObserver`, `countCalls`, `countRowLayoutBuilds`, `visibleBodyCells`, `expectSameArray`); Zähl-Specs warten
+    das erste `ResizeObserver`-Callback ab (`resizeEventDebounceDelay: 10`). (2) **Verhältnisse** in `pnpm test:perf`
+    (`packages/table/perf/`: `vitest.perf.config.ts`, `measure.ts` mit `measure`/`expectScalesFlat` – Median groß ≤
+    max(2 × klein, klein + 0,5 ms), `perf-models.ts` `BigBody` = 10 Mio. Zeilen ohne Speicher, `table.perf.ts`).
+    (3) **Trend**: `perf-reporter.ts` schreibt `perf/results/latest.json` (git-ignored), vergleicht mit
+    `perf/baseline.json` je Plattform (`linux-ci`, lokal `macos-local`), ab ×1,5 Warnung (`::warning::`, Job-Summary),
+    nie rot; `perf:baseline` übernimmt. CI-Job `test-perf` (Ubuntu, noch nicht sperrend). Neue Render-/Update-/
+    Eingabepfade bringen eine Invariante und ggf. ein Szenario mit (`prompts/000-arbeitsweise.md` Phase 2).
   - **Wrapper-Tests**: je Wrapper-Paket `vitest.config.ts` + `*.browser.spec.*` neben dem Code (Smoke: Mount →
     `tableReady`, Zeilen, Klick-Event, Modellwechsel = Neuaufbau + `destroy()`, Unmount = `destroy()`); Core per Alias aus
     `packages/table/src`; gemeinsame Helfer `packages/table/test-utils/wrapper-test-utils.ts` (ohne `vitest`-Import).

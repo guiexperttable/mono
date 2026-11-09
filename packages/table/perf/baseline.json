@@ -1,0 +1,26 @@
+{
+  "platforms": {
+    "macos-local": {
+      "createdAt": "2026-11-09T07:54:47.018Z",
+      "commit": "2c4c5f0",
+      "medians": {
+        "scroll render, constant height | small": 3.18,
+        "scroll render, constant height | large": 3.12,
+        "scroll render, variable heights | small": 2.32,
+        "scroll render, variable heights | large": 2.3,
+        "repaintHard({ py }) live tail | small": 5.2,
+        "repaintHard({ py }) live tail | large": 5.1,
+        "updateCells 50 cells | small": 0.6,
+        "updateCells 50 cells | large": 0.6,
+        "scrollToIndex / ensureRowIsVisible | small": 5.1,
+        "scrollToIndex / ensureRowIsVisible | large": 4.9,
+        "horizontal scroll render, columns | small": 5.96,
+        "horizontal scroll render, columns | large": 5.94,
+        "real click → onMouseClicked | small": 0.1,
+        "real click → onMouseClicked | large": 0.1,
+        "real key → onFocusChanged | small": 0.3,
+        "real key → onFocusChanged | large": 0.3
+      }
+    }
+  }
+}

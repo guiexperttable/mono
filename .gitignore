@@ -8,6 +8,8 @@ coverage
 # Vitest: coverage report, browser-mode screenshots/attachments of failed tests
 __screenshots__
 .vitest
+# test:perf results (prompt 021) – the baseline perf/baseline.json is checked in
+packages/table/perf/results
 .angular/
 .astro/
 .nx/

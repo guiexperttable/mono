@@ -74,9 +74,14 @@ Regeln aus CLAUDE.md §6:
   Tab-Stopp, Tastatur über `ActionId` + Shortcut-Mappings). Test: Attribute im Browser-Spec und
   `expect(await axeViolations(host)).toEqual([])` (`test-utils/axe.ts`). Neue Elemente außerhalb der Tabelle
   (Overlays, Menüs, Dialoge) folgen dem passenden APG-Muster (z. B. `role="dialog"`, `role="menu"`).
-- Performance: keine Zeit-Assertions in `test:unit`. Messungen als `vitest bench`; Bench-Dateien nicht unter `src/`
-  ablegen oder in `vitest.config.ts` → `coverage.exclude` aufnehmen (heute ausgeschlossen: `*.spec.ts`, `*.demo.ts`,
-  `*.if.ts`, `index.ts`).
+- Performance: keine Zeit-Assertions in `test:unit`/`test:browser`. Messungen als `vitest bench`; Bench-Dateien nicht
+  unter `src/` ablegen oder in `vitest.config.ts` → `coverage.exclude` aufnehmen (heute ausgeschlossen: `*.spec.ts`,
+  `*.demo.ts`, `*.if.ts`, `index.ts`).
+- **Performance-Absicherung (seit Prompt 021):** Ändert ein Prompt den Render-, Scroll-, Update- oder Eingabepfad, bringt
+  er eine **Invariante** mit (Stufe 1: Renders, neu gebaute Zellen, Aufrufe zählen – `test-utils/perf-counters.ts`,
+  Eintrag in `src/lib/table/perf-invariants.browser.spec.ts` oder in der Feature-Spec) und, wenn n eine Rolle spielt,
+  ein **`test:perf`-Szenario** (Stufe 2: kleines vs. großes n, `packages/table/perf/*.perf.ts`, `expectScalesFlat`).
+  Echte Mauseingaben (Drücken → Render → Loslassen): `test-utils/real-mouse.ts`.
 - **Wrapper:** Betrifft das Feature die Wrapper (neue Events, neue Optionen, DOM außerhalb der Zellen), einen Smoke-Test
   in mindestens React und Web Component (`pnpm test:wrappers`, Helfer `packages/table/test-utils/wrapper-test-utils.ts`).
 - Außerdem: `test:types` (Vitest prüft keine Typen; `expectTypeOf` für Generik), `docs:check`, Export-Snapshot
@@ -186,6 +191,7 @@ pnpm test:core                                   # Unit + Browser
 pnpm --filter @guiexpert/table test:unit --sequence.shuffle
 pnpm --filter @guiexpert/table test:coverage
 pnpm test:wrappers
+pnpm test:perf                                   # Verhältnisse + Trend-Tabelle (in den Abschlussbericht)
 pnpm build:libs && pnpm build:angular
 pnpm --filter @guiexpert/demo-table-models build
 pnpm --filter @guiexpert/table typedoc:website

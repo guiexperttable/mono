@@ -17,6 +17,7 @@
   "include": [
     "vitest.config.ts",
     "test-utils/**/*.ts",
+    "perf/**/*.ts",
     "src/**/*.spec.ts",
     "src/**/*.d.ts"
   ]

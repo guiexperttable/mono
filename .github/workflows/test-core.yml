@@ -3,6 +3,8 @@
 #   + the browser tests once more on macOS (job test-core-macos): ⌘ shortcuts, ⌥+letter types, the browser's own keys
 #     in inputs (⌘A, ⌘→, the ⌘C copy command) – Linux simulates the macOS shortcuts, only a Mac runs them for real
 #     (prompt 016)
+#   + job test-perf: performance ratios small n vs. large n and the trend against perf/baseline.json (prompt 021) –
+#     NOT blocking yet (continue-on-error) until the spread on the runner is known (TODO.md)
 #
 # Reusable workflow – called by
 #   - ci.yml           on every push to main and every pull request
@@ -128,4 +130,49 @@ jobs:
         with:
           name: browser-test-failures-macos
           path: packages/table/.vitest/
+          if-no-files-found: ignore
+
+  test-perf:
+    name: Performance checks @guiexpert/table (test:perf)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    continue-on-error: true   # not blocking yet – see TODO.md "Stufe 2 sperrend" (prompt 021)
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6   # version from "packageManager" in package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ inputs.use-cache && 'pnpm' || '' }}
+          package-manager-cache: ${{ inputs.use-cache }}
+
+      - run: pnpm install --frozen-lockfile --filter @guiexpert/table
+
+      - name: Cache Playwright browsers
+        if: inputs.use-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('packages/table/package.json') }}
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @guiexpert/table exec playwright install --with-deps chromium
+
+      # ratios (fail on O(n) where O(1) is expected) + trend table in the job summary, ::warning:: above +50 %
+      - name: Performance checks (ratios + trend)
+        run: pnpm --filter @guiexpert/table test:perf
+
+      - name: Upload perf results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: perf-results
+          path: packages/table/perf/results/
           if-no-files-found: ignore

@@ -14,7 +14,8 @@ Bereits veröffentlichte Versionen werden übersprungen – ein abgebrochener La
 
 **Vorher laufen die Core-Tests** (Job `test`, wiederverwendbarer Workflow `.github/workflows/test-core.yml`: Typen,
 JSDoc-Beispiele, Unit- und Browser-Tests von `@guiexpert/table`). Erst wenn sie grün sind, startet der Job `publish` –
-auch beim Dry-Run. Rote Tests = kein Release.
+auch beim Dry-Run. Rote Tests = kein Release. Der Job `test-perf` (Performance-Verhältnisse + Trend, Prompt 021) läuft
+mit, sperrt aber noch nicht (`continue-on-error`); seine Trend-Tabelle steht in der Job-Zusammenfassung.
 
 Vor dem ersten Upload prüft das Skript in GitHub Actions für **jedes** ausgewählte Paket, ob npm die OIDC-Anmeldung
 akzeptiert (`trusted publishing ok` / `FAILED` im Log). Schlägt eine fehl, wird gar nichts veröffentlicht. Das gilt
@@ -54,6 +55,11 @@ pnpm build:all                # Kontrolle
 git commit -am "chore: release 1.1.86"
 git push
 ```
+
+**Performance-Baseline** (optional, nach einem bewussten Performance-Wechsel oder wenn die Trend-Tabelle des
+CI-Jobs `test-perf` dauerhaft daneben liegt): Artefakt `perf-results` des letzten `main`-Laufs laden,
+`pnpm --filter @guiexpert/table perf:baseline <pfad>/latest.json`, den Diff von `packages/table/perf/baseline.json`
+mitcommitten.
 
 Dann auf GitHub: **Releases → Draft a new release** → Tag `v1.1.86` (neu, auf `main`) → **Publish release**.
 Das startet *Publish to npm* und veröffentlicht alle Pakete. Fortschritt unter **Actions**.

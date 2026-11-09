@@ -32,6 +32,8 @@
     "test:browser": "vitest run --project browser --project browser-scrollbars",
     "test:browser:scrollbars": "GE_ALL_SCROLLBARS=1 vitest run --project browser-scrollbars",
     "test:browser:webkit": "GE_WEBKIT=1 vitest run --project browser-webkit",
+    "test:perf": "vitest run --config perf/vitest.perf.config.ts",
+    "perf:baseline": "node perf/update-baseline.mjs",
     "test:watch": "vitest --project unit",
     "test:coverage": "vitest run --coverage",
     "test:types": "tsc -p tsconfig.spec.json --noEmit",

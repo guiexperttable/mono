@@ -50,8 +50,7 @@ Hinweise:
 ```bash
 git checkout main && git pull
 pnpm version:patch            # 1.1.85 → 1.1.86 (Wrapper behalten ihre Framework-Major), oder version:minor
-pnpm version:check            # "All versions consistent."
-pnpm build:all                # Kontrolle
+pnpm ci:local                 # die GitHub-Pipeline lokal (~2,5 min) – nur bei grün weiter
 git commit -am "chore: release 1.1.86"
 git push
 ```

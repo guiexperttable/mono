@@ -214,20 +214,22 @@ Pfaden neuer (ungetrackter) Dateien und der konkreten nächsten Version (`packag
 Stand prüfen (`git status`, `git branch --show-current`, `git log --oneline -5`) – sonst landet ein Fix auf einem
 Neben-Branch und das Release erscheint ohne ihn (so geschehen bei 1.1.104). Liegt die Arbeit schon auf `main`, entfallen
 `git merge` bzw. `git add`. Mögliche Konflikte (z. B. Versionen in `package.json`) in einem Satz darunter nennen.
-Claude führt die Befehle nicht selbst aus (Release = npm-Publish). Muster (Fix auf `chore/angular-demo-routes`, neue
-Demo-Dateien, 1.1.104 → 1.1.105):
+Claude führt die Befehle nicht selbst aus (Release = npm-Publish). **Jede Zeile endet auf ` &&`** (außer der
+letzten): ein roter Schritt beendet den Block vor `git push` und `gh release` – 1.1.110 erschien, obwohl `build:all`
+rot war, weil die einzelnen Zeilen weiterliefen. **`pnpm ci:local`** führt die GitHub-Pipeline lokal aus (Lockfile,
+`version:check`, `build:all`, Typen, `docs:check`, `check:llms`, Unit, Browser, `test:perf`, Wrapper;
+`scripts/ci-local.mjs`). Bricht er ab: Fehler beheben, `pnpm ci:local --from N`, dann den Rest des Blocks ab
+`git commit -am …`. Muster (Fix auf `chore/angular-demo-routes`, neue Demo-Dateien, 1.1.104 → 1.1.105):
 ```bash
-git checkout main
-git pull
-git merge chore/angular-demo-routes
-git add apps/table-demo/scroll-bars.html apps/table-demo/src/scroll-bars
-git commit -m "docs(table-demo): scroll-bars demo"
-pnpm --filter @guiexpert/table test
-pnpm version:patch
-pnpm version:check
-pnpm build:all
-git commit -am "chore: release 1.1.105"
-git push
+git checkout main &&
+git pull &&
+git merge chore/angular-demo-routes &&
+git add apps/table-demo/scroll-bars.html apps/table-demo/src/scroll-bars &&
+git commit -m "docs(table-demo): scroll-bars demo" &&
+pnpm version:patch &&
+pnpm ci:local &&
+git commit -am "chore: release 1.1.105" &&
+git push &&
 gh release create v1.1.105 --target main --title "v1.1.105" --generate-notes
 ```
 

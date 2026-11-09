@@ -61,6 +61,7 @@ mono/
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
 | Angular-Quellen nur synchronisieren | `pnpm sync:angular` |
 | Alles | `pnpm build:all` (= `pnpm -r build`, topologisch) |
+| **Pipeline lokal (vor jedem Release)** | `pnpm ci:local` – die Schritte von `ci.yml`, `test-core.yml`, `test-wrappers.yml` und den Builds von `npm-publish.yml` plus `build:all`, Abbruch beim ersten roten Schritt; danach `pnpm ci:local --from N` |
 | Demos | `pnpm serve:table-demo`, `serve:react-table-demo`, …, `serve:angular-table-demo` |
 | Website lokal | `pnpm build:core && pnpm --filter @guiexpert/demo-table-models build`, dann `pnpm serve:webpage-guiexpert` (`dev`/`build` kopieren die dists per `pre:build` nach `public/scripts/`, git-ignored – fehlen sie, bleiben alle Showcase-Tabellen leer) |
 | Versionen | `pnpm version:check`, `pnpm version:patch` (Core 1.1.84 → 1.1.85, Wrapper behalten Framework-Major) |
@@ -71,11 +72,13 @@ Arbeit nach `main` bringt **und** den nächsten Patch veröffentlicht (**ohne `#
 echten Branch-Namen, den echten Pfaden neuer Dateien und der konkreten Version) – ausführen tut ihn Marc. Vorher den
 Stand prüfen (`git status`, `git branch --show-current`, `git log`), damit Branch, ungetrackte Dateien und Version
 stimmen; liegt die Arbeit schon auf `main`, entfällt der Merge. Muster und Regel: `prompts/000-arbeitsweise.md`
-Phase 10. Kurzform: `git checkout main`, `git pull`, `git merge <branch>`, `git add <neue Dateien>` +
-`git commit -m "…"`, `pnpm --filter @guiexpert/table test`, `pnpm version:patch`, `pnpm version:check`,
-`pnpm build:all`, `git commit -am "chore: release X.Y.Z"`, `git push`,
-`gh release create vX.Y.Z --target main --title "vX.Y.Z" --generate-notes`. Mögliche Merge-Konflikte (z. B.
-Versionsnummern in `package.json`) darunter in einem Satz nennen.
+Phase 10. Kurzform – **jede Zeile endet auf ` &&`** (außer der letzten), damit ein roter Schritt Push und Release
+verhindert: `git checkout main`, `git pull`, `git merge <branch>`, `git add <neue Dateien>` + `git commit -m "…"`,
+`pnpm version:patch`, **`pnpm ci:local`** (die GitHub-Pipeline lokal: Lockfile, `version:check`, `build:all`, Typen,
+`docs:check`, `check:llms`, Unit, Browser, `test:perf`, Wrapper – ~2,5 min, `scripts/ci-local.mjs`), `git commit -am
+"chore: release X.Y.Z"`, `git push`, `gh release create vX.Y.Z --target main --title "vX.Y.Z" --generate-notes`.
+Mögliche Merge-Konflikte (z. B. Versionsnummern in `package.json`) darunter in einem Satz nennen. (1.1.110 erschien,
+obwohl `build:all` rot war – die einzelnen Zeilen liefen weiter.)
 
 **Abhängigkeits-Fallen (beim Aufsetzen gelöst, nicht zurückdrehen):**
 - `pnpm-lock.yaml` basiert auf der Lockdatei von `ge-table`. Ohne sie zieht pnpm neuere Transitive (z. B. Babel 8),

@@ -12,12 +12,17 @@ Class representing a MouseHandler.
 
 ### Properties
 
+- [clickMoveTolerance](MouseHandler.md#clickmovetolerance)
 - [doubleClickDelay](MouseHandler.md#doubleclickdelay)
 - [geMouseEvent](MouseHandler.md#gemouseevent)
 - [geMouseEventOld](MouseHandler.md#gemouseeventold)
 - [mouseEvent](MouseHandler.md#mouseevent)
 - [startMouseEvent](MouseHandler.md#startmouseevent)
 - [tableScope](MouseHandler.md#tablescope)
+
+### Methods
+
+- [isButtonDown](MouseHandler.md#isbuttondown)
 
 ## Constructors
 
@@ -37,9 +42,23 @@ Class representing a MouseHandler.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L43)
+[src/lib/table/mouse-handler.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L89)
 
 ## Properties
+
+### clickMoveTolerance
+
+• **clickMoveTolerance**: `number` = `4`
+
+A render between mousedown and mouseup replaces the pressed cell, and the browser sends no "click" (both must hit
+the same element). The handler then reports the click itself for the pressed cell – if the mouse moved at most
+this many pixels (screen coordinates) between mousedown and mouseup. Since 1.1.108.
+
+#### Defined in
+
+[src/lib/table/mouse-handler.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L64)
+
+___
 
 ### doubleClickDelay
 
@@ -51,7 +70,7 @@ double-click speed of the operating system.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L25)
+[src/lib/table/mouse-handler.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L55)
 
 ___
 
@@ -61,7 +80,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L29)
+[src/lib/table/mouse-handler.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L68)
 
 ___
 
@@ -71,7 +90,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L30)
+[src/lib/table/mouse-handler.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L69)
 
 ___
 
@@ -81,7 +100,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L27)
+[src/lib/table/mouse-handler.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L66)
 
 ___
 
@@ -91,7 +110,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L28)
+[src/lib/table/mouse-handler.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L67)
 
 ___
 
@@ -101,4 +120,23 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L44)
+[src/lib/table/mouse-handler.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L90)
+
+## Methods
+
+### isButtonDown
+
+▸ **isButtonDown**(): `boolean`
+
+True while the mouse button is held in the table (a click or a drag in progress) – live data does not jump to
+the end then (`tableApi.appendRows({ follow: "auto" })`, since 1.1.108).
+
+#### Returns
+
+`boolean`
+
+true between mousedown and mouseup
+
+#### Defined in
+
+[src/lib/table/mouse-handler.ts:606](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L606)

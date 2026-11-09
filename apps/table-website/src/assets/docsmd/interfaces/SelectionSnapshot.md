@@ -20,7 +20,7 @@ Saved state of a [SelectionModel](../classes/SelectionModel.md) – see [Selecti
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L16)
+[src/lib/table/selection/selection-model.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L17)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L15)
+[src/lib/table/selection/selection-model.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L16)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-model.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L14)
+[src/lib/table/selection/selection-model.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-model.ts#L15)

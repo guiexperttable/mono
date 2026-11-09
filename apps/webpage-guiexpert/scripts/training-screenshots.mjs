@@ -46,6 +46,7 @@ const DEMOS = {
   "inline-editing": { slug: "inline-editing", dblclick: [2, 7] },
   "live-data": { slug: "live-data", wait: 1500 },
   "overlays": { slug: "live-data", wait: 1500, button: "refresh" },
+  "live-append": { slug: "live-data", wait: 1500 },
   "persist-state": { slug: "persist-state" },
   "finale": { slug: "checklist", drag: [[3, 2], [6, 4]] },
   "row-grouping": { slug: "row-grouping", search: "laptop" },

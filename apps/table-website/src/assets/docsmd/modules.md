@@ -140,6 +140,7 @@
 - [RowGroup](classes/RowGroup.md)
 - [RowGroupColumnDef](classes/RowGroupColumnDef.md)
 - [RowGroupFactory](classes/RowGroupFactory.md)
+- [RowIndexShift](classes/RowIndexShift.md)
 - [RowLayout](classes/RowLayout.md)
 - [RowNumberCellRenderer](classes/RowNumberCellRenderer.md)
 - [RowNumberColumnDef](classes/RowNumberColumnDef.md)
@@ -203,6 +204,10 @@
 - [AggregateFooterRowIf](interfaces/AggregateFooterRowIf.md)
 - [AggregateSpecIf](interfaces/AggregateSpecIf.md)
 - [AggregatorIf](interfaces/AggregatorIf.md)
+- [AppendRowsContextIf](interfaces/AppendRowsContextIf.md)
+- [AppendRowsModelResultIf](interfaces/AppendRowsModelResultIf.md)
+- [AppendRowsOptionsIf](interfaces/AppendRowsOptionsIf.md)
+- [AppendRowsResultIf](interfaces/AppendRowsResultIf.md)
 - [AreaModelIf](interfaces/AreaModelIf.md)
 - [ArgsAdjustColumnsToRowParentParams](interfaces/ArgsAdjustColumnsToRowParentParams.md)
 - [ArgsRenderCellDiv](interfaces/ArgsRenderCellDiv.md)
@@ -283,6 +288,7 @@
 - [RowGroupModelOptionsIf](interfaces/RowGroupModelOptionsIf.md)
 - [RowGroupTableModelParaIf](interfaces/RowGroupTableModelParaIf.md)
 - [RowNumberOptionsIf](interfaces/RowNumberOptionsIf.md)
+- [RowsAppendedOptionsIf](interfaces/RowsAppendedOptionsIf.md)
 - [ScrollPositionIf](interfaces/ScrollPositionIf.md)
 - [SelectionAggregatesIf](interfaces/SelectionAggregatesIf.md)
 - [SelectionModelIf](interfaces/SelectionModelIf.md)
@@ -334,6 +340,7 @@
 - [AggregateSpecMap](modules.md#aggregatespecmap)
 - [AggregatorName](modules.md#aggregatorname)
 - [AggregatorRef](modules.md#aggregatorref)
+- [AppendFollowMode](modules.md#appendfollowmode)
 - [AreaIdent](modules.md#areaident)
 - [AreaObjectMapType](modules.md#areaobjectmaptype)
 - [BooleanFunction](modules.md#booleanfunction)
@@ -5880,6 +5887,29 @@ undoShortcutLayer(false)["ctrl+y"];   // "REDO"
 #### Defined in
 
 [src/lib/table/undo/undo-keymap.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/undo/undo-keymap.ts#L17)
+
+## Live data
+
+### AppendFollowMode
+
+Ƭ **AppendFollowMode**: ``"auto"`` \| `boolean`
+
+Where the view goes after new rows came in (`tableApi.appendRows()` / `rowsAppended()`):
+- `"auto"` (default): it follows the end if it was at the end before ("tail -f"), otherwise the first visible row
+  stays where it is;
+- `true`: always to the end;
+- `false`: the first visible row always stays (a "freeze scroll" button of the app).
+
+While the mouse button is held in the table (a click, a drag), `"auto"` keeps the row – the content does not slide
+away under the pointer.
+
+**`Since`**
+
+1.1.108
+
+#### Defined in
+
+[src/lib/table/live-append/append-rows-options.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/live-append/append-rows-options.if.ts#L14)
 
 ## DOM
 

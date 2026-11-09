@@ -70,6 +70,9 @@ This is the UI-agnostic table component for your next web app. 😊
 - Spreadsheet mode: `SpreadsheetFactory.create({ data })` builds column letters, row numbers, a sparse body (a million
   empty rows cost nothing) and all of the above; `FormulaBar`, insert/delete rows and columns with adjusted references;
   `spreadsheet: true` for an existing table – since 1.1.99
+- Live data that keeps coming (a log tail, an event stream): `tableApi.appendRows(rows, { follow: "auto", maxRows })` –
+  in place, O(k) per update, filter and sort order only for the new rows, selection and focus stay at their rows,
+  follow the end or freeze the view, ring buffer; own area models: `rowsAppended(count)` – since 1.1.108
 - Custom Filtering
 - In-place Cell Editing
 - Userdefined Key and Mouse Events
@@ -89,6 +92,8 @@ This is the UI-agnostic table component for your next web app. 😊
   width and height; wheel, touch, keyboard and the API still scroll.
 - **Rows are appended all the time** (live log, ticker): `tableApi.repaintHard({ py })` counts the rows and shows the
   position in one render pass (`py: Number.MAX_SAFE_INTEGER` follows the end) – since 1.1.107.
+- **Rows arrive all the time (log, stream)?** `tableApi.appendRows(rows, { follow: "auto", maxRows })` – in place, one
+  render, selection stays (since 1.1.108); not `addRows()` (copies everything, resets filter and sort).
 - **Clicks lost while the table updates?** Fixed in 1.1.108: a render between `mousedown` and `mouseup` no longer
   swallows `mouseClicked` – the table reports the click for the pressed cell itself.
 - **Own area model with other row heights:** return them from `getRowHeight(i)` and, if all are equal,

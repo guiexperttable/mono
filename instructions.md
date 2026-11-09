@@ -1429,7 +1429,79 @@ function onPriceTick(tableApi: TableApi, row: number, col: number, price: number
 A footer from `footerAggregates` (5.4) is recomputed after `updateCells()`; after changing row objects yourself call
 `tableApi.repaint()`.
 
-**Growing rows – a live tail (since 1.1.107).** When rows are appended (a log viewer, a ticker), the row count changes:
+**Appending rows – a live log (since 1.1.108).** Rows that keep coming (a log viewer, an event stream, a ticker of
+trades): `tableApi.appendRows(rows, options)` appends them **in place** and shows them in **one** render pass.
+
+```ts
+import { TableApi } from "@guiexpert/table";
+
+interface LogLine { time: string; level: string; text: string }
+
+let frozen = false;                            // a "Freeze scroll" button of the app
+
+function onLines(tableApi: TableApi, lines: LogLine[]) {   // once per animation frame, not per message
+  const result = tableApi.appendRows(lines, {
+    follow: frozen ? false : "auto",           // "auto": at the end → stay at the end ("tail -f")
+    maxRows: 1_000_000                         // ring buffer: the oldest lines leave
+  });
+  if (result && !result.following) {
+    console.log(`+${result.shown} new lines below`);
+  }
+}
+
+function scrollToEnd(tableApi: TableApi) {     // "Scroll to end" button
+  frozen = false;
+  tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER });
+}
+```
+
+- **O(k) for k new rows**: pushed to your array (`getAllRows()` is the array you passed, no copy). A filter
+  (`externalFilterFunction`) runs only for the new rows; with a sorted column (or `sort(fn)`) they are merged in at their
+  place (binary search, behind equal rows). `addRows()` copies all rows and resets filter and sort order – don't use it
+  for live data.
+- **Selection, focus, the anchor of Shift+arrows** (and checked rows) stay at their rows – the indices move along,
+  without `onSelectionChanged` (unless a selected row left the ring buffer).
+- **`follow`**: `"auto"` (default) follows the end if the view was at the end, otherwise the first visible row stays –
+  also when rows are sorted in above it or leave the ring buffer. `false` keeps the row always ("freeze scroll"),
+  `true` always jumps to the end. While the mouse button is held in the table, `"auto"` keeps the rows under the pointer
+  and follows again after the release (unless the user scrolled).
+- **`maxRows`**: the oldest rows are removed from the start, in blocks of at least 1 % of `maxRows` (removing from the
+  start of an array moves all rows, the blocks make that rare) – the row count stays between 99 % and 100 % of `maxRows`.
+- **Rows only below the view** (a reader in the middle of the log, no row removed): the cells are not rebuilt – only
+  scroll height, scroll bar and `aria-rowcount` change. No announcement for screen readers per update.
+- Result: `{ added, shown, removed, following }`; `false` (and a console warning) for a tree, row grouping, pivot,
+  spreadsheet or cell formulas.
+- **Freeze the intake** (collect lines while the user reads, append them later) is an app pattern: buffer the lines and
+  call `appendRows` once with the whole block – one call, one render.
+- **Clicks and keys during updates** arrive (since 1.1.108 a click survives a render between `mousedown` and `mouseup`,
+  see 6.5). Read the clicked row through the row object: `tableApi.getBodyModel().getRowByIndex(evt.rowIndex)` – an
+  index you stored a moment ago may point to another row after the next update.
+
+**Own area model** (millions of lines in your own structure): append to it yourself, then tell the table –
+`tableApi.rowsAppended(count, { follow, removedAtStart })` moves selection, focus and position along in the same way:
+
+```ts
+import { AreaModel, TableApi } from "@guiexpert/table";
+
+class LogBody extends AreaModel {                 // millions of lines, 20 px each
+  readonly lines: string[] = [];
+  override getRowCount(): number { return this.lines.length; }
+  override getRowHeight(): number { return 20; }
+  override getConstantRowHeight(): number { return 20; }
+  override getValueAt(row: number): string { return this.lines[row]; }
+}
+
+function onNewLines(tableApi: TableApi, body: LogBody, newLines: string[]) {
+  for (const line of newLines) body.lines.push(line);       // a loop: push(...lines) overflows above ~100,000 lines
+  const dropped = Math.max(0, body.lines.length - 1_000_000);
+  body.lines.splice(0, dropped);                            // your own ring buffer
+  tableApi.rowsAppended(newLines.length, { follow: "auto", removedAtStart: dropped });
+}
+```
+
+Showcase *Live log* (`/showcase/logtail`), demo `apps/table-demo/log-tail.html`.
+
+**Growing rows by hand (since 1.1.107).** Without `appendRows`/`rowsAppended`, the row count changes and you repaint:
 `repaintHard()`. To keep a position – or to follow the end – pass it along: `repaintHard({ px, py })` counts the rows,
 sets the position and renders **once** (`px`/`py` like `scrollToPixel`: `py` in content pixels, exact also above
 8,000,000 px of rows, where the scroll bar is scaled; a missing axis keeps its position). Before, `repaintHard()` +
@@ -1446,9 +1518,9 @@ class LogBody extends AreaModel {                 // millions of lines, 20 px ea
   override getValueAt(row: number): string { return this.lines[row]; }
 }
 
-function onNewLines(tableApi: TableApi, body: LogBody, newLines: string[], follow: boolean) {
+function onNewLinesByHand(tableApi: TableApi, body: LogBody, newLines: string[], follow: boolean) {
   const firstRow = tableApi.getFirstVisibleRowIndex();
-  body.lines.push(...newLines);
+  for (const line of newLines) body.lines.push(line);       // not push(...newLines): stack overflow above ~100,000
   tableApi.repaintHard({ py: follow ? Number.MAX_SAFE_INTEGER : firstRow * 20 }); // end, or that row at the top
 }
 ```
@@ -2441,6 +2513,21 @@ the focus frame is 1 px taller than its cell. If the rows fill the body exactly,
 `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Keep the first visible row at the top:
 `repaintHard({ py: tableApi.getFirstVisibleRowIndex() * rowHeight })`. Exact also with millions of rows
 (capped scroll height above 8,000,000 px). → 6.9
+
+**New rows arrive all the time (a log, a stream) – how do I tell the table?** `tableApi.appendRows(rows, { follow:
+"auto", maxRows })` (since 1.1.108): in place, O(k) for k new rows, one render pass, filter and sort order only for the
+new rows. An own area model appends itself and calls `tableApi.rowsAppended(count, { removedAtStart })`. Not
+`addRows()` – it copies all rows and resets filter and sort order. → 6.9
+
+**Does the selection stay when rows are appended?** Yes with `appendRows`/`rowsAppended` (since 1.1.108): selection,
+focus, the Shift+arrow anchor and checked rows stay at their rows, also when rows are sorted in above them or the oldest
+rows leave the ring buffer (`maxRows`). A selected row that leaves the buffer leaves the selection (one
+`onSelectionChanged`). → 6.9
+
+**How do I freeze the view or jump to the end?** Freeze: `appendRows(rows, { follow: false })` – the first visible row
+stays, lines keep coming. Jump to the end: `tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER })`, then
+`follow: "auto"` again – it follows while the view is at the end (also when the user scrolls there). To stop the
+intake, buffer the lines in the app and append them later in one call. → 6.9
 
 **Clicks get lost while my live table updates – why?** Fixed in 1.1.108. A render between `mousedown` and
 `mouseup` replaced the pressed cell, and the browser sends no `click` then (Chromium, WebKit, Firefox alike). The table

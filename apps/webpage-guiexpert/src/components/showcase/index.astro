@@ -15,6 +15,7 @@ import lafImage from "../../assets/screens/thumbs/laf.png";
 import mouseeventsImage from "../../assets/screens/thumbs/mouseevents.png";
 import largeImage from "../../assets/screens/thumbs/large.png";
 import coverGridImage from "../../assets/screens/thumbs/covergrid.png";
+import logTailImage from "../../assets/screens/thumbs/logtail.png";
 import type { ImageMetadata } from "astro";
 import downloadExcelImage from "../../assets/screens/thumbs/downloadexcel.png";
 import { NEW_FEATURES, featureCountWord, showcaseHref } from "../../features/new-features";
@@ -218,6 +219,16 @@ const thumbOf = (name: string) => {
             img={largeImage}
             url="/showcase/large/run">
           <p>Very large dataset</p>
+        </ShowcaseCard>
+      </div>
+
+      <div>
+        <ShowcaseCard
+            title="Live log"
+            img={logTailImage}
+            url="/showcase/logtail/run">
+          <p>A rolling log like tail -f: 5,000 lines/s, 1 million lines, freeze scroll, scroll to end – clicks and keys arrive.</p>
+          <p class="showcase-card-links"><a href="/showcase/logtail/info/" aria-label="Source: Live log">source</a></p>
         </ShowcaseCard>
       </div>
 

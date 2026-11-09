@@ -98,6 +98,7 @@ const API_GROUPS = [
   { title: "Scrolling", names: ["scrollToIndex", "scrollToPixel", "ensureRowIsVisible", "getFirstVisibleRowIndex", "getDisplayedRowCount"] },
   { title: "Sorting and filtering", names: ["sortByColumn", "sort", "reSort", "externalFilterChanged"] },
   { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
+  { title: "Live data (append)", names: ["appendRows", "rowsAppended"] },
   { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
   { title: "Columns", names: ["autoResizeColumns", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "setColumnFormula", "setShowValuesAs"] },
   { title: "Grouping and pivot", names: ["setRowGroupBy", "setPivotConfig", "getSelectionAggregates"] },
@@ -160,6 +161,7 @@ const FEATURES: { feature: string; text: string; api: string[]; slug?: string; s
   { feature: "Spreadsheet", text: "A1 cell formulas, copy & paste with Excel, undo, formula bar – one call", api: ["SpreadsheetFactory.create", "TableOptionsIf.cellFormulas", "FormulaBar"], slug: "spreadsheet" },
   { feature: "Cover grid", text: "items as tiles instead of rows – virtual scrolling, filter and sort stay", api: ["CoverGridFactory.createCoverGridModel", "CoverGridTableModel"], showcase: "covergrid" },
   { feature: "Live data", text: "update single cells – only visible ones are redrawn", api: ["TableApi.updateCells"], slug: "live-data" },
+  { feature: "Live log", text: "append rows all the time – follow the end, freeze, ring buffer; selection stays", api: ["TableApi.appendRows"], slug: "live-data" },
   { feature: "Persisted state", text: "column layout, sorting, scroll position, tree, checked and selected rows – automatically or as JSON for your server", api: ["TableOptionsIf.autoRestoreOptions", "TableApi.getState"], slug: "persist-state" }
 ];
 

@@ -1,0 +1,85 @@
+<!doctype html>
+<!--
+  Recording page for episode 15 "Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/15-live-log/demo.html
+  Runs the code of snippet.ts (plain JS) with generated log lines at a selectable rate.
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Live-Log</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 18px; }
+    h1 { font-size: 24px; margin: 0; padding: 10px 16px 0; }
+    .bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 16px; }
+    .bar button, .bar select { font: inherit; padding: 4px 14px; }
+    .bar button[aria-pressed="true"] { background: #2563eb; color: #fff; }
+    .log { font: 16px ui-monospace, monospace; opacity: 0.85; }
+    .new { color: #b45309; font-weight: 600; }
+    .table-div { height: calc(100vh - 170px); margin: 0 16px; font: 16px ui-monospace, Menlo, monospace; }
+  </style>
+</head>
+<body>
+<h1>Live-Log</h1>
+<div class="bar">
+  <select id="rate"><option value="50">50 Zeilen/s</option><option value="500">500 Zeilen/s</option><option value="5000" selected>5.000 Zeilen/s</option></select>
+  <button id="freeze" aria-pressed="false">Freeze scroll</button>
+  <button id="end">Scroll to end</button>
+  <label><input id="dark" type="checkbox"> dunkel</label>
+</div>
+<div class="bar"><span class="log" id="stats"></span><span class="new" id="new"></span></div>
+<div class="table-div"></div>
+<div class="bar"><span class="log" id="event">Klick auf eine Zeile …</span></div>
+<script type="module">
+  import { TableFactory, TableScope, TableOptions, SimpleDomService, EventAdapter, SelectionModel } from "@guiexpert/table";
+
+  // --- snippet.ts ---
+  const tableModel = TableFactory.createTableModel({ rows: [], properties: ["time", "level", "text"] });
+  let frozen = false;
+  function onLines(lines) {
+    const result = tableApi.appendRows(lines, { follow: frozen ? false : "auto", maxRows: 1_000_000 });
+    if (result) newBelow = result.following ? 0 : newBelow + result.shown;
+  }
+  const scrollToEnd = () => { frozen = false; tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER }); };
+  // --- end of snippet ---
+
+  const listener = new EventAdapter();
+  listener.onMouseClicked = evt => {
+    const line = tableApi.getBodyModel().getRowByIndex(evt.rowIndex);   // the row object at the moment of the click
+    document.querySelector("#event").textContent = `Klick: ${line?.time} ${line?.level} ${line?.text}`;
+  };
+  const tableOptions = { ...new TableOptions(), getSelectionModel: () => new SelectionModel("range", "multi") };
+  const scope = new TableScope(document.querySelector(".table-div"), tableModel, new SimpleDomService(), tableOptions, listener);
+  scope.firstInit();
+  const tableApi = scope.getApi();
+
+  // generated lines (fixed seed)
+  let id = 0, seed = 42, rate = 5000, due = 0, last = performance.now(), newBelow = 0;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  const LEVELS = ["INFO", "INFO", "INFO", "DEBUG", "WARN", "ERROR"];
+  const line = () => {
+    id++;
+    const time = new Date(8 * 3_600_000 + id * 0.2).toISOString().slice(11, 23);
+    return { time, level: LEVELS[Math.floor(rnd() * LEVELS.length)], text: `GET /api/orders/${Math.floor(rnd() * 9999)} 200 in ${Math.floor(rnd() * 900)} ms` };
+  };
+  const frame = now => {
+    due += rate * (now - last) / 1000; last = now;
+    const n = Math.floor(due); due -= n;
+    if (n) onLines(Array.from({ length: n }, line));
+    document.querySelector("#stats").textContent = `${id.toLocaleString("de")} Zeilen · ${tableApi.getBodyModel().getRowCount().toLocaleString("de")} in der Tabelle`;
+    document.querySelector("#new").textContent = newBelow ? `+${newBelow.toLocaleString("de")} neue Zeilen` : "";
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+
+  const freeze = document.querySelector("#freeze");
+  freeze.onclick = () => { frozen = !frozen; freeze.setAttribute("aria-pressed", String(frozen)); };
+  document.querySelector("#end").onclick = () => { scrollToEnd(); newBelow = 0; freeze.setAttribute("aria-pressed", "false"); };
+  document.querySelector("#rate").onchange = e => rate = Number(e.target.value);
+  document.querySelector("#dark").onchange = e => document.documentElement.dataset.theme = e.target.checked ? "dark" : "light";
+</script>
+</body>
+</html>

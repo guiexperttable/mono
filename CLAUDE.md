@@ -171,6 +171,13 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `.ge-table-scroll-viewport { scrollbar-width: none }` (keine Option `overflowY: "hidden"`).
   Test `scroll-height.browser.spec.ts`.
 - Horizontal analog über `scrollFactorX` und `adjustColumnsToRowParent(...)` (nur sichtbare Spalten).
+- **Kein Neuaufbau bei reinem Zeilenzuwachs** (seit 1.1.108, Prompt 018 Teil B / 019): jeder Render-Durchgang merkt sich
+  `RenderScope.renderedBodyRows` (Anzahl, erste sichtbare Zeile + Versatz, letzte gezeichnete Zeile, `atEnd`).
+  `appendRows`/`rowsAppended` ohne Folgen, ohne Entfernen und nur hinter der letzten gezeichneten Zeile →
+  `updateRowCountWithoutRender(py)` (Höhen, Scroll-Inhalt, Balken, `aria-rowcount`; `renderedScrollTop` gesetzt, damit
+  das Scroll-Event eines gekappten Balkens nicht zeichnet). Nicht bei Zeilennummern, Summen-Footer, berechneten Spalten,
+  Master/Detail, Spannen oder wenn der senkrechte Balken kommt/geht. `ColAndRowspanModel.updateForInsertedRows` scannt
+  nur neue Zeilen (`AbstractAreaModel.getMaxColspan()` meldet 31 → `init()` lief sonst je Zeilenzahl über alle Zeilen).
 - DOM wird pro Render neu aufgebaut (`innerText = ''`); Renderer können Cleanup-Funktionen zurückgeben
   (`RendererCleanupFnType`), die vor dem nächsten Render aufgerufen werden (`cleanupFunctions[area]`).
 - Col-/Rowspan-Zellen werden am Ende separat gezeichnet (`drawBigCell`), um „halb abgeschnittene" Zellen zu vermeiden.
@@ -586,6 +593,23 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `createSpreadsheetQuoteModelAndOptions` (`demo-table-models`), Showcase `spreadsheet`, Training-Kapitel 40. CSS
   `css/table-spreadsheet.css`. Iteration über `Set`/`Map` im Core ohne `for…of`/Spread (`forEach`, `Array.from`):
   TypeDoc und `tsconfig.lib.json` kompilieren ohne `downlevelIteration`.
+- **Live-Daten anhängen (seit 1.1.108, `live-append/`, Design `prompts/019-live-append.design.md`)**:
+  `api.appendRows(rows, { follow: "auto" | true | false, maxRows })` → `AppendRowsResultIf { added, shown, removed,
+  following }` | `false` (Baum, Gruppen, Pivot, Spreadsheet, Zellformeln: Warnung). Modell: optionales
+  `AreaModelIf.appendRows?(rows, AppendRowsContextIf { filter, compare, maxRows })` → `AppendRowsModelResultIf`
+  (`removedPositions` vor, `insertedPositions` nach dem Schritt); `AreaModelObjectArray.appendRows` **in place** (Schleife,
+  kein Spread), Filter nur für neue Zeilen, sortiert per Binärsuche + `copyWithin` eingefügt (stabil: hinter gleichen),
+  Ringpuffer in Blöcken ≥ 1 % von `maxRows` (`splice(0, k)` ist O(n)), `displayInDataOrder` = entfernte Zeilen sind
+  ein Präfix (sonst `Set`-Durchlauf); `createSortComparator(sortItems)` (wie `doSort`). DOM-frei `RowIndexShift`
+  (`mapIndex`, `mapIndexOrNext`, `mapRange`, `touchesUpTo`), optional `SelectionModelIf/FocusModelIf.adjustForRowChanges`
+  (Ranges **in place**, Einfügen teilt, Spalten-Ranges/`allSelected` bleiben; Event nur, wenn eine ausgewählte Zeile
+  entfernt wurde), `SelectionService.adjustForRowChanges` (Anker, Ende, letzter Klick). `TableScope.afterRowsAppended`:
+  Indizes nachführen, `invalidateAggregates`, Position (`follow` – `"auto"` + `renderedBodyRows.atEnd`; gedrückte Maustaste,
+  Row Drag, Fill = `busy` → Zeile halten, danach wieder folgen über `followHeldAt`, außer der Nutzer hat gescrollt),
+  **ein** `repaintHard({ py })` oder `updateRowCountWithoutRender`. Eigenes Modell: `api.rowsAppended(count,
+  { follow, removedAtStart })` (`TableScope.notifyRowsAppended`; das ältere interne `rowsAppended()` gehört zum Einfügen
+  mit `pasteAddsRows`). Kein Wrapper-Code. Demo-Logik in `demo-table-models` (`LogGenerator`, `LogTailController`,
+  `createLogTailModelAndOptions`, `LogLevelCellRenderer`) – Showcase `logtail`, `apps/table-demo/log-tail.html`, Specs.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -867,6 +891,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 37 | Excel-Formeln mit Zellbezügen – Zeigemodus, F4, Zeilen einfügen (optional) | Training-Kapitel `spreadsheet`, `instructions.md` 6.23 – 6.25 |
 | 38 | Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden (Angular 22+) | `videos/14-angular-signals/`, `apps/angular-signal-demo`, Training-Kapitel `angular` (`#signals`), `packages/angular-table/instructions.md` 14 |
 | 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
+| 40 | Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end per Knopf (kein „ohne Enterprise“: Transactions bei ag-Grid Community) | `videos/15-live-log/`, Showcase `logtail`, Training-Kapitel `live-data` (`#append`), `apps/table-demo/log-tail.html`, `instructions.md` 6.9 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

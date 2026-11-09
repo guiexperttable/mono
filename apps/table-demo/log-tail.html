@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!--
+  Live log ("tail -f", since 1.1.108): tableApi.appendRows – rolling lines, ring buffer, Freeze scroll, Scroll to end,
+  pause intake, the last mouse and keyboard events. Recording page of the live-log video.
+  Start: pnpm serve:table-demo → http://localhost:4200/log-tail.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – live log</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .bar button[aria-pressed="true"] { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .stats { font-variant-numeric: tabular-nums; font-size: 14px; opacity: .85; }
+    .new-below { font-weight: 600; color: #b45309; }
+    .table-div { height: 460px; width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+    .events { font-size: 13px; font-family: ui-monospace, Menlo, monospace; margin: 8px 0 0; padding-left: 18px; min-height: 6em; }
+    .ge-log-level { padding: 0 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+    .ge-log-level-error { background: #fee2e2; color: #991b1b; }
+    .ge-log-level-warn { background: #fef3c7; color: #92400e; }
+    .ge-log-level-info { color: #1d4ed8; }
+    .ge-log-level-debug { color: #6b7280; }
+    html[data-theme="dark"] .ge-log-level-error { background: #7f1d1d; color: #fee2e2; }
+    html[data-theme="dark"] .ge-log-level-warn { background: #78350f; color: #fef3c7; }
+    html[data-theme="dark"] .ge-log-level-info { color: #93c5fd; }
+    .ge-log-time, .ge-log-id { opacity: .7; }
+  </style>
+</head>
+<body>
+<h1>Live log</h1>
+<div class="bar">
+  <label>Rate
+    <select id="rate">
+      <option value="50">50 lines/s</option>
+      <option value="500" selected>500 lines/s</option>
+      <option value="5000">5,000 lines/s</option>
+    </select>
+  </label>
+  <button id="freeze" aria-pressed="false">Freeze scroll</button>
+  <button id="end">Scroll to end</button>
+  <button id="pause" aria-pressed="false">Pause intake</button>
+  <button id="run" aria-pressed="true">Running</button>
+  <label><input id="dark" type="checkbox"> dark</label>
+</div>
+<p class="stats"><span id="stats">–</span> <span id="new-below" class="new-below"></span></p>
+<div class="table-div"></div>
+<ol class="events" id="events" aria-live="off"></ol>
+<script src="/src/log-tail/log-tail-demo.ts" type="module"></script>
+</body>
+</html>

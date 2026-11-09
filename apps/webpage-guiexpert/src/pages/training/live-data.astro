@@ -67,6 +67,31 @@ import Callout from "../../components/training/Callout.astro";
       that shows the overlay without re-creating the table.</p>
   </Callout>
 
+  <h2 id="append">Rows that keep coming: a log tail</h2>
+  <p>
+    A log viewer, an event stream, a trade blotter: no row changes, but new rows arrive all the time – thousands per second,
+    up to a million in the table. <ApiLink name="TableApi.appendRows" /> appends them <strong>in place</strong> (your array,
+    no copy) and draws once per update:
+  </p>
+  <Snippet file="demos/live-append.ts" region="table" />
+  <Snippet file="demos/live-append.ts" region="append" />
+  <ul>
+    <li><strong>Follow or stay:</strong> <code>follow: "auto"</code> stays at the end if the view was at the end (“tail -f”),
+      otherwise the first visible line stays where it is – also while new lines are sorted in above it or the oldest lines
+      leave. <code>false</code> freezes the view, <code>true</code> always jumps to the end.</li>
+    <li><strong>Selection, focus, the anchor of Shift+arrows</strong> stay at their lines – the indices move along. Clicks
+      arrive even while the table renders under the mouse pointer.</li>
+    <li><strong>Filter and sort order</strong> apply to the new lines only: O(k) instead of O(n), sorted lines are merged in.</li>
+    <li><strong>Ring buffer:</strong> <code>maxRows</code> drops the oldest lines. Own area model:
+      <ApiLink name="TableApi.rowsAppended" /> – your model appends, the table follows.</li>
+  </ul>
+  <LiveDemo name="live-append" title="600 log lines per second, freeze and scroll to end" height={360}
+            caption="Select a line, then press “freeze scroll”: the view stays while lines keep coming. “scroll to end” follows again." />
+  <Callout type="version">
+    <p>Since 1.1.108. Before, <code>addRows()</code> copied all rows and reset filter, sort order and selection. The showcase
+      <a href="/showcase/logtail/run/">Live log</a> runs a million lines at up to 5,000 lines per second.</p>
+  </Callout>
+
   <h2 id="next">Next</h2>
   <p>A table that remembers sorting and scroll position: <ChapterLink slug="persist-state" />.</p>
 </TrainingLayout>

@@ -23,6 +23,7 @@ Represents a model for handling colspan and rowspan in a table.
 - [init](ColAndRowspanModel.md#init)
 - [initIfRowCountChanged](ColAndRowspanModel.md#initifrowcountchanged)
 - [isInRange](ColAndRowspanModel.md#isinrange)
+- [updateForInsertedRows](ColAndRowspanModel.md#updateforinsertedrows)
 
 ## Constructors
 
@@ -99,7 +100,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L67)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:93](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L93)
 
 ___
 
@@ -132,7 +133,7 @@ true if the ranges were rebuilt
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L59)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L85)
 
 ___
 
@@ -153,4 +154,31 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L74)
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L100)
+
+___
+
+### updateForInsertedRows
+
+▸ **updateForInsertedRows**(`insertedPositions`): `boolean`
+
+Live data (since 1.1.108): rows were inserted (and maybe removed at the start) – scans only the inserted rows
+(O(k)) instead of all rows ([init](ColAndRowspanModel.md#init): O(n) per update, because most area models report a possible span of 31).
+Only possible while no span exists; otherwise (or before the first init) false – then [initIfRowCountChanged](ColAndRowspanModel.md#initifrowcountchanged)
+builds the ranges again.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `insertedPositions` | `ArrayLike`\<`number`\> | display indices of the inserted rows (after the step), ascending |
+
+#### Returns
+
+`boolean`
+
+true if the ranges are up to date
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/col-and-rowspan-model.ts#L64)

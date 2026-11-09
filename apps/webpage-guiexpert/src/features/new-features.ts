@@ -1,5 +1,5 @@
 /**
- * The features added in October 2026 (prompts 001 – 015, releases 1.1.91 – 1.1.100) – one list for
+ * The features added since October 2026 (prompts 001 – 019, releases 1.1.91 – 1.1.108) – one list for
  * the page /whats-new/, the "What's new" section of the home page and the feature finder of the training.
  *
  * Every snippet is checked against the real API (see `snippets` in scripts/check-feature-snippets.mjs):
@@ -371,6 +371,34 @@ export class OrdersComponent {
     api: ["TableApi"],
     agGrid: "community",
     agGridNote: "the Angular wrapper also works zoneless"
+  },
+  {
+    id: "live-append", prompt: "019", since: "1.1.108", icon: "mdi:text-box-search-outline",
+    title: "Live log: append rows all the time",
+    problem: "A log viewer gets thousands of new lines per second – copying all rows per update is slow, the selection " +
+      "gets lost and the view jumps.",
+    points: [
+      "appendRows: in place, O(k) for k new rows – filter and sort order only for the new rows",
+      "follow the end (\"tail -f\"), freeze the view, or keep the first visible row; ring buffer with maxRows",
+      "selection, focus and keyboard anchor stay at their rows; clicks arrive even while the table renders",
+      "no cell rebuilt when only rows below the view come in; own area models: rowsAppended(count)"
+    ],
+    snippet: `let frozen = false;
+function onLines(lines: { time: string; text: string }[]) {
+  tableApi.appendRows(lines, {
+    follow: frozen ? false : "auto",   // at the end → stay at the end
+    maxRows: 1_000_000                 // ring buffer
+  });
+}
+function scrollToEnd() {
+  frozen = false;
+  tableApi.repaintHard({ py: Number.MAX_SAFE_INTEGER });
+}`,
+    showcase: { name: "logtail", title: "Live log" },
+    training: { slug: "live-data", hash: "append", label: "Chapter 32 · Live data" },
+    api: ["TableApi.appendRows", "TableApi.rowsAppended", "AppendRowsOptionsIf", "AppendRowsResultIf"],
+    agGrid: "community",
+    agGridNote: "transactions (applyTransactionAsync) are in Community"
   }
 ];
 

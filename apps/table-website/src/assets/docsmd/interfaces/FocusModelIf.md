@@ -23,6 +23,7 @@ override onFocusChanged(model: FocusModelIf): void {
 ### Methods
 
 - [addEventFocusChangedListener](FocusModelIf.md#addeventfocuschangedlistener)
+- [adjustForRowChanges](FocusModelIf.md#adjustforrowchanges)
 - [clear](FocusModelIf.md#clear)
 - [clearChanged](FocusModelIf.md#clearchanged)
 - [getEventFocusChangedListeners](FocusModelIf.md#geteventfocuschangedlisteners)
@@ -52,7 +53,37 @@ Get notified when the focus moves.
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L20)
+[src/lib/table/focus/focus-model.if.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L21)
+
+___
+
+### adjustForRowChanges
+
+▸ **adjustForRowChanges**(`shift`): `void`
+
+Optional (live data, since 1.1.108): the focused row moves along when rows were removed at the start or
+inserted (`tableApi.appendRows()`). Same row: no event. Focused row removed: the next remaining row gets the
+focus (with an event).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `shift` | [`RowIndexShift`](../classes/RowIndexShift.md) | how the display indices move |
+
+#### Returns
+
+`void`
+
+**`Example`**
+
+```ts
+focusModel.adjustForRowChanges?.(new RowIndexShift([0], []));
+```
+
+#### Defined in
+
+[src/lib/table/focus/focus-model.if.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L52)
 
 ___
 
@@ -68,7 +99,7 @@ No cell has the focus afterwards.
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L25)
+[src/lib/table/focus/focus-model.if.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L26)
 
 ___
 
@@ -84,7 +115,7 @@ Resets [hasChanged](FocusModelIf.md#haschanged).
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L40)
+[src/lib/table/focus/focus-model.if.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L41)
 
 ___
 
@@ -100,7 +131,7 @@ The registered listeners.
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L18)
+[src/lib/table/focus/focus-model.if.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L19)
 
 ___
 
@@ -116,7 +147,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:34](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L34)
+[src/lib/table/focus/focus-model.if.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L35)
 
 ___
 
@@ -132,7 +163,7 @@ Did the focus change since [clearChanged](FocusModelIf.md#clearchanged)?
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L37)
+[src/lib/table/focus/focus-model.if.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L38)
 
 ___
 
@@ -155,7 +186,7 @@ Has this cell the focus?
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L31)
+[src/lib/table/focus/focus-model.if.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L32)
 
 ___
 
@@ -177,7 +208,7 @@ Stop notifications.
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:22](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L22)
+[src/lib/table/focus/focus-model.if.ts:23](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L23)
 
 ___
 
@@ -200,4 +231,4 @@ Moves the focus to a body cell.
 
 #### Defined in
 
-[src/lib/table/focus/focus-model.if.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L28)
+[src/lib/table/focus/focus-model.if.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-model.if.ts#L29)

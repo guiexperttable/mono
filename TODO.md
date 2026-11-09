@@ -662,6 +662,24 @@ Verhalten steht als `// NOTE:` in den Specs.
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
 
+## Live-Daten (Prompt 019, 09.11.2026)
+
+- [x] `appendRows`/`rowsAppended`, Showcase `logtail`, Demo `log-tail.html`, Training `live-data#append`, Video-Skript
+      `videos/15-live-log/` (Design-Dokument `prompts/019-live-append.design.md`).
+- [ ] Tastatur-Event für die App (`onKeyDown`, Entscheidungsfrage 7): bewusst **nicht** gebaut – App-Muster (`keydown`
+      am Host + Fokus lesen). Bei Bedarf eigener Prompt (alle Wrapper).
+- [ ] Ringpuffer bei sortierter Ansicht: Entfernen sucht per `Set` über alle angezeigten Zeilen (O(n), aber nur bei jedem
+      Block ≥ 1 %); das Einsortieren verschiebt per `copyWithin` (in Node bei 10 Mio. Zeilen ~200 ms, in Chromium bei
+      2 Mio. ~4 ms – Engine-abhängig).
+- [ ] Zeilennummern `original` bauen ihren Index-Cache bei jeder neuen Zeilenzahl neu (O(n)); mit Zeilennummern zeichnet
+      `appendRows` immer neu (Breite der Nummernspalte).
+- [ ] Angehakte Zeilen (Checkbox-Modell, Zeilenobjekte), die der Ringpuffer entfernt, bleiben im Checkbox-Modell.
+- [ ] Undo-Verlauf: Einträge zu Zeilen, die der Ringpuffer entfernt hat, schreiben beim Undo in das (nicht mehr
+      angezeigte) Zeilenobjekt – wie bei ausgefilterten Zeilen.
+- [ ] Fill-Handle-Ziehen während eines Updates: der gezogene Bereich (Indizes) wird nicht nachgeführt (die Ansicht bleibt
+      stehen, solange gezogen wird).
+- [ ] Demo-Repo / Angular-Demo: nach dem Release (npm-Pakete).
+
 ## Performance-Absicherung (Prompt 021, 09.11.2026)
 
 - [x] Drei Stufen eingerichtet: Invarianten (`perf-invariants.browser.spec.ts`, in `test:browser`), Verhältnisse
@@ -827,8 +845,9 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       `TableScope.createGeMouseEventForCell`. Tests mit **echter** Maus (`test-utils/real-mouse.ts`, Vitest-Commands mit
       Playwright `page.mouse`), `click-during-render.realmouse.browser.spec.ts`, ltr/rtl, auch WebKit
       (`pnpm --filter @guiexpert/table test:browser:webkit`).
-- [ ] **018 Teil B – kein Zellen-Neuaufbau bei reinem Zeilenzuwachs** außerhalb des sichtbaren Bereichs: übernimmt
-      Prompt 019 (Live-Append, Baustein 4).
+- [x] **018 Teil B – kein Zellen-Neuaufbau bei reinem Zeilenzuwachs** außerhalb des sichtbaren Bereichs: umgesetzt mit
+      Prompt 019 (`RenderScope.updateRowCountWithoutRender`, 1.1.108). Offen: Zellen nach Zeilenindex wiederverwenden
+      (Follow-Modus baut weiter alle sichtbaren Zellen neu; beim Ringpuffer verschieben sich die Indizes → Render).
 - [ ] Aus log-commander (Prompt 018, nicht umgesetzt): (1) Spalten-/Zeilenspannen – `ColAndRowspanModel.init()` ruft bei
       jeder neuen Zeilenzahl `getColspanAt`/`getRowspanAt` für **jede Zelle aller Zeilen**, sobald ein Modell Spannen ≥ 2
       meldet (`initIfRowCountChanged`, 10 Mio. × 7 = 70 Mio. Aufrufe je Update); `isInRange` je gezeichneter Zelle
@@ -839,7 +858,17 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
 
-- **1.1.108** (in Arbeit), nur Core (`@guiexpert/table`):
+- **1.1.108** (in Arbeit), Core (`@guiexpert/table`) + `@guiexpert/demo-table-models`:
+  - **Neu: Live-Daten anhängen** – `tableApi.appendRows(rows, { follow, maxRows })` und `tableApi.rowsAppended(count,
+    { follow, removedAtStart })`: in place, O(k), Filter/Sortierung nur für neue Zeilen, Auswahl/Fokus/Anker bleiben an
+    ihren Zeilen, Folgen/Einfrieren, Ringpuffer, ein Render je Update (keiner bei Zuwachs unterhalb der Ansicht). Neue
+    Exporte: `RowIndexShift`, `AppendFollowMode`, `AppendRowsOptionsIf`, `RowsAppendedOptionsIf`, `AppendRowsResultIf`,
+    `AppendRowsContextIf`, `AppendRowsModelResultIf`; optionale Member `AreaModelIf.appendRows`,
+    `SelectionModelIf/FocusModelIf.adjustForRowChanges`; `AreaModelObjectArray.appendRows/createSortComparator`,
+    `MouseHandler.isButtonDown`, `ColAndRowspanModel.updateForInsertedRows`. Demo-Modelle: `LogGenerator`,
+    `LogTailController`, `createLogTailModelAndOptions`, `LogLevelCellRenderer`, `LogLineIf`. Showcase `logtail`.
+  - Spannen (`ColAndRowspanModel`) werden beim Anhängen nur für die neuen Zeilen gesucht (vorher bei jeder neuen
+    Zeilenzahl über alle Zeilen × Spalten).
   - Ein Klick, während die Anwendung über die API rendert (`repaint()`, `repaintHard()`, `scrollToPixel()` zwischen
     `mousedown` und `mouseup`, z. B. Live-Tail), geht nicht mehr verloren: die Tabelle meldet `mouseClicked` (Fokus,
     Auswahl, Doppelklick) für die gedrückte Zelle selbst – genau einmal. Neu: `MouseHandler.clickMoveTolerance` (4 px),

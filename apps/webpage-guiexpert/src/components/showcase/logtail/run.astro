@@ -1,0 +1,146 @@
+---
+
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class="logtail-bar">
+  <label>Rate
+    <select class={id + '-rate'}>
+      <option value="50">50 lines/s</option>
+      <option value="500" selected>500 lines/s</option>
+      <option value="5000">5,000 lines/s</option>
+    </select>
+  </label>
+  <button type="button" class={id + '-freeze'} aria-pressed="false">Freeze scroll</button>
+  <button type="button" class={id + '-end'}>Scroll to end</button>
+  <button type="button" class={id + '-pause'} aria-pressed="false">Pause intake</button>
+  <span class:list={[id + '-stats', 'logtail-stats']}></span>
+  <strong class:list={[id + '-new', 'logtail-new']}></strong>
+</div>
+<div
+    style="height: calc(100vh - 290px); min-height: 260px"
+    class:list={[ id, 'logtail-demo' ]}></div>
+<ol class:list={[id + '-events', 'logtail-events']} aria-label="Last mouse and keyboard events"></ol>
+
+<script
+    is:inline
+    define:vars={{id}}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
+  import { createLogTailModelAndOptions, LogTailController } from "/scripts/demo-table-models/index.js";
+
+  const $ = suffix => document.querySelector('.' + id + suffix);
+  const ele = $('');
+  const events = $('-events');
+
+  // the last 5 mouse and keyboard events – text only, never innerHTML with data
+  const showEvent = text => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    events.prepend(li);
+    while (events.children.length > 5) events.lastElementChild.remove();
+  };
+
+  // a log viewer: 1 million lines at most (ring buffer), one appendRows per animation frame
+  const {tableModel, tableOptions} = createLogTailModelAndOptions();
+  const listener = new EventAdapter();
+  listener.onMouseClicked = evt => {
+    const line = tableApi.getBodyModel().getRowByIndex(evt.rowIndex);   // the row object, not the app's index
+    showEvent(`click ×${evt.clickCount} · ${evt.areaIdent} row ${evt.rowIndex}` + (line ? ` · #${line.id} ${line.text}` : ''));
+  };
+  const tableScope = new TableScope(ele, tableModel, new SimpleDomService(), tableOptions, listener);
+  tableScope.firstInit();
+  const tableApi = tableScope.getApi();
+
+  const live = new LogTailController(tableApi, {
+    rate: 500,
+    maxRows: 1_000_000,
+    onStats: s => {
+      $('-stats').textContent = `${s.totalLines.toLocaleString('en')} lines · ${s.linesPerSecond.toLocaleString('en')}/s · `
+        + `${s.fps} fps · ${s.msPerUpdate.toFixed(1)} ms per update` + (s.pending ? ` · ${s.pending.toLocaleString('en')} waiting` : '');
+      $('-new').textContent = s.newBelow ? `+${s.newBelow.toLocaleString('en')} new lines` : '';
+    }
+  });
+  live.start();
+
+  // keyboard: the app listens on the table and reads the active cell after the table handled the key
+  ele.addEventListener('keydown', evt => requestAnimationFrame(() => {
+    const [row] = tableScope.focusModel()?.getFocus() ?? [-1];
+    const line = tableApi.getBodyModel().getRowByIndex(row);
+    showEvent(`key ${evt.key}${evt.shiftKey ? ' +Shift' : ''} → row ${row}` + (line ? ` · #${line.id}` : ''));
+  }));
+
+  const freeze = $('-freeze');
+  freeze.addEventListener('click', () => {
+    live.setFreezeScroll(!live.isFrozen());
+    freeze.setAttribute('aria-pressed', String(live.isFrozen()));
+  });
+  $('-end').addEventListener('click', () => {
+    live.scrollToEnd();
+    freeze.setAttribute('aria-pressed', 'false');
+  });
+  const pause = $('-pause');
+  pause.addEventListener('click', () => {
+    live.setIntakePaused(!live.isIntakePaused());
+    pause.setAttribute('aria-pressed', String(live.isIntakePaused()));
+  });
+  $('-rate').addEventListener('change', e => live.setRate(Number(e.target.value)));
+</script>
+
+<style>
+    div {
+        font-size: 14px;
+    }
+    .logtail-demo {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 13px;
+    }
+    .logtail-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        flex-wrap: wrap;
+    }
+    .logtail-bar button, .logtail-bar select {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+    }
+    .logtail-bar button[aria-pressed="true"] {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+    }
+    .logtail-stats {
+        font-variant-numeric: tabular-nums;
+        opacity: 0.8;
+    }
+    .logtail-new {
+        color: #b45309;
+    }
+    .logtail-events {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 13px;
+        margin: 8px 0 0;
+        padding-inline-start: 18px;
+        min-height: 6.5em;
+    }
+</style>
+
+<style is:global>
+    .ge-log-level { padding: 0 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+    .ge-log-level-error { background: #fee2e2; color: #991b1b; }
+    .ge-log-level-warn { background: #fef3c7; color: #92400e; }
+    .ge-log-level-info { color: #1d4ed8; }
+    .ge-log-level-debug { color: #6b7280; }
+    html[data-theme="dark"] .ge-log-level-error { background: #7f1d1d; color: #fee2e2; }
+    html[data-theme="dark"] .ge-log-level-warn { background: #78350f; color: #fef3c7; }
+    html[data-theme="dark"] .ge-log-level-info { color: #93c5fd; }
+    html[data-theme="dark"] .ge-log-level-debug { color: #9ca3af; }
+    .ge-log-time, .ge-log-id { opacity: 0.7; }
+</style>

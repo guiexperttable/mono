@@ -127,3 +127,30 @@ describe('live append – review findings', () => {
     expect(clicked).toEqual([]);
   });
 });
+
+describe('live append – a drag frame still pending after mouseup', () => {
+  // Found on the macOS CI runner (log-tail "real clicks", rtl): a mousemove while the button is held queues a drag
+  // frame. If the button goes up and an update removes rows at the start BEFORE that frame runs, the frame used the
+  // start row of the drag unshifted (it was only shifted while the button was down) – range selection put the focus
+  // one update (~100 lines) away from the clicked line.
+  it('the focus stays at the clicked line when rows leave the ring buffer between mouseup and the next frame', async () => {
+    const sm = new SelectionModel('range', 'multi');
+    const t = await mount(lines(200), { getSelectionModel: () => sm });
+    const cell = getCellDiv(t.host, 'body', 'center', 5, 1);
+    const r = cell.getBoundingClientRect();
+    const init = { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, bubbles: true, cancelable: true, button: 0 };
+    cell.dispatchEvent(new MouseEvent('mousedown', init));
+    cell.dispatchEvent(new MouseEvent('mousemove', init));  // e.g. the fake mousemove Chrome sends after a re-layout
+    cell.dispatchEvent(new MouseEvent('mouseup', init));
+    cell.dispatchEvent(new MouseEvent('click', { ...init, detail: 1 }));
+    expect(t.lineAt(t.scope.focusModel()!.getFocus()[0]).id).toBe(5);
+    t.api.appendRows(lines(3, 1000), { maxRows: 200, follow: false }); // rows 0 … 2 leave, before the drag frame
+    // Chrome sends a mousemove after a re-render: the queued drag frame reads it (a live cell, current index). The
+    // click's own delayed repaint would replace that cell first – at 6,000 lines/s an update renders instead.
+    t.scope.cancelPendingRepaint();
+    document.elementFromPoint(init.clientX, init.clientY)!.dispatchEvent(new MouseEvent('mousemove', init));
+    await nextFrame();
+    await nextFrame();
+    expect(t.lineAt(t.scope.focusModel()!.getFocus()[0]).id).toBe(5);
+  });
+});

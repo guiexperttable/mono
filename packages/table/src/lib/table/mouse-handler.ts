@@ -427,7 +427,9 @@ export class MouseHandler {
    */
   adjustForRowChanges(shift: RowIndexShift): void {
     const start = this.startMouseEvent;
-    if (this.mouseDown && start && start.areaIdent === 'body' && start.rowIndex >= 0) {
+    // also after mouseup while the end of the drag is pending: a drag frame queued before the mouseup still runs and
+    // reads the start row (range selection sets the focus to it) – unshifted it pointed one update away
+    if ((this.mouseDown || this.pendingDraggingEnd) && start && start.areaIdent === 'body' && start.rowIndex >= 0) {
       start.rowIndex = Math.max(0, shift.mapIndexOrNext(start.rowIndex));
     }
   }

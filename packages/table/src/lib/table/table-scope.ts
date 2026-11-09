@@ -203,7 +203,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   private columnDrag?: ColumnDragState;
 
   private dragFrom = -1;
-  private dragTo = -1;
   private lastDragFrom = -1;
   private lastDragTo = -1;
   private firstDraggingRendering = true;
@@ -2386,7 +2385,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.mouseStartWidth = -1;
     this.mouseStartColumnIndex = -1;
     this.dragFrom = -1;
-    this.dragTo = -1;
     this.firstDraggingRendering = true;
   }
 
@@ -2558,7 +2556,6 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     }
     // the drop zone marks where the dragged column is now
     this.draggingTargetColumnIndex = this.dragFrom;
-    this.dragTo = this.dragFrom;
   }
 
   /**

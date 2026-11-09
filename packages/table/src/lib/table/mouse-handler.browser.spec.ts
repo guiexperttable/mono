@@ -16,6 +16,7 @@ import {
   renderedRows,
   stylePx,
 } from '../../../test-utils/mount-table';
+import { realMouse } from '../../../test-utils/real-mouse';
 
 afterEach(() => {
   destroyAllTables();
@@ -389,14 +390,24 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
       ColumnDef.create({ property: 'value', width: px100 }),
     ];
     const { host, model } = await mountMouseTable({ columnDefs });
+    // Real mouse at fixed coordinates, not userEvent.dragAndDrop: that one resolves source and target again by a CSS
+    // path while the drag repaints the header – on the macOS CI runner the second drag once ended on the wrong cell
+    // (width stayed 100). The handle does not move here: the first drag keeps the width.
+    const r = resizeHandle(host, 0)!.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const drag = async (dx: number) => {
+      await realMouse.move(x, y);
+      await realMouse.down();
+      await realMouse.move(x + dx, y, 4);
+      await realMouse.up();
+    };
     // a little to the right: wider is not allowed, but the column must not snap to 80 px either
-    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 1), { targetPosition: { x: 20, y: 10 } });
+    await drag(20);
     await nextFrame();
     expect(model.getColumnWidth(0)).toBe(100);
-    // to the left: narrower works
-    await userEvent.dragAndDrop(resizeHandle(host, 0)!, getCellDiv(host, 'header', 'center', 0, 0), { targetPosition: { x: 30, y: 10 } });
-    await nextFrame();
-    expect(model.getColumnWidth(0)).toBeLessThan(80);
+    // to the left: narrower works (the end of a drag is handled in the next frame)
+    await drag(-40);
+    await vi.waitFor(() => expect(model.getColumnWidth(0)).toBeLessThan(80));
   });
 
   it('autoResizeColumns() respects minWidth and maxWidth', async () => {

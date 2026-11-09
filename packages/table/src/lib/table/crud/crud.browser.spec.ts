@@ -45,7 +45,8 @@ describe('CrudObjectView', () => {
   it('the Close button closes and removes the dialog', async () => {
     new CrudObjectView(customer()).openDialog();
     await userEvent.click(viewDialog()!.querySelector('.ge-table-dialog-footer-close-button')!);
-    expect(viewDialog()).toBeNull();
+    // <dialog> fires "close" as a queued task after close() and is removed there – not synchronously (flaky on macOS CI)
+    await vi.waitFor(() => expect(viewDialog()).toBeNull());
   });
 
   // Regression: only the Close button removed the element – after Escape the closed <dialog> stayed in the document.
@@ -54,7 +55,7 @@ describe('CrudObjectView', () => {
     const dialog = viewDialog()!;
     await userEvent.keyboard('{Escape}');
     expect(dialog.open).toBe(false);
-    expect(dialog.isConnected).toBe(false);
+    await vi.waitFor(() => expect(dialog.isConnected).toBe(false));
   });
 
   // Regression: crud-object-view.ts wrote labels and values unescaped into innerHTML – a value like "<img onerror=…>"
@@ -104,7 +105,7 @@ describe('CrudObjectEdit', () => {
     expect(saved).toEqual({ ...customer(), name: 'Grace' });
     expect(saved).not.toBe(original);
     expect(original.name).toBe('Ada');
-    expect(editDialog()).toBeNull();
+    await vi.waitFor(() => expect(editDialog()).toBeNull());
   });
 
   it('Cancel removes the dialog without calling onSave', async () => {
@@ -113,7 +114,7 @@ describe('CrudObjectEdit', () => {
     await userEvent.fill(field(editDialog()!, 'name'), 'Grace');
     await userEvent.click(editDialog()!.querySelector('.ge-table-dialog-footer-cancel-button')!);
     expect(onSave).not.toHaveBeenCalled();
-    expect(editDialog()).toBeNull();
+    await vi.waitFor(() => expect(editDialog()).toBeNull());
   });
 
   it('Escape removes the dialog without calling onSave', async () => {
@@ -121,7 +122,7 @@ describe('CrudObjectEdit', () => {
     new CrudObjectEdit<Customer>('id', customer()).openDialog(onSave);
     const dialog = editDialog()!;
     await userEvent.keyboard('{Escape}');
-    expect(dialog.isConnected).toBe(false);
+    await vi.waitFor(() => expect(dialog.isConnected).toBe(false));
     expect(onSave).not.toHaveBeenCalled();
   });
 

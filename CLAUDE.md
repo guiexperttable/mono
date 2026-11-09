@@ -244,7 +244,11 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   nicht bei Klicks in Formularelemente (input, select, button …) einer Zelle. **Klick trotz Render** (seit 1.1.108,
   Prompt 018): rendert die App zwischen `mousedown` und `mouseup` (Live-Tail), ist die gedrückte Zelle ersetzt und der
   Browser schickt kein `click` – der `MouseHandler` merkt sich beim `mousedown` die Zelle (+ Zeilenobjekt) und meldet
-  Klick/Doppelklick danach selbst (`setTimeout 0`, nur ohne natives `click`, Bewegung ≤ `clickMoveTolerance`). Strg+A, Strg+C kopiert
+  Klick/Doppelklick danach selbst (`setTimeout 0`, nur ohne natives `click`, Bewegung ≤ `clickMoveTolerance`).
+  Seit 1.1.112: ein `mousemove` ohne Bewegung (Chromium nach einem Render unter dem Zeiger) startet keinen Zug, und
+  `getMouseEventTarget` löst ein inzwischen ersetztes Ziel (Drag-/End-Frame nach einem Render) über `elementsFromPoint`
+  neu auf – vorher las der Frame den Zeilenindex des alten Elements (Bereichsauswahl zur falschen Zeile, Klick
+  verschluckt; Test `live-append/live-append-drag.realmouse.browser.spec.ts`). Strg+A, Strg+C kopiert
   den sichtbaren Body, gedeckelt durch `CopyService.maxCopyCells`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.

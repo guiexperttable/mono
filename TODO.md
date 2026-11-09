@@ -698,6 +698,12 @@ Verhalten steht als `// NOTE:` in den Specs.
 
 ## Live-Daten (Prompt 019, 09.11.2026)
 
+- [x] **Gefunden (Publish-Lauf v1.1.111, macOS, 09.11.2026)**: `log-tail.browser.spec.ts` „real clicks while 6,000
+      lines/s“ – Fokus eine Update-Länge (~100 Zeilen) neben der geklickten Zeile, nicht reproduzierbar (lokal > 30 Läufe,
+      auch CPU-gedrosselt; derselbe Commit im CI grün). Dabei zwei echte Schwächen behoben (1.1.112): ein `mousemove`
+      ohne Bewegung (Chromium nach einem Render unter dem gedrückten Zeiger) startete einen Zug, und ein Drag-/End-Frame
+      las den Zeilenindex des ersetzten Elements. Tritt der Test wieder auf: Fokus- und Auswahl-Ereignisse mitloggen.
+
 - [x] `appendRows`/`rowsAppended`, Showcase `logtail`, Demo `log-tail.html`, Training `live-data#append`, Video-Skript
       `videos/15-live-log/` (Design-Dokument `prompts/019-live-append.design.md`).
 - [ ] Tastatur-Event für die App (`onKeyDown`, Entscheidungsfrage 7): bewusst **nicht** gebaut – App-Muster (`keydown`
@@ -903,6 +909,13 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.112**, Core:
+  - Live-Daten: ein Druck, unter dem die App rendert, wird nicht mehr zum Zug, nur weil der Browser danach ein
+    `mousemove` an derselben Stelle schickt (vorher: `onMouseDragging`/`onMouseDraggingEnd` für einen Klick, mit
+    Bereichsauswahl evtl. eine Auswahl zur falschen Zeile und ein verschluckter Klick).
+  - Ein Zug, dessen Element ein Render ersetzt hat, nimmt die Zelle unter dem Zeiger statt des alten Zeilenindex.
+  - 1.1.111 (nur `dragTo` entfernt) wurde nicht veröffentlicht: der macOS-Browserjob im Publish-Lauf war rot.
 
 - **1.1.110**, Core + alle Wrapper (Prompt 022):
   - **Neu: Spalten-Ereignisse** `onColumnResizeStart/End` (`GeColumnResizeEvent`), `onColumnMoveStart/End`

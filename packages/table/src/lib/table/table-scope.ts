@@ -2315,11 +2315,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * horizontal scroll bar must stay usable), so a mouse event on a footer cell arrives at the viewport: then the footer
    * element below the mouse pointer is returned (not on the scroll bar itself).
    *
+   * A target that a render replaced meanwhile (an event handled in a later animation frame – a drag frame, the end of a
+   * drag – while live data renders) is resolved again at the pointer position: its `data-row-index` would be the index
+   * of an earlier render (since 1.1.112).
+   *
    * @param {MouseEvent} evt - a mouse event on the host element
    * @returns {EventTarget | null} the target element
    */
   getMouseEventTarget(evt: MouseEvent): EventTarget | null {
-    const target = evt.target;
+    let target = evt.target;
+    if (target instanceof Element && !target.isConnected && Number.isFinite(evt.clientX) && Number.isFinite(evt.clientY)) {
+      target = this.getCellElementAtPoint(evt.clientX, evt.clientY) ?? target;
+    }
     if ((target === this.scrollViewport || target === this.contentWrapperDiv || target === this.contentDiv)
       && this.tableModel.getPadding().bottom > 0) {
       const viewportRect = this.scrollViewport.getBoundingClientRect();
@@ -2338,6 +2345,13 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       }
     }
     return target;
+  }
+
+  /** The cell element (or an element in it) of this table at a client position, `undefined` if there is none. */
+  private getCellElementAtPoint(clientX: number, clientY: number): Element | undefined {
+    const root = this.hostElement.getRootNode() as Document | ShadowRoot;
+    return root.elementsFromPoint?.(clientX, clientY)
+      .find(e => this.hostElement.contains(e) && !!e.closest('[data-col-index]'));
   }
 
   /**

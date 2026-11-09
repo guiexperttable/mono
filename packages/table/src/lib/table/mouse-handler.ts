@@ -450,6 +450,14 @@ export class MouseHandler {
     if (!this.mouseDown && this.isBlocked(evt)) {
       return; // no hover under a loading overlay; a running drag (started in the header) keeps following the mouse
     }
+    if (this.mouseDown && !this.dragging) {
+      const down = this.startMouseEvent?.originalEvent;
+      if (down && down.clientX === evt.clientX && down.clientY === evt.clientY) {
+        // no movement: the browser sends a mousemove when a render replaced the element under the pointer (live data)
+        // – that is no drag (it started a range selection to another line and swallowed the click; since 1.1.112)
+        return;
+      }
+    }
     this.mouseEvent = evt;
     if (this.mouseDown) {
       if (!this.dragging) {

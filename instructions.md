@@ -1324,6 +1324,13 @@ listener.onSelectionChanged = () => {
 | `batchEditChanged` | `GeBatchEditEvent` | since 1.1.96, pending changes of a batch edit, see 6.17 (core: `onBatchEditChanged`) |
 | `detailExpandedChanged` | `GeDetailEvent` | since 1.1.97, a detail row was expanded or collapsed, see 6.18 (core: `onDetailExpandedChanged`) |
 
+**Clicks while the app renders (since 1.1.108).** The browser sends `click` only if `mousedown` and `mouseup` hit the
+same element. A render between the two (`repaint()`, `repaintHard()`, `scrollToPixel()` from a live update) replaces
+the pressed cell – before 1.1.108 `mouseClicked` (and the focus change, the double click) was lost. Now the table
+reports the click itself for the **pressed** cell, if the mouse moved at most `MouseHandler.clickMoveTolerance` (4 px)
+– also when the rows slid under the pointer (follow mode): the event carries the current index of the pressed row
+object (rows added or removed in front are followed; a removed row gives no click). Exactly one event, native or not.
+
 ### 6.6 Tree table and checkboxes
 
 ```ts
@@ -2434,6 +2441,11 @@ the focus frame is 1 px taller than its cell. If the rows fill the body exactly,
 `repaintHard({ py: Number.MAX_SAFE_INTEGER })`. Keep the first visible row at the top:
 `repaintHard({ py: tableApi.getFirstVisibleRowIndex() * rowHeight })`. Exact also with millions of rows
 (capped scroll height above 8,000,000 px). → 6.9
+
+**Clicks get lost while my live table updates – why?** Fixed in 1.1.108. A render between `mousedown` and
+`mouseup` replaced the pressed cell, and the browser sends no `click` then (Chromium, WebKit, Firefox alike). The table
+now reports the click for the pressed cell itself (once, with the current row index of that row object). On older
+versions render less often (only when the visible part changed). → 6.5
 
 **`repaint()` or `repaintHard()`?** `repaint()` when values changed and the row count stayed (or use
 `updateCells()` for single cells); `repaintHard()` when rows were added or removed, heights changed or you changed

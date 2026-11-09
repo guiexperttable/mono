@@ -89,6 +89,7 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - Hide the scroll bars: CSS `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – the table uses the full width/height, wheel, touch, keyboard and the API still scroll. No table option needed (`overflowY` is only "auto" | "scroll"). Thin/colored: `scrollbar-width: thin; scrollbar-color: …`.
 - Scroll bar although all rows fit (own AreaModel): fixed in 1.1.107 – the scroll height comes from the model's `getConstantRowHeight()` / `getRowHeight()`. Older versions: set `defaultRowHeights.body` to the model's row height.
 - Rows appended continuously (live log, ticker) and keep the position or follow the end: `tableApi.repaintHard({ py })` – one render pass (since 1.1.107); follow the end with `py: Number.MAX_SAFE_INTEGER`.
+- Clicks lost while the app renders (live tail, `repaint()`/`repaintHard()` between mousedown and mouseup): fixed in 1.1.108 – the table reports `mouseClicked` (and the double click) for the pressed cell itself, once, with the current index of that row object.
 - `repaint()` = values changed, same row count; `repaintHard()` = row count or heights changed; `updateCells()` = single cells.
 - Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.

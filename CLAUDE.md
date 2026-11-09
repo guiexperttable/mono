@@ -230,7 +230,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
   Bereich. „Letzte Operation je Zelle gewinnt“ (negative Ranges). Ein Klick zeichnet verzögert neu (`debounceRepaint`),
-  nicht bei Klicks in Formularelemente (input, select, button …) einer Zelle. Strg+A, Strg+C kopiert
+  nicht bei Klicks in Formularelemente (input, select, button …) einer Zelle. **Klick trotz Render** (seit 1.1.108,
+  Prompt 018): rendert die App zwischen `mousedown` und `mouseup` (Live-Tail), ist die gedrückte Zelle ersetzt und der
+  Browser schickt kein `click` – der `MouseHandler` merkt sich beim `mousedown` die Zelle (+ Zeilenobjekt) und meldet
+  Klick/Doppelklick danach selbst (`setTimeout 0`, nur ohne natives `click`, Bewegung ≤ `clickMoveTolerance`). Strg+A, Strg+C kopiert
   den sichtbaren Body, gedeckelt durch `CopyService.maxCopyCells`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
@@ -692,6 +695,7 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   | `test` | Unit + Browser |
   | `test:unit` / `test:watch` | nur Node, ~3 s (~2.170 Tests) |
   | `test:browser` | echtes Chromium, ~930 Tests in 30 Dateien (einmalig: `pnpm --filter @guiexpert/table exec playwright install chromium`; im Container `CHROMIUM_PATH=/opt/pw-browsers/chromium`) – plus Projekt `browser-scrollbars` (`*.scrollbars.browser.spec.ts`) |
+  | `test:browser:webkit` | die Specs mit echter Maus (`*.realmouse.browser.spec.ts`) zusätzlich in WebKit (einmalig `playwright install webkit`) |
   | `test:browser:scrollbars` | **alle** Browser-Specs mit klassischen Scrollbalken (Headless-Chromium versteckt sie sonst: 0 px). Neue Layout-Specs so schreiben, dass sie in beiden Modi grün sind |
   | `test:coverage` | v8-Coverage → `packages/table/coverage/` (git-ignored) |
   | `test:types` | `tsc` über Specs + `test-utils` (Vitest prüft keine Typen!) |
@@ -717,6 +721,10 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `table-api`, `crud/crud`, `keyboard`, `selection`, `scroll-to-index`, `column-visibility`, `state/table-state`,
     `row-numbers`, `aggregation`, `rowgroup/row-group`, `row-drag/row-drag`, `fill/fill-batch`, `master-detail/master-detail`,
     `rtl/rtl` …).
+  - **Echte Mauseingaben** (seit 1.1.108): `test-utils/real-mouse.ts` (`realMouse.moveTo/down/up/click`) über
+    Vitest-Browser-Commands (`test-utils/browser-commands.ts`, Playwright `page.mouse`, Koordinaten ins Test-iframe
+    umgerechnet) – nötig, wo der Browser selbst entscheidet (kein `click`, wenn `mousedown`/`mouseup` verschiedene
+    Elemente treffen). Dateien `*.realmouse.browser.spec.ts` laufen mit `test:browser:webkit` auch in WebKit.
   - Browser-Specs: Zeit nicht über feste `setTimeout`s, sondern `nextFrame()`/`vi.waitFor`; Doppelklick-Erkennung über
     `mouseHandler.doubleClickDelay`; nicht auf Pixel-genaue Textbreiten prüfen (Mac vs. Linux-CI). Helfer in
     `test-utils/mount-table.ts`: `mountTable`, `nextFrame`, `renderedRows`, `areaRows`, `cellDiv`/`getCellDiv`,

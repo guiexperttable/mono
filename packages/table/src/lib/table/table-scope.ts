@@ -4,6 +4,7 @@ import { GeOverlayKind } from "./overlay/ge-overlay-kind.type";
 
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaIdent } from './data/tablemodel/area-ident.type';
+import { SideIdent } from './data/side-ident.type';
 import { GeMouseEvent } from './data/common/event/ge-mouse-event';
 import { DomServiceIf } from './service/dom-service.if';
 import { ConvenienceDomService } from './service/convenience-dom.service';
@@ -2228,23 +2229,46 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @return {GeMouseEvent} - The created GeMouseEvent object.
    */
   createGeMouseEvent(mouseEvent: MouseEvent): GeMouseEvent {
+    if (!mouseEvent) {
+      return new GeMouseEvent();
+    }
+    const target = this.getMouseEventTarget(mouseEvent) as HTMLElement;
+    const [areaIdent, sideIdent] = this.getAreaAndSideIdentByAttr(target);
+    return this.createGeMouseEventForCell(mouseEvent, {
+      areaIdent,
+      sideIdent,
+      rowIndex: this.getNumberByAttr(target, 'data-row-index'),
+      columnIndex: this.getNumberByAttr(target, 'data-col-index'),
+      action: this.getStringByAttr(target, 'data-ge-action'),
+    });
+  }
+
+  /**
+   * Creates a GeMouseEvent for a given cell – used when the cell element of a mouse event is gone (a render replaced
+   * it between mousedown and mouseup, see {@link MouseHandler}) and the cell is known from the mousedown.
+   *
+   * @param mouseEvent - the original browser event
+   * @param cell - area, side, row and column of the cell, and the action of the pressed element
+   * @returns the event with row/column positions of the cell
+   * @since 1.1.108
+   */
+  createGeMouseEventForCell(
+    mouseEvent: MouseEvent,
+    cell: { areaIdent?: AreaIdent; sideIdent?: SideIdent; rowIndex: number; columnIndex: number; action: string | null }
+  ): GeMouseEvent {
     const ret: GeMouseEvent = new GeMouseEvent();
     ret.originalEvent = mouseEvent;
-
-    if (mouseEvent) {
-      const target = this.getMouseEventTarget(mouseEvent) as HTMLElement;
-      [ret.areaIdent, ret.sideIdent] = this.getAreaAndSideIdentByAttr(target);
-      ret.rowIndex = this.getNumberByAttr(target, 'data-row-index');
-      ret.columnIndex = this.getNumberByAttr(target, 'data-col-index');
-      ret.action = this.getStringByAttr(target, 'data-ge-action');
-
-      if (ret.areaIdent) {
-        const am = this.tableModel.getAreaModel(ret.areaIdent);
-        // body: with the heights of open detail rows above (master/detail)
-        ret.rowTop = ret.areaIdent === 'body' ? this.getBodyRowTop(ret.rowIndex) : am.getYPosByRowIndex(ret.rowIndex);
-      }
-      ret.columnLeft = this.tableModel.getXPosByColumnIndex(ret.columnIndex);
+    ret.areaIdent = cell.areaIdent;
+    ret.sideIdent = cell.sideIdent;
+    ret.rowIndex = cell.rowIndex;
+    ret.columnIndex = cell.columnIndex;
+    ret.action = cell.action;
+    if (ret.areaIdent) {
+      const am = this.tableModel.getAreaModel(ret.areaIdent);
+      // body: with the heights of open detail rows above (master/detail)
+      ret.rowTop = ret.areaIdent === 'body' ? this.getBodyRowTop(ret.rowIndex) : am.getYPosByRowIndex(ret.rowIndex);
     }
+    ret.columnLeft = this.tableModel.getXPosByColumnIndex(ret.columnIndex);
     return ret;
   }
 

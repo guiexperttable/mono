@@ -800,8 +800,34 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       Rendern); `AreaModelCellGroups.getYPosByRowIndex` war ein Stub (0). Tests: zwei `it.fails` → `it`,
       `scroll-height.browser.spec.ts`.
 - [ ] Optional: „nur geänderte Zeilen neu aufbauen“ statt `innerText = ''` je Render (eigener Prompt, falls gewünscht).
+- [x] **Klick geht verloren, wenn die App zwischen `mousedown` und `mouseup` rendert** (Prompt 018, 09.11.2026): der
+      Browser schickt `click` nur, wenn beide dasselbe Element treffen; ein `repaint()`/`repaintHard()`/`scrollToPixel()`
+      der App ersetzt die gedrückte Zelle (Chromium und WebKit gleich). → 1.1.108: `MouseHandler` merkt sich beim
+      `mousedown` (linke Taste) die Zelle (Area, Seite, Zeile, Spalte, Aktion, Zeilenobjekt); ist das gedrückte Element
+      beim `mouseup` nicht mehr im DOM und die Maus ≤ `clickMoveTolerance` (4 px) bewegt, meldet er den Klick nach dem
+      Task selbst (`setTimeout 0`, nur wenn kein natives `click` kam) – für die **gedrückte** Zeile (Index des
+      Zeilenobjekts, auch wenn Zeilen davor dazukamen/wegfielen; entfernt = kein Klick; Modelle mit wechselnden
+      Zeilenobjekten → alter Index), dazu der Doppelklick (`dblclick`: Editor, Sortieren). Neu
+      `TableScope.createGeMouseEventForCell`. Tests mit **echter** Maus (`test-utils/real-mouse.ts`, Vitest-Commands mit
+      Playwright `page.mouse`), `click-during-render.realmouse.browser.spec.ts`, ltr/rtl, auch WebKit
+      (`pnpm --filter @guiexpert/table test:browser:webkit`).
+- [ ] **018 Teil B – kein Zellen-Neuaufbau bei reinem Zeilenzuwachs** außerhalb des sichtbaren Bereichs: übernimmt
+      Prompt 019 (Live-Append, Baustein 4).
+- [ ] Aus log-commander (Prompt 018, nicht umgesetzt): (1) Spalten-/Zeilenspannen – `ColAndRowspanModel.init()` ruft bei
+      jeder neuen Zeilenzahl `getColspanAt`/`getRowspanAt` für **jede Zelle aller Zeilen**, sobald ein Modell Spannen ≥ 2
+      meldet (`initIfRowCountChanged`, 10 Mio. × 7 = 70 Mio. Aufrufe je Update); `isInRange` je gezeichneter Zelle
+      linear über alle Spannen; (2) `adjustArea` zeichnet am Ende **alle** Spannen der Area (`drawBigCell` ohne
+      Sichtbarkeitsprüfung) – vor einer Änderung mit einem Test klären, was log-commander beobachtet hat; (3) feste
+      linke Spalte (Zeilennummern) lässt sich nicht gegen Verschieben sperren; (4) Spaltenbreite nur per Maus änderbar;
+      (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.108** (in Arbeit), nur Core (`@guiexpert/table`):
+  - Ein Klick, während die Anwendung über die API rendert (`repaint()`, `repaintHard()`, `scrollToPixel()` zwischen
+    `mousedown` und `mouseup`, z. B. Live-Tail), geht nicht mehr verloren: die Tabelle meldet `mouseClicked` (Fokus,
+    Auswahl, Doppelklick) für die gedrückte Zelle selbst – genau einmal. Neu: `MouseHandler.clickMoveTolerance` (4 px),
+    `TableScope.createGeMouseEventForCell()`.
 
 - **1.1.107 – Bugfix-Release mit kleiner API-Ergänzung**, nur Core (`@guiexpert/table`), neuer Typ `ScrollPositionIf`
   (keine neuen Laufzeit-Exporte):

@@ -5,6 +5,36 @@ import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { MouseTargetData } from "./data/event/mouse-target-data";
 import {TreeRowIf} from "./data/common/tree-row-if";
 import {isTreeRow} from "./instanceof-workaround";
+import { SideIdent } from "./data/side-ident.type";
+
+/**
+ * The cell pressed by the last mousedown (prompt 018): if a render replaces its element before the mouseup, the
+ * browser sends no "click" – the handler reports the click for this cell itself.
+ */
+interface PressedCell {
+  /** the pressed element (detached after a render) */
+  target: Element;
+  areaIdent: AreaIdent;
+  sideIdent?: SideIdent;
+  rowIdx: number;
+  colIdx: number;
+  action: string | null;
+  /** the row object at the time of the mousedown (body) – it is followed when rows are added or removed */
+  row: unknown;
+  /** true if the area model returns the same object for a row each time (only then the row is followed) */
+  stableRow: boolean;
+  clientX: number;
+  clientY: number;
+}
+
+/** A cell given explicitly instead of being read from the event target (the target was replaced by a render). */
+interface ClickCell {
+  areaIdent: AreaIdent;
+  sideIdent?: SideIdent;
+  rowIdx: number;
+  colIdx: number;
+  action: string | null;
+}
 
 /**
  * Class representing a MouseHandler.
@@ -24,12 +54,28 @@ export class MouseHandler {
    */
   doubleClickDelay = 500;
 
+  /**
+   * A render between mousedown and mouseup replaces the pressed cell, and the browser sends no "click" (both must hit
+   * the same element). The handler then reports the click itself for the pressed cell – if the mouse moved at most
+   * this many pixels (screen coordinates) between mousedown and mouseup. Since 1.1.108.
+   *
+   * @type {number}
+   */
+  clickMoveTolerance = 4;
+
   mouseEvent?: MouseEvent;
   startMouseEvent?: GeMouseEvent;
   geMouseEvent?: GeMouseEvent;
   geMouseEventOld?: GeMouseEvent;
 
   private lastClickedCellKey = '';
+  /** The cell of the last left-button mousedown (see {@link PressedCell}). */
+  private pressedCell?: PressedCell;
+  /** Counts native "click" / "dblclick" events: a report of a lost click is dropped if the browser sent one after all. */
+  private nativeClickCount = 0;
+  private nativeDblClickCount = 0;
+  /** Timer of a pending report of a lost click (cleared by destroy via the abort signal). */
+  private lostClickTimer?: ReturnType<typeof setTimeout>;
   /** The second click of a double click that was already reported (clickCount 2) – its "dblclick" is not. */
   private reportedDoubleClick?: { time: number; cellKey: string };
   private mouseDown = false;
@@ -51,6 +97,7 @@ export class MouseHandler {
     this.tableScope.hostElement.addEventListener("mousemove", this.onMouseMove.bind(this), { signal });
     this.tableScope.hostElement.addEventListener("mouseup", this.onMouseUp.bind(this), { signal });
     this.tableScope.hostElement.addEventListener("contextmenu", this.onContextmenu.bind(this), { signal });
+    signal.addEventListener("abort", () => clearTimeout(this.lostClickTimer));
 
     // @ts-ignore
     this.tableScope.hostElement['_MouseHandler'] = 'true';
@@ -94,12 +141,20 @@ export class MouseHandler {
    * @return {void}
    */
   private onHostElementClicked(event: MouseEvent) {
+    this.nativeClickCount++;
     if (this.isBlocked(event)) {
       return;
     }
+    this.handleClick(event, this.tableScope.getMouseEventTarget(event)); // a footer cell below the scroll viewport
+  }
+
+  /**
+   * Handles a click: on `eventTarget`, or – if `cell` is given – on that cell (a click the browser did not send
+   * because a render replaced the pressed element; `eventTarget` is then the detached pressed element).
+   */
+  private handleClick(event: MouseEvent, eventTarget: EventTarget | null, cell?: ClickCell) {
     const now = Date.now();
-    const eventTarget = this.tableScope.getMouseEventTarget(event); // a footer cell below the scroll viewport
-    const cellKey = this.getCellKey(eventTarget);
+    const cellKey = cell ? this.toCellKey(cell) : this.getCellKey(eventTarget);
     // The second click of a double click: the browser counts the clicks (event.detail, OS double-click speed).
     // Programmatic clicks (element.click(), detail 0): two clicks on the SAME cell within doubleClickDelay.
     const secondClick = event.detail >= 2
@@ -108,6 +163,10 @@ export class MouseHandler {
     this.lastClickedCellKey = cellKey;
 
     const mouseTargetData: MouseTargetData = new MouseTargetData(eventTarget, this.tableScope);
+    if (cell) {
+      this.applyCell(mouseTargetData, cell);
+    }
+    const geMouseEvent = cell ? this.createCellEvent(event, cell) : undefined;
     if (secondClick) {
       this.reportedDoubleClick = { time: now, cellKey };
     }
@@ -116,7 +175,7 @@ export class MouseHandler {
       // follows sorts / edits / toggles and is not reported again (a double click arrived three times before, and a
       // Ctrl+double click toggled the selection on/off/on).
       // A click on a checkbox, an arrow or a toggle icon always does its job: two quick clicks = two toggles.
-      this.publishGeMouseEvent(event, 2);
+      this.publishGeMouseEvent(event, 2, geMouseEvent, eventTarget);
       return;
     }
 
@@ -159,8 +218,32 @@ export class MouseHandler {
       this.tableScope.focusModel()?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }
 
-    this.publishGeMouseEvent(event, secondClick ? 2 : 1);
+    this.publishGeMouseEvent(event, secondClick ? 2 : 1, geMouseEvent, eventTarget);
   };
+
+  /** "area:row:column" of a cell given explicitly (same format as {@link getCellKey}). */
+  private toCellKey(cell: ClickCell): string {
+    return cell.areaIdent + ':' + cell.rowIdx + ':' + cell.colIdx;
+  }
+
+  /** Target data of a replaced element: area, row and column come from the pressed cell (current row index). */
+  private applyCell(mouseTargetData: MouseTargetData, cell: ClickCell) {
+    mouseTargetData.areaIdent = cell.areaIdent;
+    mouseTargetData.areaModel = this.tableScope.tableModel.getAreaModel(cell.areaIdent);
+    mouseTargetData.rowIdx = cell.rowIdx;
+    mouseTargetData.colIdx = cell.colIdx;
+    mouseTargetData.row = mouseTargetData.areaModel.getRowByIndex(cell.rowIdx);
+  }
+
+  private createCellEvent(event: MouseEvent, cell: ClickCell): GeMouseEvent {
+    return this.tableScope.createGeMouseEventForCell(event, {
+      areaIdent: cell.areaIdent,
+      sideIdent: cell.sideIdent,
+      rowIndex: cell.rowIdx,
+      columnIndex: cell.colIdx,
+      action: cell.action,
+    });
+  }
 
   /** "area:row:column" of the cell of an event target ('' outside of a cell). */
   private getCellKey(eventTarget: EventTarget | null): string {
@@ -188,21 +271,27 @@ export class MouseHandler {
    * @param {MouseEvent} event - The double click event.
    */
   private onHostElementDblClicked(event: MouseEvent) {
+    this.nativeDblClickCount++;
     if (this.isBlocked(event)) {
       return;
     }
-    this.lastClicked = Date.now();
-    const eventTarget = this.tableScope.getMouseEventTarget(event);
-    // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
-    const geMouseEvent = this.tableScope.createGeMouseEvent(event);
+    this.handleDblClick(event, this.tableScope.getMouseEventTarget(event));
+  }
 
-    if (eventTarget instanceof HTMLElement && !this.isClickAction(new MouseTargetData(eventTarget, this.tableScope))) {
+  /** Handles a double click on `eventTarget`, or on `cell` (see {@link handleClick}). */
+  private handleDblClick(event: MouseEvent, eventTarget: EventTarget | null, cell?: ClickCell) {
+    this.lastClicked = Date.now();
+    // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
+    const geMouseEvent = cell ? this.createCellEvent(event, cell) : this.tableScope.createGeMouseEvent(event);
+    const targetData = new MouseTargetData(eventTarget, this.tableScope);
+
+    if (eventTarget instanceof HTMLElement && !this.isClickAction(targetData)) {
       // the target may be an element inside the cell (renderer, component) → look up the cell attributes
       const target = (eventTarget.closest("[data-col-index]") ?? eventTarget) as HTMLElement;
-      const area = target.closest("[data-area]")?.getAttribute("data-area") ?? null;
+      const area = cell ? cell.areaIdent : target.closest("[data-area]")?.getAttribute("data-area") ?? null;
       const areaIdent: AreaIdent = getAreaIdentByString(area);
-      const rowIdx = Number(target.closest("[data-row-index]")?.getAttribute("data-row-index"));
-      const colIdx = Number(target.getAttribute("data-col-index"));
+      const rowIdx = cell ? cell.rowIdx : Number(target.closest("[data-row-index]")?.getAttribute("data-row-index"));
+      const colIdx = cell ? cell.colIdx : Number(target.getAttribute("data-col-index"));
       const areaModel = this.tableScope.tableModel.getAreaModel(areaIdent);
 
       if (area && areaIdent === "header") {
@@ -212,7 +301,7 @@ export class MouseHandler {
           this.tableScope.onHeaderDblClicked(event, rowIdx, colIdx);
         }
 
-      } else if (target.getAttribute("data-row-index")) {
+      } else if (cell || target.getAttribute("data-row-index")) {
         const row = areaModel.getRowByIndex(rowIdx);
 
         if (area && areaIdent === "body") {
@@ -236,7 +325,8 @@ export class MouseHandler {
 
     // usually already reported by its second click (clickCount 2) – only a "dblclick" without one is reported here
     const reported = this.reportedDoubleClick;
-    if (!reported || Date.now() - reported.time > this.doubleClickDelay || reported.cellKey !== this.getCellKey(eventTarget)) {
+    const cellKey = cell ? this.toCellKey(cell) : this.getCellKey(eventTarget);
+    if (!reported || Date.now() - reported.time > this.doubleClickDelay || reported.cellKey !== cellKey) {
       this.publishGeMouseEvent(event, 2, geMouseEvent);
     }
     this.reportedDoubleClick = undefined;
@@ -251,7 +341,8 @@ export class MouseHandler {
    *
    * @return {void}
    */
-  private publishGeMouseEvent(event: MouseEvent, clickCount: number, geMouseEvent?: GeMouseEvent) {
+  private publishGeMouseEvent(event: MouseEvent, clickCount: number, geMouseEvent?: GeMouseEvent,
+                              target: EventTarget | null = event.target) {
     this.mouseEvent = event;
     this.geMouseEventOld = this.geMouseEvent?.clone();
     this.geMouseEvent = geMouseEvent ?? this.tableScope.createGeMouseEvent(event);
@@ -261,7 +352,7 @@ export class MouseHandler {
 
     const dirty = this.tableScope.onMouseClicked(this.geMouseEvent, this.geMouseEventOld);
     this.tableScope.publishGeMouseEvent(this.geMouseEvent);
-    if (dirty && !this.isInteractiveCellElement(event.target)) {
+    if (dirty && !this.isInteractiveCellElement(target)) {
       // paint the new focus and selection (before, a click only became visible with the next scroll).
       // Deferred: a synchronous repaint replaces the clicked cell, and the browser then sends the following
       // "dblclick" to the detached element – double-click editing would no longer work.
@@ -298,6 +389,9 @@ export class MouseHandler {
     if (this.tableScope.cancelPendingRepaint()) {
       this.repaintAfterMouseUp = true;
     }
+    // A render through the API (live data: repaint/repaintHard/scrollToPixel) can't be held back like the own repaint
+    // above – remember the pressed cell, the click is reported for it should the browser send none (see onMouseUp).
+    this.pressedCell = evt.button === 0 ? this.readPressedCell(evt) : undefined;
 
     if (!this.dragging) {
       this.mouseEvent = evt;
@@ -337,10 +431,15 @@ export class MouseHandler {
 
 
   private onMouseUp(evt: MouseEvent) {
+    const pressed = this.pressedCell;
+    this.pressedCell = undefined;
     if (!this.mouseDown && this.tableScope.isEventInDetail?.(evt)) {
       return; // a click in a detail row (master/detail)
     }
     this.mouseEvent = evt;
+    if (pressed && evt.button === 0) {
+      this.checkLostClick(pressed, evt);
+    }
     if (this.repaintAfterMouseUp) {
       // deferred: "click" and "dblclick" of this mouseup are dispatched first
       this.repaintAfterMouseUp = false;
@@ -357,6 +456,108 @@ export class MouseHandler {
     this.tableScope.setDragging(false);
   }
 
+
+  /** The cell under a mousedown, or undefined outside of a cell. */
+  private readPressedCell(evt: MouseEvent): PressedCell | undefined {
+    const eventTarget = this.tableScope.getMouseEventTarget(evt);
+    const target = eventTarget instanceof Element ? eventTarget : null;
+    const cellElement = target?.closest?.('[data-col-index]');
+    const areaIdent = cellElement?.closest('[data-area]')?.getAttribute('data-area');
+    const rowAttr = cellElement?.closest('[data-row-index]')?.getAttribute('data-row-index');
+    if (!target || !cellElement || !areaIdent || rowAttr === null || rowAttr === undefined) {
+      return undefined;
+    }
+    const geMouseEvent = this.tableScope.createGeMouseEvent(evt);
+    const rowIdx = Number(rowAttr);
+    const colIdx = Number(cellElement.getAttribute('data-col-index'));
+    const area = getAreaIdentByString(areaIdent);
+    let row: unknown;
+    let stableRow = false;
+    if (area === 'body') {
+      const areaModel = this.tableScope.tableModel.getBodyModel();
+      row = this.rowAt(areaModel, rowIdx);
+      // only a model that returns the same object each time can be followed (a model may create rows on the fly)
+      stableRow = typeof row === 'object' && row !== null && this.rowAt(areaModel, rowIdx) === row;
+    }
+    return {
+      target, areaIdent: area, sideIdent: geMouseEvent.sideIdent, rowIdx, colIdx, action: geMouseEvent.action,
+      row, stableRow, clientX: evt.clientX, clientY: evt.clientY,
+    };
+  }
+
+  /**
+   * After a mouseup: if a render replaced the pressed element, the browser sends no "click" (nor "dblclick"). Then the
+   * click is reported for the pressed cell – once this task is through and only if no native click came after all.
+   */
+  private checkLostClick(pressed: PressedCell, evt: MouseEvent) {
+    if (pressed.target.isConnected) {
+      return; // the element is still there: the browser decides (as always)
+    }
+    const dx = evt.clientX - pressed.clientX;
+    const dy = evt.clientY - pressed.clientY;
+    if (dx * dx + dy * dy > this.clickMoveTolerance * this.clickMoveTolerance) {
+      return; // a drag, not a click
+    }
+    const clicks = this.nativeClickCount;
+    const dblClicks = this.nativeDblClickCount;
+    clearTimeout(this.lostClickTimer);
+    // "click" and "dblclick" are dispatched in the same task as the mouseup – a timeout runs after them
+    this.lostClickTimer = setTimeout(() => {
+      this.lostClickTimer = undefined;
+      if (this.nativeClickCount !== clicks || this.tableScope.isDestroyed() || this.isBlocked(evt)) {
+        return;
+      }
+      const rowIdx = this.resolveRowIndex(pressed);
+      if (rowIdx < 0) {
+        return; // the pressed row is gone (removed, replaced): no click for a different row
+      }
+      const cell: ClickCell = {
+        areaIdent: pressed.areaIdent, sideIdent: pressed.sideIdent, rowIdx, colIdx: pressed.colIdx, action: pressed.action,
+      };
+      this.handleClick(evt, pressed.target, cell);
+      if (evt.detail === 2 && this.nativeDblClickCount === dblClicks) {
+        this.handleDblClick(evt, pressed.target, cell);
+      }
+    }, 0);
+  }
+
+  /**
+   * The current index of the pressed row: rows may have been added, removed or sorted in while the button was held.
+   * -1 if the row is gone.
+   */
+  private resolveRowIndex(pressed: PressedCell): number {
+    if (pressed.areaIdent !== 'body' || !pressed.stableRow) {
+      return pressed.rowIdx;
+    }
+    const areaModel = this.tableScope.tableModel.getBodyModel();
+    if (this.rowAt(areaModel, pressed.rowIdx) === pressed.row) {
+      return pressed.rowIdx;
+    }
+    // search outwards from the old index (rows removed in front: the row moved up; inserted: down)
+    const count = areaModel.getRowCount();
+    for (let d = 1; d < count; d++) {
+      const before = pressed.rowIdx - d;
+      const after = pressed.rowIdx + d;
+      if (before < 0 && after >= count) {
+        break;
+      }
+      if (before >= 0 && this.rowAt(areaModel, before) === pressed.row) {
+        return before;
+      }
+      if (after < count && this.rowAt(areaModel, after) === pressed.row) {
+        return after;
+      }
+    }
+    return -1;
+  }
+
+  private rowAt(areaModel: { getRowByIndex(i: number): unknown }, rowIdx: number): unknown {
+    try {
+      return areaModel.getRowByIndex(rowIdx);
+    } catch {
+      return undefined; // an own area model may throw outside of its rows
+    }
+  }
 
   private mouseDraggingOnFrame() {
     if (this.mouseEvent) {

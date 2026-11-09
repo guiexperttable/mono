@@ -30,6 +30,7 @@ Full answers: [instructions.md 6.26](https://github.com/guiexperttable/mono/blob
 - Hide the scroll bars: CSS `.my-table .ge-table-scroll-viewport { scrollbar-width: none; }` – full width/height, wheel, touch, keyboard and the API still scroll; no table option needed.
 - Scroll bar although all rows fit (own AreaModel): fixed in 1.1.107 (scroll height from `getConstantRowHeight()` / `getRowHeight()`); older versions: set `defaultRowHeights.body` to the model's row height.
 - Live data with growing rows, keep the position or follow the end: `tableApi.repaintHard({ py })` – one render pass, since 1.1.107.
+- Clicks lost while the table updates (render between mousedown and mouseup): fixed in 1.1.108 – the table reports the click for the pressed cell itself.
 - `repaint()` = same row count, `repaintHard()` = rows added/removed or heights changed, `updateCells()` = single cells.
 - Empty table: the host div needs a fixed height and `@guiexpert/table/css/main.css`.
 

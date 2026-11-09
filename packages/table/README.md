@@ -89,6 +89,8 @@ This is the UI-agnostic table component for your next web app. 😊
   width and height; wheel, touch, keyboard and the API still scroll.
 - **Rows are appended all the time** (live log, ticker): `tableApi.repaintHard({ py })` counts the rows and shows the
   position in one render pass (`py: Number.MAX_SAFE_INTEGER` follows the end) – since 1.1.107.
+- **Clicks lost while the table updates?** Fixed in 1.1.108: a render between `mousedown` and `mouseup` no longer
+  swallows `mouseClicked` – the table reports the click for the pressed cell itself.
 - **Own area model with other row heights:** return them from `getRowHeight(i)` and, if all are equal,
   `getConstantRowHeight()` – the scroll height follows them (since 1.1.107; `defaultRowHeights` is only the default).
 - **`repaint()` or `repaintHard()`?** `repaint()` for changed values, `repaintHard()` when rows were added or removed.

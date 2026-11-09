@@ -14,12 +14,16 @@
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { fileURLToPath } from 'node:url';
+import { browserCommands } from './test-utils/browser-commands';
 
 // Optional: use a preinstalled Chromium instead of Playwright's own download (e.g. in a container).
 const chromiumPath = process.env['CHROMIUM_PATH'];
 // GE_ALL_SCROLLBARS=1: the project "browser-scrollbars" runs ALL browser specs with classic scroll bars
 // (`pnpm test:browser:scrollbars`) – a check that no layout assumes scroll bars without width.
 const allWithScrollbars = !!process.env['GE_ALL_SCROLLBARS'];
+// GE_WEBKIT=1: the project "browser-webkit" runs the real-mouse specs (*.realmouse.browser.spec.ts) in WebKit too
+// (`pnpm test:browser:webkit`, once: `pnpm exec playwright install webkit`).
+const withWebkit = !!process.env['GE_WEBKIT'];
 
 export default defineConfig({
   resolve: {
@@ -56,9 +60,25 @@ export default defineConfig({
             provider: playwright(chromiumPath ? { launchOptions: { executablePath: chromiumPath } } : {}),
             instances: [{ browser: 'chromium' }],
             viewport: { width: 1200, height: 900 },
+            commands: browserCommands, // real mouse input (test-utils/real-mouse.ts)
           },
         },
       },
+      ...(withWebkit ? [{
+        extends: true as const,
+        test: {
+          name: 'browser-webkit',
+          include: ['src/**/*.realmouse.browser.spec.ts'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'webkit' as const }],
+            viewport: { width: 1200, height: 900 },
+            commands: browserCommands,
+          },
+        },
+      }] : []),
       {
         extends: true,
         test: {
@@ -77,6 +97,7 @@ export default defineConfig({
             }),
             instances: [{ browser: 'chromium' }],
             viewport: { width: 1200, height: 900 },
+            commands: browserCommands,
           },
         },
       },

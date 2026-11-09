@@ -92,3 +92,6 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [x] 012 (Firefox/Safari manuell, Angular-Demo nach dem Release; Demo-Repo entfällt)
 - [x] 013 (Screenreader und Excel-Rundreise in Firefox/Safari manuell, Demo-Repo `ep-040`; Angular-Demo-Route `spreadsheet` seit 1.1.99)
 - [x] 015 (Video 14 nach dem Release; AOT-App und SSR manuell; Demo-Repo entfällt)
+- [x] 016 (Release 1.1.106; macOS-CI-Job `test-core-macos`)
+- [x] 017 (Release 1.1.107)
+- [x] 018 Teil A (Release 1.1.108; Teil B – kein Zellen-Neuaufbau bei reinem Zeilenzuwachs – übernimmt 019)

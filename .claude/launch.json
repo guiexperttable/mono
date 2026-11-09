@@ -20,6 +20,16 @@
         "dev"
       ],
       "port": 4321
+    },
+    {
+      "name": "repo-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8080"
+      ],
+      "port": 8080
     }
   ]
 }

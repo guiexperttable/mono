@@ -166,7 +166,10 @@ export class SelectionModel implements SelectionModelIf {
         result.push(range); // whole columns
         continue;
       }
-      const pieces = shift.mapRange(lo, hi);
+      // a range open to the end stays one range: rows appended at the end join it (review of 019)
+      const pieces = hi >= Number.MAX_SAFE_INTEGER
+        ? [[shift.mapIndexOrNext(lo), Number.MAX_SAFE_INTEGER] as [number, number]]
+        : shift.mapRange(lo, hi);
       const kept = pieces.reduce((n, [a, b]) => n + (b >= Number.MAX_SAFE_INTEGER ? 0 : b - a + 1), 0);
       if (hi < Number.MAX_SAFE_INTEGER && kept < hi - lo + 1) {
         removedRows = true;

@@ -170,4 +170,13 @@ describe('SelectionModel / FocusModel.adjustForRowChanges', () => {
     none.adjustForRowChanges(new RowIndexShift([0], []));
     expect(none.getFocus()).toEqual([-1, -1]);
   });
+
+  it('review #5: a range open to the end (r > 0 … MAX) keeps one piece; rows appended at the end join it', () => {
+    const sm = new SelectionModel('range', 'multi');
+    sm.addSelection(new CellRange(3, 1, Number.MAX_SAFE_INTEGER, 1));
+    for (let u = 0; u < 5; u++) sm.adjustForRowChanges(new RowIndexShift([0], [20 + u]));
+    expect(sm.getRanges().length).toBe(1);
+    expect(sm.getRanges()[0].r2).toBe(Number.MAX_SAFE_INTEGER);
+    expect(sm.getRanges()[0].r1).toBe(0); // rows 0 … 2 removed one per update: the range starts at row 0
+  });
 });

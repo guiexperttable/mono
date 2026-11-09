@@ -142,4 +142,19 @@ describe('AreaModelObjectArray.appendRows', () => {
     m.appendRows([line(3)], { maxRows: 3 });
     expect(ids(m)).toEqual([...order.slice(1), 3]);
   });
+
+  it('review #1: rows merged in by a comparator although the display was in data order – later ring-buffer removals stay correct', () => {
+    const rows = Array.from({ length: 50 }, (_, i) => line(i, 1_000 - i));      // data order ≠ sort order
+    const m = model(rows);
+    const compare = m.createSortComparator([new SortItem(2, 'asc')])!;          // the display was never sorted
+    let next = 50;
+    for (let u = 0; u < 30; u++) {
+      const fresh = Array.from({ length: 10 }, () => line(next, next++));
+      m.appendRows(fresh, { compare, maxRows: 50 });
+    }
+    const data = new Set(m.getAllRows());
+    expect(m.getAllRows().length).toBeLessThanOrEqual(50);
+    expect(m.getFilteredRows().every(r => data.has(r))).toBe(true);
+    expect(m.getFilteredRows().length).toBe(m.getAllRows().length);
+  });
 });

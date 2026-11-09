@@ -691,8 +691,20 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Angehakte Zeilen (Checkbox-Modell, Zeilenobjekte), die der Ringpuffer entfernt, bleiben im Checkbox-Modell.
 - [ ] Undo-Verlauf: Einträge zu Zeilen, die der Ringpuffer entfernt hat, schreiben beim Undo in das (nicht mehr
       angezeigte) Zeilenobjekt – wie bei ausgefilterten Zeilen.
-- [ ] Fill-Handle-Ziehen während eines Updates: der gezogene Bereich (Indizes) wird nicht nachgeführt (die Ansicht bleibt
-      stehen, solange gezogen wird).
+- [ ] Fill-Handle-Ziehen und Row Drag während eines Updates: Quellbereich bzw. `session.rowIndices` (Indizes vom
+      Drag-Start) werden nicht nachgeführt – mit Ringpuffer/sortiertem Einfügen würden falsche Zeilen gefüllt/verschoben
+      (Review 019, nur durch Lesen gefunden). Ebenso `SelectionService.dragSnapshot` (Strg+Ziehen): entfernte/geteilte
+      Ranges sind im Snapshot nicht nachgeführt. Die Ansicht bleibt stehen, solange gezogen wird.
+- [x] Review 019 (unabhängiger Agent, 09.11.2026), behoben mit roten Tests (`live-append-review.browser.spec.ts`,
+      Unit-Specs): (1) sortiertes Einfügen ließ `displayInDataOrder` stehen → Ringpuffer zeigte entfernte Zeilen weiter;
+      (2) alter Zell-Editor (`getEditRenderer`) sprang auf eine andere Zeile; (3) `mouseup` außerhalb der Tabelle ließ
+      `isButtonDown()` hängen → Live-Tail folgte nie wieder (Dokument-Listener je Druck); (4) Bereichsauswahl per Ziehen
+      begann nach einem Update an einer anderen Zeile (`MouseHandler.adjustForRowChanges`); (5) Ranges bis zum Ende
+      (`r1 > 0`, `r2 = MAX`) wurden je Update geteilt; (6) Spannen veraltet, wenn der Ringpuffer die Zeilenzahl hält;
+      (7) Kopf-Checkbox „alle“ im Sparweg nicht neu gezeichnet; Strg+Klick auf dem Mac (Kontextmenü) meldete einen Klick.
+- [ ] NOTE: `test:browser:scrollbars` meldete einmal unter Last „Hook onTestFinished() can only be called inside a test“
+      (`test-utils/platform.ts` `mockPlatform`, `sheet-editing.browser.spec.ts` E12) – einzeln 5× grün; Vitest-Race,
+      beobachten.
 - [ ] Demo-Repo / Angular-Demo: nach dem Release (npm-Pakete).
 
 ## Performance-Absicherung (Prompt 021, 09.11.2026)
@@ -884,6 +896,10 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
     `LogTailController`, `createLogTailModelAndOptions`, `LogLevelCellRenderer`, `LogLineIf`. Showcase `logtail`.
   - Spannen (`ColAndRowspanModel`) werden beim Anhängen nur für die neuen Zeilen gesucht (vorher bei jeder neuen
     Zeilenzahl über alle Zeilen × Spalten).
+  - Ein `mouseup` außerhalb der Tabelle beendet den Druck jetzt auch (vorher blieb der Zustand „Taste gedrückt“ bis zum
+    nächsten `mouseup` in der Tabelle; ein Ziehen, das außerhalb endete, ging beim Wiedereintritt weiter).
+  - `llms.txt` ist eine Nutzungsanleitung (Rezepte, Pitfalls, kompilierte Snippets) und liegt im npm-Paket
+    (`node_modules/@guiexpert/table/llms.txt`).
   - Ein Klick, während die Anwendung über die API rendert (`repaint()`, `repaintHard()`, `scrollToPixel()` zwischen
     `mousedown` und `mouseup`, z. B. Live-Tail), geht nicht mehr verloren: die Tabelle meldet `mouseClicked` (Fokus,
     Auswahl, Doppelklick) für die gedrückte Zelle selbst – genau einmal. Neu: `MouseHandler.clickMoveTolerance` (4 px),

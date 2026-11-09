@@ -389,6 +389,9 @@ export class AreaModelObjectArray<T>
       return positions;
     }
     shown.sort(compare); // stable: equal new rows keep their order
+    // rows land between old ones: the display is no longer in data order (the prefix shortcut of the ring buffer
+    // would miss removed rows – review of 019)
+    this.displayInDataOrder = false;
     let end = fr.length;  // old rows [0, end) not moved yet
     for (let k = 0; k < m; k++) fr.push(shown[k]); // grow without holes; overwritten below
     // from the back: binary search for the place of each new row (O(log n) comparisons – a sort comparator reads

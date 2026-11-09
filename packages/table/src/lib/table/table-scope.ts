@@ -3272,6 +3272,8 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     const selectionChanged = sm?.adjustForRowChanges?.(shift) ?? false;
     this.focusModel()?.adjustForRowChanges?.(shift);
     this.selectionService.adjustForRowChanges(shift);
+    this.mouseHandler.adjustForRowChanges(shift); // a drag-select in progress starts at its row
+    this.shiftEditorRow(shift);
     const rowCount = this.tableModel.getBodyModel().getRowCount();
     const fm = this.focusModel();
     if (fm && rowCount > 0 && fm.getFocus()[0] >= rowCount) {
@@ -3280,8 +3282,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (result.removed) {
       this.batchEditService?.pruneOrphans();
     }
-    // spans: only the new rows are scanned (a full scan of all rows per update was O(n))
-    this.colAndRowspanModels.body?.updateForInsertedRows(result.insertedPositions);
+    // spans: only the new rows are scanned (a full scan of all rows per update was O(n)); existing spans moved – scan
+    // again (the row count may be the same: as many rows left the ring buffer as came in)
+    const spans = this.colAndRowspanModels.body;
+    if (spans && !spans.updateForInsertedRows(result.insertedPositions) && !shift.isEmpty()) {
+      spans.init();
+    }
     this.invalidateAggregates();
 
     // a held mouse button (click, drag, row drag, fill) keeps the rows under the pointer; a view that followed the end
@@ -3319,8 +3325,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * totals footer, no calculated/„show values as“ columns, no open detail rows.
    */
   private canKeepDrawnRows(): boolean {
-    if (this.getFirstDataColumnIndex() > 0 || this.masterDetailService) {
-      return false;
+    if (this.getFirstDataColumnIndex() > 0 || this.masterDetailService || this.tableModel.isRowCheckboxVisible()
+      || this.tableOptions.showCheckboxWihoutExtraColumn) {
+      return false; // row numbers (width), master/detail, the header "check all" box (partly checked)
     }
     const footer = this.tableModel.getAreaModel('footer');
     if (footer.getRowCount() > 0 && footer.invalidateDerivedValues) {

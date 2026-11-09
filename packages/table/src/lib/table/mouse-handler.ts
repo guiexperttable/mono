@@ -6,6 +6,7 @@ import { MouseTargetData } from "./data/event/mouse-target-data";
 import {TreeRowIf} from "./data/common/tree-row-if";
 import {isTreeRow} from "./instanceof-workaround";
 import { SideIdent } from "./data/side-ident.type";
+import type { RowIndexShift } from "./live-append/row-index-shift";
 
 /**
  * The cell pressed by the last mousedown (prompt 018): if a render replaces its element before the mouseup, the
@@ -127,6 +128,8 @@ export class MouseHandler {
       // before, it was taken for a second right click within 50 ms and stopped (it never reached the listeners)
       return;
     }
+    // Ctrl+click on macOS opens the context menu – the browser sends no click, so neither must the lost-click report
+    this.pressedCell = undefined;
     this.mouseEvent = evt;
     const mouseMoveEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
     this.tableScope.contextmenu(mouseMoveEvent);
@@ -402,6 +405,30 @@ export class MouseHandler {
       this.flushDraggingEnd();
       this.tableScope.onMouseDown(this.startMouseEvent);
       this.mouseDown = true;
+      // a mouseup outside the host (an app menu under the pointer, a drag out of the table) must end the press too –
+      // otherwise isButtonDown() stays true and live data stops following (review of 019)
+      const signal = this.tableScope.listenerAbortController.signal;
+      document.addEventListener('mouseup', e => this.onDocumentMouseUp(e), { once: true, signal });
+    }
+  }
+
+  /** A mouseup that did not reach the host (released outside the table). */
+  private onDocumentMouseUp(evt: MouseEvent) {
+    if (this.mouseDown && !this.tableScope.hostElement.contains(evt.target as Node | null)) {
+      this.onMouseUp(evt);
+    }
+  }
+
+  /**
+   * Live data (since 1.1.108): a drag in progress (range selection) keeps its start row when rows were removed at the
+   * start or inserted.
+   *
+   * @param {RowIndexShift} shift - how the display indices move
+   */
+  adjustForRowChanges(shift: RowIndexShift): void {
+    const start = this.startMouseEvent;
+    if (this.mouseDown && start && start.areaIdent === 'body' && start.rowIndex >= 0) {
+      start.rowIndex = Math.max(0, shift.mapIndexOrNext(start.rowIndex));
     }
   }
 

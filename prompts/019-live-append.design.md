@@ -110,3 +110,14 @@ Objekt-Arrays; in Chromium 2 Mio. ≈ 3,7 ms). Notiert in `TODO.md`.
 - Demo `apps/table-demo/log-tail.html`; Video `videos/15-live-log/` (Folge 40 im Backlog).
 - ag-Grid: Transactions (`applyTransactionAsync`) in Community – nicht auf ag-grid.com nachgeprüft (kein Webzugriff in
   dieser Sitzung genutzt); vor der Video-Beschreibung prüfen.
+
+## Review (unabhängiger Agent, 09.11.2026)
+
+Gefunden und mit roten Tests behoben (`live-append/live-append-review.browser.spec.ts`, Unit-Specs): sortiertes
+Einfügen ohne vorheriges Sortieren ließ `displayInDataOrder = true` (Ringpuffer zeigte entfernte Zeilen, Liste wuchs über
+`maxRows`); alter Zell-Editor folgte seiner Zeile nicht; `mouseup` außerhalb ließ `isButtonDown()` hängen (Live-Tail
+fror ein); Ziehen-Auswahl verlor ihre Startzeile; offene Ranges `[r, MAX]` wurden je Update geteilt; Spannen bei
+gleichbleibender Zeilenzahl veraltet; Kopf-Checkbox im Sparweg; Strg+Klick (macOS) nach Render als Klick gemeldet.
+Offen (nur durch Lesen gefunden, `TODO.md`): Row Drag, Fill-Handle und `dragSnapshot` während eines Updates.
+Ohne Befund: 018-Klickpfad (keine Doppelmeldung, destroy, Overlay, Master/Detail, RTL), Merge, Ringpuffer-Arithmetik,
+`RowIndexShift`, Sparweg (kein veraltetes DOM), Verhalten ohne `appendRows`.

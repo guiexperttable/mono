@@ -34,10 +34,14 @@
 <div class="table-div"></div>
 <div class="bar"><span class="log" id="event">Klick auf eine Zeile …</span></div>
 <script type="module">
-  import { TableFactory, TableScope, TableOptions, SimpleDomService, EventAdapter, SelectionModel } from "@guiexpert/table";
+  import { TableFactory, TableScope, TableOptions, SimpleDomService, EventAdapter, SelectionModel, ColumnDef, Size, px150, px100 } from "@guiexpert/table";
 
-  // --- snippet.ts ---
-  const tableModel = TableFactory.createTableModel({ rows: [], properties: ["time", "level", "text"] });
+  // --- snippet.ts (with column widths – not in the snippet) ---
+  const tableModel = TableFactory.createTableModel({ rows: [], columnDefs: [
+    ColumnDef.create({ property: "time", headerLabel: "Time", width: px150 }),
+    ColumnDef.create({ property: "level", headerLabel: "Level", width: px100 }),
+    ColumnDef.create({ property: "text", headerLabel: "Text", width: new Size(560, "px"), bodyClasses: ["ge-table-text-align-start"] }),
+  ] });
   let frozen = false;
   function onLines(lines) {
     const result = tableApi.appendRows(lines, { follow: frozen ? false : "auto", maxRows: 1_000_000 });

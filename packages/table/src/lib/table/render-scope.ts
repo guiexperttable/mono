@@ -11,6 +11,7 @@ import { CellRange } from './data/common/cell-range';
 import { RendererCleanupFnType } from './renderer/renderer-cleanup-fn.type';
 import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { SideIdent } from './data/side-ident.type';
+import type { RowIndexShift } from './live-append/row-index-shift';
 import { DivScope } from './data/div-scope.type';
 import type { AreaModelTree } from './data/tablemodel/areamodel/area-model-tree';
 import type { DerivedValuesChangeIf } from './data/tablemodel/areamodel/derived-values-change.if';
@@ -513,6 +514,27 @@ export class RenderScope extends EleScope {
    *
    * @returns {void}
    */
+  /**
+   * Live data (since 1.1.108): the in-cell editor (`getEditRenderer`) and its draft follow their row when rows were
+   * removed at the start or inserted; a removed row closes the editor.
+   *
+   * @param shift - how the display indices move
+   */
+  protected shiftEditorRow(shift: RowIndexShift): void {
+    if (this.editing && this.editorRenderer && (this.editorRendererRow ?? -1) >= 0) {
+      const row = shift.mapIndex(this.editorRendererRow!);
+      if (row < 0) {
+        this.resetEditorRenderer();
+        return;
+      }
+      this.editorRendererRow = row;
+    }
+    if (this.editorDraft) {
+      const row = shift.mapIndex(this.editorDraft.rowIndex);
+      this.editorDraft = row < 0 ? undefined : { ...this.editorDraft, rowIndex: row };
+    }
+  }
+
   resetEditorRenderer() {
     this.editorRenderer = undefined;
     this.editorRendererRow = -1;

@@ -13,9 +13,9 @@ table is good at: only the visible rows are in the DOM (10,000 books here, 1 mil
 the scroll position are built in. MIT-licensed, no dependencies.
 
 ```ts title="Books as tiles"
-const tableModel = CoverGridFactory.createCoverGridModel(books, new BookCoverRenderer(), 160, 260);
+const tableModel = CoverGridFactory.createCoverGridModel(books, new BookCoverRenderer(), 165, 220);
 const tableOptions = {
-  ...CoverGridFactory.createCoverGrisDefaultOptions(260, () => "books"),   // no borders, no hover
+  ...CoverGridFactory.createCoverGrisDefaultOptions(220, () => "books"),   // no borders, no hover
   externalFilterFunction: (book: Book) => book.title.toLowerCase().includes(searchText),
 };
 const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener)
@@ -27,7 +27,7 @@ listener.onMouseClicked = evt => {
 
 - **Columns follow the width:** `floor(width / coverWidth)` – the table measures its host, you do nothing.
   To fill the width exactly, make the tiles a bit wider (`fitCoversToWidth` in the demo model).
-- **Size without a new model:** `tableModel.bodyModel.coverWidth = 220; …coverHeight = 340; tableApi.repaintHard()`.
+- **Size without a new model:** `tableModel.bodyModel.coverWidth = 225; …coverHeight = 300; tableApi.repaintHard()`.
 - **Filter and sort:** `tableApi.externalFilterChanged()` and `tableApi.sort((a, b) => …)` – the order survives the
   filter.
 - **Renderer:** a plain `CellRendererIf` gets the cell `<div>` and the item – draw an `<img>`, a title, a progress

@@ -102,6 +102,16 @@ import { GeColumnMoveEvent } from './data/common/event/ge-column-move-event';
 import type {
   AppendFollowMode, AppendRowsModelResultIf, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf
 } from './live-append/append-rows-options.if';
+import type { FilterFunction } from './data/common/filter-function';
+import type { GeFilterEventSource } from './data/common/event/ge-filter-event';
+import { ColumnFilterService } from './column-filter/column-filter-service';
+import type { ColumnFilterIf, ColumnFiltersMap } from './column-filter/column-filter.if';
+import type { FilterRowOptionsIf } from './column-filter/column-filter-options.if';
+import { ColumnFilterMenuOptions, FilterRowOptions } from './column-filter/column-filter-options';
+import { FilterRowService } from './column-filter/filter-row-service';
+import { ColumnFilterMenuService } from './column-filter/column-filter-menu-service';
+import { ColumnChooserService } from './column-filter/column-chooser-service';
+import { columnFilterShortcutLayer } from './column-filter/column-filter-keymap';
 
 
 /** A column resize or move by the user (prompt 022). Internal. */
@@ -175,6 +185,12 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.92
    */
   public readonly stateService: TableStateService;
+  /** Built-in column filters ({@link TableApi.setColumnFilter}, since 1.1.114). */
+  public readonly columnFilterService: ColumnFilterService;
+  /** Persistent filter row below the column titles ({@link TableOptionsIf.filterRow}, since 1.1.114). */
+  public filterRowService?: FilterRowService;
+  /** Column visibility chooser popup ({@link TableApi.showColumnChooser}, since 1.1.114). */
+  public columnChooserService?: ColumnChooserService;
 
   protected selectionService: SelectionService = new SelectionService(this);
   protected keyEvent?: GeKeyEvent;
@@ -241,6 +257,19 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     // the constructor's listener plus the listeners of TableApi.subscribe() (since 1.1.99)
     this.eventListener = createEventListenerHub(eventListener ?? new EventAdapter(), this.subscribers);
     this.stateService = new TableStateService(this);
+    this.columnFilterService = new ColumnFilterService(this);
+    if (tableOptions?.filterRow) {
+      this.initFilterRowService(tableOptions.filterRow);
+    }
+    if (tableOptions?.columnFilterMenu) {
+      const menuOpts = ColumnFilterMenuOptions.create(
+        tableOptions.columnFilterMenu,
+        this.columnFilterService.getOptions().maxValues,
+      );
+      if (menuOpts) {
+        this.columnFilterMenuService = new ColumnFilterMenuService(this, menuOpts, true);
+      }
+    }
     this.mouseHandler = new MouseHandler(this);
     this.inputHandler = new InputHandler(this);
     this.resizeHandler = new ResizeHandler(this, tableOptions.resizeEventDebounceDelay);
@@ -380,6 +409,16 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (!this.headerFocus && this.tableOverlay.isBlocking() && TableScope.actionsBlockedWhileLoading.includes(actionId)) {
       return true; // a blocking "Loading…" over the body: no editing, no toggling (navigation, copying, header still work)
     }
+    if (actionId === 'FOCUS_COLUMN_FILTER') {
+      const col = this.headerFocus ? this.headerFocus[1] : this.focusModel()?.getFocus()?.[1];
+      return !!this.filterRowService?.focusActiveOrFirstColumn(col !== undefined && col >= 0 ? col : undefined);
+    }
+    if (actionId === 'OPEN_COLUMN_FILTER_MENU') {
+      if (this.headerFocus && this.columnFilterMenuService?.isActive()) {
+        return this.columnFilterMenuService.open(this.headerFocus[1]);
+      }
+      return false;
+    }
     if (this.headerFocus) {
       const consumed = this.onHeaderAction(actionId);
       if (consumed !== undefined) {
@@ -489,6 +528,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   getShortcutLayers(mac: boolean): ShortcutActionIdMapping[] {
     const layers: ShortcutActionIdMapping[] = [];
+    if (this.tableOptions.filterRow || this.filterRowService || this.tableOptions.columnFilterMenu || this.columnFilterMenuService) {
+      layers.push(columnFilterShortcutLayer(mac));
+    }
     const editing = this.editingOptions;
     if (this.clipboardOptions) {
       layers.push(clipboardShortcutLayer(mac));
@@ -592,7 +634,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @since 1.1.99
    */
   refreshAfterStructureChange(columns: boolean): void {
-    const filter = this.tableOptions.externalFilterFunction;
+    const filter = this.getEffectiveFilterFunction();
     if (filter) {
       this.tableModel.externalFilterChanged(filter);
     }
@@ -1298,6 +1340,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       case 'NAVIGATE_DOWN': {
         if (row + rowspan < headerRows) {
           this.setHeaderFocus(row + rowspan, col);
+          return true;
+        }
+        if (this.filterRowService?.isVisible() && this.filterRowService.focusColumn(col)) {
+          this.headerFocus = undefined;
+          this.repaint();
           return true;
         }
         const rowCount = this.tableModel.getBodyModel().getRowCount();
@@ -2065,8 +2112,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.stateService.initBeforeModel();
     this.tableModel.init();
     this.stateService.initAfterModel();
-    if (this.tableOptions?.externalFilterFunction) {
-      this.externalFilterChanged(false);
+    const initialFilter = this.getEffectiveFilterFunction();
+    if (initialFilter) {
+      this.applyFilterFunction(initialFilter, false, false);
     }
     this.stateService.initAfterFilter();
     this.resetSizeOfWrapperDiv();
@@ -2114,6 +2162,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.fillHandleService?.destroy(); // a running fill: cancelled, handle and preview removed
     this.cellEditorService?.destroy(); // the editor above the cell (since 1.1.99)
     this.clipboardService?.destroy(); // hidden text field and cut frame (since 1.1.99)
+    this.filterRowService?.destroy(); // persistent filter row timers & layer (since 1.1.114)
+    this.columnFilterMenuService?.destroy(); // filter menu popup & timers (since 1.1.114)
+    this.columnChooserService?.destroy(); // column chooser popup (since 1.1.114)
     this.tableSheet?.destroy(); // cell formulas: detached from the body (since 1.1.99)
     this.subscribers.clear();
     try {
@@ -2825,6 +2876,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
   protected override afterRenderPass(): void {
     this.stateService?.rendered(); // undefined while the constructor of the super class renders
+    this.filterRowService?.update(); // persistent filter row follows column geometry, scroll & RTL (since 1.1.114)
     this.fillHandleService?.update(); // the handle follows the selected range (scroll, selection, editor)
     this.cellEditorService?.update(); // the editor follows its cell (Excel-style editing, since 1.1.99)
     this.clipboardService?.update(); // the frame of cut cells (since 1.1.99)
@@ -2865,29 +2917,236 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
 
 
   /**
+   * Returns the effective filter predicate combining `tableOptions.externalFilterFunction` and active column filters
+   * via AND (returns `externalFilterFunction` unchanged when no column filters are active).
+   *
+   * @since 1.1.114
+   */
+  getEffectiveFilterFunction(): FilterFunction<any> | undefined {
+    return this.columnFilterService.getEffectiveFilterFunction();
+  }
+
+  /**
+   * Runs one filter pass with `predictFn`, re-applies sorting, invalidates aggregates, updates height/scroll wrapper
+   * and optionally repaints and announces the row count. Used by {@link externalFilterChanged} and
+   * {@link ColumnFilterService}. `keepHorizontalScroll` (column filters) scrolls to the first row only.
+   *
+   * @since 1.1.114
+   */
+  applyFilterFunction(
+    predictFn: FilterFunction<any>,
+    clearSelection: boolean = true,
+    repaintNow: boolean = true,
+    keepHorizontalScroll: boolean = false,
+  ): void {
+    if (clearSelection) {
+      this.clearSelectionModel();
+    }
+    this.tableModel.externalFilterChanged(predictFn);
+    this.reapplySorting(); // filtering starts from the unsorted rows
+    this.invalidateAggregates();
+    if (keepHorizontalScroll) {
+      // column filters: the user is working in that column (filter row, menu) – only back to the first row
+      this.scrollViewport.scrollTop = 0;
+    } else {
+      this.scrollViewport.scrollTo(0, 0);
+    }
+    this.tableModel.recalcHeightAndPadding();
+    this.resetSizeOfWrapperDiv();
+    if (repaintNow) {
+      this.repaint();
+    }
+    if (this.initialized) {
+      const rowCount = this.tableModel.getBodyModel().getRowCount();
+      this.announce(this.ariaTexts.filtered(rowCount), TableScope.filterAnnouncementDelayInMs);
+    }
+  }
+
+  /** Re-applies active column filters after `TableApi.setRows()` without repainting. @since 1.1.114 */
+  reapplyFilterAfterSetRows(predictFn: FilterFunction<any>): void {
+    this.tableModel.externalFilterChanged(predictFn);
+    this.reapplySorting();
+    this.invalidateAggregates();
+  }
+
+  /**
    * Updates the table (repaint) when an external filter is changed.
    *
    * @param {boolean} clearSelection - Indicates whether to clear the selection model or not. Default value is true.
    * @return {void}
    */
   externalFilterChanged(clearSelection: boolean = true) {
-    const predictFn = this.tableOptions.externalFilterFunction;
+    const predictFn = this.getEffectiveFilterFunction();
     if (predictFn) {
-      if (clearSelection) {
-        this.clearSelectionModel();
-      }
-      this.tableModel.externalFilterChanged(predictFn);
-      this.reapplySorting(); // filtering starts from the unsorted rows
-      this.invalidateAggregates();
-      this.scrollViewport.scrollTo(0, 0);
-      this.tableModel.recalcHeightAndPadding();
-      this.resetSizeOfWrapperDiv();
-      this.repaint();
-      if (this.initialized) {
-        const rowCount = this.tableModel.getBodyModel().getRowCount();
-        this.announce(this.ariaTexts.filtered(rowCount), TableScope.filterAnnouncementDelayInMs);
-      }
+      this.applyFilterFunction(predictFn, clearSelection, true);
     }
+  }
+
+  /** See {@link TableApi.setColumnFilter}. @since 1.1.114 */
+  setColumnFilter(column: number | string | ColumnDefIf, filter: ColumnFilterIf | undefined): void {
+    this.columnFilterService.setColumnFilter(column, filter, 'api');
+  }
+
+  /** See {@link TableApi.getColumnFilter}. @since 1.1.114 */
+  getColumnFilter(column: number | string | ColumnDefIf): ColumnFilterIf | undefined {
+    return this.columnFilterService.getColumnFilter(column);
+  }
+
+  /** See {@link TableApi.getColumnFilters}. @since 1.1.114 */
+  getColumnFilters(): ColumnFiltersMap {
+    return this.columnFilterService.getColumnFilters();
+  }
+
+  /** See {@link TableApi.setColumnFilters}. @since 1.1.114 */
+  setColumnFilters(filters: ColumnFiltersMap): void {
+    this.columnFilterService.setColumnFilters(filters, 'api');
+  }
+
+  /** See {@link TableApi.clearColumnFilters}. @since 1.1.114 */
+  clearColumnFilters(): void {
+    this.columnFilterService.clearColumnFilters('api');
+  }
+
+  /** See {@link TableApi.isColumnFiltered}. @since 1.1.114 */
+  isColumnFiltered(column: number | string | ColumnDefIf): boolean {
+    return this.columnFilterService.isColumnFiltered(column);
+  }
+
+  /** Extra height reserved below the header rows (e.g. persistent filter row) for {@link TableModel.recalcPadding}. @since 1.1.114 */
+  getHeaderExtraHeight(): number {
+    return this.filterRowService?.getReservedHeight() ?? 0;
+  }
+
+  protected override getFilterRowCount(): number {
+    return this.filterRowService?.isVisible() ? 1 : 0;
+  }
+
+  /** True if a DOM event originates inside the built-in filter UI (filter row or popup). @since 1.1.114 */
+  isEventInFilterUI(evt: Event): boolean {
+    return !!this.filterRowService?.isInLayer(evt)
+      || !!this.columnFilterMenuService?.isInPopup(evt)
+      || !!this.columnChooserService?.isInPopup(evt);
+  }
+
+  /** See {@link TableApi.showColumnFilterMenu}. @since 1.1.114 */
+  showColumnFilterMenu(column: number | string | ColumnDefIf): boolean {
+    if (!this.columnFilterMenuService) {
+      const opts = ColumnFilterMenuOptions.create(true, this.columnFilterService.getOptions().maxValues)!;
+      this.columnFilterMenuService = new ColumnFilterMenuService(this, opts, false);
+    }
+    return this.columnFilterMenuService.open(column);
+  }
+
+  /** Toggles the filter menu for `columnIndex` (used by the header funnel button). @since 1.1.114 */
+  toggleColumnFilterMenu(columnIndex: number): boolean {
+    if (!this.columnFilterMenuService) {
+      return false;
+    }
+    return this.columnFilterMenuService.toggle(columnIndex);
+  }
+
+  /** See {@link TableApi.hideColumnFilterMenu}. @since 1.1.114 */
+  hideColumnFilterMenu(): void {
+    this.columnFilterMenuService?.close('api');
+  }
+
+  /** See {@link TableApi.showColumnChooser}. @since 1.1.114 */
+  showColumnChooser(anchor?: HTMLElement): void {
+    if (!this.columnChooserService) {
+      this.columnChooserService = new ColumnChooserService(this);
+    }
+    this.columnChooserService.open(anchor);
+  }
+
+  /** See {@link TableApi.hideColumnChooser}. @since 1.1.114 */
+  hideColumnChooser(): void {
+    this.columnChooserService?.close('api');
+  }
+
+  /** True if a filter row service is configured on this table. @since 1.1.114 */
+  hasFilterRow(): boolean {
+    return !!this.filterRowService;
+  }
+
+  /** See {@link TableApi.isFilterRowVisible}. @since 1.1.114 */
+  isFilterRowVisible(): boolean {
+    return !!this.filterRowService?.isVisible();
+  }
+
+  /** See {@link TableApi.setFilterRowVisible}. @since 1.1.114 */
+  setFilterRowVisible(visible: boolean): void {
+    if (visible && !this.filterRowService) {
+      this.initFilterRowService(true);
+    } else if (!this.filterRowService) {
+      return;
+    } else if (!this.filterRowService.setVisible(visible)) {
+      return;
+    }
+    this.recalcWrappers();
+    this.stateService.markDirty('filters');
+  }
+
+  /** Restores filter row visibility from {@link TableStateService} without triggering an extra repaint. @since 1.1.114 */
+  restoreFilterRowVisible(visible: boolean): boolean {
+    if (!this.filterRowService) {
+      return false;
+    }
+    const changed = this.filterRowService.setVisible(visible);
+    if (changed) {
+      this.tableModel.recalcPadding();
+    }
+    return changed;
+  }
+
+  /** Called by {@link ColumnFilterService} after filters changed so the filter UI stays in sync. @since 1.1.114 */
+  onColumnFiltersChanged(source: GeFilterEventSource): void {
+    this.filterRowService?.syncFromFilters(source);
+  }
+
+  /** Clears a lingering header focus ring when the user focuses a filter row input. @since 1.1.114 */
+  clearHeaderFocusForFilterRow(): void {
+    if (this.headerFocus) {
+      this.headerFocus = undefined;
+      this.repaint();
+    }
+  }
+
+  /** Moves keyboard focus from a filter row input up to the column's lowest header cell. @since 1.1.114 */
+  focusHeaderFromFilterRow(columnIndex: number): void {
+    const headerRows = this.getAriaGridInfo().headerRowCount;
+    if (headerRows > 0) {
+      this.setHeaderFocus(headerRows - 1, columnIndex);
+    }
+    this.hostElement.focus({ preventScroll: true });
+  }
+
+  /** Moves keyboard focus from a filter row input down to the first visible body row in that column. @since 1.1.114 */
+  focusBodyFromFilterRow(columnIndex: number): void {
+    const rowCount = this.tableModel.getBodyModel().getRowCount();
+    this.headerFocus = undefined;
+    if (rowCount > 0) {
+      this.setFocusCell(Math.max(0, this.firstFullVisibleRowIndex), columnIndex);
+    }
+    this.hostElement.focus({ preventScroll: true });
+  }
+
+  private initFilterRowService(option: boolean | Partial<FilterRowOptionsIf>): void {
+    const opts = FilterRowOptions.create(option);
+    if (!opts) {
+      return;
+    }
+    this.filterRowService = new FilterRowService(this, opts);
+    // Insert filter rowgroups into host aria-owns between header and body rowgroups
+    const owned = (this.hostElement.getAttribute('aria-owns') ?? '').split(' ').filter(Boolean);
+    const bodyWest = this.ariaIds.rowGroup('body', 'west');
+    const idx = owned.indexOf(bodyWest);
+    const filterIds = [
+      this.ariaIds.filterRowGroup('west'),
+      this.ariaIds.filterRowGroup('center'),
+      this.ariaIds.filterRowGroup('east'),
+    ];
+    owned.splice(idx < 0 ? owned.length : idx, 0, ...filterIds);
+    this.setHostAriaAttribute('aria-owns', owned.join(' '));
   }
 
   /**
@@ -3522,7 +3781,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       return false;
     }
     const result = body.appendRows(rows, {
-      filter: this.tableOptions.externalFilterFunction as ((row: unknown) => boolean) | undefined,
+      filter: this.getEffectiveFilterFunction() as ((row: unknown) => boolean) | undefined,
       compare: this.getActiveSortComparator(),
       maxRows: options.maxRows,
     });

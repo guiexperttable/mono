@@ -24,6 +24,12 @@ import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { TableDirection } from "../../rtl/table-direction.type";
 import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
+import type {
+  ColumnFilterMenuOptionsIf,
+  ColumnFilterOptionsIf,
+  ColumnFilterTextsIf,
+  FilterRowOptionsIf,
+} from "../../column-filter/column-filter-options.if";
 
 /**
  * Represents the options for configuring a table.
@@ -580,4 +586,54 @@ export interface TableOptionsIf {
    * @since 1.1.92
    */
   stateChangedDebounceDelay?: number;
+
+  /**
+   * Persistent filter row below the column titles ({@link FilterRowOptions}).
+   * `true` uses the defaults; an object overrides single fields (`visible`, `debounce`, `height`, `placeholder`,
+   * `clearButtonVisible`, `minInputWidthInPx`). Omitted / `false` (default) keeps the header unchanged.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), filterRow: true };
+   *
+   * @since 1.1.114
+   */
+  filterRow?: boolean | Partial<FilterRowOptionsIf>;
+
+  /**
+   * Per-column filter menu popup ({@link ColumnFilterMenuOptions}): adds a funnel button to every filterable header
+   * cell that opens a top-layer dialog with comparison operators and a searchable virtualized value checklist.
+   * `true` uses the defaults; an object overrides single fields (`showCondition`, `showValues`, `applyOnChange`,
+   * `maxValues`). Omitted / `false` (default) renders no funnel buttons.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), columnFilterMenu: true };
+   *
+   * @since 1.1.114
+   */
+  columnFilterMenu?: boolean | Partial<ColumnFilterMenuOptionsIf>;
+
+  /**
+   * Global options for built-in column filters ({@link TableApi.setColumnFilter}): `managed: false` disables
+   * client-side filtering and reports changes via {@link EventListenerIf.onFilterChanged} (for server-side filtering),
+   * `caseSensitive`, `locale` and `maxValues`.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), columnFilter: { caseSensitive: true } };
+   *
+   * @since 1.1.114
+   */
+  columnFilter?: Partial<ColumnFilterOptionsIf>;
+
+  /**
+   * Localizable UI texts for the filter row, filter menu and column chooser ({@link ColumnFilterTexts}).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...new TableOptions(),
+   *   columnFilterTexts: { searchPlaceholder: "Suchen", ok: "OK", cancel: "Abbrechen" }
+   * };
+   *
+   * @since 1.1.114
+   */
+  columnFilterTexts?: Partial<ColumnFilterTextsIf>;
 }

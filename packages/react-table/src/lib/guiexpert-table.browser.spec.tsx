@@ -57,6 +57,16 @@ describe('GuiexpertTable (React)', () => {
     expect(starts).toHaveLength(1);
   });
 
+  it('column filter event: setColumnFilter reports filterChanged (since 1.1.114)', async () => {
+    const events: unknown[] = [];
+    let api: TableApi | undefined;
+    mount(<GuiexpertTable tableModel={createModel(5)} tableReady={a => { api = a; }} filterChanged={e => events.push(e)} />);
+    await nextFrame();
+    api!.setColumnFilter('name', { condition: { operator: 'contains', value: 'Row 2' } });
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ property: 'name', source: 'api', rowCount: 1, unfilteredRowCount: 5 });
+  });
+
   it('master/detail: a React component as detail keeps its state while scrolling, is unmounted on collapse (since 1.1.97)', async () => {
     const unmounted = vi.fn();
     function Detail({ row }: DetailComponentProps<{ id: number }>) {
@@ -409,5 +419,20 @@ describe('GuiexpertTable (React)', () => {
     const first = bodyCell(host, 0, 0)!;
     expect(first.style.right).toBe('0px');
     expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
+
+  it('filterRow: renders filter inputs and typing fires filterChanged with source "row" (since 1.1.114)', async () => {
+    const filterChanged = vi.fn();
+    const tableOptions = { ...new TableOptions(), filterRow: { debounce: 0 } };
+    const host = mount(<GuiexpertTable tableModel={createModel(5)} tableOptions={tableOptions} filterChanged={filterChanged} />);
+    await nextFrame();
+    const input = host.querySelector<HTMLInputElement>('.ge-table-filter-cell[data-col-property="name"] input.ge-table-filter-input')!;
+    expect(input).not.toBeNull();
+    input.value = 'Row 2';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await nextFrame();
+    expect(filterChanged).toHaveBeenCalledTimes(1);
+    expect(filterChanged.mock.calls[0][0]).toMatchObject({ source: 'row', property: 'name', rowCount: 1, unfilteredRowCount: 5 });
+    expect(rowTexts(host)).toHaveLength(1);
   });
 });

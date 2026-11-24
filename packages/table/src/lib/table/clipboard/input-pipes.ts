@@ -45,7 +45,8 @@ function stripLeadingCurrency(s: string): string {
  * numbers, a percent sign (÷ 100), currency signs or ISO codes at the start or end (`€ 12`, `12 EUR`), exponent
  * notation. `undefined` if the text is no number (`"SKU 123"`, `"+49 123"` in en-US, `"(-5)"`).
  */
-function parseLocaleNumber(text: string, locale?: string): number | undefined {
+/** @internal */
+export function parseLocaleNumber(text: string, locale?: string): number | undefined {
   let s = text.trim().replace(/[   ]/g, " ").replace(/−/g, "-");
   if (!s) {
     return undefined;
@@ -123,7 +124,8 @@ function dateOrderOf(locale?: string): string[] {
 }
 
 /** A date from ISO text (`2026-10-16`, `2026-10-16T08:30[:00]`) or the short date of the locale (`16.10.2026`). */
-function parseDateText(text: string, locale?: string): Date | undefined {
+/** @internal */
+export function parseDateText(text: string, locale?: string): Date | undefined {
   const s = text.trim();
   const iso = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(s);
   if (iso) {

@@ -242,9 +242,12 @@ export const CHAPTERS: Chapter[] = [
     slug: "filtering", no: 21, part: "data", episode: 21, minutes: 5,
     title: "Filtering with a live search", nav: "Filtering",
     lead: "The filter UI is yours – the table only asks: show this row?",
-    learn: ["set an externalFilterFunction", "trigger the filter on input", "combine several criteria"],
-    api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged", "TableApi.getBodyModel"],
-    showcases: [{ name: "idfilter", title: "Slider filter" }],
+    learn: ["set an externalFilterFunction", "trigger the filter on input", "combine several criteria",
+      "switch on the built-in filter row, filter menu and column chooser (since 1.1.114)"],
+    api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged", "TableApi.getBodyModel",
+      "TableOptionsIf.filterRow", "TableOptionsIf.columnFilterMenu", "TableApi.setColumnFilter",
+      "EventListenerIf.onFilterChanged", "TableApi.showColumnChooser"],
+    showcases: [{ name: "idfilter", title: "Slider filter" }, { name: "columnfilter", title: "Column filters" }],
     since: "1.1.88"
   },
   {

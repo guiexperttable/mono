@@ -102,6 +102,11 @@
    * @type {((evt: import("@guiexpert/table").GeColumnMoveEvent) => void) | undefined}
    */
   export let onColumnMoveEnd = undefined;
+  /**
+   * Column filters changed (since 1.1.114).
+   * @type {((evt: import("@guiexpert/table").GeFilterEvent) => void) | undefined}
+   */
+  export let onFilterChanged = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -134,7 +139,8 @@
     onColumnResizeStart: (evt) => { dispatch("columnResizeStart", evt); onColumnResizeStart?.(evt); },
     onColumnResizeEnd: (evt) => { dispatch("columnResizeEnd", evt); onColumnResizeEnd?.(evt); },
     onColumnMoveStart: (evt) => { dispatch("columnMoveStart", evt); onColumnMoveStart?.(evt); },
-    onColumnMoveEnd: (evt) => { dispatch("columnMoveEnd", evt); onColumnMoveEnd?.(evt); }
+    onColumnMoveEnd: (evt) => { dispatch("columnMoveEnd", evt); onColumnMoveEnd?.(evt); },
+    onFilterChanged: (evt) => { dispatch("filterChanged", evt); onFilterChanged?.(evt); }
   };
 
   /**

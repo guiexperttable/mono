@@ -241,7 +241,8 @@ export class TableModel implements TableModelIf {
     const westWidth = this.getSideAreaWidth("west");
     const eastWidth = this.getSideAreaWidth("east");
     // a hidden header/footer (setHeaderVisible / setFooterVisible) takes no space – its rows stay in the model
-    const headerHeight = this.headerVisible ? this.getAreaHeight("header") : 0;
+    const extraHeader = this.headerVisible ? (this.tableScope?.getHeaderExtraHeight?.() ?? 0) : 0;
+    const headerHeight = this.headerVisible ? this.getAreaHeight("header") + extraHeader : 0;
     const footerHeight = this.footerVisible ? this.getAreaHeight("footer") : 0;
 
     this.padding = new Padding(

@@ -48,6 +48,8 @@ Training: [Remember the state](https://gui.expert/training/persist-state/)
 - [columns](TableStateIf.md#columns)
 - [custom](TableStateIf.md#custom)
 - [detailRowIds](TableStateIf.md#detailrowids)
+- [filterRowVisible](TableStateIf.md#filterrowvisible)
+- [filters](TableStateIf.md#filters)
 - [headerGroups](TableStateIf.md#headergroups)
 - [scroll](TableStateIf.md#scroll)
 - [selection](TableStateIf.md#selection)
@@ -65,7 +67,7 @@ The ids of the checked rows.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L78)
+[src/lib/table/state/table-state.if.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L79)
 
 ___
 
@@ -78,7 +80,7 @@ place; unknown properties are ignored.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L70)
+[src/lib/table/state/table-state.if.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L71)
 
 ___
 
@@ -90,7 +92,7 @@ Data of your application, e.g. the text of a filter field (must be JSON).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L86)
+[src/lib/table/state/table-state.if.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L91)
 
 ___
 
@@ -106,7 +108,39 @@ The ids of the master rows with an expanded detail row (master/detail).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:80](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L80)
+[src/lib/table/state/table-state.if.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L81)
+
+___
+
+### filterRowVisible
+
+• `Optional` **filterRowVisible**: `boolean`
+
+Visibility of the filter row (set when [TableOptionsIf.filterRow](TableOptionsIf.md#filterrow) is configured).
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/state/table-state.if.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L89)
+
+___
+
+### filters
+
+• `Optional` **filters**: [`ColumnFiltersMap`](../modules.md#columnfiltersmap)
+
+Active built-in column filters by column property (Date values serialized as ISO text).
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/state/table-state.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L87)
 
 ___
 
@@ -118,7 +152,7 @@ The state of the header groups with a toggle.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L84)
+[src/lib/table/state/table-state.if.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L85)
 
 ___
 
@@ -130,7 +164,7 @@ The scroll position.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L74)
+[src/lib/table/state/table-state.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L75)
 
 ___
 
@@ -142,7 +176,7 @@ The selection.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L82)
+[src/lib/table/state/table-state.if.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L83)
 
 ___
 
@@ -154,7 +188,7 @@ The sorted columns, the first one is the primary sort key. `[]` = unsorted.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L72)
+[src/lib/table/state/table-state.if.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L73)
 
 ___
 
@@ -166,7 +200,7 @@ Expanded / collapsed nodes of a tree table.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L76)
+[src/lib/table/state/table-state.if.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L77)
 
 ___
 
@@ -178,4 +212,4 @@ Format version, always `1`.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L65)
+[src/lib/table/state/table-state.if.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L66)

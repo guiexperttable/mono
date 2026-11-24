@@ -22,6 +22,7 @@ const METHODS = [
   'onStateChanged',  // since 1.1.92
   'onUndoStackChanged', // since 1.1.99
   'onColumnResizeStart', 'onColumnResizeEnd', 'onColumnMoveStart', 'onColumnMoveEnd', // since 1.1.110
+  'onFilterChanged', // since 1.1.114
 ];
 
 describe('EventAdapter', () => {

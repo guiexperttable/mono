@@ -50,6 +50,7 @@ Training: [Fixed columns](https://gui.expert/training/fixed-columns/)
 ### Properties
 
 - [classes](RowNumberColumnDef.md#classes)
+- [filter](RowNumberColumnDef.md#filter)
 - [headerLabel](RowNumberColumnDef.md#headerlabel)
 - [isVisible](RowNumberColumnDef.md#isvisible)
 - [maxWidth](RowNumberColumnDef.md#maxwidth)
@@ -87,7 +88,7 @@ Training: [Fixed columns](https://gui.expert/training/fixed-columns/)
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L75)
+[src/lib/table/data/common/row-number-column-def.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L77)
 
 ## Properties
 
@@ -105,6 +106,22 @@ are ready-made maps for the alignment.
 #### Defined in
 
 [src/lib/table/data/common/row-number-column-def.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L55)
+
+___
+
+### filter
+
+• **filter**: `boolean` = `false`
+
+Row numbers are not filterable (since 1.1.114).
+
+#### Implementation of
+
+[ColumnDefIf](../interfaces/ColumnDefIf.md).[filter](../interfaces/ColumnDefIf.md#filter)
+
+#### Defined in
+
+[src/lib/table/data/common/row-number-column-def.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L66)
 
 ___
 
@@ -204,7 +221,7 @@ The options (defaults from [RowNumberOptions](RowNumberOptions.md)).
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L67)
+[src/lib/table/data/common/row-number-column-def.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L69)
 
 ___
 
@@ -324,7 +341,7 @@ const rowNumber = columnDef.getRowNumber(0, tableModel.getBodyModel()); // 1
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L94)
+[src/lib/table/data/common/row-number-column-def.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L96)
 
 ___
 
@@ -356,7 +373,7 @@ const text = columnDef.getRowNumberText(1999, tableModel.getBodyModel()); // "2,
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L120)
+[src/lib/table/data/common/row-number-column-def.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L122)
 
 ___
 
@@ -387,7 +404,7 @@ const widest = new RowNumberColumnDef().getWidestText(tableModel.getBodyModel())
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L134)
+[src/lib/table/data/common/row-number-column-def.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L136)
 
 ___
 
@@ -411,4 +428,4 @@ const plain = new RowNumberColumnDef().hasDefaultFormat(); // true
 
 #### Defined in
 
-[src/lib/table/data/common/row-number-column-def.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L152)
+[src/lib/table/data/common/row-number-column-def.ts:154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/row-number-column-def.ts#L154)

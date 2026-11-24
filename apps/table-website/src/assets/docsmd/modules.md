@@ -53,8 +53,14 @@
 - [CollapsedExpandedData](classes/CollapsedExpandedData.md)
 - [ColorRgb](classes/ColorRgb.md)
 - [ColumnAutoWidthOptions](classes/ColumnAutoWidthOptions.md)
+- [ColumnChooserService](classes/ColumnChooserService.md)
 - [ColumnDef](classes/ColumnDef.md)
 - [ColumnDefGenerator](classes/ColumnDefGenerator.md)
+- [ColumnFilterMenuOptions](classes/ColumnFilterMenuOptions.md)
+- [ColumnFilterMenuService](classes/ColumnFilterMenuService.md)
+- [ColumnFilterOptions](classes/ColumnFilterOptions.md)
+- [ColumnFilterService](classes/ColumnFilterService.md)
+- [ColumnFilterTexts](classes/ColumnFilterTexts.md)
 - [ColumnWidths](classes/ColumnWidths.md)
 - [ConvenienceDomService](classes/ConvenienceDomService.md)
 - [CopyService](classes/CopyService.md)
@@ -80,6 +86,9 @@
 - [ExcelService](classes/ExcelService.md)
 - [FillHandleOptions](classes/FillHandleOptions.md)
 - [FillHandleService](classes/FillHandleService.md)
+- [FilterPopupShell](classes/FilterPopupShell.md)
+- [FilterRowOptions](classes/FilterRowOptions.md)
+- [FilterRowService](classes/FilterRowService.md)
 - [FocusModel](classes/FocusModel.md)
 - [FormulaAssist](classes/FormulaAssist.md)
 - [FormulaBar](classes/FormulaBar.md)
@@ -92,6 +101,7 @@
 - [GeCssColorUtil](classes/GeCssColorUtil.md)
 - [GeDetailEvent](classes/GeDetailEvent.md)
 - [GeEditEvent](classes/GeEditEvent.md)
+- [GeFilterEvent](classes/GeFilterEvent.md)
 - [GeFilterService](classes/GeFilterService.md)
 - [GeKeyEvent](classes/GeKeyEvent.md)
 - [GeModelChangeEvent](classes/GeModelChangeEvent.md)
@@ -228,11 +238,22 @@
 - [CheckboxModelIf](interfaces/CheckboxModelIf.md)
 - [ChunkDataIf](interfaces/ChunkDataIf.md)
 - [ClipboardOptionsIf](interfaces/ClipboardOptionsIf.md)
+- [CollectDistinctValuesOptionsIf](interfaces/CollectDistinctValuesOptionsIf.md)
 - [ColorRgbIf](interfaces/ColorRgbIf.md)
 - [ColumnAutoWidthContextIf](interfaces/ColumnAutoWidthContextIf.md)
 - [ColumnAutoWidthOptionsIf](interfaces/ColumnAutoWidthOptionsIf.md)
 - [ColumnDefIf](interfaces/ColumnDefIf.md)
+- [ColumnFilterColumnOptionsIf](interfaces/ColumnFilterColumnOptionsIf.md)
+- [ColumnFilterConditionIf](interfaces/ColumnFilterConditionIf.md)
+- [ColumnFilterIf](interfaces/ColumnFilterIf.md)
+- [ColumnFilterMenuOptionsIf](interfaces/ColumnFilterMenuOptionsIf.md)
+- [ColumnFilterOptionsIf](interfaces/ColumnFilterOptionsIf.md)
+- [ColumnFilterResolverIf](interfaces/ColumnFilterResolverIf.md)
+- [ColumnFilterTextsIf](interfaces/ColumnFilterTextsIf.md)
+- [ColumnFilterValueItemIf](interfaces/ColumnFilterValueItemIf.md)
+- [ColumnFilterValuesContextIf](interfaces/ColumnFilterValuesContextIf.md)
 - [ColumnWidthsIf](interfaces/ColumnWidthsIf.md)
+- [CompileColumnFilterOptionsIf](interfaces/CompileColumnFilterOptionsIf.md)
 - [CompiledFormula](interfaces/CompiledFormula.md)
 - [CopyContextIf](interfaces/CopyContextIf.md)
 - [CopyServiceIf](interfaces/CopyServiceIf.md)
@@ -243,6 +264,7 @@
 - [DetailRenderContextIf](interfaces/DetailRenderContextIf.md)
 - [DetailRendererIf](interfaces/DetailRendererIf.md)
 - [DetailTableParamsIf](interfaces/DetailTableParamsIf.md)
+- [DistinctValuesResultIf](interfaces/DistinctValuesResultIf.md)
 - [DomServiceIf](interfaces/DomServiceIf.md)
 - [EditingOptionsIf](interfaces/EditingOptionsIf.md)
 - [EventFocusChangedListenerIf](interfaces/EventFocusChangedListenerIf.md)
@@ -255,6 +277,8 @@
 - [FillHandleOptionsIf](interfaces/FillHandleOptionsIf.md)
 - [FillRequestIf](interfaces/FillRequestIf.md)
 - [FillValueContextIf](interfaces/FillValueContextIf.md)
+- [FilterPopupOpenOptionsIf](interfaces/FilterPopupOpenOptionsIf.md)
+- [FilterRowOptionsIf](interfaces/FilterRowOptionsIf.md)
 - [FocusModelIf](interfaces/FocusModelIf.md)
 - [FormulaBarOptionsIf](interfaces/FormulaBarOptionsIf.md)
 - [FormulaFunctionInfoIf](interfaces/FormulaFunctionInfoIf.md)
@@ -356,6 +380,10 @@
 - [CheckedType](modules.md#checkedtype)
 - [ClipboardKind](modules.md#clipboardkind)
 - [ColumnEditorOption](modules.md#columneditoroption)
+- [ColumnFilterColumnOption](modules.md#columnfiltercolumnoption)
+- [ColumnFilterOperator](modules.md#columnfilteroperator)
+- [ColumnFilterType](modules.md#columnfiltertype)
+- [ColumnFiltersMap](modules.md#columnfiltersmap)
 - [DetailHeightType](modules.md#detailheighttype)
 - [DetailRenderFnType](modules.md#detailrenderfntype)
 - [DivScope](modules.md#divscope)
@@ -364,6 +392,7 @@
 - [FillDirection](modules.md#filldirection)
 - [FillMode](modules.md#fillmode)
 - [FilterFunction](modules.md#filterfunction)
+- [FilterPopupCloseReason](modules.md#filterpopupclosereason)
 - [FocusType](modules.md#focustype)
 - [FormulaBinaryOperator](modules.md#formulabinaryoperator)
 - [FormulaErrorCode](modules.md#formulaerrorcode)
@@ -375,6 +404,7 @@
 - [GeColumnResizeSource](modules.md#gecolumnresizesource)
 - [GeDetailEventSource](modules.md#gedetaileventsource)
 - [GeEditEventType](modules.md#geediteventtype)
+- [GeFilterEventSource](modules.md#gefiltereventsource)
 - [GeOverlayKind](modules.md#geoverlaykind)
 - [GeRowDragEventType](modules.md#gerowdrageventtype)
 - [GeRowDragSource](modules.md#gerowdragsource)
@@ -488,6 +518,7 @@
 - [aggregateRowGroups](modules.md#aggregaterowgroups)
 - [applySpreadsheetPreset](modules.md#applyspreadsheetpreset)
 - [applyStructureEdit](modules.md#applystructureedit)
+- [areColumnFiltersEqual](modules.md#arecolumnfiltersequal)
 - [booleanInputPipe](modules.md#booleaninputpipe)
 - [calcMoveToIndex](modules.md#calcmovetoindex)
 - [calcOverlayKind](modules.md#calcoverlaykind)
@@ -496,9 +527,13 @@
 - [canMoveTreeRows](modules.md#canmovetreerows)
 - [canScrollHorizontally](modules.md#canscrollhorizontally)
 - [clipboardShortcutLayer](modules.md#clipboardshortcutlayer)
+- [collectDistinctValues](modules.md#collectdistinctvalues)
+- [columnFilterShortcutLayer](modules.md#columnfiltershortcutlayer)
 - [columnIndexOfLetter](modules.md#columnindexofletter)
 - [columnLetter](modules.md#columnletter)
+- [compileColumnFilterPredicate](modules.md#compilecolumnfilterpredicate)
 - [compileFormula](modules.md#compileformula)
+- [compileSingleColumnFilter](modules.md#compilesinglecolumnfilter)
 - [computeFillChanges](modules.md#computefillchanges)
 - [computeFillValues](modules.md#computefillvalues)
 - [computePastePlan](modules.md#computepasteplan)
@@ -507,15 +542,20 @@
 - [createHarmonizedShortcutByKeyboardEvent](modules.md#createharmonizedshortcutbykeyboardevent)
 - [createNumberInputPipe](modules.md#createnumberinputpipe)
 - [createValueGetter](modules.md#createvaluegetter)
+- [dateSetKey](modules.md#datesetkey)
 - [dateToSerial](modules.md#datetoserial)
 - [debounce](modules.md#debounce)
+- [deserializeColumnFilters](modules.md#deserializecolumnfilters)
 - [editInputPipeForNumber](modules.md#editinputpipefornumber)
 - [editingShortcutLayer](modules.md#editingshortcutlayer)
 - [escapeHtml](modules.md#escapehtml)
+- [filterValueKey](modules.md#filtervaluekey)
 - [findDataEdge](modules.md#finddataedge)
 - [findRowIndexAtY](modules.md#findrowindexaty)
 - [firstLetterUppercase](modules.md#firstletteruppercase)
 - [formatAggregateValue](modules.md#formataggregatevalue)
+- [formatFilterCondition](modules.md#formatfiltercondition)
+- [formatFilterNumber](modules.md#formatfilternumber)
 - [formatFormula](modules.md#formatformula)
 - [formatShowValuesAs](modules.md#formatshowvaluesas)
 - [getAggregator](modules.md#getaggregator)
@@ -529,10 +569,12 @@
 - [getTopmostTreeRows](modules.md#gettopmosttreerows)
 - [groupRows](modules.md#grouprows)
 - [harmonizeShortcut](modules.md#harmonizeshortcut)
+- [inferColumnFilterType](modules.md#infercolumnfiltertype)
 - [isAreaModelAggregateFooter](modules.md#isareamodelaggregatefooter)
 - [isAreaModelPivot](modules.md#isareamodelpivot)
 - [isAreaModelRowGroups](modules.md#isareamodelrowgroups)
 - [isAreaModelTree](modules.md#isareamodeltree)
+- [isBlankFilterValue](modules.md#isblankfiltervalue)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
 - [isExcelFormattedValue](modules.md#isexcelformattedvalue)
@@ -556,9 +598,11 @@
 - [moveArrayItems](modules.md#movearrayitems)
 - [moveFlatRows](modules.md#moveflatrows)
 - [moveTreeRows](modules.md#movetreerows)
+- [normalizeColumnFilter](modules.md#normalizecolumnfilter)
 - [normalizeRowIndices](modules.md#normalizerowindices)
 - [offsetReferences](modules.md#offsetreferences)
 - [parseCellAddress](modules.md#parsecelladdress)
+- [parseFilterInput](modules.md#parsefilterinput)
 - [parseHtmlTable](modules.md#parsehtmltable)
 - [parseRangeAddress](modules.md#parserangeaddress)
 - [parseTsv](modules.md#parsetsv)
@@ -568,6 +612,7 @@
 - [resolveShowValuesAs](modules.md#resolveshowvaluesas)
 - [resolveTableDirection](modules.md#resolvetabledirection)
 - [serialToDate](modules.md#serialtodate)
+- [serializeColumnFilters](modules.md#serializecolumnfilters)
 - [setLogicalScrollLeft](modules.md#setlogicalscrollleft)
 - [sheetInputPipe](modules.md#sheetinputpipe)
 - [shiftFormula](modules.md#shiftformula)
@@ -575,6 +620,7 @@
 - [sumOfNumbers](modules.md#sumofnumbers)
 - [throttle](modules.md#throttle)
 - [toCellAddress](modules.md#tocelladdress)
+- [toDateDayKey](modules.md#todatedaykey)
 - [toHtmlTable](modules.md#tohtmltable)
 - [toLogicalX](modules.md#tologicalx)
 - [toPhysicalScrollLeft](modules.md#tophysicalscrollleft)
@@ -768,7 +814,7 @@ A number indicating the relative order of 'valueA' and 'valueB'.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L30)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L31)
 
 ___
 
@@ -1580,6 +1626,22 @@ ___
 
 [src/lib/table/renderer/edit/edit-input-pipe.if.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/renderer/edit/edit-input-pipe.if.ts#L14)
 
+## Events
+
+### GeFilterEventSource
+
+Ƭ **GeFilterEventSource**: ``"row"`` \| ``"menu"`` \| ``"api"`` \| ``"state"``
+
+What triggered a column filter change ([GeFilterEvent.source](classes/GeFilterEvent.md#source)).
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-filter-event.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-filter-event.ts#L9)
+
 ## Selection &amp; focus
 
 ### CheckedType
@@ -1662,6 +1724,98 @@ ___
 
 ## Sorting &amp; filtering
 
+### ColumnFilterColumnOption
+
+Ƭ **ColumnFilterColumnOption**: `boolean` \| [`ColumnFilterType`](modules.md#columnfiltertype) \| `Partial`\<[`ColumnFilterColumnOptionsIf`](interfaces/ColumnFilterColumnOptionsIf.md)\>
+
+Value of [ColumnDefIf.filter](interfaces/ColumnDefIf.md#filter): `false` disables filtering for the column, `true` enables it with inferred
+type, a [ColumnFilterType](modules.md#columnfiltertype) picks the type, or an object configures details.
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-options.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-options.if.ts#L75)
+
+___
+
+### ColumnFilterOperator
+
+Ƭ **ColumnFilterOperator**: ``"contains"`` \| ``"startsWith"`` \| ``"endsWith"`` \| ``"equals"`` \| ``"notEquals"`` \| ``"lessThan"`` \| ``"lessOrEqual"`` \| ``"greaterThan"`` \| ``"greaterOrEqual"`` \| ``"between"`` \| ``"blank"`` \| ``"notBlank"``
+
+Comparison operators for a [ColumnFilterConditionIf](interfaces/ColumnFilterConditionIf.md).
+
+- Text: `"contains"`, `"startsWith"`, `"endsWith"`, `"equals"`, `"notEquals"`, `"blank"`, `"notBlank"`.
+- Number / Date: `"equals"`, `"notEquals"`, `"lessThan"`, `"lessOrEqual"`, `"greaterThan"`, `"greaterOrEqual"`,
+  `"between"`, `"blank"`, `"notBlank"`.
+- Boolean: `"equals"`, `"notEquals"`, `"blank"`, `"notBlank"`.
+
+**`Example`**
+
+```ts
+const op: ColumnFilterOperator = "greaterThan";
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-operator.type.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-operator.type.ts#L15)
+
+___
+
+### ColumnFilterType
+
+Ƭ **ColumnFilterType**: ``"text"`` \| ``"number"`` \| ``"date"`` \| ``"boolean"`` \| ``"set"``
+
+Data type used for comparing values of a filtered column ([ColumnDefIf.filter](interfaces/ColumnDefIf.md#filter)).
+Without an explicit type the table infers it from the first non-blank values ([inferColumnFilterType](modules.md#infercolumnfiltertype)).
+
+**`Example`**
+
+```ts
+const kind: ColumnFilterType = "number";
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-type.type.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-type.type.ts#L11)
+
+___
+
+### ColumnFiltersMap
+
+Ƭ **ColumnFiltersMap**: `Record`\<`string`, [`ColumnFilterIf`](interfaces/ColumnFilterIf.md)\>
+
+Active column filters indexed by column property (or `"#<index>"` for array-of-arrays tables without column definitions).
+
+**`Example`**
+
+```ts
+const filters: ColumnFiltersMap = {
+  region: { values: ["EMEA", "APAC"] },
+  seats: { condition: { operator: "greaterOrEqual", value: 20 } }
+};
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter.if.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter.if.ts#L52)
+
+___
+
 ### FilterFunction
 
 Ƭ **FilterFunction**\<`T`\>: (`value`: `T`, `index`: `number`, `array`: `T`[]) => `unknown`
@@ -1708,6 +1862,565 @@ It can take one of the following values: "asc", "desc", or "" (empty string).
 #### Defined in
 
 [src/lib/table/data/common/sort-state.type.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/sort-state.type.ts#L9)
+
+___
+
+### areColumnFiltersEqual
+
+▸ **areColumnFiltersEqual**(`a`, `b`): `boolean`
+
+Returns `true` when two [ColumnFiltersMap](modules.md#columnfiltersmap) objects represent the exact same filters.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `a` | [`ColumnFiltersMap`](modules.md#columnfiltersmap) |
+| `b` | [`ColumnFiltersMap`](modules.md#columnfiltersmap) |
+
+#### Returns
+
+`boolean`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-state.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-state.ts#L139)
+
+___
+
+### collectDistinctValues
+
+▸ **collectDistinctValues**\<`T`\>(`rows`, `getValue`, `options?`): [`DistinctValuesResultIf`](interfaces/DistinctValuesResultIf.md)
+
+Collects distinct values of one column in a single pass with a `Map` (preserving `1 !== "1"`), natural sorting
+(numbers numerically, dates chronologically, blanks last), optional substring search, and a `maxValues` cap.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rows` | readonly `T`[] |
+| `getValue` | (`row`: `T`) => `unknown` |
+| `options` | [`CollectDistinctValuesOptionsIf`](interfaces/CollectDistinctValuesOptionsIf.md) |
+
+#### Returns
+
+[`DistinctValuesResultIf`](interfaces/DistinctValuesResultIf.md)
+
+**`Example`**
+
+```ts
+const res = collectDistinctValues([{ r: "EMEA" }, { r: "APAC" }, { r: "EMEA" }], (x: { r: string }) => x.r);
+res.items.map(i => i.value); // ["APAC", "EMEA"]
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/collect-distinct-values.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/collect-distinct-values.ts#L75)
+
+___
+
+### columnFilterShortcutLayer
+
+▸ **columnFilterShortcutLayer**(`mac`): [`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+Keyboard shortcuts for built-in column filtering ([TableOptionsIf.filterRow](interfaces/TableOptionsIf.md#filterrow) /
+[TableOptionsIf.columnFilterMenu](interfaces/TableOptionsIf.md#columnfiltermenu)) – applied as a layer over the system mapping only when one of those
+options is enabled; `tableOptions.shortcutActionIdMapping` still overrides it.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mac` | `boolean` | macOS keys (`⌘+Shift+F` instead of `Ctrl+Shift+F`) |
+
+#### Returns
+
+[`ShortcutActionIdMapping`](modules.md#shortcutactionidmapping)
+
+the layer
+
+**`Example`**
+
+```ts
+columnFilterShortcutLayer(false)["ctrl+shift+f"]; // "FOCUS_COLUMN_FILTER"
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-keymap.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-keymap.ts#L17)
+
+___
+
+### compileColumnFilterPredicate
+
+▸ **compileColumnFilterPredicate**\<`T`\>(`filters`, `resolvers`, `options?`): (`row`: `T`) => `boolean` \| `undefined`
+
+Compiles all active entries of a [ColumnFiltersMap](modules.md#columnfiltersmap) into a **single** row predicate closure (AND across
+columns, single pass with zero per-row allocations). Returns `undefined` when no active column filters match the
+given resolvers.
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `filters` | [`ColumnFiltersMap`](modules.md#columnfiltersmap) |
+| `resolvers` | readonly [`ColumnFilterResolverIf`](interfaces/ColumnFilterResolverIf.md)\<`T`\>[] |
+| `options?` | [`CompileColumnFilterOptionsIf`](interfaces/CompileColumnFilterOptionsIf.md) |
+
+#### Returns
+
+(`row`: `T`) => `boolean` \| `undefined`
+
+**`Example`**
+
+```ts
+const pred = compileColumnFilterPredicate(
+  { seats: { condition: { operator: "greaterThan", value: 40 } } },
+  [{ property: "seats", type: "number", getValue: (r: { seats: number }) => r.seats }]
+);
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:378](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L378)
+
+___
+
+### compileSingleColumnFilter
+
+▸ **compileSingleColumnFilter**(`filter`, `type?`, `options?`): (`value`: `unknown`) => `boolean`
+
+Compiles one [ColumnFilterIf](interfaces/ColumnFilterIf.md) into a fast value predicate closure (no `eval`).
+When both `condition` and `values` are present, both must match (AND).
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `filter` | [`ColumnFilterIf`](interfaces/ColumnFilterIf.md) | `undefined` |
+| `type` | [`ColumnFilterType`](modules.md#columnfiltertype) | `"text"` |
+| `options?` | [`CompileColumnFilterOptionsIf`](interfaces/CompileColumnFilterOptionsIf.md) | `undefined` |
+
+#### Returns
+
+`fn`
+
+▸ (`value`): `boolean`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+
+##### Returns
+
+`boolean`
+
+**`Example`**
+
+```ts
+const match = compileSingleColumnFilter({ condition: { operator: "greaterThan", value: 10 } }, "number");
+match(15); // true
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:305](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L305)
+
+___
+
+### dateSetKey
+
+▸ **dateSetKey**(`value`): `unknown`
+
+Key of a value in the value list of a **date** column: `Date` → time, date text (`"2026-01-15"`, ISO with time) →
+its time, blank → `null`, everything else as is. Used on both sides (allowed values and cell values).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+
+#### Returns
+
+`unknown`
+
+**`Example`**
+
+```ts
+dateSetKey(new Date(0)) === dateSetKey("1970-01-01T00:00:00.000Z"); // true
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:280](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L280)
+
+___
+
+### deserializeColumnFilters
+
+▸ **deserializeColumnFilters**(`raw`, `validProperties?`): [`ColumnFiltersMap`](modules.md#columnfiltersmap)
+
+Restores a [ColumnFiltersMap](modules.md#columnfiltersmap) from stored JSON, dropping invalid entries and (when `validProperties` is
+given) ignoring unknown column properties.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `raw` | `unknown` |
+| `validProperties?` | `ReadonlySet`\<`string`\> |
+
+#### Returns
+
+[`ColumnFiltersMap`](modules.md#columnfiltersmap)
+
+**`Example`**
+
+```ts
+deserializeColumnFilters({ region: { values: ["EMEA"] }, gone: { values: ["x"] } }, new Set(["region"]));
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-state.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-state.ts#L110)
+
+___
+
+### filterValueKey
+
+▸ **filterValueKey**(`value`): `string`
+
+Stable, type-preserving key for a cell value used by set filters (`values`) and distinct-value collection.
+Preserves `1 !== "1"` and `true !== "true"`; all blank values share the key `"blank"`.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+
+#### Returns
+
+`string`
+
+**`Example`**
+
+```ts
+filterValueKey(1) !== filterValueKey("1"); // true
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L38)
+
+___
+
+### formatFilterCondition
+
+▸ **formatFilterCondition**(`filter`, `texts?`, `locale?`): `string`
+
+Formats a [ColumnFilterIf](interfaces/ColumnFilterIf.md) into the concise display string shown in a filter-row input.
+
+The text of a condition is one that [parseFilterInput](modules.md#parsefilterinput) reads back to the same condition (`= EMEA`, `^Ac`,
+`GmbH$`, `""`, numbers with the decimal separator of `locale`).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `filter` | `undefined` \| [`ColumnFilterIf`](interfaces/ColumnFilterIf.md) |
+| `texts?` | `Partial`\<[`ColumnFilterTextsIf`](interfaces/ColumnFilterTextsIf.md)\> |
+| `locale?` | `string` |
+
+#### Returns
+
+`string`
+
+**`Example`**
+
+```ts
+formatFilterCondition({ condition: { operator: "greaterThan", value: 40 } }); // "> 40"
+formatFilterCondition({ values: ["EMEA", "APAC"] });                          // "(2 values)"
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/parse-filter-input.ts:243](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/parse-filter-input.ts#L243)
+
+___
+
+### formatFilterNumber
+
+▸ **formatFilterNumber**(`value`, `locale?`): `string`
+
+Formats a number the way [parseFilterInput](modules.md#parsefilterinput) reads it back in `locale`: no group separators, the decimal
+separator of the locale (`1.5` → `"1,5"` in `"de-DE"`).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `number` |
+| `locale?` | `string` |
+
+#### Returns
+
+`string`
+
+**`Example`**
+
+```ts
+formatFilterNumber(1234.5, "de-DE"); // "1234,5"
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/parse-filter-input.ts:215](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/parse-filter-input.ts#L215)
+
+___
+
+### inferColumnFilterType
+
+▸ **inferColumnFilterType**\<`T`\>(`rows`, `getValue`, `sampleSize?`): [`ColumnFilterType`](modules.md#columnfiltertype)
+
+Infers the [ColumnFilterType](modules.md#columnfiltertype) of a column from up to `sampleSize` non-blank values (`"number"`, `"date"`,
+`"boolean"`, or `"text"` for strings, mixed types, or empty data).
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `any` |
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `rows` | readonly `T`[] | `undefined` |
+| `getValue` | (`row`: `T`) => `unknown` | `undefined` |
+| `sampleSize` | `number` | `100` |
+
+#### Returns
+
+[`ColumnFilterType`](modules.md#columnfiltertype)
+
+**`Example`**
+
+```ts
+inferColumnFilterType([10, 20, null], (v: unknown) => v); // "number"
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/infer-column-filter-type.ts:14](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/infer-column-filter-type.ts#L14)
+
+___
+
+### isBlankFilterValue
+
+▸ **isBlankFilterValue**(`value`): `boolean`
+
+Returns `true` if a cell value is treated as blank by column filters (`null`, `undefined`, `""`, `NaN`, or an
+invalid `Date`). `0` and `false` are **not** blank.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+
+#### Returns
+
+`boolean`
+
+**`Example`**
+
+```ts
+isBlankFilterValue(null); // true
+isBlankFilterValue(0);    // false
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:15](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L15)
+
+___
+
+### normalizeColumnFilter
+
+▸ **normalizeColumnFilter**(`filter`): [`ColumnFilterIf`](interfaces/ColumnFilterIf.md) \| `undefined`
+
+Normalizes a [ColumnFilterIf](interfaces/ColumnFilterIf.md): returns `undefined` when neither `condition` nor `values` is set.
+An empty `values: []` array is kept (it means "match nothing").
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `filter` | `undefined` \| [`ColumnFilterIf`](interfaces/ColumnFilterIf.md) |
+
+#### Returns
+
+[`ColumnFilterIf`](interfaces/ColumnFilterIf.md) \| `undefined`
+
+**`Example`**
+
+```ts
+normalizeColumnFilter({});           // undefined
+normalizeColumnFilter({ values: [] }); // { values: [] }
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-state.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-state.ts#L35)
+
+___
+
+### parseFilterInput
+
+▸ **parseFilterInput**(`raw`, `type?`, `locale?`): [`ColumnFilterConditionIf`](interfaces/ColumnFilterConditionIf.md) \| `undefined` \| ``null``
+
+Parses text typed into a filter-row input into a [ColumnFilterConditionIf](interfaces/ColumnFilterConditionIf.md).
+
+- Returns `undefined` for empty / whitespace input (clears the condition).
+- Returns `null` when the input is incomplete or invalid for the column's type (e.g. `">"` or `"10.."` while
+  typing) so the caller can wait without applying a broken filter.
+- Every type: `""` = blank, `!=""` = not blank.
+- Text columns: `contains`; `=x` equals, `!=x` / `<>x` not equal, `^x` starts with, `x$` ends with.
+- Number columns: `>100`, `<=5`, `>=0`, `< -10`, `=7`, `!=3`/`<>3`, `10..20`, or plain number (`equals`), using
+  the locale's decimal and group separators.
+- Date columns: ISO (`2026-05-10`, `>2026-01-01`, `2026-01-01..2026-06-30`), a month (`2026-03` = the whole
+  month, `2026-01..2026-03` = January to March) or locale short date (`16.10.2026`).
+- Boolean columns: `true`/`false`/`yes`/`no`/`1`/`0`/`ja`/`nein`/`wahr`/`falsch`.
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `raw` | `string` | `undefined` |
+| `type` | [`ColumnFilterType`](modules.md#columnfiltertype) | `"text"` |
+| `locale?` | `string` | `undefined` |
+
+#### Returns
+
+[`ColumnFilterConditionIf`](interfaces/ColumnFilterConditionIf.md) \| `undefined` \| ``null``
+
+**`Example`**
+
+```ts
+parseFilterInput(">100", "number");       // { operator: "greaterThan", value: 100 }
+parseFilterInput("10..20", "number");     // { operator: "between", value: 10, valueTo: 20 }
+parseFilterInput("emea", "text");         // { operator: "contains", value: "emea" }
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/parse-filter-input.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/parse-filter-input.ts#L88)
+
+___
+
+### serializeColumnFilters
+
+▸ **serializeColumnFilters**(`filters`): [`ColumnFiltersMap`](modules.md#columnfiltersmap)
+
+Serializes a [ColumnFiltersMap](modules.md#columnfiltersmap) to plain JSON (converting `Date` values to ISO `"YYYY-MM-DD"` strings and
+dropping empty entries).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `filters` | [`ColumnFiltersMap`](modules.md#columnfiltersmap) |
+
+#### Returns
+
+[`ColumnFiltersMap`](modules.md#columnfiltersmap)
+
+**`Example`**
+
+```ts
+serializeColumnFilters({ created: { condition: { operator: "equals", value: new Date(2026, 4, 10) } } });
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/column-filter-state.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/column-filter-state.ts#L71)
 
 ## Export &amp; clipboard
 
@@ -1795,7 +2508,7 @@ module:myModule.actionIds
 
 #### Defined in
 
-[src/lib/table/action/action-id.type.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L79)
+[src/lib/table/action/action-id.type.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L82)
 
 ___
 
@@ -1817,7 +2530,7 @@ ___
 
 ### actionIds
 
-• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``, ``"NAVIGATE_NEXT_CELL"``, ``"NAVIGATE_PREVIOUS_CELL"``, ``"EXTEND_SELECTION_UP"``, ``"EXTEND_SELECTION_DOWN"``, ``"EXTEND_SELECTION_LEFT"``, ``"EXTEND_SELECTION_RIGHT"``, ``"EXTEND_SELECTION_ROW_START"``, ``"EXTEND_SELECTION_ROW_END"``, ``"EXTEND_SELECTION_PAGE_UP"``, ``"EXTEND_SELECTION_PAGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_UP"``, ``"NAVIGATE_DATA_EDGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_LEFT"``, ``"NAVIGATE_DATA_EDGE_RIGHT"``, ``"EXTEND_TO_DATA_EDGE_UP"``, ``"EXTEND_TO_DATA_EDGE_DOWN"``, ``"EXTEND_TO_DATA_EDGE_LEFT"``, ``"EXTEND_TO_DATA_EDGE_RIGHT"``, ``"SELECT_ROW"``, ``"SELECT_COLUMN"``, ``"CLEAR_CELLS"``, ``"CLEAR_AND_EDIT"``, ``"CUT_2_CLIPBOARD"``, ``"PASTE_FROM_CLIPBOARD"``, ``"UNDO"``, ``"REDO"``]
+• `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``, ``"NAVIGATE_NEXT_CELL"``, ``"NAVIGATE_PREVIOUS_CELL"``, ``"EXTEND_SELECTION_UP"``, ``"EXTEND_SELECTION_DOWN"``, ``"EXTEND_SELECTION_LEFT"``, ``"EXTEND_SELECTION_RIGHT"``, ``"EXTEND_SELECTION_ROW_START"``, ``"EXTEND_SELECTION_ROW_END"``, ``"EXTEND_SELECTION_PAGE_UP"``, ``"EXTEND_SELECTION_PAGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_UP"``, ``"NAVIGATE_DATA_EDGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_LEFT"``, ``"NAVIGATE_DATA_EDGE_RIGHT"``, ``"EXTEND_TO_DATA_EDGE_UP"``, ``"EXTEND_TO_DATA_EDGE_DOWN"``, ``"EXTEND_TO_DATA_EDGE_LEFT"``, ``"EXTEND_TO_DATA_EDGE_RIGHT"``, ``"SELECT_ROW"``, ``"SELECT_COLUMN"``, ``"CLEAR_CELLS"``, ``"CLEAR_AND_EDIT"``, ``"CUT_2_CLIPBOARD"``, ``"PASTE_FROM_CLIPBOARD"``, ``"UNDO"``, ``"REDO"``, ``"FOCUS_COLUMN_FILTER"``, ``"OPEN_COLUMN_FILTER_MENU"``]
 
 An array of action identifiers.
 
@@ -1945,7 +2658,7 @@ if (tableApi.getOverlayState() === "noMatches") {
 
 ### TableStatePart
 
-Ƭ **TableStatePart**: ``"columns"`` \| ``"sort"`` \| ``"scroll"`` \| ``"tree"`` \| ``"checked"`` \| ``"selection"`` \| ``"headerGroups"`` \| ``"custom"`` \| ``"details"``
+Ƭ **TableStatePart**: ``"columns"`` \| ``"sort"`` \| ``"scroll"`` \| ``"tree"`` \| ``"checked"`` \| ``"selection"`` \| ``"headerGroups"`` \| ``"custom"`` \| ``"details"`` \| ``"filters"``
 
 One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or apply only some parts:
 `tableApi.getState(["columns", "sort"])`.
@@ -1968,7 +2681,7 @@ One part of a [TableStateIf](interfaces/TableStateIf.md). Use it to read or appl
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L30)
+[src/lib/table/state/table-state.if.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L31)
 
 ___
 
@@ -1984,7 +2697,7 @@ The id of a row in a [TableStateIf](interfaces/TableStateIf.md) – what [AutoRe
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:9](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L9)
+[src/lib/table/state/table-state.if.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L10)
 
 ___
 
@@ -3774,7 +4487,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:275](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L275)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:300](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L300)
 
 ___
 
@@ -4292,7 +5005,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:266](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L266)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:291](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L291)
 
 ___
 
@@ -5115,7 +5828,7 @@ ColumnDef.create({ property: "due", editable: TrueFn, editInputPipe: createDateI
 
 #### Defined in
 
-[src/lib/table/clipboard/input-pipes.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L171)
+[src/lib/table/clipboard/input-pipes.ts:173](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L173)
 
 ___
 
@@ -5151,7 +5864,7 @@ ColumnDef.create({ property: "price", editable: TrueFn, editInputPipe: createNum
 
 #### Defined in
 
-[src/lib/table/clipboard/input-pipes.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L103)
+[src/lib/table/clipboard/input-pipes.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L104)
 
 ___
 
@@ -5701,7 +6414,7 @@ ColumnDef.create({ property: "b", editable: TrueFn, editInputPipe: sheetInputPip
 
 #### Defined in
 
-[src/lib/table/clipboard/input-pipes.ts:222](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L222)
+[src/lib/table/clipboard/input-pipes.ts:224](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/input-pipes.ts#L224)
 
 ___
 
@@ -6608,6 +7321,28 @@ ___
 
 ___
 
+### toDateDayKey
+
+▸ **toDateDayKey**(`value`): `number` \| `undefined`
+
+Converts a `Date` or ISO date string (`"YYYY-MM-DD..."`) into a UTC day timestamp for calendar-day comparisons.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `unknown` |
+
+#### Returns
+
+`number` \| `undefined`
+
+#### Defined in
+
+[src/lib/table/column-filter/compile-column-filters.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/compile-column-filters.ts#L60)
+
+___
+
 ### toLogicalX
 
 ▸ **toLogicalX**(`clientX`, `boxLeft`, `boxWidth`, `rtl`): `number`
@@ -6721,6 +7456,22 @@ A clipboard action of the keyboard.
 #### Defined in
 
 [src/lib/table/clipboard/clipboard-service.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/clipboard/clipboard-service.ts#L49)
+
+___
+
+### FilterPopupCloseReason
+
+Ƭ **FilterPopupCloseReason**: ``"action"`` \| ``"cancel"`` \| ``"escape"`` \| ``"outside"`` \| ``"scroll"`` \| ``"resize"`` \| ``"api"`` \| ``"destroy"``
+
+Why a [FilterPopupShell](classes/FilterPopupShell.md) was closed.
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/column-filter/filter-popup-shell.ts:4](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/column-filter/filter-popup-shell.ts#L4)
 
 ___
 

@@ -43,7 +43,8 @@ import Callout from "../../components/training/Callout.astro";
       <tr><th>Formulas typed by users</th><td>yourself (and a parser)</td><td>–</td><td>✔</td><td>✔ <code>formula</code>, own parser, no <code>eval</code>, since 1.1.95 (<a href="/showcase/formulas/run">showcase</a>, <ChapterLink slug="formulas" />)</td></tr>
       <tr><th>Show values as (% of total, running total, rank)</th><td>yourself</td><td>–</td><td>✔</td><td>✔ one option, since 1.1.95</td></tr>
       <tr><th>Spreadsheet cell references (A1) &amp; formula editor</th><td>yourself</td><td>–</td><td>✔</td><td>✔ <code>cellFormulas</code>, 70 Excel functions, colored references and pointing while typing, own parser, no <code>eval</code>, since 1.1.99 (<a href="/showcase/spreadsheet/run">showcase</a>, <ChapterLink slug="spreadsheet" label="ch. 40" />)</td></tr>
-      <tr><th>Filter UI</th><td>yourself</td><td>✔</td><td>✔</td><td>– filter function, the UI is yours (<ChapterLink slug="filtering" label="ch. 21" />)</td></tr>
+      <tr><th>Column filter row</th><td>yourself</td><td>✔</td><td>✔</td><td>✔ <code>filterRow: true</code> (shorthand <code>&gt;100</code>, <code>10..20</code>, dates, booleans), since 1.1.114 (<ChapterLink slug="filtering" label="ch. 21" />)</td></tr>
+      <tr><th>Excel value checklist &amp; column chooser</th><td>yourself (virtualized list, cascading values)</td><td>–</td><td>✔</td><td>✔ <code>columnFilterMenu: true</code> and <code>showColumnChooser()</code>, since 1.1.114 (<a href="/showcase/columnfilter/run">showcase</a>)</td></tr>
       <tr><th>Frameworks</th><td>–</td><td>React, Angular, Vue, JS</td><td>React, Angular, Vue, JS</td><td>Angular 14–22, React, Vue, Svelte 4/5, Solid, Preact, Web Component, JS</td></tr>
       <tr><th>Runtime dependencies</th><td>–</td><td>–</td><td>–</td><td>none</td></tr>
     </tbody>
@@ -52,10 +53,10 @@ import Callout from "../../components/training/Callout.astro";
   <h2 id="rule">Rule of thumb</h2>
   <Callout type="note" title="Which one?">
     <p>
-      If you need <strong>a drag &amp; drop group panel or pivot field list or a server-side row model off the shelf</strong>
-      (a filter UI is already in ag-Grid Community), ag-Grid Enterprise is further today. Row grouping
+      If you need <strong>a drag &amp; drop group panel or pivot field list or a server-side row model off the shelf</strong>,
+      ag-Grid Enterprise is further today. Row grouping
       with totals and pivot tables are built in since 1.1.94 (<ChapterLink slug="row-grouping" />,
-      <ChapterLink slug="pivot-tables" />), calculated columns, „Show values as“ and formulas since 1.1.95, a spreadsheet with cell formulas, copy &amp; paste and undo since 1.1.99 (<ChapterLink slug="spreadsheet" />).
+      <ChapterLink slug="pivot-tables" />), calculated columns, „Show values as“ and formulas since 1.1.95, a spreadsheet with cell formulas, copy &amp; paste and undo since 1.1.99 (<ChapterLink slug="spreadsheet" />), and built-in column filters, Excel value checklists and a column chooser since 1.1.114 (<ChapterLink slug="filtering" hash="column-filters" label="ch. 21" />).
     </p>
     <p>
       If you need <strong>large data sets, export, selection and full control over HTML and CSS</strong> – without licence

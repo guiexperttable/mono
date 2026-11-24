@@ -71,17 +71,18 @@ export class RowDragService {
 
   constructor(private readonly tableScope: TableScope) {
     const signal = tableScope.listenerAbortController.signal;
-    // events from a detail row (master/detail, e.g. a nested table) belong to the detail – not to this table
+    // events from a detail row or column filter UI belong there – not to this table
+    const ignore = (evt: Event) => !!tableScope.isEventInDetail?.(evt) || !!tableScope.isEventInFilterUI?.(evt);
     tableScope.hostElement.addEventListener("pointerdown", (evt: PointerEvent) => {
-      if (!tableScope.isEventInDetail?.(evt)) this.onPointerDown(evt);
+      if (!ignore(evt)) this.onPointerDown(evt);
     }, { signal });
     // the click after a real drag: the mouse handler must not move focus and selection (capture phase, before it)
     tableScope.hostElement.addEventListener("click", (evt: MouseEvent) => {
-      if (!tableScope.isEventInDetail?.(evt)) this.onClickCapture(evt);
+      if (!ignore(evt)) this.onClickCapture(evt);
     }, { capture: true, signal });
     // a double click on a grip is no double click on the cell (it would open the editor of an editable column)
     tableScope.hostElement.addEventListener("dblclick", (evt: MouseEvent) => {
-      if (!tableScope.isEventInDetail?.(evt) && evt.target instanceof Element && evt.target.closest(`[data-ge-action="${DRAG_ROW_ACTION}"]`)) {
+      if (!ignore(evt) && evt.target instanceof Element && evt.target.closest(`[data-ge-action="${DRAG_ROW_ACTION}"]`)) {
         evt.stopPropagation();
       }
     }, { capture: true, signal });

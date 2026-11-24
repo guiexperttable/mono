@@ -144,7 +144,7 @@ start or inserted.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:435](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L435)
+[src/lib/table/mouse-handler.ts:441](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L441)
 
 ___
 
@@ -163,4 +163,4 @@ true between mousedown and mouseup
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:642](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L642)
+[src/lib/table/mouse-handler.ts:656](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L656)

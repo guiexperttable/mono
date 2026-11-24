@@ -53,7 +53,18 @@ import {
   RowIndexShift, AppendFollowMode, AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf, AppendRowsContextIf,
   AppendRowsModelResultIf,
   GeColumnResizeEvent, GeColumnMoveEvent, GeColumnDragEventType, GeColumnResizeSource, ColumnAutoWidthOptionsIf,
-  ColumnAutoWidthOptions, ColumnAutoWidthContextIf
+  ColumnAutoWidthOptions, ColumnAutoWidthContextIf,
+  ColumnFilterOperator, ColumnFilterType, ColumnFilterConditionIf, ColumnFilterIf, ColumnFiltersMap,
+  ColumnFilterValueItemIf, ColumnFilterValuesContextIf, ColumnFilterColumnOptionsIf, ColumnFilterColumnOption,
+  ColumnFilterOptionsIf, ColumnFilterTextsIf, ColumnFilterOptions, ColumnFilterTexts,
+  FilterRowOptionsIf, FilterRowOptions, ColumnFilterMenuOptionsIf, ColumnFilterMenuOptions,
+  columnFilterShortcutLayer, FilterRowService, FilterPopupShell, FilterPopupCloseReason,
+  FilterPopupOpenOptionsIf, ColumnFilterMenuService, ColumnChooserService,
+  isBlankFilterValue, filterValueKey, dateSetKey, toDateDayKey, CompileColumnFilterOptionsIf, compileSingleColumnFilter,
+  ColumnFilterResolverIf, compileColumnFilterPredicate, inferColumnFilterType,
+  parseFilterInput, formatFilterCondition, formatFilterNumber, CollectDistinctValuesOptionsIf, DistinctValuesResultIf,
+  collectDistinctValues, normalizeColumnFilter, serializeColumnFilters, deserializeColumnFilters,
+  areColumnFiltersEqual, ColumnFilterService, GeFilterEvent, GeFilterEventSource
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
@@ -108,6 +119,7 @@ declare const domService: DomServiceIf;
 declare const order: Order;
 declare function save(order: Order): Promise<void>;
 declare const resetFilterButton: HTMLButtonElement;
+declare const columnsButton: HTMLButtonElement;
 declare const filterInput: HTMLInputElement;
 declare const cellDiv: HTMLDivElement;
 interface Person { id: number; name: string; age: number; city?: string }

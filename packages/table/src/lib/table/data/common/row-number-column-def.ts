@@ -62,6 +62,8 @@ export class RowNumberColumnDef implements ColumnDefIf {
   resizable = false;
   /** Stays in front: can't be dragged, no column is dropped in front of it (since 1.1.110 a flag). */
   movable = false;
+  /** Row numbers are not filterable (since 1.1.114). */
+  filter = false;
 
   /** The options (defaults from {@link RowNumberOptions}). */
   readonly options: RowNumberOptionsIf;

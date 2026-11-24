@@ -41,7 +41,8 @@ const PART_FLAGS: Record<TableStatePart, keyof AutoRestoreOptionsIf<unknown>> = 
   selection: "autoRestoreSelectedState",
   scroll: "autoRestoreScrollPosition",
   custom: "autoRestoreCustomState",
-  details: "autoRestoreDetailState"
+  details: "autoRestoreDetailState",
+  filters: "autoRestoreFilterState"
 };
 
 /** The field of a {@link TableStateIf} that holds a part. */
@@ -155,6 +156,12 @@ export class TableStateService {
     if (this.startState.columns) {
       this.applyColumns(this.startState.columns, false);
     }
+    if (this.startState.filters) {
+      this.scope.columnFilterService.applyStateFilters(this.startState.filters, false);
+    }
+    if (typeof this.startState.filterRowVisible === "boolean") {
+      this.scope.restoreFilterRowVisible(this.startState.filterRowVisible);
+    }
   }
 
   /** After the external filter: tree, sorting, checked rows, selection. */
@@ -222,6 +229,18 @@ export class TableStateService {
       recalcWidths = this.applyColumns(state.columns!, true);
       applied.push("columns");
     }
+    if (parts.includes("filters") && (state.filters !== undefined || typeof state.filterRowVisible === "boolean")) {
+      let filtersChanged = false;
+      if (state.filters !== undefined && this.scope.columnFilterService.applyStateFilters(state.filters, true)) {
+        filtersChanged = true;
+      }
+      if (typeof state.filterRowVisible === "boolean" && this.scope.restoreFilterRowVisible(state.filterRowVisible)) {
+        filtersChanged = true;
+      }
+      if (filtersChanged) {
+        applied.push("filters");
+      }
+    }
     if (has("tree")) {
       this.applyTree(state.tree!);
       applied.push("tree");
@@ -271,7 +290,10 @@ export class TableStateService {
     if (!this.defaultState) {
       return;
     }
-    this.applyState(this.defaultState);
+    const toApply: Partial<TableStateIf> = this.scope.columnFilterService.hasActiveFilters()
+      ? { ...this.defaultState, filters: this.defaultState.filters ?? {} }
+      : this.defaultState;
+    this.applyState(toApply);
     this.custom = undefined;
     this.markDirty("custom");
     this.flush();
@@ -359,6 +381,13 @@ export class TableStateService {
           delete state[field];
         } else {
           (state as unknown as Record<string, unknown>)[field] = fresh[field];
+        }
+        if (part === "filters") {
+          if (fresh.filterRowVisible === undefined) {
+            delete state.filterRowVisible;
+          } else {
+            state.filterRowVisible = fresh.filterRowVisible;
+          }
         }
         this.lastReported.set(part, this.partJson(fresh, part));
       }
@@ -455,6 +484,9 @@ export class TableStateService {
         if (field in stored) {
           (ret as Record<string, unknown>)[field] = (stored as Record<string, unknown>)[field];
         }
+        if (part === "filters" && "filterRowVisible" in stored) {
+          ret.filterRowVisible = stored.filterRowVisible;
+        }
       }
     }
     return ret;
@@ -472,6 +504,9 @@ export class TableStateService {
       const field = fieldOf(part);
       if (state[field] !== undefined) {
         (subset as unknown as Record<string, unknown>)[field] = state[field];
+      }
+      if (part === "filters" && state.filterRowVisible !== undefined) {
+        subset.filterRowVisible = state.filterRowVisible;
       }
     }
     const json = JSON.stringify(subset);
@@ -494,11 +529,19 @@ export class TableStateService {
     this.reported = state;
     if (state.scroll) this.reportedScroll = { left: state.scroll.left, top: state.scroll.top };
     for (const part of ALL_TABLE_STATE_PARTS) {
-      if (fieldOf(part) in state) this.lastReported.set(part, this.partJson(state, part));
+      if (fieldOf(part) in state || (part === "filters" && "filterRowVisible" in state)) {
+        this.lastReported.set(part, this.partJson(state, part));
+      }
     }
   }
 
   private partJson(state: TableStateIf, part: TableStatePart): string {
+    if (part === "filters") {
+      if (state.filters === undefined && state.filterRowVisible === undefined) {
+        return "";
+      }
+      return JSON.stringify({ filters: state.filters, filterRowVisible: state.filterRowVisible });
+    }
     const value = state[fieldOf(part)];
     return value === undefined ? "" : JSON.stringify(value);
   }
@@ -546,6 +589,15 @@ export class TableStateService {
       case "details": {
         const details = this.computeDetails();
         if (details) state.detailRowIds = details;
+        break;
+      }
+      case "filters": {
+        if (this.scope.columnFilterService?.hasActiveFilters()) {
+          state.filters = this.scope.columnFilterService.getColumnFilters();
+        }
+        if (this.scope.hasFilterRow()) {
+          state.filterRowVisible = this.scope.isFilterRowVisible();
+        }
         break;
       }
     }

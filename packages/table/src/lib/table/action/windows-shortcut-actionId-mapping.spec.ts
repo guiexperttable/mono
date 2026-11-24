@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   actionIds,
   clipboardShortcutLayer,
+  columnFilterShortcutLayer,
   undoShortcutLayer,
   editingShortcutLayer,
   createHarmonizedShortcutByKeyboardEvent,
@@ -74,9 +75,10 @@ describe('WindowsShortcutActionIdMapping', () => {
     }
   });
 
-  it('covers every ActionId with at least one shortcut – together with the editing and clipboard layers (1.1.99)', () => {
+  it('covers every ActionId with at least one shortcut – together with the editing, clipboard, undo and column filter layers', () => {
     expect(new Set([...Object.values(mapping), ...Object.values(editingShortcutLayer(false)),
-      ...Object.values(clipboardShortcutLayer(false)), ...Object.values(undoShortcutLayer(false))])).toEqual(new Set(actionIds));
+      ...Object.values(clipboardShortcutLayer(false)), ...Object.values(undoShortcutLayer(false)),
+      ...Object.values(columnFilterShortcutLayer(false))])).toEqual(new Set(actionIds));
   });
 
   it('returns a new object on every call', () => {

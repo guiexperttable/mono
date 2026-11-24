@@ -52,16 +52,17 @@ export class FillHandleService {
 
   constructor(private readonly tableScope: TableScope) {
     const signal = tableScope.listenerAbortController.signal;
-    // events from a detail row (master/detail, e.g. a nested table) belong to the detail – not to this table
+    // events from a detail row or column filter UI belong there – not to this table
+    const ignore = (evt: Event) => !!tableScope.isEventInDetail?.(evt) || !!tableScope.isEventInFilterUI?.(evt);
     tableScope.hostElement.addEventListener("pointerdown", (evt: PointerEvent) => {
-      if (!tableScope.isEventInDetail?.(evt)) this.onPointerDown(evt);
+      if (!ignore(evt)) this.onPointerDown(evt);
     }, { signal });
     // the click after a fill (or on the handle): the mouse handler must not change focus and selection
     tableScope.hostElement.addEventListener("click", (evt: MouseEvent) => {
-      if (!tableScope.isEventInDetail?.(evt)) this.onClickCapture(evt);
+      if (!ignore(evt)) this.onClickCapture(evt);
     }, { capture: true, signal });
     tableScope.hostElement.addEventListener("dblclick", (evt: MouseEvent) => {
-      if (!tableScope.isEventInDetail?.(evt) && this.isHandle(evt.target)) {
+      if (!ignore(evt) && this.isHandle(evt.target)) {
         evt.stopPropagation();
       }
     }, { capture: true, signal });

@@ -198,6 +198,11 @@ export class MouseHandler {
       event.preventDefault();
       event.stopPropagation();
 
+    } else if (mouseTargetData.action === 'filter-column') {
+      this.tableScope.toggleColumnFilterMenu(mouseTargetData.colIdx);
+      event.preventDefault();
+      event.stopPropagation();
+
     } else if (mouseTargetData.inputType === 'checkbox' && mouseTargetData.areaIdent){
       this.tableScope.toggleRowCheckbox(mouseTargetData.rowIdx, mouseTargetData.colIdx, mouseTargetData.areaIdent);
       event.preventDefault();
@@ -262,6 +267,7 @@ export class MouseHandler {
     return mouseTargetData.action === 'toggleExpandCollapseAll'
       || mouseTargetData.action === 'toggleHeaderGroup'
       || mouseTargetData.action === 'toggle-detail'
+      || mouseTargetData.action === 'filter-column'
       || (mouseTargetData.inputType === 'checkbox' && !!mouseTargetData.areaIdent)
       || mouseTargetData.className.includes('ge-table-tree-arrow-div');
   }
@@ -443,8 +449,8 @@ export class MouseHandler {
 
 
   private onMouseMove(evt: MouseEvent) {
-    if (!this.mouseDown && this.tableScope.isEventInDetail?.(evt)) {
-      this.tableScope.hideHover?.(); // over a detail row (master/detail): no stale hover of the master row
+    if (!this.mouseDown && (this.tableScope.isEventInDetail?.(evt) || this.tableScope.isEventInFilterUI?.(evt))) {
+      this.tableScope.hideHover?.(); // over a detail row or filter UI: no stale hover of body/header cells
       return;
     }
     if (!this.mouseDown && this.isBlocked(evt)) {
@@ -477,8 +483,8 @@ export class MouseHandler {
   private onMouseUp(evt: MouseEvent) {
     const pressed = this.pressedCell;
     this.pressedCell = undefined;
-    if (!this.mouseDown && this.tableScope.isEventInDetail?.(evt)) {
-      return; // a click in a detail row (master/detail)
+    if (!this.mouseDown && (this.tableScope.isEventInDetail?.(evt) || this.tableScope.isEventInFilterUI?.(evt))) {
+      return; // a click in a detail row or filter UI
     }
     this.mouseEvent = evt;
     if (pressed && evt.button === 0) {
@@ -653,7 +659,9 @@ export class MouseHandler {
 
   /** A mouse event on a blocking loading overlay ({@link TableOverlay.isEventBlocked}): the table ignores it. */
   private isBlocked(evt: Event): boolean {
-    // also events from a detail row (master/detail, e.g. a nested table): they belong to the detail
-    return (this.tableScope.tableOverlay?.isEventBlocked(evt) ?? false) || !!this.tableScope.isEventInDetail?.(evt);
+    // also events from a detail row (master/detail) or column filter UI (filter row / popup): they belong there
+    return (this.tableScope.tableOverlay?.isEventBlocked(evt) ?? false)
+      || !!this.tableScope.isEventInDetail?.(evt)
+      || !!this.tableScope.isEventInFilterUI?.(evt);
   }
 }

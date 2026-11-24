@@ -1,0 +1,466 @@
+/* Built-in column filters: persistent filter row (since 1.1.114).
+   Uses CSS logical properties (padding-inline, inset-inline-end, border-inline-end) for LTR & RTL. */
+
+.ge-table-filter-row-layer {
+  z-index: 6;
+  box-sizing: border-box;
+  background: var(--ge-table-filter-row-bg, var(--ge-table-header-center-bg));
+  border-block-start: 1px solid var(--ge-table-filter-row-border, var(--ge-table-header-center-horizontal-border));
+  pointer-events: auto;
+}
+
+.ge-table-filter-side {
+  box-sizing: border-box;
+}
+
+.ge-table-filter-row {
+  box-sizing: border-box;
+}
+
+.ge-table-filter-cell {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding-inline: 4px;
+  padding-block: 3px;
+  border-inline-end: 1px solid var(--ge-table-header-center-vertical-border);
+}
+
+.ge-table-filter-side-west .ge-table-filter-cell {
+  background: var(--ge-table-filter-row-bg, var(--ge-table-header-west-bg));
+  border-inline-end-color: var(--ge-table-header-west-vertical-border);
+}
+
+.ge-table-filter-side-east .ge-table-filter-cell {
+  background: var(--ge-table-filter-row-bg, var(--ge-table-header-east-bg));
+  border-inline-end-color: var(--ge-table-header-east-vertical-border);
+}
+
+.ge-table-filter-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding-block: 2px;
+  padding-inline-start: 6px;
+  padding-inline-end: 22px;
+  font: inherit;
+  font-size: 0.875em;
+  line-height: 1.25;
+  color: var(--ge-table-filter-input-text);
+  background: var(--ge-table-filter-input-bg);
+  border: 1px solid var(--ge-table-filter-input-border);
+  border-radius: 3px;
+}
+
+.ge-table-filter-input::placeholder {
+  color: var(--ge-table-filter-input-placeholder);
+  opacity: 1;
+}
+
+.ge-table-filter-input:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: -1px;
+  border-color: var(--ge-table-filter-focus-ring);
+}
+
+.ge-table-filter-cell-active .ge-table-filter-input {
+  border-color: var(--ge-table-filter-active-color);
+}
+
+.ge-table-filter-input-readonly {
+  background: var(--ge-table-filter-input-readonly-bg);
+  cursor: default;
+}
+
+.ge-table-filter-clear {
+  position: absolute;
+  inset-inline-end: 7px;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ge-table-filter-clear-color);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ge-table-filter-clear:hover {
+  background: var(--ge-table-filter-hover-bg);
+  color: var(--ge-table-filter-input-text);
+}
+
+.ge-table-filter-clear:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: 0;
+}
+
+.ge-table-filter-clear[hidden] {
+  display: none;
+}
+
+.ge-table-filter-narrow-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 1px solid var(--ge-table-filter-input-border);
+  border-radius: 3px;
+  background: var(--ge-table-filter-input-bg);
+  color: var(--ge-table-filter-clear-color);
+  cursor: pointer;
+}
+
+.ge-table-filter-cell-active .ge-table-filter-narrow-btn {
+  border-color: var(--ge-table-filter-active-color);
+  color: var(--ge-table-filter-active-color);
+}
+
+.ge-table-filter-narrow-btn:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: -1px;
+}
+
+/* Narrow columns (< minInputWidthInPx): show compact icon button until focused */
+.ge-table-filter-cell-narrow:not(:focus-within) .ge-table-filter-input,
+.ge-table-filter-cell-narrow:not(:focus-within) .ge-table-filter-clear {
+  position: absolute;
+  clip-path: inset(50%);
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+
+.ge-table-filter-cell-narrow:not(:focus-within) .ge-table-filter-narrow-btn {
+  display: inline-flex;
+}
+
+/* ------------------------------------------------------------------ Header funnel button (columnFilterMenu) */
+
+.ge-table-column-filter-btn {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 6px;
+  margin-block: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ge-table-filter-clear-color);
+  cursor: pointer;
+}
+
+.ge-table-col-div:has(> .ge-table-sorted-icon-div) > .ge-table-column-filter-btn {
+  inset-inline-end: 22px;
+}
+
+.ge-table-col-div:has(> .ge-table-column-filter-btn) .ge-table-label {
+  padding-inline-end: 28px;
+}
+
+.ge-table-col-div:has(> .ge-table-sorted-icon-div):has(> .ge-table-column-filter-btn) .ge-table-label {
+  padding-inline-end: 46px;
+}
+
+.ge-table-column-filter-btn:hover {
+  background: var(--ge-table-filter-hover-bg);
+  color: var(--ge-table-filter-input-text);
+}
+
+.ge-table-column-filter-btn:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: -1px;
+}
+
+.ge-table-column-filter-btn.ge-table-column-filter-active {
+  color: var(--ge-table-filter-active-color);
+}
+
+/* ------------------------------------------------------------------ Top-layer popup shell & filter menu */
+
+.ge-table-filter-popup {
+  box-sizing: border-box;
+  width: 270px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  padding: 0;
+  border: 1px solid var(--ge-table-filter-popup-border);
+  border-radius: 6px;
+  background: var(--ge-table-filter-popup-bg);
+  color: var(--ge-table-filter-popup-text);
+  box-shadow: var(--ge-table-filter-popup-shadow);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.35;
+  overscroll-behavior: contain;
+}
+
+.ge-table-filter-popup:where(:popover-open, .\:popover-open, .ge-table-filter-popup-fallback) {
+  display: flex;
+  flex-direction: column;
+}
+
+.ge-table-filter-popup-fallback {
+  position: fixed;
+  z-index: 10000;
+}
+
+.ge-table-filter-popup:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: -2px;
+}
+
+.ge-table-filter-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-block-end: 1px solid var(--ge-table-filter-popup-border);
+  font-weight: 600;
+}
+
+.ge-table-filter-menu-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ge-table-filter-menu-condition {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-block-end: 1px solid var(--ge-table-filter-popup-border);
+}
+
+.ge-table-filter-menu-select,
+.ge-table-filter-menu-input,
+.ge-table-filter-menu-search {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 28px;
+  padding-block: 3px;
+  padding-inline: 7px;
+  font: inherit;
+  color: var(--ge-table-filter-input-text);
+  background: var(--ge-table-filter-input-bg);
+  border: 1px solid var(--ge-table-filter-input-border);
+  border-radius: 4px;
+}
+
+.ge-table-filter-menu-select:focus-visible,
+.ge-table-filter-menu-input:focus-visible,
+.ge-table-filter-menu-search:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: -1px;
+  border-color: var(--ge-table-filter-focus-ring);
+}
+
+.ge-table-filter-menu-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ge-table-filter-menu-and {
+  font-size: 0.85em;
+  color: var(--ge-table-filter-popup-muted);
+}
+
+.ge-table-filter-menu-values {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-block: 8px;
+  padding-inline: 10px;
+  min-height: 0;
+}
+
+.ge-table-filter-select-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 2px;
+  font-weight: 500;
+}
+
+.ge-table-filter-select-all input[type="checkbox"],
+.ge-table-filter-value-row input[type="checkbox"] {
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--ge-table-filter-active-color);
+  cursor: pointer;
+}
+
+.ge-table-filter-select-all label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ge-table-filter-values-notice {
+  font-size: 0.82em;
+  color: var(--ge-table-filter-popup-muted);
+  padding-block: 2px;
+}
+
+.ge-table-filter-values-viewport {
+  position: relative;
+  height: 196px;
+  max-height: 196px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--ge-table-filter-popup-border);
+  border-radius: 4px;
+  background: var(--ge-table-filter-input-bg);
+}
+
+.ge-table-filter-values-spacer {
+  position: relative;
+  width: 100%;
+}
+
+.ge-table-filter-value-row {
+  position: absolute;
+  inset-inline: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline: 6px;
+}
+
+.ge-table-filter-value-row:hover {
+  background: var(--ge-table-filter-hover-bg);
+}
+
+.ge-table-filter-value-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ge-table-filter-value-count {
+  flex: 0 0 auto;
+  font-size: 0.82em;
+  color: var(--ge-table-filter-popup-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ge-table-filter-values-empty {
+  padding: 12px 8px;
+  text-align: center;
+  color: var(--ge-table-filter-popup-muted);
+}
+
+.ge-table-filter-menu-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-block-start: 1px solid var(--ge-table-filter-popup-border);
+}
+
+.ge-table-filter-menu-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ge-table-filter-btn {
+  box-sizing: border-box;
+  min-height: 28px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  font: inherit;
+  border: 1px solid var(--ge-table-filter-input-border);
+  border-radius: 4px;
+  background: var(--ge-table-filter-input-bg);
+  color: var(--ge-table-filter-input-text);
+  cursor: pointer;
+}
+
+.ge-table-filter-btn:hover {
+  background: var(--ge-table-filter-hover-bg);
+}
+
+.ge-table-filter-btn:focus-visible {
+  outline: 2px solid var(--ge-table-filter-focus-ring);
+  outline-offset: 1px;
+}
+
+.ge-table-filter-btn-primary {
+  background: var(--ge-table-filter-active-color);
+  border-color: var(--ge-table-filter-active-color);
+  color: #fff;
+}
+
+html[data-theme="dark"] .ge-table-filter-btn-primary {
+  color: #111827;
+}
+
+.ge-table-filter-btn-primary:hover {
+  filter: brightness(0.94);
+  background: var(--ge-table-filter-active-color);
+}
+
+/* ------------------------------------------------------------------ Column chooser popup */
+
+.ge-table-column-chooser-list {
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--ge-table-filter-popup-border);
+  border-radius: 4px;
+  background: var(--ge-table-filter-input-bg);
+}
+
+.ge-table-column-chooser-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding-inline: 6px;
+}
+
+.ge-table-column-chooser-row:hover {
+  background: var(--ge-table-filter-hover-bg);
+}
+
+.ge-table-column-chooser-row input[type="checkbox"] {
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--ge-table-filter-active-color);
+  cursor: pointer;
+}
+
+.ge-table-column-chooser-row input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

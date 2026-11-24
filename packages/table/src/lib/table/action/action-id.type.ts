@@ -65,6 +65,9 @@ export const actionIds = [
   // undo and redo (tableOptions.undo, since 1.1.99)
   "UNDO",                        // Ctrl/⌘+Z: undo the last change
   "REDO",                        // Ctrl+Y, Ctrl/⌘+Shift+Z: redo it
+  // built-in column filters (tableOptions.filterRow / columnFilterMenu, since 1.1.114)
+  "FOCUS_COLUMN_FILTER",         // Ctrl/⌘+Shift+F: focus the filter input of the active column
+  "OPEN_COLUMN_FILTER_MENU",     // Alt+ArrowDown in a header cell: open the column filter menu
 ] as const;
 
 /**

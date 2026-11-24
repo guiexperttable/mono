@@ -10,6 +10,7 @@ import type {
   GeUndoEvent,
   GeColumnResizeEvent,
   GeColumnMoveEvent,
+  GeFilterEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -58,6 +59,8 @@ export interface GuiexpertTableProps {
   onColumnMoveStart?: (evt: GeColumnMoveEvent) => void;
   /** A column move by the user ended (`evt.columnOrder`). @since 1.1.110 */
   onColumnMoveEnd?: (evt: GeColumnMoveEvent) => void;
+  /** Column filters changed. @since 1.1.114 */
+  onFilterChanged?: (evt: GeFilterEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -91,6 +94,8 @@ export interface GuiexpertTableEvents {
   columnResizeEnd: CustomEvent<GeColumnResizeEvent>;
   columnMoveStart: CustomEvent<GeColumnMoveEvent>;
   columnMoveEnd: CustomEvent<GeColumnMoveEvent>;
+  /** @since 1.1.114 */
+  filterChanged: CustomEvent<GeFilterEvent>;
 }
 
 /**

@@ -164,6 +164,24 @@ html, html[data-theme="light"] {
   --ge-table-formula-bar-text: #111;
   --ge-table-formula-bar-muted: #5f6368;
   --ge-table-formula-bar-border: #c4c7c5;
+
+  /* Column filters (since 1.1.114): light theme contrast >= 4.5:1 text, >= 3:1 borders & icons */
+  --ge-table-filter-row-bg: var(--ge-table-header-center-bg);
+  --ge-table-filter-row-border: var(--ge-table-header-center-horizontal-border);
+  --ge-table-filter-input-bg: #fff;
+  --ge-table-filter-input-readonly-bg: #f3f4f6;
+  --ge-table-filter-input-text: #111;
+  --ge-table-filter-input-placeholder: #595959;
+  --ge-table-filter-input-border: #767676;
+  --ge-table-filter-focus-ring: #0a6ebd;
+  --ge-table-filter-active-color: #0a6ebd;
+  --ge-table-filter-clear-color: #555;
+  --ge-table-filter-hover-bg: rgba(0, 0, 0, 0.08);
+  --ge-table-filter-popup-bg: #fff;
+  --ge-table-filter-popup-text: #111;
+  --ge-table-filter-popup-muted: #555;
+  --ge-table-filter-popup-border: #c4c7c5;
+  --ge-table-filter-popup-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
 }
 
 
@@ -319,4 +337,22 @@ html[data-theme="dark"] {
   --ge-table-formula-bar-text: #f3f4f6;
   --ge-table-formula-bar-muted: #9aa0a6;
   --ge-table-formula-bar-border: #4b5563;
+
+  /* Column filters (since 1.1.114): dark theme contrast >= 4.5:1 text, >= 3:1 borders & icons */
+  --ge-table-filter-row-bg: var(--ge-table-header-center-bg);
+  --ge-table-filter-row-border: var(--ge-table-header-center-horizontal-border);
+  --ge-table-filter-input-bg: #1f2937;
+  --ge-table-filter-input-readonly-bg: #2a3444;
+  --ge-table-filter-input-text: #f3f4f6;
+  --ge-table-filter-input-placeholder: #9ca3af;
+  --ge-table-filter-input-border: #6b7280;
+  --ge-table-filter-focus-ring: #8ab4f8;
+  --ge-table-filter-active-color: #8ab4f8;
+  --ge-table-filter-clear-color: #cbd5e1;
+  --ge-table-filter-hover-bg: rgba(255, 255, 255, 0.12);
+  --ge-table-filter-popup-bg: #1f2937;
+  --ge-table-filter-popup-text: #f3f4f6;
+  --ge-table-filter-popup-muted: #9ca3af;
+  --ge-table-filter-popup-border: #4b5563;
+  --ge-table-filter-popup-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
 }

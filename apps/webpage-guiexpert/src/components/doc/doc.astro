@@ -83,7 +83,7 @@ const OPTION_GROUPS = [
   { title: "Layout", names: ["defaultRowHeights", "overflowX", "overflowY", "resizeEventDebounceDelay"] },
   { title: "Mouse", names: ["hoverRowVisible", "hoverColumnVisible", "columnsResizable", "columnsDraggable", "columnResizeHandleWidthInPx", "columnAutoWidth"] },
   { title: "Borders", names: ["verticalBorderVisible", "horizontalBorderVisible", "headerSeparatorBorderVisible", "footerSeparatorBorderVisible", "fixedWestSeparatorBorderVisible", "fixedEastSeparatorBorderVisible", "tableTopBorderVisible", "tableBottomBorderVisible"] },
-  { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction"] },
+  { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction", "filterRow", "columnFilterMenu", "columnFilter", "columnFilterTexts"] },
   { title: "Selection and keyboard", names: ["getSelectionModel", "getFocusModel", "shortcutActionIdMapping", "shortcutActionsDisabled"] },
   { title: "Trees, groups, editing", names: ["treeOptions", "headerGroupOptions", "showCheckboxWihoutExtraColumn", "getEditRenderer"] },
   { title: "State", names: ["autoRestoreOptions", "initialState"] },
@@ -96,11 +96,11 @@ const OPTION_GROUPS = [
 // ── TableApi ──────────────────────────────────────────────────────────────
 const API_GROUPS = [
   { title: "Scrolling", names: ["scrollToIndex", "scrollToPixel", "ensureRowIsVisible", "getFirstVisibleRowIndex", "getDisplayedRowCount"] },
-  { title: "Sorting and filtering", names: ["sortByColumn", "sort", "reSort", "externalFilterChanged"] },
+  { title: "Sorting and filtering", names: ["sortByColumn", "sort", "reSort", "externalFilterChanged", "setColumnFilter", "setColumnFilters", "clearColumnFilters", "getColumnFilter", "getColumnFilters", "isColumnFiltered", "setFilterRowVisible", "showColumnFilterMenu"] },
   { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
   { title: "Live data (append)", names: ["appendRows", "rowsAppended"] },
   { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
-  { title: "Columns", names: ["autoResizeColumns", "autoResizeColumn", "isColumnDragging", "cancelColumnDrag", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "setColumnFormula", "setShowValuesAs"] },
+  { title: "Columns", names: ["autoResizeColumns", "autoResizeColumn", "isColumnDragging", "cancelColumnDrag", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "showColumnChooser", "setColumnFormula", "setShowValuesAs"] },
   { title: "Grouping and pivot", names: ["setRowGroupBy", "setPivotConfig", "getSelectionAggregates"] },
   { title: "Editing, rows and details", names: ["applyCellChanges", "commitBatchEdit", "cancelBatchEdit", "moveRows", "setDetailExpanded"] },
   { title: "State, overlays, announcements", names: ["getState", "applyState", "resetState", "showLoadingOverlay", "hideOverlay", "announce"] },
@@ -128,7 +128,8 @@ const EVENTS = [
   { event: "editingChanged", listener: "onEditingChanged", payload: "GeEditEvent", note: "the cell editor: start, input, commit, cancel" },
   { event: "undoStackChanged", listener: "onUndoStackChanged", payload: "GeUndoEvent", note: "canUndo, canRedo and the labels – for undo buttons" },
   { event: "columnResizeEnd", listener: "onColumnResizeEnd", payload: "GeColumnResizeEvent", note: "the user resized a column (also by a double click on the border) – once per drag, after the change; also columnResizeStart" },
-  { event: "columnMoveEnd", listener: "onColumnMoveEnd", payload: "GeColumnMoveEvent", note: "the user moved a column – fromIndex, toIndex, columnOrder; also columnMoveStart" }
+  { event: "columnMoveEnd", listener: "onColumnMoveEnd", payload: "GeColumnMoveEvent", note: "the user moved a column – fromIndex, toIndex, columnOrder; also columnMoveStart" },
+  { event: "filterChanged", listener: "onFilterChanged", payload: "GeFilterEvent", note: "column filters changed (filter row, filter menu, API or state restore) – active filters, rowCount, unfilteredRowCount" }
 ];
 
 // ── features ──────────────────────────────────────────────────────────────
@@ -143,7 +144,7 @@ const FEATURES: { feature: string; text: string; api: string[]; slug?: string; s
   { feature: "Calculated columns and formulas", text: "valueGetter, “show values as”, formulas without eval", api: ["ColumnDefIf.valueGetter", "ColumnDefIf.formula"], slug: "formulas" },
   { feature: "Column resizing and reordering", text: "drag handles and drag & drop", api: ["TableOptionsIf.columnsResizable", "TableOptionsIf.columnsDraggable", "TableApi.autoResizeColumns"], slug: "table-options" },
   { feature: "Sorting", text: "header double-click, own comparators, from code", api: ["ColumnDefIf.sortComparator", "TableApi.sortByColumn"], slug: "sorting" },
-  { feature: "Filtering", text: "your filter UI – the table asks per row", api: ["TableOptionsIf.externalFilterFunction", "TableApi.externalFilterChanged"], slug: "filtering" },
+  { feature: "Filtering & column chooser", text: "external filter function, or built-in filter row, Excel-style value checklist and column visibility picker (since 1.1.114)", api: ["TableOptionsIf.filterRow", "TableOptionsIf.columnFilterMenu", "TableApi.showColumnChooser", "TableOptionsIf.externalFilterFunction"], slug: "filtering" },
   { feature: "Selection and clipboard", text: "cells, rows, columns or ranges; copy, cut and paste with Excel", api: ["SelectionModel", "TableOptionsIf.clipboard", "TableApi.pasteText"], slug: "selection-and-copy" },
   { feature: "Events and context menu", text: "override only the events you need", api: ["EventAdapter", "EventListenerIf.onContextmenu"], slug: "events-and-context-menu" },
   { feature: "Excel export", text: "real .xlsx files without a library", api: ["TableApi.downloadExcel", "ExcelService"], slug: "excel-export" },
@@ -845,11 +846,11 @@ html[data-theme="dark"] .brand-table {
       <table class="doc-table">
         <thead><tr><th>Topic</th><th>Approach</th></tr></thead>
         <tbody>
-          <tr><td>Filter UI</td><td class="wrap">your own inputs – the table provides <ApiLink name="TableOptionsIf.externalFilterFunction" label="externalFilterFunction" /> (<ChapterLink slug="filtering" />)</td></tr>
+          <tr><td>Status bar</td><td class="wrap">a small HTML bar below the host wired to <ApiLink name="EventListenerIf.onFilterChanged" label="onFilterChanged" />, <ApiLink name="TableApi.showColumnChooser" label="showColumnChooser()" /> and <ApiLink name="TableApi.setFilterRowVisible" label="setFilterRowVisible()" /> (showcase <a href="/showcase/columnfilter/run/">Column filters &amp; chooser</a>)</td></tr>
           <tr><td>Context menu</td><td class="wrap">the <code>contextmenu</code> event plus a menu in the style of your app (<ChapterLink slug="events-and-context-menu" />)</td></tr>
           <tr><td>Pagination</td><td class="wrap">not needed for display thanks to virtual scrolling; to load data page by page, use an own area model (<ChapterLink slug="custom-area-model" />)</td></tr>
-          <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend</td></tr>
-          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> (also <code>setHeaderVisible()</code> / <code>setFooterVisible()</code>)</td></tr>
+          <tr><td>Server-side row model</td><td class="wrap">an own <ApiLink name="AreaModel" /> that requests the visible rows from your backend (combine with <code>columnFilter: {"{ managed: false }"}</code> for server-side filtering)</td></tr>
+          <tr><td>Show / hide columns at runtime</td><td class="wrap"><ApiLink name="TableApi.setColumnVisible" label="setColumnVisible()" /> or the built-in <ApiLink name="TableApi.showColumnChooser" label="showColumnChooser()" /> popup (since 1.1.114)</td></tr>
           <tr><td>Group panel, pivot field list</td><td class="wrap">your UI around <ApiLink name="TableApi.setRowGroupBy" label="setRowGroupBy()" /> and <ApiLink name="TableApi.setPivotConfig" label="setPivotConfig()" /></td></tr>
           <tr><td>Toolbar for undo, insert rows …</td><td class="wrap">your buttons calling <ApiLink name="TableApi.undo" label="undo()" />, <ApiLink name="TableApi.insertRows" label="insertRows()" /> – paste, undo/redo and the formula editor are built in since 1.1.99 (<ChapterLink slug="spreadsheet" />)</td></tr>
         </tbody>

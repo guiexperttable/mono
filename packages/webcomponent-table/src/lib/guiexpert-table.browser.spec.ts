@@ -55,6 +55,18 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(starts).toHaveLength(1);
   });
 
+  it('column filter event: "filterChanged" (bubbling) on setColumnFilter (since 1.1.114)', async () => {
+    const { host, el, events } = createTableElement();
+    const filterEvents: unknown[] = [];
+    host.addEventListener('filterChanged', e => filterEvents.push((e as CustomEvent).detail));
+    el.data = data(createModel(5));
+    await nextFrame();
+    const api = events.tableReady[0] as TableApi;
+    api.setColumnFilter('name', { condition: { operator: 'contains', value: 'Row 3' } });
+    expect(filterEvents).toHaveLength(1);
+    expect(filterEvents[0]).toMatchObject({ property: 'name', source: 'api', rowCount: 1, unfilteredRowCount: 5 });
+  });
+
   it('el.data = … dispatches tableReady once with a TableApi and renders the rows', async () => {
     const { el, events } = createTableElement();
     el.data = data(createModel(5));
@@ -469,5 +481,20 @@ describe('GuiexpertTable (Web Component)', () => {
     const first = bodyCell(el, 0, 0)!;
     expect(first.style.right).toBe('0px');
     expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
+
+  it('filterRow: renders filter inputs and typing dispatches "filterChanged" (since 1.1.114)', async () => {
+    const { host, el } = createTableElement();
+    const received: unknown[] = [];
+    host.addEventListener('filterChanged', e => received.push((e as CustomEvent).detail));
+    el.data = data(createModel(5), { ...new TableOptions(), filterRow: { debounce: 0 } });
+    await nextFrame();
+    const input = el.querySelector<HTMLInputElement>('.ge-table-filter-cell[data-col-property="name"] input.ge-table-filter-input')!;
+    expect(input).not.toBeNull();
+    input.value = 'Row 3';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await nextFrame();
+    expect(received).toHaveLength(1);
+    expect(received[0]).toMatchObject({ source: 'row', property: 'name', rowCount: 1, unfilteredRowCount: 5 });
   });
 });

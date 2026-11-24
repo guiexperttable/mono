@@ -357,7 +357,12 @@ export * from './lib/table/clipboard/clipboard-options';
 export * from './lib/table/clipboard/tsv';
 export * from './lib/table/clipboard/clipboard-html';
 export * from './lib/table/clipboard/paste-plan';
-export * from './lib/table/clipboard/input-pipes';
+export {
+  createNumberInputPipe,
+  createDateInputPipe,
+  booleanInputPipe,
+  sheetInputPipe,
+} from './lib/table/clipboard/input-pipes';
 export * from './lib/table/clipboard/clipboard-keymap';
 export * from './lib/table/clipboard/clipboard-service';
 
@@ -393,3 +398,33 @@ export * from './lib/table/spreadsheet/structure-edit';
 export * from './lib/table/spreadsheet/formula-bar';
 export * from './lib/table/live-append/row-index-shift';
 export * from './lib/table/live-append/append-rows-options.if';
+
+// Column filters (since 1.1.114, prompt 023)
+export * from './lib/table/column-filter/column-filter-operator.type';
+export * from './lib/table/column-filter/column-filter-type.type';
+export * from './lib/table/column-filter/column-filter.if';
+export * from './lib/table/column-filter/column-filter-options.if';
+export * from './lib/table/column-filter/column-filter-options';
+export {
+  isBlankFilterValue,
+  filterValueKey,
+  dateSetKey,
+  toDateDayKey,
+  compileSingleColumnFilter,
+  compileColumnFilterPredicate,
+} from './lib/table/column-filter/compile-column-filters';
+export type {
+  CompileColumnFilterOptionsIf,
+  ColumnFilterResolverIf,
+} from './lib/table/column-filter/compile-column-filters';
+export * from './lib/table/column-filter/infer-column-filter-type';
+export * from './lib/table/column-filter/parse-filter-input';
+export * from './lib/table/column-filter/collect-distinct-values';
+export * from './lib/table/column-filter/column-filter-state';
+export * from './lib/table/column-filter/column-filter-keymap';
+export * from './lib/table/column-filter/column-filter-service';
+export * from './lib/table/column-filter/filter-row-service';
+export * from './lib/table/column-filter/filter-popup-shell';
+export * from './lib/table/column-filter/column-filter-menu-service';
+export * from './lib/table/column-filter/column-chooser-service';
+export * from './lib/table/data/common/event/ge-filter-event';

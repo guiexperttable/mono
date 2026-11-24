@@ -38,6 +38,7 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 023 | [023-spaltenfilter.md](023-spaltenfilter.md) | Spaltenfilter (Vergleich mit NitGrid): Filter-Modell je Spalte mit API, Zustandsteil `filters` und `onFilterChanged`; Filterzeile im Header über **eine** Option (`filterRow`, Vorgabe `false`); Filter-Menü je Spalte (Trichter, Vergleich, Werteliste mit Checkboxen, OK/Cancel); Spaltenauswahl „Columns“ als Popup. Fußleiste bleibt App-Sache | Community (Werteliste, Spalten-Panel: Enterprise – prüfen) | 001, 003, 012, 019, 021, 022 | L |
 
 022 umgesetzt (Branch `feat/spalten-ziehen`, Design `022-spalten-ziehen.design.md`, Zielversion 1.1.110).
+023 umgesetzt (Branch `feat/spaltenfilter`, Design `023-spaltenfilter.design.md`, Zielversion 1.1.114).
 
 **Nächste Reihenfolge (ab 09.11.2026):** 016 (prüfen, ob erledigt) → 018 → **021** → 019 → 020. 021 kommt vor 019, weil
 019 seine Geschwindigkeits-, Klick- und Tastatur-Checks in die Infrastruktur von 021 einhängt; 020 beschreibt den Stand
@@ -71,6 +72,10 @@ Umfang: S ≈ 1 Sitzung, M ≈ 2–3, L ≈ 3–5, XL = mehr (in Teilen liefern)
 (Ausschneiden/Kopieren/Einfügen, Zeilen/Spalten einfügen/löschen, eigene Einträge). 013 zeigt es nur als Beispiel
 (`apps/table-demo/spreadsheet.html`, plain HTML über `onContextmenu`).
 
+**Vorschlag (noch kein Prompt):** Statusleiste – optionale, konfigurierbare Statusleiste unter dem Footer (Trefferzahl,
+Auswahl-Aggregate aus `getSelectionAggregates()`, Umschalter für Filterzeile, Spaltenauswahl-Knopf, Vollbild). 023 zeigt
+das Muster bewusst als plain-HTML-Rezept (`apps/table-demo/column-filter.html`, Showcase `columnfilter`).
+
 ## Gemeinsame Konventionen
 
 - Branch `feat/<slug>`, Design-Dokument `prompts/NNN-<slug>.design.md` (Slug steht im Kopf jedes Prompts).
@@ -102,3 +107,5 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [x] 019 (Video 15 nach dem Release; Tastatur-Event bewusst App-Muster; Angular-Demo nach dem Release)
 - [x] 020 (Blindtest mit fremden Subagenten im Design-Dokument; Lücken B1/B7 als Vorschläge in `TODO.md`)
 - [x] 021 (CI-Lauf `test-perf` und erste `linux-ci`-Baseline nach dem nächsten Push; Stufe 2 sperrend ab ~01.12.2026)
+- [x] 022 (Release 1.1.110, Branch `feat/spalten-ziehen`)
+- [x] 023 (Zielversion 1.1.114, Branch `feat/spaltenfilter`; Video 16 Aufnahme nach dem Release; Demo-Repo entfällt)

@@ -19,6 +19,7 @@ A pre-defined column definition for a checkbox representation.
 ### Properties
 
 - [classes](CheckboxColumnDef.md#classes)
+- [filter](CheckboxColumnDef.md#filter)
 - [headerLabel](CheckboxColumnDef.md#headerlabel)
 - [maxWidth](CheckboxColumnDef.md#maxwidth)
 - [minWidth](CheckboxColumnDef.md#minwidth)
@@ -53,6 +54,22 @@ are ready-made maps for the alignment.
 #### Defined in
 
 [src/lib/table/data/common/checkbox-column-def.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/checkbox-column-def.ts#L26)
+
+___
+
+### filter
+
+• **filter**: `boolean` = `false`
+
+Checkbox column is not filterable (since 1.1.114).
+
+#### Implementation of
+
+[ColumnDefIf](../interfaces/ColumnDefIf.md).[filter](../interfaces/ColumnDefIf.md#filter)
+
+#### Defined in
+
+[src/lib/table/data/common/checkbox-column-def.ts:32](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/checkbox-column-def.ts#L32)
 
 ___
 

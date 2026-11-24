@@ -37,6 +37,7 @@ ids.liveRegion();                 // "ge-orders-live"
 
 - [cell](AriaIds.md#cell)
 - [detailRowGroup](AriaIds.md#detailrowgroup)
+- [filterRowGroup](AriaIds.md#filterrowgroup)
 - [liveRegion](AriaIds.md#liveregion)
 - [rowGroup](AriaIds.md#rowgroup)
 - [createPrefix](AriaIds.md#createprefix)
@@ -117,7 +118,36 @@ e.g. `"ge-t1-rg-detail"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-ids.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L75)
+[src/lib/table/aria/aria-ids.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L87)
+
+___
+
+### filterRowGroup
+
+▸ **filterRowGroup**(`side`): `string`
+
+The ID of one of the three row groups (`west`, `center`, `east`) of the persistent filter row, referenced by
+`aria-owns` of the host when [TableOptionsIf.filterRow](../interfaces/TableOptionsIf.md#filterrow) is enabled.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `side` | [`SideIdent`](../modules.md#sideident) | west, center or east |
+
+#### Returns
+
+`string`
+
+e.g. `"ge-t1-rg-filter-center"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-ids.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L77)
 
 ___
 
@@ -135,7 +165,7 @@ e.g. `"ge-t1-live"`
 
 #### Defined in
 
-[src/lib/table/aria/aria-ids.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L84)
+[src/lib/table/aria/aria-ids.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-ids.ts#L96)
 
 ___
 

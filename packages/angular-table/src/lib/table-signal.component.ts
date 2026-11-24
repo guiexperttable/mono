@@ -31,6 +31,7 @@ import {
   GeUndoEvent,
   GeColumnResizeEvent,
   GeColumnMoveEvent,
+  GeFilterEvent,
   SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -175,6 +176,8 @@ export class TableSignalComponent implements OnDestroy {
   readonly columnMoveStart = output<GeColumnMoveEvent>();
   /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
   readonly columnMoveEnd = output<GeColumnMoveEvent>();
+  /** Column filters changed – once per filter pass, after filtering and rendering (since 1.1.114). */
+  readonly filterChanged = output<GeFilterEvent>();
 
   // ---------------------------------------------------------------- internals
 
@@ -215,6 +218,7 @@ export class TableSignalComponent implements OnDestroy {
     onColumnResizeEnd: evt => this.emitUnlessDestroyed(() => this.columnResizeEnd.emit(evt)),
     onColumnMoveStart: evt => this.columnMoveStart.emit(evt),
     onColumnMoveEnd: evt => this.emitUnlessDestroyed(() => this.columnMoveEnd.emit(evt)),
+    onFilterChanged: evt => this.emitUnlessDestroyed(() => this.filterChanged.emit(evt)),
   };
 
   constructor() {

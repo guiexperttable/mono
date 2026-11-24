@@ -54,6 +54,7 @@ Training: [Events and a context menu of your own](https://gui.expert/training/ev
 - [onContextmenu](EventListenerIf.md#oncontextmenu)
 - [onDetailExpandedChanged](EventListenerIf.md#ondetailexpandedchanged)
 - [onEditingChanged](EventListenerIf.md#oneditingchanged)
+- [onFilterChanged](EventListenerIf.md#onfilterchanged)
 - [onFocusChanged](EventListenerIf.md#onfocuschanged)
 - [onModelChanged](EventListenerIf.md#onmodelchanged)
 - [onMouseClicked](EventListenerIf.md#onmouseclicked)
@@ -93,7 +94,7 @@ The pending changes of a batch edit changed: values were marked, set back, writt
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:117](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L117)
+[src/lib/table/event-listener.if.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L118)
 
 ___
 
@@ -115,7 +116,7 @@ Checked rows changed (row checkboxes, tree checkboxes) – the argument holds al
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:63](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L63)
+[src/lib/table/event-listener.if.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L64)
 
 ___
 
@@ -142,7 +143,7 @@ order is back). Once per start, no event for the steps in between, after the tab
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L172)
+[src/lib/table/event-listener.if.ts:173](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L173)
 
 ___
 
@@ -169,7 +170,7 @@ Optional: the user started to move a column (dragged its header 4 px). Not repor
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L164)
+[src/lib/table/event-listener.if.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L165)
 
 ___
 
@@ -196,7 +197,7 @@ old width is back). Once per start, after the table applied the width: save the 
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L156)
+[src/lib/table/event-listener.if.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L157)
 
 ___
 
@@ -223,7 +224,7 @@ click on it). Not reported for API calls. See [GeColumnResizeEvent](../classes/G
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L148)
+[src/lib/table/event-listener.if.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L149)
 
 ___
 
@@ -245,7 +246,7 @@ Right-click on the table. Call `evt.originalEvent?.preventDefault()` to suppress
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L45)
+[src/lib/table/event-listener.if.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L46)
 
 ___
 
@@ -271,7 +272,7 @@ A detail row was expanded or collapsed (master/detail, [TableOptionsIf.masterDet
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L124)
+[src/lib/table/event-listener.if.ts:125](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L125)
 
 ___
 
@@ -297,7 +298,35 @@ The cell editor opened, its text changed (Excel-style editing), it committed or 
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L132)
+[src/lib/table/event-listener.if.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L133)
+
+___
+
+### onFilterChanged
+
+▸ **onFilterChanged**(`evt`): `void`
+
+Optional: column filters changed ([TableApi.setColumnFilter](../classes/TableApi.md#setcolumnfilter), filter row, filter menu or state restore).
+Called once per filter pass, after the table filtered and rendered (so `getDisplayedRowCount()` equals
+`evt.rowCount`). See [GeFilterEvent](../classes/GeFilterEvent.md).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `evt` | [`GeFilterEvent`](../classes/GeFilterEvent.md) |
+
+#### Returns
+
+`void`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/event-listener.if.ts:182](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L182)
 
 ___
 
@@ -323,7 +352,7 @@ The focused cell changed – read it from [FocusModelIf.getFocus](FocusModelIf.m
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L75)
+[src/lib/table/event-listener.if.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L76)
 
 ___
 
@@ -345,7 +374,7 @@ Cells were edited – `evt.cells` holds row and column index of each; the new va
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L66)
+[src/lib/table/event-listener.if.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L67)
 
 ___
 
@@ -368,7 +397,7 @@ A click on the table. A double-click on the same cell is reported again with `cl
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L60)
+[src/lib/table/event-listener.if.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L61)
 
 ___
 
@@ -390,7 +419,7 @@ The mouse is being dragged; `evt.draggingX` / `evt.draggingY` hold the distance.
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L54)
+[src/lib/table/event-listener.if.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L55)
 
 ___
 
@@ -412,7 +441,7 @@ A drag with the mouse ended (column resize, column move or range selection).
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L51)
+[src/lib/table/event-listener.if.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L52)
 
 ___
 
@@ -434,7 +463,7 @@ The mouse moved over the table (cell under the mouse in `evt`). Called often –
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L48)
+[src/lib/table/event-listener.if.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L49)
 
 ___
 
@@ -462,7 +491,7 @@ Managed: called after the move (`evt.toIndex` = the real position). Save the new
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L108)
+[src/lib/table/event-listener.if.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L109)
 
 ___
 
@@ -489,7 +518,7 @@ invalid (no drop marker, no drop).
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L99)
+[src/lib/table/event-listener.if.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L100)
 
 ___
 
@@ -516,7 +545,7 @@ cancels it. See [GeRowDragEvent](../classes/GeRowDragEvent.md).
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L91)
+[src/lib/table/event-listener.if.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L92)
 
 ___
 
@@ -538,7 +567,7 @@ The table was scrolled.
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L69)
+[src/lib/table/event-listener.if.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L70)
 
 ___
 
@@ -564,7 +593,7 @@ The selection changed – read it from [SelectionModelIf.getRanges](SelectionMod
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L72)
+[src/lib/table/event-listener.if.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L73)
 
 ___
 
@@ -592,7 +621,7 @@ Save `evt.state` e.g. on your server and pass it back as [TableOptionsIf.initial
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L83)
+[src/lib/table/event-listener.if.ts:84](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L84)
 
 ___
 
@@ -618,4 +647,4 @@ The undo history changed (undo and redo, [TableOptionsIf.undo](TableOptionsIf.md
 
 #### Defined in
 
-[src/lib/table/event-listener.if.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L140)
+[src/lib/table/event-listener.if.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/event-listener.if.ts#L141)

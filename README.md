@@ -21,6 +21,8 @@ Spreadsheet: `SpreadsheetFactory.create({ data })` builds a sheet in one call �
 
 Angular Signals: for Angular 22 and later a second, signal-native component `<guiexpert-table-signal>` (`TableSignalComponent`) – signal inputs, signal outputs and the `TableApi` as a signal (`[(tableApi)]="api"`), zoneless-ready, no RxJS (since 1.1.100). The classic `<guiexpert-table>` stays for Angular 14 – 22+.
 
+Column filters: `filterRow: true` puts a filter input under every column header (`>100`, `10..20`, `^abc`, dates, booleans; the inputs keep focus and caret while live data renders), `columnFilterMenu: true` adds a funnel button with operators and an Excel-style checklist of the values in the column (virtualized, works with 200,000 distinct values), `tableApi.showColumnChooser(button)` opens a column chooser. Filters are part of the table: `setColumnFilter`, `onFilterChanged`, saved state (`"filters"`), combined with `externalFilterFunction` (since 1.1.114). All three are off by default.
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside

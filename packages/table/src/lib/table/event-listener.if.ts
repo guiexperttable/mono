@@ -3,6 +3,7 @@ import type { GeUndoEvent } from './data/common/event/ge-undo-event';
 import type { GeDetailEvent } from './data/common/event/ge-detail-event';
 import type { GeColumnResizeEvent } from './data/common/event/ge-column-resize-event';
 import type { GeColumnMoveEvent } from './data/common/event/ge-column-move-event';
+import type { GeFilterEvent } from './data/common/event/ge-filter-event';
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
@@ -170,4 +171,13 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.110
    */
   onColumnMoveEnd?(evt: GeColumnMoveEvent): void;
+
+  /**
+   * Optional: column filters changed ({@link TableApi.setColumnFilter}, filter row, filter menu or state restore).
+   * Called once per filter pass, after the table filtered and rendered (so `getDisplayedRowCount()` equals
+   * `evt.rowCount`). See {@link GeFilterEvent}.
+   *
+   * @since 1.1.114
+   */
+  onFilterChanged?(evt: GeFilterEvent): void;
 }

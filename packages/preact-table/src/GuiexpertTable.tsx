@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -24,6 +24,7 @@ export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
+export type GeFilterEventFn = (evt: GeFilterEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -66,6 +67,8 @@ export interface GuiexpertTableProps {
   columnMoveStart?: GeColumnMoveEventFn;
   /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
   columnMoveEnd?: GeColumnMoveEventFn;
+  /** Column filters changed (since 1.1.114). */
+  filterChanged?: GeFilterEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -151,7 +154,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onColumnResizeStart: (evt: GeColumnResizeEvent) => current().columnResizeStart?.(evt),
       onColumnResizeEnd: (evt: GeColumnResizeEvent) => current().columnResizeEnd?.(evt),
       onColumnMoveStart: (evt: GeColumnMoveEvent) => current().columnMoveStart?.(evt),
-      onColumnMoveEnd: (evt: GeColumnMoveEvent) => current().columnMoveEnd?.(evt)
+      onColumnMoveEnd: (evt: GeColumnMoveEvent) => current().columnMoveEnd?.(evt),
+      onFilterChanged: (evt: GeFilterEvent) => current().filterChanged?.(evt)
     };
 
     const tableScope = new TableScope(

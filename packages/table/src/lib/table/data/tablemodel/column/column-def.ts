@@ -14,6 +14,7 @@ import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
 import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
 import type { FormulaOptionsIf } from "../../../formula/formula-options.if";
 import { createFormulaValueGetter } from "../../../formula/compile-formula";
+import type { ColumnFilterColumnOption } from "../../../column-filter/column-filter-options.if";
 
 
 
@@ -69,6 +70,10 @@ export class ColumnDef implements ColumnDefIf {
   public resizable?: boolean;
   /** `false`: can't be moved by dragging, see {@link ColumnDefIf.movable} (since 1.1.110). */
   public movable?: boolean;
+  /** Column filter configuration, see {@link ColumnDefIf.filter} (since 1.1.114). */
+  public filter?: ColumnFilterColumnOption;
+  /** `false`: can't be hidden in the column chooser, see {@link ColumnDefIf.hideable} (since 1.1.114). */
+  public hideable?: boolean;
   /** Lower limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.minWidth}. Default `0px`. */
   public minWidth: SizeIf;
   /** Upper limit for % widths and for resizing with the mouse, see {@link ColumnDefIf.maxWidth}. Default `100000px`. */
@@ -187,6 +192,10 @@ export class ColumnDef implements ColumnDefIf {
     resizable?: boolean,
     /** `false`: the user can't move the column (since 1.1.110). */
     movable?: boolean,
+    /** Built-in column filter config (`false` = not filterable, since 1.1.114). */
+    filter?: ColumnFilterColumnOption,
+    /** `false`: cannot be hidden in the column chooser (since 1.1.114). */
+    hideable?: boolean,
   }): ColumnDefIf {
 
     const am = new AreaObjectMap<CellRendererIf>(
@@ -239,6 +248,8 @@ export class ColumnDef implements ColumnDefIf {
     if (param.cellFormulas !== undefined) def.cellFormulas = param.cellFormulas;
     if (param.resizable !== undefined) def.resizable = param.resizable;
     if (param.movable !== undefined) def.movable = param.movable;
+    if (param.filter !== undefined) def.filter = param.filter;
+    if (param.hideable !== undefined) def.hideable = param.hideable;
     return def;
   }
 

@@ -679,6 +679,33 @@ Verhalten steht als `// NOTE:` in den Specs.
       Parameter `property`/`columns` wäre für „Summe der ausgewählten Beträge“ naheliegend.
 - [ ] `ShortcutService` loggt auf `localhost` (s. o., Prompt 021).
 
+## Spaltenfilter, Filter-Menü & Spaltenauswahl (Prompt 023, 1.1.114)
+
+- [x] Teil A–E umgesetzt (Branch `feat/spaltenfilter`, Design `prompts/023-spaltenfilter.design.md`): DOM-freie Engine,
+      `ColumnFilterService`, `onFilterChanged` (alle 7 Wrapper), Zustandsteil `"filters"` (`autoRestoreFilterState`),
+      persistente Filterzeile (`filterRow`), Filter-Menü mit Operatoren + virtualisierter Excel-Werteliste
+      (`columnFilterMenu`), Spaltenauswahl (`showColumnChooser`, `ColumnDef.hideable`), Demo `apps/table-demo/column-filter.html`,
+      Showcase `columnfilter`, Training `filtering#column-filters`, Video `videos/16-spaltenfilter/`, `instructions.md` 6.28,
+      `llms.txt` R19.
+- [x] Gefunden im Abschluss-Review (24.11.2026, Tests `column-filter-review.browser.spec.ts` + Unit): Text-Kurzformen
+      `=x`, `!=x`, `^a`, `z$`, `""` waren dokumentiert, aber nicht im Parser; der Anzeige-Text der Filterzeile ließ sich
+      nicht zurücklesen (`= EMEA`, Dezimalkomma, `(Blanks)`) – Enter im Feld bzw. OK im Menü löschte oder verfälschte den
+      Filter; unvollständige Eingabe (`>`) löschte den aktiven Filter; jede Filteränderung setzte auch die waagerechte
+      Scrollposition zurück; das Menü schloss sich über sein eigenes Scroll-Ereignis (angeschnittene Spalte,
+      `applyOnChange`, Live-Tail); `between` mit einer Grenze filterte nichts; Werteliste mit `Date`-Objekten brach nach
+      dem Speichern und leerte die Wertelisten anderer Spalten; Typ-Erkennung sah nur die ersten 100 Zeilen (leere Zeilen
+      am Anfang → Text) und merkte sich „Text“ einer leeren Tabelle; fokussierte Checkbox der Werteliste verlor beim
+      Scrollen den Fokus; gekappte Werteliste (`maxValues`) blendete nicht gelistete Werte aus; Suche + „(Select all)“
+      abwählen + Treffer anhaken behielt die übrige Auswahl; IME-Tasten (Pfeile, Escape) verließen das Filterfeld;
+      Monatsangaben (`2026-03`, `2026-01..2026-03`) waren dokumentiert, aber nicht umgesetzt – alles behoben.
+- [ ] `bodyData`-Tabellen (Array of arrays) ohne Property: Filter-Schlüssel ist die Position `#<index>`. Verschiebt der
+      Nutzer die Spalte, gilt der Filter (auch im gespeicherten Zustand) für die Spalte, die jetzt an der Position steht.
+      Lösung wäre ein stabiler Spaltenschlüssel für solche Modelle.
+- [ ] `firstInit()` mit `externalFilterFunction` zeichnet seit 1.1.114 nicht mehr vor dem Layout (ein Render weniger,
+      sichtbar gleich) – beobachten.
+- [ ] Optionaler Folge-Prompt **Statusleiste** (`statusBar`): fertige, optionale Statusleiste unter dem Footer
+      (Trefferzahl, Auswahl-Aggregate, Columns-/Filterzeilen-/Vollbild-Knöpfe) – aktuell bewusst als plain-HTML-Rezept.
+
 ## Spalten ziehen (Prompt 022, 09.11.2026)
 
 - [x] Ereignisse `onColumnResizeStart/End`, `onColumnMoveStart/End` (alle Wrapper), Sperre `ColumnDef.resizable/movable`,

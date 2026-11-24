@@ -8,6 +8,7 @@ import { editInputPipe } from "../../../renderer/edit/edit-input-pipe.if";
 import type { ColumnEditorOption } from "../../../sheet-editing/cell-editor.if";
 import type { ValueGetter, ValueSetter } from "../../../calc/value-getter.type";
 import type { ShowValuesAsConfig } from "../../../calc/show-values-as.type";
+import type { ColumnFilterColumnOption } from "../../../column-filter/column-filter-options.if";
 
 /**
  * Represents a function that compares two values for sorting purposes.
@@ -255,6 +256,30 @@ export interface ColumnDefIf {
    * @since 1.1.110
    */
   movable?: boolean;
+
+  /**
+   * Built-in column filter configuration: `false` disables filtering for this column (no filter-row input, no filter
+   * menu icon); `true` (default for data columns) infers the type from the values; `"text" | "number" | "date" |
+   * "boolean" | "set"` sets the type explicitly; an object configures type, `valueGetter`, `caseSensitive`,
+   * `placeholder` or `getValues`.
+   *
+   * @example
+   * ColumnDef.create({ property: "mrr", headerLabel: "MRR", filter: "number" })
+   *
+   * @since 1.1.114
+   */
+  filter?: ColumnFilterColumnOption;
+
+  /**
+   * `false`: the column cannot be unchecked in the built-in column chooser ({@link TableApi.showColumnChooser}).
+   * `setColumnVisible` still works. Default `true`.
+   *
+   * @example
+   * ColumnDef.create({ property: "id", headerLabel: "ID", hideable: false })
+   *
+   * @since 1.1.114
+   */
+  hideable?: boolean;
 }
 
 /**

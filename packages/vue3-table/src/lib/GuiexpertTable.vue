@@ -17,7 +17,7 @@ import {
   TableScope,
   TableModelIf, TableOptionsIf,
   GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent,
-  GeColumnResizeEvent, GeColumnMoveEvent
+  GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent
 } from '@guiexpert/table';
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -87,7 +87,8 @@ export default defineComponent({
     "columnResizeStart", // since 1.1.110 (column drag)
     "columnResizeEnd",
     "columnMoveStart",
-    "columnMoveEnd"
+    "columnMoveEnd",
+    "filterChanged" // since 1.1.114 (column filters)
   ],
 
   setup(props, { emit }) {
@@ -205,6 +206,9 @@ export default defineComponent({
         },
         onColumnMoveEnd: (evt: GeColumnMoveEvent) => {
           emit("columnMoveEnd", evt);
+        },
+        onFilterChanged: (evt: GeFilterEvent) => {
+          emit("filterChanged", evt);
         },
       };
 

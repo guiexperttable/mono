@@ -361,8 +361,8 @@ export class ClipboardService {
     // composedPath: a table in a shadow root – the document sees the event retargeted to the shadow host
     const origin = typeof evt.composedPath === "function" ? evt.composedPath()[0] : evt.target;
     const fromProxy = !!this.proxy && origin === this.proxy;
-    if (!fromProxy && (activeElementOf(host) !== host || scope.isEditing() || scope.isEventInDetail?.(evt))) {
-      return; // not for the table (the editor, a field of a cell renderer, the page)
+    if (!fromProxy && (activeElementOf(host) !== host || scope.isEditing() || scope.isEventInDetail?.(evt) || scope.isEventInFilterUI?.(evt))) {
+      return; // not for the table (the editor, a field of a cell renderer, filter UI, the page)
     }
     if (!fromProxy && (scope.getHeaderFocus() || !scope.getActiveBodyCell())) {
       return;

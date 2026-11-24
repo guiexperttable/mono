@@ -11,9 +11,11 @@ import Pipeline from "../../components/training/diagrams/Pipeline.astro";
 
   <h2 id="idea">Your UI, the table's question</h2>
   <p>
-    The GuiExpert Table has no built-in filter row – on purpose. Your app knows best whether a filter is a search field, a
-    slider, a date range or a sidebar with checkboxes. The table asks one question per row:
-    <strong>show this row?</strong> You answer it with <ApiLink name="TableOptionsIf.externalFilterFunction" />.
+    Every app can build its own filter UI – a search field, a slider, a date range or a sidebar with checkboxes. The table
+    asks one question per row: <strong>show this row?</strong> You answer it with
+    <ApiLink name="TableOptionsIf.externalFilterFunction" />. If you want a ready-made filter row, Excel-style value
+    checklists and a column chooser out of the box, jump to <a href="#column-filters">Built-in column filters</a> below
+    (since <code>1.1.114</code>) – both compose with AND.
   </p>
 
   <h2 id="function">The filter function</h2>
@@ -47,6 +49,37 @@ import Pipeline from "../../components/training/diagrams/Pipeline.astro";
     <p>Since <code>@guiexpert/table@1.1.88</code> the sort order survives filtering. Before, the table fell back to the original
       order while the sort icon stayed.</p>
   </Callout>
+
+  <h2 id="column-filters">Built-in column filters, value checklist &amp; column chooser</h2>
+  <Callout type="version">
+    <p>Since <code>@guiexpert/table@1.1.114</code> you can turn on a persistent filter row
+      (<ApiLink name="TableOptionsIf.filterRow" />), per-column Excel-style value checklists
+      (<ApiLink name="TableOptionsIf.columnFilterMenu" />) and a column visibility chooser
+      (<ApiLink name="TableApi.showColumnChooser" />) – all opt-in and MIT-licensed.</p>
+  </Callout>
+  <p>
+    Each column infers its filter type (<code>text</code>, <code>number</code>, <code>date</code>, <code>boolean</code>)
+    or takes an explicit <code>ColumnDef.filter</code> (set <code>false</code> to disable). In the filter row, shorthand
+    like <code>&gt;5000</code>, <code>1000..5000</code>, <code>=Berlin</code> or <code>!=APAC</code> is parsed directly;
+    clicking the header funnel opens operators and a virtualized unique-value checklist that cascades across other active
+    filters.
+  </p>
+  <Snippet file="demos/column-filters.ts" region="setup" title="Enable filterRow and columnFilterMenu" />
+  <Snippet file="demos/column-filters.ts" region="events" />
+  <Snippet file="demos/column-filters.ts" region="controls" />
+  <LiveDemo name="column-filters" title="Built-in filter row, Excel value checklist &amp; column chooser (100,000 orders)" height={440}
+            caption="Type “>5000” in Total, click the Country funnel for the value checklist, or open Columns to hide/show columns." />
+  <ul>
+    <li><strong>Composes with <code>externalFilterFunction</code>:</strong> active column filters and your external filter
+      combine with logical AND.</li>
+    <li><strong>Server-side mode:</strong> set <code>columnFilter: {"{ managed: false }"}</code> to handle filtering on
+      your backend via <ApiLink name="EventListenerIf.onFilterChanged" />, and provide async checklist items via
+      <code>ColumnDef.filter = {"{ getValues }"}</code>.</li>
+    <li><strong>State persistence:</strong> column filters and filter-row visibility are stored under the
+      <code>"filters"</code> state part (<ApiLink name="AutoRestoreOptionsIf.autoRestoreFilterState" />).</li>
+    <li><strong>Full showcase:</strong> <a href="/showcase/columnfilter/run/">Column filters &amp; chooser</a> (200,000 rows,
+      plain-HTML status bar, dark mode, RTL and fullscreen).</li>
+  </ul>
 
   <h2 id="showcases">More filter UIs</h2>
   <p>The showcase <a href="/showcase/idfilter/run/">Slider filter</a> uses a range input instead of a search field – the same

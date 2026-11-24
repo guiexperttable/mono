@@ -114,8 +114,8 @@ export class ShortcutService {
 
 
   private onKeyDown(evt: KeyboardEvent) {
-    if (this.tableScope.isEventInDetail?.(evt)) {
-      return; // keys in a detail row (master/detail, e.g. a nested table) belong to the detail
+    if (this.tableScope.isEventInDetail?.(evt) || this.tableScope.isEventInFilterUI?.(evt)) {
+      return; // keys in a detail row or column filter UI belong there
     }
     // keys typed into a cell editor (or any other form field in a cell) belong to that field –
     // otherwise e.g. ctrl+a re-renders the table and the editor loses its text

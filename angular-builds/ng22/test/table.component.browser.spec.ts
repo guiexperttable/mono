@@ -22,7 +22,8 @@ const ZONELESS = [provideZonelessChangeDetection()];
         (contextmenu)="contextmenus.push($event)"
         (contextMenu)="contextMenus.push($event)"
         (columnResizeStart)="columnEvents.push($event)"
-        (columnResizeEnd)="columnEvents.push($event)" />
+        (columnResizeEnd)="columnEvents.push($event)"
+        (filterChanged)="filterEvents.push($event)" />
     }`,
 })
 class ClassicHost {
@@ -35,6 +36,7 @@ class ClassicHost {
   readonly contextmenus: unknown[] = [];
   readonly contextMenus: unknown[] = [];
   readonly columnEvents: unknown[] = [];
+  readonly filterEvents: unknown[] = [];
 }
 
 afterEach(() => {
@@ -49,6 +51,13 @@ describe('TableComponent (Angular 22, zoneless)', () => {
     dblClickResizeHandle(host, 1);
     expect(cmp.columnEvents).toHaveLength(2);
     expect(cmp.columnEvents[1]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1 });
+  });
+
+  it('setColumnFilter reaches (filterChanged) (since 1.1.114)', async () => {
+    const { cmp } = await mount(ClassicHost, ZONELESS);
+    cmp.ready[0].setColumnFilter('name', { condition: { operator: 'contains', value: 'Row 4' } });
+    expect(cmp.filterEvents).toHaveLength(1);
+    expect(cmp.filterEvents[0]).toMatchObject({ property: 'name', source: 'api', rowCount: 1, unfilteredRowCount: 5 });
   });
 
   it('S15: tableReady once, rows rendered', async () => {

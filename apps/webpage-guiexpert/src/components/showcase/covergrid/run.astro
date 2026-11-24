@@ -6,9 +6,9 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 <div class="covergrid-bar">
   <label>Search <input type="search" class={id + '-search'} placeholder="title, author, genre" autocomplete="off"></label>
   <label>Size <select class={id + '-size'}>
-    <option value="100x170">small</option>
-    <option value="160x260" selected>medium</option>
-    <option value="220x340">large</option>
+    <option value="105x140">small</option>
+    <option value="165x220" selected>medium</option>
+    <option value="225x300">large</option>
   </select></label>
   <label>Order <select class={id + '-order'}>
     <option value="id" selected>collection</option>
@@ -52,7 +52,7 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   const report = () => {
     const shown = tableModel.bodyModel.filteredItems.length;
     const pick = selected ? ` · ${selected.title} – ${selected.author} (${selected.year})` : '';
-    log.textContent = `${shown.toLocaleString()} books${pick}`;
+    log.textContent = `${shown.toLocaleString()} covers${pick}`;
   };
 
   const listener = new EventAdapter();

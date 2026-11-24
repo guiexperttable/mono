@@ -27,7 +27,7 @@ scrolls to this row.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L134)
+[src/lib/table/state/table-state.if.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L139)
 
 ___
 
@@ -39,7 +39,7 @@ Horizontal scroll position in px.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L127)
+[src/lib/table/state/table-state.if.ts:132](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L132)
 
 ___
 
@@ -51,4 +51,4 @@ Vertical scroll position in px.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L129)
+[src/lib/table/state/table-state.if.ts:134](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L134)

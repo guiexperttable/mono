@@ -429,6 +429,36 @@ tableApi.autoResizeColumn("message");   // what a double click on the border doe
       "ColumnDefIf.resizable", "ColumnDefIf.movable", "TableApi.autoResizeColumn", "ColumnAutoWidthOptionsIf"],
     agGrid: "community",
     agGridNote: "column events, lockPosition and auto-size are in Community"
+  },
+  {
+    id: "column-filters", prompt: "023", since: "1.1.114", icon: "mdi:filter-variant",
+    title: "Column filters, Excel value checklist and column chooser",
+    problem: "Per-column filter inputs, Excel-style distinct-value checklists and a column visibility picker had to be " +
+      "built by every app – or bought in an Enterprise tier.",
+    points: [
+      "filterRow: true – persistent filter inputs below the header with shorthand (>100, 10..20, 2025-01..2025-06, tri-state boolean)",
+      "columnFilterMenu: true – funnel button per column with operators and a virtualized unique-value checklist (async getValues for servers)",
+      "tableApi.showColumnChooser(btn) – searchable column picker anchored to any button, with ColumnDef.hideable: false locks",
+      "composes with externalFilterFunction (AND) and appendRows, persists via autoRestoreFilterState, server-side mode (managed: false)"
+    ],
+    snippet: `const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  filterRow: true,                                      // inputs below the header
+  columnFilterMenu: true                                // funnel + Excel value checklist
+};
+listener.onFilterChanged = evt => {
+  console.log(\`\${evt.rowCount} / \${evt.unfilteredRowCount} rows\`);
+};
+tableApi.setColumnFilter("total", { condition: { operator: "greaterThan", value: 1_000 } });
+tableApi.setColumnFilter("country", { values: ["Germany", "Austria"] });
+tableApi.showColumnChooser(saveButton);                 // anchor to any button`,
+    showcase: { name: "columnfilter", title: "Column filters & chooser" },
+    training: { slug: "filtering", hash: "column-filters", label: "Chapter 21 · Filtering" },
+    api: ["TableOptionsIf.filterRow", "TableOptionsIf.columnFilterMenu", "TableOptionsIf.columnFilter",
+      "TableApi.setColumnFilter", "TableApi.clearColumnFilters", "TableApi.setFilterRowVisible",
+      "TableApi.showColumnFilterMenu", "TableApi.showColumnChooser", "EventListenerIf.onFilterChanged", "GeFilterEvent"],
+    agGrid: "partly",
+    agGridNote: "filter row in Community; Excel value checklist (Set Filter) and Columns Tool Panel in Enterprise"
   }
 ];
 

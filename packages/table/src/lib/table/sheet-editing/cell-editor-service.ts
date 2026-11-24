@@ -493,7 +493,7 @@ export class CellEditorService {
 
   private onKeyDown(evt: KeyboardEvent): void {
     const scope = this.tableScope;
-    if (scope.isEventInDetail?.(evt)) {
+    if (scope.isEventInDetail?.(evt) || scope.isEventInFilterUI?.(evt)) {
       return;
     }
     const container = this.container;

@@ -1,0 +1,139 @@
+<!doctype html>
+<!--
+  Recording page for episode 16 "Spaltenfilter & Excel-Werteliste im Header – eine Option (Werteliste bei ag-Grid Enterprise)".
+  Start (repo root):  pnpm build:core  &&  python3 -m http.server 8080
+  Open:               http://localhost:8080/videos/16-spaltenfilter/demo.html
+-->
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>GuiExpert Table – Spaltenfilter &amp; Werteliste</title>
+  <link rel="stylesheet" href="../../packages/table/dist/css/main.css">
+  <script type="importmap">{ "imports": { "@guiexpert/table": "../../packages/table/dist/index.js" } }</script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); font-size: 16px; }
+    .shell { display: flex; flex-direction: column; height: 100vh; padding: 10px 16px; box-sizing: border-box; gap: 8px; background: var(--ge-table-bg, #fff); }
+    .head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    h1 { font-size: 22px; margin: 0; }
+    .hint { font-size: 14px; opacity: 0.75; }
+    .table-div { flex: 1 1 auto; min-height: 240px; width: 100%; }
+    .status { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding: 8px 12px; border: 1px solid var(--ge-table-border, #ccc); border-radius: 4px; font-size: 14px; }
+    .count { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .actions { margin-inline-start: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .actions button { font: inherit; padding: 4px 12px; border: 1px solid currentColor; border-radius: 4px; background: transparent; color: inherit; cursor: pointer; }
+    .actions button[aria-pressed="true"] { background: #0a6ebd; border-color: #0a6ebd; color: #fff; }
+    .actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="head">
+    <h1>Spaltenfilter &amp; Excel-Werteliste (200.000 Accounts)</h1>
+    <span class="hint">Tipp: <code>&gt;50000</code> in MRR · Trichter in Region · <strong>Columns</strong> unten</span>
+  </div>
+  <div class="table-div" id="grid"></div>
+  <div class="status">
+    <span class="count" id="count"></span>
+    <span id="active"></span>
+    <div class="actions">
+      <button type="button" id="toggle-row" aria-pressed="true">Filterzeile</button>
+      <button type="button" id="columns">Columns</button>
+      <button type="button" id="clear" disabled>Filter löschen</button>
+      <label><input id="dark" type="checkbox"> dunkel</label>
+      <button type="button" id="fs" aria-pressed="false">Vollbild</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import {
+    ColumnDef, EventAdapter, NumberCellRenderer, SimpleDomService, TableFactory, TableOptions, TableScope,
+    TrueFalseCellRenderer, TrueFn, px90, px120, px150, px200
+  } from "@guiexpert/table";
+
+  // 200,000 deterministic rows (fixed seed)
+  let seed = 20261124;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const PREFIX = ["Nimbus", "Timber", "Crest", "Solar", "Silver", "Terra", "Spark", "Maple", "Bright", "Vertex"];
+  const SUFFIX = ["North", "Pulse", "River", "Beacon", "Onyx", "Kestrel", "Harbor", "Cloud", "Forge", "Peak"];
+  const LEGAL = ["GmbH", "Inc", "SAS", "Corp", "Ltd", "AG", "Systems"];
+  const REGIONS = ["EMEA", "AMER", "APAC", "LATAM"];
+  const PLANS = ["Starter", "Team", "Business", "Enterprise"];
+  const rows = new Array(200_000);
+  for (let i = 0; i < rows.length; i++) {
+    const plan = PLANS[Math.floor(rnd() * PLANS.length)];
+    const mrr = Math.round((plan === "Enterprise" ? 8000 + rnd() * 65000 : 120 + rnd() * 9000));
+    const yr = 2023 + Math.floor(rnd() * 4);
+    const mo = String(1 + Math.floor(rnd() * 12)).padStart(2, "0");
+    const dy = String(1 + Math.floor(rnd() * 28)).padStart(2, "0");
+    rows[i] = {
+      id: i + 1,
+      company: `${PREFIX[Math.floor(rnd() * PREFIX.length)]} ${SUFFIX[Math.floor(rnd() * SUFFIX.length)]} ${LEGAL[Math.floor(rnd() * LEGAL.length)]}`,
+      region: REGIONS[Math.floor(rnd() * REGIONS.length)],
+      plan,
+      mrr,
+      created: `${yr}-${mo}-${dy}`,
+      active: rnd() > 0.25,
+    };
+  }
+
+  const fmtCurrency = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  const tableModel = TableFactory.createTableModel({
+    rows,
+    columnDefs: [
+      ColumnDef.create({ property: "id", headerLabel: "ID", width: px90, sortable: TrueFn, hideable: false, filter: "number", bodyRenderer: new NumberCellRenderer() }),
+      ColumnDef.create({ property: "company", headerLabel: "Company", width: px200, sortable: TrueFn }),
+      ColumnDef.create({ property: "region", headerLabel: "Region", width: px120, sortable: TrueFn }),
+      ColumnDef.create({ property: "plan", headerLabel: "Plan", width: px120, sortable: TrueFn }),
+      ColumnDef.create({ property: "mrr", headerLabel: "MRR", width: px120, sortable: TrueFn, filter: "number", bodyClasses: ["ge-table-text-align-end"] }),
+      ColumnDef.create({ property: "created", headerLabel: "Created", width: px150, sortable: TrueFn, filter: "date" }),
+      ColumnDef.create({ property: "active", headerLabel: "Active", width: px90, sortable: TrueFn, filter: "boolean", bodyRenderer: new TrueFalseCellRenderer() }),
+    ],
+    footerAggregates: { mrr: { aggregator: "sum", format: v => fmtCurrency.format(Number(v ?? 0)) } },
+  });
+
+  const tableOptions = {
+    ...new TableOptions(),
+    filterRow: true,
+    columnFilterMenu: true,
+    columnFilter: { locale: "de" },
+  };
+
+  const countEl = document.querySelector("#count");
+  const activeEl = document.querySelector("#active");
+  const clearBtn = document.querySelector("#clear");
+  const updateStatus = (shown, total, activeCount) => {
+    countEl.textContent = `${shown.toLocaleString("de")} / ${total.toLocaleString("de")} Accounts`;
+    activeEl.textContent = activeCount ? `${activeCount} Filter aktiv` : "Keine Filter";
+    clearBtn.disabled = activeCount === 0;
+  };
+
+  const listener = new EventAdapter();
+  listener.onFilterChanged = evt => updateStatus(evt.rowCount, evt.unfilteredRowCount, Object.keys(evt.filters).length);
+
+  const scope = new TableScope(document.querySelector("#grid"), tableModel, new SimpleDomService(), tableOptions, listener);
+  scope.firstInit();
+  const tableApi = scope.getApi();
+  updateStatus(rows.length, rows.length, 0);
+
+  const toggleBtn = document.querySelector("#toggle-row");
+  toggleBtn.onclick = () => {
+    const next = !tableApi.isFilterRowVisible();
+    tableApi.setFilterRowVisible(next);
+    toggleBtn.setAttribute("aria-pressed", String(next));
+  };
+  const columnsBtn = document.querySelector("#columns");
+  columnsBtn.onclick = () => tableApi.showColumnChooser(columnsBtn);
+  clearBtn.onclick = () => tableApi.clearColumnFilters();
+  document.querySelector("#dark").onchange = e => {
+    document.documentElement.dataset.theme = e.target.checked ? "dark" : "light";
+  };
+  const shell = document.querySelector("#shell");
+  const fsBtn = document.querySelector("#fs");
+  fsBtn.onclick = () => document.fullscreenElement === shell ? document.exitFullscreen?.() : shell.requestFullscreen?.();
+  document.addEventListener("fullscreenchange", () => {
+    fsBtn.setAttribute("aria-pressed", String(document.fullscreenElement === shell));
+    requestAnimationFrame(() => tableApi.repaintHard());
+  });
+</script>
+</body>
+</html>

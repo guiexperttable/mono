@@ -17,6 +17,12 @@ import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { RowDragOptionsIf } from "../../row-drag/row-drag-options.if";
 import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
+import type {
+  ColumnFilterMenuOptionsIf,
+  ColumnFilterOptionsIf,
+  ColumnFilterTextsIf,
+  FilterRowOptionsIf,
+} from "../../column-filter/column-filter-options.if";
 import type { FillHandleOptionsIf } from "../../fill/fill-handle-options.if";
 import type { EditingOptionsIf } from "../../sheet-editing/editing-options.if";
 import type { ClipboardOptionsIf } from "../../clipboard/clipboard-options.if";
@@ -152,4 +158,12 @@ export class TableOptions implements TableOptionsIf {
    * own value takes the direction of the outer table. @since 1.1.98
    */
   direction?: TableDirection = undefined;
+  /** Persistent filter row below the column titles ({@link TableOptionsIf.filterRow}). Not set = off. @since 1.1.114 */
+  filterRow?: boolean | Partial<FilterRowOptionsIf> = undefined;
+  /** Per-column filter menu popup ({@link TableOptionsIf.columnFilterMenu}). Not set = off. @since 1.1.114 */
+  columnFilterMenu?: boolean | Partial<ColumnFilterMenuOptionsIf> = undefined;
+  /** Global options for built-in column filters ({@link TableOptionsIf.columnFilter}). @since 1.1.114 */
+  columnFilter?: Partial<ColumnFilterOptionsIf> = undefined;
+  /** UI texts for column filters ({@link TableOptionsIf.columnFilterTexts}). @since 1.1.114 */
+  columnFilterTexts?: Partial<ColumnFilterTextsIf> = undefined;
 }

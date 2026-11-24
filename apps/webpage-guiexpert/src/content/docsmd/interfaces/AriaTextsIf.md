@@ -45,8 +45,10 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 - [cellsPasted](AriaTextsIf.md#cellspasted)
 - [changesCommitted](AriaTextsIf.md#changescommitted)
 - [changesDiscarded](AriaTextsIf.md#changesdiscarded)
+- [clearColumnFilter](AriaTextsIf.md#clearcolumnfilter)
 - [clearTooLarge](AriaTextsIf.md#cleartoolarge)
 - [collapseGroup](AriaTextsIf.md#collapsegroup)
+- [columnChooserDialog](AriaTextsIf.md#columnchooserdialog)
 - [columnSelected](AriaTextsIf.md#columnselected)
 - [columnsDeleted](AriaTextsIf.md#columnsdeleted)
 - [columnsInserted](AriaTextsIf.md#columnsinserted)
@@ -60,6 +62,10 @@ Training: [Accessible tables: keyboard and screen readers](https://gui.expert/tr
 - [editingStarted](AriaTextsIf.md#editingstarted)
 - [expandGroup](AriaTextsIf.md#expandgroup)
 - [fillTooLarge](AriaTextsIf.md#filltoolarge)
+- [filterColumn](AriaTextsIf.md#filtercolumn)
+- [filterColumnActive](AriaTextsIf.md#filtercolumnactive)
+- [filterInput](AriaTextsIf.md#filterinput)
+- [filterMenuDialog](AriaTextsIf.md#filtermenudialog)
 - [filtered](AriaTextsIf.md#filtered)
 - [formulaError](AriaTextsIf.md#formulaerror)
 - [functionSuggestions](AriaTextsIf.md#functionsuggestions)
@@ -243,6 +249,34 @@ default: `"Changes discarded"`
 
 ___
 
+### clearColumnFilter
+
+▸ **clearColumnFilter**(`columnLabel`): `string`
+
+Accessible name of the clear (`×`) button of a column filter input ([TableOptionsIf.filterRow](TableOptionsIf.md#filterrow)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Clear filter for Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:450](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L450)
+
+___
+
 ### clearTooLarge
 
 ▸ **clearTooLarge**(`maxCells`): `string`
@@ -292,6 +326,28 @@ default: `"Collapse group Q1"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L96)
+
+___
+
+### columnChooserDialog
+
+▸ **columnChooserDialog**(): `string`
+
+Accessible name of the column chooser dialog ([TableApi.showColumnChooser](../classes/TableApi.md#showcolumnchooser)).
+
+#### Returns
+
+`string`
+
+default: `"Choose columns"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:485](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L485)
 
 ___
 
@@ -630,6 +686,118 @@ default: `"Too many cells to fill (at most 100000)"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.if.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L150)
+
+___
+
+### filterColumn
+
+▸ **filterColumn**(`columnLabel`): `string`
+
+Accessible name of the header funnel button when the column has no active filter ([TableOptionsIf.columnFilterMenu](TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter menu for Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:459](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L459)
+
+___
+
+### filterColumnActive
+
+▸ **filterColumnActive**(`columnLabel`): `string`
+
+Accessible name of the header funnel button when the column has an active filter ([TableOptionsIf.columnFilterMenu](TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter menu for Region (active)"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:468](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L468)
+
+___
+
+### filterInput
+
+▸ **filterInput**(`columnLabel`): `string`
+
+Accessible name of a column filter input in the persistent filter row ([TableOptionsIf.filterRow](TableOptionsIf.md#filterrow)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:441](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L441)
+
+___
+
+### filterMenuDialog
+
+▸ **filterMenuDialog**(`columnLabel`): `string`
+
+Accessible name of the per-column filter menu dialog ([TableOptionsIf.columnFilterMenu](TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.if.ts:477](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.if.ts#L477)
 
 ___
 

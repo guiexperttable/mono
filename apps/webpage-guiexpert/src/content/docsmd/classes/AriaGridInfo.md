@@ -40,6 +40,7 @@ info.colIndex(3);            // 0 (hidden)
 ### Properties
 
 - [bodyRowCount](AriaGridInfo.md#bodyrowcount)
+- [filterRowCount](AriaGridInfo.md#filterrowcount)
 - [footerRowCount](AriaGridInfo.md#footerrowcount)
 - [headerRowCount](AriaGridInfo.md#headerrowcount)
 
@@ -52,6 +53,7 @@ info.colIndex(3);            // 0 (hidden)
 
 - [colIndex](AriaGridInfo.md#colindex)
 - [colSpan](AriaGridInfo.md#colspan)
+- [filterRowIndex](AriaGridInfo.md#filterrowindex)
 - [rowIndex](AriaGridInfo.md#rowindex)
 - [create](AriaGridInfo.md#create)
 
@@ -59,16 +61,17 @@ info.colIndex(3);            // 0 (hidden)
 
 ### constructor
 
-• **new AriaGridInfo**(`headerRowCount`, `bodyRowCount`, `footerRowCount`, `colIndexMap`): [`AriaGridInfo`](AriaGridInfo.md)
+• **new AriaGridInfo**(`headerRowCount`, `bodyRowCount`, `footerRowCount`, `colIndexMap`, `filterRowCount?`): [`AriaGridInfo`](AriaGridInfo.md)
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `headerRowCount` | `number` | rendered header rows (0 if the header is hidden) |
-| `bodyRowCount` | `number` | body rows of the model (negative = unknown) |
-| `footerRowCount` | `number` | rendered footer rows (0 if the footer is hidden) |
-| `colIndexMap` | `number`[] | per model column its `aria-colindex` (0 = hidden) |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `headerRowCount` | `number` | `undefined` | rendered header rows (0 if the header is hidden) |
+| `bodyRowCount` | `number` | `undefined` | body rows of the model (negative = unknown) |
+| `footerRowCount` | `number` | `undefined` | rendered footer rows (0 if the footer is hidden) |
+| `colIndexMap` | `number`[] | `undefined` | per model column its `aria-colindex` (0 = hidden) |
+| `filterRowCount?` | `number` | `0` | rendered filter row count (1 when the filter row is visible, else 0) |
 
 #### Returns
 
@@ -76,7 +79,7 @@ info.colIndex(3);            // 0 (hidden)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L38)
+[src/lib/table/aria/aria-grid-info.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L39)
 
 ## Properties
 
@@ -88,7 +91,19 @@ body rows of the model (negative = unknown)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L40)
+[src/lib/table/aria/aria-grid-info.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L41)
+
+___
+
+### filterRowCount
+
+• `Readonly` **filterRowCount**: `number` = `0`
+
+rendered filter row count (1 when the filter row is visible, else 0)
+
+#### Defined in
+
+[src/lib/table/aria/aria-grid-info.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L44)
 
 ___
 
@@ -100,7 +115,7 @@ rendered footer rows (0 if the footer is hidden)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L41)
+[src/lib/table/aria/aria-grid-info.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L42)
 
 ___
 
@@ -112,7 +127,7 @@ rendered header rows (0 if the header is hidden)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L39)
+[src/lib/table/aria/aria-grid-info.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L40)
 
 ## Accessors
 
@@ -128,7 +143,7 @@ rendered header rows (0 if the header is hidden)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:76](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L76)
+[src/lib/table/aria/aria-grid-info.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L81)
 
 ___
 
@@ -136,7 +151,7 @@ ___
 
 • `get` **rowCount**(): `number`
 
-`aria-rowcount` of the grid: header + body + footer rows, `-1` if the body does not know its row count.
+`aria-rowcount` of the grid: header + filter row + body + footer rows, `-1` if the body does not know its row count.
 
 #### Returns
 
@@ -144,7 +159,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:68](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L68)
+[src/lib/table/aria/aria-grid-info.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L73)
 
 ## Methods
 
@@ -168,7 +183,7 @@ the 1-based position among the shown columns, 0 for a hidden or unknown column
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L107)
+[src/lib/table/aria/aria-grid-info.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L122)
 
 ___
 
@@ -193,7 +208,29 @@ the number of shown columns (at least 1)
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L118)
+[src/lib/table/aria/aria-grid-info.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L133)
+
+___
+
+### filterRowIndex
+
+▸ **filterRowIndex**(): `number`
+
+1-based `aria-rowindex` of the persistent filter row (immediately after the header rows), or `0` when none is shown.
+
+#### Returns
+
+`number`
+
+1-based row number in the grid
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/aria/aria-grid-info.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L95)
 
 ___
 
@@ -201,7 +238,7 @@ ___
 
 ▸ **rowIndex**(`area`, `rowIndex`): `number`
 
-`aria-rowindex` of a row (1-based over header → body → footer).
+`aria-rowindex` of a row (1-based over header → filter row → body → footer).
 
 #### Parameters
 
@@ -218,21 +255,22 @@ the 1-based row number in the whole grid
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L91)
+[src/lib/table/aria/aria-grid-info.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L106)
 
 ___
 
 ### create
 
-▸ **create**(`tableModel`): [`AriaGridInfo`](AriaGridInfo.md)
+▸ **create**(`tableModel`, `filterRowCount?`): [`AriaGridInfo`](AriaGridInfo.md)
 
 Reads the counts of a table model.
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `tableModel` | `Pick`\<[`TableModelIf`](../interfaces/TableModelIf.md), ``"getAreaModel"`` \| ``"isHeaderVisibe"`` \| ``"isFooterVisibe"`` \| ``"getColumnCount"`` \| ``"getColumnWidth"``\> | the table model (only the area models, header/footer visibility and column widths are read) |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `tableModel` | `Pick`\<[`TableModelIf`](../interfaces/TableModelIf.md), ``"getAreaModel"`` \| ``"isHeaderVisibe"`` \| ``"isFooterVisibe"`` \| ``"getColumnCount"`` \| ``"getColumnWidth"``\> | `undefined` | the table model (only the area models, header/footer visibility and column widths are read) |
+| `filterRowCount?` | `number` | `0` | rendered filter row count (1 when the filter row is visible, else 0) |
 
 #### Returns
 
@@ -242,4 +280,4 @@ the counts
 
 #### Defined in
 
-[src/lib/table/aria/aria-grid-info.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L52)
+[src/lib/table/aria/aria-grid-info.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-grid-info.ts#L55)

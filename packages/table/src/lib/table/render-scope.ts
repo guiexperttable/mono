@@ -2,6 +2,7 @@ import type { RowDragService } from "./row-drag/row-drag-service";
 import type { BatchEditService } from "./batch-edit/batch-edit-service";
 import type { FillHandleService } from "./fill/fill-handle-service";
 import type { CellEditorService } from "./sheet-editing/cell-editor-service";
+import type { ColumnFilterMenuService } from "./column-filter/column-filter-menu-service";
 import { TableOverlayChange } from "./overlay/table-overlay";
 import { EleScope } from './ele-scope';
 import { TableModelIf } from './data/tablemodel/table-model.if';
@@ -170,6 +171,12 @@ export class RenderScope extends EleScope {
    * @since 1.1.96
    */
   batchEditService?: BatchEditService;
+
+  /**
+   * Per-column filter menu ({@link TableOptionsIf.columnFilterMenu}) – created by {@link TableScope}.
+   * @since 1.1.114
+   */
+  columnFilterMenuService?: ColumnFilterMenuService;
 
   /**
    * Fill handle of this table – created by {@link TableScope}.
@@ -693,7 +700,7 @@ export class RenderScope extends EleScope {
     this.renderedScrollTop = this.scrollViewport.scrollTop;
     this.scrollTop = this.scrollViewport.scrollTop;
     this.renderedBodyRows = { ...this.renderedBodyRows, count: this.tableModel.getBodyModel().getRowCount(), atEnd: false };
-    this.setHostAttribute('aria-rowcount', `${AriaGridInfo.create(this.tableModel).rowCount}`);
+    this.setHostAttribute('aria-rowcount', `${AriaGridInfo.create(this.tableModel, this.getFilterRowCount()).rowCount}`);
     return true;
   }
 
@@ -895,7 +902,7 @@ export class RenderScope extends EleScope {
       footer: this.areaFooterCenter.child.clientHeight,
       header: headerHeight
     };
-    this.ariaGridInfo = AriaGridInfo.create(this.tableModel);
+    this.ariaGridInfo = AriaGridInfo.create(this.tableModel, this.getFilterRowCount());
     this.ariaSelectionKind = this.getAriaSelectionKind();
     this.ariaFocusedCell = undefined;
     this.renderedSpanCells.clear();
@@ -1439,6 +1446,7 @@ export class RenderScope extends EleScope {
       this.firstFullVisibleRowIndex = -1;
       this.lastVisibleRowIndex = -1;
       this.lastFullVisibleRowIndex = -1;
+      this.displayedRowCount = 0;
     }
 
 
@@ -1649,6 +1657,11 @@ export class RenderScope extends EleScope {
     this.updateRowGroupRoles(westArea, centerArea, eastArea);
   }
 
+  /** Number of visible persistent filter rows (0 without filter row; overridden in {@link TableScope}). @since 1.1.114 */
+  protected getFilterRowCount(): number {
+    return 0;
+  }
+
   /**
    * Row and column numbers for screen readers of the current render pass (computed at its start).
    *
@@ -1657,7 +1670,7 @@ export class RenderScope extends EleScope {
    */
   getAriaGridInfo(): AriaGridInfo {
     if (!this.ariaGridInfo) {
-      this.ariaGridInfo = AriaGridInfo.create(this.tableModel);
+      this.ariaGridInfo = AriaGridInfo.create(this.tableModel, this.getFilterRowCount());
     }
     return this.ariaGridInfo;
   }
@@ -2453,6 +2466,11 @@ export class RenderScope extends EleScope {
     if (areaIdent === 'header' && this.isColumnMovable(index)) {
       this.dom.setAttribute(cell, 'data-ge-action', 'drag-column'); // not for movable: false (e.g. the row numbers)
     }
+    if (areaIdent === 'header' && this.columnFilterMenuService?.hasHeaderButtons()
+      && colspan === 1 && rowIndex + rowspan >= this.getAriaGridInfo().headerRowCount
+      && parent.getAttribute('aria-hidden') !== 'true') {
+      this.columnFilterMenuService.decorateHeaderCell(cell, rowIndex, index);
+    }
     if (areaIdent === 'body' && this.masterDetailService?.isActive()) {
       this.masterDetailService.decorateCell(cell, rowIndex, index); // the expand icon of a master row (since 1.1.97)
     }
@@ -2630,7 +2648,7 @@ export class RenderScope extends EleScope {
    * Content pixels of the center columns scrolled out on the left – the offset that is actually rendered
    * (see adjustColumnsToRowParent), the horizontal counterpart of `contentScrollTop`.
    */
-  protected getContentScrollLeft(): number {
+  getContentScrollLeft(): number {
     const virtualRowDivLeftF1 = this.areaBodyCenterGeo.width - this.tableModel.getContentWidthInPixel();
     return -this.snapToDevicePixel(this.scrollFactorX * virtualRowDivLeftF1);
   }

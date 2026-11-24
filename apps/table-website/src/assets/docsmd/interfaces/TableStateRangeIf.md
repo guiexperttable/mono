@@ -28,7 +28,7 @@ row selections (columns have no property there).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:179](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L179)
+[src/lib/table/state/table-state.if.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L184)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:177](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L177)
+[src/lib/table/state/table-state.if.ts:182](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L182)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L180)
+[src/lib/table/state/table-state.if.ts:185](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L185)
 
 ___
 
@@ -58,4 +58,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:178](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L178)
+[src/lib/table/state/table-state.if.ts:183](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L183)

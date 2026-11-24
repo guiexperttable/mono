@@ -49,5 +49,6 @@ export class RowGroupColumnDef extends ColumnDef {
     );
     this.options = full;
     this.autoHeaderLabel = options.headerLabel === undefined;
+    this.filter = false;
   }
 }

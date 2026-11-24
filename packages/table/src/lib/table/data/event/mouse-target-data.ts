@@ -47,23 +47,29 @@ export class MouseTargetData {
 
     if (eventTarget === null) return; // skip
 
+    let target: Element | null = null;
     if (eventTarget instanceof HTMLDivElement
       || eventTarget instanceof HTMLSpanElement
       || eventTarget instanceof HTMLInputElement) {
+      target = eventTarget;
+    } else if (eventTarget instanceof Element) {
+      // e.g. native <button data-ge-action="filter-column"> or an <svg>/<path> inside it (since 1.1.114)
+      target = eventTarget.closest("[data-ge-action]");
+    }
 
-      this.className = eventTarget.className;
-      this.action = eventTarget.getAttribute("data-ge-action");
-      this.inputType = eventTarget.getAttribute("data-input-type");
-      this.rowIdx = Number(eventTarget.getAttribute("data-row-index"));
-      this.colIdx = Number(eventTarget.getAttribute("data-col-index"));
-      const area = eventTarget.getAttribute("data-area");
+    if (target) {
+      this.className = typeof target.className === "string" ? target.className : "";
+      this.action = target.getAttribute("data-ge-action");
+      this.inputType = target.getAttribute("data-input-type");
+      this.rowIdx = Number(target.getAttribute("data-row-index"));
+      this.colIdx = Number(target.getAttribute("data-col-index"));
+      const area = target.getAttribute("data-area");
       if (area) {
         this.areaIdent = getAreaIdentByString(area);
         this.areaModel = tableScope.tableModel.getAreaModel(this.areaIdent);
         this.row = this.areaModel.getRowByIndex(this.rowIdx);
       }
-      if (eventTarget instanceof HTMLInputElement) {
-        const target = eventTarget as HTMLInputElement;
+      if (target instanceof HTMLInputElement) {
         this.value = target.value;
       }
     }

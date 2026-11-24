@@ -39,7 +39,8 @@ const ROWS: [string, string, string, string][] = [
   ["Row grouping with aggregation", "–", "✔", "✔ one factory, since 1.1.94"],
   ["Pivot tables", "–", "✔", "✔ one factory, since 1.1.94"],
   ["Server-side row model", "–", "✔", "– own area model"],
-  ["Filter UI", "✔", "✔", "– your UI, a filter function"],
+  ["Column filter row", "✔", "✔", "✔ filterRow: true (>, .., dates, booleans), since 1.1.114"],
+  ["Excel value checklist & column chooser", "–", "✔", "✔ columnFilterMenu & showColumnChooser(), since 1.1.114"],
   ["Accessibility (WAI-ARIA, keyboard)", "✔", "✔", "✔ since 1.1.91"],
   ["Loading / no rows overlays", "✔", "✔", "✔ plain CSS, since 1.1.92"],
   ["Save & restore state (layout, sorting, selection)", "✔", "✔", "✔ localStorage or your server, since 1.1.92"],
@@ -96,8 +97,8 @@ const ROWS: [string, string, string, string][] = [
       <figcaption>
         <p>
           <strong>Rule of thumb:</strong> need a drag &amp; drop group panel or pivot field list or a server-side row model off the
-          shelf – or a filter UI (already in Community)?
-          ag-Grid Enterprise is further today. Need large data, export, selection and full control over HTML and CSS –
+          shelf?
+          ag-Grid Enterprise is further today. Need large data, export, selection, Excel-style column filters and full control over HTML and CSS –
           in any framework, without licence costs? That is what GuiExpert Table is for.
         </p>
         <p class="home-compare-source">

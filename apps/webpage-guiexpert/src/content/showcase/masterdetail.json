@@ -1,6 +1,5 @@
 {
   "title": "Master/Detail",
   "image": "/src/content/showcase/_images/masterdetail.png",
-  "url": "/showcase/masterdetail/run",
-  "featured": 1
+  "url": "/showcase/masterdetail/run"
 }

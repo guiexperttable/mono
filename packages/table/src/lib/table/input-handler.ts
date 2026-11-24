@@ -57,7 +57,7 @@ export class InputHandler {
 
   /** Escape in the cell editor cancels the editing: the old value stays, nothing is committed. */
   private onHostElementKeyDown(event: KeyboardEvent) {
-    if (this.tableScope.isEventInDetail?.(event) || !this.tableScope.isEditing()) {
+    if (this.tableScope.isEventInDetail?.(event) || this.tableScope.isEventInFilterUI?.(event) || !this.tableScope.isEditing()) {
       return;
     }
     const target = event.target;
@@ -89,8 +89,8 @@ export class InputHandler {
    * @return {void}
    */
   private onHostElementChanged(event: Event) {
-    if (this.tableScope.isEventInDetail?.(event)) {
-      return; // an input in a detail row (master/detail) – not a cell editor of this table
+    if (this.tableScope.isEventInDetail?.(event) || this.tableScope.isEventInFilterUI?.(event)) {
+      return; // an input in a detail row or column filter UI – not a cell editor of this table
     }
     if (event.target instanceof HTMLInputElement
       || event.target instanceof HTMLSelectElement

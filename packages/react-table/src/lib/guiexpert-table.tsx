@@ -2,7 +2,7 @@ import {
   EventListenerIf,
   FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableApi,
   TableModelIf,
@@ -26,6 +26,7 @@ export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
+export type GeFilterEventFn = (evt: GeFilterEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -69,6 +70,8 @@ export interface GuiexpertTableProps {
   columnMoveStart?: GeColumnMoveEventFn,
   /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
   columnMoveEnd?: GeColumnMoveEventFn,
+  /** Column filters changed (since 1.1.114). */
+  filterChanged?: GeFilterEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**
@@ -154,7 +157,8 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       onColumnResizeStart: (evt: GeColumnResizeEvent) => propsRef.current.columnResizeStart?.(evt),
       onColumnResizeEnd: (evt: GeColumnResizeEvent) => propsRef.current.columnResizeEnd?.(evt),
       onColumnMoveStart: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveStart?.(evt),
-      onColumnMoveEnd: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveEnd?.(evt)
+      onColumnMoveEnd: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveEnd?.(evt),
+      onFilterChanged: (evt: GeFilterEvent) => propsRef.current.filterChanged?.(evt)
     };
 
     // A new tableModel or tableOptions object re-creates the table (dependency array below);

@@ -100,4 +100,22 @@ describe('AriaGridInfo', () => {
     });
     expect([info.headerRowCount, info.bodyRowCount, info.footerRowCount, info.rowCount, info.colCount]).toEqual([0, 0, 0, 0, 2]);
   });
+
+  it('includes a visible persistent filter row between header and body', () => {
+    const tableModel = createModel(10);
+    tableModel.init();
+    const info = AriaGridInfo.create(tableModel, 1);
+    expect(info.headerRowCount).toBe(1);
+    expect(info.filterRowCount).toBe(1);
+    expect(info.filterRowIndex()).toBe(2);
+    expect(info.rowIndex('header', 0)).toBe(1);
+    expect(info.rowIndex('body', 0)).toBe(3);
+    expect(info.rowCount).toBe(12);
+
+    tableModel.setHeaderVisible!(false);
+    const hiddenHeader = AriaGridInfo.create(tableModel, 1);
+    expect(hiddenHeader.filterRowCount).toBe(0);
+    expect(hiddenHeader.filterRowIndex()).toBe(0);
+    expect(hiddenHeader.rowCount).toBe(10);
+  });
 });

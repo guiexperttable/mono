@@ -118,6 +118,11 @@ export interface AutoRestoreOptionsIf<T> {
    * @since 1.1.97
    */
   autoRestoreDetailState?: boolean;
+  /**
+   * Remember active built-in column filters ({@link TableStateIf.filters}).
+   * @since 1.1.114
+   */
+  autoRestoreFilterState?: boolean;
 
   /**
    * A unique, stable id per row (tree: per node). With the default of {@link AutoRestoreOptions} the table uses the

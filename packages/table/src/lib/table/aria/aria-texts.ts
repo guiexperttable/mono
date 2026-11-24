@@ -234,4 +234,28 @@ export class AriaTexts implements AriaTextsIf {
   columnsDeleted(count: number): string {
     return count === 1 ? "1 column deleted" : `${count} columns deleted`;
   }
+
+  filterInput(columnLabel: string): string {
+    return columnLabel ? `Filter ${columnLabel}` : "Filter column";
+  }
+
+  clearColumnFilter(columnLabel: string): string {
+    return columnLabel ? `Clear filter for ${columnLabel}` : "Clear filter";
+  }
+
+  filterColumn(columnLabel: string): string {
+    return columnLabel ? `Filter menu for ${columnLabel}` : "Filter menu";
+  }
+
+  filterColumnActive(columnLabel: string): string {
+    return columnLabel ? `Filter menu for ${columnLabel} (active)` : "Filter menu (active)";
+  }
+
+  filterMenuDialog(columnLabel: string): string {
+    return columnLabel ? `Filter ${columnLabel}` : "Filter";
+  }
+
+  columnChooserDialog(): string {
+    return "Choose columns";
+  }
 }

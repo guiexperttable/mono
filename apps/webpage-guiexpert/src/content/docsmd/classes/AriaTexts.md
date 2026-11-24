@@ -36,8 +36,10 @@ texts.filtered(42);    // "42 rows" (default)
 - [cellsPasted](AriaTexts.md#cellspasted)
 - [changesCommitted](AriaTexts.md#changescommitted)
 - [changesDiscarded](AriaTexts.md#changesdiscarded)
+- [clearColumnFilter](AriaTexts.md#clearcolumnfilter)
 - [clearTooLarge](AriaTexts.md#cleartoolarge)
 - [collapseGroup](AriaTexts.md#collapsegroup)
+- [columnChooserDialog](AriaTexts.md#columnchooserdialog)
 - [columnSelected](AriaTexts.md#columnselected)
 - [columnsDeleted](AriaTexts.md#columnsdeleted)
 - [columnsInserted](AriaTexts.md#columnsinserted)
@@ -51,6 +53,10 @@ texts.filtered(42);    // "42 rows" (default)
 - [editingStarted](AriaTexts.md#editingstarted)
 - [expandGroup](AriaTexts.md#expandgroup)
 - [fillTooLarge](AriaTexts.md#filltoolarge)
+- [filterColumn](AriaTexts.md#filtercolumn)
+- [filterColumnActive](AriaTexts.md#filtercolumnactive)
+- [filterInput](AriaTexts.md#filterinput)
+- [filterMenuDialog](AriaTexts.md#filtermenudialog)
 - [filtered](AriaTexts.md#filtered)
 - [formulaError](AriaTexts.md#formulaerror)
 - [functionSuggestions](AriaTexts.md#functionsuggestions)
@@ -269,6 +275,38 @@ default: `"Changes discarded"`
 
 ___
 
+### clearColumnFilter
+
+▸ **clearColumnFilter**(`columnLabel`): `string`
+
+Accessible name of the clear (`×`) button of a column filter input ([TableOptionsIf.filterRow](../interfaces/TableOptionsIf.md#filterrow)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Clear filter for Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[clearColumnFilter](../interfaces/AriaTextsIf.md#clearcolumnfilter)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:242](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L242)
+
+___
+
 ### clearTooLarge
 
 ▸ **clearTooLarge**(`maxCells`): `string`
@@ -326,6 +364,32 @@ default: `"Collapse group Q1"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L74)
+
+___
+
+### columnChooserDialog
+
+▸ **columnChooserDialog**(): `string`
+
+Accessible name of the column chooser dialog ([TableApi.showColumnChooser](TableApi.md#showcolumnchooser)).
+
+#### Returns
+
+`string`
+
+default: `"Choose columns"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[columnChooserDialog](../interfaces/AriaTextsIf.md#columnchooserdialog)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:258](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L258)
 
 ___
 
@@ -716,6 +780,134 @@ default: `"Too many cells to fill (at most 100000)"`
 #### Defined in
 
 [src/lib/table/aria/aria-texts.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L106)
+
+___
+
+### filterColumn
+
+▸ **filterColumn**(`columnLabel`): `string`
+
+Accessible name of the header funnel button when the column has no active filter ([TableOptionsIf.columnFilterMenu](../interfaces/TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter menu for Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[filterColumn](../interfaces/AriaTextsIf.md#filtercolumn)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:246](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L246)
+
+___
+
+### filterColumnActive
+
+▸ **filterColumnActive**(`columnLabel`): `string`
+
+Accessible name of the header funnel button when the column has an active filter ([TableOptionsIf.columnFilterMenu](../interfaces/TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter menu for Region (active)"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[filterColumnActive](../interfaces/AriaTextsIf.md#filtercolumnactive)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:250](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L250)
+
+___
+
+### filterInput
+
+▸ **filterInput**(`columnLabel`): `string`
+
+Accessible name of a column filter input in the persistent filter row ([TableOptionsIf.filterRow](../interfaces/TableOptionsIf.md#filterrow)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[filterInput](../interfaces/AriaTextsIf.md#filterinput)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:238](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L238)
+
+___
+
+### filterMenuDialog
+
+▸ **filterMenuDialog**(`columnLabel`): `string`
+
+Accessible name of the per-column filter menu dialog ([TableOptionsIf.columnFilterMenu](../interfaces/TableOptionsIf.md#columnfiltermenu)).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `columnLabel` | `string` | the header label of the column |
+
+#### Returns
+
+`string`
+
+default: `"Filter Region"`
+
+**`Since`**
+
+1.1.114
+
+#### Implementation of
+
+[AriaTextsIf](../interfaces/AriaTextsIf.md).[filterMenuDialog](../interfaces/AriaTextsIf.md#filtermenudialog)
+
+#### Defined in
+
+[src/lib/table/aria/aria-texts.ts:254](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/aria/aria-texts.ts#L254)
 
 ___
 

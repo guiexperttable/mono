@@ -430,4 +430,57 @@ export interface AriaTextsIf {
    * @since 1.1.99
    */
   columnsDeleted?(count: number): string;
+
+  /**
+   * Accessible name of a column filter input in the persistent filter row ({@link TableOptionsIf.filterRow}).
+   *
+   * @param {string} columnLabel - the header label of the column
+   * @returns {string} default: `"Filter Region"`
+   * @since 1.1.114
+   */
+  filterInput?(columnLabel: string): string;
+
+  /**
+   * Accessible name of the clear (`×`) button of a column filter input ({@link TableOptionsIf.filterRow}).
+   *
+   * @param {string} columnLabel - the header label of the column
+   * @returns {string} default: `"Clear filter for Region"`
+   * @since 1.1.114
+   */
+  clearColumnFilter?(columnLabel: string): string;
+
+  /**
+   * Accessible name of the header funnel button when the column has no active filter ({@link TableOptionsIf.columnFilterMenu}).
+   *
+   * @param {string} columnLabel - the header label of the column
+   * @returns {string} default: `"Filter menu for Region"`
+   * @since 1.1.114
+   */
+  filterColumn?(columnLabel: string): string;
+
+  /**
+   * Accessible name of the header funnel button when the column has an active filter ({@link TableOptionsIf.columnFilterMenu}).
+   *
+   * @param {string} columnLabel - the header label of the column
+   * @returns {string} default: `"Filter menu for Region (active)"`
+   * @since 1.1.114
+   */
+  filterColumnActive?(columnLabel: string): string;
+
+  /**
+   * Accessible name of the per-column filter menu dialog ({@link TableOptionsIf.columnFilterMenu}).
+   *
+   * @param {string} columnLabel - the header label of the column
+   * @returns {string} default: `"Filter Region"`
+   * @since 1.1.114
+   */
+  filterMenuDialog?(columnLabel: string): string;
+
+  /**
+   * Accessible name of the column chooser dialog ({@link TableApi.showColumnChooser}).
+   *
+   * @returns {string} default: `"Choose columns"`
+   * @since 1.1.114
+   */
+  columnChooserDialog?(): string;
 }

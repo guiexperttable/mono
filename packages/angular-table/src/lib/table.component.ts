@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -290,6 +290,18 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onColumnMoveEnd(evt: GeColumnMoveEvent): void {
     this.columnMoveEnd.next(evt);
+  }
+
+  /**
+   * Column filters changed – fired once per filter pass, after filtering and rendering.
+   *
+   * @since 1.1.114
+   */
+  @Output()
+  filterChanged: Subject<GeFilterEvent> = new Subject<GeFilterEvent>();
+
+  onFilterChanged(evt: GeFilterEvent): void {
+    this.filterChanged.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

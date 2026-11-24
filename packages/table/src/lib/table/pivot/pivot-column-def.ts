@@ -39,5 +39,6 @@ export class PivotColumnDef extends ColumnDef {
       new Size(2000, "px"),
       TrueFn
     );
+    this.filter = false;
   }
 }

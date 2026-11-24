@@ -213,9 +213,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Spalten: `ColumnDef.create({ property, headerLabel, width: px200, minWidth, maxWidth, headerRenderer, bodyRenderer,
   footerRenderer, headerClasses, bodyClasses, footerClasses, sortable, sortComparator, sortState, editable, isVisible,
   getEditRenderer, editInputPipe, valueGetter, valueSetter, showValuesAs, formula, formulaOptions, rowDrag, validate,
-  resizable, movable })`
+  resizable, movable, filter, hideable })`
   (`valueGetter` … `rowDrag` seit 1.1.95, § 3.6 „Berechnete Spalten“ bzw. „Row Drag“; `validate` seit 1.1.96, § 3.6
-  „Fill-Handle und Batch-Edit“; `resizable`/`movable` seit 1.1.110, § 3.6 „Spalten ziehen“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
+  „Fill-Handle und Batch-Edit“; `resizable`/`movable` seit 1.1.110, § 3.6 „Spalten ziehen“; `filter`/`hideable` seit
+  1.1.114, § 3.6 „Spaltenfilter“). Größen über Konstanten `px0 … px500` (`data/common/sizes.ts`) bzw. `Size`.
 - Eingebaute Spalten: `CheckboxColumnDef` und seit 1.1.93 `RowNumberColumnDef` (Erkennung über `type`:
   `isCheckboxColumnDef`/`isRowNumberColumnDef`). **Reihenfolge immer Nummer → Checkbox → Daten**: Code, der „die erste
   Spalte“ meint (Checkbox-Erkennung, Baumpfeil, `showCheckboxWihoutExtraColumn`), liest den Versatz
@@ -237,9 +238,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
   seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged`, seit 1.1.97 `onDetailExpandedChanged`, seit 1.1.110
-  `onColumnResizeStart/End`, `onColumnMoveStart/End` (optional). Event-Typen: `GeMouseEvent`,
+  `onColumnResizeStart/End`, `onColumnMoveStart/End`, seit 1.1.114 `onFilterChanged` (optional). Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent` (seit 1.1.96 + `changes`/`source`), `GeScrollEvent`, `GeStateChangeEvent`,
-  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`, `GeColumnResizeEvent`, `GeColumnMoveEvent`.
+  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`, `GeColumnResizeEvent`, `GeColumnMoveEvent`, `GeFilterEvent`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -649,6 +650,32 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `columnResizeStart/End`, `columnMoveStart/End`. Specs `column-drag/column-drag.realmouse.browser.spec.ts` (echte Maus,
   ltr/rtl, auch WebKit), `column-order.spec.ts`, Invarianten in `perf-invariants`, `test:perf`-Szenario
   `autoResizeColumn`.
+- **Spaltenfilter, Filter-Menü & Spaltenauswahl (seit 1.1.114, `column-filter/`, Design `prompts/023-spaltenfilter.design.md`)**:
+  drei opt-in Bausteine (Standard aus → bit-gleich ohne Option): **Teil A** DOM-freie Engine (`compile-column-filters`,
+  `infer-column-filter-type`, `parse-filter-input`, `collect-distinct-values`, `column-filter-state`, `column-filter-keymap`)
+  + `ColumnFilterService` (`tableScope.columnFilterService`): `ColumnFiltersMap` nach Spalten-`property`, UND-Komposition
+  mit `externalFilterFunction`, `columnFilter: { managed, caseSensitive, locale, maxValues }`, `ColumnDef.filter`,
+  `onFilterChanged(GeFilterEvent)` (Wrapper: `filterChanged`), Zustandsteil `"filters"` (`TableStateIf.filters`,
+  `filterRowVisible`, `autoRestoreFilterState`), 1 Filterlauf + 1 Render je Änderung, Live-`appendRows` filtert nur neue Zeilen.
+  **Teil B** `FilterRowService` (`tableOptions.filterRow: true | FilterRowOptionsIf`): dauerhafte Ebene `ge-table-filter-row-layer`
+  unter dem Header (west/center/east, Spalten-Virtualisierung, `clip-path`-Parken für Fokus/Caret/IME über Live-Append/Scroll),
+  Kurzschreibweisen (`>100`, `10..20`, `=x`, `!=x`, `^a`, `z$`, `""`, `!=""`, Datum, Monat `2026-03`, Boolean-Select;
+  `formatFilterCondition` schreibt dieselbe Syntax, die `parseFilterInput` liest – auch Zahlen mit Dezimalkomma;
+  unvollständige Eingabe = `null` → der aktive Filter bleibt), Spaltenfilter behalten die waagerechte Scrollposition
+  (`applyFilterFunction(…, keepHorizontalScroll)`), `recalcPadding` addiert
+  `getHeaderExtraHeight`, `AriaGridInfo.filterRowCount`, Ereignis-Isolation über `isEventInFilterUi()` ohne `stopPropagation`,
+  Tasten `FOCUS_COLUMN_FILTER` (`Ctrl/⌘+Shift+F`), `OPEN_COLUMN_FILTER_MENU` (`Alt+ArrowDown`).
+  **Teil C** `ColumnFilterMenuService` (`tableOptions.columnFilterMenu: true | ColumnFilterMenuOptionsIf`) + gemeinsame
+  `FilterPopupShell` (`[popover="manual"]` in `fullscreenElement`/ShadowRoot/`document.body` statt Kind des `role="grid"`-Hosts
+  → axe 0 Fehler, Top-Layer & Vollbild, Fallback, Fokusfalle, RTL-Flip): Trichter-Button je filterbarer Blatt-Kopfzelle,
+  Operatoren + virtualisierte Excel-Werteliste (kaskadierend, Suche, `(Select all)`, `maxValues`, async `getValues`),
+  OK/Cancel/Clear; das Popup schließt nur bei **waagerechtem** Scrollen der Tabelle (senkrecht – Live-Tail, Filter →
+  erste Zeile – bleibt es offen), mit Suchtext übernimmt OK die im Suchergebnis angehakten Werte, bei gekappter Liste
+  behalten nicht gelistete Werte ihren Zustand (ein Durchlauf beim OK), Wertelisten von Datumsspalten vergleichen über
+  `dateSetKey` (Date = ISO-Text des Zustands). Review-Funde: `column-filter-review.browser.spec.ts`. **Teil D** `ColumnChooserService` (`tableApi.showColumnChooser(anchor)`/`hideColumnChooser`,
+  `ColumnDef.hideable: false`, Schutz der letzten sichtbaren Spalte). CSS `css/table-column-filter.css`, `--ge-table-filter-*`.
+  Demo `apps/table-demo/column-filter.html`, Modell `createColumnFilterModelAndOptions` (`demo-table-models`), Showcase
+  `columnfilter`, Training `filtering#column-filters`, Video `videos/16-spaltenfilter/`.
 - Lebenszyklus: `TableScope.destroy()` / `api.destroy()` gibt alle Listener (alle über `listenerAbortController`),
   den ResizeObserver und Renderer-Cleanups frei. Wrapper rufen es beim Modellwechsel und Unmount auf.
 - Weitere API: `scrollToIndex`, `scrollToPixel`, `ensureRowIsVisible`, `ensureColumnIsVisible`, `autoResizeColumns`, `setColumnWidth`,
@@ -939,6 +966,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
 | 40 | Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end per Knopf (kein „ohne Enterprise“: Transactions bei ag-Grid Community) | `videos/15-live-log/`, Showcase `logtail`, Training-Kapitel `live-data` (`#append`), `apps/table-demo/log-tail.html`, `instructions.md` 6.9 |
 | 41 | Spaltenlayout speichern, wenn der Nutzer zieht – Ereignisse, gesperrte Spalte, Doppelklick passt die Breite an (geplant; kein „ohne Enterprise“: bei ag-Grid Community) | `apps/table-demo/column-drag.html`, Training-Kapitel `persist-state` (`#column-events`), `instructions.md` 6.27 |
+| 42 | Spaltenfilter & Excel-Werteliste im Header – eine Option (Werteliste & Spaltenauswahl bei ag-Grid Enterprise, einfache Filterzeile Community) | `videos/16-spaltenfilter/`, Showcase `columnfilter`, Training-Kapitel `filtering` (`#column-filters`), `apps/table-demo/column-filter.html`, `instructions.md` 6.28 |
 
 Bei Folgen, die Lücken in der Bibliothek aufdecken (z. B. kein eingebautes Kontextmenü, kein Server-Side-Row-Model),
 zuerst das Feature im Code ergänzen (Ziel 1), dann die Folge drehen (Ziel 2).

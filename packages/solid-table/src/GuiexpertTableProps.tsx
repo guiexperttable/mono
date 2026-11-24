@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -19,6 +19,7 @@ export type GeEditEventFn = (evt: GeEditEvent) => void;
 export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
+export type GeFilterEventFn = (evt: GeFilterEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -60,6 +61,8 @@ export interface GuiexpertTableProps {
   columnMoveStart?: GeColumnMoveEventFn,
   /** A column move by the user ended – `evt.columnOrder` (since 1.1.110). */
   columnMoveEnd?: GeColumnMoveEventFn,
+  /** Column filters changed (since 1.1.114). */
+  filterChanged?: GeFilterEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

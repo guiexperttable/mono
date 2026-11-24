@@ -42,9 +42,11 @@ Training: [Columns with ColumnDef](https://gui.expert/training/column-definition
 - [editable](ColumnDefIf.md#editable)
 - [editor](ColumnDefIf.md#editor)
 - [emptyValue](ColumnDefIf.md#emptyvalue)
+- [filter](ColumnDefIf.md#filter)
 - [formula](ColumnDefIf.md#formula)
 - [getEditRenderer](ColumnDefIf.md#geteditrenderer)
 - [headerLabel](ColumnDefIf.md#headerlabel)
+- [hideable](ColumnDefIf.md#hideable)
 - [isVisible](ColumnDefIf.md#isvisible)
 - [maxWidth](ColumnDefIf.md#maxwidth)
 - [minWidth](ColumnDefIf.md#minwidth)
@@ -85,7 +87,7 @@ ColumnDef.create({ property: "note", editable: TrueFn, cellFormulas: false })
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:233](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L233)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:234](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L234)
 
 ___
 
@@ -98,7 +100,7 @@ are ready-made maps for the alignment.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L87)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:88](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L88)
 
 ___
 
@@ -110,7 +112,7 @@ Converts the text of the editor before it is written into the model, e.g. [editI
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:129](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L129)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L130)
 
 ___
 
@@ -126,7 +128,7 @@ Training: [Inline editing](https://gui.expert/training/inline-editing/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:113](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L113)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L114)
 
 ___
 
@@ -151,7 +153,7 @@ ColumnDef.create({ property: "status", editable: TrueFn, editor: () => SelectCel
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:213](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L213)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:214](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L214)
 
 ___
 
@@ -174,7 +176,32 @@ ColumnDef.create({ property: "quantity", editable: TrueFn, emptyValue: 0 })
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:223](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L223)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:224](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L224)
+
+___
+
+### filter
+
+• `Optional` **filter**: [`ColumnFilterColumnOption`](../modules.md#columnfiltercolumnoption)
+
+Built-in column filter configuration: `false` disables filtering for this column (no filter-row input, no filter
+menu icon); `true` (default for data columns) infers the type from the values; `"text" | "number" | "date" |
+"boolean" | "set"` sets the type explicitly; an object configures type, `valueGetter`, `caseSensitive`,
+`placeholder` or `getValues`.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "mrr", headerLabel: "MRR", filter: "number" })
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:271](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L271)
 
 ___
 
@@ -195,7 +222,7 @@ The formula of a formula column (`ColumnDef.create({ formula })` compiles it int
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L175)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L176)
 
 ___
 
@@ -213,7 +240,7 @@ getEditRenderer: () => new SelectCellRenderer(["open", "paid"].map(s => new Valu
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L127)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L128)
 
 ___
 
@@ -225,7 +252,30 @@ Text of the header cell (used when the header is built from the column definitio
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L59)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L60)
+
+___
+
+### hideable
+
+• `Optional` **hideable**: `boolean`
+
+`false`: the column cannot be unchecked in the built-in column chooser ([TableApi.showColumnChooser](../classes/TableApi.md#showcolumnchooser)).
+`setColumnVisible` still works. Default `true`.
+
+**`Example`**
+
+```ts
+ColumnDef.create({ property: "id", headerLabel: "ID", hideable: false })
+```
+
+**`Since`**
+
+1.1.114
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/column/column-def.if.ts:282](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L282)
 
 ___
 
@@ -243,7 +293,7 @@ ColumnDef.create({ property: "category", headerLabel: "Category", isVisible: Fal
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L120)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:121](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L121)
 
 ___
 
@@ -256,7 +306,7 @@ column with the mouse. `ColumnDef` default: `100000px` (no limit).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L71)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:72](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L72)
 
 ___
 
@@ -269,7 +319,7 @@ column with the mouse. A pixel width itself is not changed. `ColumnDef` default:
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L66)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:67](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L67)
 
 ___
 
@@ -293,7 +343,7 @@ ColumnDef.create({ property: "id", headerLabel: "ID", movable: false })
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:257](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L257)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:258](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L258)
 
 ___
 
@@ -305,7 +355,7 @@ Property of the row object shown in this column (`"customer"`). With nested obje
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L57)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L58)
 
 ___
 
@@ -329,7 +379,7 @@ Training: [Cell renderers](https://gui.expert/training/cell-renderers/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L82)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L83)
 
 ___
 
@@ -353,7 +403,7 @@ ColumnDef.create({ property: "line", headerLabel: "#", width: px50, resizable: f
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:245](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L245)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:246](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L246)
 
 ___
 
@@ -378,7 +428,7 @@ ColumnDef.create({ property: "title", headerLabel: "Task", rowDrag: (task: { loc
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L187)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L188)
 
 ___
 
@@ -405,7 +455,7 @@ Training: [Show values as](https://gui.expert/training/formulas/#show-values-as)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L167)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L168)
 
 ___
 
@@ -427,7 +477,7 @@ Training: [Sorting](https://gui.expert/training/sorting/)
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:100](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L100)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:101](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L101)
 
 ___
 
@@ -439,7 +489,7 @@ Show the sort icon in the header. Default: follows `sortable` resp. `sortState`.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L91)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:92](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L92)
 
 ___
 
@@ -452,7 +502,7 @@ sort the rows once with [TableModelIf.doSort](TableModelIf.md#dosort) to match i
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:105](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L105)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L106)
 
 ___
 
@@ -464,7 +514,7 @@ Order of the sort states on repeated double-clicks. Default: `TableOptions.sortO
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L107)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:108](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L108)
 
 ___
 
@@ -476,7 +526,7 @@ The column can be sorted by a double-click on its header (e.g. `TrueFn`).
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:89](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L89)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L90)
 
 ___
 
@@ -503,7 +553,7 @@ ColumnDef.create({
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:201](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L201)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:202](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L202)
 
 ___
 
@@ -536,7 +586,7 @@ ColumnDef.create({ property: "total", headerLabel: "Total", sortable: TrueFn,
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L147)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L148)
 
 ___
 
@@ -558,7 +608,7 @@ valueSetter: (o: Item, v: unknown) => { o.price = Number(v) / o.quantity; }
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L156)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L157)
 
 ___
 
@@ -570,4 +620,4 @@ Width of the column: `px120`, `new Size(10, "%")` or `new Size(1, "weight")`. Se
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/column/column-def.if.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L61)
+[src/lib/table/data/tablemodel/column/column-def.if.ts:62](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/column/column-def.if.ts#L62)

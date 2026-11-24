@@ -26,7 +26,7 @@ Everything selected (⌘/Ctrl+A).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L160)
+[src/lib/table/state/table-state.if.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L165)
 
 ___
 
@@ -38,7 +38,7 @@ Rectangles removed from the selection (Ctrl/⌘+Alt-click).
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L164)
+[src/lib/table/state/table-state.if.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L169)
 
 ___
 
@@ -50,4 +50,4 @@ The selected rectangles.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:162](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L162)
+[src/lib/table/state/table-state.if.ts:167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L167)

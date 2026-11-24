@@ -34,12 +34,14 @@ export class AriaGridInfo {
    * @param {number} bodyRowCount - body rows of the model (negative = unknown)
    * @param {number} footerRowCount - rendered footer rows (0 if the footer is hidden)
    * @param {number[]} colIndexMap - per model column its `aria-colindex` (0 = hidden)
+   * @param {number} [filterRowCount=0] - rendered filter row count (1 when the filter row is visible, else 0)
    */
   constructor(
     readonly headerRowCount: number,
     readonly bodyRowCount: number,
     readonly footerRowCount: number,
-    private readonly colIndexMap: number[]
+    private readonly colIndexMap: number[],
+    readonly filterRowCount: number = 0
   ) {
   }
 
@@ -47,12 +49,15 @@ export class AriaGridInfo {
    * Reads the counts of a table model.
    *
    * @param {TableModelIf} tableModel - the table model (only the area models, header/footer visibility and column widths are read)
+   * @param {number} [filterRowCount=0] - rendered filter row count (1 when the filter row is visible, else 0)
    * @returns {AriaGridInfo} the counts
    */
   static create(
-    tableModel: Pick<TableModelIf, "getAreaModel" | "isHeaderVisibe" | "isFooterVisibe" | "getColumnCount" | "getColumnWidth">
+    tableModel: Pick<TableModelIf, "getAreaModel" | "isHeaderVisibe" | "isFooterVisibe" | "getColumnCount" | "getColumnWidth">,
+    filterRowCount: number = 0
   ): AriaGridInfo {
     const headerRowCount = tableModel.isHeaderVisibe() ? Math.max(0, tableModel.getAreaModel("header")?.getRowCount() ?? 0) : 0;
+    const effectiveFilterRows = headerRowCount > 0 ? Math.max(0, filterRowCount) : 0;
     const footerRowCount = tableModel.isFooterVisibe() ? Math.max(0, tableModel.getAreaModel("footer")?.getRowCount() ?? 0) : 0;
     const bodyRowCount = tableModel.getAreaModel("body")?.getRowCount() ?? 0;
     const columnCount = tableModel.getColumnCount();
@@ -61,15 +66,15 @@ export class AriaGridInfo {
     for (let c = 0; c < columnCount; c++) {
       colIndexMap[c] = tableModel.getColumnWidth(c) > 0 ? ++n : 0;
     }
-    return new AriaGridInfo(headerRowCount, bodyRowCount, footerRowCount, colIndexMap);
+    return new AriaGridInfo(headerRowCount, bodyRowCount, footerRowCount, colIndexMap, effectiveFilterRows);
   }
 
-  /** `aria-rowcount` of the grid: header + body + footer rows, `-1` if the body does not know its row count. */
+  /** `aria-rowcount` of the grid: header + filter row + body + footer rows, `-1` if the body does not know its row count. */
   get rowCount(): number {
     if (this.bodyRowCount < 0) {
       return -1;
     }
-    return this.headerRowCount + this.bodyRowCount + this.footerRowCount;
+    return this.headerRowCount + this.filterRowCount + this.bodyRowCount + this.footerRowCount;
   }
 
   /** `aria-colcount` of the grid: the number of shown columns. */
@@ -82,7 +87,17 @@ export class AriaGridInfo {
   }
 
   /**
-   * `aria-rowindex` of a row (1-based over header → body → footer).
+   * 1-based `aria-rowindex` of the persistent filter row (immediately after the header rows), or `0` when none is shown.
+   *
+   * @returns {number} 1-based row number in the grid
+   * @since 1.1.114
+   */
+  filterRowIndex(): number {
+    return this.filterRowCount > 0 ? this.headerRowCount + 1 : 0;
+  }
+
+  /**
+   * `aria-rowindex` of a row (1-based over header → filter row → body → footer).
    *
    * @param {AreaIdent} area - header, body or footer
    * @param {number} rowIndex - row index in the area
@@ -93,9 +108,9 @@ export class AriaGridInfo {
       return rowIndex + 1;
     }
     if (area === "body") {
-      return this.headerRowCount + rowIndex + 1;
+      return this.headerRowCount + this.filterRowCount + rowIndex + 1;
     }
-    return this.headerRowCount + Math.max(0, this.bodyRowCount) + rowIndex + 1;
+    return this.headerRowCount + this.filterRowCount + Math.max(0, this.bodyRowCount) + rowIndex + 1;
   }
 
   /**

@@ -67,6 +67,18 @@ export class AriaIds {
   }
 
   /**
+   * The ID of one of the three row groups (`west`, `center`, `east`) of the persistent filter row, referenced by
+   * `aria-owns` of the host when {@link TableOptionsIf.filterRow} is enabled.
+   *
+   * @param {SideIdent} side - west, center or east
+   * @returns {string} e.g. `"ge-t1-rg-filter-center"`
+   * @since 1.1.114
+   */
+  filterRowGroup(side: SideIdent): string {
+    return `${this.prefix}-rg-filter-${side}`;
+  }
+
+  /**
    * The ID of the row group of the detail rows (master/detail), referenced by `aria-owns` of the host.
    *
    * @returns {string} e.g. `"ge-t1-rg-detail"`

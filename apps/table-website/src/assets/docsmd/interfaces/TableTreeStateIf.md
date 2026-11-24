@@ -27,7 +27,7 @@ These nodes are collapsed, all other nodes are expanded.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L149)
+[src/lib/table/state/table-state.if.ts:154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L154)
 
 ___
 
@@ -39,4 +39,4 @@ These nodes are expanded, all other nodes are collapsed.
 
 #### Defined in
 
-[src/lib/table/state/table-state.if.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L147)
+[src/lib/table/state/table-state.if.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/state/table-state.if.ts#L152)

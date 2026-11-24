@@ -2574,6 +2574,17 @@ column also stays in its area – nobody drags a center column into the fixed co
 – all up to 10,000 rows, above only the rows drawn now. Own measurement: `tableOptions.columnAutoWidth.getWidth`;
 off: `columnAutoWidth: { doubleClick: false }`; one column by code: `tableApi.autoResizeColumn("name")`. → 6.27
 
+**Does the table have built-in column filters, an Excel-style value checklist or a column chooser?** Yes (since 1.1.114):
+`filterRow: true` adds a filter row below the header (with number/date ranges like `>100`, `10..20`, `2026-01..2026-03`),
+`columnFilterMenu: true` adds a funnel button per column with operators and a virtualized unique-value checklist, and
+`tableApi.showColumnChooser(button)` opens a column visibility picker anchored to any button. All three work together,
+keep live updates smooth, and persist via `autoRestoreFilterState` / `getState(["filters"])`. → 6.28
+
+**How do I build a status bar (record count, Columns button, filter toggle, fullscreen)?** The table intentionally has no
+built-in status bar chrome — render a small HTML bar below the host `<div>` and wire it to `onFilterChanged`,
+`tableApi.setFilterRowVisible(...)`, `tableApi.showColumnChooser(btn)`, `tableApi.clearColumnFilters()` and
+`container.requestFullscreen()`. → 6.28
+
 **The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
 gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4
 
@@ -2672,15 +2683,144 @@ vetoes the drag (nothing changes, the end comes with `type: "cancel"`).
 
 Not yet: resizing or moving columns with the keyboard.
 
+### 6.28 Column filters, filter menu and column chooser (since 1.1.114)
+
+Three opt-in features cover per-column filtering and visibility without leaving the core package (all off by default so
+existing tables stay bit-identical):
+
+1. **Filter row (`filterRow: true`)** – a persistent input row below the header (supporting fixed west/east columns,
+   horizontal scroll, RTL and multi-row header groups).
+2. **Column filter menu (`columnFilterMenu: true`)** – a funnel button in each filterable header cell opening a popup
+   with operators and an Excel-style virtualized unique-value checklist.
+3. **Column chooser (`tableApi.showColumnChooser(anchor)`)** – a popup listing columns with search, checkboxes and
+   show/hide all, anchored to any button in your toolbar or status bar.
+
+```ts
+import { ColumnDef, EventAdapter, TableFactory, TableOptions, px120, px160 } from "@guiexpert/table";
+import type { GeFilterEvent, TableApi, TableOptionsIf } from "@guiexpert/table";
+
+interface Account { id: number; name: string; region: string; revenue: number; active: boolean; }
+declare const rows: Account[];
+declare const tableApi: TableApi;
+declare const columnsBtn: HTMLElement;
+
+const tableModel = TableFactory.createTableModel({
+  rows,
+  columnDefs: [
+    ColumnDef.create({ property: "id", headerLabel: "ID", width: px120, hideable: false, filter: "number" }),
+    ColumnDef.create({ property: "name", headerLabel: "Account", width: px160 }),
+    ColumnDef.create({ property: "region", headerLabel: "Region", width: px120 }),
+    ColumnDef.create({ property: "revenue", headerLabel: "Revenue", width: px120, filter: "number" }),
+    ColumnDef.create({ property: "active", headerLabel: "Active", width: px120, filter: "boolean" }),
+  ],
+  footerAggregates: { revenue: "sum" },
+});
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  filterRow: { debounce: 150 },                         // persistent filter inputs below the header (or `true`)
+  columnFilterMenu: true,                               // funnel button + Excel value checklist per column
+  columnFilter: { locale: "en" },                       // optional defaults (locale for numbers/dates)
+};
+
+const listener = new EventAdapter();
+listener.onFilterChanged = (evt: GeFilterEvent) => {
+  console.log(`${evt.rowCount} / ${evt.unfilteredRowCount} rows (${evt.source})`);
+};
+
+tableApi.setColumnFilter("revenue", { condition: { operator: "greaterThan", value: 10_000 } });
+tableApi.setColumnFilter("region", { values: ["DACH", "Nordics"] });
+tableApi.showColumnChooser(columnsBtn);                 // anchor to any button in your UI
+```
+
+**Filter types & shorthand syntax in the filter row**
+
+Each column auto-detects its type (`"text"` | `"number"` | `"date"` | `"boolean"`) from `ColumnDef.filter` or the first
+non-empty values, or can be turned off with `filter: false` (`RowNumberColumnDef`, checkbox and group columns default to
+non-filterable). Typing in a filter-row input parses shorthand expressions directly:
+
+| Column type | Filter-row examples | Meaning |
+|---|---|---|
+| `text` | `berlin`, `=berlin`, `!=berlin`, `^ber`, `lin$`, `""` | contains (default), exact, not equal, starts with, ends with, blank |
+| `number` | `>100`, `>=100`, `<50`, `<=50`, `!=0`, `10..20`, `""` | comparisons, inclusive range, blank (respects `columnFilter.locale`, e.g. `1.234,50` for `"de"`) |
+| `date` | `2026-03`, `>2026-01-15`, `2026-01-01..2026-03-31`, `2026-01..2026-03` | a whole month, before/after, inclusive date range (months: first to last day) |
+| `boolean` | tri-state select: all / true / false | exact boolean match |
+
+`""` means blank and `!=""` not blank in every column type. While the text is incomplete or invalid (`>`, `1..`, `abc`
+in a number column) the filter that is active stays – it changes with the next valid text and is removed when the input
+is empty. A filter set by the menu or the API is shown in the same syntax (`= EMEA`, `^Ac`, `> 1,5` in a locale with a
+decimal comma), so the text in the input can be edited and confirmed. Changing a column filter scrolls to the first row
+and keeps the horizontal scroll position. The filter menu stays open while the table scrolls vertically (live data) and
+closes when it scrolls horizontally. With a search text in the value list, OK keeps what is checked in the search result
+(like Excel). If the list is capped (`maxValues`), values that are not listed keep their state.
+
+**Programmatic API (`TableApi`)**
+
+- `setColumnFilter(column, filter | undefined)` (pass `undefined` to clear one column) / `setColumnFilters(filters)` / `clearColumnFilters()`
+- `getColumnFilter(column)` / `getColumnFilters()` / `isColumnFiltered(column)`
+- `setFilterRowVisible(visible)` / `isFilterRowVisible()` – hides/shows the filter row without clearing active filters; call `clearColumnFilters()` if you want to clear them too.
+- `showColumnFilterMenu(column)` / `hideColumnFilterMenu()`
+- `showColumnChooser(anchor?)` / `hideColumnChooser()`
+
+**Composing with `externalFilterFunction` and live `appendRows`**
+
+Built-in column filters and `tableOptions.externalFilterFunction` compose with logical AND (all built-in column filters
+AND the external filter must match). When `appendRows()` adds rows to a live table, only the newly appended rows are
+tested against the compiled predicate, and an open filter input keeps its DOM node, focus, selection range and IME
+composition intact.
+
+**Server-side / unmanaged filtering (`columnFilter: { managed: false }`)**
+
+For server-side filtering or custom `AreaModel` bodies that do not implement `externalFilterChanged()`, set
+`columnFilter: { managed: false }`. The UI still manages inputs, filter menus, active icons and state, and fires
+`onFilterChanged` (`evt.filters` holds the full filter map) without filtering rows locally. For value checklists with
+remote data, supply `ColumnDef.filter = { getValues: () => Promise.resolve([...]) }`.
+
+**State persistence (index-free)**
+
+Column filters and filter-row visibility are stored under the `"filters"` state part (`TableStateIf.filters` keyed by
+column `property` plus `TableStateIf.filterRowVisible`), never by column index. Enable `autoRestoreFilterState: true`
+in `autoRestoreOptions` (with `getStorageKeyFn`), or read/write `tableApi.getState(["filters"])` / `applyState(state)`.
+
+**Keyboard & accessibility**
+
+- `Ctrl+Shift+F` (`⌘+Shift+F` on macOS): focus the filter input of the active column (when `filterRow` is visible).
+- `Alt+ArrowDown` (on a header cell or filter input): open the column filter menu (when `columnFilterMenu` is enabled).
+- Inside the filter row, `ArrowDown` jumps straight into the body; `Escape` clears the focused filter input (or closes
+  an open popup and returns focus to the trigger). Popups render in the browser top layer (`popover="manual"` where
+  supported) so they work inside containers with `overflow: hidden` and fullscreen mode.
+- Localize labels via `tableOptions.columnFilterTexts` and `tableOptions.ariaTexts` (`filterInput`, `clearColumnFilter`,
+  `filterColumn`, `filterColumnActive`, `filterMenuDialog`, `columnChooserDialog`).
+
+**Plain-HTML status bar recipe**
+
+```html
+<div class="table-shell">
+  <div id="grid" style="height: 520px; width: 100%;"></div>
+  <div class="status-bar">
+    <span id="row-count"></span>
+    <button id="btn-filter-row" type="button">Filter row</button>
+    <button id="btn-columns" type="button">Columns</button>
+    <button id="btn-clear" type="button">Clear filters</button>
+    <button id="btn-fullscreen" type="button">Fullscreen</button>
+  </div>
+</div>
+```
+
+Wire the buttons directly to `tableApi.setFilterRowVisible(!tableApi.isFilterRowVisible())`,
+`tableApi.showColumnChooser(btnColumns)`, `tableApi.clearColumnFilters()`, and `shell.requestFullscreen()`. See the full
+200,000-row demo in `apps/table-demo/column-filter.html` and the showcase `/showcase/columnfilter/`.
+
 ---
 
 ## 7. Not available yet
 
 To avoid surprises – these are **not** implemented in the current releases:
 
-- No built-in filter UI, context menu or pagination – build them with the events (`contextmenu`, `mouseClicked`) and
-  `externalFilterFunction`. Row drag (6.16) works inside one table; dragging rows into **another** table is up to
-  your code (`rowDragEnd` with `outside: true`).
+- No built-in context menu, status bar or pagination – build them with the events (`contextmenu`, `mouseClicked`,
+  `onFilterChanged`) and plain HTML (see 6.28 for a status bar recipe). Built-in column filters, Excel value checklists
+  and a column chooser are available since 1.1.114 (6.28). Row drag (6.16) works inside one table; dragging rows into
+  **another** table is up to your code (`rowDragEnd` with `outside: true`).
 - No drag & drop group panel or pivot field list – row grouping (5.6) and pivot tables (5.7) themselves are built in;
   change them with `tableApi.setRowGroupBy()` / `tableApi.setPivotConfig()`.
 - No server-side row model yet; for huge remote data sets implement your own `AreaModel` (see 5.5).

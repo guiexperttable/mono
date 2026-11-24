@@ -22,3 +22,4 @@ Regeln und Episoden-Backlog: siehe `CLAUDE.md` § 10.
 | 13 | [Excel im Browser: Formeln, Copy & Paste, Undo – MIT-lizenziert](13-excel-im-browser/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.99 (Branches `feat/spreadsheet-*`) |
 | 14 | [Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden](14-angular-signals/script.md) | Drehbuch + Demo-App fertig (`apps/angular-signal-demo`); Aufnahme nach Release 1.1.100 (Branch `feat/angular-signal-table`) |
 | 15 | [Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end](15-live-log/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.108 (Branch `feat/live-append`) |
+| 16 | [Spaltenfilter & Excel-Werteliste im Header – eine Option (Werteliste bei ag-Grid Enterprise)](16-spaltenfilter/script.md) | Drehbuch + Demo fertig; Aufnahme nach Release 1.1.114 (Branch `feat/spaltenfilter`) |

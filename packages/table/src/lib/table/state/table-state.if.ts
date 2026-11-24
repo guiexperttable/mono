@@ -1,4 +1,5 @@
 import { SortState } from "../data/common/sort-state.type";
+import type { ColumnFiltersMap } from "../column-filter/column-filter.if";
 
 /**
  * The id of a row in a {@link TableStateIf} – what {@link AutoRestoreOptionsIf.getRowId} returns.
@@ -28,7 +29,7 @@ export type TableStateRowId = string | number;
  * @since 1.1.92
  */
 export type TableStatePart =
-  "columns" | "sort" | "scroll" | "tree" | "checked" | "selection" | "headerGroups" | "custom" | "details";
+  "columns" | "sort" | "scroll" | "tree" | "checked" | "selection" | "headerGroups" | "custom" | "details" | "filters";
 
 /**
  * The state of a table as plain JSON: column layout, sorting, scroll position, tree, checked and selected rows,
@@ -82,6 +83,10 @@ export interface TableStateIf {
   selection?: TableSelectionStateIf;
   /** The state of the header groups with a toggle. */
   headerGroups?: TableHeaderGroupStateIf[];
+  /** Active built-in column filters by column property (Date values serialized as ISO text). @since 1.1.114 */
+  filters?: ColumnFiltersMap;
+  /** Visibility of the filter row (set when {@link TableOptionsIf.filterRow} is configured). @since 1.1.114 */
+  filterRowVisible?: boolean;
   /** Data of your application, e.g. the text of a filter field (must be JSON). */
   custom?: unknown;
 }

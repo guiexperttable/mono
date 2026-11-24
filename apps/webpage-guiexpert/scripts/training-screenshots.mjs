@@ -34,6 +34,7 @@ const DEMOS = {
   "table-options": { slug: "table-options" },
   "sorting": { slug: "sorting", button: "sort by status" },
   "filtering": { slug: "filtering", search: "berlin" },
+  "column-filters": { slug: "filtering", wait: 600 },
   "selection-and-copy": { slug: "selection-and-copy", drag: [[2, 2], [7, 5]] },
   "events-and-context-menu": { slug: "events-and-context-menu", contextmenu: [3, 2] },
   "excel-export": { slug: "excel-export", search: "berlin" },

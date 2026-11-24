@@ -1,7 +1,7 @@
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableModelAndOptionsIf,
   TableOptions,
@@ -157,7 +157,8 @@ export class GuiexpertTable extends HTMLElement {
         onColumnResizeStart: (evt: GeColumnResizeEvent) => dispatch("columnResizeStart", evt),
         onColumnResizeEnd: (evt: GeColumnResizeEvent) => dispatch("columnResizeEnd", evt),
         onColumnMoveStart: (evt: GeColumnMoveEvent) => dispatch("columnMoveStart", evt),
-        onColumnMoveEnd: (evt: GeColumnMoveEvent) => dispatch("columnMoveEnd", evt)
+        onColumnMoveEnd: (evt: GeColumnMoveEvent) => dispatch("columnMoveEnd", evt),
+        onFilterChanged: (evt: GeFilterEvent) => dispatch("filterChanged", evt)
       };
 
       const tableScope = new TableScope(

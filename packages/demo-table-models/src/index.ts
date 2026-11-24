@@ -47,3 +47,5 @@ export * from "./model/log-line.if";
 export * from "./lib/log-tail/log-generator";
 export * from "./lib/log-tail/log-tail-controller";
 export * from "./lib/log-tail/createLogTailModel";
+export * from "./model/account-record.if";
+export * from "./lib/createColumnFilterModel";

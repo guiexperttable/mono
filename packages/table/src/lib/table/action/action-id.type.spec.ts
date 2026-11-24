@@ -53,6 +53,9 @@ describe('actionIds', () => {
       'PASTE_FROM_CLIPBOARD',
       'UNDO',
       'REDO',
+      // since 1.1.114 (built-in column filters)
+      'FOCUS_COLUMN_FILTER',
+      'OPEN_COLUMN_FILTER_MENU',
     ]);
   });
 

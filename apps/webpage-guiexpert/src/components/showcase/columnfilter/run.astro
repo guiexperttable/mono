@@ -1,0 +1,195 @@
+---
+const id = 'div' + Math.random().toString(36).slice(2, 11);
+---
+
+<div class:list={[id + '-shell', 'cf-shell']}>
+  <div class="cf-hint">
+    Try typing <code>&gt;50000</code> in <strong>Revenue</strong>, <code>2025-01..2025-06</code> in <strong>Renewal</strong>,
+    or click a header funnel for the virtualized Excel value checklist. Shortcuts: <kbd>Ctrl/⌘+Shift+F</kbd> (filter row),
+    <kbd>Alt+↓</kbd> (filter menu).
+  </div>
+  <div
+      style="height: calc(100vh - 285px); min-height: 320px"
+      class:list={[id, 'cf-grid']}></div>
+  <div class="cf-status" role="region" aria-label="Table status and controls">
+    <span class:list={[id + '-count', 'cf-count']}></span>
+    <span class:list={[id + '-active', 'cf-active']}></span>
+    <div class="cf-actions">
+      <button type="button" class={id + '-toggle-row'} aria-pressed="true">Filter row</button>
+      <button type="button" class={id + '-columns'}>Columns</button>
+      <button type="button" class={id + '-clear'} disabled>Clear filters</button>
+      <button type="button" class={id + '-rtl'} aria-pressed="false">RTL</button>
+      <button type="button" class={id + '-fullscreen'} aria-pressed="false">Fullscreen</button>
+    </div>
+  </div>
+</div>
+
+<script
+    is:inline
+    define:vars={{ id }}
+    type="module">
+
+  import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js';
+  import { createColumnFilterModelAndOptions } from '/scripts/demo-table-models/index.js';
+
+  const $ = suffix => document.querySelector('.' + id + suffix);
+  const shell = $('-shell');
+  const host = $('');
+  const countEl = $('-count');
+  const activeEl = $('-active');
+  const toggleRowBtn = $('-toggle-row');
+  const columnsBtn = $('-columns');
+  const clearBtn = $('-clear');
+  const rtlBtn = $('-rtl');
+  const fsBtn = $('-fullscreen');
+
+  let currentDirection = 'ltr';
+  let tableScope;
+  let tableApi;
+
+  const updateStatus = (rowCount, unfilteredCount, filterCount) => {
+    countEl.textContent = `${rowCount.toLocaleString('en')} / ${unfilteredCount.toLocaleString('en')} accounts`;
+    activeEl.textContent = filterCount > 0 ? `${filterCount} active filter${filterCount === 1 ? '' : 's'}` : 'No filters';
+    clearBtn.disabled = filterCount === 0;
+  };
+
+  const mount = (direction, savedState) => {
+    if (tableScope) {
+      tableScope.destroy();
+      host.replaceChildren();
+    }
+    const { tableModel, tableOptions } = createColumnFilterModelAndOptions(200_000);
+    tableOptions.direction = direction;
+    if (savedState) {
+      tableOptions.initialState = savedState;
+    }
+
+    const listener = new EventAdapter();
+    listener.onFilterChanged = evt => {
+      updateStatus(evt.rowCount, evt.unfilteredRowCount, Object.keys(evt.filters).length);
+    };
+
+    tableScope = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener);
+    tableScope.firstInit();
+    tableApi = tableScope.getApi();
+
+    const filters = tableApi.getColumnFilters();
+    updateStatus(
+      tableApi.getDisplayedRowCount(),
+      tableModel.getBodyModel().getUnfilteredRowCount?.() ?? tableApi.getDisplayedRowCount(),
+      Object.keys(filters).length,
+    );
+    toggleRowBtn.setAttribute('aria-pressed', String(tableApi.isFilterRowVisible()));
+  };
+
+  mount(currentDirection);
+
+  toggleRowBtn.addEventListener('click', () => {
+    const next = !tableApi.isFilterRowVisible();
+    tableApi.setFilterRowVisible(next);
+    toggleRowBtn.setAttribute('aria-pressed', String(next));
+  });
+
+  columnsBtn.addEventListener('click', () => {
+    tableApi.showColumnChooser(columnsBtn);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    tableApi.clearColumnFilters();
+  });
+
+  rtlBtn.addEventListener('click', () => {
+    const state = tableApi.getState(['filters', 'columns', 'sorting']);
+    currentDirection = currentDirection === 'ltr' ? 'rtl' : 'ltr';
+    rtlBtn.setAttribute('aria-pressed', String(currentDirection === 'rtl'));
+    mount(currentDirection, state);
+  });
+
+  fsBtn.addEventListener('click', () => {
+    if (document.fullscreenElement === shell) {
+      document.exitFullscreen?.();
+    } else {
+      shell.requestFullscreen?.();
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    const isFs = document.fullscreenElement === shell;
+    fsBtn.setAttribute('aria-pressed', String(isFs));
+    host.style.height = isFs ? 'calc(100vh - 96px)' : 'calc(100vh - 285px)';
+    requestAnimationFrame(() => tableApi?.repaintHard());
+  });
+</script>
+
+<style>
+  .cf-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--ge-table-bg, inherit);
+  }
+  .cf-shell:fullscreen {
+    padding: 12px;
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+  }
+  .cf-hint {
+    font-size: 13px;
+    opacity: 0.85;
+    line-height: 1.45;
+  }
+  .cf-hint code,
+  .cf-hint kbd {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px;
+    padding: 1px 5px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    opacity: 0.9;
+  }
+  .cf-grid {
+    font-size: 14px;
+  }
+  .cf-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--ge-table-border, #ccc);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .cf-count {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .cf-active {
+    opacity: 0.8;
+  }
+  .cf-actions {
+    margin-inline-start: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cf-actions button {
+    font: inherit;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .cf-actions button[aria-pressed="true"] {
+    background: #0a6ebd;
+    border-color: #0a6ebd;
+    color: #fff;
+  }
+  .cf-actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+</style>

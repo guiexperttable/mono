@@ -44,6 +44,7 @@ import type { TableSheet } from './sheet/table-sheet';
 import type { SheetEngine } from './sheet/sheet-engine';
 import type { ScrollPositionIf } from './data/common/scroll-position.if';
 import type { AppendRowsOptionsIf, AppendRowsResultIf, RowsAppendedOptionsIf } from './live-append/append-rows-options.if';
+import type { ColumnFilterIf, ColumnFiltersMap } from './column-filter/column-filter.if';
 
 
 /**
@@ -251,6 +252,181 @@ export class TableApi {
   externalFilterChanged(): void {
     this.tableScope.externalFilterChanged();
   };
+
+  /**
+   * Sets or clears the built-in filter of one column (by model index, property, `"#<index>"`, or `ColumnDefIf`),
+   * compiles all active column filters into one predicate (AND with `externalFilterFunction`), filters, keeps the
+   * sort order, repaints once and fires {@link EventListenerIf.onFilterChanged}.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or definition
+   * @param {ColumnFilterIf | undefined} filter - condition and/or allowed values, or `undefined` to clear
+   *
+   * @example
+   * tableApi.setColumnFilter("seats", { condition: { operator: "greaterThan", value: 40 } });
+   * tableApi.setColumnFilter("region", { values: ["EMEA", "APAC"] });
+   * tableApi.setColumnFilter("seats", undefined);   // clear one column
+   *
+   * @since 1.1.114
+   */
+  setColumnFilter(column: number | string | ColumnDefIf, filter: ColumnFilterIf | undefined): void {
+    this.tableScope.setColumnFilter(column, filter);
+  }
+
+  /**
+   * Returns a copy of the active filter of one column, or `undefined` when the column is unfiltered.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or definition
+   * @returns {ColumnFilterIf | undefined} the active filter
+   *
+   * @example
+   * const filter = tableApi.getColumnFilter("region");
+   *
+   * @since 1.1.114
+   */
+  getColumnFilter(column: number | string | ColumnDefIf): ColumnFilterIf | undefined {
+    return this.tableScope.getColumnFilter(column);
+  }
+
+  /**
+   * Returns a plain JSON-safe copy of all active column filters (property → {@link ColumnFilterIf}).
+   *
+   * @returns {ColumnFiltersMap} active column filters
+   *
+   * @example
+   * const filters = tableApi.getColumnFilters();
+   *
+   * @since 1.1.114
+   */
+  getColumnFilters(): ColumnFiltersMap {
+    return this.tableScope.getColumnFilters();
+  }
+
+  /**
+   * Replaces all column filters in one batch: one filter pass, one render, one {@link EventListenerIf.onFilterChanged}.
+   *
+   * @param {ColumnFiltersMap} filters - new filters by column property
+   *
+   * @example
+   * tableApi.setColumnFilters({
+   *   region: { values: ["EMEA"] },
+   *   seats: { condition: { operator: "greaterOrEqual", value: 20 } }
+   * });
+   *
+   * @since 1.1.114
+   */
+  setColumnFilters(filters: ColumnFiltersMap): void {
+    this.tableScope.setColumnFilters(filters);
+  }
+
+  /**
+   * Clears all active column filters in one pass.
+   *
+   * @example
+   * tableApi.clearColumnFilters();
+   *
+   * @since 1.1.114
+   */
+  clearColumnFilters(): void {
+    this.tableScope.clearColumnFilters();
+  }
+
+  /**
+   * Returns `true` when the given column currently has an active column filter.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or definition
+   * @returns {boolean} whether the column is filtered
+   *
+   * @example
+   * if (tableApi.isColumnFiltered("region")) console.log("Region is filtered");
+   *
+   * @since 1.1.114
+   */
+  isColumnFiltered(column: number | string | ColumnDefIf): boolean {
+    return this.tableScope.isColumnFiltered(column);
+  }
+
+  /**
+   * Shows or hides the persistent filter row below the column titles ({@link TableOptionsIf.filterRow}).
+   * Hiding the filter row keeps all active column filters intact; use {@link clearColumnFilters} to clear them.
+   *
+   * @param {boolean} visible - `true` to show the filter row, `false` to hide it
+   *
+   * @example
+   * tableApi.setFilterRowVisible(!tableApi.isFilterRowVisible());
+   *
+   * @since 1.1.114
+   */
+  setFilterRowVisible(visible: boolean): void {
+    this.tableScope.setFilterRowVisible(visible);
+  }
+
+  /**
+   * Returns `true` when the persistent filter row is currently visible.
+   *
+   * @returns {boolean} whether the filter row is shown
+   *
+   * @example
+   * const open = tableApi.isFilterRowVisible();
+   *
+   * @since 1.1.114
+   */
+  isFilterRowVisible(): boolean {
+    return this.tableScope.isFilterRowVisible();
+  }
+
+  /**
+   * Opens the per-column filter menu popup anchored to the given column's header cell.
+   *
+   * @param {number | string | ColumnDefIf} column - column index, property or definition
+   * @returns {boolean} `true` if the menu opened, `false` if the column is missing, hidden or not filterable
+   *
+   * @example
+   * tableApi.showColumnFilterMenu("region");
+   *
+   * @since 1.1.114
+   */
+  showColumnFilterMenu(column: number | string | ColumnDefIf): boolean {
+    return this.tableScope.showColumnFilterMenu(column);
+  }
+
+  /**
+   * Closes the currently open per-column filter menu popup, if any.
+   *
+   * @example
+   * tableApi.hideColumnFilterMenu();
+   *
+   * @since 1.1.114
+   */
+  hideColumnFilterMenu(): void {
+    this.tableScope.hideColumnFilterMenu();
+  }
+
+  /**
+   * Opens the column visibility chooser popup (optionally anchored to a button in your app).
+   * Respects {@link ColumnDefIf.hideable}, keeps at least one column visible, and persists visibility via `"columns"` state.
+   *
+   * @param {HTMLElement} [anchor] - optional trigger element to position the popup next to
+   *
+   * @example
+   * columnsButton.addEventListener("click", () => tableApi.showColumnChooser(columnsButton));
+   *
+   * @since 1.1.114
+   */
+  showColumnChooser(anchor?: HTMLElement): void {
+    this.tableScope.showColumnChooser(anchor);
+  }
+
+  /**
+   * Closes the column visibility chooser popup, if open.
+   *
+   * @example
+   * tableApi.hideColumnChooser();
+   *
+   * @since 1.1.114
+   */
+  hideColumnChooser(): void {
+    this.tableScope.hideColumnChooser();
+  }
 
   /**
    * Scrolls the table content to the specified pixel coordinates.
@@ -1398,7 +1574,8 @@ export class TableApi {
     if (bodyModel instanceof AreaModelObjectArray){
       // Type assertion with unknown as intermediate step for type safety
       const am = bodyModel as unknown as AreaModelObjectArray<T>;
-      am.setRows(rows); 
+      am.setRows(rows);
+      this.tableScope.columnFilterService.onRowsReplaced();
       this.tableScope.batchEditService?.pruneOrphans();   // pending values of replaced rows are dropped (since 1.1.96)
       this.tableScope.invalidateRowLayout();               // other rows (heights, open detail rows) at the indices (since 1.1.97)
     } else {

@@ -354,8 +354,8 @@ tableApi.sortByColumn("total", "desc");                   // like a double click
 ```
 
 - The header sorts on **double click** (not single click). After changing data: `tableApi.reSort()`.
-- `externalFilterChanged()` filters all rows, clears the selection and scrolls to the top. There is no built-in filter
-  UI – build inputs yourself. → instructions.md 6.2, 6.3
+- `externalFilterChanged()` filters all rows, clears the selection and scrolls to the top. For a built-in filter row,
+  Excel-style value checklist and column chooser (since 1.1.114), see **R19**; both compose with AND. → instructions.md 6.2, 6.3, 6.28
 
 ### R10 – Own cell renderer
 
@@ -450,11 +450,13 @@ host without destroying the first.
 
 ### R17 – Not built in (and how to do it)
 
-- **Filter UI**: inputs of your own + `externalFilterFunction` + `externalFilterChanged()` (R9).
 - **Context menu**: `onContextmenu` + your own HTML menu (R3); example `apps/table-demo/spreadsheet.html`.
+- **Status bar**: a plain HTML bar below the host wired to `onFilterChanged`, `setFilterRowVisible`,
+  `showColumnChooser(btn)`, `clearColumnFilters()` and `requestFullscreen()` (R19, `apps/table-demo/column-filter.html`).
 - **Pagination**: not needed for size (virtual scrolling); if wanted, `setRows(page)` + `repaintHard()`.
 - **Server-side row model** (fetch rows on demand): an own `AreaModel` whose `getValueAt` reads a cache and requests
-  missing blocks; `repaint()` when a block arrives (R8).
+  missing blocks; `repaint()` when a block arrives (R8). Combine with `columnFilter: { managed: false }` (R19) for
+  server-side column filtering.
 - **Drag between tables**: row drag works inside one table (`rowDrag: true`); between tables use `onRowDragEnd` +
   `rowDragOptions.managed: false` and move the data yourself.
 
@@ -478,6 +480,55 @@ Once per drag, after the table applied the change (no `setTimeout`); `type: "can
 (`setColumnWidth`, `applyState`, `autoResizeColumns`) report nothing. Double click on the resize handle fits the width
 (`source: "dblclick"`; own measurement `tableOptions.columnAutoWidth.getWidth`). Renders of a live table while the
 user drags are fine. → instructions.md 6.27
+
+### R19 – Built-in column filters, Excel value checklist and column chooser (since 1.1.114)
+
+```ts
+import { ColumnDef, EventAdapter, TableFactory, TableOptions, px120, px160 } from "@guiexpert/table";
+import type { GeFilterEvent, TableApi, TableOptionsIf } from "@guiexpert/table";
+
+interface Account { id: number; name: string; region: string; revenue: number; active: boolean }
+declare const rows: Account[];
+declare const tableApi: TableApi;
+declare const columnsBtn: HTMLElement;
+
+const tableModel = TableFactory.createTableModel({
+  rows,
+  columnDefs: [
+    ColumnDef.create({ property: "id", headerLabel: "ID", width: px120, hideable: false, filter: "number" }),
+    ColumnDef.create({ property: "name", headerLabel: "Account", width: px160 }),
+    ColumnDef.create({ property: "region", headerLabel: "Region", width: px120 }),
+    ColumnDef.create({ property: "revenue", headerLabel: "Revenue", width: px120, filter: "number" }),
+    ColumnDef.create({ property: "active", headerLabel: "Active", width: px120, filter: "boolean" }),
+  ],
+});
+
+const tableOptions: TableOptionsIf = {
+  ...new TableOptions(),
+  filterRow: { debounce: 150 },                         // persistent filter inputs below the header (or `true`)
+  columnFilterMenu: true,                               // funnel button + virtualized Excel value checklist
+  columnFilter: { locale: "en" },                       // set managed: false for server-side filtering
+};
+
+const listener = new EventAdapter();
+listener.onFilterChanged = (evt: GeFilterEvent) => {
+  console.log(evt.rowCount, "/", evt.unfilteredRowCount, evt.filters);
+};
+
+tableApi.setColumnFilter("revenue", { condition: { operator: "greaterThan", value: 10_000 } });
+tableApi.setColumnFilter("region", { values: ["DACH", "Nordics"] });
+tableApi.showColumnChooser(columnsBtn);                 // anchor to any button (hideable: false locks a column)
+```
+
+- Filter-row shorthand: `>100`, `10..20`, `=exact`, `!=x`, `^start`, `end$`, `""` (blank), `2026-01..2026-03`; boolean
+  renders a tri-state select. Opt out per column with `ColumnDef.filter: false`.
+- API: `setColumnFilter` (`undefined` clears one column), `setColumnFilters`, `clearColumnFilters`, `getColumnFilter`,
+  `getColumnFilters`, `isColumnFiltered`, `setFilterRowVisible` / `isFilterRowVisible`,
+  `showColumnFilterMenu` / `hideColumnFilterMenu`, `showColumnChooser` / `hideColumnChooser`.
+- Composes with `externalFilterFunction` (logical AND) and `appendRows()` (keeps input focus/caret/IME).
+- Shortcuts: `Ctrl/⌘+Shift+F` focuses the active column's filter input; `Alt+ArrowDown` opens the column filter menu.
+- State persistence: `"filters"` part (`TableStateIf.filters` + `filterRowVisible`, `autoRestoreFilterState: true`).
+  → instructions.md 6.28, showcase "columnfilter", `apps/table-demo/column-filter.html`
 
 More (short): tree + checkboxes `TreeFactory` (instructions.md 6.6), master/detail `masterDetail` (6.18), row grouping
 `RowGroupFactory` (5.6), pivot `PivotFactory` (5.7), calculated columns `valueGetter`/`formula` (5.2, 5.9), spreadsheet
@@ -525,6 +576,11 @@ Symptom → cause → fix.
 - **Own `mousedown`/`mouseup`/`dblclick` listeners on the header** (to save widths, lock a column, fit on double click)
   → the table had no column events before 1.1.110 → `onColumnResizeEnd` / `onColumnMoveEnd` (R18),
   `ColumnDef.resizable: false` / `movable: false`, the built-in double click (`columnAutoWidth`).
+- **Filter row or filter menu enabled on a custom `AreaModel` does not filter rows** → custom `AreaModel` without
+  `externalFilterChanged()` → set `columnFilter: { managed: false }` and filter in `onFilterChanged` (or supply
+  `ColumnDef.filter = { getValues }`) (R19).
+- **Hiding the filter row (`setFilterRowVisible(false)`) still hides rows** → by design, toggling the filter row only
+  toggles the UI; active filters stay → call `tableApi.clearColumnFilters()` if you want to clear them too (R19).
 - **`AsyncBodyAreaModelObjectArray` cannot be imported** → unfinished, not exported → own `AreaModel` (R8, R17).
 - **Invented APIs** – these do NOT exist: `getSelectedRows()`, `onKeyDown`, `api.addRow()`, `api.refresh()`,
   `setData()`, `gridOptions`, `rowData`, `columnDefs` as a table option (it is a model parameter). Use R4–R7.
@@ -539,6 +595,7 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - `repaint()` = values changed, same row count; `repaintHard()` = row count or heights changed; `updateCells()` = single cells.
 - Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
 - Save the column layout when the user resizes or moves a column: `onColumnResizeEnd` / `onColumnMoveEnd` (wrappers `columnResizeEnd`, `columnMoveEnd`, since 1.1.110) – once per drag, after the change; read `tableApi.getState(["columns"])` there. Lock a column: `ColumnDef.resizable: false`, `movable: false`. Double click on the column border fits the width (`columnAutoWidth`, `tableApi.autoResizeColumn(column)`).
+- Built-in column filters, Excel value checklist and column chooser: `filterRow: true`, `columnFilterMenu: true`, `tableApi.showColumnChooser(btn)` (since 1.1.114); events `onFilterChanged` (wrapper `filterChanged`); state part `"filters"` (`autoRestoreFilterState: true`); server-side via `columnFilter: { managed: false }`. → R19, instructions.md 6.28.
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 
 ## Feature reference
@@ -574,6 +631,7 @@ What the table can do – one line per feature, details in instructions.md (each
 - Spreadsheet mode (since 1.1.99): SpreadsheetFactory.create({ data: unknown[][], rowCount (100), columnCount (26), columnWidth, rowHeight, rowNumbers, locale, functions, tableOptions }) → { tableModel: SpreadsheetTableModel, tableOptions } – column letters (AreaModelSheetHeader), row numbers, sparse AreaModelSheet; preset tableOptions.spreadsheet: true | { editing, clipboard, undo, cellFormulas, fillHandle } (false = off) for any flat table (TableFactory columnLetters: true). FormulaBar(container, api) – address box + formula input. api.getActiveCell(), goToAddress("B2:C5"), insertRows(at, count), deleteRows, insertColumns, deleteColumns (references adjusted, one undo step, source "structure"), getSheetData() (inputs for JSON).
 - Angular signal component (since 1.1.100, Angular 22 and later): TableSignalComponent, selector guiexpert-table-signal, from @guiexpert/angular-table@22.x – inputs (input()) tableModel (TableModelIf | undefined), tableOptions (default new TableOptions()), loading, debounceMouseClickDelay (150, 0 = synchronous); tableApi = model<TableApi | undefined>() → [(tableApi)]="api" with api = signal<TableApi | undefined>(undefined), (tableApiChange), viewChild(TableSignalComponent)?.tableApi(); set when the table is built, switches directly to the new API on a new model/options, undefined after destroy, written from outside = replaced. Outputs (output()): no tableReady (the API comes as the signal tableApi / tableApiChange), mouseClicked, mouseMoved, mouseDragging, mouseDraggingEnded, contextMenu (camelCase – TableComponent's (contextmenu) also receives the native MouseEvent first), scroll, modelChanged, selectionChanged, focusChanged, checkboxChanged, stateChanged, rowDragStart/Move/End, batchEditChanged, detailExpandedChanged, editingChanged, undoStackChanged, columnResizeStart/End, columnMoveStart/End (since 1.1.110) – events of the table (mouse, keyboard, scroll …) are emitted outside the Angular zone (write signals in handlers). effect() instead of ngOnChanges, no RxJS, zoneless (provideZonelessChangeDetection()), SSR: no table on the server. TableComponent (<guiexpert-table>) unchanged for Angular 14 – 22+.
 - Column drag (since 1.1.110): events EventListenerIf.onColumnResizeStart/End (GeColumnResizeEvent: type "start" | "end" | "cancel", source "mouse" | "dblclick", columnIndex, columnDef, property, oldWidth, newWidth) and onColumnMoveStart/End (GeColumnMoveEvent: type, fromIndex, toIndex, columnDef, property, columnOrder, moved) – only user actions, once per drag, the end after the change, start after 4 px, Escape / tableApi.cancelColumnDrag() = "cancel", tableApi.isColumnDragging(); wrappers columnResizeStart/End, columnMoveStart/End. Locks: ColumnDef.resizable: false (no handle, no double click, no auto width), movable: false (fixed place, applyState keeps it); RowNumberColumnDef has both false; a column stays in its area (west/center/east). Double click on the resize handle fits the width (no sorting): tableOptions.columnAutoWidth: { doubleClick (true), maxRows (10,000: all body rows, above only the rendered rows), getWidth(ctx: ColumnAutoWidthContextIf { columnIndex, columnDef, property, source, firstRenderedRow, lastRenderedRow, measureText(text), getDefaultWidth() }) => number | undefined }, limited by minWidth/maxWidth; tableApi.autoResizeColumn(index | property | ColumnDef) → width | undefined.
+- Column filters, filter menu and column chooser (since 1.1.114): opt-in persistent filter row `tableOptions.filterRow: true | FilterRowOptionsIf` (visible, debounce, placeholder, height, clearButtonVisible, minInputWidthInPx), Excel-style per-column filter menu `tableOptions.columnFilterMenu: true | ColumnFilterMenuOptionsIf` (showCondition, showValues, applyOnChange, maxValues, virtualized unique-value checklist, async `ColumnDef.filter.getValues`), global `tableOptions.columnFilter: ColumnFilterOptionsIf` (`managed: true | false`, `caseSensitive`, `locale`, `maxValues`), `tableOptions.columnFilterTexts: ColumnFilterTextsIf`; per-column `ColumnDef.filter: false | "text" | "number" | "date" | "boolean" | ColumnFilterColumnOptionsIf` (type, valueGetter, caseSensitive, placeholder, getValues) and `ColumnDef.hideable: false`; shorthand syntax in filter row (`>100`, `10..20`, `=x`, `!=x`, `^a`, `z$`, `""`, `2026-01..2026-03`, tri-state boolean); `TableApi`: `setColumnFilter`, `setColumnFilters`, `clearColumnFilters`, `getColumnFilter`, `getColumnFilters`, `isColumnFiltered`, `setFilterRowVisible`, `isFilterRowVisible`, `showColumnFilterMenu`, `hideColumnFilterMenu`, `showColumnChooser`, `hideColumnChooser`; event `EventListenerIf.onFilterChanged(GeFilterEvent: filters, property, source, rowCount, unfilteredRowCount)` (wrappers: `filterChanged`); composes with `externalFilterFunction` (AND) and live `appendRows` (input focus/caret/IME preserved); state part `"filters"` (`TableStateIf.filters`, `filterRowVisible`, `autoRestoreOptions.autoRestoreFilterState`); keyboard `FOCUS_COLUMN_FILTER` (Ctrl/⌘+Shift+F), `OPEN_COLUMN_FILTER_MENU` (Alt+ArrowDown); top-layer popups (`popover="manual"` with fullscreen/Shadow DOM fallback), RTL & fixed columns; DOM-free engine `parseFilterInput`, `formatFilterCondition`, `compileSingleColumnFilter`, `compileColumnFilterPredicate`, `inferColumnFilterType`, `collectDistinctValues`; CSS `ge-table-filter-row*`, `ge-table-filter-menu*`, `ge-table-column-chooser*`, `--ge-table-filter-*`. Showcase `columnfilter`, demo `apps/table-demo/column-filter.html`.
 - Live data / log tail (since 1.1.108): tableApi.appendRows(rows, { follow?: "auto" (default: stays at the end if it was at the end, else the first visible row stays) | true (always the end) | false (freeze), maxRows?: ring buffer – oldest rows removed from the start in blocks of ≥ 1 % }) → AppendRowsResultIf { added, shown, removed, following } | false (tree, row groups, pivot, spreadsheet, cell formulas) – AreaModelObjectArray body only, IN PLACE (pushes to your array, no copy), O(k): externalFilterFunction only for the new rows, sorted column / sort(fn) → merged in (binary search, behind equal rows); selection, focus, Shift+arrow anchor and checked rows stay at their rows (RowIndexShift, SelectionModel/FocusModel.adjustForRowChanges – no onSelectionChanged unless a selected row left the buffer); one render pass, none when only rows below the view came in (cells not rebuilt). Held mouse button: "auto" keeps the rows under the pointer and follows again after release. Own AreaModel: append yourself, then tableApi.rowsAppended(count, { follow, removedAtStart }). Not addRows() (copies all rows, resets filter and sort). Showcase logtail, demo apps/table-demo/log-tail.html, LogTailController + createLogTailModelAndOptions in @guiexpert/demo-table-models.
 - Custom filtering
 - In-place cell editing

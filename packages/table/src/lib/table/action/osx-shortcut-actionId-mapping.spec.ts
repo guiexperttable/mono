@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   actionIds,
   clipboardShortcutLayer,
+  columnFilterShortcutLayer,
   undoShortcutLayer,
   editingShortcutLayer,
   createHarmonizedShortcutByKeyboardEvent,
@@ -74,9 +75,10 @@ describe('OsxShortcutActionIdMapping', () => {
     }
   });
 
-  it('covers every ActionId with at least one shortcut – together with the editing and clipboard layers (1.1.99)', () => {
+  it('covers every ActionId with at least one shortcut – together with the editing, clipboard, undo and column filter layers', () => {
     expect(new Set([...Object.values(mapping), ...Object.values(editingShortcutLayer(true)),
-      ...Object.values(clipboardShortcutLayer(true)), ...Object.values(undoShortcutLayer(true))])).toEqual(new Set(actionIds));
+      ...Object.values(clipboardShortcutLayer(true)), ...Object.values(undoShortcutLayer(true)),
+      ...Object.values(columnFilterShortcutLayer(true))])).toEqual(new Set(actionIds));
   });
 
   it('has no "ctrl+x" and no "meta -" shortcut (unlike the Windows mapping)', () => {

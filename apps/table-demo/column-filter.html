@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!--
+  Column filters (since 1.1.114): persistent filter row, Excel-style per-column value checklist menu,
+  sum footer, and a plain-HTML status bar with record count, filter row toggle, column chooser, and fullscreen.
+  Start: pnpm serve:table-demo → http://localhost:4200/column-filter.html
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>GuiExpert Table – Column filters</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+  <style>
+    body { margin: 0; padding: 16px 24px; font-family: system-ui, sans-serif; background: var(--ge-table-bg, #fff); color: var(--ge-table-header-center-text, #000); }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .hint { margin: 0 0 12px; opacity: .8; font-size: 14px; }
+    .bar { display: flex; gap: 12px; align-items: center; margin: 0 0 12px; flex-wrap: wrap; }
+    .bar button, .bar select { font: inherit; padding: 4px 10px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; }
+    .table-shell { display: flex; flex-direction: column; border: 1px solid var(--ge-table-border, #ccc); background: var(--ge-table-bg, #fff); }
+    .table-shell:fullscreen { padding: 12px; box-sizing: border-box; }
+    .table-shell:fullscreen .table-div { flex: 1 1 auto; height: auto; }
+    .table-div { height: 480px; width: 100%; }
+    .status-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px;
+      border-top: 1px solid var(--ge-table-border, #ccc); font-size: 13px; flex-wrap: wrap; }
+    .status-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-actions button { font: inherit; padding: 3px 9px; cursor: pointer; }
+    .log { height: 516px; overflow: auto; margin: 0; padding: 8px; font: 12px/1.5 ui-monospace, monospace;
+      border: 1px solid var(--ge-table-border, #ddd); list-style: none; }
+    .log li { white-space: pre-wrap; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .log { height: 180px; } }
+  </style>
+</head>
+<body>
+<h1>Column filters, Excel value checklist &amp; column chooser</h1>
+<p class="hint">Type in the filter row (e.g. <code>emea</code>, <code>&gt;50</code>, <code>1000..5000</code>, <code>2025-01-01..2025-12-31</code>), click any header funnel icon for operators &amp; distinct values, or press <code>Ctrl/⌘+Shift+F</code> and <code>Alt+↓</code>.</p>
+<div class="bar">
+  <label>Rows
+    <select id="rows">
+      <option value="1000">1,000</option>
+      <option value="50000">50,000</option>
+      <option value="200000" selected>200,000</option>
+    </select>
+  </label>
+  <label><input id="dark" type="checkbox"> dark</label>
+  <label><input id="rtl" type="checkbox"> RTL</label>
+</div>
+<div class="layout">
+  <div class="table-shell" id="shell">
+    <div class="table-div" id="table"></div>
+    <div class="status-bar">
+      <span id="record-count">Records: –</span>
+      <div class="status-actions">
+        <button id="toggle-filter-row" type="button">Hide filter row</button>
+        <button id="columns-btn" type="button">Columns</button>
+        <button id="clear-filters" type="button">Clear filters</button>
+        <button id="fullscreen-btn" type="button">Fullscreen</button>
+      </div>
+    </div>
+  </div>
+  <ol class="log" id="log" aria-label="Filter events"></ol>
+</div>
+<script src="/src/column-filter/column-filter-demo.ts" type="module"></script>
+</body>
+</html>

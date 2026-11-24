@@ -28,6 +28,8 @@ export class CheckboxColumnDef implements ColumnDefIf {
     ["ge-table-text-align-left"],
     []
   );
+  /** Checkbox column is not filterable (since 1.1.114). */
+  public filter = false;
 
 
 }

@@ -178,7 +178,10 @@ export class MouseHandler {
       // follows sorts / edits / toggles and is not reported again (a double click arrived three times before, and a
       // Ctrl+double click toggled the selection on/off/on).
       // A click on a checkbox, an arrow or a toggle icon always does its job: two quick clicks = two toggles.
+      // read the clicked cell BEFORE the listener of the app runs (it may render, sort, filter)
+      const checkLostDblClick = cell ? undefined : this.prepareLostDblClickCheck(event, eventTarget);
       this.publishGeMouseEvent(event, 2, geMouseEvent, eventTarget);
+      checkLostDblClick?.();
       return;
     }
 
@@ -221,13 +224,76 @@ export class MouseHandler {
       }
     }
 
-    if (mouseTargetData.areaIdent === "body") {
+    if (mouseTargetData.areaIdent === "body" && this.tableScope.canFocusBodyCell(mouseTargetData.rowIdx, mouseTargetData.colIdx)) {
       // fires onFocusChanged once, and only if the focus moves (a clear() before it fired twice per click)
+      // (not for an empty tile behind the last item of a cover grid, since 1.1.115)
       this.tableScope.focusModel()?.setFocus(mouseTargetData.rowIdx, mouseTargetData.colIdx);
     }
 
     this.publishGeMouseEvent(event, secondClick ? 2 : 1, geMouseEvent, eventTarget);
   };
+
+  /**
+   * After the second click of a double click was reported: an app that renders in its click handler (it marks the
+   * clicked cell or tile with `repaint()`) replaces the clicked element – the browser then sends "dblclick" to the
+   * detached element and it never reaches the host: no editor, no `onCellActivated`. Then the double click is
+   * handled for the clicked cell – once this task is through and only if no native "dblclick" came (since 1.1.115).
+   *
+   * Call it before the click is reported; the returned function starts the check afterwards.
+   */
+  private prepareLostDblClickCheck(event: MouseEvent, eventTarget: EventTarget | null): (() => void) | undefined {
+    const clicked = this.tableScope.createGeMouseEvent(event);
+    if (event.detail !== 2 || !(eventTarget instanceof Element) || !clicked || !clicked.areaIdent
+      || clicked.rowIndex < 0 || clicked.columnIndex < 0) {
+      // a programmatic click or the third click of a triple click (no "dblclick" follows), or not on a cell
+      return undefined;
+    }
+    const areaIdent = clicked.areaIdent;
+    const cell: ClickCell = {
+      areaIdent, sideIdent: clicked.sideIdent, rowIdx: clicked.rowIndex, colIdx: clicked.columnIndex,
+      action: clicked.action,
+    };
+    // what the click meant: the handler of the app may also sort, filter or remove rows – the double click belongs
+    // to the row resp. the tile, not to the index
+    const areaModel = this.tableScope.tableModel.getAreaModel(areaIdent);
+    const row = areaIdent === 'body' ? this.rowAt(areaModel, cell.rowIdx) : undefined;
+    const stableRow = typeof row === 'object' && row !== null && this.rowAt(areaModel, cell.rowIdx) === row;
+    const tile = areaIdent === 'body' && this.tableScope.getTileLayout()
+      ? areaModel.getValueAt(cell.rowIdx, cell.colIdx) : undefined;
+    return () => this.checkLostDblClick(event, eventTarget, cell, row, stableRow, tile);
+  }
+
+  private checkLostDblClick(event: MouseEvent, eventTarget: Element, cell: ClickCell, row: unknown,
+                            stableRow: boolean, tile: unknown) {
+    const areaIdent = cell.areaIdent;
+    const dblClicks = this.nativeDblClickCount;
+    // "dblclick" is dispatched in the same task as "click" – a timeout runs after it
+    setTimeout(() => {
+      if (this.nativeDblClickCount !== dblClicks || eventTarget.isConnected || this.tableScope.isDestroyed()
+        || this.isBlocked(event)) {
+        return; // the browser's own "dblclick" arrived (or will be handled as always)
+      }
+      if (tile !== undefined) {
+        const tiles = this.tableScope.getTileLayout();
+        const index = tiles ? tiles.indexOfTile(tile) : -1;
+        if (!tiles || index < 0) {
+          return; // the item is gone
+        }
+        const perRow = Math.max(1, tiles.getTilesPerRow());
+        cell.rowIdx = Math.floor(index / perRow);
+        cell.colIdx = index % perRow;
+      } else {
+        cell.rowIdx = this.resolveRowIndex({
+          target: eventTarget, areaIdent, sideIdent: cell.sideIdent, rowIdx: cell.rowIdx, colIdx: cell.colIdx,
+          action: cell.action, row, stableRow, clientX: event.clientX, clientY: event.clientY,
+        });
+        if (cell.rowIdx < 0) {
+          return; // the row is gone
+        }
+      }
+      this.handleDblClick(event, eventTarget, cell);
+    }, 0);
+  }
 
   /** "area:row:column" of a cell given explicitly (same format as {@link getCellKey}). */
   private toCellKey(cell: ClickCell): string {
@@ -293,6 +359,7 @@ export class MouseHandler {
     // created BEFORE sorting/editing: they repaint, the target element is detached afterwards (area/side unknown)
     const geMouseEvent = cell ? this.createCellEvent(event, cell) : this.tableScope.createGeMouseEvent(event);
     const targetData = new MouseTargetData(eventTarget, this.tableScope);
+    let activate: [number, number] | undefined;
     // a double click on the resize handle fits the width – it does not sort or edit (prompt 022)
     const resizeHandle = (cell ? cell.action : targetData.action) === 'resize-column';
     if (resizeHandle) {
@@ -319,11 +386,13 @@ export class MouseHandler {
 
       } else if (cell || target.getAttribute("data-row-index")) {
         const row = areaModel.getRowByIndex(rowIdx);
+        let handled = false;
 
         if (area && areaIdent === "body") {
           if (areaModel.isEditable(rowIdx, colIdx)) {
             // the editor above the cell (Excel-style editing, since 1.1.99) or inside it (clears the selection)
             this.tableScope.startEditing(rowIdx, colIdx, "edit");
+            handled = true;
           }
         }
 
@@ -334,7 +403,15 @@ export class MouseHandler {
             event.stopPropagation();
             const tr: TreeRowIf<any> = row as TreeRow<any>;
             this.tableScope.setTreeRowExpanded(tr, !tr.expanded);
+            handled = true;
           }
+        }
+
+        // nothing else to do: the double click "opens" the cell (since 1.1.115) – not on a handle inside it
+        const action = cell ? cell.action : targetData.action;
+        if (!handled && area && areaIdent === "body" && !action && !this.tableScope.isEditing()
+          && !this.isInteractiveCellElement(eventTarget)) { // a button, link or input of a renderer keeps its clicks
+          activate = [rowIdx, colIdx];
         }
       }
     }
@@ -346,6 +423,9 @@ export class MouseHandler {
       this.publishGeMouseEvent(event, 2, geMouseEvent);
     }
     this.reportedDoubleClick = undefined;
+    if (activate) {
+      this.tableScope.activateCell(activate[0], activate[1], 'mouse', event); // after onMouseClicked (clickCount 2)
+    }
   };
 
 

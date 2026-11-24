@@ -17,7 +17,7 @@ import {
   TableScope,
   TableModelIf, TableOptionsIf,
   GeScrollEvent, GeStateChangeEvent, GeRowDragEvent, GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent,
-  GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent
+  GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent
 } from '@guiexpert/table';
 import { defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -88,7 +88,8 @@ export default defineComponent({
     "columnResizeEnd",
     "columnMoveStart",
     "columnMoveEnd",
-    "filterChanged" // since 1.1.114 (column filters)
+    "filterChanged", // since 1.1.114 (column filters)
+    "cellActivated" // since 1.1.115 (Enter or double click opens a cell)
   ],
 
   setup(props, { emit }) {
@@ -209,6 +210,9 @@ export default defineComponent({
         },
         onFilterChanged: (evt: GeFilterEvent) => {
           emit("filterChanged", evt);
+        },
+        onCellActivated: (evt: GeCellActivateEvent) => {
+          emit("cellActivated", evt);
         },
       };
 

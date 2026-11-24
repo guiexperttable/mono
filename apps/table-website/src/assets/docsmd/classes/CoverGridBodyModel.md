@@ -3,8 +3,14 @@
 # Class: CoverGridBodyModel\<T\>
 
 Body of a cover grid: `filteredItems[row * columns + column]` is the item of a tile (`getValueAt`), `columns` =
-`floor(width / coverWidth)`. `items` = all items, `filteredItems` = shown items (filter and `sort()` work on it).
-Change `coverWidth`/`coverHeight` or the items and call `tableApi.repaintHard()`.
+`floor(width / coverWidth)` (at least 1). `items` = all items, `filteredItems` = shown items (filter and `sort()`
+work on it). Change `coverWidth`/`coverHeight` or the items and call `tableApi.repaintHard()`.
+
+`filteredItems` is the `items` array itself until the first filter or sort; `sort()` and `doSort()` sort a copy
+(since 1.1.115 – before, they reordered the array of the app as long as no filter was set).
+
+The model is a [TileLayoutIf](../interfaces/TileLayoutIf.md) (since 1.1.115): the keyboard moves from item to item, empty tiles never get
+the focus and the focus follows the item after sorting, filtering and resizing.
 
 **`Example`**
 
@@ -25,6 +31,7 @@ tableApi.repaintHard();
 ## Implements
 
 - [`AreaModelIf`](../interfaces/AreaModelIf.md)
+- [`TileLayoutIf`](../interfaces/TileLayoutIf.md)
 
 ## Table of contents
 
@@ -62,10 +69,15 @@ tableApi.repaintHard();
 - [getRowHeight](CoverGridBodyModel.md#getrowheight)
 - [getRowspanAt](CoverGridBodyModel.md#getrowspanat)
 - [getTextValueAt](CoverGridBodyModel.md#gettextvalueat)
+- [getTileAt](CoverGridBodyModel.md#gettileat)
+- [getTileCount](CoverGridBodyModel.md#gettilecount)
+- [getTileLayout](CoverGridBodyModel.md#gettilelayout)
+- [getTilesPerRow](CoverGridBodyModel.md#gettilesperrow)
 - [getTooltipAt](CoverGridBodyModel.md#gettooltipat)
 - [getUnfilteredRowCount](CoverGridBodyModel.md#getunfilteredrowcount)
 - [getValueAt](CoverGridBodyModel.md#getvalueat)
 - [getYPosByRowIndex](CoverGridBodyModel.md#getyposbyrowindex)
+- [indexOfTile](CoverGridBodyModel.md#indexoftile)
 - [init](CoverGridBodyModel.md#init)
 - [isEditable](CoverGridBodyModel.md#iseditable)
 - [isFilterable](CoverGridBodyModel.md#isfilterable)
@@ -107,7 +119,7 @@ tableApi.repaintHard();
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L38)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L45)
 
 ## Properties
 
@@ -141,7 +153,7 @@ if (areaModel.areaIdent === "body") {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:29](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L29)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:36](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L36)
 
 ___
 
@@ -151,7 +163,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L40)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L47)
 
 ___
 
@@ -161,7 +173,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L42)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L49)
 
 ___
 
@@ -171,7 +183,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:41](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L41)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L48)
 
 ___
 
@@ -181,7 +193,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:31](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L31)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:38](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L38)
 
 ___
 
@@ -191,7 +203,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L44)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L51)
 
 ___
 
@@ -201,7 +213,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L39)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L46)
 
 ___
 
@@ -232,7 +244,7 @@ const isSelected = bodyModel.isRowChecked(5);
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:28](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L28)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:35](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L35)
 
 ___
 
@@ -242,7 +254,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L43)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L50)
 
 ## Methods
 
@@ -264,7 +276,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:192](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L192)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:243](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L243)
 
 ___
 
@@ -312,7 +324,7 @@ changeColumnOrder(sourceColumnIndex: number, targetColumnIndex: number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:184](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L184)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:235](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L235)
 
 ___
 
@@ -383,7 +395,7 @@ class MyBodyModel extends AreaModelObjectArray<any> {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L154)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:199](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L199)
 
 ___
 
@@ -436,7 +448,7 @@ externalFilterChanged<T>(predictFn: FilterFunction<T>): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:146](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L146)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:191](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L191)
 
 ___
 
@@ -485,7 +497,7 @@ getCellRenderer(rowIndex: number, columnIndex: number): CellRendererIf | undefin
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L91)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L136)
 
 ___
 
@@ -539,7 +551,7 @@ getColspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L95)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:140](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L140)
 
 ___
 
@@ -547,13 +559,18 @@ ___
 
 ▸ **getColumnCount**(): `number`
 
+The number of tiles per row: as many as fit into the width – at least 1 (a width smaller than one tile, width 0
+or a tile width of 0; before 1.1.115 a narrow grid had 0 columns and `Infinity` rows).
+
 #### Returns
 
 `number`
 
+tiles per row, ≥ 1
+
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:69](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L69)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L82)
 
 ___
 
@@ -620,7 +637,7 @@ getCustomClassesAt(rowIndex: number, columnIndex: number): string[] {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L99)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:144](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L144)
 
 ___
 
@@ -679,7 +696,7 @@ getCustomStyleAt(rowIndex: number, columnIndex: number): { [key: string]: string
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L103)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:148](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L148)
 
 ___
 
@@ -722,7 +739,7 @@ getMaxColspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:127](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L127)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:172](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L172)
 
 ___
 
@@ -765,7 +782,7 @@ getMaxRowspan(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L131)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:176](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L176)
 
 ___
 
@@ -812,7 +829,7 @@ getRowByIndex(rowIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L111)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:156](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L156)
 
 ___
 
@@ -852,7 +869,7 @@ getRowCount(): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L53)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L60)
 
 ___
 
@@ -919,7 +936,7 @@ getRowHeight(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:85](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L85)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:130](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L130)
 
 ___
 
@@ -973,7 +990,7 @@ getRowspanAt(rowIndex: number, columnIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L107)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:152](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L152)
 
 ___
 
@@ -1024,7 +1041,112 @@ getTextValueAt(rowIndex: number, columnIndex: number): string {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:77](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L77)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L122)
+
+___
+
+### getTileAt
+
+▸ **getTileAt**(`index`): `undefined` \| `T`
+
+The shown item at an index, `undefined` outside the items.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `index` | `number` |
+
+#### Returns
+
+`undefined` \| `T`
+
+**`Since`**
+
+1.1.115
+
+#### Implementation of
+
+[TileLayoutIf](../interfaces/TileLayoutIf.md).[getTileAt](../interfaces/TileLayoutIf.md#gettileat)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L109)
+
+___
+
+### getTileCount
+
+▸ **getTileCount**(): `number`
+
+The number of shown items.
+
+#### Returns
+
+`number`
+
+**`Since`**
+
+1.1.115
+
+#### Implementation of
+
+[TileLayoutIf](../interfaces/TileLayoutIf.md).[getTileCount](../interfaces/TileLayoutIf.md#gettilecount)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L99)
+
+___
+
+### getTileLayout
+
+▸ **getTileLayout**(): [`TileLayoutIf`](../interfaces/TileLayoutIf.md)
+
+The tiles as one sequence of items – the table uses it for the keyboard navigation and to keep the focus on
+the same item.
+
+#### Returns
+
+[`TileLayoutIf`](../interfaces/TileLayoutIf.md)
+
+this model
+
+**`Since`**
+
+1.1.115
+
+#### Implementation of
+
+[AreaModelIf](../interfaces/AreaModelIf.md).[getTileLayout](../interfaces/AreaModelIf.md#gettilelayout)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L94)
+
+___
+
+### getTilesPerRow
+
+▸ **getTilesPerRow**(): `number`
+
+Tiles per row ([getColumnCount](CoverGridBodyModel.md#getcolumncount)).
+
+#### Returns
+
+`number`
+
+**`Since`**
+
+1.1.115
+
+#### Implementation of
+
+[TileLayoutIf](../interfaces/TileLayoutIf.md).[getTilesPerRow](../interfaces/TileLayoutIf.md#gettilesperrow)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:104](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L104)
 
 ___
 
@@ -1075,7 +1197,7 @@ getTooltipAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L81)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L126)
 
 ___
 
@@ -1101,7 +1223,7 @@ grid rows for all items
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L64)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L71)
 
 ___
 
@@ -1165,7 +1287,7 @@ getValueAt(rowIndex: number, columnIndex: number): any {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:73](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L73)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L118)
 
 ___
 
@@ -1228,7 +1350,37 @@ getYPosByRowIndex(rowIndex: number): number {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L136)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:181](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L181)
+
+___
+
+### indexOfTile
+
+▸ **indexOfTile**(`item`): `number`
+
+The index of a shown item, `-1` if it is not shown (filtered out, removed).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `item` | `unknown` |
+
+#### Returns
+
+`number`
+
+**`Since`**
+
+1.1.115
+
+#### Implementation of
+
+[TileLayoutIf](../interfaces/TileLayoutIf.md).[indexOfTile](../interfaces/TileLayoutIf.md#indexoftile)
+
+#### Defined in
+
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L114)
 
 ___
 
@@ -1263,7 +1415,7 @@ init(): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:142](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L142)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L187)
 
 ___
 
@@ -1330,7 +1482,7 @@ isEditable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:171](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L171)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:222](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L222)
 
 ___
 
@@ -1373,7 +1525,7 @@ isFilterable(): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:150](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L150)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:195](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L195)
 
 ___
 
@@ -1426,7 +1578,7 @@ isRowCheckable(rowIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L115)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:160](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L160)
 
 ___
 
@@ -1479,7 +1631,7 @@ isRowChecked(rowIndex: number): CheckedType | undefined {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:119](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L119)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:164](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L164)
 
 ___
 
@@ -1533,7 +1685,7 @@ isSelectable(rowIndex: number, columnIndex: number): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:180](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L180)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:231](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L231)
 
 ___
 
@@ -1553,7 +1705,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L49)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L56)
 
 ___
 
@@ -1575,7 +1727,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:188](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L188)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:239](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L239)
 
 ___
 
@@ -1626,7 +1778,7 @@ setRowChecked(rowIndex: number, checked: boolean): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L123)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:168](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L168)
 
 ___
 
@@ -1678,7 +1830,7 @@ setValue(rowIndex: number, columnIndex: number, value: any): boolean {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:175](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L175)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:226](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L226)
 
 ___
 
@@ -1686,44 +1838,17 @@ ___
 
 ▸ **sort**(`compareFn?`): `void`
 
-Sorts the rows in this area using a custom comparator function.
-This method provides more flexibility than doSort for complex sorting logic.
+Sorts the shown items – a copy, the `items` array of the app keeps its order (since 1.1.115).
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `compareFn?` | (`a`: `any`, `b`: `any`) => `number` | A function that compares two rows and returns a number: - Negative if a should come before b - Positive if a should come after b - Zero if they are equivalent for sorting purposes |
+| `compareFn?` | (`a`: `any`, `b`: `any`) => `number` | compares two items |
 
 #### Returns
 
 `void`
-
-**`Example`**
-
-```ts
-// Sort rows by name length
-bodyAreaModel.sort((a, b) => a.name.length - b.name.length);
-
-// Sort rows by a computed value
-bodyAreaModel.sort((a, b) => {
-  const scoreA = a.wins * 3 + a.draws;
-  const scoreB = b.wins * 3 + b.draws;
-  return scoreB - scoreA; // Descending order
-});
-```
-
-**`Example`**
-
-```ts
-// Implementation example
-sort(compareFn?: (a: any, b: any) => number): void {
-  if (!compareFn) return;
-  
-  // Apply the custom sort function
-  this.rows.sort(compareFn);
-}
-```
 
 #### Implementation of
 
@@ -1731,4 +1856,4 @@ sort(compareFn?: (a: any, b: any) => number): void {
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:166](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L166)
+[src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts:217](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/areamodel/cover-grid-body-model.ts#L217)

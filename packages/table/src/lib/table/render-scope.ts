@@ -839,6 +839,7 @@ export class RenderScope extends EleScope {
    * to the table's appearance and behavior after a scroll event occurs.
    */
   override adjustAfterScrolling() {
+    this.beforeRenderPass();
     if (!this.adjustingRowNumberWidth && this.adjustRowNumberColumnWidth()) {
       // the fixed west area got wider or narrower: new geometry first (it renders the table again – once: the flag
       // stops a second width change in the nested pass)
@@ -2227,6 +2228,20 @@ export class RenderScope extends EleScope {
   private rowNumberWidth?: { text: string; width: number; approximate: boolean };
   /** true while the containers are adjusted to a new row number width (no second change in that nested pass). */
   protected adjustingRowNumberWidth = false;
+
+  /** The last input in the table was a key – with `focusFrame: "keyboard"` the focus frame is drawn. @since 1.1.115 */
+  protected keyboardModality = false;
+
+  /** Is the frame of the focused cell drawn now ({@link TableOptionsIf.focusFrame})? @since 1.1.115 */
+  protected isFocusFrameVisible(): boolean {
+    const mode = this.tableOptions?.focusFrame ?? 'always';
+    return mode === 'always' || (mode === 'keyboard' && this.keyboardModality);
+  }
+
+  /** Hook at the start of every render pass (before anything is drawn). @since 1.1.115 */
+  protected beforeRenderPass(): void {
+    return undefined;
+  }
   /** Guards {@link adjustRelativeColumnWidthsToScrollBar} against re-entry. */
   private adjustingRelativeWidths = false;
   /** The width % and weight columns were last computed for (`TableModelIf.setParentWidth`), -1 = unknown. */
@@ -2450,7 +2465,10 @@ export class RenderScope extends EleScope {
     if (this.getFocusModel && areaIdent === 'body' && !this.headerFocus) {
       const fm = this.getFocusModel();
       if (fm?.hasFocus(rowIndex, index)) {
-        this.dom.addFocusBorderDivs(parent, geo, {});
+        if (this.isFocusFrameVisible()) {
+          // a tile has no grid lines around it: the frame lies inside the cell (not cut off in the last column)
+          this.dom.addFocusBorderDivs(parent, geo, {}, !!areaModel.getTileLayout?.());
+        }
         this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
       } else if (fm && (rowspan > 1 || colspan > 1)) {
         const [fr, fc] = fm.getFocus();
@@ -2460,7 +2478,9 @@ export class RenderScope extends EleScope {
       }
     } else if (areaIdent === 'header' && this.headerFocus
       && this.headerFocus[0] === rowIndex && this.headerFocus[1] === index) {
-      this.dom.addFocusBorderDivs(parent, geo, {});
+      if (this.isFocusFrameVisible()) {
+        this.dom.addFocusBorderDivs(parent, geo, {});
+      }
       this.setAriaFocusedCell(cell, areaIdent, rowIndex, index);
     }
     if (areaIdent === 'header' && this.isColumnMovable(index)) {

@@ -115,6 +115,9 @@ export class SelectionService implements OnActionTriggeredIf {
     if (evt.areaIdent !== 'body' || evt.rowIndex < 0 || evt.columnIndex < 0 || evt.clickCount > 1) {
       return false; // header/footer (before: cleared the selection, focused a body cell), double click
     }
+    if (this.tableScope.canFocusBodyCell?.(evt.rowIndex, evt.columnIndex) === false) {
+      return false; // an empty tile behind the last item of a cover grid (since 1.1.115)
+    }
     let dirty = false;
 
     if (this.getSelectionModel && this.getFocusModel) {

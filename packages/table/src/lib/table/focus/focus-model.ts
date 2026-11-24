@@ -11,6 +11,10 @@ import type { RowIndexShift } from '../live-append/row-index-shift';
  * This class also maintains a list of `EventFocusChangedListenerIf` instances and notifies them
  * whenever there is a change in focus.
  *
+ * The type given to the constructor is informational: the table never reads it – `new FocusModel()` (type "none")
+ * has a focused cell and a focus frame like `new FocusModel("cell")`. Hide the frame with
+ * {@link TableOptionsIf.focusFrame} (since 1.1.115).
+ *
  * ## Instance Properties:
  *  - `selectionType: FocusType` — Specifies the type of selection that is currently in focus. It could be either a specific cell or the whole row. Defaults to "none".
  *  - `rowIndex: number` — Specifies the row index of the cell that is currently in focus.

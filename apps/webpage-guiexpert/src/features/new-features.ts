@@ -1,5 +1,5 @@
 /**
- * The features added since October 2026 (prompts 001 – 022, releases 1.1.91 – 1.1.110) – one list for
+ * The features added since October 2026 (prompts 001 – 024, releases 1.1.91 – 1.1.115) – one list for
  * the page /whats-new/, the "What's new" section of the home page and the feature finder of the training.
  *
  * Every snippet is checked against the real API (see `snippets` in scripts/check-feature-snippets.mjs):
@@ -459,6 +459,35 @@ tableApi.showColumnChooser(saveButton);                 // anchor to any button`
       "TableApi.showColumnFilterMenu", "TableApi.showColumnChooser", "EventListenerIf.onFilterChanged", "GeFilterEvent"],
     agGrid: "partly",
     agGridNote: "filter row in Community; Excel value checklist (Set Filter) and Columns Tool Panel in Enterprise"
+  },
+  {
+    id: "open-and-tiles", prompt: "024", since: "1.1.115", icon: "mdi:view-grid-outline",
+    title: "Open with Enter or double click – and a cover grid for the keyboard",
+    problem: "A double click opened an item, Enter did nothing – and a grid of tiles could only be used with the mouse: " +
+      "arrow keys stopped at the end of a row and landed on empty tiles.",
+    points: [
+      "onCellActivated – Enter on the focused cell and a double click report one event, in every table",
+      "cover grid: arrow keys move from item to item and wrap at the end of a row, Home/End, Page ↑/↓, empty tiles skipped",
+      "the focus follows the item after sorting, filtering and resizing",
+      "focusFrame: \"always\" | \"keyboard\" | \"never\" – the focus frame without a CSS trick"
+    ],
+    snippet: `const tableModel = GE.CoverGridFactory.createCoverGridModel(books, renderer, 160, 240);
+const tableOptions: TableOptionsIf = {
+  ...GE.CoverGridFactory.createCoverGridDefaultOptions(240, () => "books"),
+  focusFrame: "keyboard"                              // the default of a cover grid
+};
+// Enter on the focused cover and a double click – one handler
+listener.onCellActivated = evt => {
+  openBook(evt.value as Book);                        // evt.source: "keyboard" | "mouse"
+};
+// the focused book stays focused:
+tableApi.sort((a: Book, b: Book) => a.title.localeCompare(b.title));`,
+    showcase: { name: "covergrid", title: "Cover grid" },
+    training: { slug: "accessibility", hash: "tiles", label: "Chapter 35 · Tiles with the keyboard" },
+    api: ["EventListenerIf.onCellActivated", "GeCellActivateEvent", "TableOptionsIf.focusFrame", "TileLayoutIf",
+      "AreaModelIf.getTileLayout", "navigateTiles", "CoverGridFactory.createCoverGridDefaultOptions", "CoverGridBodyModel"],
+    agGrid: "community",
+    agGridNote: "double-click and key events of cells are in Community"
   }
 ];
 

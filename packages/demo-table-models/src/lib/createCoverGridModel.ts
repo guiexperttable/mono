@@ -365,6 +365,8 @@ export interface CoverGridModelAndOptionsIf {
  * Cover grid demo: books as tiles (magazine covers, edge to edge) in a grid that fills the width of the table. The number of columns follows the
  * width (`floor(width / coverWidth)`); only the visible rows are in the DOM.
  *
+ * - keyboard (since 1.1.115): the arrow keys move from book to book, Enter and a double click open one –
+ *   `listener.onCellActivated = evt => open(evt.value)`
  * - filter: `filter` becomes `externalFilterFunction` – call `tableApi.externalFilterChanged()` after a change
  * - sort: `tableApi.sort(BOOK_SORTS.title)`
  * - size: `tableModel.bodyModel.coverWidth/coverHeight = …` + `tableApi.repaintHard()`
@@ -383,9 +385,9 @@ export function createCoverGridModelAndOptions(
   const tableModel = CoverGridFactory.createCoverGridModel<BookIf>(
     books, new BookCoverRenderer(ctx), coverWidth, coverHeight);
   const tableOptions: TableOptionsIf = {
-    ...CoverGridFactory.createCoverGrisDefaultOptions(coverHeight, () => "coverGridDemo"),
+    // no borders, no hover; the focus frame shows only while the grid is used with the keyboard
+    ...CoverGridFactory.createCoverGridDefaultOptions(coverHeight, () => "coverGridDemo"),
     externalFilterFunction: ctx.filter,
-    shortcutActionsDisabled: true,       // the table's cell navigation does not apply to tiles
     overflowY: "scroll",   // a classic scroll bar is always there: the number of columns does not jump
     ariaLabel: "Books"
   };

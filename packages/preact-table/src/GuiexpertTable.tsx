@@ -2,7 +2,7 @@ import { Component, createRef } from "preact";
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService, TableApi,
   TableModelIf,
   TableOptions,
@@ -25,6 +25,7 @@ export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 export type GeFilterEventFn = (evt: GeFilterEvent) => void;
+export type GeCellActivateEventFn = (evt: GeCellActivateEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -69,6 +70,8 @@ export interface GuiexpertTableProps {
   columnMoveEnd?: GeColumnMoveEventFn;
   /** Column filters changed (since 1.1.114). */
   filterChanged?: GeFilterEventFn;
+  /** Enter or a double click "opens" a body cell – `evt.value`, `evt.row`, `evt.source` (since 1.1.115). */
+  cellActivated?: GeCellActivateEventFn;
   /**
    * `true` shows the loading overlay ("Loading…" with a CSS spinner) over the body, `false` hides it.
    * Changing it does **not** re-create the table. Texts: `tableOptions.overlayOptions`. @since 1.1.92
@@ -155,7 +158,8 @@ export class GuiexpertTable extends Component<GuiexpertTableProps>  {
       onColumnResizeEnd: (evt: GeColumnResizeEvent) => current().columnResizeEnd?.(evt),
       onColumnMoveStart: (evt: GeColumnMoveEvent) => current().columnMoveStart?.(evt),
       onColumnMoveEnd: (evt: GeColumnMoveEvent) => current().columnMoveEnd?.(evt),
-      onFilterChanged: (evt: GeFilterEvent) => current().filterChanged?.(evt)
+      onFilterChanged: (evt: GeFilterEvent) => current().filterChanged?.(evt),
+      onCellActivated: (evt: GeCellActivateEvent) => current().cellActivated?.(evt)
     };
 
     const tableScope = new TableScope(

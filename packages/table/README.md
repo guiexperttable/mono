@@ -89,6 +89,10 @@ This is the UI-agnostic table component for your next web app. 😊
   visibility picker with `ColumnDef.hideable: false` locks); composes with `externalFilterFunction` and `appendRows()`,
   persists in `TableStateIf` (`autoRestoreFilterState`), and supports server-side filtering (`columnFilter: { managed:
   false }`) – since 1.1.114
+- "Open" a row or a tile with Enter **and** double click: one event `onCellActivated` (wrappers `cellActivated`) in
+  every table. Cover grid with the keyboard: the arrow keys move from item to item (wrap at the end of a row, empty
+  tiles skipped), Home/End, Page Up/Down, the focus follows the item after sorting, filtering and resizing. Focus
+  frame: `focusFrame: "always" | "keyboard" | "never"` – since 1.1.115
 - State persistence: column layout (width, order, visibility), sorting, scroll position, tree, checked and selected
   rows, header groups – in `localStorage` (`autoRestoreOptions`) or on your server (`tableApi.getState()` /
   `applyState()`, `initialState`, `onStateChanged`); stored by property and row id, never by index – since 1.1.92
@@ -118,6 +122,10 @@ This is the UI-agnostic table component for your next web app. 😊
 - **Built-in column filters, value checklist or column chooser:** `filterRow: true`, `columnFilterMenu: true`,
   `tableApi.showColumnChooser(button)` (since 1.1.114); `onFilterChanged` (wrapper `filterChanged`), server-side mode
   via `columnFilter: { managed: false }`.
+- **Open a row or a cover with Enter or a double click:** `listener.onCellActivated = evt => open(evt.row ?? evt.value)`
+  (wrappers `cellActivated`, since 1.1.115) – one handler for keyboard and mouse.
+- **Hide the focus frame:** `tableOptions.focusFrame: "never"`, or `"keyboard"` to show it only while the table is used
+  with the keyboard (since 1.1.115) – not with CSS.
 - **AI assistants:** `llms.txt` in this package – recipes and pitfalls, every snippet compiled against the API.
 - **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 

@@ -32,6 +32,7 @@ import {
   GeColumnResizeEvent,
   GeColumnMoveEvent,
   GeFilterEvent,
+  GeCellActivateEvent,
   SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -178,6 +179,8 @@ export class TableSignalComponent implements OnDestroy {
   readonly columnMoveEnd = output<GeColumnMoveEvent>();
   /** Column filters changed – once per filter pass, after filtering and rendering (since 1.1.114). */
   readonly filterChanged = output<GeFilterEvent>();
+  /** Enter or a double click "opens" a body cell – `evt.value`, `evt.row`, `evt.source` (since 1.1.115). */
+  readonly cellActivated = output<GeCellActivateEvent>();
 
   // ---------------------------------------------------------------- internals
 
@@ -219,6 +222,7 @@ export class TableSignalComponent implements OnDestroy {
     onColumnMoveStart: evt => this.columnMoveStart.emit(evt),
     onColumnMoveEnd: evt => this.emitUnlessDestroyed(() => this.columnMoveEnd.emit(evt)),
     onFilterChanged: evt => this.emitUnlessDestroyed(() => this.filterChanged.emit(evt)),
+    onCellActivated: evt => this.emitUnlessDestroyed(() => this.cellActivated.emit(evt)),
   };
 
   constructor() {

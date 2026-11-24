@@ -20,7 +20,7 @@ const renderer: CellRendererIf = {
   }
 };
 const gridModel = CoverGridFactory.createCoverGridModel(books, renderer, 160, 240);
-const gridOptions = CoverGridFactory.createCoverGrisDefaultOptions(240, () => "books");
+const gridOptions = CoverGridFactory.createCoverGridDefaultOptions(240, () => "books");
 const gridApi = new TableScope(host, gridModel, new SimpleDomService(), gridOptions, new EventAdapter())
   .firstInit()
   .getApi();
@@ -34,6 +34,7 @@ const gridApi = new TableScope(host, gridModel, new SimpleDomService(), gridOpti
 
 ### Methods
 
+- [createCoverGridDefaultOptions](CoverGridFactory.md#createcovergriddefaultoptions)
 - [createCoverGridModel](CoverGridFactory.md#createcovergridmodel)
 - [createCoverGrisDefaultOptions](CoverGridFactory.md#createcovergrisdefaultoptions)
 
@@ -48,6 +49,47 @@ const gridApi = new TableScope(host, gridModel, new SimpleDomService(), gridOpti
 [`CoverGridFactory`](CoverGridFactory.md)
 
 ## Methods
+
+### createCoverGridDefaultOptions
+
+▸ **createCoverGridDefaultOptions**(`defaultRowHeight`, `getStorageKeyFn?`): [`TableOptionsIf`](../interfaces/TableOptionsIf.md)
+
+Options for a cover grid: no borders and separators, no row or column hover, header and footer height 0, the
+scroll position restored under the key of `getStorageKeyFn` (`localStorage`), and the focus frame only while the
+grid is used with the keyboard (`focusFrame: "keyboard"`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `defaultRowHeight` | `number` | the height of a tile (`coverHeight`) |
+| `getStorageKeyFn` | () => `string` | storage key of the scroll position (default `"CoverGrid"`) |
+
+#### Returns
+
+[`TableOptionsIf`](../interfaces/TableOptionsIf.md)
+
+new options – add your own fields with a spread
+
+**`Since`**
+
+1.1.115
+
+**`Example`**
+
+```ts
+let photoFilter = "";
+const gridOptions: TableOptionsIf = {
+  ...CoverGridFactory.createCoverGridDefaultOptions(240, () => "photos"),
+  externalFilterFunction: (photo: { name: string }) => photo.name.includes(photoFilter)
+};
+```
+
+#### Defined in
+
+[src/lib/table/factory/cover-grid-factory.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L95)
+
+___
 
 ### createCoverGridModel
 
@@ -99,9 +141,7 @@ ___
 
 ▸ **createCoverGrisDefaultOptions**(`defaultRowHeight`, `getStorageKeyFn?`): [`TableOptionsIf`](../interfaces/TableOptionsIf.md)
 
-Options for a cover grid: no borders and separators, no row or column hover, header and footer height 0, and the
-scroll position restored under the key of `getStorageKeyFn` (`localStorage`). (The name has a typo – kept for
-compatibility.)
+The same as [createCoverGridDefaultOptions](CoverGridFactory.md#createcovergriddefaultoptions) – the old name with a typo, kept for compatibility.
 
 #### Parameters
 
@@ -116,17 +156,16 @@ compatibility.)
 
 new options – add your own fields with a spread
 
+**`Deprecated`**
+
+since 1.1.115: use [createCoverGridDefaultOptions](CoverGridFactory.md#createcovergriddefaultoptions)
+
 **`Example`**
 
 ```ts
-let photoFilter = "";
-const gridOptions: TableOptionsIf = {
-  ...CoverGridFactory.createCoverGrisDefaultOptions(240, () => "photos"),
-  externalFilterFunction: (photo: { name: string }) => photo.name.includes(photoFilter),
-  shortcutActionsDisabled: true
-};
+const gridOptions: TableOptionsIf = CoverGridFactory.createCoverGrisDefaultOptions(240, () => "photos");
 ```
 
 #### Defined in
 
-[src/lib/table/factory/cover-grid-factory.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L95)
+[src/lib/table/factory/cover-grid-factory.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L116)

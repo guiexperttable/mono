@@ -1,4 +1,5 @@
 import type { TableDirection } from "../../rtl/table-direction.type";
+import type { FocusFrameMode } from "../../focus/focus-frame.type";
 import type { MasterDetailOptionsIf } from "../../master-detail/master-detail-options.if";
 import { DefaultRowHeightsIf } from "./default-row-heights.if";
 import { TableOptionsIf } from "./table-options.if";
@@ -158,6 +159,8 @@ export class TableOptions implements TableOptionsIf {
    * own value takes the direction of the outer table. @since 1.1.98
    */
   direction?: TableDirection = undefined;
+  /** When the focus frame is drawn ({@link TableOptionsIf.focusFrame}). Not set = `"always"`. @since 1.1.115 */
+  focusFrame?: FocusFrameMode = undefined;
   /** Persistent filter row below the column titles ({@link TableOptionsIf.filterRow}). Not set = off. @since 1.1.114 */
   filterRow?: boolean | Partial<FilterRowOptionsIf> = undefined;
   /** Per-column filter menu popup ({@link TableOptionsIf.columnFilterMenu}). Not set = off. @since 1.1.114 */

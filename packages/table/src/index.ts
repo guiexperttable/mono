@@ -428,3 +428,7 @@ export * from './lib/table/column-filter/filter-popup-shell';
 export * from './lib/table/column-filter/column-filter-menu-service';
 export * from './lib/table/column-filter/column-chooser-service';
 export * from './lib/table/data/common/event/ge-filter-event';
+export * from './lib/table/data/common/event/ge-cell-activate-event';
+export * from './lib/table/data/tablemodel/areamodel/tile-layout.if';
+export * from './lib/table/tile-navigation/tile-navigation';
+export * from './lib/table/focus/focus-frame.type';

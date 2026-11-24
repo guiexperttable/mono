@@ -11,6 +11,7 @@ import type {
   GeColumnResizeEvent,
   GeColumnMoveEvent,
   GeFilterEvent,
+  GeCellActivateEvent,
   GeScrollEvent,
   GeStateChangeEvent,
   SelectionModelIf,
@@ -61,6 +62,8 @@ export interface GuiexpertTableProps {
   onColumnMoveEnd?: (evt: GeColumnMoveEvent) => void;
   /** Column filters changed. @since 1.1.114 */
   onFilterChanged?: (evt: GeFilterEvent) => void;
+  /** Enter or a double click "opens" a body cell. @since 1.1.115 */
+  onCellActivated?: (evt: GeCellActivateEvent) => void;
 }
 
 export interface GuiexpertTableEvents {
@@ -96,6 +99,8 @@ export interface GuiexpertTableEvents {
   columnMoveEnd: CustomEvent<GeColumnMoveEvent>;
   /** @since 1.1.114 */
   filterChanged: CustomEvent<GeFilterEvent>;
+  /** @since 1.1.115 */
+  cellActivated: CustomEvent<GeCellActivateEvent>;
 }
 
 /**

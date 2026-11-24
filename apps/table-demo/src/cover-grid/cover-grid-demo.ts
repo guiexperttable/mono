@@ -21,6 +21,7 @@ let tableApi: TableApi | undefined;
 let tableModel: CoverGridTableModel<BookIf> | undefined;
 let searchText = '';
 let selected: BookIf | undefined;
+let opened: BookIf | undefined;
 
 const matches = (book: BookIf) =>
   !searchText || `${book.title} ${book.author} ${book.genre} ${book.year}`.toLowerCase().includes(searchText);
@@ -52,6 +53,14 @@ function createGrid() {
     report();
   };
 
+  // "open": Enter on the focused book and a double click report the same event (since 1.1.115)
+  listener.onCellActivated = evt => {
+    opened = evt.value as BookIf;
+    selected = opened;
+    tableApi?.repaint();
+    report(evt.source);
+  };
+
   tableApi = new TableScope(host, model, new SimpleDomService(), grid.tableOptions, listener).firstInit().getApi();
   applySize();
   applyOrder();
@@ -63,11 +72,12 @@ function applyOrder() {
   tableApi?.sort(BOOK_SORTS[orderSelect.value as keyof typeof BOOK_SORTS]);
 }
 
-function report() {
+function report(openedBy?: string) {
   const columns = tableModel?.getColumnCount() ?? 0;
   const shown = books.filter(matches).length;
   const pick = selected ? `   Selected: ${selected.title} – ${selected.author} (${selected.year})` : '';
-  status.textContent = `${shown.toLocaleString()} of ${books.length.toLocaleString()} books, ${columns} columns.${pick}`;
+  const open = opened ? `   Opened: ${opened.title}${openedBy ? ` (${openedBy})` : ''}` : '';
+  status.textContent = `${shown.toLocaleString()} of ${books.length.toLocaleString()} books, ${columns} columns.${pick}${open}`;
 }
 
 let searchTimer = 0;
@@ -97,7 +107,7 @@ function applySize() {
 sizeSelect.addEventListener('change', applySize);
 stretch.addEventListener('change', applySize);
 orderSelect.addEventListener('change', applyOrder);
-countSelect.addEventListener('change', () => { selected = undefined; createGrid(); });
+countSelect.addEventListener('change', () => { selected = undefined; opened = undefined; createGrid(); });
 $('#top').addEventListener('click', () => tableApi?.scrollToPixel(0, 0));
 // The table follows the width of its host by itself (own ResizeObserver, debounced by
 // tableOptions.resizeEventDebounceDelay). We want the new width at once to fit the tiles: recalcColumnWidths() hands

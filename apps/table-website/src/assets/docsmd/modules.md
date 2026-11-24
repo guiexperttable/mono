@@ -95,6 +95,7 @@
 - [FormulaError](classes/FormulaError.md)
 - [FormulaRange](classes/FormulaRange.md)
 - [GeBatchEditEvent](classes/GeBatchEditEvent.md)
+- [GeCellActivateEvent](classes/GeCellActivateEvent.md)
 - [GeCellIndices](classes/GeCellIndices.md)
 - [GeColumnMoveEvent](classes/GeColumnMoveEvent.md)
 - [GeColumnResizeEvent](classes/GeColumnResizeEvent.md)
@@ -346,6 +347,8 @@
 - [TableStateRangeIf](interfaces/TableStateRangeIf.md)
 - [TableTreeStateIf](interfaces/TableTreeStateIf.md)
 - [ThreeColorGradientArgIf](interfaces/ThreeColorGradientArgIf.md)
+- [TileLayoutIf](interfaces/TileLayoutIf.md)
+- [TileNavigationLayoutIf](interfaces/TileNavigationLayoutIf.md)
 - [TreeAriaModel](interfaces/TreeAriaModel.md)
 - [TreeAriaRowInfo](interfaces/TreeAriaRowInfo.md)
 - [TreeFactoryOptions](interfaces/TreeFactoryOptions.md)
@@ -393,6 +396,7 @@
 - [FillMode](modules.md#fillmode)
 - [FilterFunction](modules.md#filterfunction)
 - [FilterPopupCloseReason](modules.md#filterpopupclosereason)
+- [FocusFrameMode](modules.md#focusframemode)
 - [FocusType](modules.md#focustype)
 - [FormulaBinaryOperator](modules.md#formulabinaryoperator)
 - [FormulaErrorCode](modules.md#formulaerrorcode)
@@ -400,6 +404,7 @@
 - [FormulaNode](modules.md#formulanode)
 - [FormulaValue](modules.md#formulavalue)
 - [GeBatchEditEventType](modules.md#gebatchediteventtype)
+- [GeCellActivateSource](modules.md#gecellactivatesource)
 - [GeColumnDragEventType](modules.md#gecolumndrageventtype)
 - [GeColumnResizeSource](modules.md#gecolumnresizesource)
 - [GeDetailEventSource](modules.md#gedetaileventsource)
@@ -439,6 +444,7 @@
 - [TableDirection](modules.md#tabledirection)
 - [TableStatePart](modules.md#tablestatepart)
 - [TableStateRowId](modules.md#tablestaterowid)
+- [TileNavigationAction](modules.md#tilenavigationaction)
 - [TreeArrowType](modules.md#treearrowtype)
 - [TreeRowExpandedFn](modules.md#treerowexpandedfn)
 - [ValueAccessor](modules.md#valueaccessor)
@@ -526,6 +532,7 @@
 - [canMoveFlatRows](modules.md#canmoveflatrows)
 - [canMoveTreeRows](modules.md#canmovetreerows)
 - [canScrollHorizontally](modules.md#canscrollhorizontally)
+- [cellToTileIndex](modules.md#celltotileindex)
 - [clipboardShortcutLayer](modules.md#clipboardshortcutlayer)
 - [collectDistinctValues](modules.md#collectdistinctvalues)
 - [columnFilterShortcutLayer](modules.md#columnfiltershortcutlayer)
@@ -598,6 +605,7 @@
 - [moveArrayItems](modules.md#movearrayitems)
 - [moveFlatRows](modules.md#moveflatrows)
 - [moveTreeRows](modules.md#movetreerows)
+- [navigateTiles](modules.md#navigatetiles)
 - [normalizeColumnFilter](modules.md#normalizecolumnfilter)
 - [normalizeRowIndices](modules.md#normalizerowindices)
 - [offsetReferences](modules.md#offsetreferences)
@@ -619,6 +627,7 @@
 - [spreadsheetOption](modules.md#spreadsheetoption)
 - [sumOfNumbers](modules.md#sumofnumbers)
 - [throttle](modules.md#throttle)
+- [tileIndexToCell](modules.md#tileindextocell)
 - [toCellAddress](modules.md#tocelladdress)
 - [toDateDayKey](modules.md#todatedaykey)
 - [toHtmlTable](modules.md#tohtmltable)
@@ -1628,6 +1637,23 @@ ___
 
 ## Events
 
+### GeCellActivateSource
+
+Ƭ **GeCellActivateSource**: ``"keyboard"`` \| ``"mouse"`` \| ``"api"``
+
+What activated a cell: Enter (`"keyboard"`), a double click (`"mouse"`) or
+`tableApi.triggerAction("ACTIVATE_CELL")` (`"api"`).
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/data/common/event/ge-cell-activate-event.ts:10](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-cell-activate-event.ts#L10)
+
+___
+
 ### GeFilterEventSource
 
 Ƭ **GeFilterEventSource**: ``"row"`` \| ``"menu"`` \| ``"api"`` \| ``"state"``
@@ -1666,6 +1692,34 @@ ___
 
 ___
 
+### FocusFrameMode
+
+Ƭ **FocusFrameMode**: ``"always"`` \| ``"keyboard"`` \| ``"never"``
+
+When the frame around the focused cell is drawn ([TableOptionsIf.focusFrame](interfaces/TableOptionsIf.md#focusframe)):
+
+- `"always"` (default): whenever a cell has the focus – after a click and after a key.
+- `"keyboard"`: only while the table is used with the keyboard (like CSS `:focus-visible`): a key press or Tab
+  into the table shows it, a mouse press hides it. The default of a cover grid.
+- `"never"`: no frame. Keyboard users then need another visible focus indicator (WCAG 2.4.7), e.g. drawn by your
+  cell renderer.
+
+**`Example`**
+
+```ts
+const tableOptions: TableOptionsIf = { ...new TableOptions(), focusFrame: "keyboard" };
+```
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/focus/focus-frame.type.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus-frame.type.ts#L16)
+
+___
+
 ### FocusType
 
 Ƭ **FocusType**: ``"none"`` \| ``"cell"`` \| ``"row"``
@@ -1677,6 +1731,10 @@ The values are:
 - "none" : Indicating that cells and rows cannot have a focus.
 - "cell" : Indicating that cells can have a focus.
 - "row"  : Indicating that entire rows can have a focus.
+
+The table does **not** evaluate this type: every focus model has one focused cell (`getFocus()`), and the frame
+around it is drawn for all three values. To hide the frame use [TableOptionsIf.focusFrame](interfaces/TableOptionsIf.md#focusframe)
+(`"never"`, or `"keyboard"` = only while the table is used with the keyboard) – not `new FocusModel("none")`.
 
 Typically, this type is used within the `FocusModel` class,
 specifically in the `constructor` and in the `setFocus` method,
@@ -1700,7 +1758,7 @@ Then the focus is set to the cell at row index 2 and column index 3.
 
 #### Defined in
 
-[src/lib/table/focus/focus.type.ts:33](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus.type.ts#L33)
+[src/lib/table/focus/focus.type.ts:37](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/focus/focus.type.ts#L37)
 
 ___
 
@@ -2528,6 +2586,23 @@ Represents a mapping of shortcut action IDs.
 
 ___
 
+### TileNavigationAction
+
+Ƭ **TileNavigationAction**: ``"previous"`` \| ``"next"`` \| ``"up"`` \| ``"down"`` \| ``"first"`` \| ``"last"`` \| ``"pageUp"`` \| ``"pageDown"``
+
+A keyboard move in a grid of tiles ([TileLayoutIf](interfaces/TileLayoutIf.md)): the tiles are **one sequence** of items, so `previous`
+and `next` wrap over the end of a row. `first`/`last` are the first and last item.
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/tile-navigation/tile-navigation.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/tile-navigation/tile-navigation.ts#L8)
+
+___
+
 ### actionIds
 
 • `Const` **actionIds**: readonly [``"COPY_2_CLIPBOARD"``, ``"START_EDITING"``, ``"TOGGLE_SELECTION"``, ``"SELECT_ALL"``, ``"DESELECT_ALL"``, ``"NAVIGATE_LEFT"``, ``"NAVIGATE_RIGHT"``, ``"NAVIGATE_UP"``, ``"NAVIGATE_DOWN"``, ``"NAVIGATE_ROW_START"``, ``"NAVIGATE_ROW_END"``, ``"NAVIGATE_FIRST_CELL"``, ``"NAVIGATE_LAST_CELL"``, ``"NAVIGATE_PAGE_UP"``, ``"NAVIGATE_PAGE_DOWN"``, ``"ACTIVATE_CELL"``, ``"MOVE_ROW_UP"``, ``"MOVE_ROW_DOWN"``, ``"FILL_DOWN"``, ``"FILL_RIGHT"``, ``"NAVIGATE_NEXT_CELL"``, ``"NAVIGATE_PREVIOUS_CELL"``, ``"EXTEND_SELECTION_UP"``, ``"EXTEND_SELECTION_DOWN"``, ``"EXTEND_SELECTION_LEFT"``, ``"EXTEND_SELECTION_RIGHT"``, ``"EXTEND_SELECTION_ROW_START"``, ``"EXTEND_SELECTION_ROW_END"``, ``"EXTEND_SELECTION_PAGE_UP"``, ``"EXTEND_SELECTION_PAGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_UP"``, ``"NAVIGATE_DATA_EDGE_DOWN"``, ``"NAVIGATE_DATA_EDGE_LEFT"``, ``"NAVIGATE_DATA_EDGE_RIGHT"``, ``"EXTEND_TO_DATA_EDGE_UP"``, ``"EXTEND_TO_DATA_EDGE_DOWN"``, ``"EXTEND_TO_DATA_EDGE_LEFT"``, ``"EXTEND_TO_DATA_EDGE_RIGHT"``, ``"SELECT_ROW"``, ``"SELECT_COLUMN"``, ``"CLEAR_CELLS"``, ``"CLEAR_AND_EDIT"``, ``"CUT_2_CLIPBOARD"``, ``"PASTE_FROM_CLIPBOARD"``, ``"UNDO"``, ``"REDO"``, ``"FOCUS_COLUMN_FILTER"``, ``"OPEN_COLUMN_FILTER_MENU"``]
@@ -2537,6 +2612,42 @@ An array of action identifiers.
 #### Defined in
 
 [src/lib/table/action/action-id.type.ts:8](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/action/action-id.type.ts#L8)
+
+___
+
+### cellToTileIndex
+
+▸ **cellToTileIndex**(`rowIndex`, `columnIndex`, `perRow`): `number`
+
+The index of the tile in a cell (`rowIndex * perRow + columnIndex`).
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rowIndex` | `number` | row of the cell |
+| `columnIndex` | `number` | column of the cell |
+| `perRow` | `number` | tiles per row (values below 1 count as 1) |
+
+#### Returns
+
+`number`
+
+the index, `-1` for a cell outside the grid (negative, or a column behind the row)
+
+**`Example`**
+
+```ts
+cellToTileIndex(1, 1, 3);   // 4
+```
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/tile-navigation/tile-navigation.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/tile-navigation/tile-navigation.ts#L131)
 
 ___
 
@@ -2624,6 +2735,90 @@ mirrorArrowKeys("cmd right");  // "cmd left"
 #### Defined in
 
 [src/lib/table/rtl/rtl-util.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/rtl/rtl-util.ts#L165)
+
+___
+
+### navigateTiles
+
+▸ **navigateTiles**(`index`, `action`, `layout`): `number`
+
+The item a keyboard move in a grid of tiles leads to – index arithmetic only, O(1) for any number of items.
+
+- `previous` / `next`: one item back / forward, wrapping over the end of a row; the focus stays on the first and
+  on the last item.
+- `up` / `down`: one row, same column. `down` without an item below goes to the last item if there is an
+  (incomplete) row below, otherwise the focus stays.
+- `first` / `last`: the first / last item.
+- `pageUp` / `pageDown`: `pageRows` rows, same column; beyond the start the same column of the first row, beyond
+  the end the same column of the last row (the last item if that tile is empty).
+- Without a focused item (`index` outside `0 … count - 1`) a move starts at `firstVisible`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `index` | `number` | index of the focused item, `-1` if none |
+| `action` | [`TileNavigationAction`](modules.md#tilenavigationaction) | the move |
+| `layout` | [`TileNavigationLayoutIf`](interfaces/TileNavigationLayoutIf.md) | item count, tiles per row, rows per page |
+
+#### Returns
+
+`number`
+
+index of the target item (always inside the items), `-1` without items
+
+**`Example`**
+
+```ts
+// 5 items, 2 per row:  [0 1] [2 3] [4 ·]
+const layout = { count: 5, perRow: 2, pageRows: 1 };
+navigateTiles(1, "next", layout);   // 2 – wraps into the next row
+navigateTiles(3, "down", layout);   // 4 – no item below: the last item
+navigateTiles(4, "next", layout);   // 4 – stays on the last item
+```
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/tile-navigation/tile-navigation.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/tile-navigation/tile-navigation.ts#L54)
+
+___
+
+### tileIndexToCell
+
+▸ **tileIndexToCell**(`index`, `perRow`): [`number`, `number`]
+
+Row and column of a tile.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `index` | `number` | index of the item |
+| `perRow` | `number` | tiles per row (values below 1 count as 1) |
+
+#### Returns
+
+[`number`, `number`]
+
+`[rowIndex, columnIndex]`, `[-1, -1]` for a negative index
+
+**`Example`**
+
+```ts
+tileIndexToCell(4, 3);   // [1, 1]
+```
+
+**`Since`**
+
+1.1.115
+
+#### Defined in
+
+[src/lib/table/tile-navigation/tile-navigation.ts:109](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/tile-navigation/tile-navigation.ts#L109)
 
 ## Overlays
 

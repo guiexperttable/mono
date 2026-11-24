@@ -2,6 +2,7 @@
 <!--
   Cover grid: items as tiles (covers, photos, products) in a virtual grid – CoverGridFactory.createCoverGridModel.
   The number of columns follows the width; filter, sort, cover size and click work without rebuilding the table.
+  Keyboard (since 1.1.115): arrow keys move from item to item, Enter and a double click open a tile (onCellActivated).
   Start: pnpm serve:table-demo → http://localhost:4200/cover-grid.html
 -->
 <html lang="en" data-theme="light">
@@ -16,16 +17,17 @@
     p { margin: 4px 0; max-width: 900px; }
     .bar { display: flex; gap: 14px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
     .bar input, .bar select, .bar button { font: inherit; padding: 4px 8px; }
-    .table-div { height: calc(100vh - 220px); min-height: 300px; width: 100%; }
+    .table-div { height: calc(100vh - 250px); min-height: 300px; width: 100%; }
     #status { font-size: 14px; min-height: 1.5em; }
-    /* tiles, not cells: no focus frame around the clicked cell – the renderer frames the selected book */
-    .table-div .ge-table-focus-border { display: none; }
+    kbd { font: inherit; font-size: 13px; padding: 0 5px; border: 1px solid currentColor; border-radius: 4px; opacity: 0.8; }
   </style>
 </head>
 <body>
 <h1>Cover grid</h1>
 <p>Books as tiles – only the visible rows are in the DOM. Resize the window: the number of columns follows the width.
   Type to filter, change the size or the order, click a book.</p>
+<p>Keyboard: <kbd>Tab</kbd> into the grid, <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> move from book to book
+  (the row wraps), <kbd>Home</kbd> / <kbd>End</kbd> first / last book, <kbd>Enter</kbd> or a double click opens one.</p>
 <div class="bar">
   <label>Search <input id="search" type="search" placeholder="title, author, genre" autocomplete="off"></label>
   <label>Size <select id="size">

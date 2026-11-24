@@ -1,7 +1,7 @@
 
 import {
   FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent, GeModelChangeEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, SelectionModelIf, TableApi, TableModelIf, TableOptions
 } from '@guiexpert/table';
 
 export type GeMouseEventFn = (evt: GeMouseEvent) => void;
@@ -20,6 +20,7 @@ export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 export type GeFilterEventFn = (evt: GeFilterEvent) => void;
+export type GeCellActivateEventFn = (evt: GeCellActivateEvent) => void;
 
 
 export interface GuiexpertTableProps {
@@ -63,6 +64,8 @@ export interface GuiexpertTableProps {
   columnMoveEnd?: GeColumnMoveEventFn,
   /** Column filters changed (since 1.1.114). */
   filterChanged?: GeFilterEventFn,
+  /** Enter or a double click "opens" a body cell – `evt.value`, `evt.row`, `evt.source` (since 1.1.115). */
+  cellActivated?: GeCellActivateEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**

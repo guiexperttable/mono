@@ -9,6 +9,10 @@
  * - "cell" : Indicating that cells can have a focus.
  * - "row"  : Indicating that entire rows can have a focus.
  *
+ * The table does **not** evaluate this type: every focus model has one focused cell (`getFocus()`), and the frame
+ * around it is drawn for all three values. To hide the frame use {@link TableOptionsIf.focusFrame}
+ * (`"never"`, or `"keyboard"` = only while the table is used with the keyboard) – not `new FocusModel("none")`.
+ *
  * Typically, this type is used within the `FocusModel` class,
  * specifically in the `constructor` and in the `setFocus` method,
  * to set `selectionType` property and determine where the focus is set respectively.

@@ -37,11 +37,40 @@ import { Code } from "astro-expressive-code/components";
       <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>first / last cell of the row (macOS also <kbd>⌘←</kbd> / <kbd>⌘→</kbd>)</td></tr>
       <tr><td><kbd>Ctrl+Home</kbd> / <kbd>Ctrl+End</kbd></td><td>first cell of the table / last cell of the last row (macOS also <kbd>⌘↑</kbd> / <kbd>⌘↓</kbd>)</td></tr>
       <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>one page</td></tr>
-      <tr><td><kbd>Enter</kbd></td><td>header: sort, open/close a header group · body: row checkbox, open/close a tree node or a detail row</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>header: sort, open/close a header group · body: row checkbox, open/close a tree node or a detail row – otherwise it “opens” the cell (<a href="#tiles"><code>onCellActivated</code></a>)</td></tr>
       <tr><td><kbd>Space</kbd>, <kbd>Ctrl+A</kbd>, <kbd>Ctrl+C</kbd>, <kbd>F2</kbd></td><td>select, select all, copy, edit (<ChapterLink slug="selection-and-copy" />, <ChapterLink slug="inline-editing" />)</td></tr>
     </tbody>
   </table>
   <p>The keys are <ApiLink name="ActionId" />s – change them with <code>shortcutActionIdMapping</code> (<ChapterLink slug="table-options" />).</p>
+
+  <h2 id="tiles">Open a row – and tiles with the keyboard</h2>
+  <p>
+    What a double click does, <kbd>Enter</kbd> must do too. <ApiLink name="EventListenerIf.onCellActivated" /> reports both
+    with one event (<ApiLink name="GeCellActivateEvent" />): <code>evt.row</code> is the row of a list, <code>evt.source</code>
+    says <code>"keyboard"</code> or <code>"mouse"</code>. The wrappers call it <code>cellActivated</code>.
+  </p>
+  <Code lang="ts" title="open an order" code={`const listener = new EventAdapter();
+listener.onCellActivated = (evt: GeCellActivateEvent) => {
+  openOrder(evt.row as Order);      // Enter on the focused cell – or a double click
+};`} />
+  <p>
+    A cover grid (<a href="/showcase/covergrid/run/">showcase</a>) shows items as tiles. Its keys treat the tiles as
+    <strong>one sequence</strong>: <kbd>←</kbd> <kbd>→</kbd> move to the previous / next item and wrap at the end of a row,
+    <kbd>↑</kbd> <kbd>↓</kbd> move one row, <kbd>Home</kbd> / <kbd>End</kbd> go to the first / last item. Empty tiles behind
+    the last item never get the focus, and after sorting, filtering or resizing the same item is still focused.
+    <code>evt.value</code> of <code>onCellActivated</code> is the item. Your own tile model gets the same keys with
+    <ApiLink name="AreaModelIf.getTileLayout" /> (<ApiLink name="TileLayoutIf" />).
+  </p>
+  <p>
+    The frame around the focused cell is an option: <ApiLink name="TableOptionsIf.focusFrame" /> –
+    <code>"always"</code> (default), <code>"keyboard"</code> (only while the keyboard is used, like CSS
+    <code>:focus-visible</code>; the default of a cover grid) or <code>"never"</code>. Do not hide
+    <code>.ge-table-focus-border</code> with CSS: keyboard users would lose their place.
+  </p>
+  <Callout type="version">
+    <p><code>onCellActivated</code>, the keys of the cover grid and <code>focusFrame</code> need
+      <code>@guiexpert/table@1.1.115</code>.</p>
+  </Callout>
 
   <h2 id="what">What the screen reader gets</h2>
   <ul>

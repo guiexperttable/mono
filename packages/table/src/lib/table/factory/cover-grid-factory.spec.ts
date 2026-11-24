@@ -74,5 +74,26 @@ describe('CoverGridFactory', () => {
       expect(options.sortOrder).toEqual(defaults.sortOrder);
       expect(options.overflowY).toBe(defaults.overflowY);
     });
+
+    it('keeps the keyboard on and shows the focus frame only after keyboard input (since 1.1.115)', () => {
+      expect(options.shortcutActionsDisabled).toBe(false);
+      expect(options.focusFrame).toBe('keyboard');
+    });
+  });
+
+  describe('createCoverGridDefaultOptions (since 1.1.115)', () => {
+    it('returns the same options as the old name with the typo', () => {
+      const key = () => 'k';
+      const a = CoverGridFactory.createCoverGridDefaultOptions(250, key);
+      const b = CoverGridFactory.createCoverGrisDefaultOptions(250, key);
+      expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+      expect(a.autoRestoreOptions?.getStorageKeyFn?.()).toBe('k');
+      expect(a.focusFrame).toBe('keyboard');
+      expect(a.defaultRowHeights).toEqual({ header: 0, body: 250, footer: 0 });
+    });
+
+    it('uses the storage key "CoverGrid" by default', () => {
+      expect(CoverGridFactory.createCoverGridDefaultOptions(100).autoRestoreOptions?.getStorageKeyFn?.()).toBe('CoverGrid');
+    });
   });
 });

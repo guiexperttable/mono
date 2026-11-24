@@ -25,7 +25,7 @@ import { AutoRestoreOptions } from '../data/options/auto-restore-options';
  *   }
  * };
  * const gridModel = CoverGridFactory.createCoverGridModel(books, renderer, 160, 240);
- * const gridOptions = CoverGridFactory.createCoverGrisDefaultOptions(240, () => "books");
+ * const gridOptions = CoverGridFactory.createCoverGridDefaultOptions(240, () => "books");
  * const gridApi = new TableScope(host, gridModel, new SimpleDomService(), gridOptions, new EventAdapter())
  *   .firstInit()
  *   .getApi();
@@ -74,22 +74,43 @@ export class CoverGridFactory {
 
 
   /**
-   * Options for a cover grid: no borders and separators, no row or column hover, header and footer height 0, and the
-   * scroll position restored under the key of `getStorageKeyFn` (`localStorage`). (The name has a typo – kept for
-   * compatibility.)
+   * Options for a cover grid: no borders and separators, no row or column hover, header and footer height 0, the
+   * scroll position restored under the key of `getStorageKeyFn` (`localStorage`), and the focus frame only while the
+   * grid is used with the keyboard (`focusFrame: "keyboard"`).
    *
+   * @param defaultRowHeight - the height of a tile (`coverHeight`)
+   * @param getStorageKeyFn - storage key of the scroll position (default `"CoverGrid"`)
+   * @returns new options – add your own fields with a spread
+   * @since 1.1.115
+   *
+   * @example
+   * ```ts
+   * let photoFilter = "";
+   * const gridOptions: TableOptionsIf = {
+   *   ...CoverGridFactory.createCoverGridDefaultOptions(240, () => "photos"),
+   *   externalFilterFunction: (photo: { name: string }) => photo.name.includes(photoFilter)
+   * };
+   * ```
+   */
+  public static createCoverGridDefaultOptions(
+    defaultRowHeight: number,
+    getStorageKeyFn: () => string = () => 'CoverGrid',
+  ): TableOptionsIf {
+    return CoverGridFactory.createCoverGrisDefaultOptions(defaultRowHeight, getStorageKeyFn);
+  }
+
+
+  /**
+   * The same as {@link createCoverGridDefaultOptions} – the old name with a typo, kept for compatibility.
+   *
+   * @deprecated since 1.1.115: use {@link createCoverGridDefaultOptions}
    * @param defaultRowHeight - the height of a tile (`coverHeight`)
    * @param getStorageKeyFn - storage key of the scroll position (default `"CoverGrid"`)
    * @returns new options – add your own fields with a spread
    *
    * @example
    * ```ts
-   * let photoFilter = "";
-   * const gridOptions: TableOptionsIf = {
-   *   ...CoverGridFactory.createCoverGrisDefaultOptions(240, () => "photos"),
-   *   externalFilterFunction: (photo: { name: string }) => photo.name.includes(photoFilter),
-   *   shortcutActionsDisabled: true
-   * };
+   * const gridOptions: TableOptionsIf = CoverGridFactory.createCoverGrisDefaultOptions(240, () => "photos");
    * ```
    */
   public static createCoverGrisDefaultOptions(
@@ -111,6 +132,8 @@ export class CoverGridFactory {
 
       hoverColumnVisible: false,
       hoverRowVisible: false,
+      // like :focus-visible – the mouse marks a tile through the renderer of the app (since 1.1.115)
+      focusFrame: 'keyboard',
 
       defaultRowHeights: {
         header: 0,

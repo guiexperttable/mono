@@ -1,7 +1,7 @@
 import {
   EventListenerIf, FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableModelAndOptionsIf,
   TableOptions,
@@ -19,7 +19,8 @@ import {
  *   `mouseClicked`, `mouseMoved`, `mouseDragging`, `mouseDraggingEnd`, `checkboxChanged`,
  *   `modelChanged`, `selectionChanged`, `focusChanged`, `stateChanged` (since 1.1.92), `rowDragStart`, `rowDragMove`,
  *   `rowDragEnd` (since 1.1.95), `batchEditChanged` (since 1.1.96), `detailExpandedChanged` (since 1.1.97), `editingChanged`, `undoStackChanged` (since 1.1.99),
- *   `columnResizeStart`, `columnResizeEnd`, `columnMoveStart`, `columnMoveEnd` (since 1.1.110) – and `scroll` and
+ *   `columnResizeStart`, `columnResizeEnd`, `columnMoveStart`, `columnMoveEnd` (since 1.1.110), `filterChanged` (since 1.1.114),
+ *   `cellActivated` (since 1.1.115: Enter or a double click opens a body cell) – and `scroll` and
  *   `contextmenu`, which do **not** bubble
  *   (the browser's own `contextmenu` MouseEvent reaches a listener on the element, too: check
  *   `e instanceof CustomEvent`).
@@ -158,7 +159,8 @@ export class GuiexpertTable extends HTMLElement {
         onColumnResizeEnd: (evt: GeColumnResizeEvent) => dispatch("columnResizeEnd", evt),
         onColumnMoveStart: (evt: GeColumnMoveEvent) => dispatch("columnMoveStart", evt),
         onColumnMoveEnd: (evt: GeColumnMoveEvent) => dispatch("columnMoveEnd", evt),
-        onFilterChanged: (evt: GeFilterEvent) => dispatch("filterChanged", evt)
+        onFilterChanged: (evt: GeFilterEvent) => dispatch("filterChanged", evt),
+        onCellActivated: (evt: GeCellActivateEvent) => dispatch("cellActivated", evt)
       };
 
       const tableScope = new TableScope(

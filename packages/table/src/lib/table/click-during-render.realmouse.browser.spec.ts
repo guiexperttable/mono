@@ -165,6 +165,28 @@ describe.each(DIRECTIONS)('a click survives a render through the API (%s)', dire
     expect(clicked.map(e => e.clickCount)).toEqual([1, 2]);
   });
 
+  it('a double click opens the editor although the app repaints in its click handler (since 1.1.115)', async () => {
+    // the app marks the clicked row: its repaint replaces the clicked cell, "dblclick" goes to the detached element
+    const clicked: GeMouseEvent[] = [];
+    const listener = new EventAdapter();
+    const model = TableFactory.createTableModel({
+      rows: createRows(100),
+      columnDefs: ['id', 'name'].map(p => ColumnDef.create({ property: p, headerLabel: p, width: px100, editable: () => true })),
+    });
+    const t = mountTable(model, { eventListener: listener, tableOptions: { direction } });
+    listener.onMouseClicked = e => {
+      clicked.push(e);
+      t.api.repaint();
+    };
+    await nextFrame();
+    await realMouse.moveTo(bodyCell(t.host, 3, 1));
+    await realMouse.click(1);
+    await realMouse.click(2);
+    await settle();
+    expect(t.api.isEditing()).toBe(true);
+    expect(clicked.map(e => e.clickCount)).toEqual([1, 2]);
+  });
+
   it('dragging beyond the threshold with a render: no click, dragging events as before', async () => {
     const t = await mountClickTable(direction);
     const cell = bodyCell(t.host, 3, 1);

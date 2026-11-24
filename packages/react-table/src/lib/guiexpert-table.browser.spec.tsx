@@ -12,7 +12,7 @@ import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
 import type { DetailComponentProps } from './detail-component-renderer-wrapper';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -55,6 +55,22 @@ describe('GuiexpertTable (React)', () => {
     expect(ends).toHaveLength(1);
     expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
     expect(starts).toHaveLength(1);
+  });
+
+  it('cellActivated: a double click and Enter "open" a body cell (since 1.1.115)', async () => {
+    const events: { source: string; rowIndex: number; row: unknown }[] = [];
+    let api: TableApi | undefined;
+    const model = createModel(5);
+    const host = mount(<GuiexpertTable tableModel={model} tableReady={a => { api = a; }} cellActivated={e => events.push(e)} />);
+    await nextFrame();
+    dblClickBodyCell(host, 2, 1);
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ source: 'mouse', areaIdent: 'body', rowIndex: 2, columnIndex: 1, value: 'Row 2' });
+    expect(events[0].row).toEqual({ id: 2, name: 'Row 2' });
+    api!.tableScope.focusModel()!.setFocus(3, 0);
+    api!.tableScope.hostElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true }));
+    expect(events).toHaveLength(2);
+    expect(events[1]).toMatchObject({ source: 'keyboard', rowIndex: 3, columnIndex: 0 });
   });
 
   it('column filter event: setColumnFilter reports filterChanged (since 1.1.114)', async () => {

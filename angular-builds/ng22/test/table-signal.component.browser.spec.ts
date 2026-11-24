@@ -299,6 +299,7 @@ const FORWARDED: [string, string][] = [
   ['onUndoStackChanged', 'undoStackChanged'],
   ['onColumnResizeStart', 'columnResizeStart'], ['onColumnResizeEnd', 'columnResizeEnd'],
   ['onColumnMoveStart', 'columnMoveStart'], ['onColumnMoveEnd', 'columnMoveEnd'],
+  ['onFilterChanged', 'filterChanged'], ['onCellActivated', 'cellActivated'],
 ];
 
 @Component({
@@ -317,7 +318,8 @@ const FORWARDED: [string, string][] = [
       (batchEditChanged)="got('batchEditChanged', $event)" (detailExpandedChanged)="got('detailExpandedChanged', $event)"
       (editingChanged)="got('editingChanged', $event)" (undoStackChanged)="got('undoStackChanged', $event)"
       (columnResizeStart)="got('columnResizeStart', $event)" (columnResizeEnd)="got('columnResizeEnd', $event)"
-      (columnMoveStart)="got('columnMoveStart', $event)" (columnMoveEnd)="got('columnMoveEnd', $event)" />`,
+      (columnMoveStart)="got('columnMoveStart', $event)" (columnMoveEnd)="got('columnMoveEnd', $event)"
+      (filterChanged)="got('filterChanged', $event)" (cellActivated)="got('cellActivated', $event)" />`,
 })
 class AllOutputsHost {
   readonly model = createRowDragModel();

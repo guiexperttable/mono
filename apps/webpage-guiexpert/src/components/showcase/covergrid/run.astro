@@ -18,8 +18,10 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   </select></label>
   <span class:list={[id + '-log', 'covergrid-log']} aria-live="polite"></span>
 </div>
+<p class="covergrid-hint">Keyboard: arrow keys move from cover to cover, <kbd>Home</kbd> / <kbd>End</kbd> first / last,
+  <kbd>Enter</kbd> or a double click opens one.</p>
 <div
-    style="height: calc(100vh - 176px)"
+    style="height: calc(100vh - 206px)"
     class:list={[ id, 'covergrid-demo' ]}></div>
 
 <script
@@ -41,6 +43,7 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   const books = generateBooks(10_000);
   let searchText = '';
   let selected;
+  let opened;
   const size = () => sizeSelect.value.split('x').map(Number);
 
   const [coverWidth, coverHeight] = size();
@@ -52,7 +55,8 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   const report = () => {
     const shown = tableModel.bodyModel.filteredItems.length;
     const pick = selected ? ` · ${selected.title} – ${selected.author} (${selected.year})` : '';
-    log.textContent = `${shown.toLocaleString()} covers${pick}`;
+    const open = opened ? ` · opened: ${opened.title}` : '';
+    log.textContent = `${shown.toLocaleString()} covers${pick}${open}`;
   };
 
   const listener = new EventAdapter();
@@ -62,6 +66,14 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
     const book = tableModel.bodyModel.getValueAt(evt.rowIndex, evt.columnIndex);
     if (!book) return;
     selected = book;
+    tableApi.repaint();
+    report();
+  };
+
+  // "open": Enter on the focused cover and a double click report the same event (since 1.1.115)
+  listener.onCellActivated = evt => {
+    opened = evt.value;
+    selected = opened;
     tableApi.repaint();
     report();
   };
@@ -100,9 +112,17 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
     .covergrid-demo {
         font-size: 14px;
     }
-    /* tiles, not cells: no focus frame around the clicked cell – the renderer frames the selected book */
-    .covergrid-demo .ge-table-focus-border {
-        display: none;
+    .covergrid-hint {
+        margin: 0;
+        padding: 0 12px 8px;
+        font-size: 13px;
+        opacity: 0.8;
+    }
+    .covergrid-hint kbd {
+        font: inherit;
+        padding: 0 5px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
     }
     .covergrid-bar {
         display: flex;

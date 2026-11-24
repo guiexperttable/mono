@@ -36,9 +36,11 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 021 | [021-performance-regressionsschutz.md](021-performance-regressionsschutz.md) | Test-Infrastruktur: Performance-Rückschritte fallen in der CI auf – nur Vitest, drei Stufen: Invarianten zählen (Renders, neu gebaute Zellen, Aufrufe; in `test:browser`, sperrt den Release), Verhältnisse messen (`test:perf`, kleines vs. großes n), absolute Zeiten als Trend gegen eine Baseline (Warnung); Regel für alle künftigen Prompts. **Vor 019 ausführen** | – | 018 | M |
 | 022 | [022-spalten-ziehen-ereignisse-und-sperren.md](022-spalten-ziehen-ereignisse-und-sperren.md) | Aus dem log-commander: Ereignisse beim Ziehen von Spalten (`onColumnResizeStart/End`, `onColumnMoveStart/End`, Ende mit Ergebnis, nur Nutzeraktionen), Sperre je Spalte (`resizable`/`movable` in `ColumnDef`, ersetzt den Sonderfall der Zeilennummern), Doppelklick auf den Griff passt die Breite an (`autoResizeColumn(index)`, Messung unabhängig von n, Haken `getAutoColumnWidth`) | Community | 004, 018, 021 | M |
 | 023 | [023-spaltenfilter.md](023-spaltenfilter.md) | Spaltenfilter (Vergleich mit NitGrid): Filter-Modell je Spalte mit API, Zustandsteil `filters` und `onFilterChanged`; Filterzeile im Header über **eine** Option (`filterRow`, Vorgabe `false`); Filter-Menü je Spalte (Trichter, Vergleich, Werteliste mit Checkboxen, OK/Cancel); Spaltenauswahl „Columns“ als Popup. Fußleiste bleibt App-Sache | Community (Werteliste, Spalten-Panel: Enterprise – prüfen) | 001, 003, 012, 019, 021, 022 | L |
+| 024 | [024-cover-grid-tastatur.md](024-cover-grid-tastatur.md) | Cover Grid mit der Tastatur: Kachel-Navigation (Umbruch, keine leeren Kacheln, Pos1/Ende = erstes/letztes Item), Ereignis „Kachel öffnen“ für Enter **und** Doppelklick (`onCellActivated`, alle Wrapper), Fokus folgt dem Item nach Sortieren/Filtern/Größe, Fokusrahmen ohne CSS-Umweg abschaltbar (`FocusModel("none")`); dazu drei Modellfehler (0 Spalten → `Infinity`, leere Extrazeile, `sort()` sortiert das Array der App). Herkunft: Hands-on-Film „Cover Grid“ (`videoserien`) | – | 001, 012, 019, 021 | M |
 
 022 umgesetzt (Branch `feat/spalten-ziehen`, Design `022-spalten-ziehen.design.md`, Zielversion 1.1.110).
 023 umgesetzt (Branch `feat/spaltenfilter`, Design `023-spaltenfilter.design.md`, Zielversion 1.1.114).
+024 umgesetzt (Branch `feat/cover-grid-tastatur`, Design `024-cover-grid-tastatur.design.md`, Zielversion 1.1.115).
 
 **Nächste Reihenfolge (ab 09.11.2026):** 016 (prüfen, ob erledigt) → 018 → **021** → 019 → 020. 021 kommt vor 019, weil
 019 seine Geschwindigkeits-, Klick- und Tastatur-Checks in die Infrastruktur von 021 einhängt; 020 beschreibt den Stand
@@ -109,3 +111,4 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [x] 021 (CI-Lauf `test-perf` und erste `linux-ci`-Baseline nach dem nächsten Push; Stufe 2 sperrend ab ~01.12.2026)
 - [x] 022 (Release 1.1.110, Branch `feat/spalten-ziehen`)
 - [x] 023 (Zielversion 1.1.114, Branch `feat/spaltenfilter`; Video 16 Aufnahme nach dem Release; Demo-Repo entfällt)
+- [x] 024 (Zielversion 1.1.115, Branch `feat/cover-grid-tastatur`, Design `024-cover-grid-tastatur.design.md`; Film im Repo `videoserien`, Serie `covergrid`; Demo-Repo und Video entfallen hier)

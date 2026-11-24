@@ -5,7 +5,7 @@ import { Component, provideZonelessChangeDetection, signal } from '@angular/core
 import { TableComponent } from '@guiexpert/angular-table';
 import { TableApi, TableOptions, TableScope } from '@guiexpert/table';
 import type { GeMouseEvent, TableModelIf, TableOptionsIf } from '@guiexpert/table';
-import { bodyCell, cellOf, createModel, dblClickResizeHandle, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
+import { bodyCell, cellOf, createModel, dblClickBodyCell, dblClickResizeHandle, isDestroyed, nextFrame, overlayKind, rowTexts, tableCount } from '../../../packages/table/test-utils/wrapper-test-utils';
 import { destroyApps, mount } from './angular-test-utils';
 
 const ZONELESS = [provideZonelessChangeDetection()];
@@ -23,7 +23,8 @@ const ZONELESS = [provideZonelessChangeDetection()];
         (contextMenu)="contextMenus.push($event)"
         (columnResizeStart)="columnEvents.push($event)"
         (columnResizeEnd)="columnEvents.push($event)"
-        (filterChanged)="filterEvents.push($event)" />
+        (filterChanged)="filterEvents.push($event)"
+        (cellActivated)="activated.push($event)" />
     }`,
 })
 class ClassicHost {
@@ -37,6 +38,7 @@ class ClassicHost {
   readonly contextMenus: unknown[] = [];
   readonly columnEvents: unknown[] = [];
   readonly filterEvents: unknown[] = [];
+  readonly activated: unknown[] = [];
 }
 
 afterEach(() => {
@@ -51,6 +53,18 @@ describe('TableComponent (Angular 22, zoneless)', () => {
     dblClickResizeHandle(host, 1);
     expect(cmp.columnEvents).toHaveLength(2);
     expect(cmp.columnEvents[1]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1 });
+  });
+
+  it('a double click and Enter on a body cell reach (cellActivated) (since 1.1.115)', async () => {
+    const { host, cmp } = await mount(ClassicHost, ZONELESS);
+    dblClickBodyCell(host, 2, 1);
+    expect(cmp.activated).toHaveLength(1);
+    expect(cmp.activated[0]).toMatchObject({ source: 'mouse', areaIdent: 'body', rowIndex: 2, columnIndex: 1, value: 'Row 2' });
+    const scope = cmp.ready[0].tableScope;
+    scope.focusModel()!.setFocus(3, 0);
+    scope.hostElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true }));
+    expect(cmp.activated).toHaveLength(2);
+    expect(cmp.activated[1]).toMatchObject({ source: 'keyboard', rowIndex: 3, columnIndex: 0 });
   });
 
   it('setColumnFilter reaches (filterChanged) (since 1.1.114)', async () => {

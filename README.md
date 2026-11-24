@@ -23,6 +23,8 @@ Angular Signals: for Angular 22 and later a second, signal-native component `<gu
 
 Column filters: `filterRow: true` puts a filter input under every column header (`>100`, `10..20`, `^abc`, dates, booleans; the inputs keep focus and caret while live data renders), `columnFilterMenu: true` adds a funnel button with operators and an Excel-style checklist of the values in the column (virtualized, works with 200,000 distinct values), `tableApi.showColumnChooser(button)` opens a column chooser. Filters are part of the table: `setColumnFilter`, `onFilterChanged`, saved state (`"filters"`), combined with `externalFilterFunction` (since 1.1.114). All three are off by default.
 
+Open a row or a tile: `onCellActivated` reports Enter on the focused cell and a double click with one event (wrappers: `cellActivated`). A cover grid is usable with the keyboard – the arrow keys move from item to item and wrap at the end of a row, Home/End go to the first/last item, the focus follows the item after sorting, filtering and resizing. The focus frame is an option: `focusFrame: "always" | "keyboard" | "never"` (since 1.1.115).
+
 Website & showcases: https://gui.expert · Training: https://gui.expert/training/ · API: https://gui.expert/api · License: MIT (see below)
 
 ## What's inside

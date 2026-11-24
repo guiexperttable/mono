@@ -23,6 +23,7 @@ import { AriaTextsIf } from "../../aria/aria-texts.if";
 import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { TableDirection } from "../../rtl/table-direction.type";
+import type { FocusFrameMode } from "../../focus/focus-frame.type";
 import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
 import type {
   ColumnFilterMenuOptionsIf,
@@ -564,6 +565,22 @@ export interface TableOptionsIf {
    * @see [Live demo: right-to-left](https://gui.expert/showcase/rtl/run/) · Training: [Right-to-left](https://gui.expert/training/theming-dark-mode/#rtl)
    */
   direction?: TableDirection;
+
+  /**
+   * When the frame around the focused cell is drawn: `"always"` (default – after a click and after a key),
+   * `"keyboard"` (only while the table is used with the keyboard, like CSS `:focus-visible`; a mouse press hides it)
+   * or `"never"`. The focused cell itself is not affected: arrow keys, Enter and `aria-activedescendant` work in all
+   * three modes.
+   *
+   * Use it instead of hiding `.ge-table-focus-border` with CSS. The type of a {@link FocusModel}
+   * (`new FocusModel("none")`) does **not** hide the frame.
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = { ...new TableOptions(), focusFrame: "never" };
+   *
+   * @since 1.1.115
+   */
+  focusFrame?: FocusFrameMode;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

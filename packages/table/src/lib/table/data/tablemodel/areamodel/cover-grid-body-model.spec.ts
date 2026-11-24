@@ -30,13 +30,13 @@ describe('CoverGridBodyModel', () => {
       expect(m.rowSelectionModel).toBeUndefined();
     });
 
-    it('works directly on the given items array (no copy)', () => {
-      // NOTE: unlike AreaModelObjectArray there is no copy – doSort()/sort() reorder the caller's array.
+    it('shows the given items array itself until the first sort or filter (no copy)', () => {
+      // items pushed by the app appear with the next repaintHard()
       const items = letters();
       const m = create(items);
       expect(m.filteredItems).toBe(items);
-      m.sort((a, b) => a.localeCompare(b));
-      expect(items).toEqual(['a', 'b', 'c', 'd', 'e']);
+      items.push('f');
+      expect(m.getTileCount()).toBe(6);
     });
   });
 
@@ -55,10 +55,17 @@ describe('CoverGridBodyModel', () => {
       expect(m.getColumnCount()).toBe(1);
     });
 
-    // BUG: a width smaller than one cover gives 0 columns – getRowCount() then divides by 0 (Infinity rows).
-    it.fails('has at least one column if the width is smaller than one cover', () => {
+    it('has at least one column if the width is smaller than one cover', () => {
       const m = create();
       m.setParentWidth(150);
+      expect(m.getColumnCount()).toBe(1);
+      expect(m.getRowCount()).toBe(5);
+      expect(m.getUnfilteredRowCount()).toBe(5);
+    });
+
+    it('has one column for a cover width of 0 or less (no division by zero)', () => {
+      const m = create();
+      m.coverWidth = 0;
       expect(m.getColumnCount()).toBe(1);
       expect(m.getRowCount()).toBe(5);
     });
@@ -71,9 +78,17 @@ describe('CoverGridBodyModel', () => {
       expect(create([]).getRowCount()).toBe(0);
     });
 
-    // BUG: Math.floor(n / columns) + 1 adds an empty row when the item count is a multiple of the column count (should be Math.ceil).
-    it.fails('getRowCount has no empty last row if all rows are full', () => {
+    it('getRowCount has no empty last row if all rows are full', () => {
       expect(create(['a', 'b', 'c', 'd']).getRowCount()).toBe(2);
+      expect(create(['a', 'b']).getRowCount()).toBe(1);
+    });
+
+    it('getUnfilteredRowCount counts the rows of all items', () => {
+      const m = create(['a', 'b', 'c', 'd']);
+      m.externalFilterChanged((s: string) => s === 'a');
+      expect(m.getRowCount()).toBe(1);
+      expect(m.getUnfilteredRowCount()).toBe(2);
+      expect(create([]).getUnfilteredRowCount()).toBe(0);
     });
 
     it('getValueAt maps (row, column) to item index row * columns + column', () => {
@@ -137,6 +152,26 @@ describe('CoverGridBodyModel', () => {
       expect(m.filteredItems.map(i => i.t)).toEqual(['b', 'a']);
     });
 
+    it('sort() and doSort() leave the items array of the app untouched', () => {
+      const items = letters();
+      const m = create(items);
+      m.sort((a, b) => a.localeCompare(b));
+      expect(m.filteredItems).toEqual(['a', 'b', 'c', 'd', 'e']);
+      expect(items).toEqual(letters());
+      m.doSort([new SortItem(0, 'desc')]);
+      expect(m.filteredItems).toEqual(['e', 'd', 'c', 'b', 'a']);
+      expect(items).toEqual(letters());
+      expect(m.items).toBe(items);
+    });
+
+    it('sort() after a filter sorts the filtered items only', () => {
+      const m = create();
+      m.externalFilterChanged((s: string) => s !== 'a');
+      m.sort((a, b) => a.localeCompare(b));
+      expect(m.filteredItems).toEqual(['b', 'c', 'd', 'e']);
+      expect(m.items).toEqual(letters());
+    });
+
     it('sort(compareFn) sorts with a custom comparator', () => {
       const items = [{ t: 'b' }, { t: 'a' }];
       const m = new CoverGridBodyModel<{ t: string }>(items, renderer);
@@ -146,6 +181,39 @@ describe('CoverGridBodyModel', () => {
 
     it('is filterable', () => {
       expect(create().isFilterable()).toBe(true);
+    });
+  });
+
+  describe('tile layout (keyboard navigation, since 1.1.115)', () => {
+    it('getTileLayout returns the model itself', () => {
+      const m = create();
+      expect(m.getTileLayout()).toBe(m);
+    });
+
+    it('describes the shown items as one sequence', () => {
+      const m = create();
+      expect(m.getTileCount()).toBe(5);
+      expect(m.getTilesPerRow()).toBe(2);
+      expect(m.getTileAt(2)).toBe('e');
+      expect(m.getTileAt(5)).toBeUndefined();
+      expect(m.getTileAt(-1)).toBeUndefined();
+      expect(m.indexOfTile('e')).toBe(2);
+      expect(m.indexOfTile('x')).toBe(-1);
+    });
+
+    it('follows filter and sort', () => {
+      const m = create();
+      m.externalFilterChanged((s: string) => s !== 'c');
+      m.sort((a, b) => a.localeCompare(b));
+      expect(m.getTileCount()).toBe(4);
+      expect(m.indexOfTile('e')).toBe(3);
+      expect(m.indexOfTile('c')).toBe(-1);
+    });
+
+    it('has no tiles without items', () => {
+      const m = create([]);
+      expect(m.getTileCount()).toBe(0);
+      expect(m.getTilesPerRow()).toBe(2);
     });
   });
 

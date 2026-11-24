@@ -5,7 +5,7 @@ import { FormulaBar, SpreadsheetFactory, GeBatchEditEvent, GeDetailEvent, GeEdit
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle
+  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -53,6 +53,22 @@ describe('GuiexpertTable (Web Component)', () => {
     expect(ends).toHaveLength(1);
     expect(ends[0]).toMatchObject({ type: 'end', source: 'dblclick', columnIndex: 1, property: 'name' });
     expect(starts).toHaveLength(1);
+  });
+
+  it('"cellActivated" (bubbling): a double click and Enter "open" a body cell (since 1.1.115)', async () => {
+    const { host, el, events } = createTableElement();
+    const activated: { source: string; rowIndex: number }[] = [];
+    host.addEventListener('cellActivated', e => activated.push((e as CustomEvent).detail));
+    el.data = data(createModel(5));
+    await nextFrame();
+    dblClickBodyCell(host, 1, 1);
+    expect(activated).toHaveLength(1);
+    expect(activated[0]).toMatchObject({ source: 'mouse', areaIdent: 'body', rowIndex: 1, columnIndex: 1, value: 'Row 1' });
+    const api = events.tableReady[0] as TableApi;
+    api.tableScope.focusModel()!.setFocus(4, 0);
+    api.tableScope.hostElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true }));
+    expect(activated).toHaveLength(2);
+    expect(activated[1]).toMatchObject({ source: 'keyboard', rowIndex: 4, columnIndex: 0 });
   });
 
   it('column filter event: "filterChanged" (bubbling) on setColumnFilter (since 1.1.114)', async () => {

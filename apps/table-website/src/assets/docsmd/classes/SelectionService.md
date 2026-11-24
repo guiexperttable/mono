@@ -185,7 +185,7 @@ start or inserted (`tableApi.appendRows()`); a removed row drops them.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:237](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L237)
+[src/lib/table/selection/selection-service.ts:240](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L240)
 
 ___
 
@@ -213,7 +213,7 @@ is the new anchor. Selection types other than `"range"`/`"cell"` only get the an
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:286](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L286)
+[src/lib/table/selection/selection-service.ts:289](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L289)
 
 ___
 
@@ -243,7 +243,7 @@ the new range, `undefined` without a range selection
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:317](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L317)
+[src/lib/table/selection/selection-service.ts:320](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L320)
 
 ___
 
@@ -257,7 +257,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:257](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L257)
+[src/lib/table/selection/selection-service.ts:260](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L260)
 
 ___
 
@@ -279,7 +279,7 @@ row and column
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:267](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L267)
+[src/lib/table/selection/selection-service.ts:270](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L270)
 
 ___
 
@@ -307,7 +307,7 @@ Triggers an action based on the provided action ID.
 
 #### Defined in
 
-[src/lib/table/selection/selection-service.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L186)
+[src/lib/table/selection/selection-service.ts:189](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/selection/selection-service.ts#L189)
 
 ___
 

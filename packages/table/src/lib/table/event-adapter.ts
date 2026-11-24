@@ -13,6 +13,7 @@ import { GeRowDragEvent } from "./data/common/event/ge-row-drag-event";
 import type { GeColumnResizeEvent } from "./data/common/event/ge-column-resize-event";
 import type { GeColumnMoveEvent } from "./data/common/event/ge-column-move-event";
 import type { GeFilterEvent } from "./data/common/event/ge-filter-event";
+import type { GeCellActivateEvent } from "./data/common/event/ge-cell-activate-event";
 
 /**
  * Empty implementation of {@link EventListenerIf} – extend it and override only the events you need.
@@ -107,6 +108,10 @@ export class EventAdapter implements EventListenerIf {
 
   /** @since 1.1.114 */
   onFilterChanged(_evt: GeFilterEvent): void {
+  }
+
+  /** @since 1.1.115 */
+  onCellActivated(_evt: GeCellActivateEvent): void {
   }
 
 }

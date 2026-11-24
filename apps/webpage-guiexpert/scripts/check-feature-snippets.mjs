@@ -21,11 +21,15 @@ interface OrderItem { sku: string; qty: number }
 interface Order { id: number; country: string; city: string; category: string; year: number; quantity: number; total: number; items: OrderItem[] }
 interface Item { product: string; price: number; quantity: number }
 interface Task { id: number; title: string }
+interface Book { title: string }
 declare const orders: Order[];
 declare const tasks: Task[];
 declare const tableApi: TableApi;
 declare const listener: GE.EventAdapter;
 declare const saveButton: HTMLButtonElement;
+declare const books: Book[];
+declare const renderer: GE.CellRendererIf;
+declare function openBook(book: Book): void;
 declare function save(rows: unknown[]): void;
 declare function sendToServer(changes: unknown): Promise<void>;
 void GE; void AutoRestoreOptions; void ColumnDef; void PivotFactory; void RowGroupFactory; void SelectionModel; void TableFactory; void TableOptions; void SpreadsheetFactory;

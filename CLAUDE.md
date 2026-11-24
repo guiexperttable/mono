@@ -206,7 +206,9 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     (1.1.94), `rowDrag` (1.1.95), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)` (Kacheln statt Zeilen, Spalten =
-    `floor(Breite / coverWidth)`; Doku `instructions.md` 5.10, Demo `apps/table-demo/cover-grid.html`, Showcase `covergrid`,
+    `floor(Breite / coverWidth)`, mindestens 1; Options `createCoverGridDefaultOptions` – der alte Name
+    `createCoverGrisDefaultOptions` ist seit 1.1.115 `@deprecated`; mit der Tastatur bedienbar, § 3.6 „Kacheln“; Doku
+    `instructions.md` 5.10, Demo `apps/table-demo/cover-grid.html`, Showcase `covergrid`,
     Modell `createCoverGridModelAndOptions` in `demo-table-models`), `CrudTableModelFactory`,
     `RowGroupFactory.createTableModel({ rows, groupBy, aggregations, … })` (1.1.94, § 3.6 „Row Grouping“),
     `PivotFactory.createTableModel({ rows, rowFields, columnFields, values, … })` → `PivotTableModel` (1.1.94, § 3.6 „Pivot“).
@@ -238,9 +240,24 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 - Events über `EventListenerIf`: `onMouseClicked`, `onMouseMoved`, `onContextmenu`, `onMouseDragging(End)`,
   `onCheckboxChanged`, `onModelChanged`, `onSelectionChanged`, `onFocusChanged`, `onScroll`, seit 1.1.92 `onStateChanged`,
   seit 1.1.95 `onRowDragStart/Move/End`, seit 1.1.96 `onBatchEditChanged`, seit 1.1.97 `onDetailExpandedChanged`, seit 1.1.110
-  `onColumnResizeStart/End`, `onColumnMoveStart/End`, seit 1.1.114 `onFilterChanged` (optional). Event-Typen: `GeMouseEvent`,
+  `onColumnResizeStart/End`, `onColumnMoveStart/End`, seit 1.1.114 `onFilterChanged`, seit 1.1.115 `onCellActivated`
+  (optional). Event-Typen: `GeMouseEvent`,
   `GeKeyEvent`, `GeModelChangeEvent` (seit 1.1.96 + `changes`/`source`), `GeScrollEvent`, `GeStateChangeEvent`,
-  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`, `GeColumnResizeEvent`, `GeColumnMoveEvent`, `GeFilterEvent`.
+  `GeRowDragEvent`, `GeBatchEditEvent`, `GeDetailEvent`, `GeColumnResizeEvent`, `GeColumnMoveEvent`, `GeFilterEvent`,
+  `GeCellActivateEvent`.
+- **Zelle öffnen (seit 1.1.115, Prompt 024)**: `onCellActivated(GeCellActivateEvent { areaIdent "body", rowIndex,
+  columnIndex, value, row, source "keyboard" | "mouse" | "api", originalEvent })` – Enter auf der fokussierten
+  Body-Zelle **und** Doppelklick, in jeder Tabelle. Enter: nach `activateBodyCell` (Checkbox → Master/Detail →
+  Baumknoten) und `editing.enterKey` in `onBodyNavigation` → `TableScope.activateCell()`; die Taste wird **nicht**
+  verbraucht (`false` – ein Dialog um die Tabelle sieht sie weiter, Test „Enter on a plain cell does nothing“ in
+  `aria.browser.spec.ts`; der Handler stoppt sie über `evt.originalEvent`). Doppelklick: `MouseHandler.handleDblClick`,
+  wenn weder Editor (editierbare Zelle) noch Baum-Umschalten griff, kein `data-ge-action` (Griffe), kein offener
+  Editor, kein Button/Link/Input eines Renderers (`isInteractiveCellElement`); `onMouseClicked` mit `clickCount 2`
+  bleibt. Nie für leere Kacheln oder unter blockierendem Overlay; gehaltene Enter-Taste (`repeat`) meldet einmal.
+  **Verlorener Doppelklick**: rendert die App in `onMouseClicked` (markiert die Kachel), geht `dblclick` an das
+  abgehängte Element – `MouseHandler.prepareLostDblClickCheck` (vor dem Melden des 2. Klicks, nur `detail === 2`)
+  merkt sich Zeile bzw. Item und ruft danach `handleDblClick` für sie, falls kein natives `dblclick` kam.
+  Specs `cell-activated.browser.spec.ts`.
 - Selektion: `SelectionModel(selectionType: "none"|"cell"|"row"|"column"|"range", selectionMode)` – via
   `tableOptions.getSelectionModel = () => sm`. Fokus analog `getFocusModel`. Maus (`SelectionService`): Klick = neue
   Selektion, Shift-Klick = Bereich ab letztem Klick, Strg/⌘-Klick = umschalten, Strg/⌘+Alt-Klick = abwählen, Ziehen =
@@ -296,6 +313,29 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `exported: true` (Excel mit Default-`format` als Zahl). Selektion `range`: Klick/Leertaste auf die Nummer = ganze Zeile;
   Klick auf „#“ (unterste Header-Zeile) = `selectAll`. Baum: CSS `.ge-table-row-number.ge-table-tree-cell` hebt das
   Baum-Layout der Nummernzellen auf. Breitenänderung mit Re-Entry-Schutz, %-/Gewichtsspalten werden neu verteilt.
+- **Kacheln / Cover Grid mit der Tastatur (seit 1.1.115, `tile-navigation/`, Design
+  `prompts/024-cover-grid-tastatur.design.md`)**: optionales `AreaModelIf.getTileLayout?(): TileLayoutIf`
+  (`getTileCount`, `getTilesPerRow`, `getTileAt(index)`, `indexOfTile(item)`; `CoverGridBodyModel` implementiert es) =
+  die Body-Zellen sind **eine Folge** von Items. `TableScope.onTileNavigation` (vor `onBodyNavigation`) rechnet mit der
+  DOM-freien `navigateTiles(index, action, { count, perRow, pageRows, firstVisible })` (`previous`/`next` mit Umbruch,
+  `up`/`down`, `first`/`last` = Pos1/Ende **und** Strg+Pos1/Ende, `pageUp`/`pageDown`; RTL über `mirrorArrowKeys` wie
+  immer) – **genau ein Render je Taste** (`showBodyRow`: scrollt pixelgenau und rendert, sonst `repaint()`; Invariante
+  in `perf-invariants`). Leere Kacheln nie fokussierbar: `TableScope.canFocusBodyCell()` vor `setFocus` in
+  `MouseHandler.handleClick` und `SelectionService.onMouseClicked`. **Fokus folgt dem Item**: `onFocusChanged` merkt
+  sich Item + Index (`focusedTile`); `RenderScope.beforeRenderPass()` (neuer Hook am Anfang von
+  `adjustAfterScrolling`) vergleicht O(1) und sucht nur bei Abweichung einmal (`indexOfTile`) – Sortieren, Filter,
+  andere Spaltenzahl, neue Items; Item weg → Kachel am alten Index (geklemmt), keine Items → `clear()`; meldet
+  `onFocusChanged` (Zeile/Spalte ändern sich). Strg/⌘+C kopiert in einem Kachel-Layout ohne Texte nichts.
+  **Fokusrahmen**: `tableOptions.focusFrame` `"always"` (Vorgabe) | `"keyboard"` (wie `:focus-visible`:
+  `RenderScope.keyboardModality`, Host-`keydown`/`mousedown` im Capture – **nicht** für Ereignisse aus
+  Formularelementen/Buttons/Links in Zellen, sonst ersetzt der Repaint das Eingabefeld –, `setKeyboardModality` →
+  `debounceRepaint`, den der nächste Render-Durchgang in `beforeRenderPass` wieder absagt; Vorgabe des Cover Grids) |
+  `"never"`;
+  `isFocusFrameVisible()` gilt für Body und Header, `aria-activedescendant` bleibt immer. Bei Kacheln liegt der
+  Rahmen innen (`addFocusBorderDivs(…, inside)`). `FocusModel("none")` wird weiter **nicht** ausgewertet.
+  Modell-Fixes: `getColumnCount()` ≥ 1, `Math.ceil` statt `floor + 1`, `sort()`/`doSort()` sortieren eine Kopie
+  (`filteredItems === items` nur bis zum ersten Filter/Sortieren). Specs
+  `tile-navigation/cover-grid-keyboard.browser.spec.ts`, `tile-navigation.spec.ts`, `perf/cover-grid.perf.ts`.
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -696,7 +736,8 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
 seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 1.1.92 `overlayOptions`, `initialState`,
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
 seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`, `spreadsheet`, seit 1.1.110
-`columnAutoWidth`.
+`columnAutoWidth`, seit 1.1.114 `filterRow`, `columnFilterMenu`, `columnFilter`, `columnFilterTexts`, seit 1.1.115
+`focusFrame`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -718,7 +759,7 @@ Alle Wrapper haben seit 1.1.92 die Prop `loading` (Angular `@Input`, Web Compone
 ohne Neuaufbau der Tabelle – und das Event `stateChanged` (`GeStateChangeEvent`; React/Preact/Solid Callback-Prop, Vue
 `@stateChanged`, Svelte `on:stateChanged`/`onStateChanged`, Angular `(stateChanged)`, Web Component `CustomEvent`).
 Seit 1.1.95 genauso `rowDragStart`, `rowDragMove`, `rowDragEnd` (`GeRowDragEvent`), seit 1.1.96 `batchEditChanged`
-(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`), `undoStackChanged` (`GeUndoEvent`), seit 1.1.110 `columnResizeStart`, `columnResizeEnd` (`GeColumnResizeEvent`), `columnMoveStart`, `columnMoveEnd` (`GeColumnMoveEvent`) – und je Wrapper `DetailComponentRendererWrapper`
+(`GeBatchEditEvent`), seit 1.1.97 `detailExpandedChanged` (`GeDetailEvent`), seit 1.1.99 `editingChanged` (`GeEditEvent`), `undoStackChanged` (`GeUndoEvent`), seit 1.1.110 `columnResizeStart`, `columnResizeEnd` (`GeColumnResizeEvent`), `columnMoveStart`, `columnMoveEnd` (`GeColumnMoveEvent`), seit 1.1.114 `filterChanged` (`GeFilterEvent`), seit 1.1.115 `cellActivated` (`GeCellActivateEvent`: Enter oder Doppelklick „öffnet“ eine Zelle/Kachel) – und je Wrapper `DetailComponentRendererWrapper`
 (Detailzeile als Framework-Komponente; Angular `DetailRenderWrapperFactory`). `direction` (1.1.98) ist eine Option wie jede
 andere: kein Wrapper-Code, ein neues Options-Objekt baut neu auf (Smoke-Tests React + Web Component).
 
@@ -758,8 +799,9 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
   `DomServiceIf.setAttribute`/`removeAttribute` (wiederverwendete Row-Divs: veraltete Attribute entfernen). Keine eigenen
   Tab-Stopps (die Tabelle ist **ein** Tab-Stopp): Bedienelemente in Zellen `tabindex="-1"`. Test mit `axeViolations()` (`test-utils/axe.ts`, axe-core) + Eintrag in
   `aria/aria.browser.spec.ts`. Regeln für eigene Renderer: `instructions.md` 6.14.
-- Bestehende Tippfehler in öffentlichen APIs (`isHeaderVisibe`, `showCheckboxWihoutExtraColumn`, `emmitDataKey`,
-  `createCoverGrisDefaultOptions`) **nicht stillschweigend umbenennen** – Breaking Change. Nur mit Alias + `@deprecated`.
+- Bestehende Tippfehler in öffentlichen APIs (`isHeaderVisibe`, `showCheckboxWihoutExtraColumn`, `emmitDataKey`)
+  **nicht stillschweigend umbenennen** – Breaking Change. Nur mit Alias + `@deprecated` (so geschehen 1.1.115:
+  `createCoverGridDefaultOptions`, der alte Name `createCoverGrisDefaultOptions` bleibt).
 
 ## 6. Doku, Tests & Verifikation
 

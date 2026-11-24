@@ -4,6 +4,7 @@ import type { EventListenerIf, GeModelChangeEvent, GeMouseEvent, GeScrollEvent }
 
 const METHODS = [
   'onBatchEditChanged',
+  'onCellActivated',  // since 1.1.115
   'onCheckboxChanged',
   'onContextmenu',
   'onDetailExpandedChanged',

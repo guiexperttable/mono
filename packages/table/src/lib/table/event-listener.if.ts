@@ -4,6 +4,7 @@ import type { GeDetailEvent } from './data/common/event/ge-detail-event';
 import type { GeColumnResizeEvent } from './data/common/event/ge-column-resize-event';
 import type { GeColumnMoveEvent } from './data/common/event/ge-column-move-event';
 import type { GeFilterEvent } from './data/common/event/ge-filter-event';
+import type { GeCellActivateEvent } from './data/common/event/ge-cell-activate-event';
 import { GeMouseEvent } from "./data/common/event/ge-mouse-event";
 import { GeModelChangeEvent } from "./data/common/event/ge-model-change-event";
 import { GeScrollEvent } from "./data/common/event/ge-scroll-event";
@@ -180,4 +181,25 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
    * @since 1.1.114
    */
   onFilterChanged?(evt: GeFilterEvent): void;
+
+  /**
+   * Optional: the user "opens" a body cell – **Enter** on the focused cell or a **double click** (one handler for
+   * both). Typical: open the item of a cover grid (`evt.value`) or the row of a list (`evt.row`).
+   *
+   * Reported only if the gesture did nothing else: Enter first toggles a row checkbox, a detail row or a tree node
+   * and – with Excel-style editing – edits or moves down; a double click first opens the editor of an editable cell
+   * or toggles a tree node. Not on resize handles, row drag handles, empty tiles of a cover grid, in an open editor
+   * or under a blocking loading overlay. A double click is still reported to {@link onMouseClicked} with
+   * `clickCount` 2. See {@link GeCellActivateEvent}.
+   *
+   * The Enter key is **not** consumed (a dialog or form around the table still gets it, as before 1.1.115): call
+   * `evt.originalEvent?.preventDefault()` and `stopPropagation()` in the handler if nothing else should react.
+   *
+   * @example
+   * const listener = new EventAdapter();
+   * listener.onCellActivated = (evt: GeCellActivateEvent) => console.log("open", evt.row ?? evt.value, evt.source);
+   *
+   * @since 1.1.115
+   */
+  onCellActivated?(evt: GeCellActivateEvent): void;
 }

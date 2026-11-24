@@ -16,7 +16,7 @@ import { CommonModule } from "@angular/common";
 import { debounceTime, Subject, takeWhile } from "rxjs";
 import {
   EventListenerIf, FocusModelIf,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeModelChangeEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent,
   GeMouseEvent, SelectionModelIf,
   TableApi,
   TableModelIf,
@@ -302,6 +302,20 @@ export class TableComponent implements OnInit, OnChanges, OnDestroy, EventListen
 
   onFilterChanged(evt: GeFilterEvent): void {
     this.filterChanged.next(evt);
+  }
+
+  /**
+   * Enter on the focused cell or a double click "opens" a body cell – one handler for keyboard and mouse
+   * (`evt.value`, `evt.row`, `evt.source`). Not if the gesture toggled a checkbox, a tree node or a detail row or
+   * opened an editor.
+   *
+   * @since 1.1.115
+   */
+  @Output()
+  cellActivated: Subject<GeCellActivateEvent> = new Subject<GeCellActivateEvent>();
+
+  onCellActivated(evt: GeCellActivateEvent): void {
+    this.cellActivated.next(evt);
   }
 
   onMouseMoved(evt: GeMouseEvent): void {

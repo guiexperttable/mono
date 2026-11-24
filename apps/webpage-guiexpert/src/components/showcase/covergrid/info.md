@@ -10,20 +10,28 @@ Model, books and renderer: [createCoverGridModel.ts](https://github.com/guiexper
 Not every list is a table: book covers, photos, products, videos. A **cover grid** shows your items as tiles – as
 many per row as fit into the width. It is a GuiExpert Table with a different table model, so it keeps what the
 table is good at: only the visible rows are in the DOM (10,000 books here, 1 million work too), filter, sort and
-the scroll position are built in. MIT-licensed, no dependencies.
+the scroll position are built in – and it is usable with the keyboard: the arrow keys move from cover to cover,
+Enter opens one (since 1.1.115). MIT-licensed, no dependencies.
 
 ```ts title="Books as tiles"
 const tableModel = CoverGridFactory.createCoverGridModel(books, new BookCoverRenderer(), 165, 220);
 const tableOptions = {
-  ...CoverGridFactory.createCoverGrisDefaultOptions(220, () => "books"),   // no borders, no hover
+  ...CoverGridFactory.createCoverGridDefaultOptions(220, () => "books"),   // no borders, no hover
   externalFilterFunction: (book: Book) => book.title.toLowerCase().includes(searchText),
 };
 const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener)
   .firstInit().getApi();
+listener.onCellActivated = evt => openBook(evt.value as Book);   // Enter and double click
 listener.onMouseClicked = evt => {
   const book = tableModel.bodyModel.getValueAt(evt.rowIndex, evt.columnIndex);   // the tile under the mouse
 };
 ```
+
+- **Keyboard:** ← → move to the previous / next cover and wrap at the end of a row, ↑ ↓ one row, Home / End the
+  first / last cover, Page Up / Down a page. Empty tiles after the last cover are skipped, and the focus stays on the
+  same cover after sorting, filtering and resizing. The focus frame appears only while you use the keyboard
+  (`focusFrame: "keyboard"`).
+- **Open a cover:** `onCellActivated` reports Enter on the focused cover and a double click – one handler.
 
 - **Columns follow the width:** `floor(width / coverWidth)` – the table measures its host, you do nothing.
   To fill the width exactly, make the tiles a bit wider (`fitCoversToWidth` in the demo model).

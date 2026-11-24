@@ -6,8 +6,8 @@
 // (packages/table/perf), never here.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { ColumnDef, SelectionModel, TableCellUpdateEvent, TableFactory, px100 } from '@guiexpert/table';
-import type { TableModelIf, TableOptionsIf } from '@guiexpert/table';
+import { ColumnDef, CoverGridFactory, SelectionModel, TableCellUpdateEvent, TableFactory, px100 } from '@guiexpert/table';
+import type { AreaIdent, AreaModelIf, CellRendererIf, TableModelIf, TableOptionsIf } from '@guiexpert/table';
 import { createRows, destroyAllTables, DIRECTIONS, getCellDiv, mountTable, nextFrame } from '../../../test-utils/mount-table';
 import {
   countCalls,
@@ -299,6 +299,102 @@ describe.each(DIRECTIONS)('performance invariants (%s)', direction => {
       await nextFrame();
       expect(renders.count()).toBe(1);
     });
+  });
+});
+
+// A grid of tiles (cover grid, prompt 024): one key = exactly one render, also at the edge of the view (the cell
+// navigation above needs two there); the focus follows the item with one search per change and none per key.
+describe.each(DIRECTIONS)('performance invariants: cover grid (%s)', direction => {
+  const tileRenderer: CellRendererIf = {
+    render(cellDiv: HTMLDivElement, _r: number, _c: number, _a: AreaIdent, _m: AreaModelIf, item: unknown) {
+      cellDiv.textContent = item === undefined ? '' : 'Item ' + item;
+      return undefined;
+    },
+  };
+
+  async function mountTiles(count: number) {
+    const model = CoverGridFactory.createCoverGridModel(Array.from({ length: count }, (_, i) => i), tileRenderer, 150, 200);
+    const table = mountTable(model, {
+      width: 620,
+      tableOptions: {
+        ...CoverGridFactory.createCoverGridDefaultOptions(200),
+        autoRestoreOptions: undefined, direction, resizeEventDebounceDelay: 10,
+      },
+    });
+    await settleMount();
+    table.host.focus();
+    const perRow = model.getColumnCount();
+    const focusIndex = () => {
+      const [r, c] = table.scope.focusModel()!.getFocus();
+      return r * perRow + c;
+    };
+    return { ...table, model, perRow, focusIndex };
+  }
+
+  /** Waits until a deferred repaint (1 ms timer) would have run. */
+  async function settleKey() {
+    await nextFrame();
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await nextFrame();
+  }
+
+  it('a key inside the view: exactly 1 render, the row layout is kept, the items are not searched', async () => {
+    const t = await mountTiles(10_000);
+    t.scope.focusModel()!.setFocus(0, 0);
+    await userEvent.keyboard('{ArrowDown}');   // keyboard modality on (the frame is shown)
+    await settleKey();
+    const renders = countRenders(t.scope);
+    const layout = countRowLayoutBuilds(t.scope);
+    const search = countCalls(t.model.bodyModel, 'indexOfTile');
+    await userEvent.keyboard(direction === 'rtl' ? '{ArrowLeft}' : '{ArrowRight}');
+    await settleKey();
+    expect(t.focusIndex()).toBe(t.perRow + 1);
+    expect(renders.count()).toBe(1);
+    expect(layout.count()).toBe(0);
+    expect(search.count()).toBe(0);
+  });
+
+  it('a key at the edge of the view (the grid scrolls): exactly 1 render', async () => {
+    const t = await mountTiles(10_000);
+    t.scope.focusModel()!.setFocus(0, 1);
+    await userEvent.keyboard('{ArrowDown}');
+    await settleKey();
+    const renders = countRenders(t.scope);
+    const search = countCalls(t.model.bodyModel, 'indexOfTile');
+    for (let i = 1; i <= 4; i++) {
+      const before = renders.count();
+      await userEvent.keyboard('{ArrowDown}');
+      await settleKey();
+      expect(t.focusIndex()).toBe((1 + i) * t.perRow + 1);
+      expect(renders.count() - before).toBe(1);
+    }
+    expect(viewportOf(t.host).scrollTop).toBeGreaterThan(0);
+    expect(search.count()).toBe(0);
+  });
+
+  it('the first key after a mouse click (the focus frame appears): exactly 1 render', async () => {
+    const t = await mountTiles(1_000);
+    await userEvent.click(getCellDiv(t.host, 'body', 'center', 0, 1));
+    await settleKey();
+    expect(t.host.querySelectorAll('.ge-table-focus-border')).toHaveLength(0);
+    const renders = countRenders(t.scope);
+    await userEvent.keyboard('{ArrowDown}');
+    await settleKey();
+    expect(t.host.querySelectorAll('.ge-table-focus-border')).toHaveLength(4);
+    expect(renders.count()).toBe(1);
+  });
+
+  it('sort(): 1 render, the focused item is searched once', async () => {
+    const t = await mountTiles(10_000);
+    t.scope.focusModel()!.setFocus(2, 1);
+    await settleKey();
+    const renders = countRenders(t.scope);
+    const search = countCalls(t.model.bodyModel, 'indexOfTile');
+    t.api.sort((a: number, b: number) => b - a);
+    await settleKey();
+    expect(t.model.bodyModel.getValueAt(...t.scope.focusModel()!.getFocus())).toBe(2 * t.perRow + 1);
+    expect(renders.count()).toBe(1);
+    expect(search.count()).toBe(1);
   });
 });
 

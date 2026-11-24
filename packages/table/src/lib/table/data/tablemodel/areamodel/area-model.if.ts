@@ -1,6 +1,7 @@
 import type { RowDropTargetIf } from "../../../row-drag/row-drop-target.if";
 import type { AppendRowsContextIf, AppendRowsModelResultIf } from "../../../live-append/append-rows-options.if";
 import type { DerivedValuesChangeIf } from "./derived-values-change.if";
+import type { TileLayoutIf } from './tile-layout.if';
 import { CellRendererIf } from "../../../renderer/cell-render.if";
 import { CheckedType } from "../../common/checked-type";
 import { CheckboxModelIf } from "../../../checkbox/checkbox-model.if";
@@ -368,6 +369,20 @@ export interface AreaModelIf {
    * @since 1.1.94
    */
   invalidateDerivedValues?(change?: DerivedValuesChangeIf): void;
+
+  /**
+   * Optional (body only): the cells are one sequence of items shown as tiles – the table then navigates from item
+   * to item (arrow keys wrap over the end of a row, Home/End = first/last item), never focuses an empty tile and
+   * keeps the focus on the same item after sorting, filtering and resizing. See {@link TileLayoutIf};
+   * {@link CoverGridBodyModel} implements it. `undefined` (or no method) = a normal table.
+   *
+   * @example
+   * const tiles = tableModel.getBodyModel().getTileLayout?.();
+   * if (tiles) console.log(`${tiles.getTileCount()} items, ${tiles.getTilesPerRow()} per row`);
+   *
+   * @since 1.1.115
+   */
+  getTileLayout?(): TileLayoutIf | undefined;
 
   /**
    * Optional: true for a cell that names its row (a label such as "Nord" or "Total") – the table gives it

@@ -107,6 +107,11 @@
    * @type {((evt: import("@guiexpert/table").GeFilterEvent) => void) | undefined}
    */
   export let onFilterChanged = undefined;
+  /**
+   * Enter or a double click "opens" a body cell – `evt.value`, `evt.row`, `evt.source` (since 1.1.115).
+   * @type {((evt: import("@guiexpert/table").GeCellActivateEvent) => void) | undefined}
+   */
+  export let onCellActivated = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -140,7 +145,8 @@
     onColumnResizeEnd: (evt) => { dispatch("columnResizeEnd", evt); onColumnResizeEnd?.(evt); },
     onColumnMoveStart: (evt) => { dispatch("columnMoveStart", evt); onColumnMoveStart?.(evt); },
     onColumnMoveEnd: (evt) => { dispatch("columnMoveEnd", evt); onColumnMoveEnd?.(evt); },
-    onFilterChanged: (evt) => { dispatch("filterChanged", evt); onFilterChanged?.(evt); }
+    onFilterChanged: (evt) => { dispatch("filterChanged", evt); onFilterChanged?.(evt); },
+    onCellActivated: (evt) => { dispatch("cellActivated", evt); onCellActivated?.(evt); }
   };
 
   /**

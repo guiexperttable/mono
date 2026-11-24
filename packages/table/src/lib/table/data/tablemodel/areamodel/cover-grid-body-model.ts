@@ -6,11 +6,18 @@ import { FilterFunction } from '../../common/filter-function';
 import { SortItem } from '../../common/sort-item';
 import { AreaIdent } from '../area-ident.type';
 import { SorterService } from '../../../service/sorter.service';
+import { TileLayoutIf } from './tile-layout.if';
 
 /**
  * Body of a cover grid: `filteredItems[row * columns + column]` is the item of a tile (`getValueAt`), `columns` =
- * `floor(width / coverWidth)`. `items` = all items, `filteredItems` = shown items (filter and `sort()` work on it).
- * Change `coverWidth`/`coverHeight` or the items and call `tableApi.repaintHard()`.
+ * `floor(width / coverWidth)` (at least 1). `items` = all items, `filteredItems` = shown items (filter and `sort()`
+ * work on it). Change `coverWidth`/`coverHeight` or the items and call `tableApi.repaintHard()`.
+ *
+ * `filteredItems` is the `items` array itself until the first filter or sort; `sort()` and `doSort()` sort a copy
+ * (since 1.1.115 – before, they reordered the array of the app as long as no filter was set).
+ *
+ * The model is a {@link TileLayoutIf} (since 1.1.115): the keyboard moves from item to item, empty tiles never get
+ * the focus and the focus follows the item after sorting, filtering and resizing.
  *
  * @example
  * ```ts
@@ -23,7 +30,7 @@ import { SorterService } from '../../../service/sorter.service';
  *
  * @category Area models
  */
-export class CoverGridBodyModel<T> implements AreaModelIf {
+export class CoverGridBodyModel<T> implements AreaModelIf, TileLayoutIf {
 
   public rowSelectionModel: CheckboxModelIf<any> | undefined = undefined;
   public areaIdent: AreaIdent = 'body';
@@ -52,7 +59,7 @@ export class CoverGridBodyModel<T> implements AreaModelIf {
 
   getRowCount(): number {
     if (!this.filteredItems?.length) return 0;
-    return Math.floor(this.filteredItems.length / this.getColumnCount()) + 1;
+    return Math.ceil(this.filteredItems.length / this.getColumnCount());
   }
 
   /**
@@ -63,11 +70,49 @@ export class CoverGridBodyModel<T> implements AreaModelIf {
    */
   getUnfilteredRowCount(): number {
     if (!this.items?.length) return 0;
-    return Math.floor(this.items.length / this.getColumnCount()) + 1;
+    return Math.ceil(this.items.length / this.getColumnCount());
   }
 
+  /**
+   * The number of tiles per row: as many as fit into the width – at least 1 (a width smaller than one tile, width 0
+   * or a tile width of 0; before 1.1.115 a narrow grid had 0 columns and `Infinity` rows).
+   *
+   * @returns {number} tiles per row, ≥ 1
+   */
   getColumnCount(): number {
-    return !this.width ? 1 : Math.floor(this.width / this.coverWidth);
+    if (!this.width || !(this.coverWidth > 0)) return 1;
+    return Math.max(1, Math.floor(this.width / this.coverWidth));
+  }
+
+  /**
+   * The tiles as one sequence of items – the table uses it for the keyboard navigation and to keep the focus on
+   * the same item.
+   *
+   * @returns {TileLayoutIf} this model
+   * @since 1.1.115
+   */
+  getTileLayout(): TileLayoutIf {
+    return this;
+  }
+
+  /** The number of shown items. @since 1.1.115 */
+  getTileCount(): number {
+    return this.filteredItems?.length ?? 0;
+  }
+
+  /** Tiles per row ({@link getColumnCount}). @since 1.1.115 */
+  getTilesPerRow(): number {
+    return this.getColumnCount();
+  }
+
+  /** The shown item at an index, `undefined` outside the items. @since 1.1.115 */
+  getTileAt(index: number): T | undefined {
+    return this.filteredItems?.[index];
+  }
+
+  /** The index of a shown item, `-1` if it is not shown (filtered out, removed). @since 1.1.115 */
+  indexOfTile(item: unknown): number {
+    return this.filteredItems ? this.filteredItems.indexOf(item as T) : -1;
   }
 
   getValueAt(rowIndex: number, columnIndex: number): T | undefined {
@@ -158,13 +203,19 @@ export class CoverGridBodyModel<T> implements AreaModelIf {
       const { sortState } = sortItem;
       const f = sortState === 'asc' ? 1 :
         sortState === 'desc' ? -1 : 0;
-      this.filteredItems = this.filteredItems.sort((a, b) => this.sorterService.genericSortComparator(a, b, f));
+      // a copy: the array of the app (items) keeps its order
+      this.filteredItems = this.filteredItems.slice().sort((a, b) => this.sorterService.genericSortComparator(a, b, f));
     }
     return true;
   }
 
+  /**
+   * Sorts the shown items – a copy, the `items` array of the app keeps its order (since 1.1.115).
+   *
+   * @param compareFn - compares two items
+   */
   sort(compareFn?: (a: any, b: any) => number): void {
-    this.filteredItems = this.filteredItems.sort(compareFn);
+    this.filteredItems = this.filteredItems.slice().sort(compareFn);
   }
 
 

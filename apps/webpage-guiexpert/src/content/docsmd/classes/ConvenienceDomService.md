@@ -253,13 +253,13 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:634](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L634)
+[src/lib/table/service/convenience-dom.service.ts:636](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L636)
 
 ___
 
 ### addFocusBorderDivs
 
-▸ **addFocusBorderDivs**(`parent`, `geo`, `style`): `HTMLDivElement`
+▸ **addFocusBorderDivs**(`parent`, `geo`, `style`, `inside?`): `HTMLDivElement`
 
 Draws the focus frame of a cell: four divs with the class `ge-table-focus-border` (2 px, color
 `--ge-table-focus-outline-color` resp. `--ge-table-focus-border`). Hidden from screen readers – they get the
@@ -267,11 +267,12 @@ focus through `aria-activedescendant`.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `parent` | `HTMLDivElement` |
-| `geo` | [`GeoData`](GeoData.md) |
-| `style` | [`HtmlStyle`](../modules.md#htmlstyle) |
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `parent` | `HTMLDivElement` | `undefined` |
+| `geo` | [`GeoData`](GeoData.md) | `undefined` |
+| `style` | [`HtmlStyle`](../modules.md#htmlstyle) | `undefined` |
+| `inside` | `boolean` | `false` |
 
 #### Returns
 
@@ -396,7 +397,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:615](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L615)
+[src/lib/table/service/convenience-dom.service.ts:617](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L617)
 
 ___
 
@@ -642,7 +643,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/service/convenience-dom.service.ts:650](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L650)
+[src/lib/table/service/convenience-dom.service.ts:652](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/service/convenience-dom.service.ts#L652)
 
 ___
 

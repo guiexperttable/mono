@@ -64,7 +64,9 @@ import {
   ColumnFilterResolverIf, compileColumnFilterPredicate, inferColumnFilterType,
   parseFilterInput, formatFilterCondition, formatFilterNumber, CollectDistinctValuesOptionsIf, DistinctValuesResultIf,
   collectDistinctValues, normalizeColumnFilter, serializeColumnFilters, deserializeColumnFilters,
-  areColumnFiltersEqual, ColumnFilterService, GeFilterEvent, GeFilterEventSource
+  areColumnFiltersEqual, ColumnFilterService, GeFilterEvent, GeFilterEventSource,
+  GeCellActivateEvent, GeCellActivateSource, TileLayoutIf, TileNavigationAction, TileNavigationLayoutIf, navigateTiles,
+  tileIndexToCell, cellToTileIndex, FocusFrameMode
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }

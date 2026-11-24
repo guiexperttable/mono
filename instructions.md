@@ -1088,13 +1088,14 @@ and evaluated only for the visible cells (`bench/formula.bench.ts`).
 
 Not every list is a table: book or comic covers, photos, products, videos. `CoverGridFactory.createCoverGridModel()`
 returns a `CoverGridTableModel` that shows a flat array as **tiles** – as many per row as fit into the width
-(`floor(width / coverWidth)`), no header, no footer. It is a normal GuiExpert Table with a different model: only the
-visible rows are in the DOM, filter, sort, scroll position and resize work as usual.
+(`floor(width / coverWidth)`, at least one), no header, no footer. It is a normal GuiExpert Table with a different
+model: only the visible rows are in the DOM, filter, sort, scroll position and resize work as usual. Since 1.1.115 the
+grid is usable with the keyboard: the arrow keys move from item to item, Enter and a double click open a tile.
 
 ```ts
 import {
-  AreaIdent, AreaModelIf, CellRendererIf, CoverGridFactory, EventAdapter, RendererCleanupFnType, SimpleDomService,
-  TableScope
+  AreaIdent, AreaModelIf, CellRendererIf, CoverGridFactory, EventAdapter, GeCellActivateEvent, RendererCleanupFnType,
+  SimpleDomService, TableScope
 } from "@guiexpert/table";
 
 interface Book { title: string; coverUrl: string; }
@@ -1119,14 +1120,16 @@ let searchText = "";
 
 const tableModel = CoverGridFactory.createCoverGridModel(books, new BookRenderer(), 160, 240);
 const tableOptions = {
-  ...CoverGridFactory.createCoverGrisDefaultOptions(240, () => "books"),   // (sic) no borders, no hover
-  externalFilterFunction: (book: Book) => book.title.toLowerCase().includes(searchText),
-  shortcutActionsDisabled: true                  // cell navigation does not apply to tiles
+  ...CoverGridFactory.createCoverGridDefaultOptions(240, () => "books"),   // no borders, no hover, focus frame after keys
+  externalFilterFunction: (book: Book) => book.title.toLowerCase().includes(searchText)
 };
 const listener = new EventAdapter();
+listener.onCellActivated = (evt: GeCellActivateEvent) => {     // Enter on the focused tile or a double click
+  console.info("open", (evt.value as Book).title, evt.source);   // evt.value = the item, source "keyboard" | "mouse"
+};
 listener.onMouseClicked = evt => {
   const book = tableModel.bodyModel.getValueAt(evt.rowIndex, evt.columnIndex);   // the tile under the mouse
-  if (book) console.info(book.title);
+  if (book) console.info("select", book.title);                // undefined for an empty tile after the last item
 };
 const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener)
   .firstInit()
@@ -1135,8 +1138,10 @@ const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableO
 
 `createCoverGridModel(items, cellRenderer, coverWidth = 200, coverHeight = 300, width = 0, firstRowPaddingTop = 0)`:
 the renderer gets the **item** as `cellValue`; `firstRowPaddingTop` makes the first row higher (room for a floating
-toolbar above the first tiles). `createCoverGrisDefaultOptions(rowHeight, getStorageKeyFn)` switches off borders and
-hover and restores the scroll position under the given key (spelled with an `s` – kept for compatibility).
+toolbar above the first tiles). `createCoverGridDefaultOptions(rowHeight, getStorageKeyFn)` switches off borders and
+hover, restores the scroll position under the given key and shows the focus frame only while the grid is used with the
+keyboard (`focusFrame: "keyboard"`). (Before 1.1.115 the method was only available under the misspelled name
+`createCoverGrisDefaultOptions` – it still works, deprecated.)
 
 | Task | How |
 |---|---|
@@ -1147,11 +1152,20 @@ hover and restores the scroll position under the given key (spelled with an `s` 
 | Sort | `tableApi.sort((a, b) => a.title.localeCompare(b.title))` – sorts the shown items; survives the next filter |
 | New items | `tableModel.bodyModel.items = list; tableModel.bodyModel.filteredItems = list; tableApi.repaintHard();` (or `externalFilterChanged()` when a filter is set) |
 | Item ↔ cell | `bodyModel.getValueAt(row, col)` = `filteredItems[row * columns + col]`; to scroll to item `i`: `tableApi.scrollToIndex(0, Math.floor(i / tableModel.getColumnCount()))` |
-| Selection / focus | the cover grid has no selection model of its own – keep the selected item in your app and let the renderer mark it (repaint after a change). The cell focus frame of the table can be hidden with `.my-grid .ge-table-focus-border { display: none }` |
+| Keyboard (since 1.1.115) | the tiles are **one sequence**: ← / → previous / next item (wrap over the end of a row, mirrored in right-to-left), ↑ / ↓ one row (↓ without a tile below: the last item), Home / End and Ctrl/⌘+Home / End first / last item, Page Up / Down one page. Empty tiles after the last item never get the focus (keyboard and mouse). Tab into the grid focuses the first visible item. One render per key |
+| Open a tile (since 1.1.115) | `listener.onCellActivated = evt => …` – **Enter** on the focused tile and a **double click** report the same event: `evt.value` = the item, `evt.source` = `"keyboard"` \| `"mouse"`. Wrappers: `cellActivated`. The Enter key is not consumed – call `evt.originalEvent?.stopPropagation()` if a dialog around the grid also reacts to Enter. A held Enter key reports once; a double click on a button, link or input that your renderer put into the tile belongs to that control |
+| Focus (since 1.1.115) | the focus follows the **item**: after `sort()`, a filter, a resize (another number of tiles per row) or new items the same item is focused (`onFocusChanged` reports the new cell). An item that is filtered out hands the focus to the tile at its place, no items = no focus. Focused item: `bodyModel.getValueAt(...focusModel.getFocus())` |
+| Focus frame | `focusFrame: "keyboard"` (default of the cover grid): only after a key, a mouse press hides it. `"always"` shows it after clicks too, `"never"` hides it (then draw your own focus indicator in the renderer). Color: `--ge-table-focus-outline-color` / `--ge-table-focus-border`. No CSS trick needed |
+| Selection | the cover grid has no selection model of its own – keep the selected item in your app and let the renderer mark it (repaint after a change) |
+| Screen readers | the grid is a `role="grid"`, each tile a `gridcell`; the name of a tile is what your renderer puts into it – an `alt` text, a title, or `<span class="ge-table-sr-only">…</span>` (6.14) |
 
 Notes: the tiles start at the left edge – with a fixed `coverWidth` the space right of the last column stays empty
-(stretch the tiles, see above). `getRowCount()` adds one empty row when the last row is full, and a grid narrower than
-one tile has 0 columns – keep `coverWidth ≤ width` (both in `TODO.md`).
+(stretch the tiles, see above). `sort()` sorts a copy: your `items` array keeps its order (since 1.1.115; before, it
+was reordered as long as no filter was set). After you changed `items` (also after a `push`), hand the list over as
+shown under "New items" – `filteredItems` is a copy as soon as a filter or a sort was applied, and then new items do
+not appear by themselves; call `tableApi.sort(…)` again if the grid was sorted. Fixed in 1.1.115: no empty extra row when the last row is
+full, and a grid narrower than one tile has one column (before: 0 columns and `Infinity` rows). Own tile models:
+implement `AreaModelIf.getTileLayout()` (`TileLayoutIf`) to get the same keyboard navigation.
 
 Demo: `pnpm serve:table-demo` → http://localhost:4200/cover-grid.html (10,000 – 100,000 books, search, size, order,
 fill the width). Showcase: [Cover grid](https://gui.expert/showcase/covergrid/run). Model, books and renderer of both:
@@ -1325,6 +1339,8 @@ listener.onSelectionChanged = () => {
 | `detailExpandedChanged` | `GeDetailEvent` | since 1.1.97, a detail row was expanded or collapsed, see 6.18 (core: `onDetailExpandedChanged`) |
 | `columnResizeStart`, `columnResizeEnd` | `GeColumnResizeEvent` | since 1.1.110, the user resized a column (handle dragged or double-clicked), see 6.27 (core: `onColumnResizeStart/End`) |
 | `columnMoveStart`, `columnMoveEnd` | `GeColumnMoveEvent` | since 1.1.110, the user moved a column by its header, see 6.27 (core: `onColumnMoveStart/End`) |
+| `filterChanged` | `GeFilterEvent` | since 1.1.114, column filters changed, see 6.28 (core: `onFilterChanged`) |
+| `cellActivated` | `GeCellActivateEvent` | since 1.1.115, **Enter** on the focused body cell or a **double click** "opens" it – `evt.row` (the row of a list; a `TreeRow` in trees and groups: `evt.row.data`), `evt.value` (the item of a cover grid), `evt.source`. Only if the gesture did nothing else (checkbox, tree node, detail row, editor); the Enter key is not consumed. Core: `onCellActivated` |
 
 **Clicks while the app renders (since 1.1.108).** The browser sends `click` only if `mousedown` and `mouseup` hit the
 same element. A render between the two (`repaint()`, `repaintHard()`, `scrollToPixel()` from a live update) replaces
@@ -2584,6 +2600,23 @@ keep live updates smooth, and persist via `autoRestoreFilterState` / `getState([
 built-in status bar chrome — render a small HTML bar below the host `<div>` and wire it to `onFilterChanged`,
 `tableApi.setFilterRowVisible(...)`, `tableApi.showColumnChooser(btn)`, `tableApi.clearColumnFilters()` and
 `container.requestFullscreen()`. → 6.28
+
+**How do I open a row or a cover with Enter or a double click?** `listener.onCellActivated = evt => open(evt.row ??
+evt.value)` (since 1.1.115; wrappers: `cellActivated`) – one handler for keyboard and mouse. `evt.row` is the row object
+of a list (in a tree, row grouping or pivot a `TreeRow` – your object is `evt.row.data`), `evt.value` the item of a
+cover grid, `evt.source` `"keyboard"`, `"mouse"` or `"api"`. Enter keeps its other
+jobs first (row checkbox, tree node, detail row, Excel-style editing), a double click on an editable cell opens the
+editor instead. The Enter key itself is not consumed. → 5.10, 6.5
+
+**How do I hide the focus frame?** `tableOptions.focusFrame: "never"` – or `"keyboard"` to show it only while the table
+is used with the keyboard, like CSS `:focus-visible` (since 1.1.115; the default of a cover grid). Do not hide
+`.ge-table-focus-border` with CSS, and `new FocusModel("none")` does not hide it either. With `"never"` give keyboard
+users another visible focus indicator. → 5.10
+
+**Can a cover grid be used with the keyboard?** Yes (since 1.1.115): arrow keys move from item to item and wrap over the
+end of a row, Home/End go to the first/last item, Enter opens (`onCellActivated`), empty tiles are skipped and the focus
+stays on the same item after sorting, filtering and resizing. Remove `shortcutActionsDisabled: true` from older cover
+grid code. → 5.10
 
 **The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
 gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4

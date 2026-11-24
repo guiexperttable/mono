@@ -586,8 +586,10 @@ export class ConvenienceDomService {
    * `--ge-table-focus-outline-color` resp. `--ge-table-focus-border`). Hidden from screen readers – they get the
    * focus through `aria-activedescendant`.
    */
-  addFocusBorderDivs(parent: HTMLDivElement, geo: GeoData, style: HtmlStyle): HTMLDivElement {
-    geo = {...geo, width: geo.width+1, height: geo.height+1}; // we want draw on the right and bottom border
+  addFocusBorderDivs(parent: HTMLDivElement, geo: GeoData, style: HtmlStyle, inside = false): HTMLDivElement {
+    if (!inside) {
+      geo = {...geo, width: geo.width+1, height: geo.height+1}; // we want draw on the right and bottom border
+    }
     const t = ConvenienceDomService.focusBorderWidthInPx;
     const sides: [number, number, number, number][] = [
       [geo.left, geo.top, t, geo.height],                         // west

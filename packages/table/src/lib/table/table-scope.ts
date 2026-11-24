@@ -104,6 +104,11 @@ import type {
 } from './live-append/append-rows-options.if';
 import type { FilterFunction } from './data/common/filter-function';
 import type { GeFilterEventSource } from './data/common/event/ge-filter-event';
+import { GeCellActivateEvent } from './data/common/event/ge-cell-activate-event';
+import type { GeCellActivateSource } from './data/common/event/ge-cell-activate-event';
+import type { TileLayoutIf } from './data/tablemodel/areamodel/tile-layout.if';
+import { cellToTileIndex, navigateTiles, tileIndexToCell } from './tile-navigation/tile-navigation';
+import type { TileNavigationAction } from './tile-navigation/tile-navigation';
 import { ColumnFilterService } from './column-filter/column-filter-service';
 import type { ColumnFilterIf, ColumnFiltersMap } from './column-filter/column-filter.if';
 import type { FilterRowOptionsIf } from './column-filter/column-filter-options.if';
@@ -336,6 +341,18 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       if (evt.key === 'Tab') this.lastTabKeyTime = Date.now();
     }, { capture: true, signal });
     hostElement.addEventListener('focus', () => this.onHostKeyboardFocus(), { signal });
+    // focusFrame "keyboard" (since 1.1.115): the frame follows the last input – a key shows it, a mouse press hides it.
+    // Capture: before the ShortcutService and the MouseHandler, so their render / deferred repaint draws the change.
+    // Not for keys and clicks in a form control, button or link inside the table (an own cell renderer, the editor,
+    // a filter input): they belong to that control, and the repaint for the frame would replace it.
+    hostElement.addEventListener('keydown', (evt: KeyboardEvent) => {
+      if (!['Shift', 'Control', 'Alt', 'Meta'].includes(evt.key) && !TableScope.isControlEvent(evt)) {
+        this.setKeyboardModality(true);
+      }
+    }, { capture: true, signal });
+    hostElement.addEventListener('mousedown', (evt: MouseEvent) => {
+      if (!TableScope.isControlEvent(evt)) this.setKeyboardModality(false);
+    }, { capture: true, signal });
     // A click on a body cell or the scroll bar would focus the scroll viewport (tabindex -1) – the grid (host)
     // must keep the focus, otherwise screen readers lose aria-activedescendant.
     this.scrollViewport.addEventListener('focus', () => this.hostElement.focus({ preventScroll: true }), { signal });
@@ -364,6 +381,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    */
   private onHostKeyboardFocus() {
     const keyboard = Date.now() - this.lastTabKeyTime < 1000;
+    if (keyboard) {
+      this.setKeyboardModality(true); // Tab into the table: the key went to the element before
+    }
     const fm = this.focusModel();
     if (!keyboard || !fm || this.headerFocus || this.isEditing()) {
       return;
@@ -440,6 +460,10 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     if (actionId === 'NAVIGATE_UP' && this.moveFocusIntoHeader()) {
       return true;
     }
+    const tileNavigation = this.onTileNavigation(actionId);
+    if (tileNavigation !== undefined) {
+      return tileNavigation; // a grid of tiles (cover grid, since 1.1.115): from item to item
+    }
     const bodyNavigation = this.onBodyNavigation(actionId);
     if (bodyNavigation !== undefined) {
       return bodyNavigation;
@@ -501,7 +525,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       const fm = this.getFocusModel ? this.getFocusModel() : undefined;
       this.copyService
         .createContent(this.tableModel, sm, fm)
-        .then(txt => this.copyService.copyContent(txt).then(() => this.announceCopied(txt)))
+        // a grid of tiles without texts (cover grid): nothing to copy – the clipboard keeps its content (since 1.1.115)
+        .then(txt => (txt || !this.getTileLayout())
+          ? this.copyService.copyContent(txt).then(() => this.announceCopied(txt)) : undefined)
         .catch(reason => console.warn('GuiExpert Table – copy to clipboard failed:', reason));
     }
     return false;
@@ -1245,17 +1271,233 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
         }
         // Excel-style editing (since 1.1.99): Enter edits (Google Sheets) or moves down (Excel)
         const editing = this.editingOptions;
-        if (!editing) {
-          return false;
+        if (editing) {
+          if (editing.enterKey === 'moveDown') {
+            return this.moveActiveCell(row, col, 1, 0);
+          }
+          if (this.tableModel.getBodyModel().isEditable(row, col)) {
+            return this.startEditing(row, col, 'edit');
+          }
         }
-        if (editing.enterKey === 'moveDown') {
-          return this.moveActiveCell(row, col, 1, 0);
-        }
-        if (this.tableModel.getBodyModel().isEditable(row, col)) {
-          return this.startEditing(row, col, 'edit');
+        // nothing else to do: "open" the cell (since 1.1.115). The key is NOT consumed (as before, when Enter did
+        // nothing here): a dialog or form around the table still sees it – a listener stops it via evt.originalEvent.
+        const key = this.shortcutKeyEvent;
+        if (!key?.repeat) { // a held Enter key opens once
+          this.activateCell(row, col, key ? 'keyboard' : 'api', key);
         }
         return false;
       }
+    }
+  }
+
+  // ------------------------------------------------------------------- open a cell, tiles (since 1.1.115)
+
+  /**
+   * Reports {@link EventListenerIf.onCellActivated} for a body cell ("open": Enter or double click). Nothing for a
+   * cell outside the body and for an empty tile of a cover grid.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @param {GeCellActivateSource} source - keyboard, mouse or api
+   * @param {KeyboardEvent | MouseEvent} [originalEvent] - the key or mouse event
+   * @returns {boolean} true if it was reported
+   * @since 1.1.115
+   */
+  activateCell(rowIndex: number, columnIndex: number, source: GeCellActivateSource,
+               originalEvent?: KeyboardEvent | MouseEvent): boolean {
+    const body = this.tableModel.getBodyModel();
+    if (!(rowIndex >= 0 && columnIndex >= 0) || rowIndex >= body.getRowCount()
+      || columnIndex >= this.tableModel.getColumnCount() || !this.canFocusBodyCell(rowIndex, columnIndex)
+      || this.tableOverlay.isBlocking()) {
+      return false; // outside the body, an empty tile, or a blocking "Loading…" over the body
+    }
+    this.eventListener.onCellActivated?.(new GeCellActivateEvent('body', rowIndex, columnIndex,
+      body.getValueAt(rowIndex, columnIndex), body.getRowByIndex(rowIndex), source, originalEvent));
+    return true;
+  }
+
+  /**
+   * The tiles of the body if its cells are one sequence of items ({@link AreaModelIf.getTileLayout}, e.g. a cover
+   * grid) – `undefined` for a normal table.
+   *
+   * @returns {TileLayoutIf | undefined} the layout
+   * @since 1.1.115
+   */
+  getTileLayout(): TileLayoutIf | undefined {
+    return this.tableModel.getBodyModel().getTileLayout?.();
+  }
+
+  /**
+   * False for a body cell that must not get the focus: an empty tile behind the last item of a grid of tiles.
+   *
+   * @param {number} rowIndex - display row index
+   * @param {number} columnIndex - model column index
+   * @returns {boolean} true for every cell of a normal table
+   * @since 1.1.115
+   */
+  canFocusBodyCell(rowIndex: number, columnIndex: number): boolean {
+    const tiles = this.getTileLayout();
+    if (!tiles) {
+      return true;
+    }
+    const index = cellToTileIndex(rowIndex, columnIndex, tiles.getTilesPerRow());
+    return index >= 0 && index < tiles.getTileCount();
+  }
+
+  private static readonly tileActions: Partial<Record<ActionId, TileNavigationAction>> = {
+    NAVIGATE_LEFT: 'previous', NAVIGATE_RIGHT: 'next', NAVIGATE_UP: 'up', NAVIGATE_DOWN: 'down',
+    NAVIGATE_ROW_START: 'first', NAVIGATE_FIRST_CELL: 'first', NAVIGATE_ROW_END: 'last', NAVIGATE_LAST_CELL: 'last',
+    NAVIGATE_PAGE_UP: 'pageUp', NAVIGATE_PAGE_DOWN: 'pageDown',
+  };
+
+  /**
+   * Keyboard navigation in a grid of tiles: the items are one sequence ({@link navigateTiles}), empty tiles are never
+   * focused. Renders exactly once per key. `undefined` = not a navigation key or not a grid of tiles.
+   */
+  private onTileNavigation(actionId: ActionId): boolean | undefined {
+    const action = TableScope.tileActions[actionId];
+    const tiles = action ? this.getTileLayout() : undefined;
+    if (!action || !tiles) {
+      return undefined;
+    }
+    const fm = this.focusModel();
+    const count = tiles.getTileCount();
+    if (!fm || this.isEditing() || count < 1) {
+      return false;
+    }
+    const perRow = Math.max(1, tiles.getTilesPerRow());
+    const [row, col] = fm.getFocus();
+    const firstRow = this.firstFullVisibleRowIndex >= 0 ? this.firstFullVisibleRowIndex
+      : Math.max(0, this.getBodyRowIndexAtY(this.contentScrollTop));
+    const target = navigateTiles(cellToTileIndex(row, col, perRow), action, {
+      count, perRow, pageRows: this.displayedRowCount - 1, firstVisible: firstRow * perRow,
+    });
+    const [targetRow, targetCol] = tileIndexToCell(target, perRow);
+    if (targetRow !== row || targetCol !== col) {
+      this.headerFocus = undefined;
+      fm.setFocus(targetRow, targetCol);
+      if (!this.showBodyRow(targetRow)) {
+        this.repaint();
+      }
+    }
+    return true; // also at the first / last item: the key belongs to the grid (the page must not scroll)
+  }
+
+  /**
+   * Scrolls a body row into view (pixel-exact: to the top or to the bottom edge).
+   *
+   * @returns {boolean} true if the table was rendered at the new position – false if the row is visible already
+   */
+  private showBodyRow(rowIndex: number): boolean {
+    const top = this.getBodyRowTop(rowIndex);
+    const bottom = top + this.tableModel.getRowHeight('body', rowIndex);
+    const viewTop = this.contentScrollTop;
+    const viewHeight = this.areaBodyCenterGeo.height;
+    const py = top < viewTop ? top : bottom > viewTop + viewHeight ? Math.min(top, bottom - viewHeight) : undefined;
+    if (py === undefined || !this.setContentScrollPosition(undefined, py)) {
+      return false;
+    }
+    this.adjustAfterScrolling();
+    return true;
+  }
+
+  /** The item that has the focus in a grid of tiles and its index when it got it (the focus follows the item). */
+  private focusedTile?: { item: unknown; index: number };
+  private syncingTileFocus = false;
+  private tileFocusKnown = false;
+
+  /** Remembers the item under the focus (called for every focus change). */
+  private rememberFocusedTile(): void {
+    const tiles = this.getTileLayout();
+    const fm = tiles ? this.focusModel() : undefined;
+    if (!tiles || !fm) {
+      this.focusedTile = undefined;
+      return;
+    }
+    const [row, col] = fm.getFocus();
+    const index = cellToTileIndex(row, col, tiles.getTilesPerRow());
+    const item = index >= 0 && index < tiles.getTileCount() ? tiles.getTileAt(index) : undefined;
+    this.focusedTile = item === undefined ? undefined : { item, index };
+  }
+
+  /**
+   * A grid of tiles: the focus follows the **item**. Before a render pass draws the focus, the focused cell is
+   * compared with the remembered item (O(1)); only if another item sits there now (sorted, filtered, another number
+   * of tiles per row, new items) the item is searched once. An item that is gone hands the focus to the tile at its
+   * old index (the last item if there is none; no items: no focus).
+   */
+  protected override beforeRenderPass(): void {
+    if (this.focusFrameDirty) {
+      this.focusFrameDirty = false;
+      this.cancelPendingRepaint(); // this pass draws the frame change – the repaint scheduled for it is not needed
+    }
+    if (!this.tileFocusKnown) {
+      // the first pass (the width and with it the tiles per row are known now): a focus set before the table
+      // listened to the focus model – an own model of the app, a table that was built again
+      this.tileFocusKnown = true;
+      this.rememberFocusedTile();
+      return;
+    }
+    const focused = this.focusedTile;
+    if (!focused || this.syncingTileFocus) {
+      return;
+    }
+    const tiles = this.getTileLayout();
+    const fm = tiles ? this.focusModel() : undefined;
+    if (!tiles || !fm) {
+      return;
+    }
+    const perRow = Math.max(1, tiles.getTilesPerRow());
+    const count = tiles.getTileCount();
+    const [row, col] = fm.getFocus();
+    const index = cellToTileIndex(row, col, perRow);
+    if (index >= 0 && index < count && tiles.getTileAt(index) === focused.item) {
+      focused.index = index;
+      return;
+    }
+    let target = count > 0 ? tiles.indexOfTile(focused.item) : -1;
+    if (target < 0 || target >= count) {
+      target = Math.min(count - 1, focused.index);
+    }
+    this.syncingTileFocus = true;
+    try {
+      if (target < 0) {
+        fm.clear();
+      } else {
+        const [targetRow, targetCol] = tileIndexToCell(target, perRow);
+        fm.setFocus(targetRow, targetCol); // fires onFocusChanged: row and column did change
+      }
+    } finally {
+      this.syncingTileFocus = false;
+    }
+    this.rememberFocusedTile();
+  }
+
+  /** True if an event comes from a form control, button, link or editable element (inside a cell, the editor …). */
+  private static isControlEvent(evt: Event): boolean {
+    const target = evt.target instanceof Element ? evt.target : null;
+    return !!target?.closest('input, select, textarea, button, a[href], [contenteditable]:not([contenteditable="false"])');
+  }
+
+  /** A change of the focus frame (focusFrame "keyboard") that the next render pass has to draw. */
+  private focusFrameDirty = false;
+
+  /**
+   * The last input in the table was a key (true) or a mouse press (false) – with `focusFrame: "keyboard"` the frame
+   * of the focused cell appears resp. disappears with the next render (at once if no other render follows).
+   */
+  private setKeyboardModality(keyboard: boolean): void {
+    if (this.keyboardModality === keyboard) {
+      return;
+    }
+    this.keyboardModality = keyboard;
+    if (this.tableOptions?.focusFrame !== 'keyboard') {
+      return;
+    }
+    const focus = this.focusModel()?.getFocus();
+    if (this.headerFocus || (focus && focus[0] >= 0 && focus[1] >= 0)) {
+      this.focusFrameDirty = true;
+      this.debounceRepaint(); // a mouse press holds it back until mouseup (MouseHandler), a navigation key replaces it
     }
   }
 
@@ -2863,6 +3105,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   onFocusChanged(sm: FocusModelIf) {
+    this.rememberFocusedTile(); // a grid of tiles: the focus follows this item (since 1.1.115)
     this.eventListener.onFocusChanged?.(sm);
   }
 

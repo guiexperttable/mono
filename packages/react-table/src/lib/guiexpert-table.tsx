@@ -2,7 +2,7 @@ import {
   EventListenerIf,
   FocusModelIf,
   GeModelChangeEvent,
-  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
+  GeBatchEditEvent, GeDetailEvent, GeEditEvent, GeUndoEvent, GeColumnResizeEvent, GeColumnMoveEvent, GeFilterEvent, GeCellActivateEvent, GeMouseEvent, GeRowDragEvent, GeScrollEvent, GeStateChangeEvent, LicenseManager, SelectionModelIf,
   SimpleDomService,
   TableApi,
   TableModelIf,
@@ -27,6 +27,7 @@ export type GeUndoEventFn = (evt: GeUndoEvent) => void;
 export type GeColumnResizeEventFn = (evt: GeColumnResizeEvent) => void;
 export type GeColumnMoveEventFn = (evt: GeColumnMoveEvent) => void;
 export type GeFilterEventFn = (evt: GeFilterEvent) => void;
+export type GeCellActivateEventFn = (evt: GeCellActivateEvent) => void;
 
 export interface GuiexpertTableProps {
   tableModel: TableModelIf,
@@ -72,6 +73,8 @@ export interface GuiexpertTableProps {
   columnMoveEnd?: GeColumnMoveEventFn,
   /** Column filters changed (since 1.1.114). */
   filterChanged?: GeFilterEventFn,
+  /** Enter or a double click "opens" a body cell – `evt.value`, `evt.row`, `evt.source` (since 1.1.115). */
+  cellActivated?: GeCellActivateEventFn,
   tableReady?: GeTableReadyEventFn,
   licenseKey?: string,
   /**
@@ -104,6 +107,7 @@ export interface GuiexpertTableProps {
  * @param {Function} [props.editingChanged] - The cell editor opened, changed, committed or was cancelled (since 1.1.99).
  * @param {Function} [props.undoStackChanged] - The undo history changed (since 1.1.99).
  * @param {Function} [props.columnResizeEnd] - A column resize by the user ended (since 1.1.110); also `columnResizeStart`, `columnMoveStart`, `columnMoveEnd`.
+ * @param {Function} [props.cellActivated] - Enter or a double click "opens" a body cell (since 1.1.115).
  * @param {string} [props.licenseKey] - The license key for the GuiexpertTable component.
  * @param {boolean} [props.loading] - Shows the loading overlay (no re-creation of the table, since 1.1.92).
  *
@@ -158,7 +162,8 @@ export function GuiexpertTable(props: GuiexpertTableProps) {
       onColumnResizeEnd: (evt: GeColumnResizeEvent) => propsRef.current.columnResizeEnd?.(evt),
       onColumnMoveStart: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveStart?.(evt),
       onColumnMoveEnd: (evt: GeColumnMoveEvent) => propsRef.current.columnMoveEnd?.(evt),
-      onFilterChanged: (evt: GeFilterEvent) => propsRef.current.filterChanged?.(evt)
+      onFilterChanged: (evt: GeFilterEvent) => propsRef.current.filterChanged?.(evt),
+      onCellActivated: (evt: GeCellActivateEvent) => propsRef.current.cellActivated?.(evt)
     };
 
     // A new tableModel or tableOptions object re-creates the table (dependency array below);

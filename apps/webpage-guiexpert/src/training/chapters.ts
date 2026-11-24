@@ -391,7 +391,8 @@ export const CHAPTERS: Chapter[] = [
     learn: ["name the table for screen readers", "know the keys of the grid", "announce sorting, filter and copy – also in German",
       "write cell renderers that screen readers understand"],
     api: ["TableOptionsIf.ariaLabelledBy", "TableOptionsIf.ariaLabel", "TableOptionsIf.ariaTexts", "AriaTextsIf", "AriaTexts",
-      "TableApi.announce", "TableApi.getHeaderFocus", "LiveAnnouncer", "ActionId"],
+      "TableApi.announce", "TableApi.getHeaderFocus", "LiveAnnouncer", "ActionId",
+      "EventListenerIf.onCellActivated", "TableOptionsIf.focusFrame"],
     since: "1.1.91"
   },
   {

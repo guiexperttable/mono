@@ -636,12 +636,13 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [x] `ColumnDef`-Konstruktor überschreibt `minWidth`/`maxWidth` bei %-Breiten (`column-def.ts:62`). Behoben 1.1.103.
 - [x] `createTableModel({headerData, bodyData})` ohne `columnSizes` → Spaltenbreiten −1 (`table-model.ts:512`). Behoben
       1.1.103: 100 px je Spalte (wie ein Default-`ColumnDef`).
-- [ ] `CoverGridBodyModel`: Breite < 1 Cover → 0 Spalten → `getRowCount() = Infinity` (`:44`); leere Extrazeile bei
-      voller letzter Zeile (`:40`, `floor+1` statt `ceil`).
-- [ ] `FocusModel("none")` wird ignoriert: `RenderScope` zeichnet den Fokusrahmen, sobald `hasFocus()` stimmt – der
-      `selectionType` des `FocusModel` wird nirgends gelesen. Cover-Grid-Demo und -Showcase blenden den Rahmen per CSS
-      aus (`.ge-table-focus-border { display: none }`, Okt. 2026). Fix nur mit Bedacht: `new FocusModel()` hat den
-      Default `"none"` – Anwender-Code mit `new FocusModel()` bekäme dann gar keinen Fokusrahmen mehr.
+- [x] `CoverGridBodyModel`: ~~Breite < 1 Cover → 0 Spalten → `getRowCount() = Infinity`; leere Extrazeile bei voller
+      letzter Zeile (`floor+1` statt `ceil`)~~ – behoben 1.1.115 (Prompt 024): mindestens eine Spalte, `Math.ceil`;
+      außerdem sortieren `sort()`/`doSort()` eine Kopie (das `items`-Array der App behält seine Reihenfolge).
+- [x] `FocusModel("none")` wird ignoriert – entschieden in 1.1.115 (Prompt 024): der Typ wird **weiter nicht**
+      ausgewertet (`new FocusModel()` hat die Vorgabe `"none"`, bestehende Apps verlören den Rahmen); dafür gibt es die
+      Option `tableOptions.focusFrame: "always" | "keyboard" | "never"`. JSDoc von `FocusModel`/`FocusType` sagt es.
+      Cover-Grid-Demo und -Showcase brauchen den CSS-Umweg nicht mehr.
 - [ ] Header-Gruppen (`AreaModelCellGroups`, WIP): zugeklappte Gruppe überdeckt ihr „always“-Kind (`:130/168`).
 - [x] Excel-Export: `NaN`/`Infinity` als `<v>NaN</v>` → Excel meldet defekte Datei (`excel-service.ts:194`). Behoben 1.1.103:
       Textzelle („NaN“, „Infinity“ wie in der Tabelle); ein `ExcelFormattedValueIf` mit solchem Wert ergab „[object Object]“
@@ -678,6 +679,36 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] `getSelectionAggregates()` rechnet über alle numerischen Zellen der Auswahl (bei Zeilenauswahl alle Spalten) – ein
       Parameter `property`/`columns` wäre für „Summe der ausgewählten Beträge“ naheliegend.
 - [ ] `ShortcutService` loggt auf `localhost` (s. o., Prompt 021).
+
+## Cover Grid mit der Tastatur (Prompt 024, 24.11.2026)
+
+- [x] Prompt 024 umgesetzt (Branch `feat/cover-grid-tastatur`, Design `prompts/024-cover-grid-tastatur.design.md`,
+      Zielversion 1.1.115): Kachel-Navigation über `AreaModelIf.getTileLayout?()` (`TileLayoutIf`, DOM-frei
+      `navigateTiles`), `onCellActivated` (`GeCellActivateEvent`, alle Wrapper: `cellActivated`), Fokus folgt dem Item,
+      `tableOptions.focusFrame`, Alias `createCoverGridDefaultOptions`, drei Modellfehler.
+- [ ] Auswahlmodell für Kacheln (Mehrfachauswahl mit Shift/Strg, Leertaste) – heute App-Sache (Renderer markiert);
+      Leertaste, Strg/⌘+A und Strg/⌘+C tun im Cover Grid bewusst nichts.
+- [ ] Option „Kacheln füllen die Breite“ im Core (heute `fitCoversToWidth` in `demo-table-models` + eigener
+      `ResizeObserver` mit `recalcColumnWidths()`).
+- [ ] „Fokus folgt der Zeile“ für alle Tabellen (nach Sortieren/Filtern zeigt der Fokus einer normalen Tabelle auf
+      eine andere Zeile; 024 löst es nur für Kachel-Layouts über das Item).
+- [ ] CSS-Klasse an der fokussierten Zelle (z. B. `ge-table-cell-focused`) + Host-Klasse für „Tastatur-Bedienung“,
+      damit ein Renderer einen eigenen Fokus-Ring zeichnen kann (runde Kacheln); heute nur der rechteckige Rahmen
+      oder `focusFrame: "never"` + eigener Zustand in der App.
+- [ ] Zellnavigation aller Tabellen am Rand: weiter zwei Render-Durchgänge (`ensureRowIsVisible` + `repaint`,
+      NOTE in `perf-invariants`); der Kachel-Weg (`TableScope.showBodyRow`) braucht einen – übertragbar.
+- [ ] `CoverGridBodyModel`: `getYPosByRowIndex(0)` meldet das Padding statt 0; `doSort` über Objekte vergleicht
+      `"[object Object]"` (NOTEs in der Spec, im Cover Grid ohne Header nicht auslösbar).
+- [x] Abschluss-Review (unabhängiger Agent, 24.11.2026), sechs Fehler mit Tests behoben: `focusFrame: "keyboard"`
+      ersetzte Eingabefelder eigener Renderer (Repaint beim Wechsel Taste/Maus – jetzt nicht für Ereignisse aus
+      Formularelementen); Dreifachklick behandelte den Doppelklick zweimal; Doppelklick auf Button/Link/Input einer
+      Zelle meldete `onCellActivated`; Fokus vor dem Aufbau der Tabelle (eigenes `FocusModel`) folgte dem Item nicht;
+      verlorener Doppelklick nahm den Index statt der Zeile/des Items; gehaltene Enter-Taste meldete je Wiederholung.
+- [ ] Ein `FocusModel`, das sich zwei Kachel-Tabellen teilen: die Größenänderung der einen verschiebt den Fokus der
+      anderen (Fokus folgt dem Item je Tabelle) – je Tabelle ein eigenes Modell verwenden.
+- [ ] Enter wird für `onCellActivated` **nicht** verbraucht (Dialog/Formular um die Tabelle sieht die Taste weiter,
+      Test `aria.browser.spec.ts` „Enter on a plain cell does nothing“). Falls gewünscht: Option oder
+      `evt.preventDefault()` am `GeCellActivateEvent`.
 
 ## Spaltenfilter, Filter-Menü & Spaltenauswahl (Prompt 023, 1.1.114)
 
@@ -940,6 +971,29 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.115**, Core + alle Wrapper (Prompt 024):
+  - **Neu: `onCellActivated`** (`GeCellActivateEvent`; Wrapper `cellActivated`) – Enter auf der fokussierten
+    Body-Zelle und Doppelklick melden dasselbe Ereignis („Zeile/Kachel öffnen“), in jeder Tabelle. Nur wenn die Geste
+    nichts anderes tat (Checkbox, Detailzeile, Baumknoten, Editor). Enter wird dabei nicht verbraucht.
+  - **Neu: `tableOptions.focusFrame`** `"always"` (Vorgabe, wie bisher) | `"keyboard"` | `"never"`.
+  - **Cover Grid, Verhaltensänderungen:** Die Tasten navigieren von Item zu Item (Umbruch am Reihenende, Pos1/Ende =
+    erstes/letztes Item); leere Kacheln bekommen keinen Fokus mehr (auch nicht per Klick); der Fokus folgt dem Item
+    nach Sortieren, Filtern, Größenänderung; der Fokusrahmen erscheint nur noch nach Tastatur
+    (`createCoverGrisDefaultOptions` setzt `focusFrame: "keyboard"`) und liegt innen an der Kachel; Strg/⌘+C kopiert
+    in einem Kachel-Layout ohne Texte nichts mehr (vorher: leerer Text in die Zwischenablage).
+  - **Cover Grid, Fehler:** Breite < eine Kachel → eine Spalte (vorher 0 Spalten, `Infinity` Zeilen); keine leere
+    Extrazeile bei voller letzter Reihe (Scrollhöhe kleiner); `sort()`/`doSort()` sortieren eine Kopie – das
+    `items`-Array der App wird nicht mehr umsortiert (wer sich darauf verlassen hat: `bodyModel.filteredItems` lesen).
+    Folge: Wer nach einem `sort()` ohne Filter Items an `items` **anhängt** und nur `repaintHard()` ruft, sieht sie
+    nicht mehr (vorher war `filteredItems` dasselbe Array) – wie dokumentiert `bodyModel.filteredItems = bodyModel.items`
+    setzen (bzw. `externalFilterChanged()`) und neu sortieren.
+  - **Doppelklick trotz Render im Klick-Handler:** Rendert die App in `onMouseClicked` (markiert die angeklickte
+    Zeile/Kachel), ging der `dblclick` verloren – kein Editor, kein Baum-Umschalten. Jetzt behandelt der `MouseHandler`
+    ihn selbst (genau einmal, für die Zeile bzw. das Item des Klicks).
+  - Alias `CoverGridFactory.createCoverGridDefaultOptions`; `createCoverGrisDefaultOptions` ist `@deprecated`.
+  - Apps mit Cover Grid: `shortcutActionsDisabled: true` und das CSS `.ge-table-focus-border { display: none }`
+    entfernen.
 
 - **1.1.112**, Core:
   - Live-Daten: ein Druck, unter dem die App rendert, wird nicht mehr zum Zug, nur weil der Browser danach ein

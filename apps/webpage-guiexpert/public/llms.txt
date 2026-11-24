@@ -128,6 +128,8 @@ const unsubscribe = tableApi.subscribe({ onMouseClicked: e => console.log("secon
   focus frame – it only selects nothing.
 - A double click arrives as a click with `clickCount: 1`, then one with `clickCount: 2`. On a header cell a double click
   sorts (sortable columns), on an editable body cell it opens the editor.
+- "Open this row" for mouse **and** keyboard: `listener.onCellActivated = evt => open(evt.row)` (since 1.1.115) – a
+  double click and Enter on the focused cell report the same event (R20). Prefer it to `clickCount === 2`.
 - Since 1.1.108 a click is reported even if your code renders between `mousedown` and `mouseup` (live data).
 - There is no built-in context menu – `onContextmenu` + your own HTML. `onMouseMoved` fires per mouse move (keep it cheap).
   → instructions.md 6.5, training "events-and-context-menu"
@@ -162,7 +164,8 @@ tableApi.triggerAction("NAVIGATE_DOWN");                                        
   `getActiveCell()` works without configuration. To keep a reference, pass `getFocusModel: () => focusModel`
   (`new FocusModel("cell")`) and read `focusModel.getFocus()`; `onFocusChanged` reports moves.
 - Your `keydown` listener and the table's own handler both run (both listen on the host); the table does not stop the
-  event. Enter also triggers the built-in `ACTIVATE_CELL` (toggles a row checkbox / tree node, else nothing); with
+  event. Enter also triggers the built-in `ACTIVATE_CELL` (toggles a row checkbox / tree node / detail row, else it
+  reports `onCellActivated` since 1.1.115 – R20; the key is not consumed); with
   `editing` (Excel-style) Delete also clears the selected cells – remap or disable those keys
   (`shortcutActionIdMapping`, `shortcutActionsDisabled: true` switches all built-in keys off).
 - `removeRows(rows, predicate?)` works on a `TableFactory.createTableModel({ rows })` body: O(n) (filters all rows into a
@@ -534,6 +537,52 @@ More (short): tree + checkboxes `TreeFactory` (instructions.md 6.6), master/deta
 `RowGroupFactory` (5.6), pivot `PivotFactory` (5.7), calculated columns `valueGetter`/`formula` (5.2, 5.9), spreadsheet
 `SpreadsheetFactory.create` (6.25), cover grid (5.10), totals footer `footerAggregates` (5.4), row numbers (5.2).
 
+### R20 – Open a row or a cover with Enter and double click; cover grid with the keyboard (since 1.1.115)
+
+```ts
+import {
+  AreaIdent, AreaModelIf, CellRendererIf, CoverGridFactory, EventAdapter, GeCellActivateEvent, SimpleDomService,
+  TableScope
+} from "@guiexpert/table";
+
+interface Book { title: string; coverUrl: string }
+declare const host: HTMLDivElement;
+declare const books: Book[];
+declare function openBook(book: Book): void;
+
+const renderer: CellRendererIf = {
+  render(cellDiv: HTMLDivElement, _r: number, _c: number, _a: AreaIdent, _m: AreaModelIf, book: any) {
+    if (!book) return undefined;                       // the tiles after the last item are empty
+    const img = document.createElement("img");
+    img.src = (book as Book).coverUrl;
+    img.alt = (book as Book).title;                    // the accessible name of the tile
+    cellDiv.append(img);
+    return undefined;
+  }
+};
+const tableModel = CoverGridFactory.createCoverGridModel(books, renderer, 160, 240);
+const tableOptions = CoverGridFactory.createCoverGridDefaultOptions(240, () => "books");
+const listener = new EventAdapter();
+listener.onCellActivated = (evt: GeCellActivateEvent) => openBook(evt.value as Book);   // Enter AND double click
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, listener).firstInit().getApi();
+```
+
+- `onCellActivated` works in **every** table: in a list `evt.row` is the row object (`evt.value` the cell value; in a
+  tree, row grouping or pivot `evt.row` is a `TreeRow` – your object is `evt.row.data`), in a cover grid `evt.value`
+  is the item. `evt.source` = `"keyboard"` | `"mouse"` | `"api"`. Wrappers: `cellActivated`
+  (React/Preact/Solid prop, Vue `@cellActivated`, Svelte `on:cellActivated`, Angular `(cellActivated)`, Web Component
+  `CustomEvent`).
+- It is reported only if the gesture did nothing else: Enter first toggles a row checkbox, a detail row, a tree node
+  and (Excel-style editing) edits or moves down; a double click on an editable cell opens the editor, on the tree
+  column it toggles the node. Never on resize/drag handles, on a button/link/input of your renderer, on empty tiles
+  or under a loading overlay. A held Enter key reports once.
+- The Enter key is not consumed: a dialog around the table still sees it – `evt.originalEvent?.stopPropagation()`.
+- Cover grid keys (built in, no code): ← → previous/next item with wrap over the end of a row, ↑ ↓ one row,
+  Home/End first/last item, Page Up/Down, Tab focuses the first visible item. The focus follows the **item** after
+  `sort()`, filter and resize. Do not set `shortcutActionsDisabled: true` (older examples did).
+- Focus frame: `tableOptions.focusFrame: "always"` (default) | `"keyboard"` (cover grid default, like `:focus-visible`)
+  | `"never"`. → instructions.md 5.10
+
 ## Pitfalls
 
 Symptom → cause → fix.
@@ -572,7 +621,15 @@ Symptom → cause → fix.
 - **`instanceof AreaModelTree` is false** → two copies of the core in the bundle → `isAreaModelTree(x)`, `isTreeRow(x)`;
   dedupe `@guiexpert/table`.
 - **TypeScript: unknown option** → "corrected" a misspelled API → use `showCheckboxWihoutExtraColumn`, `isHeaderVisibe`,
-  `emmitDataKey`, `createCoverGrisDefaultOptions` as they are.
+  `emmitDataKey` as they are. (`createCoverGrisDefaultOptions` has a correctly spelled alias since 1.1.115:
+  `createCoverGridDefaultOptions`.)
+- **The focus frame is hidden with CSS (`.ge-table-focus-border { display: none }`) or `new FocusModel("none")`** → CSS
+  takes the frame from keyboard users, the focus model type is not evaluated → `tableOptions.focusFrame: "keyboard"`
+  (only after keys) or `"never"` (since 1.1.115, R20).
+- **A cover grid cannot be used with the keyboard / arrow keys stop at the end of a row** → `shortcutActionsDisabled:
+  true` from old examples, or a version before 1.1.115 → remove the option; the grid navigates item by item (R20).
+- **A double click opens the item, Enter does nothing** → only `onMouseClicked` with `clickCount === 2` is handled →
+  `onCellActivated` (R20).
 - **Own `mousedown`/`mouseup`/`dblclick` listeners on the header** (to save widths, lock a column, fit on double click)
   → the table had no column events before 1.1.110 → `onColumnResizeEnd` / `onColumnMoveEnd` (R18),
   `ColumnDef.resizable: false` / `movable: false`, the built-in double click (`columnAutoWidth`).
@@ -596,6 +653,9 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - Variable row heights: implement `getRowHeight(i)`; `getConstantRowHeight()` only if all rows are equally high. `defaultRowHeights` only applies to models the factory builds or whose `getRowHeight()` returns 0.
 - Save the column layout when the user resizes or moves a column: `onColumnResizeEnd` / `onColumnMoveEnd` (wrappers `columnResizeEnd`, `columnMoveEnd`, since 1.1.110) – once per drag, after the change; read `tableApi.getState(["columns"])` there. Lock a column: `ColumnDef.resizable: false`, `movable: false`. Double click on the column border fits the width (`columnAutoWidth`, `tableApi.autoResizeColumn(column)`).
 - Built-in column filters, Excel value checklist and column chooser: `filterRow: true`, `columnFilterMenu: true`, `tableApi.showColumnChooser(btn)` (since 1.1.114); events `onFilterChanged` (wrapper `filterChanged`); state part `"filters"` (`autoRestoreFilterState: true`); server-side via `columnFilter: { managed: false }`. → R19, instructions.md 6.28.
+- Open a row or a cover with Enter or a double click: `listener.onCellActivated = evt => open(evt.row ?? evt.value)` (wrappers `cellActivated`, since 1.1.115) – one handler for keyboard and mouse; only if the gesture did nothing else (checkbox, tree node, detail row, editor); the Enter key is not consumed. → R20
+- Hide the focus frame: `tableOptions.focusFrame: "never"`; only while the keyboard is used: `"keyboard"` (default of a cover grid, since 1.1.115). Not with CSS, not with `new FocusModel("none")`.
+- Cover grid with the keyboard (since 1.1.115): built in – arrows move from item to item (wrap at the end of a row), Home/End first/last item, Enter opens, the focus follows the item after sort/filter/resize. → R20
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 
 ## Feature reference
@@ -633,6 +693,7 @@ What the table can do – one line per feature, details in instructions.md (each
 - Column drag (since 1.1.110): events EventListenerIf.onColumnResizeStart/End (GeColumnResizeEvent: type "start" | "end" | "cancel", source "mouse" | "dblclick", columnIndex, columnDef, property, oldWidth, newWidth) and onColumnMoveStart/End (GeColumnMoveEvent: type, fromIndex, toIndex, columnDef, property, columnOrder, moved) – only user actions, once per drag, the end after the change, start after 4 px, Escape / tableApi.cancelColumnDrag() = "cancel", tableApi.isColumnDragging(); wrappers columnResizeStart/End, columnMoveStart/End. Locks: ColumnDef.resizable: false (no handle, no double click, no auto width), movable: false (fixed place, applyState keeps it); RowNumberColumnDef has both false; a column stays in its area (west/center/east). Double click on the resize handle fits the width (no sorting): tableOptions.columnAutoWidth: { doubleClick (true), maxRows (10,000: all body rows, above only the rendered rows), getWidth(ctx: ColumnAutoWidthContextIf { columnIndex, columnDef, property, source, firstRenderedRow, lastRenderedRow, measureText(text), getDefaultWidth() }) => number | undefined }, limited by minWidth/maxWidth; tableApi.autoResizeColumn(index | property | ColumnDef) → width | undefined.
 - Column filters, filter menu and column chooser (since 1.1.114): opt-in persistent filter row `tableOptions.filterRow: true | FilterRowOptionsIf` (visible, debounce, placeholder, height, clearButtonVisible, minInputWidthInPx), Excel-style per-column filter menu `tableOptions.columnFilterMenu: true | ColumnFilterMenuOptionsIf` (showCondition, showValues, applyOnChange, maxValues, virtualized unique-value checklist, async `ColumnDef.filter.getValues`), global `tableOptions.columnFilter: ColumnFilterOptionsIf` (`managed: true | false`, `caseSensitive`, `locale`, `maxValues`), `tableOptions.columnFilterTexts: ColumnFilterTextsIf`; per-column `ColumnDef.filter: false | "text" | "number" | "date" | "boolean" | ColumnFilterColumnOptionsIf` (type, valueGetter, caseSensitive, placeholder, getValues) and `ColumnDef.hideable: false`; shorthand syntax in filter row (`>100`, `10..20`, `=x`, `!=x`, `^a`, `z$`, `""`, `2026-01..2026-03`, tri-state boolean); `TableApi`: `setColumnFilter`, `setColumnFilters`, `clearColumnFilters`, `getColumnFilter`, `getColumnFilters`, `isColumnFiltered`, `setFilterRowVisible`, `isFilterRowVisible`, `showColumnFilterMenu`, `hideColumnFilterMenu`, `showColumnChooser`, `hideColumnChooser`; event `EventListenerIf.onFilterChanged(GeFilterEvent: filters, property, source, rowCount, unfilteredRowCount)` (wrappers: `filterChanged`); composes with `externalFilterFunction` (AND) and live `appendRows` (input focus/caret/IME preserved); state part `"filters"` (`TableStateIf.filters`, `filterRowVisible`, `autoRestoreOptions.autoRestoreFilterState`); keyboard `FOCUS_COLUMN_FILTER` (Ctrl/⌘+Shift+F), `OPEN_COLUMN_FILTER_MENU` (Alt+ArrowDown); top-layer popups (`popover="manual"` with fullscreen/Shadow DOM fallback), RTL & fixed columns; DOM-free engine `parseFilterInput`, `formatFilterCondition`, `compileSingleColumnFilter`, `compileColumnFilterPredicate`, `inferColumnFilterType`, `collectDistinctValues`; CSS `ge-table-filter-row*`, `ge-table-filter-menu*`, `ge-table-column-chooser*`, `--ge-table-filter-*`. Showcase `columnfilter`, demo `apps/table-demo/column-filter.html`.
 - Live data / log tail (since 1.1.108): tableApi.appendRows(rows, { follow?: "auto" (default: stays at the end if it was at the end, else the first visible row stays) | true (always the end) | false (freeze), maxRows?: ring buffer – oldest rows removed from the start in blocks of ≥ 1 % }) → AppendRowsResultIf { added, shown, removed, following } | false (tree, row groups, pivot, spreadsheet, cell formulas) – AreaModelObjectArray body only, IN PLACE (pushes to your array, no copy), O(k): externalFilterFunction only for the new rows, sorted column / sort(fn) → merged in (binary search, behind equal rows); selection, focus, Shift+arrow anchor and checked rows stay at their rows (RowIndexShift, SelectionModel/FocusModel.adjustForRowChanges – no onSelectionChanged unless a selected row left the buffer); one render pass, none when only rows below the view came in (cells not rebuilt). Held mouse button: "auto" keeps the rows under the pointer and follows again after release. Own AreaModel: append yourself, then tableApi.rowsAppended(count, { follow, removedAtStart }). Not addRows() (copies all rows, resets filter and sort). Showcase logtail, demo apps/table-demo/log-tail.html, LogTailController + createLogTailModelAndOptions in @guiexpert/demo-table-models.
+- Open a cell, tile navigation, focus frame (since 1.1.115): EventListenerIf.onCellActivated(GeCellActivateEvent: areaIdent "body", rowIndex, columnIndex, value, row, source "keyboard" | "mouse" | "api", originalEvent) – Enter on the focused body cell or a double click, in every table, after the built-in jobs (row checkbox, detail row, tree node, editing.enterKey; double click: editor of an editable cell, tree node), not on handles, empty tiles or under a blocking overlay; the Enter key is not consumed; wrappers cellActivated. Cover grid keyboard: AreaModelIf.getTileLayout?(): TileLayoutIf { getTileCount, getTilesPerRow, getTileAt(index), indexOfTile(item) } (CoverGridBodyModel implements it) → the items are one sequence: ←/→ previous/next with wrap (RTL mirrored), ↑/↓ one row (↓ without a tile below: last item), Home/End and Ctrl/⌘+Home/End first/last item, Page Up/Down; empty tiles never focused (keys and mouse); one render per key; the focus follows the item (sort, filter, resize, new items; filtered out → tile at the same index). DOM-free: navigateTiles(index, action, { count, perRow, pageRows, firstVisible }), tileIndexToCell, cellToTileIndex. tableOptions.focusFrame: "always" (default) | "keyboard" (only while the keyboard is used, default of CoverGridFactory.createCoverGridDefaultOptions) | "never"; FocusModel("none") does not hide the frame. CoverGridFactory.createCoverGridDefaultOptions (alias, the old createCoverGrisDefaultOptions is deprecated). Cover grid fixes: at least one column (was 0 → Infinity rows), no empty extra row, sort()/doSort() sort a copy (the app's items array keeps its order).
 - Custom filtering
 - In-place cell editing
 - User-defined key and mouse events

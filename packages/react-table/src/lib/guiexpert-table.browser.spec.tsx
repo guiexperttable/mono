@@ -12,7 +12,7 @@ import { GuiexpertTable } from './guiexpert-table';
 import { DetailComponentRendererWrapper } from './detail-component-renderer-wrapper';
 import type { DetailComponentProps } from './detail-component-renderer-wrapper';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
+  bodyCell, cellOf, coverGridRightGap, createCoverGridFillModelAndOptions, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
 } from '../../../table/test-utils/wrapper-test-utils';
 
 beforeAll(() => {
@@ -435,6 +435,21 @@ describe('GuiexpertTable (React)', () => {
     const first = bodyCell(host, 0, 0)!;
     expect(first.style.right).toBe('0px');
     expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
+
+  it('coverGridFill: the tiles of a cover grid fill the width, setCoverGridFill changes them (since 1.1.117)', async () => {
+    const tableReady = vi.fn<(api: TableApi) => void>();
+    const { tableModel, tableOptions } = createCoverGridFillModelAndOptions();
+    const host = mount(<GuiexpertTable tableModel={tableModel} tableOptions={tableOptions} tableReady={tableReady} />);
+    await nextFrame();
+    const api = tableReady.mock.calls[0][0];
+    expect(api.getCoverGridFill()).toEqual({ tileWidth: 140 });
+    expect(Math.abs(coverGridRightGap(host))).toBeLessThanOrEqual(1);
+    expect(api.setCoverGridFill({ tileWidth: 250 })).toBe(true);   // 2 tiles of 300 px
+    await nextFrame();
+    expect(tableModel.getColumnCount()).toBe(2);
+    expect(Math.abs(coverGridRightGap(host))).toBeLessThanOrEqual(1);
+    expect(tableReady).toHaveBeenCalledTimes(1);   // no rebuild
   });
 
   it('filterRow: renders filter inputs and typing fires filterChanged with source "row" (since 1.1.114)', async () => {

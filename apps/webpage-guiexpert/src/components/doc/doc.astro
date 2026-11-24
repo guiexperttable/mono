@@ -80,7 +80,7 @@ const AREA_MODELS: { name: string; text: string; slug?: string; showcase?: strin
 
 // ── options ───────────────────────────────────────────────────────────────
 const OPTION_GROUPS = [
-  { title: "Layout", names: ["defaultRowHeights", "overflowX", "overflowY", "resizeEventDebounceDelay"] },
+  { title: "Layout", names: ["defaultRowHeights", "overflowX", "overflowY", "resizeEventDebounceDelay", "coverGridFill"] },
   { title: "Mouse", names: ["hoverRowVisible", "hoverColumnVisible", "columnsResizable", "columnsDraggable", "columnResizeHandleWidthInPx", "columnAutoWidth"] },
   { title: "Borders", names: ["verticalBorderVisible", "horizontalBorderVisible", "headerSeparatorBorderVisible", "footerSeparatorBorderVisible", "fixedWestSeparatorBorderVisible", "fixedEastSeparatorBorderVisible", "tableTopBorderVisible", "tableBottomBorderVisible"] },
   { title: "Sorting and filtering", names: ["sortedOptions", "sortOrder", "externalFilterFunction", "filterRow", "columnFilterMenu", "columnFilter", "columnFilterTexts"] },
@@ -100,7 +100,7 @@ const API_GROUPS = [
   { title: "Rows (object models)", names: ["setRows", "addRows", "addRowsAt", "updateRows", "removeRows", "findRows"] },
   { title: "Live data (append)", names: ["appendRows", "rowsAppended"] },
   { title: "Cells and rendering", names: ["updateCells", "repaint", "repaintHard", "getTableModel", "getBodyModel"] },
-  { title: "Columns", names: ["autoResizeColumns", "autoResizeColumn", "isColumnDragging", "cancelColumnDrag", "setColumnWidth", "recalcColumnWidths", "setColumnVisible", "showColumnChooser", "setColumnFormula", "setShowValuesAs"] },
+  { title: "Columns", names: ["autoResizeColumns", "autoResizeColumn", "isColumnDragging", "cancelColumnDrag", "setColumnWidth", "recalcColumnWidths", "setCoverGridFill", "getCoverGridFill", "setColumnVisible", "showColumnChooser", "setColumnFormula", "setShowValuesAs"] },
   { title: "Grouping and pivot", names: ["setRowGroupBy", "setPivotConfig", "getSelectionAggregates"] },
   { title: "Editing, rows and details", names: ["applyCellChanges", "commitBatchEdit", "cancelBatchEdit", "moveRows", "setDetailExpanded"] },
   { title: "State, overlays, announcements", names: ["getState", "applyState", "resetState", "showLoadingOverlay", "hideOverlay", "announce"] },
@@ -163,7 +163,7 @@ const FEATURES: { feature: string; text: string; api: string[]; slug?: string; s
   { feature: "Loading and empty overlays", text: "CSS spinner, “No rows”, “No matching rows”", api: ["TableApi.showLoadingOverlay", "TableOptionsIf.overlayOptions"], slug: "live-data" },
   { feature: "Right-to-left", text: "Arabic, Hebrew, Persian – one option", api: ["TableOptionsIf.direction"], slug: "theming-dark-mode" },
   { feature: "Spreadsheet", text: "A1 cell formulas, copy & paste with Excel, undo, formula bar – one call", api: ["SpreadsheetFactory.create", "TableOptionsIf.cellFormulas", "FormulaBar"], slug: "spreadsheet" },
-  { feature: "Cover grid", text: "items as tiles instead of rows – virtual scrolling, filter and sort stay; arrow keys move from item to item, Enter and double click open one (since 1.1.115)", api: ["CoverGridFactory.createCoverGridModel", "CoverGridTableModel", "EventListenerIf.onCellActivated", "TableOptionsIf.focusFrame"], showcase: "covergrid" },
+  { feature: "Cover grid", text: "items as tiles instead of rows – virtual scrolling, filter and sort stay; arrow keys move from item to item, Enter and double click open one (since 1.1.115); tiles fill the width with coverGridFill (since 1.1.117)", api: ["CoverGridFactory.createCoverGridModel", "CoverGridTableModel", "EventListenerIf.onCellActivated", "TableOptionsIf.focusFrame", "TableOptionsIf.coverGridFill"], showcase: "covergrid" },
   { feature: "Live data", text: "update single cells – only visible ones are redrawn", api: ["TableApi.updateCells"], slug: "live-data" },
   { feature: "Live log", text: "append rows all the time – follow the end, freeze, ring buffer; selection stays", api: ["TableApi.appendRows"], slug: "live-data" },
   { feature: "Persisted state", text: "column layout, sorting, scroll position, tree, checked and selected rows – automatically or as JSON for your server", api: ["TableOptionsIf.autoRestoreOptions", "TableApi.getState"], slug: "persist-state" }

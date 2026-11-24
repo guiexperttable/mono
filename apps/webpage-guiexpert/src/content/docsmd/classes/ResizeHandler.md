@@ -6,7 +6,10 @@ Class representing a ResizeHandler.
 
 **`Classdesc`**
 
-Handles resizing of elements and calls a callback function on resize. These calls will be debounced with 500 ms.
+Handles resizing of the host element and calls `TableScope.recalcColumnWidths` – debounced by
+`resizeEventDebounceDelay` (500 ms). A cover grid that fills its width (`coverGridFill`, since 1.1.117) takes the
+new size over at once: in the `ResizeObserver` callback (after the layout, before the paint – the same frame, at most
+one callback and so one render per frame); a pending debounced call is dropped.
 
 ## Table of contents
 
@@ -21,6 +24,7 @@ Handles resizing of elements and calls a callback function on resize. These call
 
 ### Methods
 
+- [cancelPending](ResizeHandler.md#cancelpending)
 - [disconnect](ResizeHandler.md#disconnect)
 
 ## Constructors
@@ -42,7 +46,7 @@ Handles resizing of elements and calls a callback function on resize. These call
 
 #### Defined in
 
-[src/lib/table/resize-handler.ts:16](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L16)
+[src/lib/table/resize-handler.ts:19](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L19)
 
 ## Properties
 
@@ -52,7 +56,7 @@ Handles resizing of elements and calls a callback function on resize. These call
 
 #### Defined in
 
-[src/lib/table/resize-handler.ts:18](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L18)
+[src/lib/table/resize-handler.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L21)
 
 ___
 
@@ -62,9 +66,25 @@ ___
 
 #### Defined in
 
-[src/lib/table/resize-handler.ts:17](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L17)
+[src/lib/table/resize-handler.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L20)
 
 ## Methods
+
+### cancelPending
+
+▸ **cancelPending**(): `void`
+
+Drops a debounced call that has not run yet (e.g. a render that takes the width over anyway).
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/lib/table/resize-handler.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L52)
+
+___
 
 ### disconnect
 
@@ -78,4 +98,4 @@ Stops observing the host element. Called by [TableScope.destroy](TableScope.md#d
 
 #### Defined in
 
-[src/lib/table/resize-handler.ts:27](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L27)
+[src/lib/table/resize-handler.ts:30](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/resize-handler.ts#L30)

@@ -13,6 +13,7 @@ import { AreaIdent } from './data/tablemodel/area-ident.type';
 import { TableModelIf } from './data/tablemodel/table-model.if';
 import { AreaModelIf } from './data/tablemodel/areamodel/area-model.if';
 import { AreaModelObjectArray } from './data/tablemodel/areamodel/area-model-object-array';
+import type { CoverGridFillOptionsIf } from './cover-grid/cover-grid-fill-options.if';
 import { isAreaModelRowGroups, isPivotColumnDef, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import type { PivotConfigIf } from './pivot/pivot-config.if';
 import type { RowGroupField } from './rowgroup/row-group-field.type';
@@ -2061,6 +2062,42 @@ export class TableApi {
   getRowGroupBy(): RowGroupField[] | undefined {
     const body = this.tableScope.tableModel.getBodyModel();
     return isAreaModelRowGroups(body) ? body.getGroupBy() : undefined;
+  }
+
+  /**
+   * Cover grid ({@link CoverGridFactory}): lets the tiles fill the whole width or changes how
+   * ({@link TableOptionsIf.coverGridFill}) – e.g. a size slider, without a new model and without an own
+   * `ResizeObserver`. Parts are merged with the current settings (`{ tileWidth: 220 }` keeps `aspectRatio` and
+   * `extraHeight`), `true` = `{ tileWidth: coverWidth }`, `false` switches it off (tiles of `tileWidth`, a gap on the
+   * right again). One render; the top item and the focused item stay. The options object is not changed: a framework
+   * wrapper that builds the table again with the same options starts with their value.
+   *
+   * @param {boolean | Partial<CoverGridFillOptionsIf>} fill - the changed parts, `true` or `false`
+   * @returns {boolean} false if the body is no cover grid
+   *
+   * @example
+   * slider.addEventListener("input", () => tableApi.setCoverGridFill({ tileWidth: Number(slider.value) }));
+   * stretch.addEventListener("change", () => tableApi.setCoverGridFill(stretch.checked));
+   *
+   * @since 1.1.117
+   */
+  setCoverGridFill(fill: boolean | Partial<CoverGridFillOptionsIf>): boolean {
+    return this.tableScope.setCoverGridFill(fill);
+  }
+
+  /**
+   * Cover grid: the settings of the full width ({@link setCoverGridFill}, {@link TableOptionsIf.coverGridFill}).
+   *
+   * @returns {CoverGridFillOptionsIf | undefined} a copy, `undefined` if the tiles keep their width or the body is
+   *   no cover grid
+   *
+   * @example
+   * const tileWidth = tableApi.getCoverGridFill()?.tileWidth ?? 165;
+   *
+   * @since 1.1.117
+   */
+  getCoverGridFill(): CoverGridFillOptionsIf | undefined {
+    return this.tableScope.getCoverGridFill();
   }
 
   /**

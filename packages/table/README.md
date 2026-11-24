@@ -93,6 +93,9 @@ This is the UI-agnostic table component for your next web app. 😊
   every table. Cover grid with the keyboard: the arrow keys move from item to item (wrap at the end of a row, empty
   tiles skipped), Home/End, Page Up/Down, the focus follows the item after sorting, filtering and resizing. Focus
   frame: `focusFrame: "always" | "keyboard" | "never"` – since 1.1.115
+- Cover grid in the full width: `coverGridFill: { tileWidth, aspectRatio, extraHeight }` – tiles stretch flush to the
+  edge, a resize takes effect in the same frame with one render, a size slider via `tableApi.setCoverGridFill()` –
+  since 1.1.117
 - State persistence: column layout (width, order, visibility), sorting, scroll position, tree, checked and selected
   rows, header groups – in `localStorage` (`autoRestoreOptions`) or on your server (`tableApi.getState()` /
   `applyState()`, `initialState`, `onStateChanged`); stored by property and row id, never by index – since 1.1.92
@@ -128,6 +131,8 @@ This is the UI-agnostic table component for your next web app. 😊
   with the keyboard (since 1.1.115) – not with CSS.
 - **Cover grid warns "the body model has no row objects"?** Fixed in 1.1.116 – the scroll state stores the first
   visible item, no warning. Do not set `getRowId: (_row, rowIndex) => rowIndex` for a cover grid.
+- **Cover grid tiles should fill the whole width?** `tableOptions.coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165 }`
+  (since 1.1.117) – no own `ResizeObserver`; size slider: `tableApi.setCoverGridFill({ tileWidth })`.
 - **AI assistants:** `llms.txt` in this package – recipes and pitfalls, every snippet compiled against the API.
 - **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 

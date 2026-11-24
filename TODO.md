@@ -664,6 +664,11 @@ Verhalten steht als `// NOTE:` in den Specs.
 - [ ] Header-Gruppen: `getYPosByRowIndex` ist ein Stub (0); diskutabel: Gruppe mit eigener `property` + Kindern,
       `CellGroupExt.getColumnIndex` (unfertig).
 - [ ] Nicht exportiert: `SorterService`, `AbstractStoreStateService` (bewusst?).
+- [x] Cover Grid **ohne** `coverGridFill` mit klassischem Scrollbalken: das erste Layout rechnete mit der Breite ohne
+      Balken (er erscheint erst nach dem Zeilen-Layout) – eine Spalte zu viel und ein waagerechter Balken, bis der
+      entprellte `ResizeObserver`-Durchgang (500 ms) korrigierte. Gefunden mit Prompt 027, behoben 1.1.117: jedes
+      Cover Grid zählt in `RenderScope.hasRelativeColumnWidths()` als breitenabhängig
+      (`cover-grid/cover-grid-scroll-bar.scrollbars.browser.spec.ts`).
 
 ## llms.txt als Nutzungsanleitung (Prompt 020, 09.11.2026)
 
@@ -688,8 +693,17 @@ Verhalten steht als `// NOTE:` in den Specs.
       `tableOptions.focusFrame`, Alias `createCoverGridDefaultOptions`, drei Modellfehler.
 - [ ] Auswahlmodell für Kacheln (Mehrfachauswahl mit Shift/Strg, Leertaste) – heute App-Sache (Renderer markiert);
       Leertaste, Strg/⌘+A und Strg/⌘+C tun im Cover Grid bewusst nichts.
-- [ ] Option „Kacheln füllen die Breite“ im Core (heute `fitCoversToWidth` in `demo-table-models` + eigener
-      `ResizeObserver` mit `recalcColumnWidths()`).
+- [x] Option „Kacheln füllen die Breite“ im Core – Prompt 027 (Branch `feat/cover-grid-volle-breite`, Design
+      `prompts/027-cover-grid-volle-breite.design.md`, Zielversion 1.1.117): `tableOptions.coverGridFill`,
+      `tableApi.setCoverGridFill()`/`getCoverGridFill()`, DOM-frei `computeCoverGridFill`, `isCoverGridBodyModel`;
+      Resize im selben Frame mit einem Render. Showcase `covergrid` und `apps/table-demo/cover-grid.html` umgestellt.
+- [ ] Ausblick 027: `maxTileWidth`/`maxColumns` für `coverGridFill` (eine Spalte mehr, sobald die Kachel breiter als
+      `max` würde); Abstand zwischen Kacheln (`gap`) als Option statt Innenabstand im Renderer.
+- [ ] Resize ohne Entprellung für **alle** Tabellen prüfen (027 macht es nur mit `coverGridFill`: Callback des
+      `ResizeObserver` = derselbe Frame, ein Render je Frame) – Last großer Tabellen mit %-Spalten beim Fensterziehen
+      messen, `resizeEventDebounceDelay` bliebe als Opt-out.
+- [ ] Film „Cover Grid zum Nachbauen“ (`videoserien`, Kapitel 011 „Kacheln strecken“) und Demo-Repo
+      `krocon/cover-grid-demo`: Hinweis „seit 1.1.117 eine Option“ (`coverGridFill`) – nach dem Release.
 - [ ] „Fokus folgt der Zeile“ für alle Tabellen (nach Sortieren/Filtern zeigt der Fokus einer normalen Tabelle auf
       eine andere Zeile; 024 löst es nur für Kachel-Layouts über das Item).
 - [ ] CSS-Klasse an der fokussierten Zelle (z. B. `ge-table-cell-focused`) + Host-Klasse für „Tastatur-Bedienung“,
@@ -1007,6 +1021,25 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.117**, Core + `demo-table-models` (Prompt 027):
+  - **Neu: `tableOptions.coverGridFill`** (`CoverGridFillOptionsIf`: `tileWidth`, `aspectRatio`, `extraHeight`) – die
+    Kacheln eines Cover Grids füllen die ganze Breite (bündig am Rand, auch neben einem klassischen Balken), die Höhe
+    wächst mit dem Seitenverhältnis; ein Resize wirkt im selben Frame mit einem Render, das oberste und das
+    fokussierte Item bleiben. `tableApi.setCoverGridFill(parts | true | false)`, `getCoverGridFill()`; Modell
+    `CoverGridBodyModel.setFill()`; DOM-frei `computeCoverGridFill()`, `isCoverGridBodyModel()`. Kein Wrapper-Code.
+  - **Cover Grid schneller beim Resize** (auch ohne Option): `CoverGridBodyModel.getConstantRowHeight()` (=
+    `coverHeight`, nicht mit `firstRowPaddingTop`) und `getMaxColspan()`/`getMaxRowspan()` = 1 (vorher 31) – vorher
+    baute jede neue Spaltenzahl die Reihen-Präfixsummen und die Span-Suche über alle Reihen neu (1 Mio. Items:
+    O(Reihen)). Eine Unterklasse, die `getRowHeight` bzw. `getColspanAt`/`getRowspanAt` überschreibt, behält das alte
+    Verhalten (keine konstante Höhe bzw. 31).
+  - **Cover Grid neben einem klassischen Balken (Bugfix, auch ohne Option):** das erste Bild hatte eine Spalte zu viel
+    und einen waagerechten Balken, bis der entprellte Resize (500 ms) korrigierte – jetzt im selben Layout.
+  - **% -/Gewichtsspalten und `coverGridFill` neben einem klassischen Balken:** verschwindet der Balken nach der
+    Neuverteilung wieder (Kacheln mit `aspectRatio` werden niedriger), bleibt das schmalere Layout (kein waagerechter
+    Balken, eine Lücke in Balkenbreite) – vorher hätte jedes `repaintHard` zwischen beiden Layouts gewechselt.
+  - `createCoverGridModelAndOptions(…, { fill: true })` (`demo-table-models`); `fitCoversToWidth` bleibt für ältere
+    Versionen.
 
 - **1.1.116**, Core + `demo-table-models` (Prompt 025):
   - **Cover Grid ohne Konsolen-Warnung:** `createCoverGridDefaultOptions` schrieb bei jedem Start „the body model has

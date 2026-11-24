@@ -50,15 +50,16 @@ export class CoverGridTableModel<T> implements TableModelIf {
   }
 
   setParentWidth(widthInPixel: number): void {
-    this.bodyModel.width = widthInPixel;
+    this.bodyModel.setParentWidth(widthInPixel);
   }
 
   getColumnCount(): number {
     return this.bodyModel.getColumnCount();
   }
 
+  /** The x position of a column – the sum of the widths before it (with `coverGridFill` they differ by 1 px). */
   getXPosByColumnIndex(columnIndex: number): number {
-    return columnIndex * this.getColumnWidth(columnIndex);
+    return this.bodyModel.getTileLeftAt(columnIndex);
   }
 
   getAreaModel(rowAreaIdent: AreaIdent): AreaModelIf {
@@ -111,8 +112,9 @@ export class CoverGridTableModel<T> implements TableModelIf {
     return this.bodyModel.getRowByIndex(rowIndex);
   }
 
-  getColumnWidth(_columnIndex: number): number {
-    return this.bodyModel.coverWidth;
+  /** `coverWidth`; with `coverGridFill` the first columns are 1 px wider (the rest pixels of the width). */
+  getColumnWidth(columnIndex: number): number {
+    return this.bodyModel.getTileWidthAt(columnIndex);
   }
 
   setColumnWidth(_columnIndex: number, width: number): void {
@@ -141,7 +143,7 @@ export class CoverGridTableModel<T> implements TableModelIf {
   }
 
   getContentWidthInPixel(): number {
-    return this.bodyModel.getColumnCount() * this.bodyModel.coverWidth;
+    return this.bodyModel.getTileRowWidth();
   }
 
   externalFilterChanged<T>(predictFn: FilterFunction<T>): void {

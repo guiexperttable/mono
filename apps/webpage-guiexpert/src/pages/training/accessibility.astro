@@ -71,6 +71,18 @@ listener.onCellActivated = (evt: GeCellActivateEvent) => {
     <p><code>onCellActivated</code>, the keys of the cover grid and <code>focusFrame</code> need
       <code>@guiexpert/table@1.1.115</code>.</p>
   </Callout>
+  <p>
+    Tiles that fill the whole width are one option: <ApiLink name="TableOptionsIf.coverGridFill" /> with the wanted tile
+    width (and an aspect ratio for the height). A resize keeps the focused item and the top item where they are – the
+    keys above work the same; a size slider calls <ApiLink name="TableApi.setCoverGridFill" />.
+  </p>
+  <Code lang="ts" title="covers in the full width" code={`const tableOptions: TableOptionsIf = {
+  ...CoverGridFactory.createCoverGridDefaultOptions(264, () => "books"),
+  coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }
+};`} />
+  <Callout type="version">
+    <p><code>coverGridFill</code> and <code>setCoverGridFill</code> need <code>@guiexpert/table@1.1.117</code>.</p>
+  </Callout>
 
   <h2 id="what">What the screen reader gets</h2>
   <ul>

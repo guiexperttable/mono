@@ -172,7 +172,7 @@ Sorts an array of SortItem objects based on a predetermined sorting algorithm.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:151](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L151)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L153)
 
 ___
 
@@ -204,7 +204,7 @@ This is triggered when an external filter has changed.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:147](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L147)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:149](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L149)
 
 ___
 
@@ -232,7 +232,7 @@ The area model corresponding to the provided row area identifier.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:64](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L64)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L65)
 
 ___
 
@@ -254,7 +254,7 @@ The body model representing an area.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:70](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L70)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:71](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L71)
 
 ___
 
@@ -282,7 +282,7 @@ Retrieves the body row at the specified index.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:110](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L110)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:111](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L111)
 
 ___
 
@@ -332,7 +332,7 @@ Retrieves the column definition for the specified index.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L98)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L99)
 
 ___
 
@@ -354,7 +354,7 @@ An array of column definitions or undefined if there are no column definitions.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L102)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:103](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L103)
 
 ___
 
@@ -382,27 +382,25 @@ The property of the column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:106](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L106)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:107](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L107)
 
 ___
 
 ### getColumnWidth
 
-▸ **getColumnWidth**(`_columnIndex`): `number`
+▸ **getColumnWidth**(`columnIndex`): `number`
 
-Retrieves the width (in pixels) of a specific column.
+`coverWidth`; with `coverGridFill` the first columns are 1 px wider (the rest pixels of the width).
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `_columnIndex` | `number` | The index of the column to get the width of. |
+| Name | Type |
+| :------ | :------ |
+| `columnIndex` | `number` |
 
 #### Returns
 
 `number`
-
-The width of the specified column.
 
 #### Implementation of
 
@@ -410,7 +408,7 @@ The width of the specified column.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:114](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L114)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L116)
 
 ___
 
@@ -432,7 +430,7 @@ The height of the content in pixels.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:139](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L139)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:141](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L141)
 
 ___
 
@@ -454,7 +452,7 @@ The width of the content in pixels.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:143](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L143)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:145](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L145)
 
 ___
 
@@ -476,7 +474,7 @@ The count of fixed left columns.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:74](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L74)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:75](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L75)
 
 ___
 
@@ -498,7 +496,7 @@ The count of fixed right columns.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:78](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L78)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:79](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L79)
 
 ___
 
@@ -520,7 +518,7 @@ The padding value of the element.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L135)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:137](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L137)
 
 ___
 
@@ -549,7 +547,7 @@ The height of the specified row in pixels.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:94](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L94)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L95)
 
 ___
 
@@ -571,7 +569,7 @@ The selection model instance if available, or undefined if none is found.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:159](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L159)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:161](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L161)
 
 ___
 
@@ -589,7 +587,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:167](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L167)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L169)
 
 ___
 
@@ -597,19 +595,17 @@ ___
 
 ▸ **getXPosByColumnIndex**(`columnIndex`): `number`
 
-Returns the x position corresponding to the given column index.
+The x position of a column – the sum of the widths before it (with `coverGridFill` they differ by 1 px).
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `columnIndex` | `number` | The index of the column. |
+| Name | Type |
+| :------ | :------ |
+| `columnIndex` | `number` |
 
 #### Returns
 
 `number`
-
-- The x position corresponding to the given column index.
 
 #### Implementation of
 
@@ -617,7 +613,7 @@ Returns the x position corresponding to the given column index.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:60](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L60)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:61](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L61)
 
 ___
 
@@ -659,7 +655,7 @@ Returns true if the footer is visible, otherwise returns false.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:86](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L86)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:87](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L87)
 
 ___
 
@@ -681,7 +677,7 @@ Checks if the header is visible.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L82)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:83](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L83)
 
 ___
 
@@ -703,7 +699,7 @@ True if the row checkbox is visible, false otherwise.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L90)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L91)
 
 ___
 
@@ -751,7 +747,7 @@ No-op: the height follows from the item count, the column count and `coverHeight
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:131](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L131)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:133](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L133)
 
 ___
 
@@ -773,7 +769,7 @@ is properly aligned and displayed.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:126](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L126)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:128](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L128)
 
 ___
 
@@ -799,7 +795,7 @@ Recalculates the size of the element based on the provided client width.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:122](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L122)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:124](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L124)
 
 ___
 
@@ -826,7 +822,7 @@ Sets the width of a column in the table.
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:118](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L118)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:120](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L120)
 
 ___
 
@@ -876,7 +872,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:163](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L163)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:165](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L165)
 
 ___
 
@@ -900,4 +896,4 @@ ___
 
 #### Defined in
 
-[src/lib/table/data/tablemodel/cover-grid-table-model.ts:155](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L155)
+[src/lib/table/data/tablemodel/cover-grid-table-model.ts:157](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/tablemodel/cover-grid-table-model.ts#L157)

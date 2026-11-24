@@ -58,6 +58,13 @@ Options for a cover grid: no borders and separators, no row or column hover, hea
 scroll position restored under the key of `getStorageKeyFn` (`localStorage`), and the focus frame only while the
 grid is used with the keyboard (`focusFrame: "keyboard"`).
 
+The scroll position follows the **item** (since 1.1.116): the state stores the id of the first item of the first
+visible row (`id`/`uuid` of the item or `autoRestoreOptions.getRowId(item, index)`), so a restore with another
+width shows the same covers at the top; while the grid lives, a resize or a new tile size keeps the top item at the
+top, too. Items without id: only the pixels. Before 1.1.116 every cover grid that stored its scroll position (these
+options do) wrote a console warning "the body model has no row objects" – do not set
+`getRowId: (_row, rowIndex) => rowIndex`.
+
 #### Parameters
 
 | Name | Type | Description |
@@ -87,7 +94,7 @@ const gridOptions: TableOptionsIf = {
 
 #### Defined in
 
-[src/lib/table/factory/cover-grid-factory.ts:95](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L95)
+[src/lib/table/factory/cover-grid-factory.ts:102](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L102)
 
 ___
 
@@ -168,4 +175,4 @@ const gridOptions: TableOptionsIf = CoverGridFactory.createCoverGrisDefaultOptio
 
 #### Defined in
 
-[src/lib/table/factory/cover-grid-factory.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L116)
+[src/lib/table/factory/cover-grid-factory.ts:123](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/factory/cover-grid-factory.ts#L123)

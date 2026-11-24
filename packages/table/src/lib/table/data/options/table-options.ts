@@ -31,6 +31,7 @@ import type { UndoOptionsIf } from "../../undo/undo-options.if";
 import type { CellFormulaOptionsIf } from "../../sheet/cell-formula-options.if";
 import type { SpreadsheetOptionsIf } from "../../spreadsheet/spreadsheet-options.if";
 import type { BatchEditOptionsIf } from "../../batch-edit/batch-edit-options.if";
+import type { CoverGridFillOptionsIf } from "../../cover-grid/cover-grid-fill-options.if";
 
 
 /**
@@ -161,6 +162,8 @@ export class TableOptions implements TableOptionsIf {
   direction?: TableDirection = undefined;
   /** When the focus frame is drawn ({@link TableOptionsIf.focusFrame}). Not set = `"always"`. @since 1.1.115 */
   focusFrame?: FocusFrameMode = undefined;
+  /** A cover grid fills the whole width ({@link TableOptionsIf.coverGridFill}). Not set = off. @since 1.1.117 */
+  coverGridFill?: boolean | Partial<CoverGridFillOptionsIf> = undefined;
   /** Persistent filter row below the column titles ({@link TableOptionsIf.filterRow}). Not set = off. @since 1.1.114 */
   filterRow?: boolean | Partial<FilterRowOptionsIf> = undefined;
   /** Per-column filter menu popup ({@link TableOptionsIf.columnFilterMenu}). Not set = off. @since 1.1.114 */

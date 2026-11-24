@@ -231,13 +231,20 @@ describe('CoverGridBodyModel', () => {
       expect(m.getRowByIndex(0)).toBeUndefined();
     });
 
-    it('has no spans, classes or styles; allows spans up to 31', () => {
+    it('has no spans, classes or styles; reports no spans (since 1.1.117 – before 31: a resize scanned all rows)', () => {
       expect(m.getColspanAt(0, 0)).toBe(0);
       expect(m.getRowspanAt(0, 0)).toBe(0);
       expect(m.getCustomClassesAt(0, 0)).toEqual([]);
       expect(m.getCustomStyleAt(0, 0)).toBeUndefined();
-      expect(m.getMaxColspan()).toBe(31);
-      expect(m.getMaxRowspan()).toBe(31);
+      expect(m.getMaxColspan()).toBe(1);
+      expect(m.getMaxRowspan()).toBe(1);
+    });
+
+    it('constant row height = coverHeight (since 1.1.117), not with a higher first row', () => {
+      expect(m.getConstantRowHeight()).toBe(300);
+      expect(create(letters(), 40).getConstantRowHeight()).toBeUndefined();
+      m.coverHeight = 0;
+      expect(m.getConstantRowHeight()).toBeUndefined();
     });
 
     it('rows are checkable but never checked, cells are not selectable or editable', () => {

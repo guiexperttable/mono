@@ -488,6 +488,32 @@ tableApi.sort((a: Book, b: Book) => a.title.localeCompare(b.title));`,
       "AreaModelIf.getTileLayout", "navigateTiles", "CoverGridFactory.createCoverGridDefaultOptions", "CoverGridBodyModel"],
     agGrid: "community",
     agGridNote: "double-click and key events of cells are in Community"
+  },
+  {
+    id: "cover-grid-fill", prompt: "027", since: "1.1.117", icon: "mdi:view-grid-plus-outline",
+    title: "A cover grid that fills the width – one option",
+    problem: "Tiles kept their width: a gap stayed on the right, and the columns jumped 500 ms after a resize. Every " +
+      "gallery app wrote its own ResizeObserver and stretched the tiles itself.",
+    points: [
+      "coverGridFill: as many tiles as fit, stretched until the last one ends flush with the edge (also next to a scroll bar)",
+      "aspectRatio + extraHeight – the height grows with the width",
+      "a resize takes effect in the same frame with one render, the top cover and the focused cover stay",
+      "a size slider without a new model: tableApi.setCoverGridFill({ tileWidth })"
+    ],
+    snippet: `const tableModel = GE.CoverGridFactory.createCoverGridModel(books, renderer, 165, 264);
+const tableOptions: TableOptionsIf = {
+  ...GE.CoverGridFactory.createCoverGridDefaultOptions(264, () => "books"),
+  coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }
+};
+// 960 px → 5 covers of 192 × 300 px, flush with the edge – no ResizeObserver of your own
+// a size slider, one render, the top cover stays:
+tableApi.setCoverGridFill({ tileWidth: 220 });`,
+    showcase: { name: "covergrid", title: "Cover grid" },
+    training: { slug: "accessibility", hash: "tiles", label: "Chapter 35 · Tiles" },
+    api: ["TableOptionsIf.coverGridFill", "CoverGridFillOptionsIf", "TableApi.setCoverGridFill", "TableApi.getCoverGridFill",
+      "CoverGridBodyModel.setFill", "computeCoverGridFill"],
+    agGrid: "community",
+    agGridNote: "ag-Grid has no tile layout; its counterpart for columns (fit the grid width) is in Community"
   }
 ];
 

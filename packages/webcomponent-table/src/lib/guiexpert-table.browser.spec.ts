@@ -5,7 +5,7 @@ import { FormulaBar, SpreadsheetFactory, GeBatchEditEvent, GeDetailEvent, GeEdit
 import type { DetailRenderContextIf, TableModelAndOptionsIf, TableModelIf } from '@guiexpert/table';
 import { GuiexpertTable } from './guiexpert-table';
 import {
-  bodyCell, cellOf, clickDetailToggle, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
+  bodyCell, cellOf, clickDetailToggle, coverGridRightGap, createCoverGridFillModelAndOptions, detailRowsOf, createFillModelAndOptions, dragFillHandle, createGroupedModel, createHost, createModel, createPivotModel, createRowDragModel, dragRow, groupLabels, isDestroyed, nextFrame, overlayKind, pivotTotals, removeHosts, rowTexts, tableCount, dblClickResizeHandle, dblClickBodyCell
 } from '../../../table/test-utils/wrapper-test-utils';
 
 const TAG = 'ge-test-table';
@@ -497,6 +497,21 @@ describe('GuiexpertTable (Web Component)', () => {
     const first = bodyCell(el, 0, 0)!;
     expect(first.style.right).toBe('0px');
     expect(Math.abs(first.getBoundingClientRect().right - table.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+  });
+
+  it('coverGridFill: the tiles of a cover grid fill the width, setCoverGridFill changes them (since 1.1.117)', async () => {
+    const { el, events } = createTableElement();
+    const { tableModel, tableOptions } = createCoverGridFillModelAndOptions();
+    el.data = data(tableModel, tableOptions);
+    await nextFrame();
+    const api = events.tableReady[0];
+    expect(api.getCoverGridFill()).toEqual({ tileWidth: 140 });
+    expect(Math.abs(coverGridRightGap(el))).toBeLessThanOrEqual(1);
+    expect(api.setCoverGridFill({ tileWidth: 250 })).toBe(true);
+    await nextFrame();
+    expect(tableModel.getColumnCount()).toBe(2);
+    expect(Math.abs(coverGridRightGap(el))).toBeLessThanOrEqual(1);
+    expect(events.tableReady).toHaveLength(1);
   });
 
   it('filterRow: renders filter inputs and typing dispatches "filterChanged" (since 1.1.114)', async () => {

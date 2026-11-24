@@ -34,7 +34,7 @@ import { ColAndRowspanModel } from './data/tablemodel/areamodel/col-and-rowspan-
 import { AreaObjectMapType } from './data/common/area-map.type';
 import { AreaObjectMap } from './data/common/area-map';
 import { TableCellUpdateEventIf } from './data/common/event/input/table-cell-update-event.if';
-import { isAreaModelAggregateFooter, isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import { isAreaModelAggregateFooter, isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isCoverGridBodyModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import { getLeadingRowNumberColumnCount } from './data/common/row-number-columns';
 import type { RowNumberColumnDef } from './data/common/row-number-column-def';
 import { AriaGridInfo } from './aria/aria-grid-info';
@@ -786,9 +786,26 @@ export class RenderScope extends EleScope {
     this.tableModel.setParentWidth(widthInPixel);
   }
 
-  /** True if a column has a % or weight width (it depends on the width of the host). */
+  /**
+   * True if a column has a % or weight width (it depends on the width of the host) – or the body is a cover grid
+   * (since 1.1.117: its number of tiles per row and with `coverGridFill` their width follow the width; a vertical
+   * scroll bar that appears after the first layout takes room – before, the first render had one tile too many and a
+   * horizontal scroll bar until the debounced resize).
+   */
   protected hasRelativeColumnWidths(): boolean {
-    return !!this.tableModel.getColumnDefs?.()?.some(def => def.width?.unit === 'weight' || def.width?.unit === '%');
+    return isCoverGridBodyModel(this.tableModel.getBodyModel())
+      || !!this.tableModel.getColumnDefs?.()?.some(def => def.width?.unit === 'weight' || def.width?.unit === '%');
+  }
+
+  /**
+   * True if the body is a cover grid whose tiles fill the width ({@link TableOptionsIf.coverGridFill}).
+   *
+   * @returns {boolean} true with an active fill
+   * @since 1.1.117
+   */
+  isCoverGridFillActive(): boolean {
+    const body = this.tableModel.getBodyModel();
+    return isCoverGridBodyModel(body) && !!body.getFill();
   }
 
   protected override layoutContainers(): void {
@@ -812,14 +829,28 @@ export class RenderScope extends EleScope {
     }
     this.adjustingRelativeWidths = true;
     try {
-      this.setParentWidth(available);
-      this.tableModel.init();
-      this.tableModel.recalcPadding();
-      this.resetSizeOfWrapperDiv();
-      this.layoutContainers(); // the caller renders (adjustContainersAndRows, repaintHard)
+      this.relayoutForWidth(available);
+      // Tiles whose height follows their width (coverGridFill with aspectRatio): narrower tiles are lower, the bar may
+      // be gone again – and the wider layout would bring it back. Keep the narrower layout (no horizontal scroll bar,
+      // a gap of the bar width); every repaintHard ends there again instead of flipping (since 1.1.117).
+      const after = this.getAvailableColumnWidth();
+      if (after > 0 && after !== this.relativeWidthsBase) {
+        const narrow = Math.min(after, this.relativeWidthsBase);
+        if (narrow !== this.relativeWidthsBase) {
+          this.relayoutForWidth(narrow);
+        }
+      }
     } finally {
       this.adjustingRelativeWidths = false;
     }
+  }
+
+  private relayoutForWidth(width: number): void {
+    this.setParentWidth(width);
+    this.tableModel.init();
+    this.tableModel.recalcPadding();
+    this.resetSizeOfWrapperDiv();
+    this.layoutContainers(); // the caller renders (adjustContainersAndRows, repaintHard)
   }
 
   /**

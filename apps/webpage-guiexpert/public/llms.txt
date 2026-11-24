@@ -583,6 +583,37 @@ const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableO
 - Focus frame: `tableOptions.focusFrame: "always"` (default) | `"keyboard"` (cover grid default, like `:focus-visible`)
   | `"never"`. → instructions.md 5.10
 
+### R21 – Cover grid in the full width, tile size with a slider (since 1.1.117)
+
+```ts
+import { CellRendererIf, CoverGridFactory, EventAdapter, SimpleDomService, TableOptionsIf, TableScope } from "@guiexpert/table";
+
+declare const host: HTMLDivElement;
+declare const books: { title: string }[];
+declare const renderer: CellRendererIf;            // draws one cover (R20)
+declare const slider: HTMLInputElement;
+
+const tableModel = CoverGridFactory.createCoverGridModel(books, renderer, 165, 264);
+const tableOptions: TableOptionsIf = {
+  ...CoverGridFactory.createCoverGridDefaultOptions(264, () => "books"),
+  coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }   // 44 px caption below the cover
+};
+const tableApi = new TableScope(host, tableModel, new SimpleDomService(), tableOptions, new EventAdapter())
+  .firstInit().getApi();
+slider.addEventListener("input", () => tableApi.setCoverGridFill({ tileWidth: Number(slider.value) }));
+```
+
+- Columns = `max(1, floor(width / tileWidth))`; the tiles are stretched until the last one ends flush with the edge
+  (rest pixels go to the first columns, 1 px each; next to a classic scroll bar they leave room for it). Height =
+  `round(tile width × aspectRatio) + extraHeight`, without `aspectRatio` it stays `coverHeight`.
+- A resize takes effect in the same frame with **one** render (not after `resizeEventDebounceDelay`); the top item
+  and the focused item stay. **No** own `ResizeObserver`, no `recalcColumnWidths()`, no code that sets
+  `coverWidth`/`coverHeight` (that was the way before 1.1.117).
+- `setCoverGridFill(parts)` merges (`{ tileWidth }` keeps the ratio), `true` = `{ tileWidth: coverWidth }`, `false` =
+  off (tiles of `tileWidth`, a gap on the right). `getCoverGridFill()` reads it. The options object is not changed.
+- `bodyModel.coverWidth`/`coverHeight` hold the effective (stretched) size – renderers can read them. Any other body
+  than a cover grid: a console warning, no effect. → instructions.md 5.10
+
 ## Pitfalls
 
 Symptom → cause → fix.
@@ -628,6 +659,9 @@ Symptom → cause → fix.
   (only after keys) or `"never"` (since 1.1.115, R20).
 - **A cover grid cannot be used with the keyboard / arrow keys stop at the end of a row** → `shortcutActionsDisabled:
   true` from old examples, or a version before 1.1.115 → remove the option; the grid navigates item by item (R20).
+- **A cover grid leaves a gap on the right / the columns jump half a second after a resize** → tiles keep
+  `coverWidth`, the table debounces its resize (`resizeEventDebounceDelay` 500 ms) → `coverGridFill` (since 1.1.117,
+  R21) instead of an own `ResizeObserver` + `fitCoversToWidth`.
 - **A double click opens the item, Enter does nothing** → only `onMouseClicked` with `clickCount === 2` is handled →
   `onCellActivated` (R20).
 - **Own `mousedown`/`mouseup`/`dblclick` listeners on the header** (to save widths, lock a column, fit on double click)
@@ -656,6 +690,7 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - Open a row or a cover with Enter or a double click: `listener.onCellActivated = evt => open(evt.row ?? evt.value)` (wrappers `cellActivated`, since 1.1.115) – one handler for keyboard and mouse; only if the gesture did nothing else (checkbox, tree node, detail row, editor); the Enter key is not consumed. → R20
 - Hide the focus frame: `tableOptions.focusFrame: "never"`; only while the keyboard is used: `"keyboard"` (default of a cover grid, since 1.1.115). Not with CSS, not with `new FocusModel("none")`.
 - Cover grid with the keyboard (since 1.1.115): built in – arrows move from item to item (wrap at the end of a row), Home/End first/last item, Enter opens, the focus follows the item after sort/filter/resize. → R20
+- Cover grid in the full width (since 1.1.117): `tableOptions.coverGridFill: { tileWidth, aspectRatio, extraHeight }` – tiles stretch flush to the edge, a resize takes effect in the same frame; slider: `tableApi.setCoverGridFill({ tileWidth })`. → R21
 - Cover grid warns "the body model has no row objects": fixed in 1.1.116 – its scroll state stores the first visible item (`id`/`uuid` or `getRowId(item, index)`), no warning; a resize or a new tile size keeps that item at the top. Never `getRowId: (_row, rowIndex) => rowIndex` for a cover grid (a row holds other items after a resize).
 - `@guiexpert/demo-table-models` makes the bundle ~600 kB bigger: fixed in 1.1.116 (nothing computed on import, `"sideEffects": false`); an app with only `BookCoverRenderer` ≈ 11 kB minified.
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
@@ -696,6 +731,7 @@ What the table can do – one line per feature, details in instructions.md (each
 - Column filters, filter menu and column chooser (since 1.1.114): opt-in persistent filter row `tableOptions.filterRow: true | FilterRowOptionsIf` (visible, debounce, placeholder, height, clearButtonVisible, minInputWidthInPx), Excel-style per-column filter menu `tableOptions.columnFilterMenu: true | ColumnFilterMenuOptionsIf` (showCondition, showValues, applyOnChange, maxValues, virtualized unique-value checklist, async `ColumnDef.filter.getValues`), global `tableOptions.columnFilter: ColumnFilterOptionsIf` (`managed: true | false`, `caseSensitive`, `locale`, `maxValues`), `tableOptions.columnFilterTexts: ColumnFilterTextsIf`; per-column `ColumnDef.filter: false | "text" | "number" | "date" | "boolean" | ColumnFilterColumnOptionsIf` (type, valueGetter, caseSensitive, placeholder, getValues) and `ColumnDef.hideable: false`; shorthand syntax in filter row (`>100`, `10..20`, `=x`, `!=x`, `^a`, `z$`, `""`, `2026-01..2026-03`, tri-state boolean); `TableApi`: `setColumnFilter`, `setColumnFilters`, `clearColumnFilters`, `getColumnFilter`, `getColumnFilters`, `isColumnFiltered`, `setFilterRowVisible`, `isFilterRowVisible`, `showColumnFilterMenu`, `hideColumnFilterMenu`, `showColumnChooser`, `hideColumnChooser`; event `EventListenerIf.onFilterChanged(GeFilterEvent: filters, property, source, rowCount, unfilteredRowCount)` (wrappers: `filterChanged`); composes with `externalFilterFunction` (AND) and live `appendRows` (input focus/caret/IME preserved); state part `"filters"` (`TableStateIf.filters`, `filterRowVisible`, `autoRestoreOptions.autoRestoreFilterState`); keyboard `FOCUS_COLUMN_FILTER` (Ctrl/⌘+Shift+F), `OPEN_COLUMN_FILTER_MENU` (Alt+ArrowDown); top-layer popups (`popover="manual"` with fullscreen/Shadow DOM fallback), RTL & fixed columns; DOM-free engine `parseFilterInput`, `formatFilterCondition`, `compileSingleColumnFilter`, `compileColumnFilterPredicate`, `inferColumnFilterType`, `collectDistinctValues`; CSS `ge-table-filter-row*`, `ge-table-filter-menu*`, `ge-table-column-chooser*`, `--ge-table-filter-*`. Showcase `columnfilter`, demo `apps/table-demo/column-filter.html`.
 - Live data / log tail (since 1.1.108): tableApi.appendRows(rows, { follow?: "auto" (default: stays at the end if it was at the end, else the first visible row stays) | true (always the end) | false (freeze), maxRows?: ring buffer – oldest rows removed from the start in blocks of ≥ 1 % }) → AppendRowsResultIf { added, shown, removed, following } | false (tree, row groups, pivot, spreadsheet, cell formulas) – AreaModelObjectArray body only, IN PLACE (pushes to your array, no copy), O(k): externalFilterFunction only for the new rows, sorted column / sort(fn) → merged in (binary search, behind equal rows); selection, focus, Shift+arrow anchor and checked rows stay at their rows (RowIndexShift, SelectionModel/FocusModel.adjustForRowChanges – no onSelectionChanged unless a selected row left the buffer); one render pass, none when only rows below the view came in (cells not rebuilt). Held mouse button: "auto" keeps the rows under the pointer and follows again after release. Own AreaModel: append yourself, then tableApi.rowsAppended(count, { follow, removedAtStart }). Not addRows() (copies all rows, resets filter and sort). Showcase logtail, demo apps/table-demo/log-tail.html, LogTailController + createLogTailModelAndOptions in @guiexpert/demo-table-models.
 - Open a cell, tile navigation, focus frame (since 1.1.115): EventListenerIf.onCellActivated(GeCellActivateEvent: areaIdent "body", rowIndex, columnIndex, value, row, source "keyboard" | "mouse" | "api", originalEvent) – Enter on the focused body cell or a double click, in every table, after the built-in jobs (row checkbox, detail row, tree node, editing.enterKey; double click: editor of an editable cell, tree node), not on handles, empty tiles or under a blocking overlay; the Enter key is not consumed; wrappers cellActivated. Cover grid keyboard: AreaModelIf.getTileLayout?(): TileLayoutIf { getTileCount, getTilesPerRow, getTileAt(index), indexOfTile(item) } (CoverGridBodyModel implements it) → the items are one sequence: ←/→ previous/next with wrap (RTL mirrored), ↑/↓ one row (↓ without a tile below: last item), Home/End and Ctrl/⌘+Home/End first/last item, Page Up/Down; empty tiles never focused (keys and mouse); one render per key; the focus follows the item (sort, filter, resize, new items; filtered out → tile at the same index). DOM-free: navigateTiles(index, action, { count, perRow, pageRows, firstVisible }), tileIndexToCell, cellToTileIndex. tableOptions.focusFrame: "always" (default) | "keyboard" (only while the keyboard is used, default of CoverGridFactory.createCoverGridDefaultOptions) | "never"; FocusModel("none") does not hide the frame. CoverGridFactory.createCoverGridDefaultOptions (alias, the old createCoverGrisDefaultOptions is deprecated). Cover grid fixes: at least one column (was 0 → Infinity rows), no empty extra row, sort()/doSort() sort a copy (the app's items array keeps its order).
+- Cover grid in the full width (since 1.1.117): tableOptions.coverGridFill: true | Partial<CoverGridFillOptionsIf { tileWidth, aspectRatio?, extraHeight? }> → columns = max(1, floor(layout width / tileWidth)), tiles stretched flush (first columns +1 px for the rest), height = round(width × aspectRatio) + extraHeight (without ratio: coverHeight); a resize in the ResizeObserver callback (same frame, one render, no debounce), top item and focused item stay; next to a classic scroll bar the width is corrected in the same layout. TableApi.setCoverGridFill(parts | true | false): boolean (merges, one render, false = no cover grid), getCoverGridFill(). Model: CoverGridBodyModel.setFill/getFill/getTileWidthAt/getTileLeftAt/getTileRowWidth, coverWidth/coverHeight = effective size; DOM-free computeCoverGridFill(width, fill, coverHeight); isCoverGridBodyModel. Other body: one console warning. Also 1.1.117: CoverGridBodyModel.getConstantRowHeight() = coverHeight and getMaxColspan()/getMaxRowspan() = 1 (a resize of 1,000,000 items no longer O(rows)).
 - Custom filtering
 - In-place cell editing
 - User-defined key and mouse events

@@ -71,3 +71,43 @@ describe('cover grid: a key costs the same for any number of items', () => {
     expectScalesFlat(s, l);
   });
 });
+
+// Prompt 027: a cover grid that fills its width – a resize computes the columns and the tile size in O(1) and keeps
+// the top item at the top (no search while it keeps its index): the same time with 10,000 and 1,000,000 items.
+describe('cover grid with coverGridFill: a resize costs the same for any number of items', () => {
+
+  async function mountFilled(n: number) {
+    const items = Array.from({ length: n }, (_, i) => i);
+    const model = CoverGridFactory.createCoverGridModel(items, renderer, 150, 200);
+    const t = mountTable(model, {
+      width: 1000, height: 600,
+      tableOptions: {
+        ...CoverGridFactory.createCoverGridDefaultOptions(200),
+        autoRestoreOptions: undefined,
+        coverGridFill: { tileWidth: 150, aspectRatio: 4 / 3 },
+      },
+    });
+    await nextFrame();
+    t.api.scrollToIndex(0, Math.floor(n / 2 / model.getColumnCount()));   // the middle: the row index grows with n
+    await nextFrame();
+    return t;
+  }
+
+  /** what the ResizeObserver callback of the table does with coverGridFill: the new width, one render */
+  const resize = (t: Awaited<ReturnType<typeof mountFilled>>, run: number) => {
+    const width = run % 2 ? 1000 : 760;
+    t.host.style.width = width + 'px';
+    t.scope.recalcColumnWidths(width);
+  };
+
+  it('resize 1000 ↔ 760 px (6 ↔ 5 tiles per row): 10,000 → 1,000,000 items', async ({ task }) => {
+    const tSmall = await mountFilled(10_000);
+    const s = await measure(run => resize(tSmall, run));
+    tSmall.destroy();
+    const tLarge = await mountFilled(LARGE);
+    const l = await measure(run => resize(tLarge, run));
+    tLarge.destroy();
+    report(task, 'cover grid: resize with coverGridFill', { small: { n: 10_000, m: s }, large: { n: LARGE, m: l } });
+    expectScalesFlat(s, l);
+  });
+});

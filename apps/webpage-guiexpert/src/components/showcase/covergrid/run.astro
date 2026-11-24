@@ -31,7 +31,7 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
 
   import { TableScope, EventAdapter, SimpleDomService } from '/scripts/table/index.js'
   import {
-    createCoverGridModelAndOptions, generateBooks, fitCoversToWidth, BOOK_SORTS
+    createCoverGridModelAndOptions, generateBooks, BOOK_SORTS
   } from "/scripts/demo-table-models/index.js";
 
   const $ = suffix => document.querySelector('.' + id + suffix);
@@ -49,7 +49,8 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   const [coverWidth, coverHeight] = size();
   const {tableModel, tableOptions} = createCoverGridModelAndOptions(books, coverWidth, coverHeight, {
     filter: book => !searchText || `${book.title} ${book.author} ${book.genre}`.toLowerCase().includes(searchText),
-    isSelected: book => book === selected
+    isSelected: book => book === selected,
+    fill: true   // tableOptions.coverGridFill: the tiles fill the width, also at once on a resize (since 1.1.117)
   });
 
   const report = () => {
@@ -82,19 +83,12 @@ const id = 'div' + Math.random().toString(36).slice(2, 11);
   tableScope.firstInit();
   const tableApi = tableScope.getApi();
 
-  // size: tiles fill the width – columns = floor(width / tile width), no new model, just repaint
-  const applySize = () => {
-    const [w, h] = size();
-    fitCoversToWidth(tableModel, w, h);
-    tableApi.repaintHard();
-  };
-  applySize();
+  // size: the wanted tile width and the ratio – no new model, one render, the top cover stays
   report();
-  sizeSelect.addEventListener('change', applySize);
-  new ResizeObserver(() => requestAnimationFrame(() => {
-    tableApi.recalcColumnWidths();   // the new width at once (the table's own observer is debounced)
-    applySize();
-  })).observe(ele);
+  sizeSelect.addEventListener('change', () => {
+    const [w, h] = size();
+    tableApi.setCoverGridFill({ tileWidth: w, aspectRatio: h / w });
+  });
 
   let timer;
   $('-search').addEventListener('input', e => {

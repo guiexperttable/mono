@@ -66,13 +66,15 @@ import {
   collectDistinctValues, normalizeColumnFilter, serializeColumnFilters, deserializeColumnFilters,
   areColumnFiltersEqual, ColumnFilterService, GeFilterEvent, GeFilterEventSource,
   GeCellActivateEvent, GeCellActivateSource, TileLayoutIf, TileNavigationAction, TileNavigationLayoutIf, navigateTiles,
-  tileIndexToCell, cellToTileIndex, FocusFrameMode
+  tileIndexToCell, cellToTileIndex, FocusFrameMode,
+  CoverGridFillOptionsIf, CoverGridFillLayoutIf, computeCoverGridFill, isCoverGridBodyModel
 } from "__CORE__";
 
 interface Item { product: string; price: number; quantity: number }
 declare const input: HTMLInputElement;
 declare const hint: HTMLElement;
 declare const select: HTMLSelectElement;
+declare const slider: HTMLInputElement, stretch: HTMLInputElement;
 declare const saveButton: HTMLButtonElement, discardButton: HTMLButtonElement, editButton: HTMLButtonElement;
 declare const copyButton: HTMLButtonElement, cutButton: HTMLButtonElement;
 declare const undoButton: HTMLButtonElement, redoButton: HTMLButtonElement;

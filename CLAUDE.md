@@ -208,7 +208,7 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
     (1.1.94), `rowDrag` (1.1.95), `tableOptions`).
   - `createByObjectArray(Param)`, `buildByTypedRows(Param)`, `createByAreaModels(Param)`.
   - `TreeFactory.buildTreeRows(...)`, `CoverGridFactory.createCoverGridModel(...)` (Kacheln statt Zeilen, Spalten =
-    `floor(Breite / coverWidth)`, mindestens 1; Options `createCoverGridDefaultOptions` – der alte Name
+    `floor(Breite / coverWidth)`, mindestens 1, volle Breite über `coverGridFill` seit 1.1.117; Options `createCoverGridDefaultOptions` – der alte Name
     `createCoverGrisDefaultOptions` ist seit 1.1.115 `@deprecated`; mit der Tastatur bedienbar, § 3.6 „Kacheln“; Doku
     `instructions.md` 5.10, Demo `apps/table-demo/cover-grid.html`, Showcase `covergrid`,
     Modell `createCoverGridModelAndOptions` in `demo-table-models`), `CrudTableModelFactory`,
@@ -338,6 +338,29 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   Modell-Fixes: `getColumnCount()` ≥ 1, `Math.ceil` statt `floor + 1`, `sort()`/`doSort()` sortieren eine Kopie
   (`filteredItems === items` nur bis zum ersten Filter/Sortieren). Specs
   `tile-navigation/cover-grid-keyboard.browser.spec.ts`, `tile-navigation.spec.ts`, `perf/cover-grid.perf.ts`.
+- **Cover Grid in voller Breite (seit 1.1.117, `cover-grid/`, Design `prompts/027-cover-grid-volle-breite.design.md`)**:
+  `tableOptions.coverGridFill: true | Partial<CoverGridFillOptionsIf>` (`tileWidth`, `aspectRatio?`, `extraHeight?`;
+  `true` = `{ tileWidth: coverWidth }`) – `TableScope` gibt sie im Konstruktor an `CoverGridBodyModel.setFill()`
+  (erkannt über `isCoverGridBodyModel` = `kind`; nicht gesetzt = Modell behält seinen Stand, anderer Body = eine
+  Warnung). Rechenkern DOM-frei `computeCoverGridFill(width, fill, coverHeight)` → `{ columns, baseWidth, rest,
+  tileHeight }`: Spalten aus `tileWidth` (gespeichert, nie aus dem gestreckten `coverWidth` zurückgerechnet), die
+  ersten `rest` Spalten 1 px breiter, Höhe `round(base × ratio) + extra`. Das Modell schreibt die **wirksame** Größe in
+  `coverWidth`/`coverHeight` (in `setParentWidth`, bzw. lazy, wenn `width` direkt gesetzt wurde);
+  `CoverGridTableModel.getColumnWidth/getXPosByColumnIndex/getContentWidthInPixel` = `getTileWidthAt`/`getTileLeftAt`/
+  `getTileRowWidth` (ohne Fill bit-gleich). Klassischer Balken: `RenderScope.hasRelativeColumnWidths()` zählt jedes
+  Cover Grid mit (`isCoverGridBodyModel`, auch ohne Fill – vorher eine Spalte zu viel bis zum entprellten Resize) →
+  Neuverteilung im selben Layout; verschwindet der Balken danach wieder (Höhe folgt
+  der Breite), bleibt das schmalere Layout (`adjustRelativeColumnWidthsToScrollBar`, sonst Pendeln je `repaintHard`).
+  Die Option **ersetzt** die Einstellungen des Modells (`setFill(fill, true)` – ein Wrapper-Neuaufbau startet wieder
+  mit ihr), `setCoverGridFill` führt zusammen. Resize: `ResizeHandler` ruft bei aktivem Fill
+  `recalcColumnWidths` **im Callback** (derselbe Frame, ein Render) und verwirft einen anstehenden entprellten Aufruf;
+  sonst Entprellung wie bisher. Oberstes Item/Fokus: vorhandener `keepTileScrollAnchor`/`beforeRenderPass`. API
+  `setCoverGridFill(parts | true | false)` (führt zusammen, ein Render, Options-Objekt unverändert),
+  `getCoverGridFill()`. Nebenbei (auch ohne Option): `CoverGridBodyModel.getConstantRowHeight()` = `coverHeight` (nicht
+  mit `firstRowPaddingTop`), `getMaxColspan/getMaxRowspan()` = 1 – vorher O(Reihen) je neuer Spaltenzahl
+  (RowLayout-Präfixsummen + Span-Suche); Unterklassen, die `getRowHeight` bzw. `getColspanAt`/`getRowspanAt`
+  überschreiben, behalten das alte Verhalten (Vergleich mit dem Prototyp). Specs `cover-grid/cover-grid-fill(.browser).spec.ts`,
+  `cover-grid-scroll-bar.scrollbars.browser.spec.ts` (erstes Layout mit Balken, mit und ohne Option; Pendeln), Invariante in `perf-invariants`, Szenario in `perf/cover-grid.perf.ts`.
 - Sortierung: Header-Klick, `ColumnDef.sortable/sortComparator`, `api.sort(fn)`, `api.reSort()`.
 - Filter: **extern** – `tableOptions.externalFilterFunction = (row) => boolean`, danach `api.externalFilterChanged()`.
   Baum (`AreaModelTree`): eine Pipeline alle Zeilen → sichtbar (Eltern aufgeklappt) → Filter; das Prädikat bekommt die
@@ -747,7 +770,7 @@ seit 1.1.91 `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy`, `ariaTexts`, seit 
 `stateChangedDebounceDelay`, seit 1.1.95 `rowDragOptions`, seit 1.1.96 `fillHandle`, `batchEdit`, seit 1.1.97 `masterDetail`,
 seit 1.1.98 `direction`, seit 1.1.99 `editing`, `clipboard`, `undo`, `cellFormulas`, `spreadsheet`, seit 1.1.110
 `columnAutoWidth`, seit 1.1.114 `filterRow`, `columnFilterMenu`, `columnFilter`, `columnFilterTexts`, seit 1.1.115
-`focusFrame`.
+`focusFrame`, seit 1.1.117 `coverGridFill`.
 Muster: `const opts = { ...new TableOptions(), hoverColumnVisible: false, ... }`.
 
 ---
@@ -1019,7 +1042,7 @@ und heute an Performance, ag-Grid-Lizenzkosten oder Framework-Lock-in scheitern.
 | 36 | Copy & Paste mit Excel – ohne Enterprise-Lizenz (optional) | Training-Kapitel `selection-and-copy` (`#paste`), `instructions.md` 6.21 |
 | 37 | Excel-Formeln mit Zellbezügen – Zeigemodus, F4, Zeilen einfügen (optional) | Training-Kapitel `spreadsheet`, `instructions.md` 6.23 – 6.25 |
 | 38 | Angular Signals: die Tabelle als Signal – zoneless in 60 Sekunden (Angular 22+) | `videos/14-angular-signals/`, `apps/angular-signal-demo`, Training-Kapitel `angular` (`#signals`), `packages/angular-table/instructions.md` 14 |
-| 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
+| 39 | Kein Tabellen-Look: 10.000 Buchcover als Kachel-Raster – gleiche Tabelle, anderes Modell, volle Breite mit einer Option `coverGridFill` (geplant) | Showcase `covergrid`, `apps/table-demo/cover-grid.html`, `instructions.md` 5.10 |
 | 40 | Live-Log mit 1 Mio. Zeilen: anhängen, Auswahl bleibt, Freeze und Scroll to end per Knopf (kein „ohne Enterprise“: Transactions bei ag-Grid Community) | `videos/15-live-log/`, Showcase `logtail`, Training-Kapitel `live-data` (`#append`), `apps/table-demo/log-tail.html`, `instructions.md` 6.9 |
 | 41 | Spaltenlayout speichern, wenn der Nutzer zieht – Ereignisse, gesperrte Spalte, Doppelklick passt die Breite an (geplant; kein „ohne Enterprise“: bei ag-Grid Community) | `apps/table-demo/column-drag.html`, Training-Kapitel `persist-state` (`#column-events`), `instructions.md` 6.27 |
 | 42 | Spaltenfilter & Excel-Werteliste im Header – eine Option (Werteliste & Spaltenauswahl bei ag-Grid Enterprise, einfache Filterzeile Community) | `videos/16-spaltenfilter/`, Showcase `columnfilter`, Training-Kapitel `filtering` (`#column-filters`), `apps/table-demo/column-filter.html`, `instructions.md` 6.28 |

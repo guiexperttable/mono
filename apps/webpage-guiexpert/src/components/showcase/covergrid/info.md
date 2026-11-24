@@ -33,9 +33,11 @@ listener.onMouseClicked = evt => {
   (`focusFrame: "keyboard"`).
 - **Open a cover:** `onCellActivated` reports Enter on the focused cover and a double click – one handler.
 
-- **Columns follow the width:** `floor(width / coverWidth)` – the table measures its host, you do nothing.
-  To fill the width exactly, make the tiles a bit wider (`fitCoversToWidth` in the demo model).
-- **Size without a new model:** `tableModel.bodyModel.coverWidth = 225; …coverHeight = 300; tableApi.repaintHard()`.
+- **Full width with one option (since 1.1.117):** `coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165 }` – as
+  many tiles as fit, stretched until the last one ends flush with the edge; a resize takes effect in the same frame
+  and the top cover stays. No own `ResizeObserver`.
+- **Size without a new model:** `tableApi.setCoverGridFill({ tileWidth: 225 })` – one render. Without the option:
+  `tableModel.bodyModel.coverWidth = 225; …coverHeight = 300; tableApi.repaintHard()`, columns = `floor(width / coverWidth)`.
 - **Filter and sort:** `tableApi.externalFilterChanged()` and `tableApi.sort((a, b) => …)` – the order survives the
   filter.
 - **Renderer:** a plain `CellRendererIf` gets the cell `<div>` and the item – draw an `<img>`, a title, a progress

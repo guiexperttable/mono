@@ -24,6 +24,7 @@ import { TableStateIf } from "../../state/table-state.if";
 import { OverlayOptionsIf } from "./overlay-options.if";
 import type { TableDirection } from "../../rtl/table-direction.type";
 import type { FocusFrameMode } from "../../focus/focus-frame.type";
+import type { CoverGridFillOptionsIf } from "../../cover-grid/cover-grid-fill-options.if";
 import type { ColumnAutoWidthOptionsIf } from "../../column-drag/column-auto-width-options.if";
 import type {
   ColumnFilterMenuOptionsIf,
@@ -581,6 +582,29 @@ export interface TableOptionsIf {
    * @since 1.1.115
    */
   focusFrame?: FocusFrameMode;
+
+  /**
+   * A cover grid ({@link CoverGridFactory.createCoverGridModel}) fills the whole width: as many tiles of `tileWidth`
+   * per row as fit (at least 1), stretched until the last one ends flush with the edge (also next to a classic scroll
+   * bar); with `aspectRatio` the height grows with the width (`round(width × aspectRatio) + extraHeight`). A resize is
+   * taken over in the same frame with one render (not after {@link resizeEventDebounceDelay}), the top item and the
+   * focused item stay. `true` = `{ tileWidth: coverWidth }`, height unchanged. Change it at runtime with
+   * {@link TableApi.setCoverGridFill} (the options object stays as it is). `false` switches off a fill that was set
+   * on the model. Only for a cover grid body – any other body: a console warning, no effect.
+   *
+   * Replaces the code apps wrote before 1.1.117: an own `ResizeObserver`, `recalcColumnWidths()` and a function that
+   * set `coverWidth`/`coverHeight` (`fitCoversToWidth` in the demo models).
+   *
+   * @example
+   * const tableOptions: TableOptionsIf = {
+   *   ...CoverGridFactory.createCoverGridDefaultOptions(264, () => "books"),
+   *   coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }
+   * };
+   *
+   * @since 1.1.117
+   * @see [Live demo: cover grid](https://gui.expert/showcase/covergrid/run/)
+   */
+  coverGridFill?: boolean | Partial<CoverGridFillOptionsIf>;
 
   /**
    * The state the table starts with: column layout, sorting, tree, checked and selected rows … – e.g. loaded from

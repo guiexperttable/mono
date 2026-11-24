@@ -1145,9 +1145,9 @@ keyboard (`focusFrame: "keyboard"`). (Before 1.1.115 the method was only availab
 
 | Task | How |
 |---|---|
-| Width / number of columns | automatic: the table hands the width of its host to the model (`setParentWidth`) on start and after a resize (debounced, `resizeEventDebounceDelay`). Immediately: `tableApi.recalcColumnWidths()` |
+| Width / number of columns | automatic: the table hands the width of its host to the model (`setParentWidth`) on start and after a resize (debounced, `resizeEventDebounceDelay`; with `coverGridFill` in the same frame). Immediately: `tableApi.recalcColumnWidths()` |
 | Tile size | `tableModel.bodyModel.coverWidth = 220; tableModel.bodyModel.coverHeight = 330; tableApi.repaintHard();` – no new model |
-| Fill the width | stretch the tiles: `columns = floor(bodyModel.width / wanted)`, `coverWidth = floor(bodyModel.width / columns)`, then `repaintHard()` |
+| Fill the width (since 1.1.117) | `tableOptions.coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }` – see "Full width" below. At runtime: `tableApi.setCoverGridFill({ tileWidth: 220 })`, off: `setCoverGridFill(false)` |
 | Filter | `externalFilterFunction` gets the item; after a change `tableApi.externalFilterChanged()` (scrolls to the top, keeps the order) |
 | Sort | `tableApi.sort((a, b) => a.title.localeCompare(b.title))` – sorts the shown items; survives the next filter |
 | New items | `tableModel.bodyModel.items = list; tableModel.bodyModel.filteredItems = list; tableApi.repaintHard();` (or `externalFilterChanged()` when a filter is set) |
@@ -1160,8 +1160,41 @@ keyboard (`focusFrame: "keyboard"`). (Before 1.1.115 the method was only availab
 | Selection | the cover grid has no selection model of its own – keep the selected item in your app and let the renderer mark it (repaint after a change) |
 | Screen readers | the grid is a `role="grid"`, each tile a `gridcell`; the name of a tile is what your renderer puts into it – an `alt` text, a title, or `<span class="ge-table-sr-only">…</span>` (6.14) |
 
-Notes: the tiles start at the left edge – with a fixed `coverWidth` the space right of the last column stays empty
-(stretch the tiles, see above). `sort()` sorts a copy: your `items` array keeps its order (since 1.1.115; before, it
+**Full width (since 1.1.117).** Without the option the tiles keep `coverWidth` and the space right of the last column
+stays empty (960 px / 165 px → 5 columns, 135 px empty). `coverGridFill` stretches them:
+
+```ts
+declare const books: { title: string }[];
+declare const renderer: CellRendererIf;          // draws one cover (see the BookRenderer above)
+declare const host: HTMLDivElement;
+declare const slider: HTMLInputElement;
+
+const gridModel = CoverGridFactory.createCoverGridModel(books, renderer, 165, 264);
+const gridOptions: TableOptionsIf = {
+  ...CoverGridFactory.createCoverGridDefaultOptions(264, () => "books"),
+  coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }   // 44 px: two lines of text
+};
+const gridApi = new TableScope(host, gridModel, new SimpleDomService(), gridOptions, new EventAdapter())
+  .firstInit()
+  .getApi();
+slider.addEventListener("input", () => gridApi.setCoverGridFill({ tileWidth: Number(slider.value) }));
+```
+
+- Columns = `max(1, floor(width / tileWidth))`, then the tiles get wider until the last one ends flush with the edge –
+  the first columns are 1 px wider if the width does not divide (961 px → 193 + 4 × 192). The width is the layout width
+  of the table: next to a classic scroll bar the tiles leave room for it.
+- Height = `round(tile width × aspectRatio) + extraHeight`; without `aspectRatio` it stays `coverHeight`.
+- `bodyModel.coverWidth`/`coverHeight` hold the **effective** size (renderers can read them), the wanted width is
+  `tableApi.getCoverGridFill()?.tileWidth`. `coverGridFill: true` = `{ tileWidth: coverWidth }`, height unchanged.
+- A resize is taken over in the same frame with one render (not after `resizeEventDebounceDelay`); the top item and the
+  focused item stay. `setCoverGridFill()` merges its parts (`{ tileWidth }` keeps the ratio), renders once and does not
+  change the options object – a framework wrapper that rebuilds the table starts again with the options.
+- Not a cover grid body: a console warning, no effect. Without a table: `bodyModel.setFill(…)` + `repaintHard()`,
+  the geometry alone: `computeCoverGridFill(width, fill, coverHeight)`.
+- Replaces the code before 1.1.117 – an own `ResizeObserver`, `recalcColumnWidths()` and a function that set
+  `coverWidth`/`coverHeight` (`fitCoversToWidth` in the demo models).
+
+Notes: without `coverGridFill` the tiles start at the left edge and keep their width; next to a classic scroll bar the number of tiles per row leaves room for the bar from the first render (fixed in 1.1.117 – before, one tile too many and a horizontal scroll bar for half a second). `sort()` sorts a copy: your `items` array keeps its order (since 1.1.115; before, it
 was reordered as long as no filter was set). After you changed `items` (also after a `push`), hand the list over as
 shown under "New items" – `filteredItems` is a copy as soon as a filter or a sort was applied, and then new items do
 not appear by themselves; call `tableApi.sort(…)` again if the grid was sorted. Fixed in 1.1.115: no empty extra row when the last row is
@@ -1169,9 +1202,9 @@ full, and a grid narrower than one tile has one column (before: 0 columns and `I
 implement `AreaModelIf.getTileLayout()` (`TileLayoutIf`) to get the same keyboard navigation.
 
 Demo: `pnpm serve:table-demo` → http://localhost:4200/cover-grid.html (10,000 – 100,000 books, search, size, order,
-fill the width). Showcase: [Cover grid](https://gui.expert/showcase/covergrid/run). Model, books and renderer of both:
-`packages/demo-table-models/src/lib/createCoverGridModel.ts` (`createCoverGridModelAndOptions`, `BookCoverRenderer`,
-`fitCoversToWidth`).
+fill the width via `coverGridFill`). Showcase: [Cover grid](https://gui.expert/showcase/covergrid/run). Model, books and
+renderer of both: `packages/demo-table-models/src/lib/createCoverGridModel.ts` (`createCoverGridModelAndOptions` with
+`{ fill: true }`, `BookCoverRenderer`; `fitCoversToWidth` only for versions before 1.1.117).
 
 ## 6. Features
 
@@ -2624,6 +2657,12 @@ grid code. → 5.10
 state of a cover grid stores the first visible **item** (its `id`/`uuid` or your `getRowId(item, index)`) instead of a
 row, without a warning – and a resize or a new tile size keeps that item at the top. On 1.1.115 ignore the warning – the pixel position is stored anyway. Do not set
 `getRowId: (_row, rowIndex) => rowIndex`: a row of a cover grid holds other items after a resize. → 5.10
+
+**How do the tiles of a cover grid fill the whole width?** One option (since 1.1.117):
+`tableOptions.coverGridFill: { tileWidth: 165, aspectRatio: 220 / 165, extraHeight: 44 }` – as many tiles of
+`tileWidth` as fit, stretched until the last one ends flush with the edge, the height grows with the width; a resize
+takes effect in the same frame, the top item stays. A size slider: `tableApi.setCoverGridFill({ tileWidth })`. No own
+`ResizeObserver`, no `recalcColumnWidths()`, no `fitCoversToWidth`. → 5.10
 
 **Importing one renderer from `@guiexpert/demo-table-models` makes my bundle 600 kB bigger.** Fixed in 1.1.116: before,
 the package grouped the Seattle weather data of a heat map demo on import, so every bundle kept them. Since 1.1.116 it

@@ -7,8 +7,8 @@
 // Imports only `@guiexpert/table` (alias) and relative files – no `vitest` here: the wrapper's own Vitest must be
 // used (CI installs only the wrapper packages, packages/table/node_modules is missing there).
 // Lives outside src/ on purpose: it must not end up in any npm package.
-import { CellRange, ColumnDef, PivotFactory, RowGroupFactory, SelectionModel, TableFactory, TableOptions, TrueFn } from '@guiexpert/table';
-import type { GeMouseEvent, TableApi, TableModelIf, TableOptionsIf } from '@guiexpert/table';
+import { CellRange, ColumnDef, CoverGridFactory, PivotFactory, RowGroupFactory, SelectionModel, TableFactory, TableOptions, TrueFn } from '@guiexpert/table';
+import type { CellRendererIf, GeMouseEvent, TableApi, TableModelIf, TableOptionsIf } from '@guiexpert/table';
 import { nextFrame, renderedRows } from './mount-table'; // also loads css/main.css
 
 export { nextFrame, renderedRows };
@@ -225,4 +225,32 @@ export function dblClickResizeHandle(container: Element, columnIndex: number): v
   handle.dispatchEvent(new MouseEvent('dblclick', {
     bubbles: true, cancelable: true, detail: 2, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
   }));
+}
+
+/**
+ * A cover grid of 100 items whose tiles fill the width (`coverGridFill`, since 1.1.117): tile width 140 px – in a
+ * 600 px host 4 tiles of 150 px. No wrapper code: the option goes through like any other.
+ */
+export function createCoverGridFillModelAndOptions(): { tableModel: TableModelIf; tableOptions: TableOptionsIf } {
+  const renderer: CellRendererIf = {
+    render: (cellDiv, _r, _c, _a, _m, item) => {
+      cellDiv.textContent = item === undefined ? '' : 'Item ' + item;
+      return undefined;
+    },
+  };
+  const tableModel = CoverGridFactory.createCoverGridModel(Array.from({ length: 100 }, (_, i) => i), renderer, 140, 100);
+  const tableOptions: TableOptionsIf = {
+    ...CoverGridFactory.createCoverGridDefaultOptions(100),
+    autoRestoreOptions: undefined,
+    coverGridFill: { tileWidth: 140 },
+  };
+  return { tableModel, tableOptions };
+}
+
+/** The distance in px between the end of the last tile of row 0 and the end of the table (0 = flush). */
+export function coverGridRightGap(container: Element): number {
+  const table = container.querySelector<HTMLElement>('.ge-table') ?? (container as HTMLElement);
+  const cells = Array.from(container.querySelectorAll<HTMLElement>('.ge-table-body-center [data-area="body"][data-row-index="0"]'));
+  const right = Math.max(...cells.map(c => c.getBoundingClientRect().right));
+  return table.getBoundingClientRect().right - right;
 }

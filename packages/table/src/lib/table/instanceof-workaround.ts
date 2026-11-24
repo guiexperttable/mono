@@ -7,6 +7,7 @@ import type { TreeRowIf } from './data/common/tree-row-if';
 import type { AreaModelPivot } from './data/tablemodel/areamodel/area-model-pivot';
 import type { PivotTableModel } from './pivot/pivot-table-model';
 import type { PivotColumnDef } from './pivot/pivot-column-def';
+import type { CoverGridBodyModel } from './data/tablemodel/areamodel/cover-grid-body-model';
 
 
 /*
@@ -218,4 +219,21 @@ export function isAreaModelPivot(o: any): o is AreaModelPivot {
  */
 export function isPivotColumnDef(o: any): o is PivotColumnDef {
   return !!o && o['type'] === 'PivotColumnDef';
+}
+
+/**
+ * True for the body of a cover grid ({@link CoverGridBodyModel}). Works across copies of the core.
+ *
+ * @param {any} o - the object to check, e.g. `tableModel.getBodyModel()`
+ * @returns {boolean} true for a cover grid body
+ *
+ * @example
+ * const body = tableModel.getBodyModel();
+ * const fill = isCoverGridBodyModel(body) ? body.getFill() : undefined;
+ *
+ * @since 1.1.117
+ * @category Table model
+ */
+export function isCoverGridBodyModel(o: any): o is CoverGridBodyModel<unknown> {
+  return !!o && o['kind'] === 'CoverGridBodyModel';
 }

@@ -3,7 +3,7 @@
 // showcase "covergrid").
 import '../../../../packages/table/css/main.css';
 import { EventAdapter, SimpleDomService, TableApi, TableScope } from '@guiexpert/table';
-import { BOOK_SORTS, createCoverGridModelAndOptions, fitCoversToWidth, generateBooks } from '@guiexpert/demo-table-models';
+import { BOOK_SORTS, createCoverGridModelAndOptions, generateBooks } from '@guiexpert/demo-table-models';
 import type { BookIf } from '@guiexpert/demo-table-models';
 import type { CoverGridTableModel } from '@guiexpert/table';
 
@@ -35,9 +35,11 @@ function createGrid() {
   tableApi?.destroy();
   books = generateBooks(Number(countSelect.value));
   const [coverWidth, coverHeight] = size();
+  // fill: tableOptions.coverGridFill (since 1.1.117) – the tiles stretch to the width, also at once on a resize
   const grid = createCoverGridModelAndOptions(books, coverWidth, coverHeight, {
     filter: matches,
-    isSelected: book => book === selected
+    isSelected: book => book === selected,
+    fill: stretch.checked
   });
   const model = grid.tableModel;
   tableModel = model;
@@ -62,7 +64,6 @@ function createGrid() {
   };
 
   tableApi = new TableScope(host, model, new SimpleDomService(), grid.tableOptions, listener).firstInit().getApi();
-  applySize();
   applyOrder();
   if (searchText) tableApi.externalFilterChanged();
   report();
@@ -90,17 +91,19 @@ search.addEventListener('input', () => {
   }, 150);
 });
 
-// tile size: the column count is floor(width / coverWidth) – set the size, repaint, done (no new model)
+// tile size: no new model. Filled: the wanted width and the ratio – one render, the top book stays (since 1.1.117).
+// Not filled: columns = floor(width / coverWidth), a gap on the right.
 function applySize() {
   if (!tableModel || !tableApi) return;
   const [coverWidth, coverHeight] = size();
   if (stretch.checked) {
-    fitCoversToWidth(tableModel, coverWidth, coverHeight);   // wider tiles, no gap on the right
+    tableApi.setCoverGridFill({ tileWidth: coverWidth, aspectRatio: coverHeight / coverWidth });
   } else {
+    tableApi.setCoverGridFill(false);
     tableModel.bodyModel.coverWidth = coverWidth;
     tableModel.bodyModel.coverHeight = coverHeight;
+    tableApi.repaintHard();
   }
-  tableApi.repaintHard();
   report();
 }
 
@@ -109,16 +112,8 @@ stretch.addEventListener('change', applySize);
 orderSelect.addEventListener('change', applyOrder);
 countSelect.addEventListener('change', () => { selected = undefined; opened = undefined; createGrid(); });
 $('#top').addEventListener('click', () => tableApi?.scrollToPixel(0, 0));
-// The table follows the width of its host by itself (own ResizeObserver, debounced by
-// tableOptions.resizeEventDebounceDelay). We want the new width at once to fit the tiles: recalcColumnWidths() hands
-// the width of the host to the model (bodyModel.width), applySize() fits the tiles and repaints.
-let frame = 0;
-new ResizeObserver(() => {
-  cancelAnimationFrame(frame);
-  frame = requestAnimationFrame(() => {
-    tableApi?.recalcColumnWidths();
-    applySize();
-  });
-}).observe(host);
+// The table follows the width of its host by itself (with coverGridFill in the same frame) – this observer only
+// updates the column count in the status line.
+new ResizeObserver(() => requestAnimationFrame(() => report())).observe(host);
 
 createGrid();

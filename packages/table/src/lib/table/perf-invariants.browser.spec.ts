@@ -338,6 +338,35 @@ describe.each(DIRECTIONS)('performance invariants: cover grid (%s)', direction =
     await nextFrame();
   }
 
+  // prompt 027: a cover grid that fills its width takes a resize over in the ResizeObserver callback – one render,
+  // no debounced second pass; the top item is not searched while it keeps its index
+  it('coverGridFill: a resize and setCoverGridFill() = exactly 1 render each, the items are not searched', async () => {
+    const model = CoverGridFactory.createCoverGridModel(Array.from({ length: 100_000 }, (_, i) => i), tileRenderer, 150, 200);
+    const t = mountTable(model, {
+      width: 620,
+      tableOptions: {
+        ...CoverGridFactory.createCoverGridDefaultOptions(200),
+        autoRestoreOptions: undefined, direction, resizeEventDebounceDelay: 10, coverGridFill: { tileWidth: 150, aspectRatio: 4 / 3 },
+      },
+    });
+    await settleMount();
+    t.api.scrollToIndex(0, 500);
+    await nextFrame();
+    const renders = countRenders(t.scope);
+    const search = countCalls(model.bodyModel, 'indexOfTile');
+    t.host.style.width = '920px';
+    await nextFrame();
+    expect(renders.count()).toBe(1);
+    await new Promise(resolve => setTimeout(resolve, 40));   // the debounce delay has passed: nothing more
+    await nextFrame();
+    expect(renders.count()).toBe(1);
+    t.api.setCoverGridFill({ tileWidth: 200 });
+    expect(renders.count()).toBe(2);
+    await nextFrame();
+    expect(renders.count()).toBe(2);
+    expect(search.count()).toBe(0);
+  });
+
   it('a key inside the view: exactly 1 render, the row layout is kept, the items are not searched', async () => {
     const t = await mountTiles(10_000);
     t.scope.focusModel()!.setFocus(0, 0);

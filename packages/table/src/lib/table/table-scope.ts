@@ -32,7 +32,8 @@ import { EventAdapter } from './event-adapter';
 import { SimpleDomService } from './service/simple-dom-service';
 import { TableOptions } from './data/options/table-options';
 import { TreeRowIf } from './data/common/tree-row-if';
-import { isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
+import type { CoverGridFillOptionsIf } from './cover-grid/cover-grid-fill-options.if';
+import { isAreaModelRowGroups, isAreaModelTree, isCheckboxCellRenderer, isCoverGridBodyModel, isPivotTableModel, isRowNumberColumnDef, isTreeRow } from './instanceof-workaround';
 import type { PivotConfigIf } from './pivot/pivot-config.if';
 import type { DerivedValuesChangeIf } from './data/tablemodel/areamodel/derived-values-change.if';
 import type { RowGroupField } from './rowgroup/row-group-field.type';
@@ -263,6 +264,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.eventListener = createEventListenerHub(eventListener ?? new EventAdapter(), this.subscribers);
     this.stateService = new TableStateService(this);
     this.columnFilterService = new ColumnFilterService(this);
+    this.applyCoverGridFillOption(tableOptions?.coverGridFill);
     if (tableOptions?.filterRow) {
       this.initFilterRowService(tableOptions.filterRow);
     }
@@ -3082,6 +3084,53 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.stateService.markDirty('tree');
     this.stateService.markDirty('columns');
     return true;
+  }
+
+  /**
+   * `tableOptions.coverGridFill` (since 1.1.117): hands it to the body of a cover grid before the first layout – it
+   * replaces the settings of the model (a change by `setCoverGridFill` is gone after a rebuild); not set = the model
+   * keeps what it has (a fill set on the model directly); another body = one warning.
+   */
+  private applyCoverGridFillOption(fill: TableOptionsIf['coverGridFill']): void {
+    if (fill === undefined) {
+      return;
+    }
+    const body = this.tableModel.getBodyModel();
+    if (isCoverGridBodyModel(body)) {
+      body.setFill(fill, true); // the options are the whole settings (a wrapper that rebuilds starts with them again)
+    } else if (fill) {
+      console.warn('GuiExpert Table – coverGridFill: the body model is no cover grid (CoverGridFactory.createCoverGridModel), the option has no effect.');
+    }
+  }
+
+  /**
+   * A cover grid fills the width (see {@link TableApi.setCoverGridFill}): new settings, then one render; the top item
+   * and the focused item stay.
+   *
+   * @param {boolean | Partial<CoverGridFillOptionsIf>} fill - changed parts, `true` or `false` (off)
+   * @returns {boolean} false if the body is no cover grid
+   * @since 1.1.117
+   */
+  setCoverGridFill(fill: boolean | Partial<CoverGridFillOptionsIf>): boolean {
+    const body = this.tableModel.getBodyModel();
+    if (!isCoverGridBodyModel(body)) {
+      return false;
+    }
+    body.setFill(fill);
+    this.resizeHandler.cancelPending(); // a debounced resize from before: this render takes the width over
+    this.recalcColumnWidths();
+    return true;
+  }
+
+  /**
+   * The settings of a cover grid that fills the width – a copy, `undefined` if it is off or the body is no cover grid.
+   *
+   * @returns {CoverGridFillOptionsIf | undefined} the settings
+   * @since 1.1.117
+   */
+  getCoverGridFill(): CoverGridFillOptionsIf | undefined {
+    const body = this.tableModel.getBodyModel();
+    return isCoverGridBodyModel(body) ? body.getFill() : undefined;
   }
 
   /**

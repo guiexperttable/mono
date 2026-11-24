@@ -369,18 +369,21 @@ export interface CoverGridModelAndOptionsIf {
  *   `listener.onCellActivated = evt => open(evt.value)`
  * - filter: `filter` becomes `externalFilterFunction` – call `tableApi.externalFilterChanged()` after a change
  * - sort: `tableApi.sort(BOOK_SORTS.title)`
- * - size: `tableModel.bodyModel.coverWidth/coverHeight = …` + `tableApi.repaintHard()`
+ * - size: `tableModel.bodyModel.coverWidth/coverHeight = …` + `tableApi.repaintHard()`; with `fill`:
+ *   `tableApi.setCoverGridFill({ tileWidth: 220 })`
+ * - full width (since 1.1.117): `ctx.fill: true` sets `coverGridFill` – the tiles stretch to the width, the height
+ *   keeps the ratio `coverHeight / coverWidth`
  *
  * @param books - the items (default: {@link generateBooks})
- * @param coverWidth - width of a tile in px (default 165)
+ * @param coverWidth - width of a tile in px (default 165) – with `fill` the wanted (minimal) width
  * @param coverHeight - height of a tile in px (default 220)
- * @param ctx - `filter` (which books are shown) and `isSelected` (frame)
+ * @param ctx - `filter` (which books are shown), `isSelected` (frame) and `fill` (tiles fill the width)
  */
 export function createCoverGridModelAndOptions(
   books: BookIf[] = generateBooks(),
   coverWidth = 165,
   coverHeight = 220,
-  ctx: BookCoverContextIf & { filter?: (book: BookIf) => boolean } = {}
+  ctx: BookCoverContextIf & { filter?: (book: BookIf) => boolean; fill?: boolean } = {}
 ): CoverGridModelAndOptionsIf {
   const tableModel = CoverGridFactory.createCoverGridModel<BookIf>(
     books, new BookCoverRenderer(ctx), coverWidth, coverHeight);
@@ -389,12 +392,16 @@ export function createCoverGridModelAndOptions(
     ...CoverGridFactory.createCoverGridDefaultOptions(coverHeight, () => "coverGridDemo"),
     externalFilterFunction: ctx.filter,
     overflowY: "scroll",   // a classic scroll bar is always there: the number of columns does not jump
-    ariaLabel: "Books"
+    ariaLabel: "Books",
+    coverGridFill: ctx.fill ? { tileWidth: coverWidth, aspectRatio: coverHeight / coverWidth } : undefined
   };
   return { tableModel, tableOptions };
 }
 
 /**
+ * Since 1.1.117 the core does this itself: `tableOptions.coverGridFill` (here `createCoverGridModelAndOptions(…, { fill:
+ * true })`) – also at once on a resize, with one render. This function stays for apps on older versions.
+ *
  * Stretches the tiles so that the columns fill the width of the grid (no gap on the right). The number of columns
  * stays `floor(width / baseWidth)`, the height grows with the width (same aspect ratio). Call it after the width of
  * the table changed (e.g. `tableApi.recalcColumnWidths()` from your own `ResizeObserver`), then `tableApi.repaintHard()`.

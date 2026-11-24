@@ -258,6 +258,8 @@
 - [CompiledFormula](interfaces/CompiledFormula.md)
 - [CopyContextIf](interfaces/CopyContextIf.md)
 - [CopyServiceIf](interfaces/CopyServiceIf.md)
+- [CoverGridFillLayoutIf](interfaces/CoverGridFillLayoutIf.md)
+- [CoverGridFillOptionsIf](interfaces/CoverGridFillOptionsIf.md)
 - [CreateTableModelPara](interfaces/CreateTableModelPara.md)
 - [CrudOptionsIf](interfaces/CrudOptionsIf.md)
 - [DefaultRowHeightsIf](interfaces/DefaultRowHeightsIf.md)
@@ -541,6 +543,7 @@
 - [compileColumnFilterPredicate](modules.md#compilecolumnfilterpredicate)
 - [compileFormula](modules.md#compileformula)
 - [compileSingleColumnFilter](modules.md#compilesinglecolumnfilter)
+- [computeCoverGridFill](modules.md#computecovergridfill)
 - [computeFillChanges](modules.md#computefillchanges)
 - [computeFillValues](modules.md#computefillvalues)
 - [computePastePlan](modules.md#computepasteplan)
@@ -584,6 +587,7 @@
 - [isBlankFilterValue](modules.md#isblankfiltervalue)
 - [isCheckboxCellRenderer](modules.md#ischeckboxcellrenderer)
 - [isCheckboxColumnDef](modules.md#ischeckboxcolumndef)
+- [isCoverGridBodyModel](modules.md#iscovergridbodymodel)
 - [isExcelFormattedValue](modules.md#isexcelformattedvalue)
 - [isExcelFormulaCell](modules.md#isexcelformulacell)
 - [isFillSeries](modules.md#isfillseries)
@@ -636,6 +640,83 @@
 - [toTsv](modules.md#totsv)
 - [trimArraySuffixes](modules.md#trimarraysuffixes)
 - [undoShortcutLayer](modules.md#undoshortcutlayer)
+
+## Table model
+
+### computeCoverGridFill
+
+▸ **computeCoverGridFill**(`width`, `fill`, `coverHeight`): [`CoverGridFillLayoutIf`](interfaces/CoverGridFillLayoutIf.md)
+
+Computes the tiles of a cover grid that fill a width (DOM-free; [CoverGridBodyModel](classes/CoverGridBodyModel.md) uses it with
+[TableOptionsIf.coverGridFill](interfaces/TableOptionsIf.md#covergridfill)): columns = `max(1, floor(width / tileWidth))`, `baseWidth` =
+`floor(width / columns)`, the rest pixels go to the first columns (1 px each), so the last tile ends flush with the
+edge. Height = `round(baseWidth × aspectRatio) + extraHeight`, at least 1 (without a valid `aspectRatio`:
+`coverHeight`; an `extraHeight` that is no finite number counts as 0). A width ≤ 0 (hidden host) gives one column of
+`tileWidth` – no division by 0; a `tileWidth` that is no positive number gives one column of the whole width.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `width` | `number` | the width to fill in px (fractions are floored) |
+| `fill` | [`CoverGridFillOptionsIf`](interfaces/CoverGridFillOptionsIf.md) | wanted tile width, aspect ratio and extra height |
+| `coverHeight` | `number` | the height without `aspectRatio` |
+
+#### Returns
+
+[`CoverGridFillLayoutIf`](interfaces/CoverGridFillLayoutIf.md)
+
+columns, widths and height
+
+**`Since`**
+
+1.1.117
+
+**`Example`**
+
+```ts
+const layout = computeCoverGridFill(961, { tileWidth: 165 }, 220);
+// { columns: 5, baseWidth: 192, rest: 1, tileHeight: 220 } → widths 193, 192, 192, 192, 192
+```
+
+#### Defined in
+
+[src/lib/table/cover-grid/cover-grid-fill.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/cover-grid/cover-grid-fill.ts#L42)
+
+___
+
+### isCoverGridBodyModel
+
+▸ **isCoverGridBodyModel**(`o`): o is CoverGridBodyModel\<unknown\>
+
+True for the body of a cover grid ([CoverGridBodyModel](classes/CoverGridBodyModel.md)). Works across copies of the core.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `o` | `any` | the object to check, e.g. `tableModel.getBodyModel()` |
+
+#### Returns
+
+o is CoverGridBodyModel\<unknown\>
+
+true for a cover grid body
+
+**`Example`**
+
+```ts
+const body = tableModel.getBodyModel();
+const fill = isCoverGridBodyModel(body) ? body.getFill() : undefined;
+```
+
+**`Since`**
+
+1.1.117
+
+#### Defined in
+
+[src/lib/table/instanceof-workaround.ts:237](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L237)
 
 ## Area models
 
@@ -3005,7 +3086,7 @@ const hasRowNumbers = isRowNumberColumnDef(tableModel.getColumnDef(0));
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:81](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L81)
+[src/lib/table/instanceof-workaround.ts:82](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L82)
 
 ## Aggregation
 
@@ -3482,7 +3563,7 @@ const totals = isAreaModelAggregateFooter(footer) ? footer.getResults() : {};
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:98](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L98)
+[src/lib/table/instanceof-workaround.ts:99](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L99)
 
 ## Row grouping
 
@@ -3697,7 +3778,7 @@ const groups = isAreaModelRowGroups(body) ? body.getGroups() : [];
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:153](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L153)
+[src/lib/table/instanceof-workaround.ts:154](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L154)
 
 ___
 
@@ -3735,7 +3816,7 @@ eventListener.onMouseClicked = (evt: GeMouseEvent) => {
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:135](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L135)
+[src/lib/table/instanceof-workaround.ts:136](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L136)
 
 ___
 
@@ -3770,7 +3851,7 @@ if (isTreeRow(row) && isRowGroup(row.data)) console.log(row.data.label, row.data
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:115](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L115)
+[src/lib/table/instanceof-workaround.ts:116](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L116)
 
 ___
 
@@ -3804,7 +3885,7 @@ const groupColumnIndex = (tableModel.getColumnDefs() ?? []).findIndex(isRowGroup
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:169](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L169)
+[src/lib/table/instanceof-workaround.ts:170](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L170)
 
 ## Pivot
 
@@ -3867,7 +3948,7 @@ const total = isAreaModelPivot(body) ? pivotBody.getResult().getValue() : undefi
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:203](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L203)
+[src/lib/table/instanceof-workaround.ts:204](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L204)
 
 ___
 
@@ -3901,7 +3982,7 @@ const valueColumns = (tableModel.getColumnDefs() ?? []).filter(isPivotColumnDef)
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:219](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L219)
+[src/lib/table/instanceof-workaround.ts:220](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L220)
 
 ___
 
@@ -3936,7 +4017,7 @@ const config = isPivotTableModel(model) ? model.getPivotConfig() : undefined;
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:186](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L186)
+[src/lib/table/instanceof-workaround.ts:187](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L187)
 
 ___
 
@@ -7297,7 +7378,7 @@ Determines if the given model is an AreaModelTree.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:39](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L39)
+[src/lib/table/instanceof-workaround.ts:40](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L40)
 
 ___
 
@@ -7329,7 +7410,7 @@ isCheckboxCellRenderer(new CheckboxCellRenderer()); // true
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L53)
+[src/lib/table/instanceof-workaround.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L54)
 
 ___
 
@@ -7353,7 +7434,7 @@ Checks if the given object is a CheckboxColumnDef.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:65](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L65)
+[src/lib/table/instanceof-workaround.ts:66](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L66)
 
 ___
 
@@ -7399,7 +7480,7 @@ Checks if the given row is a tree row.
 
 #### Defined in
 
-[src/lib/table/instanceof-workaround.ts:25](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L25)
+[src/lib/table/instanceof-workaround.ts:26](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/instanceof-workaround.ts#L26)
 
 ___
 

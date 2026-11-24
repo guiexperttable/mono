@@ -16,6 +16,8 @@ const STEPS = [
   ['lockfile is up to date (CI: pnpm install --frozen-lockfile)', 'pnpm install --frozen-lockfile'],
   ['versions are consistent (publish: version:check)', 'pnpm version:check'],
   ['build everything: core, libraries, Angular 14 – 22, demo apps, website (build:all)', 'pnpm build:all'],
+  ['demo models: unit tests + bundle check – no demo data in an app that imports one export (ci: build)',
+    'pnpm --filter @guiexpert/demo-table-models test && pnpm check:bundle'],
   ['type check of specs and test-utils (test-core)', 'pnpm --filter @guiexpert/table test:types'],
   ['JSDoc examples compile (test-core: docs:check)', 'pnpm --filter @guiexpert/table docs:check'],
   ['llms.txt snippets compile (test-core: check:llms)', 'pnpm check:llms'],

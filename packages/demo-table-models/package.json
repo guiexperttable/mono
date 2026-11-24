@@ -12,6 +12,7 @@
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
+  "sideEffects": false,
   "lib": {
     "entryFile": "src/index.ts"
   },
@@ -19,6 +20,7 @@
     "i": "pnpm i",
     "patch-version": "node patch.js",
     "build": "vite build",
+    "test": "vitest run",
     "npm-pub": "pnpm publish --no-git-checks --access public"
   },
   "publishConfig": {
@@ -53,6 +55,7 @@
     "typedoc-plugin-rename-defaults": "^0.7.0",
     "typedoc-plugin-markdown": "3.17.1",
     "typescript": "5.2.2",
-    "@babel/core": "~7.28.6"
+    "@babel/core": "~7.28.6",
+    "vitest": "5.0.4"
   }
 }

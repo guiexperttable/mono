@@ -656,6 +656,8 @@ Full answers: instructions.md section 6.26 (https://github.com/guiexperttable/mo
 - Open a row or a cover with Enter or a double click: `listener.onCellActivated = evt => open(evt.row ?? evt.value)` (wrappers `cellActivated`, since 1.1.115) – one handler for keyboard and mouse; only if the gesture did nothing else (checkbox, tree node, detail row, editor); the Enter key is not consumed. → R20
 - Hide the focus frame: `tableOptions.focusFrame: "never"`; only while the keyboard is used: `"keyboard"` (default of a cover grid, since 1.1.115). Not with CSS, not with `new FocusModel("none")`.
 - Cover grid with the keyboard (since 1.1.115): built in – arrows move from item to item (wrap at the end of a row), Home/End first/last item, Enter opens, the focus follows the item after sort/filter/resize. → R20
+- Cover grid warns "the body model has no row objects": fixed in 1.1.116 – its scroll state stores the first visible item (`id`/`uuid` or `getRowId(item, index)`), no warning; a resize or a new tile size keeps that item at the top. Never `getRowId: (_row, rowIndex) => rowIndex` for a cover grid (a row holds other items after a resize).
+- `@guiexpert/demo-table-models` makes the bundle ~600 kB bigger: fixed in 1.1.116 (nothing computed on import, `"sideEffects": false`); an app with only `BookCoverRenderer` ≈ 11 kB minified.
 - Empty table: the host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 
 ## Feature reference

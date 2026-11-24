@@ -26,7 +26,10 @@ export interface TeamDataIf {
   updatedAt?: Date,
 }
 
-export const data: TeamDataIf[] = (
+// The module-level values below are created by functions marked /* @__PURE__ */ (since 1.1.116): an app that does
+// not use the time table drops them – a plain `[…].map()`, `new ColumnDef()` or `{ ...new TableOptions() }` on module
+// level is a side effect for the bundler and kept ColumnDef, TableOptions & Co. in every app (prompt 025).
+export const data: TeamDataIf[] = /* @__PURE__ */ withUpdatedAt(
   [
     {
       id: 1,
@@ -175,11 +178,12 @@ export const data: TeamDataIf[] = (
       team: { name: "Team TCC", active: true },
       data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
-  ] as TeamDataIf[])
-  .map(r => {
-    r.updatedAt = new Date();
-    return r;
-  });
+  ] as TeamDataIf[]);
+
+function withUpdatedAt(rows: TeamDataIf[]): TeamDataIf[] {
+  rows.forEach(r => r.updatedAt = new Date());
+  return rows;
+}
 
 /*
 export function createTreeTableRows(): TreeRow<TeamDataIf>[] {
@@ -204,7 +208,10 @@ export function createTreeTableRows(): TreeRow<TeamDataIf>[] {
   return ret;
 }
 */
-const columnDefs: ColumnDefIf[] = [
+const columnDefs: ColumnDefIf[] = /* @__PURE__ */ createTimeTableColumnDefs();
+
+function createTimeTableColumnDefs(): ColumnDefIf[] {
+  return [
   new ColumnDef("city", "City", new Size(90, "px")),
   new ColumnDef("location", "Location", new Size(100, "px")),
   new ColumnDef("team.name", "Team", new Size(100, "px")),
@@ -232,21 +239,28 @@ const columnDefs: ColumnDefIf[] = [
     width: new Size(175, "px"),
     bodyRenderer: new DateToTecCellRenderer()
   })
-];
-export const COL_IDX_UPDATED_AT = columnDefs.length - 1;
+  ];
+}
 
-export const tableOptions = {
-  ...new TableOptions(),
-  hoverRowVisible: false,
-  hoverColumnVisible: false,
-  defaultRowHeights: {
-    header: 34,
-    body: 34,
-    footer: 34
-  },
-  columnsDraggable: false,
-  columnsResizable: true
-};
+/** The column "Updated at" – the last of the 17 columns (a literal: `columnDefs.length - 1` would keep the columns). */
+export const COL_IDX_UPDATED_AT = 16;
+
+export const tableOptions = /* @__PURE__ */ createTimeTableOptions();
+
+function createTimeTableOptions() {
+  return {
+    ...new TableOptions(),
+    hoverRowVisible: false,
+    hoverColumnVisible: false,
+    defaultRowHeights: {
+      header: 34,
+      body: 34,
+      footer: 34
+    },
+    columnsDraggable: false,
+    columnsResizable: true
+  };
+}
 
 export function createTimeTableModel(): TableModelIf {
 

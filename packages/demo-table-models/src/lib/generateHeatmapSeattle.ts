@@ -10,41 +10,49 @@ import {
 
 const defaultRowHeights = 30;
 const defaultColumnWidth = 3;
-const data: RawData[] = getRawData();
-
-
-const map: { [key: string]: { [key: string]: RawData } } = {};
-data.forEach(item => {
-  const [d, t] = item.date.split("T") as [string, string];
-  if (!map[d]) {
-    map[d] = {};
-  }
-  map[d][t.substring(0, 5)] = item;
-});
-
-
-const days = Object.keys(map);
 const times = ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00",
   "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00",
   "00:00", "01:00", "02:00", "03:00", "04:00", "05:00"];
 
-
-function getMinMax(): [number, number] {
-  let min = 10;
-  let max = 0;
-  data.forEach(item => {
-    min = Math.min(min, item.temperature);
-    max = Math.max(max, item.temperature);
-  });
-  return [min, max];
+/** The weather data grouped by day and hour, with the temperature range. */
+interface SeattleWeather {
+  /** date → "HH:MM" → value */
+  map: { [key: string]: { [key: string]: RawData } };
+  days: string[];
+  min: number;
+  max: number;
 }
 
-const [MIN, MAX] = getMinMax();
+let seattleWeather: SeattleWeather | undefined;
+
+/**
+ * Reads and groups the 8,759 values once, on the first model – never on import (before 1.1.116 this ran on module
+ * level: a side effect, so every app that imported anything from this package kept the weather data in its bundle).
+ */
+function getSeattleWeather(): SeattleWeather {
+  if (!seattleWeather) {
+    const map: SeattleWeather["map"] = {};
+    let min = 10;
+    let max = 0;
+    getRawData().forEach(item => {
+      const [d, t] = item.date.split("T") as [string, string];
+      if (!map[d]) {
+        map[d] = {};
+      }
+      map[d][t.substring(0, 5)] = item;
+      min = Math.min(min, item.temperature);
+      max = Math.max(max, item.temperature);
+    });
+    seattleWeather = { map, days: Object.keys(map), min, max };
+  }
+  return seattleWeather;
+}
 
 export function createHeatMapSeattleModel(): TableModelIf {
-  const bodyAreaModel = new HeatMapSeattleBodyModel();
+  const weather = getSeattleWeather();
+  const bodyAreaModel = new HeatMapSeattleBodyModel(weather);
   const footerAreaModel = new HeatMapSeattleFooterModel();
-  const columnSizes = [60, ...(new Array(days.length).fill(defaultColumnWidth))];
+  const columnSizes = [60, ...(new Array(weather.days.length).fill(defaultColumnWidth))];
 
   return TableFactory.createTableModel({
     bodyAreaModel,
@@ -58,6 +66,10 @@ export function createHeatMapSeattleModel(): TableModelIf {
 // colors  from   #430355 -> #1F908D  -> #FAE625
 
 class HeatMapSeattleBodyModel extends AreaModel {
+
+  constructor(private readonly weather: SeattleWeather) {
+    super();
+  }
 
   override getRowCount(): number {
     return times.length;
@@ -78,6 +90,7 @@ class HeatMapSeattleBodyModel extends AreaModel {
       return "";
     }
     columnIndex--;
+    const { map, days } = this.weather;
     const date = days[columnIndex];
     const time = times[rowIndex];
     if (map[date] && map[date][time]) {
@@ -91,6 +104,7 @@ class HeatMapSeattleBodyModel extends AreaModel {
       return undefined;
     }
     columnIndex--;
+    const { map, days, min: MIN, max: MAX } = this.weather;
     const date = days[columnIndex];
     const time = times[rowIndex];
     if (!map[date] || !map[date][time]) return undefined;

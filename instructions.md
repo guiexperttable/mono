@@ -1155,6 +1155,7 @@ keyboard (`focusFrame: "keyboard"`). (Before 1.1.115 the method was only availab
 | Keyboard (since 1.1.115) | the tiles are **one sequence**: ← / → previous / next item (wrap over the end of a row, mirrored in right-to-left), ↑ / ↓ one row (↓ without a tile below: the last item), Home / End and Ctrl/⌘+Home / End first / last item, Page Up / Down one page. Empty tiles after the last item never get the focus (keyboard and mouse). Tab into the grid focuses the first visible item. One render per key |
 | Open a tile (since 1.1.115) | `listener.onCellActivated = evt => …` – **Enter** on the focused tile and a **double click** report the same event: `evt.value` = the item, `evt.source` = `"keyboard"` \| `"mouse"`. Wrappers: `cellActivated`. The Enter key is not consumed – call `evt.originalEvent?.stopPropagation()` if a dialog around the grid also reacts to Enter. A held Enter key reports once; a double click on a button, link or input that your renderer put into the tile belongs to that control |
 | Focus (since 1.1.115) | the focus follows the **item**: after `sort()`, a filter, a resize (another number of tiles per row) or new items the same item is focused (`onFocusChanged` reports the new cell). An item that is filtered out hands the focus to the tile at its place, no items = no focus. Focused item: `bodyModel.getValueAt(...focusModel.getFocus())` |
+| Scroll position (since 1.1.116) | `createCoverGridDefaultOptions` stores it under the key of `getStorageKeyFn`: the pixels **and** the id of the first item of the first visible row (`id`/`uuid` of the item or your `autoRestoreOptions.getRowId(item, index)`). After a restore with another width (another number of tiles per row) or new items the grid scrolls to the row of that item; items without id (image URLs): only the pixels. While the grid lives, a resize or a new tile size (`coverWidth`/`coverHeight` + `repaintHard()`, `fitCoversToWidth`) keeps the top item at the top – in the same render pass (a filter still scrolls to the top) No console warning – do **not** set `getRowId: (_row, rowIndex) => rowIndex` for a cover grid, a row number points to other items after a resize |
 | Focus frame | `focusFrame: "keyboard"` (default of the cover grid): only after a key, a mouse press hides it. `"always"` shows it after clicks too, `"never"` hides it (then draw your own focus indicator in the renderer). Color: `--ge-table-focus-outline-color` / `--ge-table-focus-border`. No CSS trick needed |
 | Selection | the cover grid has no selection model of its own – keep the selected item in your app and let the renderer mark it (repaint after a change) |
 | Screen readers | the grid is a `role="grid"`, each tile a `gridcell`; the name of a tile is what your renderer puts into it – an `alt` text, a title, or `<span class="ge-table-sr-only">…</span>` (6.14) |
@@ -1632,7 +1633,8 @@ const tableOptions: TableOptionsIf = {
 - Tables before 1.1.92 stored three keys (`<key>sortingState`, `<key>scrollState`, `<key>collapsedExpandedState`).
   They are read once (sort index → property of the default column order) and removed with the next save.
 - Models without row objects (e.g. an own `AreaModel` for millions of rows): use
-  `getRowId: (_row, rowIndex) => rowIndex`, otherwise checked and selected rows are not stored.
+  `getRowId: (_row, rowIndex) => rowIndex`, otherwise checked and selected rows are not stored. Not for a cover grid
+  (or any body with `getTileLayout()`): its scroll state stores the first visible **item** (since 1.1.116, 5.10).
 - **Privacy:** the state holds no cell values – only properties, widths, sort states and row ids. Ids can be personal
   data (an e-mail address as id). Rows without `id`/`uuid` and without an own `getRowId` are not stored (the table
   warns once) – before 1.1.92 the JSON of the whole row was used as id.
@@ -2617,6 +2619,16 @@ users another visible focus indicator. → 5.10
 end of a row, Home/End go to the first/last item, Enter opens (`onCellActivated`), empty tiles are skipped and the focus
 stays on the same item after sorting, filtering and resizing. Remove `shortcutActionsDisabled: true` from older cover
 grid code. → 5.10
+
+**My cover grid warns "the body model has no row objects – these rows are not stored".** Fixed in 1.1.116: the scroll
+state of a cover grid stores the first visible **item** (its `id`/`uuid` or your `getRowId(item, index)`) instead of a
+row, without a warning – and a resize or a new tile size keeps that item at the top. On 1.1.115 ignore the warning – the pixel position is stored anyway. Do not set
+`getRowId: (_row, rowIndex) => rowIndex`: a row of a cover grid holds other items after a resize. → 5.10
+
+**Importing one renderer from `@guiexpert/demo-table-models` makes my bundle 600 kB bigger.** Fixed in 1.1.116: before,
+the package grouped the Seattle weather data of a heat map demo on import, so every bundle kept them. Since 1.1.116 it
+computes nothing on import and declares `"sideEffects": false` – an app that imports only `BookCoverRenderer` is about 11 kB (minified, with the core parts it uses). The demo
+package is meant for demos; copy what you need into your app for production.
 
 **The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
 gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4

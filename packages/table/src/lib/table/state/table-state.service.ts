@@ -15,6 +15,7 @@ import { GeStateChangeEvent } from "../data/common/event/ge-state-change-event";
 import { isAreaModelTree, isRowGroup, isTreeRow } from "../instanceof-workaround";
 import { SelectionModelIf } from "../selection/selection-model.if";
 import { SelectionSnapshot } from "../selection/selection-model";
+import type { TileLayoutIf } from "../data/tablemodel/areamodel/tile-layout.if";
 import { ALL_TABLE_STATE_PARTS } from "./table-state-part";
 import { StateStorageIf } from "./state-storage.if";
 import { readLegacyState, removeLegacyState } from "./table-state-migration";
@@ -648,7 +649,13 @@ export class TableStateService {
     // left from the start of the row (right-to-left: ≥ 0 as well) – a state is independent of the direction
     const scroll: TableScrollStateIf = { left: this.scope.getViewportScrollLeft(), top: viewport.scrollTop };
     const first = this.scope.getFirstVisibleRowIndex();
-    if (first > -1 && this.body().getRowCount() > 0) {
+    const tiles = this.scope.getTileLayout();
+    if (tiles) {
+      // a row of tiles is not a record (getRowByIndex() is undefined): the first ITEM of the first visible row – its
+      // id survives another number of tiles per row (a row number would not). Items without id: only the pixels.
+      const id = first > -1 ? this.tileIdAt(tiles, first * tiles.getTilesPerRow()) : undefined;
+      if (id !== undefined) scroll.firstRowId = id;
+    } else if (first > -1 && this.body().getRowCount() > 0) {
       const id = this.idAt(first, this.warns("scroll"));
       if (id !== undefined) scroll.firstRowId = id;
     }
@@ -987,6 +994,11 @@ export class TableStateService {
     if (scroll.firstRowId === undefined) {
       return;
     }
+    const tiles = this.scope.getTileLayout();
+    if (tiles) {
+      this.applyTileScroll(tiles, scroll.firstRowId);
+      return;
+    }
     const first = this.scope.getFirstVisibleRowIndex();
     if (first > -1 && this.idAt(first, false) === scroll.firstRowId) {
       return;
@@ -995,6 +1007,32 @@ export class TableStateService {
     if (index !== undefined) {
       this.scope.scrollToIndex(-1, index);
       this.scope.adjustAfterScrolling();
+    }
+  }
+
+  /**
+   * A grid of tiles: if the stored item is not in the first visible row after restoring the pixels (another number
+   * of tiles per row, new items), scroll to the row of the item. Item gone: the pixel position stays.
+   */
+  private applyTileScroll(tiles: TileLayoutIf, firstRowId: TableStateRowId): void {
+    const perRow = tiles.getTilesPerRow();
+    const count = tiles.getTileCount();
+    const first = this.scope.getFirstVisibleRowIndex();
+    if (first > -1) {
+      for (let i = first * perRow, end = Math.min(count, (first + 1) * perRow); i < end; i++) {
+        if (this.tileIdAt(tiles, i) === firstRowId) {
+          this.scope.anchorTileScroll(i); // a later change of the tile size keeps this item at the top
+          return;
+        }
+      }
+    }
+    for (let i = 0; i < count; i++) {
+      if (this.tileIdAt(tiles, i) === firstRowId) {
+        this.scope.scrollToIndex(-1, Math.floor(i / perRow));
+        this.scope.adjustAfterScrolling();
+        this.scope.anchorTileScroll(i);
+        return;
+      }
     }
   }
 
@@ -1022,6 +1060,17 @@ export class TableStateService {
   private ownGetRowId(): GetRowIdFn<unknown> | undefined {
     const fn = this.scope.tableOptions.autoRestoreOptions?.getRowId;
     return fn && !isDefaultGetRowId(fn) ? fn : undefined;
+  }
+
+  /**
+   * The id of the item at `index` of a grid of tiles: an own `getRowId(item, index)`, otherwise `id`/`uuid` of the
+   * item. Never warns – an item without id is a normal case of a cover grid (image URLs), the pixels are stored.
+   */
+  private tileIdAt(tiles: TileLayoutIf, index: number): TableStateRowId | undefined {
+    if (index < 0 || index >= tiles.getTileCount()) {
+      return undefined;
+    }
+    return this.idOfRow(tiles.getTileAt(index), index, false);
   }
 
   /** The id of the displayed row at `index`. */

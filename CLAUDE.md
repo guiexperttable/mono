@@ -39,7 +39,8 @@ mono/
 │   └── table-website/         # Ziel für typedoc-Ausgabe
 ├── scripts/
 │   ├── sync-angular-src.mjs   # packages/angular-table/src + Core-CSS → angular-builds/ngNN/lib/src (Marke @since-angular N)
-│   └── version.mjs            # check | sync | patch | minor – ein Versionsschema für alle Pakete
+│   ├── version.mjs            # check | sync | patch | minor – ein Versionsschema für alle Pakete
+│   └── check-demo-bundle.mjs  # Mini-Apps gegen die dists bauen: keine Demo-Daten im Bundle (Prompt 025, `pnpm check:bundle`)
 ├── instructions.md            # Entwickler-Doku aller Frameworks (geprüft, s. §6)
 ├── TODO.md                    # offene Code-Aufgaben
 ├── prompts/                   # Feature-Prompts für neue Sitzungen (Index + Reihenfolge: prompts/README.md)
@@ -54,6 +55,7 @@ mono/
 | Core bauen (Voraussetzung für alles) | `pnpm build:core` |
 | Core testen (Unit + Browser) / nur Unit | `pnpm test:core` / `pnpm test:core:unit` (Details §6) |
 | `llms.txt`-Snippets prüfen (jeder `ts`-Block einzeln gegen `packages/table/src`, Prompt 020) | `pnpm check:llms` |
+| Demo-Paket: Unit-Tests / Bundle-Check (Mini-Apps mit Vite gegen die dists, rot bei Demo-Daten im Bundle, Prompt 025) | `pnpm --filter @guiexpert/demo-table-models test` / `pnpm check:bundle` (nach `build:core` + Demo-Build; in `ci:local` und `ci.yml`) |
 | Performance prüfen (Verhältnis kleines/großes n + Trend gegen Baseline, Prompt 021) | `pnpm test:perf` (~20 s, nicht in `pnpm test`); Baseline übernehmen: `pnpm --filter @guiexpert/table perf:baseline` |
 | Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`; enthält Angular 22 – braucht vorher `pnpm build:core`) |
 | Angular-Wrapper testen | `pnpm test:angular` (baut ng22, testet das `dist` in Chromium; Typen: `pnpm --filter angular-build-ng22 test:types`) |
@@ -352,7 +354,15 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   (`<key>tableState`, `storage: StateStorageIf`, Default `localStorage`); Flags `autoRestoreSortingState`, `…ScrollPosition`,
   `…CollapsedExpandedState`, `…CheckedState`, `…SelectedState`, `…ColumnLayout`, `…HeaderGroupState`, `…CustomState`.
   Alte Schlüssel (`<key>sortingState` …) liest `readLegacyState` einmal (Index → Property der Standardreihenfolge).
-  Ohne `getStorageKeyFn` wird nichts gespeichert (eine Warnung).
+  Ohne `getStorageKeyFn` wird nichts gespeichert (eine Warnung). **Kachel-Layout** (`getTileLayout()`, Cover Grid, seit
+  1.1.116, Prompt 025): `scroll.firstRowId` = Id des ersten **Items** der ersten sichtbaren Reihe (`tileIdAt`, nie eine
+  Warnung – `getRowByIndex()` ist dort immer `undefined`), beim Laden `applyTileScroll` (andere Spaltenzahl → Reihe des
+  Items); ohne Id nur Pixel. Nie `getRowId: (_row, i) => i` für Kacheln empfehlen. **Laufzeit**: `TableScope` merkt
+  sich in `afterRenderPass` das oberste Item (`tileScrollAnchor`: Item, Index, Spalten, Reihenhöhe, Versatz 0…1 – bleibt
+  dasselbe Item, solange es in der obersten Reihe steht; `anchorTileScroll(i)` nach der Wiederherstellung);
+  `keepTileScrollAnchor` am Anfang von `beforeRenderPass` setzt bei anderer Spaltenzahl/Kachelhöhe die Position auf
+  dessen Reihe (`setContentScrollPosition`, derselbe Render-Durchgang; `indexOfTile` nur, wenn es den Index verließ).
+  Filter/Sortieren/neue Items folgen nicht (Filter scrollt nach oben).
 - Export: `api.copyToClipboard()`, `api.downloadExcel(fileName, author)` (eigener XLSX-Writer, keine Lib) = **aktuelle
   Sicht** (gefilterte Zeilen in Sortierreihenfolge + Header + Footer); beliebige Daten (z. B. alle Zeilen via
   `getAllRows()`) über `new ExcelService().downloadExcel(matrix, …)`.
@@ -887,6 +897,10 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     `perf/baseline.json` je Plattform (`linux-ci`, lokal `macos-local`), ab ×1,5 Warnung (`::warning::`, Job-Summary),
     nie rot; `perf:baseline` übernimmt. CI-Job `test-perf` (Ubuntu, noch nicht sperrend). Neue Render-/Update-/
     Eingabepfade bringen eine Invariante und ggf. ein Szenario mit (`prompts/000-arbeitsweise.md` Phase 2).
+  - **Demo-Paket** (`packages/demo-table-models`, seit 1.1.116): Vitest-Unit-Tests (Node, `vitest.config.ts`, Core per
+    Alias aus `src`), `"sideEffects": false`, **nichts auf Modul-Ebene rechnen** (`dist/index.js` ist eine Datei: Aufrufe,
+    `.map()`, `new X()` auf Modul-Ebene bleiben in jedem Bundle – lazy oder `/* @__PURE__ */`-Fabrik); Wache
+    `pnpm check:bundle`. Die Baum-Personen liegen einmal als JSON-Text (`demodata/tree-persons.ts`, `createTreePersons()`).
   - **Wrapper-Tests**: je Wrapper-Paket `vitest.config.ts` + `*.browser.spec.*` neben dem Code (Smoke: Mount →
     `tableReady`, Zeilen, Klick-Event, Modellwechsel = Neuaufbau + `destroy()`, Unmount = `destroy()`); Core per Alias aus
     `packages/table/src`; gemeinsame Helfer `packages/table/test-utils/wrapper-test-utils.ts` (ohne `vitest`-Import).

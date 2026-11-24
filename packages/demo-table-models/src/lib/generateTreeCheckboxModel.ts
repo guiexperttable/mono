@@ -13,7 +13,7 @@ import {
   TreeFactory
 } from "@guiexpert/table";
 import { PersonIf } from "../model/person.if";
-import data from "../demodata/tree-persons";
+import { createTreePersons } from "../demodata/tree-persons";
 
 
 export function generateTreeCheckboxModel(): TableModelIf {
@@ -42,7 +42,7 @@ export function generateTreeCheckboxModel(): TableModelIf {
     new ColumnDef("id", "ID", new Size(60, "px"))
   ];
 
-  const tree = TreeFactory.buildTreeRows<PersonIf>(data, "friends");
+  const tree = TreeFactory.buildTreeRows<PersonIf>(createTreePersons(), "friends");
   return TableFactory.createTableModel({
     rows: tree,
     columnDefs,

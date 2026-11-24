@@ -36,6 +36,18 @@ This is the UI-agnostic table component for your next web app. 😊
 - Full control over the HTML structure and style
 
 
+## Bundle size (since 1.1.116)
+
+The package declares `"sideEffects": false` and computes nothing on import: an app bundles only the demos it uses
+(an app that imports only `BookCoverRenderer`: ≈ 11 kB minified including the core parts it uses; before 1.1.116
+every import kept 614 kB of Seattle weather data). The big
+data sets (tree persons, weather) are read only when their model is created.
+
+For contributors – `dist/index.js` is **one** file, so `"sideEffects": false` alone does not help: no call, loop,
+`.map()` or `new X()` on module level. Compute lazily in a function, or wrap a module-level value in a function marked
+`/* @__PURE__ */` (see `createTimeTableModel.ts`). `pnpm check:bundle` (root, also in `pnpm ci:local` and CI) builds
+mini apps and fails if they contain demo data; unit tests: `pnpm --filter @guiexpert/demo-table-models test`.
+
 ## Links
 
 - [Demos](https://gui.expert/demos)

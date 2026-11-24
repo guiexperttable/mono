@@ -40,6 +40,11 @@ jobs:
       - name: Build libraries
         run: pnpm build:libs
 
+      # @guiexpert/demo-table-models: unit tests, then a Vite build of mini apps against the dists – an app that
+      # imports one export must not get the demo data sets (prompt 025: 614 kB of weather data in every app)
+      - name: Demo models – tests and bundle check
+        run: pnpm --filter @guiexpert/demo-table-models test && pnpm check:bundle
+
       - name: Build Angular 14 … 22
         run: pnpm build:angular
 

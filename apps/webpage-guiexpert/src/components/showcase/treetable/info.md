@@ -7,7 +7,7 @@ Source of demo: [treetable/run.astro](https://github.com/guiexperttable/mono/blo
 
 Model: [generateTreePeopleModel.ts](https://github.com/guiexperttable/mono/blob/main/packages/demo-table-models/src/lib/treepeople/generateTreePeopleModel.ts).
 
-Data: [treePeopleData.ts](https://github.com/guiexperttable/mono/blob/main/packages/demo-table-models/src/lib/treepeople/treePeopleData.ts).
+Data: [tree-persons.ts](https://github.com/guiexperttable/mono/blob/main/packages/demo-table-models/src/demodata/tree-persons.ts) (`createTreePersons()` – a new copy of the persons for each model).
 
 This example demonstrates a Tree-Table.
 In a Tree-Table, objects are in a hierarchical relationship to each other and typically belong to the same type, 
@@ -76,7 +76,7 @@ Subsequently, a TableModel is created using `TableFactory.createTableModel()`.
 The `ColumnDefIf[]` defines the columns in this process.
 
 ```ts title="Creation of the table model"
-const tree = TreeFactory.buildTreeRows<PersonIf>(TREE_PEOPLE_DATA, "friends");
+const tree = TreeFactory.buildTreeRows<PersonIf>(createTreePersons(), "friends");
 const tableModel = TableFactory.createTableModel({
   rows: tree,
   columnDefs,

@@ -126,6 +126,8 @@ This is the UI-agnostic table component for your next web app. 😊
   (wrappers `cellActivated`, since 1.1.115) – one handler for keyboard and mouse.
 - **Hide the focus frame:** `tableOptions.focusFrame: "never"`, or `"keyboard"` to show it only while the table is used
   with the keyboard (since 1.1.115) – not with CSS.
+- **Cover grid warns "the body model has no row objects"?** Fixed in 1.1.116 – the scroll state stores the first
+  visible item, no warning. Do not set `getRowId: (_row, rowIndex) => rowIndex` for a cover grid.
 - **AI assistants:** `llms.txt` in this package – recipes and pitfalls, every snippet compiled against the API.
 - **Nothing visible?** The host div needs a fixed height and the stylesheet `@guiexpert/table/css/main.css`.
 

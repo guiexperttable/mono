@@ -1427,6 +1427,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * old index (the last item if there is none; no items: no focus).
    */
   protected override beforeRenderPass(): void {
+    this.keepTileScrollAnchor();
     if (this.focusFrameDirty) {
       this.focusFrameDirty = false;
       this.cancelPendingRepaint(); // this pass draws the frame change – the repaint scheduled for it is not needed
@@ -1471,6 +1472,89 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
       this.syncingTileFocus = false;
     }
     this.rememberFocusedTile();
+  }
+
+  /**
+   * A grid of tiles: the first item of the top row and where the view stood in that row (0 … 1), remembered after each
+   * render pass – the scroll position follows it when the geometry changes (since 1.1.116).
+   */
+  private tileScrollAnchor?: { item: unknown; index: number; perRow: number; rowHeight: number; ratio: number };
+
+  /**
+   * Remembers the top item of a grid of tiles after a render pass (O(1)): the item of the last anchor while it is
+   * still in the top row (several resizes in a row do not drift to the first item of each new row), otherwise the
+   * first item of the top row.
+   */
+  private rememberTileScrollAnchor(): TableScope['tileScrollAnchor'] {
+    const tiles = this.getTileLayout();
+    const rendered = this.renderedBodyRows;
+    if (!tiles || !rendered || rendered.count <= 0) {
+      this.tileScrollAnchor = undefined;
+      return undefined;
+    }
+    const perRow = Math.max(1, tiles.getTilesPerRow());
+    const count = tiles.getTileCount();
+    const last = this.tileScrollAnchor;
+    let index = rendered.first * perRow;
+    let item: unknown;
+    if (last && Math.floor(last.index / perRow) === rendered.first && last.index < count
+      && tiles.getTileAt(last.index) === last.item) {
+      index = last.index;
+      item = last.item;
+    } else {
+      item = index < count ? tiles.getTileAt(index) : undefined;
+    }
+    const rowHeight = this.tableModel.getRowHeight('body', rendered.first);
+    this.tileScrollAnchor = item === undefined ? undefined
+      : { item, index, perRow, rowHeight, ratio: rowHeight > 0 ? rendered.offset / rowHeight : 0 };
+    return this.tileScrollAnchor;
+  }
+
+  /**
+   * The scroll state was restored to a grid of tiles: the restored item is the top item from now on (not the first
+   * item of its row), so a later change of the tile size keeps it at the top.
+   *
+   * @internal
+   */
+  anchorTileScroll(index: number): void {
+    this.tileScrollAnchor = undefined;
+    const anchor = this.rememberTileScrollAnchor();
+    const tiles = this.getTileLayout();
+    if (tiles && anchor && Math.floor(index / anchor.perRow) === Math.floor(anchor.index / anchor.perRow)
+      && index < tiles.getTileCount()) {
+      this.tileScrollAnchor = { ...anchor, item: tiles.getTileAt(index), index };
+    }
+  }
+
+  /**
+   * A grid of tiles: the scroll position follows the **item** when the geometry changes (since 1.1.116). Another
+   * number of tiles per row (a resize) or another tile height (`coverHeight` + `repaintHard()`) moves the remembered
+   * top item to another row – this pass shows that row at the top again (with the same relative offset), instead of
+   * the old pixels, which would show other items. Only the geometry is followed: new items, a filter or `sort()` keep
+   * their own position (a filter scrolls to the top). The item is searched only if it left its index.
+   */
+  private keepTileScrollAnchor(): void {
+    const anchor = this.tileScrollAnchor;
+    const tiles = anchor ? this.getTileLayout() : undefined;
+    if (!anchor || !tiles) {
+      return;
+    }
+    const perRow = Math.max(1, tiles.getTilesPerRow());
+    const oldRow = Math.floor(anchor.index / anchor.perRow);
+    if (perRow === anchor.perRow && this.tableModel.getRowHeight('body', oldRow) === anchor.rowHeight) {
+      return;
+    }
+    const count = tiles.getTileCount();
+    const index = anchor.index < count && tiles.getTileAt(anchor.index) === anchor.item
+      ? anchor.index : tiles.indexOfTile(anchor.item);
+    if (index < 0 || index >= count) {
+      this.tileScrollAnchor = undefined; // the item is gone: the pixels stay
+      return;
+    }
+    anchor.index = index; // the pass after this one keeps the item as anchor (rememberTileScrollAnchor)
+    const row = Math.floor(index / perRow);
+    this.setContentScrollPosition(undefined,
+      this.getBodyRowTop(row) + Math.round(anchor.ratio * this.tableModel.getRowHeight('body', row)));
   }
 
   /** True if an event comes from a form control, button, link or editable element (inside a cell, the editor …). */
@@ -3118,6 +3202,7 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   }
 
   protected override afterRenderPass(): void {
+    this.rememberTileScrollAnchor(); // the scroll position of a grid of tiles follows its top item (since 1.1.116)
     this.stateService?.rendered(); // undefined while the constructor of the super class renders
     this.filterRowService?.update(); // persistent filter row follows column geometry, scroll & RTL (since 1.1.114)
     this.fillHandleService?.update(); // the handle follows the selected range (scroll, selection, editor)

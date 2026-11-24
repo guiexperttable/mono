@@ -710,6 +710,42 @@ Verhalten steht als `// NOTE:` in den Specs.
       Test `aria.browser.spec.ts` „Enter on a plain cell does nothing“). Falls gewünscht: Option oder
       `evt.preventDefault()` am `GeCellActivateEvent`.
 
+## Cover Grid ohne Warnung, Demo-Paket ohne Ballast (Prompt 025, 24.11.2026)
+
+Herkunft: Probelauf des Hands-on-Films „Cover Grid zum Nachbauen“ mit den Paketen 1.1.115 (Befunde G10, G11).
+
+- [x] **G10** Jedes Cover Grid mit `createCoverGridDefaultOptions` warnte beim Start „the body model has no row
+      objects“ (`computeScroll` → `getRowByIndex()` = `undefined`). Jetzt speichert der Scrollzustand eines
+      Kachel-Layouts (`getTileLayout()`) die Id des ersten Items der ersten sichtbaren Reihe und findet es bei anderer
+      Spaltenzahl wieder (`TableStateService.tileIdAt`/`applyTileScroll`); Items ohne Id = nur Pixel, nie eine Warnung.
+      Dazu zur Laufzeit: andere Breite/Kachelgröße (Resize, `fitCoversToWidth` + `repaintHard()`) hält das oberste Item
+      oben (`TableScope.keepTileScrollAnchor`, ein Render-Durchgang) – die Cover-Grid-Demo landete nach dem Neuladen
+      sonst nicht beim gespeicherten Buch (sie passt die Kacheln erst nach der Wiederherstellung an); deckt auch Breite 0
+      beim Start und den nachträglich erscheinenden Scrollbalken ab (Review-Funde).
+      Spec `state/cover-grid-state.browser.spec.ts`. Zielversion 1.1.116.
+- [x] **G11** `@guiexpert/demo-table-models` zog 614 kB Seattle-Wetterdaten in jede App (Rechnung auf Modul-Ebene in
+      `generateHeatmapSeattle.ts`); dazu weitere Modul-Seiteneffekte (`createTimeTableModel.ts`: `.map()`,
+      `new ColumnDef()`, `{ ...new TableOptions() }` = +15 kB Core-Klassen; `generateHeatMapTableModel.ts`). Jetzt
+      Cache-Funktion bzw. `/* @__PURE__ */`-Fabriken, `"sideEffects": false`, Personendaten **einmal** als JSON-Text
+      (`demodata/tree-persons.ts`, `createTreePersons()` = eigene Objekte je Modell). Mini-App mit `BookCoverRenderer`
+      633 → 11 kB, `dist/index.js` 10,7 → 3,5 MB (gzip 1.056 → 489 kB). Wache: `pnpm check:bundle`
+      (`scripts/check-demo-bundle.mjs`, in `ci:local` und `ci.yml`), Unit-Tests `pnpm --filter
+      @guiexpert/demo-table-models test` (erstmals Vitest im Demo-Paket).
+- [ ] Core, Seiteneffekte auf Modul-Ebene (Prompt 025 Teil B.5, gemessen): jeder Import aus `@guiexpert/table` behält
+      ~3 kB (minifiziert) – die Formel-Funktionstabellen `BUILT_IN_FUNCTIONS`/`LAZY_FUNCTIONS` (Aufrufe wie
+      `ko(Math.abs)`, `Object.freeze([...Object.keys(…)].sort())` in `formula/compile-formula.ts`) und `FormulaError`.
+      `"sideEffects"` im Manifest bringt nichts (gemessen: gleiche Größen), weil `index.js` **eine** Datei ist. Lohnt
+      erst mit `/* @__PURE__ */`/Lazy-Tabellen, wenn jemand eine Mini-App baut – heute zu klein.
+- [ ] Kachel-Layout mit `autoRestoreSelectedState: true` warnt weiter „no row objects“ (Auswahl ist reihenbasiert,
+      `toStateRange` → `idAt`) – mit den Default-Options nicht erreichbar; gehört zu „Auswahlmodell für Kacheln“ (024).
+- [ ] Website (Prompt 025 Teil C, gemessen 24.11.2026, nginx liefert gzip): die Showcases laden
+      `/scripts/demo-table-models/index.js` jetzt mit 489 kB gzip (vorher 1.056 kB); Minifizieren spart dort nur noch
+      9 kB. Der Core `/scripts/table/index.js` (39 Seiten) ginge minifiziert von 328 auf 189 kB gzip (1.271 → 669 kB) –
+      braucht einen Minifier im `pre:build` der Website (weder `vite` noch `esbuild` ist dort auflösbar → neue
+      devDependency) oder ein minifiziertes Zweit-Bundle des Cores; vorher prüfen, ob eine Seite Klassennamen liest.
+- [ ] Demo-Paket: die Seattle-Rohdaten stehen weiter als Objektliteral in `dist/index.js` (958 kB, gzip-freundlich);
+      als JSON-Text wie die Personen ≈ 600 kB.
+
 ## Spaltenfilter, Filter-Menü & Spaltenauswahl (Prompt 023, 1.1.114)
 
 - [x] Teil A–E umgesetzt (Branch `feat/spaltenfilter`, Design `prompts/023-spaltenfilter.design.md`): DOM-freie Engine,
@@ -971,6 +1007,19 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.116**, Core + `demo-table-models` (Prompt 025):
+  - **Cover Grid ohne Konsolen-Warnung:** `createCoverGridDefaultOptions` schrieb bei jedem Start „the body model has
+    no row objects …“. Der gespeicherte Scrollzustand eines Kachel-Layouts merkt sich jetzt das erste sichtbare
+    **Item** (`scroll.firstRowId` = `id`/`uuid` des Items bzw. eigenes `getRowId(item, index)`) und zeigt es nach einer
+    Wiederherstellung mit anderer Breite oben; Items ohne Id: nur die Pixelposition. **Verhaltensänderung:** auch zur
+    Laufzeit bleibt das oberste Item oben, wenn sich Breite oder Kachelgröße ändern (vorher blieben die Pixel und oben
+    standen andere Cover).
+  - **`@guiexpert/demo-table-models` ohne Ballast:** nichts wird mehr beim Import gerechnet (Seattle-Heatmap,
+    Zeitplan, Temperatur-Heatmap), `"sideEffects": false`, die Personen der Baum-Demos nur noch einmal (als JSON).
+    Eine App, die nur `BookCoverRenderer` importiert: 633 → 11 kB; `index.js` 10,7 → 3,5 MB. Jeder Aufruf von
+    `generateTreeCheckboxModel()`/`createTreePeopleModelAndOptions()` bekommt eigene Personen-Objekte (vorher teilten
+    sich mehrere Modelle desselben Aufrufers die Objekte).
 
 - **1.1.115**, Core + alle Wrapper (Prompt 024):
   - **Neu: `onCellActivated`** (`GeCellActivateEvent`; Wrapper `cellActivated`) – Enter auf der fokussierten

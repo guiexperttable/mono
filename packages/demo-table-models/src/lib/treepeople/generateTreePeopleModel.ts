@@ -27,7 +27,7 @@ import {
   ValueLabel
 } from "@guiexpert/table";
 import {PersonIf} from "./person.if";
-import {TREE_PEOPLE_DATA} from "./treePeopleData";
+import { createTreePersons } from "../../demodata/tree-persons";
 
 
 
@@ -113,7 +113,7 @@ export function createTreePeopleModelAndOptions(
   columnDefs[0].editable = FalseFn;
 
 
-  const tree = TreeFactory.buildTreeRows<PersonIf>(TREE_PEOPLE_DATA, "friends");
+  const tree = TreeFactory.buildTreeRows<PersonIf>(createTreePersons(), "friends");
   const tableModel = TableFactory.createTableModel({
     rows: tree,
     columnDefs,

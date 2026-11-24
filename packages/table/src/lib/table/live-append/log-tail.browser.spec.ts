@@ -74,9 +74,14 @@ describe.each(DIRECTIONS)('LogTailController (%s)', direction => {
   });
 
   it('real clicks while 6,000 lines/s come in (ring buffer full): every click arrives at the pressed line', async () => {
-    const t = await mountLive(6_000, 2_000);
+    // 12,000 lines = 2 s at 6,000 lines/s: a pressed line stays in the ring buffer that long. With 2,000 lines it was
+    // gone after 333 ms – a stalled CI runner needs longer from the press to the report, and for a line that left the
+    // buffer the table reports no click (by design; macOS runner, 1.1.114: the first click never arrived)
+    const t = await mountLive(6_000, 12_000);
     t.live.start();
-    await vi.waitFor(() => expect(t.api.getBodyModel().getRowCount()).toBe(2_000), { timeout: 5_000 });
+    // full: the ring buffer drops lines in blocks of 1 % (120), the count then moves between 11,880 and 12,000
+    await vi.waitFor(() => expect(t.api.getBodyModel().getRowCount()).toBeGreaterThanOrEqual(11_880), { timeout: 10_000 });
+    await frames(3);
     for (let i = 0; i < 8; i++) {
       const index = t.api.getLastFullVisibleRowIndex() - 3;
       await realMouse.moveTo(getCellDiv(t.host, 'body', 'center', index, 3));

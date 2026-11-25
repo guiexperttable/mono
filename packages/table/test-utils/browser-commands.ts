@@ -44,4 +44,9 @@ export const geMouseUp: BrowserCommand<[clickCount?: number]> = async (ctx, clic
   await ctx.page.mouse.up({ clickCount });
 };
 
-export const browserCommands = { geMouseMove, geMouseDown, geMouseUp };
+/** Turns the real mouse wheel at the current position (pixels; the browser hit-tests and scrolls like a user's wheel). */
+export const geMouseWheel: BrowserCommand<[deltaX: number, deltaY: number]> = async (ctx, deltaX, deltaY) => {
+  await ctx.page.mouse.wheel(deltaX, deltaY);
+};
+
+export const browserCommands = { geMouseMove, geMouseDown, geMouseUp, geMouseWheel };

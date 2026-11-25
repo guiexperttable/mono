@@ -15,6 +15,7 @@ declare module 'vitest/browser' {
     geMouseMove: (x: number, y: number, steps?: number) => Promise<void>;
     geMouseDown: (clickCount?: number) => Promise<void>;
     geMouseUp: (clickCount?: number) => Promise<void>;
+    geMouseWheel: (deltaX: number, deltaY: number) => Promise<void>;
   }
 }
 
@@ -35,6 +36,10 @@ export const realMouse = {
   /** Releases the left button. */
   up(clickCount = 1): Promise<void> {
     return commands.geMouseUp(clickCount);
+  },
+  /** Turns the wheel at the current position (pixels, positive = down / to the end). */
+  wheel(deltaX: number, deltaY: number): Promise<void> {
+    return commands.geMouseWheel(deltaX, deltaY);
   },
   /** A complete click (down + up) at the current position. */
   async click(clickCount = 1): Promise<void> {

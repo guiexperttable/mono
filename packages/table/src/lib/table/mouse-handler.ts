@@ -105,6 +105,10 @@ export class MouseHandler {
 
     this.tableScope.scrollViewport.addEventListener("scroll", () => this.tableScope.onViewportScroll(), { signal });
     this.tableScope.scrollViewport.addEventListener("wheel", this.tableScope.onWheel.bind(this.tableScope), { passive: false, signal });
+    // the fixed columns lie next to the viewport – the wheel there scrolls the table, too (found by the E2E tests, 026)
+    this.tableScope.getFixedBodyAreaElements().forEach(
+      ele => ele.addEventListener("wheel", evt => this.tableScope.onFixedAreaWheel(evt), { passive: false, signal })
+    );
 
     [window, this.tableScope.hostElement].forEach(
       ele => ele.addEventListener("resize", this.tableScope.adjustContainersAndRows.bind(this.tableScope), { signal })

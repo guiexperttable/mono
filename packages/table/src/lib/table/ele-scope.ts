@@ -620,4 +620,14 @@ export class EleScope {
     this.dom.setStyle(this.contentWrapperDiv, "height", h);
   }
 
+
+  /**
+   * The parent divs of the fixed body areas (west, east) – they lie above the scroll viewport, not inside it.
+   *
+   * @returns {HTMLDivElement[]} west and east body area
+   * @since 1.1.118
+   */
+  getFixedBodyAreaElements(): HTMLDivElement[] {
+    return [this.areaBodyWest.parent, this.areaBodyEast.parent];
+  }
 }

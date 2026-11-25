@@ -1388,6 +1388,37 @@ export class RenderScope extends EleScope {
     }
   }
 
+  /**
+   * Mouse wheel over the FIXED body areas (west/east): they lie next to the scroll viewport, so the browser does not
+   * scroll anything there – pass the movement on to the viewport, like a wheel over the middle columns.
+   * Not consumed when the table cannot move further (the page scrolls), with Ctrl (zoom) or over a form field.
+   *
+   * @param {WheelEvent} evt - the wheel event of a fixed body area
+   * @since 1.1.118
+   */
+  onFixedAreaWheel(evt: WheelEvent) {
+    if (evt.defaultPrevented || evt.ctrlKey) {
+      return;
+    }
+    const target = evt.target as HTMLElement | null;
+    if (target?.closest?.('input, textarea, select, [contenteditable="true"]')) {
+      return; // a field in a cell scrolls itself
+    }
+    const viewport = this.scrollViewport;
+    const unit = evt.deltaMode === 1 ? 16 : evt.deltaMode === 2 ? viewport.clientHeight : 1;
+    const top = viewport.scrollTop;
+    const left = viewport.scrollLeft;
+    if (evt.deltaY) {
+      viewport.scrollTop = top + evt.deltaY * unit * this.getScrollerToContentRatioY();
+    }
+    if (evt.deltaX) {
+      viewport.scrollLeft = left + evt.deltaX * unit; // physical, like the browser's own wheel (RTL: 0 … negative)
+    }
+    if (viewport.scrollTop !== top || viewport.scrollLeft !== left) {
+      evt.preventDefault(); // the table scrolled – not the page
+    }
+  }
+
   protected adjustBody() {
     const virtualRowDivTopF1 = this.areaBodyCenterGeo.height - this.getBodyContentHeight();
     const virtualRowDivTop = this.snapToDevicePixel(this.scrollFactorY * virtualRowDivTopF1);

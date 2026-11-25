@@ -1,0 +1,17 @@
+{
+  "name": "e2e",
+  "version": "1.1.117",
+  "private": true,
+  "type": "module",
+  "description": "E2E smoke tests of the built apps (website, demos) with Playwright – prompt 026",
+  "scripts": {
+    "test": "playwright test",
+    "test:website": "E2E_SKIP_ANGULAR_DEV=1 playwright test specs/website.spec.ts specs/showcases.spec.ts specs/training.spec.ts",
+    "test:demos": "playwright test specs/table-demo.spec.ts specs/framework-demos.spec.ts specs/angular-dev.spec.ts",
+    "serve": "node serve-dist.mjs",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}

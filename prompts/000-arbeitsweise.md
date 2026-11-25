@@ -129,6 +129,8 @@ Regeln aus CLAUDE.md §6:
 - `apps/angular-table-demo`: Route + Eintrag in `apps/angular-table-demo/instructions.md`. Achtung: nutzt noch die
   npm-Pakete (s. `TODO.md`), läuft also erst nach dem Release oder nach Kopplung an lokale Builds.
 - Framework-Demos (`apps/react-table-demo` …): optional.
+- Neue Demo-Seite/-Route läuft automatisch im E2E-Smoke mit (`pnpm test:e2e`, `apps/e2e`); eine neue App unter `apps/`
+  kommt in `apps/e2e/apps.mjs`. Ausnahmen nur mit Begründung in `apps/e2e/exceptions.ts`.
 
 ### Phase 6 – Website gui.expert (`apps/webpage-guiexpert`) 🛑 kein Deploy
 
@@ -141,6 +143,8 @@ Regeln aus CLAUDE.md §6:
   the course“ und die „New“-Kacheln der Showcase-Übersicht. Prüfen: `pnpm --filter webpage-guiexpert check:features`.
   `/doc/` (Tabellen `FEATURES`, `OPTION_GROUPS`, `API_GROUPS`, `EVENTS` in `src/components/doc/doc.astro`) mitpflegen.
 - Neues Tabellen-CSS auch in die Website-Kopie `src/styles/ge-table.css` übernehmen (die Showcases laden nur sie).
+- Neues Showcase/Kapitel läuft automatisch im E2E-Smoke mit (`pnpm test:e2e:website` nach dem Website-Build): keine
+  Konsolenfehler/-warnungen, keine fremden Requests, jede `<LiveDemo>` startet. Ausnahme nur begründet in `apps/e2e/exceptions.ts`.
 - Vergleichsaussagen prüfen und ggf. anpassen: `src/components/home/why.astro` (Tabelle `ROWS` + „Rule of thumb“),
   `src/pages/training/build-buy-or-guiexpert.astro`, `src/pages/training/checklist.astro`, Beiträge unter
   `src/pages/post/` bzw. `src/components/post/`. Ehrlich bleiben: was fehlt, bleibt als fehlend stehen.

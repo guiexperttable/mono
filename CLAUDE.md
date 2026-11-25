@@ -36,6 +36,7 @@ mono/
 │   ├── angular-table-demo/    # Angular 17, NgModule-basiert, ~20 Feature-Demos (nutzt noch npm-Pakete, s. TODO.md)
 │   ├── angular-signal-demo/   # Angular 22, zoneless, TableSignalComponent gegen angular-builds/ng22/dist (seit 1.1.100)
 │   ├── webpage-guiexpert/     # Astro 7 + Tailwind 3 (via PostCSS): Quelle von https://gui.expert
+│   ├── e2e/                   # Playwright-Smoke-Tests der GEBAUTEN Apps (Website, Demos), Prompt 026 – kein Build
 │   └── table-website/         # Ziel für typedoc-Ausgabe
 ├── scripts/
 │   ├── sync-angular-src.mjs   # packages/angular-table/src + Core-CSS → angular-builds/ngNN/lib/src (Marke @since-angular N)
@@ -58,6 +59,7 @@ mono/
 | Demo-Paket: Unit-Tests / Bundle-Check (Mini-Apps mit Vite gegen die dists, rot bei Demo-Daten im Bundle, Prompt 025) | `pnpm --filter @guiexpert/demo-table-models test` / `pnpm check:bundle` (nach `build:core` + Demo-Build; in `ci:local` und `ci.yml`) |
 | Performance prüfen (Verhältnis kleines/großes n + Trend gegen Baseline, Prompt 021) | `pnpm test:perf` (~20 s, nicht in `pnpm test`); Baseline übernehmen: `pnpm --filter @guiexpert/table perf:baseline` |
 | Wrapper testen (Smoke-Tests aller Frameworks, Chromium) | `pnpm test:wrappers` (~1 min; je Paket `pnpm --filter @guiexpert/react-table test`; enthält Angular 22 – braucht vorher `pnpm build:core`) |
+| E2E der gebauten Apps (Playwright, Prompt 026) | `pnpm test:e2e:build` (Core, Demo-Paket, ng22, Website, alle Demos), dann `pnpm test:e2e` (Chromium + Firefox + `ng serve` der Angular-Demo, ~35 s ohne Firefox); `test:e2e:website`, `test:e2e:demos`; `E2E_WEBKIT=1`, `E2E_SKIP_FIREFOX=1` (Firefox startet unter macOS 27.2 nicht), `E2E_DEV=1`; in `ci:local` hinter `--e2e` |
 | Angular-Wrapper testen | `pnpm test:angular` (baut ng22, testet das `dist` in Chromium; Typen: `pnpm --filter angular-build-ng22 test:types`) |
 | Alle Bibliotheken | `pnpm build:libs` |
 | Angular, alle Majors / eine | `pnpm build:angular` / `pnpm build:angular:ng22` (je ~7 s) |
@@ -100,6 +102,10 @@ obwohl `build:all` rot war – die einzelnen Zeilen liefen weiter.)
   `~0.15 || ~0.16`; die Zone.js-Tests belegen also 0.14 (die Apps der Anwender bringen ihr eigenes Zone.js mit).
   Beim Hinzufügen hat pnpm außerdem doppelte Transitive auf Versionen zusammengeführt, die schon im Lockfile standen
   (Babel-Helfer 7.29.7, semver 7.8.5, picomatch 4.0.7; `@babel/core` bleibt 7.28.6).
+- `@playwright/test` (nur `apps/e2e`) **exakt 1.64.0** = `playwright` der Vitest-Pakete – sonst zweite Browser-Version.
+  Beim Hinzufügen hat ein normales `pnpm i` den optionalen Peer `supports-color` von `debug` im ganzen Lockfile
+  umsortiert (8.1.1 → 5.5.0, ~55 Stellen); eingecheckt sind nur die 15 Zeilen für `@playwright/test` (von Hand,
+  `pnpm i --frozen-lockfile` akzeptiert sie). Ein Lockfile-Diff mit `supports-color` ist dieser Effekt, kein Update.
 - Root-`pnpm.overrides`: `@jridgewell/sourcemap-codec ^1.6.0` – Angular 22 deklariert `^1.4.14`, braucht aber 1.6
   (`encodeRangeMappings`).
 - Root-`pnpm.packageExtensions`: `@angular/animations` bekommt die Peer-Dependency `@angular/common`. Angular 17
@@ -177,6 +183,10 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   `.ge-table-scroll-viewport { scrollbar-width: none }` (keine Option `overflowY: "hidden"`).
   Test `scroll-height.browser.spec.ts`.
 - Horizontal analog über `scrollFactorX` und `adjustColumnsToRowParent(...)` (nur sichtbare Spalten).
+- **Mausrad über fixierten Spalten** (seit 1.1.118): die West-/East-Body-Areas liegen **neben** dem Viewport – der
+  `MouseHandler` hängt an sie (`EleScope.getFixedBodyAreaElements()`) einen `wheel`-Listener, der die Bewegung an den
+  Viewport gibt (`RenderScope.onFixedAreaWheel`, gekappte Höhen über `getScrollerToContentRatioY`, `preventDefault` nur,
+  wenn sich etwas bewegt hat). Test `fixed-columns-wheel.realmouse.browser.spec.ts` (echtes Mausrad: `realMouse.wheel`).
 - **Kein Neuaufbau bei reinem Zeilenzuwachs** (seit 1.1.108, Prompt 018 Teil B / 019): jeder Render-Durchgang merkt sich
   `RenderScope.renderedBodyRows` (Anzahl, erste sichtbare Zeile + Versatz, letzte gezeichnete Zeile, `atEnd`).
   `appendRows`/`rowsAppended` ohne Folgen, ohne Entfernen und nur hinter der letzten gezeichneten Zeile →
@@ -940,6 +950,19 @@ Bare Import `@guiexpert/table/css/main.css` funktioniert ab 1.1.85 (`exports` um
     Screenshots als Artefakt `browser-test-failures`. Rote Tests = kein Release. Seit 1.1.106 zusätzlich Job
     `test-core-macos` (`macos-15`, nur `test:browser`, Artefakt `browser-test-failures-macos`) – prüft die echten
     Mac-Tasten (⌘-Kürzel, ⌘A/⌘→ im Input, ⌘C-Kopierbefehl); gehört zu `test-core.yml`, sperrt also auch den Release.
+- **E2E der gebauten Apps (seit Prompt 026, `apps/e2e`, Design `prompts/026-e2e-playwright.design.md`)**: Abgrenzung
+  **Core-Verhalten → Vitest, gebaute Apps → Playwright**. `@playwright/test` 1.64.0 gegen die dists (ein statischer
+  Server `serve-dist.mjs`, Port je App in `apps.mjs`, 404 = rot) plus Projekt `angular-dev` (`ng serve` der Angular-Demo:
+  der Vite-Vorab-Bundle-Fehler aus §2 zeigt sich nur dort). Ziele **generiert** (`targets.ts`): jedes Showcase (`run` +
+  `info`), jede Seite unter `/training/` mit `?demos` (jede `<LiveDemo>` gestartet, je eine Tabelle), Top-Level-Seiten,
+  `apps/table-demo/*.html`, jede Demo-App + Routen von `angular-table-demo`/`vue3-multi-demo` – eine neue Seite läuft
+  automatisch mit. Wächter (`fixtures.ts`, Auto-Fixture): `pageerror`, `console.error`, `console.warn`, eigene Requests ≥ 400,
+  fehlgeschlagene und **fremde** Requests = rot. Prüfung: Tabelle sichtbar mit Zeilen oder Overlay, Mausrad → andere Zeilen,
+  Klick → Fokus; Angular genau ein `[ng-version]`. Alle Ausnahmen mit Begründung in `exceptions.ts` (Platzhalter,
+  `noTable`, `noInteraction`, `skip`, erlaubte Warnungen/Hosts, Mocks für JSONPlaceholder). Fehler nie dort umgehen,
+  sondern die Seite fixen. CI: `.github/workflows/e2e.yml` (Ubuntu, Chromium + Firefox, `continue-on-error`, Artefakt
+  `playwright-report`), nicht in `npm-publish.yml`. Firefox 157 (Playwright 1.64) startet unter macOS 27.2 nicht
+  (`E2E_SKIP_FIREFOX=1`, `ci:local --e2e` nimmt dort WebKit dazu). README: `apps/e2e/README.md`.
 - Weitere Verifikation: Builds + Demo-Apps + Website-Showcases
   (*Large dataset*, *Render speed*, *Tree table*, *Timetable*, *Slider filter*) + die 39 Live-Demos der Schulung (§11).
   Achtung: die Showcases `sorting1`, `inputfilter`, `sliderfilter`, `renderer1`, `rowspan`, `nobel` sind **Platzhalter**

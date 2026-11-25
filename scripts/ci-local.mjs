@@ -10,6 +10,7 @@
 //
 //   pnpm ci:local            all steps (~2.5 min on an M-series Mac)
 //   pnpm ci:local --from 5   start at step 5 (after a fix)
+//   pnpm ci:local --e2e      plus the E2E smoke tests of the built apps (e2e.yml, not blocking there yet; ~35 s)
 import { spawnSync } from 'node:child_process';
 
 const STEPS = [
@@ -26,6 +27,12 @@ const STEPS = [
   ['performance ratios (test-core: test:perf)', 'pnpm --filter @guiexpert/table test:perf'],
   ['wrapper tests incl. Angular 22 (test-wrappers)', 'pnpm test:wrappers'],
 ];
+// E2E (prompt 026): after build:all every dist exists. Behind a flag until it is blocking in e2e.yml (TODO.md).
+// On macOS 27.2 Firefox of Playwright 1.64 does not start – Chromium + WebKit locally, Firefox in CI.
+if (process.argv.includes('--e2e')) {
+  STEPS.push(['E2E smoke tests of the built apps (e2e.yml)',
+    process.platform === 'darwin' ? 'E2E_SKIP_FIREFOX=1 E2E_WEBKIT=1 pnpm test:e2e' : 'pnpm test:e2e']);
+}
 
 const fromArg = process.argv.indexOf('--from');
 const from = fromArg > -1 ? Math.max(1, Number(process.argv[fromArg + 1]) || 1) : 1;

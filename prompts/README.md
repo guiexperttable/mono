@@ -118,5 +118,6 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [x] 023 (Zielversion 1.1.114, Branch `feat/spaltenfilter`; Video 16 Aufnahme nach dem Release; Demo-Repo entfällt)
 - [x] 024 (Zielversion 1.1.115, Branch `feat/cover-grid-tastatur`, Design `024-cover-grid-tastatur.design.md`; Film im Repo `videoserien`, Serie `covergrid`; Demo-Repo und Video entfallen hier)
 - [x] 025 (Zielversion 1.1.116, Branch `fix/cover-grid-warnung-demo-paket`, Design `025-cover-grid-warnung-und-demo-paket.design.md`; Website-Minifizierung des Cores offen in `TODO.md`)
-- [ ] 026 (Branch `test/e2e-playwright`, Design `026-e2e-playwright.design.md`)
+- [ ] 026 (Branch `test/e2e-playwright`, Design `026-e2e-playwright.design.md`): Etappe 1 umgesetzt (`apps/e2e`,
+      `pnpm test:e2e`, `e2e.yml` nicht sperrend); Etappe 2 (Screenshots) und 3 (Videos) offen
 - [x] 027 (Zielversion 1.1.117, Branch `feat/cover-grid-volle-breite`, Design `027-cover-grid-volle-breite.design.md`; Showcase `covergrid` und `apps/table-demo` umgestellt; offen nach dem Release: Film `covergrid` und Demo-Repo `cover-grid-demo`, s. `TODO.md`)

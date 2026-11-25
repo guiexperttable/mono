@@ -724,6 +724,39 @@ Verhalten steht als `// NOTE:` in den Specs.
       Test `aria.browser.spec.ts` „Enter on a plain cell does nothing“). Falls gewünscht: Option oder
       `evt.preventDefault()` am `GeCellActivateEvent`.
 
+## E2E der gebauten Apps (Prompt 026, 25.11.2026)
+
+Etappe 1 (`apps/e2e`, `pnpm test:e2e`): Chromium + `angular-dev` ~35 s; `ci:local --e2e` auf dem Mac (Chromium + WebKit +
+`angular-dev`): 431 grün, 8 übersprungen, 71 s – zweimal hintereinander stabil.
+
+- [x] **Core: Mausrad über fixierten Spalten tat nichts** (`row-numbers.html`, `vue3-multi-demo /multisize`; flackernder
+      E2E-Test, je nachdem, ob der Zeiger über einer fixierten Spalte stand). Die West-/East-Body-Areas liegen neben dem
+      Scroll-Viewport. → `RenderScope.onFixedAreaWheel` (Listener in `MouseHandler`, Elemente aus
+      `EleScope.getFixedBodyAreaElements()`), roter Test zuerst: `fixed-columns-wheel.realmouse.browser.spec.ts` (ltr/rtl,
+      Chromium + WebKit, echter Mausrad über `realMouse.wheel`). Zielversion 1.1.118.
+- [x] **`apps/table-demo` baute nur `index.html`** (Befund B1): die 22 Feature-Seiten (`row-grouping.html`,
+      `cover-grid.html` …) fehlten in `dist/`. → `build.rollupOptions.input` aus allen `*.html` (`vite.config.ts`).
+- [x] **Toter Link „ch. 21“** in `training/checklist` und `training/build-buy-or-guiexpert`: `<ChapterLink hash="column-filters">`
+      ohne `#` → `/training/filtering/column-filters` (404). → `hash="#column-filters"`. Offen (klein): `ChapterLink` könnte
+      ein fehlendes `#` selbst ergänzen oder den Build scheitern lassen (`new-features.ts` erwartet den Hash **ohne** `#`).
+- [x] **`preact-table-demo` lud das Tabellen-CSS vom CDN** (`cdn.jsdelivr.net/npm/@guiexpert/table/css/main.css` = letztes
+      npm-Release, der Code kommt aber aus `packages/table/src`). → Import von `packages/table/css/main.css` in `src/index.tsx`.
+- [x] **`angular-table-demo` lud Google Fonts** (Roboto, Material Icons von `fonts.googleapis.com`/`fonts.gstatic.com`),
+      obwohl `styles.css` dieselben Fonts aus `assets/fonts` einbindet. → die drei `<link>`s aus `src/index.html` entfernt.
+- [ ] **`e2e.yml` sperrend machen** – Termin ~09.12.2026 (zwei Wochen ohne Fehlalarm), dann `continue-on-error` weg und
+      `pnpm test:e2e` fest in `ci:local` (heute `--e2e`). Erster CI-Lauf prüft auch Firefox (lokal nicht möglich, s. u.).
+- [ ] **Firefox lokal**: Firefox 157 aus Playwright 1.64 startet unter macOS 27.2.1 nicht („Could not find profile folder“,
+      auch ohne Sandbox und mit anderem `TMPDIR`). Lokal `E2E_SKIP_FIREFOX=1`; nach `playwright install --force firefox`
+      bzw. dem nächsten Playwright erneut versuchen.
+- [ ] `angular-table-demo` nutzt die npm-Pakete 1.1.105 (Befund B2, s. „Angular-Demo an lokale Builds koppeln“) – daher
+      die erlaubte Warnung „no row objects“ in `/demo/covergrid` (`exceptions.ts`; seit 1.1.116 behoben). Nach der Kopplung entfernen.
+- [ ] `/demo/chunksocket` (`angular-table-demo`) braucht den socket.io-Server auf `localhost:3334` – nicht im Repo, im E2E
+      `skip`. Server ins Repo holen oder die Demo auf einen Mock umstellen?
+- [ ] Showcase `crypto` lädt die Münz-Icons zur Laufzeit von `s2.coinmarketcap.com` (`CoinIconRenderer`, demo-table-models) –
+      auf gui.expert ein Request an einen fremden Host (Datenschutz). Lokal ablegen? Im E2E erlaubt, aber nie geladen.
+- [ ] Etappe 2 (Screenshots): `__screenshots__` ist in `.gitignore` global ignoriert (Vitest) – für die Baselines unter
+      `apps/e2e/` eine Ausnahme (`!apps/e2e/__screenshots__/`) oder einen anderen Ordnernamen wählen.
+
 ## Cover Grid ohne Warnung, Demo-Paket ohne Ballast (Prompt 025, 24.11.2026)
 
 Herkunft: Probelauf des Hands-on-Films „Cover Grid zum Nachbauen“ mit den Paketen 1.1.115 (Befunde G10, G11).
@@ -1021,6 +1054,13 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.118**, Core (gefunden durch die E2E-Smoke-Tests, Prompt 026):
+  - **Fix: Mausrad über fixierten Spalten** (west/east, z. B. Zeilennummern, `fixedLeftColumnCount`) scrollt die Tabelle
+    jetzt wie über der Mitte (senkrecht und waagerecht). Vorher geschah dort nichts – die fixierten Bereiche liegen neben
+    dem Scroll-Viewport. Am Ende der Tabelle, mit Strg (Zoom) und über Formularfeldern bleibt das Rad beim Browser.
+  - Demo-Apps/Website: `apps/table-demo` baut alle Seiten, Preact-Demo ohne CDN-CSS, Angular-Demo ohne Google Fonts,
+    toter Link „ch. 21“ im Training behoben; neues Paket `apps/e2e` (`pnpm test:e2e`).
 
 - **1.1.117**, Core + `demo-table-models` (Prompt 027):
   - **Neu: `tableOptions.coverGridFill`** (`CoverGridFillOptionsIf`: `tileWidth`, `aspectRatio`, `extraHeight`) – die

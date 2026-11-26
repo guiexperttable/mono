@@ -5198,7 +5198,8 @@ normalizeRowIndices([5, 2, 2, 99, -1], 10);   // [2, 5]
 
 Phase of a column drag (resize or move): `"start"` (the mouse moved past the drag threshold of 4 px, or a double
 click on the resize handle), `"end"` (released – also outside of the table) or `"cancel"` (Escape,
-[TableApi.cancelColumnDrag](classes/TableApi.md#cancelcolumndrag): the old width resp. order is back).
+[TableApi.cancelColumnDrag](classes/TableApi.md#cancelcolumndrag), or the mouseup never reached the page – a native drag, a system dialog,
+[TableApi.releaseMouse](classes/TableApi.md#releasemouse), since 1.1.119: the old width resp. order is back).
 
 **`Since`**
 
@@ -5206,7 +5207,7 @@ click on the resize handle), `"end"` (released – also outside of the table) or
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:11](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L11)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:12](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L12)
 
 ___
 
@@ -5223,7 +5224,7 @@ to the content).
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:20](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L20)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:21](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L21)
 
 ## Fill handle &amp; batch edit
 

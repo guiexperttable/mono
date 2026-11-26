@@ -308,7 +308,16 @@ export class FormulaAssist {
     const doc = this.input.ownerDocument;
     const host = this.scope.hostElement;
     let last = this.pointer?.cell;
+    const end = () => {
+      drag.abort();
+      const text = this.pointer ? this.input.value.slice(this.pointer.start, this.pointer.end) : "";
+      if (text) this.scope.announce(this.texts().referenceInserted(text)); // once, not per move
+    };
     doc.addEventListener("pointermove", (evt: PointerEvent) => {
+      if (evt.buttons === 0) {
+        end(); // moving without a button: the pointerup never reached the page (since 1.1.119)
+        return;
+      }
       const rect = host.getBoundingClientRect();
       const cell = this.scope.getBodyCellAtHostPoint(this.scope.clientXToHostX(evt.clientX), evt.clientY - rect.top - host.clientTop);
       if (cell[0] < 0 || this.sheet.engineColumn(cell[1]) === undefined) return;
@@ -316,11 +325,6 @@ export class FormulaAssist {
       last = cell;
       this.point(anchor, cell, false);
     }, { signal: drag.signal });
-    const end = () => {
-      drag.abort();
-      const text = this.pointer ? this.input.value.slice(this.pointer.start, this.pointer.end) : "";
-      if (text) this.scope.announce(this.texts().referenceInserted(text)); // once, not per move
-    };
     doc.addEventListener("pointerup", end, { signal: drag.signal });
     doc.addEventListener("pointercancel", end, { signal: drag.signal });
   }

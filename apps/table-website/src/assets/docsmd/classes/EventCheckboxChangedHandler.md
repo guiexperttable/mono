@@ -480,7 +480,9 @@ ___
 
 ▸ **onMouseDraggingEnd**(`_evt`): `void`
 
-A drag with the mouse ended (column resize, column move or range selection).
+A drag with the mouse ended (column resize, column move or range selection). Since 1.1.119 also when the mouseup
+never reached the page (a native drag out of the window, a system dialog, [TableApi.releaseMouse](TableApi.md#releasemouse)): then
+with the last position of the drag.
 
 #### Parameters
 

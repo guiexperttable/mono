@@ -78,12 +78,22 @@ describe('formula input', () => {
     b2.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: rect.left + 5, clientY: rect.top + 5, pointerId: 1 }));
     expect(t.input().value).toBe('=SUM(B2');
     const b4 = getCellDiv(t.host, 'body', 'center', 3, QTY).getBoundingClientRect();
-    document.dispatchEvent(new PointerEvent('pointermove', { clientX: b4.left + 5, clientY: b4.top + 5, pointerId: 1 }));
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: b4.left + 5, clientY: b4.top + 5, pointerId: 1, buttons: 1 }));
     expect(t.input().value).toBe('=SUM(B2:C4');
     document.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
     document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 5, clientY: rect.top + 5, pointerId: 1 }));
     expect(t.input().value).toBe('=SUM(B2:C4'); // the drag ended
     expect(t.api.isEditing()).toBe(true);
+    // a pointerup that never arrives (prompt 028): a move without a button ends the drag, too
+    b2.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: rect.left + 5, clientY: rect.top + 5, pointerId: 1 }));
+    expect(t.input().value).toBe('=SUM(B2');
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: b4.left + 5, clientY: b4.top + 5, pointerId: 1, buttons: 0 }));
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: b4.left + 5, clientY: b4.top + 5, pointerId: 1, buttons: 1 }));
+    expect(t.input().value).toBe('=SUM(B2');
+    b2.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: rect.left + 5, clientY: rect.top + 5, pointerId: 1 }));
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: b4.left + 5, clientY: b4.top + 5, pointerId: 1, buttons: 1 }));
+    document.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
+    expect(t.input().value).toBe('=SUM(B2:C4');
     await userEvent.keyboard('){Enter}');
     expect(t.api.getCellValue(4, NOTE)).toBe(1299 + 349 + 25 + 2 + 3 + 10);
     // not at an insertion point: a click commits as before
@@ -284,8 +294,8 @@ describe('formula input', () => {
     const rect = cellAt(1, PRICE + N).getBoundingClientRect();
     cellAt(1, PRICE + N).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: rect.left + 3, clientY: rect.top + 3, pointerId: 1 }));
     const rn = t.host.querySelector<HTMLElement>('.ge-table-row-number')!.getBoundingClientRect();
-    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rn.left + 3, clientY: rect.top + 3, pointerId: 1 }));
-    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 3, clientY: rect.top + 3, pointerId: 1 }));
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rn.left + 3, clientY: rect.top + 3, pointerId: 1, buttons: 1 }));
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 3, clientY: rect.top + 3, pointerId: 1, buttons: 1 }));
     document.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
     expect(t.input().value).toBe(before.replace('B2:C3', 'B2'));
     // a selection: no pointing (the arrow commits in enter mode)

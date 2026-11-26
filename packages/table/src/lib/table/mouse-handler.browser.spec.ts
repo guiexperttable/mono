@@ -92,7 +92,10 @@ const topInHost = (host: HTMLElement, el: Element) => el.getBoundingClientRect()
 function fireMouse(target: Element, type: string, init: MouseEventInit = {}) {
   const r = target.getBoundingClientRect();
   target.dispatchEvent(new MouseEvent(type, {
-    bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, ...init,
+    bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
+    // like the browser: the left button is held during mousedown and the moves of a drag – a mousemove without it
+    // ends the press (a lost mouseup, since 1.1.119)
+    buttons: type === 'mousedown' || type === 'mousemove' ? 1 : 0, ...init,
   }));
 }
 
@@ -450,7 +453,8 @@ describe('column resize by dragging the header edge (columnsResizable)', () => {
     // drag did nothing. Here both drags happen in one task, before any frame.
     const { host, model } = await mountMouseTable();
     const fire = (target: EventTarget, type: string, x: number, y: number) =>
-      target.dispatchEvent(new MouseEvent(type, { clientX: x, clientY: y, bubbles: true, cancelable: true, button: 0 }));
+      target.dispatchEvent(new MouseEvent(type, {
+        clientX: x, clientY: y, bubbles: true, cancelable: true, button: 0, buttons: type === 'mouseup' ? 0 : 1 }));
     const drag = (col: number, dx: number) => {
       const handle = resizeHandle(host, col)!;
       const r = handle.getBoundingClientRect();

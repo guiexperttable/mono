@@ -222,6 +222,11 @@ export class RowDragService {
     if (!this.pending || evt.pointerId !== this.pending.pointerId) {
       return;
     }
+    if (evt.buttons === 0) {
+      // moving without a button: the pointerup never reached the page (a system dialog, a native drag) – since 1.1.119
+      this.cancel(evt);
+      return;
+    }
     if (!this.session) {
       const dx = evt.clientX - this.pending.startX;
       const dy = evt.clientY - this.pending.startY;

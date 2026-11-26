@@ -268,6 +268,30 @@ describe('cancel (D4)', () => {
     expect(titles(tasks).slice(0, 4)).toEqual([0, 1, 2, 3]);
   });
 
+  // Prompt 028: a pointerup that never reaches the page (a system dialog, the pointer taken away without a
+  // pointercancel) – the ghost followed the pointer without a button, and the next pointerup dropped the rows.
+  it('a pointermove without a button (the pointerup was lost) cancels the drag', async () => {
+    const { host, events, api, tasks } = await mountRowDrag();
+    startDrag(host, 2, rowPoint(host, 6));
+    expect(api.isRowDragging()).toBe(true);
+    const p = rowPoint(host, 8);
+    pointer(document, 'pointermove', p.x, p.y, { buttons: 0 });
+    expect(api.isRowDragging()).toBe(false);
+    expect(events[events.length - 1]).toMatchObject({ type: 'cancel', target: undefined });
+    expect(host.querySelector('.ge-table-row-drag-ghost')).toBeNull();
+    drop(p);
+    expect(titles(tasks).slice(0, 4)).toEqual([0, 1, 2, 3]);
+
+    // below the threshold: the press on the handle is over, later moves start no drag
+    const count = events.length;
+    const r = handle(host, 3).getBoundingClientRect();
+    pointer(handle(host, 3), 'pointerdown', r.left + 4, r.top + 4);
+    pointer(document, 'pointermove', r.left + 5, r.top + 5, { buttons: 0 });
+    pointer(document, 'pointermove', p.x, p.y);
+    expect(api.isRowDragging()).toBe(false);
+    expect(events).toHaveLength(count);
+  });
+
   it('destroy during a drag: "cancel" event, the document listeners are gone', async () => {
     const { host, events, destroy, tasks } = await mountRowDrag();
     startDrag(host, 2, rowPoint(host, 6));

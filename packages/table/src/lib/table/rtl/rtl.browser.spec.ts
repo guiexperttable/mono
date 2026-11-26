@@ -69,7 +69,10 @@ const near = (a: number, b: number, tolerance = 1.01) => expect(Math.abs(a - b))
 function fireMouse(target: Element, type: string, init: MouseEventInit = {}) {
   const r = target.getBoundingClientRect();
   target.dispatchEvent(new MouseEvent(type, {
-    bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, ...init,
+    bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
+    // like the browser: the left button is held during mousedown and the moves of a drag – a mousemove without it
+    // ends the press (a lost mouseup, since 1.1.119)
+    buttons: type === 'mousedown' || type === 'mousemove' ? 1 : 0, ...init,
   }));
 }
 
@@ -235,7 +238,7 @@ describe('R4 – resizing a column', () => {
     const h = rect(handle);
     const y = h.top + h.height / 2;
     handle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: h.left + 1, clientY: y }));
-    host.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: h.left - 29, clientY: y }));
+    host.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: h.left - 29, clientY: y, buttons: 1 }));
     host.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: h.left - 29, clientY: y }));
     await nextFrame();
     expect(scope.tableModel.getColumnWidth(0)).toBe(130);

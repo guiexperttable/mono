@@ -290,7 +290,7 @@ describe('O6 – loading over existing rows (refresh)', () => {
     const header = areaRows(host, 'header')[0].querySelector<HTMLElement>('[data-col-index="1"]')!;
     const h = rect(header);
     header.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: h.left + 20, clientY: h.top + 5 }));
-    overlayOf(host).dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: h.left + 60, clientY: h.top + 80 }));
+    overlayOf(host).dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: h.left + 60, clientY: h.top + 80, buttons: 1 }));
     host.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: h.left + 60, clientY: h.top + 80 }));
     expect(moved).toHaveBeenCalledWith(true);
   });

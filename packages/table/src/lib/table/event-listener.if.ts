@@ -49,7 +49,11 @@ export interface EventListenerIf extends EventFocusChangedListenerIf, EventSelec
   /** The mouse moved over the table (cell under the mouse in `evt`). Called often – keep it cheap. */
   onMouseMoved(evt: GeMouseEvent): void;
 
-  /** A drag with the mouse ended (column resize, column move or range selection). */
+  /**
+   * A drag with the mouse ended (column resize, column move or range selection). Since 1.1.119 also when the mouseup
+   * never reached the page (a native drag out of the window, a system dialog, {@link TableApi.releaseMouse}): then
+   * with the last position of the drag.
+   */
   onMouseDraggingEnd(evt: GeMouseEvent): void;
 
   /** The mouse is being dragged; `evt.draggingX` / `evt.draggingY` hold the distance. */

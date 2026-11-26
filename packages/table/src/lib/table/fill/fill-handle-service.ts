@@ -196,6 +196,11 @@ export class FillHandleService {
     if (!this.pending || evt.pointerId !== this.pending.pointerId) {
       return;
     }
+    if (evt.buttons === 0) {
+      // moving without a button: the pointerup never reached the page (a system dialog, a native drag) – since 1.1.119
+      this.cancel();
+      return;
+    }
     if (!this.session) {
       const options = this.tableScope.getFillHandleOptions();
       if (!options) {

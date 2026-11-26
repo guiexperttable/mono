@@ -60,7 +60,7 @@ Cancels a running fill (Escape, `pointercancel`, [TableApi.cancelFill](TableApi.
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:356](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L356)
+[src/lib/table/fill/fill-handle-service.ts:361](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L361)
 
 ___
 
@@ -76,7 +76,7 @@ Releases everything (TableScope.destroy).
 
 #### Defined in
 
-[src/lib/table/fill/fill-handle-service.ts:379](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L379)
+[src/lib/table/fill/fill-handle-service.ts:384](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/fill/fill-handle-service.ts#L384)
 
 ___
 

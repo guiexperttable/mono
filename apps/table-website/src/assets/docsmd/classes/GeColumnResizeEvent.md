@@ -65,7 +65,7 @@ listener.onColumnResizeEnd = (evt: GeColumnResizeEvent) => {
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:42](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L42)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:43](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L43)
 
 ## Properties
 
@@ -77,7 +77,7 @@ The column definition – `undefined` for a table model without column definitio
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:50](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L50)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:51](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L51)
 
 ___
 
@@ -89,7 +89,7 @@ Model index of the column (over west, center and east).
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:48](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L48)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:49](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L49)
 
 ___
 
@@ -101,7 +101,7 @@ Width in px now: `"start"` = `oldWidth`, `"end"` = the new width, `"cancel"` = `
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:56](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L56)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:57](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L57)
 
 ___
 
@@ -113,7 +113,7 @@ Width in px when the drag started.
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:54](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L54)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:55](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L55)
 
 ___
 
@@ -125,7 +125,7 @@ The browser event behind it (mouse up, double click; `undefined` for [TableApi.c
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:58](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L58)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:59](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L59)
 
 ___
 
@@ -137,7 +137,7 @@ The property of the column (`columnDef.property`) – use it to store the width,
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:52](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L52)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:53](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L53)
 
 ___
 
@@ -149,7 +149,7 @@ Dragging the handle or a double click on it.
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:46](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L46)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:47](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L47)
 
 ___
 
@@ -161,4 +161,4 @@ Phase: `"start"`, `"end"` or `"cancel"`.
 
 #### Defined in
 
-[src/lib/table/data/common/event/ge-column-resize-event.ts:44](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L44)
+[src/lib/table/data/common/event/ge-column-resize-event.ts:45](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/data/common/event/ge-column-resize-event.ts#L45)

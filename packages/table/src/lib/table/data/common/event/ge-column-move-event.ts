@@ -24,7 +24,7 @@ import type { GeColumnDragEventType } from "./ge-column-resize-event";
 export class GeColumnMoveEvent {
 
   constructor(
-    /** Phase: `"start"`, `"end"` or `"cancel"` (Escape: the old order is back). */
+    /** Phase: `"start"`, `"end"` or `"cancel"` (Escape, or the mouseup never arrived – since 1.1.119: the old order is back). */
     public readonly type: GeColumnDragEventType,
     /** Model index of the column when the drag started. */
     public readonly fromIndex: number,

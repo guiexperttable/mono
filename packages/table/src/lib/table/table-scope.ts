@@ -224,6 +224,9 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
   /** The column resize or move of the current press (prompt 022) – `undefined` without an allowed column action. */
   private columnDrag?: ColumnDragState;
 
+  /** Counts the presses that ended without a mouseup ({@link mousePressLost}) – a drag frame in progress stops. */
+  private pressLostCount = 0;
+
   private dragFrom = -1;
   private lastDragFrom = -1;
   private lastDragTo = -1;
@@ -2862,6 +2865,33 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
     this.emitColumnDragEvent(drag, 'cancel', originalEvent);
   }
 
+  /**
+   * The press ended without a mouseup ({@link MouseHandler.releaseMouse}, {@link TableApi.releaseMouse}): nothing is
+   * dropped. A running column resize or move is cancelled like with Escape (`onColumnResizeEnd` / `onColumnMoveEnd`
+   * with type `"cancel"`), the column action of the press is forgotten, then `onMouseDraggingEnd` is reported if a
+   * drag was.
+   *
+   * @param {GeMouseEvent} [draggingEndEvent] - the last position of the drag (only if `onMouseDragging` was reported)
+   * @param {Event} [originalEvent] - the event that told that the button is not held any more
+   * @since 1.1.119
+   */
+  mousePressLost(draggingEndEvent?: GeMouseEvent, originalEvent?: Event): void {
+    this.pressLostCount++;
+    const columnMove = this.mouseStartAction === 'drag-column';
+    this.cancelColumnDrag(originalEvent); // may call listeners: they may destroy the table
+    if (this.isDestroyed()) {
+      return;
+    }
+    if (columnMove) {
+      this.draggingTargetColumnIndex = -1;
+      this.hideDraggingColumn();
+    }
+    this.resetColumnDrag();
+    if (draggingEndEvent) {
+      this.eventListener.onMouseDraggingEnd?.(draggingEndEvent);
+    }
+  }
+
   /** Reports a column drag to the listener (and the subscribers). */
   private emitColumnDragEvent(drag: ColumnDragState, type: GeColumnDragEventType, originalEvent?: Event) {
     const property = drag.columnDef?.property;
@@ -2893,7 +2923,11 @@ export class TableScope extends RenderScope implements OnActionTriggeredIf, Even
    * @param startMouseEvent
    */
   mouseDraggingOnFrame(mouseEvent: GeMouseEvent, startMouseEvent: GeMouseEvent | undefined) {
+    const lost = this.pressLostCount;
     this.eventListener.onMouseDragging?.(mouseEvent);
+    if (lost !== this.pressLostCount || this.isDestroyed()) {
+      return; // the listener ended the press (tableApi.releaseMouse(): the app starts a native drag) or the table
+    }
     this.mouseEvent = mouseEvent;
 
     if ((this.mouseStartAction === 'resize-column' || this.mouseStartAction === 'drag-column')

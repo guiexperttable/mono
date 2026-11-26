@@ -86,6 +86,12 @@ export class MouseHandler {
   private dragGeneration = 0;
   /** The end of the last drag, until its frame ran – a new mousedown handles it at once (see {@link flushDraggingEnd}). */
   private pendingDraggingEnd?: { evt: MouseEvent; start?: GeMouseEvent; frameId: number };
+  /** The button of the press as a bit of `MouseEvent.buttons` (left 1, right 2, middle 4) – see {@link isPressLost}. */
+  private pressButtons = 0;
+  /** The listeners of the current press at the document and the window (mouseup, lost press) – aborted when it ends. */
+  private pressAbort?: AbortController;
+  /** `onMouseDragging` was reported for the current press – only then {@link releaseMouse} reports the end. */
+  private dragReported = false;
 
   constructor(
     protected tableScope: TableScope
@@ -98,7 +104,15 @@ export class MouseHandler {
     this.tableScope.hostElement.addEventListener("mousemove", this.onMouseMove.bind(this), { signal });
     this.tableScope.hostElement.addEventListener("mouseup", this.onMouseUp.bind(this), { signal });
     this.tableScope.hostElement.addEventListener("contextmenu", this.onContextmenu.bind(this), { signal });
-    signal.addEventListener("abort", () => clearTimeout(this.lostClickTimer));
+    signal.addEventListener("abort", () => {
+      clearTimeout(this.lostClickTimer);
+      // the table is gone: a press in progress is over, without any event
+      this.pressAbort?.abort();
+      this.pressAbort = undefined;
+      this.pressedCell = undefined;
+      this.mouseDown = false;
+      this.dragging = false;
+    });
 
     // @ts-ignore
     this.tableScope.hostElement['_MouseHandler'] = 'true';
@@ -481,7 +495,21 @@ export class MouseHandler {
 
 
   private onMouseDown(evt: MouseEvent) {
-    if (this.isBlocked(evt)) {
+    const blocked = this.isBlocked(evt);
+    // the button of the press goes down again, or it is not held any more: its mouseup never arrived (1.1.119)
+    const stale = this.isStalePress(evt);
+    // Read what is pressed BEFORE anything renders: ending a stale press (a cancelled column drag) or the previous
+    // drag repaints and replaces the elements. The click is reported for this cell should the browser send none –
+    // also after a render through the API (live data: repaint/repaintHard/scrollToPixel), see onMouseUp.
+    const pressedCell = !blocked && evt.button === 0 ? this.readPressedCell(evt) : undefined;
+    const start = !blocked && (stale || !this.dragging) ? this.tableScope.createGeMouseEvent(evt) : undefined;
+    if (stale) {
+      this.releaseMouse(evt);
+      if (this.tableScope.isDestroyed()) {
+        return; // a listener of the end destroyed the table
+      }
+    }
+    if (blocked) {
       return;
     }
     // A click repaint must not happen between mousedown and mouseup/click/dblclick: it would replace the pressed cell
@@ -489,24 +517,80 @@ export class MouseHandler {
     if (this.tableScope.cancelPendingRepaint()) {
       this.repaintAfterMouseUp = true;
     }
-    // A render through the API (live data: repaint/repaintHard/scrollToPixel) can't be held back like the own repaint
-    // above – remember the pressed cell, the click is reported for it should the browser send none (see onMouseUp).
-    this.pressedCell = evt.button === 0 ? this.readPressedCell(evt) : undefined;
+    this.pressedCell = pressedCell;
 
-    if (!this.dragging) {
+    if (start) {
       this.mouseEvent = evt;
-      // read the pressed cell first: handling the end of the previous drag repaints and replaces the elements
-      this.startMouseEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
+      this.startMouseEvent = start;
       // The end of the previous drag must be handled before this one starts: its frame may come later on a busy
       // machine and would reset the start of this drag (before 1.1.106 a quick second column resize was lost).
       this.flushDraggingEnd();
       this.tableScope.onMouseDown(this.startMouseEvent);
       this.mouseDown = true;
-      // a mouseup outside the host (an app menu under the pointer, a drag out of the table) must end the press too –
-      // otherwise isButtonDown() stays true and live data stops following (review of 019)
-      const signal = this.tableScope.listenerAbortController.signal;
-      document.addEventListener('mouseup', e => this.onDocumentMouseUp(e), { once: true, signal });
+      this.dragReported = false;
+      this.pressButtons = MouseHandler.buttonsOf(evt);
+      this.listenToPress();
     }
+  }
+
+  /** True if a mousedown shows that the press of the table is over: the same button again, or its button is not held. */
+  private isStalePress(evt: MouseEvent): boolean {
+    return this.mouseDown && (MouseHandler.buttonsOf(evt) === this.pressButtons || this.isPressLost(evt));
+  }
+
+  /** The bit of `MouseEvent.buttons` for the button of a mousedown (`button` 0 → 1, 1 → 4, 2 → 2, 3 → 8, 4 → 16). */
+  private static buttonsOf(evt: MouseEvent): number {
+    return [1, 4, 2, 8, 16][evt.button] ?? 1;
+  }
+
+  /**
+   * True if the table is pressed but the button of the press is not held any more: the mouseup never reached the
+   * page – a native drag out of the window (Tauri, Electron), an HTML5 drag, a system dialog (since 1.1.119).
+   */
+  private isPressLost(evt: MouseEvent): boolean {
+    return this.mouseDown && (evt.buttons & this.pressButtons) === 0;
+  }
+
+  /**
+   * Listens at the document and the window while the button is held: for the mouseup outside of the host, and for
+   * everything that tells that no mouseup will come ({@link releaseMouse}). {@link endPressListeners} removes them.
+   */
+  private listenToPress() {
+    this.pressAbort?.abort();
+    const press = new AbortController();
+    this.pressAbort = press;
+    const signal = press.signal;
+    const doc = this.tableScope.hostElement.ownerDocument ?? document;
+    // a mouseup outside the host (an app menu under the pointer, a drag out of the table) must end the press too –
+    // otherwise isButtonDown() stays true and live data stops following (review of 019)
+    doc.addEventListener('mouseup', e => this.onDocumentMouseUp(e), { signal });
+    // The mouseup may never come (1.1.119). Any mouse movement in the document without the button of the press …
+    doc.addEventListener('mousemove', e => {
+      if (this.isPressLost(e)) this.releaseMouse(e);
+    }, { capture: true, signal });
+    // … a press somewhere else in the page (in the host: onMouseDown) …
+    doc.addEventListener('mousedown', e => {
+      if (!this.tableScope.hostElement.contains(e.target as Node | null) && this.isStalePress(e)) this.releaseMouse(e);
+    }, { capture: true, signal });
+    // … the browser taking the pointer away (not a finger: touch sends its mouse events after the touch ended) …
+    doc.addEventListener('pointercancel', e => {
+      if (e.pointerType !== 'touch') this.releaseMouse(e);
+    }, { signal });
+    // … an HTML5 drag starting (no mouse events until it ends). A prevented dragstart starts none: whether it was
+    // prevented is known once all listeners ran (an app may do it at the window) …
+    doc.addEventListener('dragstart', e => setTimeout(() => {
+      if (this.pressAbort === press && !e.defaultPrevented) this.releaseMouse(e);
+    }, 0), { signal });
+    // … or the window losing the focus (a system dialog, another app; not the focus going into an iframe of the
+    // page – the document still has it then) end it.
+    doc.defaultView?.addEventListener('blur', e => {
+      if (!doc.hasFocus()) this.releaseMouse(e);
+    }, { signal });
+  }
+
+  private endPressListeners() {
+    this.pressAbort?.abort();
+    this.pressAbort = undefined;
   }
 
   /** A mouseup that did not reach the host (released outside the table). */
@@ -514,6 +598,50 @@ export class MouseHandler {
     if (this.mouseDown && !this.tableScope.hostElement.contains(evt.target as Node | null)) {
       this.onMouseUp(evt);
     }
+  }
+
+  /**
+   * Ends the press without a mouseup ({@link TableApi.releaseMouse}): the table is not pressed any more. Nothing is
+   * dropped – a running column resize or move is cancelled like with Escape (old width resp. order, end with type
+   * `"cancel"`), a range selection stays as it is, no click is reported. `onMouseDraggingEnd` is called once if
+   * `onMouseDragging` was (with the last position of the press). Without a press nothing happens.
+   *
+   * Called by the table itself as soon as it notices that the button is not held any more: a mouse movement in the
+   * document without the button, `pointercancel`, an HTML5 `dragstart` that is not prevented, the window losing the
+   * focus, the next mousedown of that button.
+   *
+   * @param {Event} [originalEvent] - the event that told it (passed on to the column event)
+   * @returns {boolean} true if a press was ended
+   * @since 1.1.119
+   */
+  releaseMouse(originalEvent?: Event): boolean {
+    if (!this.mouseDown || this.tableScope.isDestroyed()) {
+      return false;
+    }
+    const dragging = this.dragging && this.dragReported; // a drag whose first frame did not run was never reported
+    const last = this.mouseEvent;       // the mousedown or the last movement with the button held
+    const start = this.startMouseEvent;
+    // the state first: a listener may call releaseMouse() again, press anew or destroy the table
+    this.mouseDown = false;
+    this.dragging = false;
+    this.pressedCell = undefined;       // a lost mouseup is no click
+    this.dragGeneration++;              // drag frames that did not run yet are outdated
+    this.endPressListeners();
+    this.tableScope.setDragging(false);
+    if (this.repaintAfterMouseUp) {
+      this.repaintAfterMouseUp = false; // the repaint of the last click was held back for this press
+      this.tableScope.debounceRepaint();
+    }
+    let endEvent: GeMouseEvent | undefined;
+    if (dragging && last) {
+      endEvent = this.tableScope.createGeMouseEvent(last);
+      if (start?.originalEvent) {
+        endEvent.draggingX = last.clientX - start.originalEvent.clientX;
+        endEvent.draggingY = last.clientY - start.originalEvent.clientY;
+      }
+    }
+    this.tableScope.mousePressLost(endEvent, originalEvent);
+    return true;
   }
 
   /**
@@ -533,6 +661,8 @@ export class MouseHandler {
 
 
   private onMouseMove(evt: MouseEvent) {
+    // (a movement without the button of the press was handled before by the document listener of the press, see
+    // listenToPress: the press is over then and this movement is a hover – since 1.1.119)
     if (!this.mouseDown && (this.tableScope.isEventInDetail?.(evt) || this.tableScope.isEventInFilterUI?.(evt))) {
       this.tableScope.hideHover?.(); // over a detail row or filter UI: no stale hover of body/header cells
       return;
@@ -587,6 +717,7 @@ export class MouseHandler {
     }
     this.mouseDown = false;
     this.dragging = false;
+    this.endPressListeners();
     this.tableScope.setDragging(false);
   }
 
@@ -695,6 +826,7 @@ export class MouseHandler {
 
   private mouseDraggingOnFrame() {
     if (this.mouseEvent) {
+      this.dragReported = true;
       const mouseEvent = this.tableScope.createGeMouseEvent(this.mouseEvent);
       if (this.startMouseEvent?.originalEvent) {
         mouseEvent.draggingX = this.mouseEvent.clientX - this.startMouseEvent.originalEvent.clientX;
@@ -734,6 +866,9 @@ export class MouseHandler {
   /**
    * True while the mouse button is held in the table (a click or a drag in progress) – live data does not jump to
    * the end then (`tableApi.appendRows({ follow: "auto" })`, since 1.1.108).
+   *
+   * Since 1.1.119 a press also ends without a mouseup, as soon as the table notices that the button is not held any
+   * more (see {@link releaseMouse}).
    *
    * @returns {boolean} true between mousedown and mouseup
    */

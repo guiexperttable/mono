@@ -1383,6 +1383,37 @@ reports the click itself for the **pressed** cell, if the mouse moved at most `M
 – also when the rows slid under the pointer (follow mode): the event carries the current index of the pressed row
 object (rows added or removed in front are followed; a removed row gives no click). Exactly one event, native or not.
 
+**A press whose `mouseup` never arrives (since 1.1.119).** A drag that the operating system takes over (Tauri /
+Electron `startDrag` to drop a file into another program), an HTML5 drag out of a cell renderer (`draggable`, an
+`<img>`), a system dialog: the page gets no `mouseup`. Before 1.1.119 the table stayed "pressed" – no hover, a range
+selection or a column drag followed the pointer without a button, the next `mousedown` was ignored and live data
+stopped following the end. Now the press ends by itself: with the first mouse movement anywhere in the document
+without the pressed button (`MouseEvent.buttons`), a `pointercancel`, a `dragstart` that is not prevented, the window
+losing the focus, or the next press. Nothing is dropped: a running column resize or move is cancelled like with Escape
+(`columnResizeEnd` / `columnMoveEnd` with `type: "cancel"`), a range selection stays as it is, no click is reported,
+and `mouseDraggingEnd` comes once if `mouseDragging` was reported. An app that starts the native drag itself knows the
+moment and says so – until the next mouse movement the table can't know:
+
+```ts
+import type { TableApi } from "@guiexpert/table";
+
+declare const tableApi: TableApi;
+declare function startNativeDrag(paths: string[]): Promise<void>;   // e.g. the Tauri "drag" plugin
+
+async function dragFilesOut(paths: string[]) {
+  tableApi.releaseMouse();           // the system takes the mouse: no mouseup will come
+  await startNativeDrag(paths);
+}
+
+if (!tableApi.isMouseDown()) {
+  // not while the user clicks or drags in the table
+}
+```
+
+Tests that drag with synthetic events must say that the button is held, like the browser does:
+`new MouseEvent("mousemove", { bubbles: true, clientX, clientY, buttons: 1 })` (and `buttons: 1` for a
+`pointermove` of a row drag or the fill handle) – a move with `buttons: 0` ends the press since 1.1.119.
+
 ### 6.6 Tree table and checkboxes
 
 ```ts
@@ -2669,6 +2700,13 @@ the package grouped the Seattle weather data of a heat map demo on import, so ev
 computes nothing on import and declares `"sideEffects": false` – an app that imports only `BookCoverRenderer` is about 11 kB (minified, with the core parts it uses). The demo
 package is meant for demos; copy what you need into your app for production.
 
+**After dragging something out of the table (a native drag, Tauri / Electron) the table behaves as if the mouse
+button were still held.** Fixed in 1.1.119: the system took the mouse, the `mouseup` never reached the page. The table
+now ends the press by itself with the next mouse movement without the button (also on `pointercancel`, `dragstart`,
+window blur); a column drag in progress is cancelled. If your app starts the native drag, call
+`tableApi.releaseMouse()` right before – `tableApi.isMouseDown()` tells the state. Older versions: dispatch a
+`mouseup` (not bubbling) on the host element. → 6.5
+
 **The table is empty / not visible.** The host div needs a fixed height (`height: 500px` or a flex/grid parent that
 gives it one) and the stylesheet `@guiexpert/table/css/main.css`. → 2, 4
 
@@ -2706,7 +2744,8 @@ listener.onColumnMoveEnd = (evt: GeColumnMoveEvent) => {
 - **One move event per drag**: the table moves the column step by step while the mouse moves; you get the start and
   the end, not the steps.
 - **Escape** (or `tableApi.cancelColumnDrag()`) cancels: the old width resp. order is back, the end has
-  `type: "cancel"`. `tableApi.isColumnDragging()` is true between start and end.
+  `type: "cancel"`. `tableApi.isColumnDragging()` is true between start and end. Since 1.1.119 a drag whose `mouseup`
+  never reaches the page (a native drag, a system dialog, `tableApi.releaseMouse()`) is cancelled the same way (6.5).
 - **Renders while dragging are fine**: `repaint()`, `repaintHard({ py })`, `appendRows()` of a live table don't disturb
   the drag (no `headerBusy` flag needed). Do not change column widths or the order yourself while
   `isColumnDragging()` is true.

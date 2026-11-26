@@ -24,6 +24,7 @@ Class representing a MouseHandler.
 
 - [adjustForRowChanges](MouseHandler.md#adjustforrowchanges)
 - [isButtonDown](MouseHandler.md#isbuttondown)
+- [releaseMouse](MouseHandler.md#releasemouse)
 
 ## Constructors
 
@@ -43,7 +44,7 @@ Class representing a MouseHandler.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:90](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L90)
+[src/lib/table/mouse-handler.ts:96](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L96)
 
 ## Properties
 
@@ -121,7 +122,7 @@ ___
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:91](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L91)
+[src/lib/table/mouse-handler.ts:97](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L97)
 
 ## Methods
 
@@ -144,7 +145,7 @@ start or inserted.
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:521](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L521)
+[src/lib/table/mouse-handler.ts:653](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L653)
 
 ___
 
@@ -155,6 +156,9 @@ ___
 True while the mouse button is held in the table (a click or a drag in progress) – live data does not jump to
 the end then (`tableApi.appendRows({ follow: "auto" })`, since 1.1.108).
 
+Since 1.1.119 a press also ends without a mouseup, as soon as the table notices that the button is not held any
+more (see [releaseMouse](MouseHandler.md#releasemouse)).
+
 #### Returns
 
 `boolean`
@@ -163,4 +167,39 @@ true between mousedown and mouseup
 
 #### Defined in
 
-[src/lib/table/mouse-handler.ts:736](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L736)
+[src/lib/table/mouse-handler.ts:875](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L875)
+
+___
+
+### releaseMouse
+
+▸ **releaseMouse**(`originalEvent?`): `boolean`
+
+Ends the press without a mouseup ([TableApi.releaseMouse](TableApi.md#releasemouse)): the table is not pressed any more. Nothing is
+dropped – a running column resize or move is cancelled like with Escape (old width resp. order, end with type
+`"cancel"`), a range selection stays as it is, no click is reported. `onMouseDraggingEnd` is called once if
+`onMouseDragging` was (with the last position of the press). Without a press nothing happens.
+
+Called by the table itself as soon as it notices that the button is not held any more: a mouse movement in the
+document without the button, `pointercancel`, an HTML5 `dragstart` that is not prevented, the window losing the
+focus, the next mousedown of that button.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `originalEvent?` | `Event` | the event that told it (passed on to the column event) |
+
+#### Returns
+
+`boolean`
+
+true if a press was ended
+
+**`Since`**
+
+1.1.119
+
+#### Defined in
+
+[src/lib/table/mouse-handler.ts:617](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/mouse-handler.ts#L617)

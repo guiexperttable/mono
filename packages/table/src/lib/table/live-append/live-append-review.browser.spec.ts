@@ -140,7 +140,7 @@ describe('live append – a drag frame still pending after mouseup', () => {
     const r = cell.getBoundingClientRect();
     const init = { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, bubbles: true, cancelable: true, button: 0 };
     cell.dispatchEvent(new MouseEvent('mousedown', init));
-    cell.dispatchEvent(new MouseEvent('mousemove', init));  // e.g. the fake mousemove Chrome sends after a re-layout
+    cell.dispatchEvent(new MouseEvent('mousemove', { ...init, buttons: 1 }));  // e.g. the fake mousemove Chrome sends after a re-layout
     cell.dispatchEvent(new MouseEvent('mouseup', init));
     cell.dispatchEvent(new MouseEvent('click', { ...init, detail: 1 }));
     expect(t.lineAt(t.scope.focusModel()!.getFocus()[0]).id).toBe(5);

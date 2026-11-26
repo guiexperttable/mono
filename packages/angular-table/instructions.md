@@ -423,6 +423,12 @@ export class MouseEventsDemo {   // the component class of the template above
 `mouseClicked` is emitted inside the Angular zone; `mouseMoved`, `scroll` and the other events are emitted outside
 of it – call `ChangeDetectorRef.detectChanges()` (or set a signal) if the template has to react.
 
+**Dragging out of the window (Tauri, Electron – since 1.1.119).** When the app hands a drag over to the operating
+system, the page gets no `mouseup`. Call `tableApi.releaseMouse()` right before the native drag starts
+(`tableApi.isMouseDown()` tells the state); the table also ends the press by itself with the next mouse movement
+without the button. Before 1.1.119 the table stayed "pressed" (no hover, a column followed the pointer). Details:
+general guide, section 6.5.
+
 ---
 
 ## 11. Tree table with checkboxes

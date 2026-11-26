@@ -113,6 +113,9 @@ This is the UI-agnostic table component for your next web app. 😊
   render, selection stays (since 1.1.108); not `addRows()` (copies everything, resets filter and sort).
 - **Clicks lost while the table updates?** Fixed in 1.1.108: a render between `mousedown` and `mouseup` no longer
   swallows `mouseClicked` – the table reports the click for the pressed cell itself.
+- **Dragging files out of the window (Tauri, Electron)?** Call `tableApi.releaseMouse()` right before the native drag
+  starts – the system takes the mouse and no `mouseup` reaches the page (since 1.1.119; the table also notices it
+  with the next mouse movement without the button). `tableApi.isMouseDown()` tells the state.
 - **Own area model with other row heights:** return them from `getRowHeight(i)` and, if all are equal,
   `getConstantRowHeight()` – the scroll height follows them (since 1.1.107; `defaultRowHeights` is only the default).
 - **`repaint()` or `repaintHard()`?** `repaint()` for changed values, `repaintHard()` when rows were added or removed.

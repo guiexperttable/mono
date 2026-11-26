@@ -1510,6 +1510,50 @@ export class TableApi {
   }
 
   /**
+   * Ends the mouse press of the table when its `mouseup` never reaches the page – e.g. because the app hands a drag
+   * over to the operating system (Tauri / Electron `startDrag`: the mouse belongs to the system from then on).
+   *
+   * Nothing is dropped: a running column resize or move is cancelled like with Escape (`onColumnResizeEnd` /
+   * `onColumnMoveEnd` with type `"cancel"`), a range selection stays as it is, no click is reported, and
+   * `onMouseDraggingEnd` is called once if `onMouseDragging` was. Without a press nothing happens.
+   *
+   * The table also notices it by itself – with the next mouse movement without the button, a `pointercancel`, an
+   * HTML5 `dragstart` or when the window loses the focus. Call this method when the app knows the moment: until
+   * then {@link isMouseDown} is `true` and live data does not follow the end ({@link appendRows}).
+   *
+   * @example
+   * // the app drags a file out of the window: the system takes the mouse, no mouseup will come
+   * declare function startNativeDrag(): Promise<void>;
+   *
+   * tableApi.releaseMouse();
+   * await startNativeDrag();
+   *
+   * @since 1.1.119
+   */
+  releaseMouse(): void {
+    this.tableScope.mouseHandler.releaseMouse();
+  }
+
+  /**
+   * True while a mouse button is held in the table: between `mousedown` and `mouseup` – or {@link releaseMouse},
+   * or the moment the table notices that the button is not held any more. Live data does not jump to the end
+   * meanwhile ({@link appendRows} with `follow: "auto"`).
+   *
+   * A row drag at its handle and the fill handle use pointer events: see {@link isRowDragging} and {@link isFilling}.
+   *
+   * @example
+   * if (!tableApi.isMouseDown()) {
+   *   tableApi.setRows(newOrders);   // not while the user clicks or drags
+   * }
+   *
+   * @returns {boolean} true while the button is held in the table
+   * @since 1.1.119
+   */
+  isMouseDown(): boolean {
+    return this.tableScope.mouseHandler.isButtonDown();
+  }
+
+  /**
    * Recalculates the dimensions of all wrapper elements in the table.
    * 
    * This method is typically called after changes to the table structure or content

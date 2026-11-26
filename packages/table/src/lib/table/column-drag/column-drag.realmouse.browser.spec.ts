@@ -524,7 +524,8 @@ describe('review findings (prompt 022)', () => {
   function dragInOneTask(host: HTMLElement, from: Element, to: Element) {
     const fire = (target: EventTarget, type: string, el: Element) => {
       const { x, y } = centre(el);
-      target.dispatchEvent(new MouseEvent(type, { clientX: x, clientY: y, bubbles: true, cancelable: true, button: 0 }));
+      target.dispatchEvent(new MouseEvent(type, {
+        clientX: x, clientY: y, bubbles: true, cancelable: true, button: 0, buttons: type === 'mouseup' ? 0 : 1 }));
     };
     fire(from, 'mousedown', from);
     fire(to, 'mousemove', to);

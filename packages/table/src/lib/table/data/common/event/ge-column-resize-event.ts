@@ -3,7 +3,8 @@ import type { ColumnDefIf } from "../../tablemodel/column/column-def.if";
 /**
  * Phase of a column drag (resize or move): `"start"` (the mouse moved past the drag threshold of 4 px, or a double
  * click on the resize handle), `"end"` (released – also outside of the table) or `"cancel"` (Escape,
- * {@link TableApi.cancelColumnDrag}: the old width resp. order is back).
+ * {@link TableApi.cancelColumnDrag}, or the mouseup never reached the page – a native drag, a system dialog,
+ * {@link TableApi.releaseMouse}, since 1.1.119: the old width resp. order is back).
  *
  * @category Column drag
  * @since 1.1.110

@@ -734,6 +734,22 @@ describe('fill handle – pointer details', () => {
     expect(t.modelEvents).toHaveLength(0);
   });
 
+  // Prompt 028: a pointerup that never reaches the page – the preview followed the pointer without a button.
+  it('a pointermove without a button (the pointerup was lost) cancels the fill', async () => {
+    const t = await mountFill();
+    select(t, 0, 1, 0, 1);
+    const h = fillHandle(t.host)!;
+    const p = center(h);
+    pointer(h, 'pointerdown', p.x, p.y);
+    pointer(document, 'pointermove', p.x, p.y + 40);
+    expect(t.api.isFilling()).toBe(true);
+    pointer(document, 'pointermove', p.x, p.y + 80, { buttons: 0 });
+    expect(t.api.isFilling()).toBe(false);
+    expect(preview(t.host)).toBeNull();
+    pointer(document, 'pointerup', p.x, p.y + 80);
+    expect(t.modelEvents).toHaveLength(0);
+  });
+
   it('touch works like the mouse; a double click on the handle does not reach the table', async () => {
     const t = await mountFill();
     select(t, 0, 1, 0, 1);

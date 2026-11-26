@@ -283,6 +283,22 @@ LicenseManager.getInstance().setLicenseKey(key); // optional, setzt nur ein <met
   neu auf – vorher las der Frame den Zeilenindex des alten Elements (Bereichsauswahl zur falschen Zeile, Klick
   verschluckt; Test `live-append/live-append-drag.realmouse.browser.spec.ts`). Strg+A, Strg+C kopiert
   den sichtbaren Body, gedeckelt durch `CopyService.maxCopyCells`.
+- **Druck ohne `mouseup` (seit 1.1.119, Prompt 028)**: nimmt das System die Maus (nativer Drag aus Tauri/Electron,
+  HTML5-Drag aus einer Zelle, Systemdialog), kommt das `mouseup` nie an – vorher blieb `MouseHandler.mouseDown`/
+  `dragging` stehen (kein Hover, Bereichsauswahl und Spalten-Drag ohne Taste, nächstes `mousedown` ignoriert, Live-Daten
+  folgten nicht). Jetzt: `onMouseDown` merkt sich die Taste als Maske (`pressButtons`: 0 → 1, 1 → 4, 2 → 2) und hängt
+  je Druck Listener an Dokument/Fenster (`listenToPress`, eigener `AbortController`, weg mit `mouseup`/Ende/`destroy`):
+  `mouseup`, `mousemove` (Capture; Taste fehlt in `evt.buttons` → `isPressLost`), `pointercancel`, nicht verhindertes
+  `dragstart`, Fenster-`blur`; dazu das nächste `mousedown` derselben Taste. Alle rufen **eine** Funktion
+  `MouseHandler.releaseMouse(evt?)` (= `tableApi.releaseMouse()`; `tableApi.isMouseDown()` = `isButtonDown()`): Zustand
+  zuerst, dann `TableScope.mousePressLost()` – Spalten-Resize/-Move **abbrechen** wie Escape (`cancelColumnDrag`, Ende
+  mit `type: "cancel"`), Bereichsauswahl bleibt, kein `mouseClicked` (`pressedCell` weg), `repaintAfterMouseUp`
+  nachgeholt, `onMouseDraggingEnd` genau einmal, wenn ein Zug lief (letzte Position **mit** Taste). `pressLostCount`
+  beendet einen laufenden Drag-Frame, wenn der `onMouseDragging`-Handler `releaseMouse()` ruft. Dieselbe Prüfung in
+  `RowDragService`, `FillHandleService`, `FormulaAssist` (`pointermove` mit `buttons === 0` → Abbruch). **Synthetische
+  Züge in Specs brauchen `buttons: 1`** (`mousemove`, `pointermove`) – kein `isTrusted`-Sonderweg. Spec
+  `mouse-press-lost.realmouse.browser.spec.ts` (verlorenes `mouseup` = Capture-Listener am `window` mit
+  `stopImmediatePropagation`; auch WebKit). Folgepunkt Pointer-Events + `setPointerCapture`: `TODO.md`.
 - Tastatur: `ShortcutService` + `ActionId` (`COPY_2_CLIPBOARD`, `START_EDITING`, `TOGGLE_SELECTION`, `SELECT_ALL`,
   `DESELECT_ALL`, `NAVIGATE_*`), Mappings für Windows/OSX, überschreibbar über `shortcutActionIdMapping`.
   Mapping-Schlüssel werden mit `harmonizeShortcut` normalisiert („ctrl+c“, „meta+c“ = „cmd c“, „arrowup“ = „up“).

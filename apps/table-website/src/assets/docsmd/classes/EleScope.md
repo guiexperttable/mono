@@ -60,6 +60,7 @@ Represents a store for HTML elements.
 - [clientXToHostX](EleScope.md#clientxtohostx)
 - [getAreaChild](EleScope.md#getareachild)
 - [getBodyContentHeight](EleScope.md#getbodycontentheight)
+- [getFixedBodyAreaElements](EleScope.md#getfixedbodyareaelements)
 - [getLayoutHeight](EleScope.md#getlayoutheight)
 - [getLayoutWidth](EleScope.md#getlayoutwidth)
 - [getViewportScrollLeft](EleScope.md#getviewportscrollleft)
@@ -595,6 +596,28 @@ px
 #### Defined in
 
 [src/lib/table/ele-scope.ts:602](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L602)
+
+___
+
+### getFixedBodyAreaElements
+
+▸ **getFixedBodyAreaElements**(): `HTMLDivElement`[]
+
+The parent divs of the fixed body areas (west, east) – they lie above the scroll viewport, not inside it.
+
+#### Returns
+
+`HTMLDivElement`[]
+
+west and east body area
+
+**`Since`**
+
+1.1.118
+
+#### Defined in
+
+[src/lib/table/ele-scope.ts:630](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/ele-scope.ts#L630)
 
 ___
 

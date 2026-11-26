@@ -40,12 +40,14 @@ Herkunft: Abgleich mit ag-Grid 36.2 (Okt. 2026). Die Lücken sind in `TODO.md` (
 | 025 | [025-cover-grid-warnung-und-demo-paket.md](025-cover-grid-warnung-und-demo-paket.md) | Bugfix aus dem Cover-Grid-Film: Konsolen-Warnung „no row objects“ bei jedem Cover Grid (Scrollzustand merkt sich künftig das erste sichtbare Item), `demo-table-models` zieht 624 kB Seattle-Wetterdaten in jede App (Seiteneffekt beim Import, kein `sideEffects`, Personendaten doppelt, 11 MB `index.js`) + Bundle-Check in `ci:local`; prüfen: Showcases laden 12 MB unminifiziert | – | 021, 024 | S–M |
 | 026 | [026-e2e-playwright.md](026-e2e-playwright.md) | Test-Infrastruktur: Paket `apps/e2e` mit `@playwright/test` (gleiche Version wie `playwright` im Core) – Etappe 1 Smoke-Test je Showcase, Training-Kapitel und Demo-App (Liste generiert, Konsole/404 = rot, Chromium + Firefox, Build + preview), Etappe 2 Screenshots/visuelle Regression (light/dark/RTL, Baselines je Plattform, ersetzt `training-screenshots.mjs`), Etappe 3 Video-Aufnahmen je Folge; Core-Tests bleiben bei Vitest | – | 021, 025 | M |
 | 027 | [027-cover-grid-volle-breite.md](027-cover-grid-volle-breite.md) | Cover Grid in voller Breite über **eine** Option (`coverGridFill`: Wunschbreite, Seitenverhältnis, Zusatzhöhe): Spaltenzahl aus der Breite, Kacheln strecken bündig bis zum Rand, sofort beim Resize (statt nach 500 ms) mit einem Render, oberstes Item bleibt oben, Kachelgröße zur Laufzeit per API. Ersetzt `fillWidth` + eigenen `ResizeObserver` der App. Herkunft: Hands-on-Film „Cover Grid“ (`videoserien`, Befund G4) | – | 021, 024, 025 | M |
+| 028 | [028-press-ohne-mouseup.md](028-press-ohne-mouseup.md) | Bugfix aus files-and-folders-tauri: die Tabelle bleibt „gedrückt“, wenn das `mouseup` nie ankommt (nativer System-Drag aus Tauri/Electron, HTML5-Drag, `pointercancel`) – Hover tot, Bereichsauswahl und Spalten-Drag laufen ohne Taste weiter, das nächste `mousedown` wird ignoriert, Live-Daten folgen nicht. Teil A: der `MouseHandler` beendet den Druck selbst, sobald die Taste in `evt.buttons` fehlt; Teil B: `tableApi.releaseMouse()` / `isMouseDown()`; Regressionstest für die veraltete Spalten-Aktion nach einem Klick auf den Kopf (seit 1.1.110 behoben) | – | 018, 019, 022 | S–M |
 
 022 umgesetzt (Branch `feat/spalten-ziehen`, Design `022-spalten-ziehen.design.md`, Zielversion 1.1.110).
 023 umgesetzt (Branch `feat/spaltenfilter`, Design `023-spaltenfilter.design.md`, Zielversion 1.1.114).
 027 umgesetzt (Branch `feat/cover-grid-volle-breite`, Design `027-cover-grid-volle-breite.design.md`, Zielversion 1.1.117).
 025 umgesetzt (Branch `fix/cover-grid-warnung-demo-paket`, Design `025-cover-grid-warnung-und-demo-paket.design.md`, Zielversion 1.1.116).
 024 umgesetzt (Branch `feat/cover-grid-tastatur`, Design `024-cover-grid-tastatur.design.md`, Zielversion 1.1.115).
+028 umgesetzt (Branch `fix/press-ohne-mouseup`, ohne Design-Dokument, Zielversion 1.1.119).
 
 **Nächste Reihenfolge (ab 09.11.2026):** 016 (prüfen, ob erledigt) → 018 → **021** → 019 → 020. 021 kommt vor 019, weil
 019 seine Geschwindigkeits-, Klick- und Tastatur-Checks in die Infrastruktur von 021 einhängt; 020 beschreibt den Stand
@@ -121,3 +123,5 @@ Erledigte Prompts hier und in `TODO.md` abhaken; das Design-Dokument bleibt als 
 - [ ] 026 (Branch `test/e2e-playwright`, Design `026-e2e-playwright.design.md`): Etappe 1 umgesetzt (`apps/e2e`,
       `pnpm test:e2e`, `e2e.yml` nicht sperrend); Etappe 2 (Screenshots) und 3 (Videos) offen
 - [x] 027 (Zielversion 1.1.117, Branch `feat/cover-grid-volle-breite`, Design `027-cover-grid-volle-breite.design.md`; Showcase `covergrid` und `apps/table-demo` umgestellt; offen nach dem Release: Film `covergrid` und Demo-Repo `cover-grid-demo`, s. `TODO.md`)
+- [x] 028 (Zielversion 1.1.119, Branch `fix/press-ohne-mouseup`, kein Design-Dokument – Lösung wie im Prompt empfohlen;
+      dasselbe Loch in Row Drag, Fill-Handle und Formel-Zeigemodus mit behoben; Folgepunkte in `TODO.md`)

@@ -93,7 +93,7 @@ type `"cancel"`, nothing is moved.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:440](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L440)
+[src/lib/table/row-drag/row-drag-service.ts:445](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L445)
 
 ___
 
@@ -132,7 +132,7 @@ Releases everything (TableScope.destroy). A running drag is cancelled.
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:470](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L470)
+[src/lib/table/row-drag/row-drag-service.ts:475](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L475)
 
 ___
 
@@ -172,7 +172,7 @@ The dragged rows for a grabbed row: all rows with a selection if it is one of th
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:699](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L699)
+[src/lib/table/row-drag/row-drag-service.ts:704](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L704)
 
 ___
 
@@ -260,7 +260,7 @@ true if the key was used (a row with a drag handle has the focus)
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:630](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L630)
+[src/lib/table/row-drag/row-drag-service.ts:635](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L635)
 
 ___
 
@@ -287,4 +287,4 @@ the new display index of the first moved row, -1 if nothing moved
 
 #### Defined in
 
-[src/lib/table/row-drag/row-drag-service.ts:558](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L558)
+[src/lib/table/row-drag/row-drag-service.ts:563](https://github.com/guiexperttable/mono/blob/main/packages/table/src/lib/table/row-drag/row-drag-service.ts#L563)

@@ -55,7 +55,7 @@ listener.onColumnMoveEnd = (evt: GeColumnMoveEvent) => {
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `type` | [`GeColumnDragEventType`](../modules.md#gecolumndrageventtype) | Phase: `"start"`, `"end"` or `"cancel"` (Escape: the old order is back). |
+| `type` | [`GeColumnDragEventType`](../modules.md#gecolumndrageventtype) | Phase: `"start"`, `"end"` or `"cancel"` (Escape, or the mouseup never arrived – since 1.1.119: the old order is back). |
 | `fromIndex` | `number` | Model index of the column when the drag started. |
 | `toIndex` | `number` | Model index of the column now (`"start"` and `"cancel"`: `fromIndex`; `"end"`: also when it did not change). |
 | `columnDef` | `undefined` \| [`ColumnDefIf`](../interfaces/ColumnDefIf.md) | The column definition of the dragged column. |
@@ -149,7 +149,7 @@ ___
 
 • `Readonly` **type**: [`GeColumnDragEventType`](../modules.md#gecolumndrageventtype)
 
-Phase: `"start"`, `"end"` or `"cancel"` (Escape: the old order is back).
+Phase: `"start"`, `"end"` or `"cancel"` (Escape, or the mouseup never arrived – since 1.1.119: the old order is back).
 
 #### Defined in
 

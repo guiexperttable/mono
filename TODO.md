@@ -820,6 +820,24 @@ Herkunft: Probelauf des Hands-on-Films „Cover Grid zum Nachbauen“ mit den Pa
 - [ ] Optionaler Folge-Prompt **Statusleiste** (`statusBar`): fertige, optionale Statusleiste unter dem Footer
       (Trefferzahl, Auswahl-Aggregate, Columns-/Filterzeilen-/Vollbild-Knöpfe) – aktuell bewusst als plain-HTML-Rezept.
 
+## Druck ohne `mouseup` (Prompt 028, 26.11.2026)
+
+- [x] Die Tabelle blieb „gedrückt“, wenn das `mouseup` nie ankam (nativer Drag aus Tauri/Electron, HTML5-Drag,
+      Systemdialog): der `MouseHandler` beendet den Druck selbst (`evt.buttons` je `mousemove` im Dokument,
+      `pointercancel`, `dragstart`, Fenster-`blur`, nächstes `mousedown`); API `tableApi.releaseMouse()`,
+      `isMouseDown()`. Spec `mouse-press-lost.realmouse.browser.spec.ts` (Chromium + WebKit, ltr/rtl).
+- [x] Dasselbe Loch in `RowDragService`, `FillHandleService`, `FormulaAssist` (Pointer-Events: verlorenes `pointerup`
+      ohne `pointercancel`) – ein `pointermove` mit `buttons: 0` bricht ab.
+- [x] Regressionstest für die veraltete Spalten-Aktion nach einem Klick auf den Spaltenkopf (`drag-column`, behoben in
+      1.1.110, bisher nur für den Resize-Griff getestet).
+- [ ] `MouseHandler` auf Pointer-Events umbauen (`setPointerCapture`: `pointerup`/`pointercancel` kommen dann auch
+      außerhalb des Fensters an, die `buttons`-Prüfung wäre nur noch Netz) – eigener, größerer Schritt: alle
+      synthetischen Maus-Specs, Wrapper-Events (`GeMouseEvent.originalEvent` ist heute ein `MouseEvent`), Touch.
+- [ ] Rechtsklick auf macOS/Linux: das Kontextmenü des Browsers schluckt das `mouseup` – der Druck endet seit 1.1.119
+      mit der nächsten Mausbewegung. Prüfen, ob `onContextmenu` ihn sofort beenden soll (`isMouseDown()` bis dahin `true`).
+- [ ] files-and-folders-tauri nach dem Upgrade auf ≥ 1.1.119: `releaseTableMouse` (`table-bridge.ts`) →
+      `tableApi.releaseMouse()`, der `mousemove`-Filter `onPressMouseMove` (`file-list.ts`) entfällt.
+
 ## Spalten ziehen (Prompt 022, 09.11.2026)
 
 - [x] Ereignisse `onColumnResizeStart/End`, `onColumnMoveStart/End` (alle Wrapper), Sperre `ColumnDef.resizable/movable`,
@@ -1054,6 +1072,26 @@ Zeilen/s). Umgesetzt mit Prompt `prompts/017-ein-render-je-update-und-scrollhoeh
       (5) kein Ereignis „Spalten-Ziehen beendet“.
 
 ## Für die Release-Notes (nächstes Release) – Verhaltensänderungen
+
+- **1.1.119**, Core (Prompt 028, gefunden in files-and-folders-tauri):
+  - **Fix: die Tabelle bleibt nicht mehr „gedrückt“, wenn das `mouseup` nie ankommt** – nativer System-Drag aus
+    Tauri/Electron (`startDrag`), HTML5-Drag aus einer Zelle (`draggable`, `<img>`), Systemdialog. Vorher: kein Hover,
+    Bereichsauswahl und Spalten-Resize/-Move liefen ohne Taste hinter dem Zeiger her, das nächste `mousedown` wurde
+    ignoriert, `appendRows({ follow: "auto" })` folgte nicht mehr. Jetzt endet der Druck von selbst: mit der ersten
+    Mausbewegung im Dokument ohne die gedrückte Taste (`MouseEvent.buttons`), bei `pointercancel`, bei einem nicht
+    verhinderten `dragstart`, wenn das Fenster den Fokus verliert, oder beim nächsten Druck. Nichts wird „gedroppt“:
+    ein laufender Spalten-Resize/-Move wird wie mit Escape abgebrochen (`onColumnResizeEnd`/`onColumnMoveEnd` mit
+    `type: "cancel"`), die Bereichsauswahl bleibt stehen, kein `mouseClicked`, `onMouseDraggingEnd` genau einmal, wenn
+    `onMouseDragging` gemeldet wurde (mit der letzten Position des Zugs).
+  - **Neu: `tableApi.releaseMouse()`** (beendet den Druck sofort – für Apps, die selbst einen nativen Drag starten) und
+    **`tableApi.isMouseDown()`**. Kein Wrapper-Code.
+  - **Row Drag, Fill-Handle, Formel-Zeigemodus**: ein `pointermove` ohne Taste (`buttons: 0` – das `pointerup` kam nie
+    an) bricht den Zug ab.
+  - **Verhaltensänderung für Tests mit synthetischen Ereignissen**: ein `new MouseEvent("mousemove")` hat
+    `buttons: 0` und beendet jetzt einen Druck – Tests, die so ziehen, setzen `buttons: 1` (ebenso `pointermove` bei
+    Row Drag/Fill-Handle). Echte Browser-Ereignisse sind nicht betroffen.
+  - Für **files-and-folders-tauri**: nach dem Upgrade ersetzt `tableApi.releaseMouse()` das synthetische `mouseup` in
+    `releaseTableMouse` (`table-bridge.ts`), und der `mousemove`-Filter `onPressMouseMove` (`file-list.ts`) entfällt.
 
 - **1.1.118**, Core (gefunden durch die E2E-Smoke-Tests, Prompt 026):
   - **Fix: Mausrad über fixierten Spalten** (west/east, z. B. Zeilennummern, `fixedLeftColumnCount`) scrollt die Tabelle
